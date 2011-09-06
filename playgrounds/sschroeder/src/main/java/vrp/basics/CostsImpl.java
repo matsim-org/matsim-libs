@@ -1,10 +1,26 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.basics;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 
 import vrp.api.Costs;
 import vrp.api.Node;
@@ -19,10 +35,10 @@ import vrp.api.Node;
 public class CostsImpl implements Costs{
 
 	private static class CostMatrixKey {
-		private Id fromNodeId;
-		private Id toNodeId;
+		private String fromNodeId;
+		private String toNodeId;
 		
-		public CostMatrixKey(Id fromNodeId, Id toNodeId) {
+		public CostMatrixKey(String fromNodeId, String toNodeId) {
 			super();
 			this.fromNodeId = fromNodeId;
 			this.toNodeId = toNodeId;
@@ -71,6 +87,7 @@ public class CostsImpl implements Costs{
 	
 	private Map<CostMatrixKey,CostValues> costMatrix = new HashMap<CostMatrixKey, CostValues>();
 	
+	@Override
 	public Double getCost(Node from, Node to) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
@@ -87,6 +104,7 @@ public class CostsImpl implements Costs{
 		}
 	}
 
+	@Override
 	public Double getDistance(Node from, Node to) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
@@ -102,6 +120,7 @@ public class CostsImpl implements Costs{
 		}
 	}
 
+	@Override
 	public Double getTime(Node from, Node to) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
@@ -117,7 +136,7 @@ public class CostsImpl implements Costs{
 		}
 	}
 	
-	public void addCostValues(Id from, Id to, Double time, Double distance, Double cost){
+	public void addCostValues(String from, String to, Double time, Double distance, Double cost){
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from,to);
 		CostValues costValues = new CostValues(time,distance,cost);
 		if(!costMatrix.containsKey(costMatrixKey)){

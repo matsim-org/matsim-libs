@@ -35,7 +35,7 @@ public class VrpBuilder {
 	public VRP buildVRP(){
 		String depotId = "depot";
 		vrpTrafo.addAndCreateCustomer(depotId, depotLocationId, 0, 0.0, 48*3600, 0.0);
-		VRP vrp = new VrpImpl(makeId(depotId), vrpTrafo.getCustomers(), costs, constraints);
+		VRP vrp = new VrpImpl(depotId, vrpTrafo.getCustomers(), costs, constraints);
 		return vrp;
 	}
 	

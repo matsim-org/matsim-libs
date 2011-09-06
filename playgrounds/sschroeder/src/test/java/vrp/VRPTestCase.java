@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp;
 
 import java.util.ArrayList;
@@ -7,12 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
-
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
@@ -22,6 +33,7 @@ import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.api.VRP;
+import vrp.basics.Coordinate;
 import vrp.basics.CustomerImpl;
 import vrp.basics.ManhattanDistance;
 import vrp.basics.MultipleDepotsInitialSolutionFactory;
@@ -44,7 +56,7 @@ public class VRPTestCase extends TestCase{
 	
 	public List<Customer> customers;
 	
-	public Map<Id,Customer> customerMap;
+	public Map<String,Customer> customerMap;
 	
 	public Constraints constraints;
 	
@@ -74,7 +86,7 @@ public class VRPTestCase extends TestCase{
 		costs = new ManhattanDistance();
 		nodes = new Nodes();
 		customers = new ArrayList<Customer>();
-		customerMap = new HashMap<Id, Customer>();
+		customerMap = new HashMap<String, Customer>();
 		createNodesAndCustomer();
 		constraints = new CapacityPickupsDeliveriesSequenceConstraint(20);
 		init = true;
@@ -143,7 +155,7 @@ public class VRPTestCase extends TestCase{
 	private void createNodesAndCustomer() {
 		for(int i=0;i<11;i++){
 			for(int j=0;j<11;j++){
-				Id nodeId = makeId(i,j);
+				String nodeId = makeId(i,j);
 				Node node = makeNode(nodeId);
 				node.setCoord(makeCoord(i,j));
 				nodes.getNodes().put(nodeId, node);
@@ -168,16 +180,16 @@ public class VRPTestCase extends TestCase{
 		return customer;
 	}
 
-	private Coord makeCoord(int i, int j) {
-		return new CoordImpl(i,j);
+	private Coordinate makeCoord(int i, int j) {
+		return new Coordinate(i,j);
 	}
 
-	private Node makeNode(Id nodeId) {
+	private Node makeNode(String nodeId) {
 		return new NodeImpl(nodeId);
 	}
 
-	protected Id makeId(int i, int j) {
-		return new IdImpl(i + "," + j);
+	protected String makeId(int i, int j) {
+		return i + "," + j;
 	}
 
 }

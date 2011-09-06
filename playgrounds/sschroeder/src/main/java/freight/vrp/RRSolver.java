@@ -125,11 +125,11 @@ public class RRSolver implements VRPSolver{
 				Shipment shipment = getShipment(act.getCustomer());
 				if(act instanceof vrp.basics.OtherDepotActivity){
 					if(tourStarted){
-						tourBuilder.scheduleEnd(act.getCustomer().getLocation().getId());
+						tourBuilder.scheduleEnd(makeId(act.getCustomer().getLocation().getId()));
 					}
 					else{
 						tourStarted = true;
-						tourBuilder.scheduleStart(act.getCustomer().getLocation().getId());
+						tourBuilder.scheduleStart(makeId(act.getCustomer().getLocation().getId()));
 					}
 				}
 				if(act instanceof vrp.basics.EnRouteDelivery){
@@ -145,6 +145,10 @@ public class RRSolver implements VRPSolver{
 		return tours;
 	}
 
+	private Id makeId(String id) {
+		return new IdImpl(id);
+	}
+
 	private VRPTransformation makeVRPTransformation() {
 		return new VRPTransformation(new Locations(){
 
@@ -157,7 +161,7 @@ public class RRSolver implements VRPSolver{
 	}
 	
 	private Shipment getShipment(Customer customer) {
-		return vrpTransformation.getShipment(customer.getId());
+		return vrpTransformation.getShipment(makeId(customer.getId()));
 	}
 
 	private RuinAndRecreate makeAlgorithm() {

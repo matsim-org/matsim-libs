@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.basics;
 
 import java.util.ArrayList;
@@ -5,8 +22,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -32,13 +47,13 @@ public class VRPBuilder {
 	
 	private Costs costs = new CrowFlyDistance();
 	
-	private List<Id> depots = new ArrayList<Id>();
+	private List<String> depots = new ArrayList<String>();
 	
 	private Collection<Customer> customers = new ArrayList<Customer>();
 	
-	private Map<Id,VehicleType> types = new HashMap<Id, VehicleType>();
+	private Map<String,VehicleType> types = new HashMap<String, VehicleType>();
 
-	public Customer createAndAddCustomer(Id id, Node node, int demand, double start, double end, double serviceTime, boolean isDepot){
+	public Customer createAndAddCustomer(String id, Node node, int demand, double start, double end, double serviceTime, boolean isDepot){
 		Customer customer = createCustomer(id, node, demand, start, end, serviceTime);
 		addCustomer(customer,isDepot);
 		return customer;
@@ -51,11 +66,11 @@ public class VRPBuilder {
 		}
 	}
 	
-	public void assignVehicleType(Id depotId, VehicleType vehicleType){
+	public void assignVehicleType(String depotId, VehicleType vehicleType){
 		types.put(depotId, vehicleType);
 	}
 	
-	private Customer createCustomer(Id id, Node node, int demand, double start, double end, double serviceTime){
+	private Customer createCustomer(String id, Node node, int demand, double start, double end, double serviceTime){
 		Customer customer = new CustomerImpl(id, node);
 		customer.setDemand(demand);
 		customer.setServiceTime(serviceTime);
@@ -74,7 +89,7 @@ public class VRPBuilder {
 	public VRP buildVRP(){
 		verify();
 		VRPWithMultipleDepotsAndVehiclesImpl vrp = new VRPWithMultipleDepotsAndVehiclesImpl(depots, customers, costs, constraints);
-		for(Id id : types.keySet()){
+		for(String id : types.keySet()){
 			vrp.assignVehicleType(id, types.get(id));
 		}
 		assertEachDepotHasVehicleType(vrp);
@@ -82,7 +97,7 @@ public class VRPBuilder {
 	}
 	
 	private void assertEachDepotHasVehicleType(VRP vrp) {
-		for(Id id : depots){
+		for(String id : depots){
 			VehicleType type = vrp.getVehicleType(id);
 			if(type == null){
 				throw new IllegalStateException("each depot must have one vehicleType. Depot " + id + " does not have!");

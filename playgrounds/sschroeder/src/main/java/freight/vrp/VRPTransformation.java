@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -12,6 +13,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import playground.mzilske.freight.Shipment;
 import vrp.api.Customer;
 import vrp.api.Node;
+import vrp.basics.Coordinate;
 import vrp.basics.VrpUtils;
 
 /**
@@ -48,10 +50,11 @@ public class VRPTransformation {
 	}
 	
 	public void addAndCreateCustomer(Id customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
-		Node node = makeNode(linkId);
-		Customer customer = VrpUtils.createCustomer(customerId, node, demand, startTime, endTime, serviceTime);
-		nodes.put(node.getId(), node);
-		customers.put(customer.getId(), customer);
+		Id nodeId = linkId;
+		Node node = makeNode(nodeId);
+		Customer customer = VrpUtils.createCustomer(customerId.toString(), node, demand, startTime, endTime, serviceTime);
+		nodes.put(nodeId, node);
+		customers.put(customerId, customer);
 	}
 
 	public void addShipments(Collection<Shipment> shipments){
@@ -121,19 +124,19 @@ public class VRPTransformation {
 
 	private void updateMaps(Shipment shipment, Customer fromCustomer,
 			Customer toCustomer) {
-		customers.put(fromCustomer.getId(),fromCustomer);
-		customers.put(toCustomer.getId(),toCustomer);
-		toCustomers.put(shipment, toCustomer.getId());
-		fromCustomers.put(shipment, fromCustomer.getId());
-		shipments.put(fromCustomer.getId(), shipment);
-		shipments.put(toCustomer.getId(), shipment);
+		customers.put(makeId(fromCustomer.getId()),fromCustomer);
+		customers.put(makeId(toCustomer.getId()),toCustomer);
+		toCustomers.put(shipment, makeId(toCustomer.getId()));
+		fromCustomers.put(shipment, makeId(fromCustomer.getId()));
+		shipments.put(makeId(fromCustomer.getId()), shipment);
+		shipments.put(makeId(toCustomer.getId()), shipment);
 	}
 
 	private Customer makeToCustomer(Shipment shipment) {
 		customerCounter++;
 		Id id = shipment.getTo();
 		Node node = makeNode(id);
-		Customer customer = VrpUtils.createCustomer(makeId(customerCounter.toString()), node, shipment.getSize()*-1, 
+		Customer customer = VrpUtils.createCustomer(customerCounter.toString(), node, shipment.getSize()*-1, 
 				shipment.getDeliveryTimeWindow().getStart(), shipment.getDeliveryTimeWindow().getEnd(), 0.0);
 		return customer;
 	}
@@ -145,10 +148,14 @@ public class VRPTransformation {
 		}
 		else{
 			node = VrpUtils.createNode(id.toString());
-			node.setCoord(locations.getCoord(id));
-			nodes.put(node.getId(), node);
+			node.setCoord(makeCoordinate(locations.getCoord(id)));
+			nodes.put(makeId(node.getId()), node);
 		}
 		return node;
+	}
+
+	private Coordinate makeCoordinate(Coord coord) {
+		return new Coordinate(coord.getX(),coord.getY());
 	}
 
 	private Id makeId(String customerCounter) {
@@ -164,10 +171,10 @@ public class VRPTransformation {
 		}
 		else{
 			node = VrpUtils.createNode(id.toString());
-			node.setCoord(locations.getCoord(id));
-			nodes.put(node.getId(), node);
+			node.setCoord(makeCoordinate(locations.getCoord(id)));
+			nodes.put(makeId(node.getId()), node);
 		}
-		Customer customer = VrpUtils.createCustomer(makeId(customerCounter.toString()), node, shipment.getSize(), 
+		Customer customer = VrpUtils.createCustomer(customerCounter.toString(), node, shipment.getSize(), 
 				shipment.getPickupTimeWindow().getStart(), shipment.getPickupTimeWindow().getEnd(), 0.0);	
 		return customer;
 	}

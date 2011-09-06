@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierPlan;
@@ -66,7 +67,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 				List<Delivery> deliveriesAtDepot = new ArrayList<Delivery>();
 				List<TourElement> enRouteActivities = new ArrayList<Tour.TourElement>();
 				for(TourActivity act : tour.getActivities()){
-					Shipment shipment = getShipment(act.getCustomer().getId());
+					Shipment shipment = getShipment(makeId(act.getCustomer().getId()));
 					if(act instanceof vrp.basics.DepotDelivery){
 						pickupsAtDepot.add(new Pickup(shipment));
 						enRouteActivities.add(new Delivery(shipment));
@@ -96,6 +97,10 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 		return carrierPlan;
 	}
 		
+
+	private Id makeId(String id) {
+		return new IdImpl(id);
+	}
 
 	private Shipment getShipment(Id customerId) {
 		return vrpTrafo.getShipment(customerId);

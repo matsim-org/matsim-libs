@@ -1,4 +1,4 @@
-package vrp.algorithms.ruinAndRecreate.basics;
+package freight.vrp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ public class ChartListener implements RuinAndRecreateListener {
 		this.filename = filename;
 	}
 
+	@Override
 	public void inform(RuinAndRecreateEvent event) {
 		bestResultList.add(event.getCurrentResult());
 		tentativeResultList.add(event.getTentativeSolution());
@@ -41,6 +42,7 @@ public class ChartListener implements RuinAndRecreateListener {
 //		bestResult.add(event.getCurrentMutation(),event.getTentativeSolution());
 	}
 
+	@Override
 	public void finish() {
 		bestResults = new double[bestResultList.size()];
 		tentativeResults = new double[tentativeResultList.size()];

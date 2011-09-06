@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.basics;
 
 import java.util.Collection;
@@ -66,6 +83,7 @@ class RRTourAgent implements TourAgent {
 		return constraint;
 	}
 	
+	@Override
 	public boolean tourIsValid(){
 		activityStatusUpdater.update(tour);
 		currentCost = tour.costs.generalizedCosts;
@@ -80,6 +98,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#setConstraint(api.basic.Constraints)
 	 */
+	@Override
 	public void setConstraint(Constraints constraint) {
 		this.constraint = constraint;
 	}
@@ -88,6 +107,7 @@ class RRTourAgent implements TourAgent {
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#requestService(core.basic.Node)
 	 */
 	
+	@Override
 	public Offer requestService(Shipment shipment, double bestKnownPrice){
 		Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment, bestKnownPrice);
 		if(newTour != null){
@@ -107,6 +127,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTourSize()
 	 */
+	@Override
 	public int getTourSize(){
 		return tour.getActivities().size();
 	}
@@ -114,6 +135,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerGranted(core.basic.Node)
 	 */
+	@Override
 	public void offerGranted(Shipment shipment){
 		if(tourOfLastOffer != null){
 			tour = tourOfLastOffer;
@@ -132,6 +154,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
 	 */
+	@Override
 	public void offerRejected(Offer offer){
 		openOffer = null;
 		tourOfLastOffer = null;
@@ -141,6 +164,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getTotalCost()
 	 */
+	@Override
 	public double getTotalCost(){
 		return currentCost;
 	}
@@ -148,6 +172,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#removeNode(core.basic.Node)
 	 */
+	@Override
 	public void removeCustomer(Customer customer){
 //		logger.debug("remove node: " + node);
 		for(TourActivity c : tour.getActivities()){
@@ -163,6 +188,7 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#hasNode(core.basic.Node)
 	 */
+	@Override
 	public boolean hasCustomer(Customer customer) {
 		for(TourActivity c : tour.getActivities()){
 			if(c.getCustomer().getId().equals(customer.getId())){
@@ -175,10 +201,12 @@ class RRTourAgent implements TourAgent {
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getVehicleCapacity()
 	 */
+	@Override
 	public int getVehicleCapacity() {
 		return vehicle.getCapacity();
 	}
 	
+	@Override
 	public Collection<TourActivity> getTourActivities(){
 		return Collections.unmodifiableCollection(tour.getActivities());
 	}
@@ -188,6 +216,7 @@ class RRTourAgent implements TourAgent {
 		return tour.toString();
 	}
 
+	@Override
 	public Tour getTour() {
 		return tour;
 	}

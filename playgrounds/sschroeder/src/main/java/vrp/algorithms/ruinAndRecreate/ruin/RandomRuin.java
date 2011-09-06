@@ -1,11 +1,28 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.ruin;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.MatsimRandom;
 
 import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
@@ -13,6 +30,7 @@ import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
 import vrp.api.VRP;
+import vrp.basics.RandomNumberGeneration;
 import vrp.basics.VrpUtils;
 
 
@@ -36,6 +54,12 @@ public class RandomRuin implements RuinStrategy {
 	
 	private List<Customer> customersWithoutDepot = new ArrayList<Customer>();
 	
+	private Random random = RandomNumberGeneration.getRandom();
+	
+	public void setRandom(Random random) {
+		this.random = random;
+	}
+
 	public RandomRuin(VRP vrp) {
 		super();
 		this.vrp = vrp;
@@ -60,6 +84,7 @@ public class RandomRuin implements RuinStrategy {
 		return false;
 	}
 
+	@Override
 	public void run(Solution initialSolution) {
 		clear();
 		int nOfCustomers2BeRemoved = selectNumberOfNearestNeighbors();
@@ -67,15 +92,18 @@ public class RandomRuin implements RuinStrategy {
 		List<TourAgent> agent2BeRemoved = new ArrayList<TourAgent>();
 		for(int i=0;i<nOfCustomers2BeRemoved;i++){
 			Customer customer = pickRandomCustomer(customerList);
+			logger.debug("randCust: " + customer);
 			for(TourAgent agent : initialSolution.getTourAgents()){
 				if(agent.hasCustomer(customer)){
 					Shipment shipment = null;
 					agent.removeCustomer(customer);
+					logger.debug("remCust: " + customer);
 					customerList.remove(customer);
 					if(customer.hasRelation()){
 						Customer relatedCustomer = customer.getRelation().getCustomer();
 						agent.removeCustomer(relatedCustomer);
 						customerList.remove(relatedCustomer);
+						logger.debug("remCust: " + relatedCustomer);
 						shipment = makeShipment(customer, relatedCustomer);
 					}
 					else{
@@ -109,7 +137,7 @@ public class RandomRuin implements RuinStrategy {
 	
 	private Customer pickRandomCustomer(List<Customer> customerList) {
 		int totNuOfNodes = customerList.size();
-		int randomIndex = MatsimRandom.getRandom().nextInt(totNuOfNodes);
+		int randomIndex = random.nextInt(totNuOfNodes);
 		Customer customer = customerList.get(randomIndex);
 		return customer;
 	}
@@ -140,6 +168,7 @@ public class RandomRuin implements RuinStrategy {
 		return shipment;
 	}
 
+	@Override
 	public List<Shipment> getShipmentsWithoutService() {
 		return shipmentsWithoutService;
 	}

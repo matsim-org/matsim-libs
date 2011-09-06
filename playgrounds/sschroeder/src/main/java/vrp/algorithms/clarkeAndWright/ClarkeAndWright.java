@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 /**
  * 
  */
@@ -11,7 +28,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 
 import vrp.api.Costs;
 import vrp.api.Customer;
@@ -35,10 +51,10 @@ public class ClarkeAndWright {
 	static class Saving {
 		
 		private double saving;
-		private Id from;
-		private Id to;
+		private String from;
+		private String to;
 		
-		Saving(Id from, Id to, double saving) {
+		Saving(String from, String to, double saving) {
 			this.to = to;
 			this.from = from;
 			this.saving = saving;
@@ -48,14 +64,15 @@ public class ClarkeAndWright {
 			return saving;
 		}
 		
-		Id getOrigin() {
+		String getOrigin() {
 			return from;
 		}
 		
-		Id getDestination() {
+		String getDestination() {
 			return to;
 		}
 		
+		@Override
 		public String toString(){
 			return "saving={"+from+","+to+","+saving+"}";
 		}
@@ -63,6 +80,7 @@ public class ClarkeAndWright {
 	
 	static class DescendingOrderSavingComparator implements Comparator<Saving> {
 
+		@Override
 		public int compare(Saving o1, Saving o2) {
 			if(o1.getSaving() < o2.getSaving()){
 				return 1;
@@ -82,7 +100,7 @@ public class ClarkeAndWright {
 	private final VRP vrp;
 	private PriorityQueue<Saving> savings;
 	private List<Tour> tours = new ArrayList<Tour>();
-	private HashMap<Id,Tour> tourAssignment = new HashMap<Id, Tour>();
+	private HashMap<String,Tour> tourAssignment = new HashMap<String, Tour>();
 	
 	
 	public ClarkeAndWright(final VRP vrp){
@@ -142,8 +160,8 @@ public class ClarkeAndWright {
 		logger.info("build tours");
 		while(savingsListNotEmpty() && notAllCustomersAssigned()){
 			Saving saving = savings.poll();
-			Id from = saving.getOrigin();
-			Id to = saving.getDestination();
+			String from = saving.getOrigin();
+			String to = saving.getDestination();
 			
 			if(bothCustomersNotAssigned(from, to)){
 				Customer depot = vrp.getDepot();
@@ -217,20 +235,20 @@ public class ClarkeAndWright {
 		}
 	}
 
-	private boolean bothCustomersAssigned(Id from, Id to) {
+	private boolean bothCustomersAssigned(String from, String to) {
 		return tourAssignment.containsKey(from) && tourAssignment.containsKey(to);
 	}
 
-	private boolean bothCustomersNotAssigned(Id from, Id to) {
+	private boolean bothCustomersNotAssigned(String from, String to) {
 		return !tourAssignment.containsKey(from) && !tourAssignment.containsKey(to);
 	}
 
-	private boolean customerIsFirstCustomer(Id to, Tour tour) {
+	private boolean customerIsFirstCustomer(String to, Tour tour) {
 		Customer firstCustomer = tour.getActivities().get(1).getCustomer();
 		return firstCustomer.getId().equals(to);
 	}
 
-	private boolean customerIsLastCustomer(Id from, Tour tour) {
+	private boolean customerIsLastCustomer(String from, Tour tour) {
 		Customer lastCustomer = tour.getActivities().get(tour.getActivities().size()-2).getCustomer();
 		return lastCustomer.getId().equals(from);
 	}

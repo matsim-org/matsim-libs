@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 /**
  * 
  */
@@ -7,8 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
 import vrp.api.Constraints;
 import vrp.basics.DepotDelivery;
 import vrp.basics.EnRouteDelivery;
@@ -35,10 +50,11 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 	}
 
 	
+	@Override
 	public boolean judge(Tour tour) {
 		int currentCap = 0;
 		boolean deliveryStarted = false;
-		Set<Id> openCustomers = new HashSet<Id>();
+		Set<String> openCustomers = new HashSet<String>();
 		double time = 0.0;
 		for(TourActivity tourAct : tour.getActivities()){
 			
@@ -65,7 +81,7 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 				if(deliveryStarted == false){
 					deliveryStarted = true;
 				}
-				Id relatedCustomer = tourAct.getCustomer().getRelation().getCustomer().getId();
+				String relatedCustomer = tourAct.getCustomer().getRelation().getCustomer().getId();
 				if(openCustomers.contains(relatedCustomer)){
 					openCustomers.remove(relatedCustomer);
 				}
@@ -85,7 +101,7 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 		int currentCap = 0;
 		maxCap = vehicle.getCapacity();
 		boolean deliveryStarted = false;
-		Set<Id> openCustomers = new HashSet<Id>();
+		Set<String> openCustomers = new HashSet<String>();
 		for(TourActivity tourAct : tour.getActivities()){
 			
 			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
@@ -111,7 +127,7 @@ public class CapacityPickupsDeliveriesSequenceConstraint implements Constraints 
 				if(deliveryStarted == false){
 					deliveryStarted = true;
 				}
-				Id relatedCustomer = tourAct.getCustomer().getRelation().getCustomer().getId();
+				String relatedCustomer = tourAct.getCustomer().getRelation().getCustomer().getId();
 				if(openCustomers.contains(relatedCustomer)){
 					openCustomers.remove(relatedCustomer);
 				}

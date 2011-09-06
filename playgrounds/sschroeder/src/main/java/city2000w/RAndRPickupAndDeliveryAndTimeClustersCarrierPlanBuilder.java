@@ -227,7 +227,11 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 	}
 
 	private Shipment getShipment(Customer customer) {
-		return vrpTrafo.getShipment(customer.getId());
+		return vrpTrafo.getShipment(makeId(customer.getId()));
+	}
+
+	private Id makeId(String id) {
+		return new IdImpl(id);
 	}
 
 	private CarrierPlan getEmptyPlan(CarrierCapabilities carrierCapabilities) {

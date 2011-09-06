@@ -1,11 +1,26 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.basics;
 
 import java.util.Collection;
 import java.util.HashMap;
 
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -18,11 +33,11 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 	
 	private Constraints constraints;
 	
-	private Map<Id,Customer> customers;
+	private Map<String,Customer> customers;
 	
-	private Map<Id,Customer> depots;
+	private Map<String,Customer> depots;
 	
-	public VRPWithMultipleDepotsImpl(Collection<Id> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
+	public VRPWithMultipleDepotsImpl(Collection<String> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
 		super();
 		this.costs = costs;
 		this.constraints = constraints;
@@ -30,9 +45,9 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 		mapDepots(depots);
 	}
 
-	private void mapDepots(Collection<Id> depots) {
-		this.depots = new HashMap<Id,Customer>();
-		for(Id id : depots){
+	private void mapDepots(Collection<String> depots) {
+		this.depots = new HashMap<String,Customer>();
+		for(String id : depots){
 			if(customers.containsKey(id)){
 				this.depots.put(id, customers.get(id));
 			}
@@ -41,14 +56,9 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 			}
 		}
 	}
-
-	@Override
-	public Id getDepotId() {
-		return null;
-	}
 	
 	private void mapCustomers(Collection<Customer> customers) {
-		this.customers = new HashMap<Id, Customer>();
+		this.customers = new HashMap<String, Customer>();
 		for(Customer customer : customers){
 			this.customers.put(customer.getId(), customer);
 		}
@@ -70,17 +80,17 @@ public class VRPWithMultipleDepotsImpl implements VRP{
 	}
 
 	@Override
-	public Map<Id, Customer> getCustomers() {
+	public Map<String, Customer> getCustomers() {
 		return customers;
 	}
 
 	@Override
-	public Map<Id, Customer> getDepots() {
+	public Map<String, Customer> getDepots() {
 		return depots;
 	}
 
 	@Override
-	public VehicleType getVehicleType(Id depotId) {
+	public VehicleType getVehicleType(String depotId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

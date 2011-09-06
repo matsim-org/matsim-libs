@@ -20,7 +20,6 @@ import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
-import vrp.algorithms.ruinAndRecreate.basics.ChartListener;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -127,11 +126,11 @@ public class RRPDTWSolver implements VRPSolver{
 				Shipment shipment = getShipment(act.getCustomer());
 				if(act instanceof vrp.basics.OtherDepotActivity){
 					if(tourStarted){
-						tourBuilder.scheduleEnd(act.getCustomer().getLocation().getId());
+						tourBuilder.scheduleEnd(makeId(act.getCustomer().getLocation().getId()));
 					}
 					else{
 						tourStarted = true;
-						tourBuilder.scheduleStart(act.getCustomer().getLocation().getId());
+						tourBuilder.scheduleStart(makeId(act.getCustomer().getLocation().getId()));
 					}
 				}
 				if(act instanceof vrp.basics.EnRouteDelivery){
@@ -147,6 +146,10 @@ public class RRPDTWSolver implements VRPSolver{
 		return tours;
 	}
 
+	private Id makeId(String id) {
+		return new IdImpl(id);
+	}
+
 	private VRPTransformation makeVRPTransformation() {
 		return new VRPTransformation(new Locations(){
 
@@ -159,7 +162,7 @@ public class RRPDTWSolver implements VRPSolver{
 	}
 	
 	private Shipment getShipment(Customer customer) {
-		return vrpTransformation.getShipment(customer.getId());
+		return vrpTransformation.getShipment(makeId(customer.getId()));
 	}
 
 	private RuinAndRecreate makeAlgorithm() {

@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 /**
  * 
  */
@@ -5,8 +22,6 @@ package vrp.basics;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -25,7 +40,7 @@ public class VRPDistanceMatrixBuilder {
 	
 	private Nodes nodes = new Nodes();
 	
-	private Id depotId = null;
+	private String depotId = null;
 	
 	private Constraints constraints;
 	
@@ -49,20 +64,20 @@ public class VRPDistanceMatrixBuilder {
 		distanceMatrixSet = true;
 	}
 	
-	public Node createAndAddNode(Id id, int matrixId){
+	public Node createAndAddNode(String id, int matrixId){
 		Node node = nodeFactory.createNode(id, matrixId);
 		nodes.getMatrixIdNodeMap().put(matrixId, node);
 		nodes.getNodes().put(id, node);
 		return node;
 	}
 	
-	public Customer createAndAddCustomer(Id id, Node node, int demand){
+	public Customer createAndAddCustomer(String id, Node node, int demand){
 		Customer customer = createCustomer(id, node, demand, 0.0, 24*3600, 0.0);
 		customers.add(customer);
 		return customer;
 	}
 	
-	public Customer createCustomer(Id id, Node node, int demand, double start, double end, double serviceTime){
+	public Customer createCustomer(String id, Node node, int demand, double start, double end, double serviceTime){
 		Customer customer = new CustomerImpl(id, node);
 		customer.setDemand(demand);
 		customer.setServiceTime(serviceTime);
@@ -70,7 +85,7 @@ public class VRPDistanceMatrixBuilder {
 		return customer;
 	}
 	
-	public Customer createAndAddCustomer(Id id, Node node, int demand, double start, double end, double serviceTime){
+	public Customer createAndAddCustomer(String id, Node node, int demand, double start, double end, double serviceTime){
 		Customer customer = createCustomer(id, node, demand, start, end, serviceTime);
 		customers.add(customer);
 		return customer;
@@ -82,7 +97,7 @@ public class VRPDistanceMatrixBuilder {
 //		return rel;
 //	}
 	
-	public void setDepot(Id depotId){
+	public void setDepot(String depotId){
 		this.depotId = depotId;
 		depotNodeSet = true;
 	}

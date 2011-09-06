@@ -65,17 +65,26 @@ public class VRPWithMultipleDepotsBuilder {
 		for(int i=0;i<depots.size();i++){
 			vrpTrafo.addAndCreateCustomer(depots.get(i), depotLocations.get(i), 0, 0.0, Double.MAX_VALUE, 0.0);
 		}
-		VRPWithMultipleDepotsAndVehiclesImpl vrp = new VRPWithMultipleDepotsAndVehiclesImpl(depots, vrpTrafo.getCustomers(), costs, constraints);
+		List<String> depots_ = makeDepotList();
+		VRPWithMultipleDepotsAndVehiclesImpl vrp = new VRPWithMultipleDepotsAndVehiclesImpl(depots_, vrpTrafo.getCustomers(), costs, constraints);
 		for(Id id : types.keySet()){
-			vrp.assignVehicleType(id, types.get(id));
+			vrp.assignVehicleType(id.toString(), types.get(id));
 		}
 		assertEachDepotHasVehicleType(vrp);
 		return vrp;
 	}
 	
+	private List<String> makeDepotList() {
+		List<String> depots_ = new ArrayList<String>();
+		for(Id id : depots){
+			depots_.add(id.toString());
+		}
+		return depots_;
+	}
+
 	private void assertEachDepotHasVehicleType(VRP vrp) {
 		for(Id id : depots){
-			VehicleType type = vrp.getVehicleType(id);
+			VehicleType type = vrp.getVehicleType(id.toString());
 			if(type == null){
 				throw new IllegalStateException("each depot must have one vehicleType. Depot " + id + " does not have!");
 			}

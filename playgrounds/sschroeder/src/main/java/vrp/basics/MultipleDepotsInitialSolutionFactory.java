@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.basics;
 
 import java.util.ArrayList;
@@ -6,8 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-
 import vrp.api.Customer;
 import vrp.api.VRP;
 
@@ -19,7 +34,7 @@ public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFact
 	public Collection<Tour> createInitialSolution(VRP vrp) {
 		logger.info("create initial solution");
 		Collection<Tour> tours = new ArrayList<Tour>();
-		Set<Id> customersWithService = new HashSet<Id>();
+		Set<String> customersWithService = new HashSet<String>();
 		for(Customer customer : vrp.getCustomers().values()){
 			if(customersWithService.contains(customer.getId())){
 				continue;
@@ -54,6 +69,7 @@ public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFact
 		return tours;
 	}
 	
+	@Override
 	public Tour createRoundTour(VRP vrp, Customer from, Customer to){
 		Tour tour = null;
 		if(vrp.getDepots().containsKey(from.getId())){
@@ -104,7 +120,7 @@ public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFact
 		if(tour.getActivities().size()<1){
 			throw new IllegalStateException("number of tourActivities smaller than 1");
 		}
-		Id depotId = tour.getActivities().get(0).getCustomer().getId();
+		String depotId = tour.getActivities().get(0).getCustomer().getId();
 		assertNotNull(depotId);
 		Vehicle vehicle = VrpUtils.createVehicle(vrp.getVehicleType(depotId));
 		assertNotNull(vehicle);
@@ -117,7 +133,7 @@ public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFact
 		}
 	}
 
-	private void assertNotNull(Id depotId) {
+	private void assertNotNull(String depotId) {
 		if(depotId == null){
 			throw new IllegalStateException("id null. this cannot be.");
 		}

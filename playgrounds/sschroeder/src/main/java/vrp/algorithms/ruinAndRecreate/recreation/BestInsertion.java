@@ -1,12 +1,29 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.recreation;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.gbl.MatsimRandom;
 
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
 import vrp.algorithms.ruinAndRecreate.api.RecreationStrategy;
@@ -16,6 +33,7 @@ import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.VRP;
 import vrp.basics.InitialSolutionFactory;
+import vrp.basics.RandomNumberGeneration;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 
@@ -40,6 +58,12 @@ public class BestInsertion implements RecreationStrategy{
 	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
+	private Random random = RandomNumberGeneration.getRandom();
+	
+	public void setRandom(Random random) {
+		this.random = random;
+	}
+
 	public Collection<RecreationListener> getRecreationListener() {
 		return recreationListeners;
 	}
@@ -57,8 +81,9 @@ public class BestInsertion implements RecreationStrategy{
 		this.tourAgentFactory = tourAgentFactory;
 	}
 
+	@Override
 	public void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
-		Collections.shuffle(shipmentsWithoutService, MatsimRandom.getRandom());
+		Collections.shuffle(shipmentsWithoutService,random);
 		for(Shipment shipmentWithoutService : shipmentsWithoutService){
 			assertShipmentIsInCorrectOrder(shipmentWithoutService);
 			Offer bestOffer = null;

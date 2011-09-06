@@ -1,3 +1,20 @@
+/*******************************************************************************
+ * Copyright (C) 2011 Stefan Schršder.
+ * eMail: stefan.schroeder@kit.edu
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package vrp.basics;
 
 import java.util.ArrayList;
@@ -5,11 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
@@ -138,7 +150,7 @@ public class VrpUtils {
 		return new TimeWindow(start, end);
 	}
 	
-	public static Customer createCustomer(Id id, Node node, int demand, double startTime, double endTime, double serviceTime){
+	public static Customer createCustomer(String id, Node node, int demand, double startTime, double endTime, double serviceTime){
 		Customer customer = new CustomerImpl(id, node);
 		customer.setDemand(demand);
 		customer.setServiceTime(serviceTime);
@@ -150,16 +162,16 @@ public class VrpUtils {
 		return new Shipment(c1,c2);
 	}
 	
-	public static Id createId(String id){
-		return new IdImpl(id);
+	public static String createId(String id){
+		return id;
 	}
 	
 	public static Node createNode(String id){
-		return new NodeImpl(createId(id));
+		return new NodeImpl(id);
 	}
 
-	public static Coord createCoord(int x, int y) {
-		return new CoordImpl(x,y);
+	public static Coordinate createCoord(int x, int y) {
+		return new Coordinate(x,y);
 	}
 	
 	public static Relation createRelation(Customer customer){
@@ -169,7 +181,7 @@ public class VrpUtils {
 	public static Collection<Tour> createTrivialSolution(VRP vrp){
 		Collection<Tour> tours = new ArrayList<Tour>();
 		Customer depot = vrp.getDepot();
-		Set<Id> customersWithService = new HashSet<Id>();
+		Set<String> customersWithService = new HashSet<String>();
 		for(Customer customer : vrp.getCustomers().values()){
 			if(customersWithService.contains(customer.getId())){
 				continue;
