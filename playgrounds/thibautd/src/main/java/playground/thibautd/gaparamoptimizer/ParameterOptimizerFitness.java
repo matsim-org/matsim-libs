@@ -66,22 +66,31 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int N_PLAN_EXEC = 1;
 
 	// indices of the genes in the chromosome:
-	private static final int CHROM_LENGTH = 10;
-	private static final int POP_SIZE_GENE = 0;
+	private static final int CHROM_LENGTH = 13;
+	//private static final int POP_SIZE_GENE = 0;
+	private static final int POP_INTERCEPT_GENE = 0;
 	private static final int MUT_PROB_GENE = 1;
 	private static final int WHOLE_PROB_GENE = 2;
 	private static final int SIMPLE_PROB_GENE = 3;
 	private static final int SINGLE_PROB_GENE = 4;
 	private static final int DISCRETE_SCALE_GENE = 5;
-	private static final int RTS_WINDOW_GENE = 6;
+	//private static final int RTS_WINDOW_GENE = 6;
+	private static final int RTS_WINDOW_INTERCEPT_GENE = 6;
 	private static final int NON_UNIFORM_GENE = 7;
 	private static final int IN_PLACE_GENE = 8;
 	private static final int P_NON_UNIFORM_GENE = 9;
+	private static final int POP_SLOPE_GENE = 10;
+	private static final int RTS_WINDOW_SLOPE_GENE = 11;
+	private static final int HAMMING_GENE = 12;
 
 	// bounds
-	private static final int MAX_POP_SIZE = 100;
+	//private static final int MAX_POP_SIZE = 100;
+	private static final double MAX_POP_INTERCEPT = 30;
+	private static final double MAX_POP_SLOPE = 2;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
-	private static final int MAX_WINDOW_SIZE = 20;
+	//private static final int MAX_WINDOW_SIZE = 20;
+	private static final int MAX_WINDOW_SLOPE = 2;
+	private static final int MAX_WINDOW_INTERCEPT = 20;
 	private static final double MAX_NON_UNIFORM = 50d;
 
 	// instance fields
@@ -114,9 +123,13 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		}
 
 		log.debug("fitness function initialized");
-		log.debug("max pop size: "+MAX_POP_SIZE);
+		//log.debug("max pop size: "+MAX_POP_SIZE);
+		log.debug("max pop slope: "+MAX_POP_SLOPE);
+		log.debug("max pop intercept: "+MAX_POP_INTERCEPT);
 		log.debug("max discrete scale: "+MAX_DISCRETE_SCALE);
-		log.debug("max window size: "+MAX_WINDOW_SIZE);
+		//log.debug("max window size: "+MAX_WINDOW_SIZE);
+		log.debug("max window size slope: "+MAX_WINDOW_SLOPE);
+		log.debug("max window size intercept: "+MAX_WINDOW_INTERCEPT);
 		log.debug("max non uniformity: "+MAX_NON_UNIFORM);
 		log.debug("n plan execs: "+N_PLAN_EXEC);
 		log.debug("CHF per microsec: "+CHF_PER_MICROSEC);
@@ -211,16 +224,21 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	public IChromosome getSampleChromosome() throws InvalidConfigurationException {
 		Gene[] genes = new Gene[CHROM_LENGTH];
 
-		genes[POP_SIZE_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_POP_SIZE);
+		//genes[POP_SIZE_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_POP_SIZE);
+		genes[POP_SLOPE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_POP_SLOPE);
+		genes[POP_INTERCEPT_GENE] = new DoubleGene(this.jgapConfig, 2d, MAX_POP_INTERCEPT);
 		genes[MUT_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[WHOLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[SIMPLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[SINGLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[DISCRETE_SCALE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_DISCRETE_SCALE);
-		genes[RTS_WINDOW_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_WINDOW_SIZE);
+		//genes[RTS_WINDOW_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_WINDOW_SIZE);
+		genes[RTS_WINDOW_SLOPE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_WINDOW_SLOPE);
+		genes[RTS_WINDOW_INTERCEPT_GENE] = new DoubleGene(this.jgapConfig, 2d, MAX_WINDOW_INTERCEPT);
 		genes[NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_NON_UNIFORM);
 		genes[IN_PLACE_GENE] = new BooleanGene(this.jgapConfig);
 		genes[P_NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
+		genes[HAMMING_GENE] = new BooleanGene(this.jgapConfig);
 
 		return new Chromosome(this.jgapConfig, genes);
 	}
@@ -234,16 +252,21 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 
 		Gene[] genes = chromosome.getGenes();
 
-		configGroup.setPopulationSize(getIntValue(genes[POP_SIZE_GENE]));
+		//configGroup.setPopulationSize(getIntValue(genes[POP_SIZE_GENE]));
+		configGroup.setPopulationCoef(getDoubleValue(genes[POP_SLOPE_GENE]));
+		configGroup.setPopulationIntercept(getDoubleValue(genes[POP_INTERCEPT_GENE]));
 		configGroup.setMutationProbability(getDoubleValue(genes[MUT_PROB_GENE]));
 		configGroup.setWholeCrossOverProbability(getDoubleValue(genes[WHOLE_PROB_GENE]));
 		configGroup.setSimpleCrossOverProbability(getDoubleValue(genes[SIMPLE_PROB_GENE]));
 		configGroup.setSingleCrossOverProbability(getDoubleValue(genes[SINGLE_PROB_GENE]));
 		configGroup.setDiscreteDistanceScale(getDoubleValue(genes[DISCRETE_SCALE_GENE]));
-		configGroup.setRtsWindowSize(getIntValue(genes[RTS_WINDOW_GENE]));
+		//configGroup.setRtsWindowSize(getIntValue(genes[RTS_WINDOW_GENE]));
+		configGroup.setWindowSizeCoef(getDoubleValue(genes[RTS_WINDOW_SLOPE_GENE]));
+		configGroup.setWindowSizeIntercept(getDoubleValue(genes[RTS_WINDOW_INTERCEPT_GENE]));
 		configGroup.setMutationNonUniformity(getDoubleValue(genes[NON_UNIFORM_GENE]));
 		configGroup.setInPlaceMutation(getBooleanValue(genes[IN_PLACE_GENE]));
 		configGroup.setNonUniformMutationProbability(getDoubleValue(genes[P_NON_UNIFORM_GENE]));
+		configGroup.setUseOnlyHammingDistanceInRTS(getBooleanValue(genes[HAMMING_GENE]));
 
 		return configGroup;
 	}

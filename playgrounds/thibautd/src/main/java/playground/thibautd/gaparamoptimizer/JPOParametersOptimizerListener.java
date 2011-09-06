@@ -64,10 +64,11 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private String outputFileName = "optimizedConf.xml";
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 10;
+	private final static int N_PLANS = 5;
 
 	private final static int MIN_MEMBERS = 3;
-	private final static int MAX_MEMBERS = 10;
+	private final static int MAX_MEMBERS = 20;
+	private final static int MAX_PLANS_PER_SIZE = 1;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -102,6 +103,12 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		log.debug("maximum members of clique: "+MAX_MEMBERS);
 
 		int count = 0;
+		int[] counts = new int[MAX_MEMBERS - MIN_MEMBERS + 1];
+
+		for (int j = 0; j < counts.length; j++) {
+			counts[j] = 0;
+		}
+
 		int i = 0;
 		int size;
 		while (count < N_PLANS) {
@@ -109,11 +116,14 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			size = currentPlan.getClique().getMembers().size();;
 			i++;
 
-			// only consider joint plans
-			if (size >= MIN_MEMBERS && size <= MAX_MEMBERS) {
+			// only consider joint plans satisfying the conditions
+			if (size >= MIN_MEMBERS &&
+					size <= MAX_MEMBERS &&
+					counts[size - MIN_MEMBERS] < MAX_PLANS_PER_SIZE) {
 				log.debug("adding test instance with "+size+" members.");
 				output.add(currentPlan);
 				count++;
+				counts[size - MIN_MEMBERS]++;
 			}
 		}
 
