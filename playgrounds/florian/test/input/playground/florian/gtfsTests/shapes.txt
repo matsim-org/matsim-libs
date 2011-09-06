@@ -1,4 +1,4 @@
 shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_dist_traveled
 TEST_SHAPE,36.868446,-116.784582,1,0
-TEST_SHAPE,36.915682,-116.784582,1,0.5
+TEST_SHAPE,36.915682,-116.784582,3,0.5
 TEST_SHAPE,36.915682,-116.751677,5,1
