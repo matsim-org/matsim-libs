@@ -70,9 +70,14 @@
 		<xs:sequence>
 			<xs:element name="samplingRate" type="xs:double"/>
 			<xs:element name="year" type="xs:nonNegativeInteger"/>
-			<xs:element name="tempDirectory" type="xs:token"/>
+			<xs:element name="opusHome" type="xs:token"/>
+			<xs:element name="opusDataPath" type="xs:token"/>
+			<xs:element name="matsim4opus" type="xs:token"/>
+			<xs:element name="matsim4opusConfig" type="xs:token"/>
+			<xs:element name="matsim4opusOutput" type="xs:token"/>
+			<xs:element name="matsim4opusTemp" type="xs:token"/>
 			<xs:element name="isTestRun" type="xs:boolean"/>
-			<xs:element name="opusHOME" type="xs:token"/>
+			
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
