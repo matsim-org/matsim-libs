@@ -55,7 +55,7 @@ public class InitialStateGenerator {
 		for(SocialVertex v : graph.getVertices()) {
 			Person person = v.getPerson().getPerson();
 			
-			ActivityFacility homeFac = facilities.getFacilities().get(new IdImpl(HomeFacilityGenerator.HOME_PREFIX + person.getId().toString())); 
+			ActivityFacility homeFac = facilities.getFacilities().get(new IdImpl(FacilityValidator.HOME_PREFIX + person.getId().toString())); 
 			
 			Plan plan = factory.createPlan();
 			

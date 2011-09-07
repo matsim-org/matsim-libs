@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointActivityScoringFactory.java
+ * JointActivityTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,78 +17,77 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.analysis;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
+import org.matsim.contrib.sna.math.DummyDiscretizer;
 
+import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
-
 /**
  * @author illenberger
- *
+ * 
  */
-public class JointActivityScoringFactory extends CharyparNagelScoringFunctionFactory {
+public class JointActivityTask extends TrajectoryAnalyzerTask {
 
-	private final Map<Person, ScoringFunctionAccumulator> accumulators;
-	
-	private final Map<SocialVertex, JointActivityScoring> jointActScorers;
-	
-	private final Map<Person, SocialVertex> personVertexMap;
-	
 	private final VisitorTracker tracker;
-	
-	private final double beta;
-	
-	public JointActivityScoringFactory(SocialGraph graph, VisitorTracker tracker, PlanCalcScoreConfigGroup config, double beta) {
-		super(config);
+
+	private final Map<Person, SocialVertex> personVertexMap;
+
+	public JointActivityTask(SocialGraph graph, VisitorTracker tracker) {
 		this.tracker = tracker;
-		this.beta = beta;
-		this.accumulators = new HashMap<Person, ScoringFunctionAccumulator>();
 		
 		personVertexMap = new HashMap<Person, SocialVertex>(graph.getVertices().size());
-		for(SocialVertex v : graph.getVertices())
+		for(SocialVertex v : graph.getVertices()) {
 			personVertexMap.put(v.getPerson().getPerson(), v);
-		
-		jointActScorers = new HashMap<SocialVertex, JointActivityScoring>(graph.getVertices().size());
+		}
+	}
+	
+	@Override
+	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		DescriptiveStatistics timeStats = new DescriptiveStatistics();
+		DescriptiveStatistics visitorStats = new DescriptiveStatistics();
+
+		for (Trajectory t : trajectories) {
+			Person person = t.getPerson();
+			SocialVertex ego = personVertexMap.get(person);
+
+			int visitors = 0;
+			for (SocialVertex alter : ego.getNeighbours()) {
+				double time = tracker.timeOverlap(person, alter.getPerson().getPerson());
+				if (time > 0) {
+					timeStats.addValue(time);
+					visitors++;
+				}
+			}
+
+			visitorStats.addValue(visitors);
+		}
+
+		String timeKey = "t_joint";
+		results.put(timeKey, timeStats);
+
+		String visitorKey = "visitors";
+		results.put(visitorKey, visitorStats);
+
+		if (outputDirectoryNotNull()) {
+			try {
+				writeHistograms(timeStats, timeKey, 50, 50);
+				writeHistograms(visitorStats, new DummyDiscretizer(), visitorKey, false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
-	@Override
-	public ScoringFunction createNewScoringFunction(Plan plan) {
-		Person person = plan.getPerson();
-		ScoringFunctionAccumulator accumulator = accumulators.get(person);
-		
-		if(accumulator == null) {
-			accumulator = (ScoringFunctionAccumulator) super.createNewScoringFunction(plan);
-			
-			SocialVertex ego = personVertexMap.get(person);
-			JointActivityScoring jointActScoring = new JointActivityScoring(ego, tracker, beta);
-			accumulator.addScoringFunction(jointActScoring);
-			
-			accumulators.put(person, accumulator);
-			jointActScorers.put(ego, jointActScoring);
-		}
-		
-		return accumulator;
-	}
-	
-	public void resetAccumulators() {
-		for(ScoringFunctionAccumulator acc : accumulators.values()) {
-			acc.reset();
-		}
-	}
-	
-	public Map<SocialVertex, JointActivityScoring> getJointActivityScorers() {
-		return jointActScorers;
-	}
 }

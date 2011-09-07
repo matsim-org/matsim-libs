@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.pysical;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,27 +111,21 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	public double timeOverlap(Person person, Person alter) {
 		Set<Visit> facilityVisits = visits.get(person.getId());
-		if(facilityVisits == null)
+		if (facilityVisits == null)
 			return 0;
-		
+
 		double sum = 0;
 		for (Visit visit : facilityVisits) {
-			if (visit.startEvent.getActType().equalsIgnoreCase("leisure")) {
-
-				Set<Visitor> facilityVisitors = visitors.get(visit.facility);
-				for (Visitor visitor : facilityVisitors) {
-					if (visitor.startEvent.getActType().equalsIgnoreCase("leisure")) {
-
-						if (alter.getId().equals(visitor.person)) {
-							double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
-							double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
-							double delta = Math.max(0.0, end - start);
-							sum += delta;
-							break;
-						}
-
-					}
+			Set<Visitor> facilityVisitors = visitors.get(visit.facility);
+			for (Visitor visitor : facilityVisitors) {
+				if (alter.getId().equals(visitor.person)) {
+					double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+					double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+					double delta = Math.max(0.0, end - start);
+					sum += delta;
+					break;
 				}
+
 			}
 		}
 
@@ -140,31 +134,26 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	public double timeOverlap(Person person, Set<Person> alters) {
 		Set<Visit> facilityVisits = visits.get(person.getId());
-		if(facilityVisits == null)
+		if (facilityVisits == null)
 			return 0;
-		
+
 		double sum = 0;
 		for (Visit visit : facilityVisits) {
-			if (visit.startEvent.getActType().equalsIgnoreCase("leisure")) {
-
-				Set<Visitor> facilityVisitors = visitors.get(visit.facility);
-				for (Visitor visitor : facilityVisitors) {
-					if (visitor.startEvent.getActType().equalsIgnoreCase("leisure")) {
-
-						for (Person alter : alters) {
-							if (alter.getId().equals(visitor.person)) {
-								double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
-								double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
-								double delta = Math.max(0.0, end - start);
-								sum += delta;
-								break;
-							}
-						}
+			Set<Visitor> facilityVisitors = visitors.get(visit.facility);
+			for (Visitor visitor : facilityVisitors) {
+				for (Person alter : alters) {
+					if (alter.getId().equals(visitor.person)) {
+						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
+						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
+						double delta = Math.max(0.0, end - start);
+						sum += delta;
+						break;
 					}
 				}
+
 			}
 		}
-		
+
 		return sum;
 	}
 	

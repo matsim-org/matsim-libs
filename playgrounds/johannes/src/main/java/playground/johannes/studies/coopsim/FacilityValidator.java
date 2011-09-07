@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointActivityScoring.java
+ * HomeFacilityGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.studies.coopsim;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.network.NetworkImpl;
 
-import playground.johannes.coopsim.pysical.VisitorTracker;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-
+import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 
 /**
  * @author illenberger
  *
  */
-public class JointActivityScoring implements BasicScoring {
+public class FacilityValidator {
 
-	private final SocialVertex ego;
+	public static final String HOME_PREFIX = "home";
 	
-	private final Set<Person> alters;
-	
-	private final VisitorTracker tracker;
-	
-	private final double beta;
-	
-	private double score;
-	
-	public JointActivityScoring(SocialVertex ego, VisitorTracker tracker, double beta) {
-		this.ego = ego;
-		this.tracker = tracker;
-		this.beta = beta;
-		
-		alters = new HashSet<Person>();
-		for(SocialVertex alter : ego.getNeighbours())
-			alters.add(alter.getPerson().getPerson());
+	public static void generate(ActivityFacilitiesImpl facilities, NetworkImpl network, SocialGraph graph) {
+		/*
+		 * set link ids
+		 */
+		for(ActivityFacility facility : facilities.getFacilities().values()) {
+			Coord coord = facility.getCoord();
+			Link link = network.getNearestLink(coord);
+			((ActivityFacilityImpl) facility).setLinkId(link.getId());
+		}
+		/*
+		 * create home facilities
+		 */
+		for(SocialVertex v : graph.getVertices()) {
+			Person person = v.getPerson().getPerson();
+			
+			Id id = new IdImpl(HOME_PREFIX + person.getId().toString());
+			ActivityFacilityImpl homeFac = facilities.createFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
+			Link link = network.getNearestLink(homeFac.getCoord());
+			homeFac.setLinkId(link.getId());
+		}
 	}
 	
-	@Override
-	public void finish() {
-		double time = tracker.timeOverlap(ego.getPerson().getPerson(), alters);
-		score = time * beta;
-	}
-
-	@Override
-	public double getScore() {
-		return score;
-	}
-
-	@Override
-	public void reset() {
-	}
-
 }

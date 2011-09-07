@@ -40,17 +40,29 @@ public class PhysicalEngine {
 	
 	private final TravelTime travelTime;
 	
+	private final VisitorTracker tracker;
+	
 	public PhysicalEngine(Network network) {
 		this.network = network;
 		this.pseudoSim = new PseudoSim();
 		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
+		this.tracker = new VisitorTracker();
 	}
 	
 	public TravelTime getTravelTime() {
 		return travelTime;
 	}
 	
+	public VisitorTracker getVisitorTracker() {
+		return tracker;
+	}
+	
 	public void run(Set<Plan> plans, EventsManager eventsManager) {
+		eventsManager.addHandler(tracker);
+		tracker.reset(0);
+		
 		pseudoSim.run(plans, network, travelTime, eventsManager);
+		
+		eventsManager.removeHandler(tracker);
 	}
 }

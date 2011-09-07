@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HomeFacilityGenerator.java
+ * ScoreTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.studies.coopsim;
+package playground.johannes.coopsim.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import gnu.trove.TObjectDoubleHashMap;
+
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
+import playground.johannes.coopsim.eval.EvalEngine;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class HomeFacilityGenerator {
+public class ScoreTask extends TrajectoryAnalyzerTask {
 
-	public static final String HOME_PREFIX = "home";
+	private final EvalEngine eval;
 	
-	public static void generate(ActivityFacilitiesImpl facilities, NetworkImpl network, SocialGraph graph) {
-		for(SocialVertex v : graph.getVertices()) {
-			Person person = v.getPerson().getPerson();
-			
-			Id id = new IdImpl(HOME_PREFIX + person.getId().toString());
-			ActivityFacilityImpl homeFac = facilities.createFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
-			Link link = network.getNearestLink(homeFac.getCoord());
-			homeFac.setLinkId(link.getId());
-		}
+	public ScoreTask(EvalEngine eval) {
+		this.eval = eval;
 	}
 	
+	@Override
+	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		DescriptiveStatistics joinScoreStats = new DescriptiveStatistics();
+		DescriptiveStatistics totalScoreStats = new DescriptiveStatistics();
+		
+		TObjectDoubleHashMap<Person> values = eval.getJointActivityScores();
+		
+		for(Trajectory t : trajectories) {
+			joinScoreStats.addValue(values.get(t.getPerson()));
+			totalScoreStats.addValue(t.getPerson().getSelectedPlan().getScore());
+		}
+		
+		results.put("score", totalScoreStats);
+		results.put("score_join", joinScoreStats);
+
+	}
+
 }

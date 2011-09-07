@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
+
 /**
  * @author illenberger
  *

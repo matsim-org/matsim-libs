@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
@@ -38,8 +37,6 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class PlansWriterTask extends TrajectoryAnalyzerTask {
 
-	private static final Logger logger = Logger.getLogger(PlansWriterTask.class);
-	
 	private final Network network;
 	
 	public PlansWriterTask(Network network) {
@@ -48,8 +45,6 @@ public class PlansWriterTask extends TrajectoryAnalyzerTask {
 	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		logger.info("Writing plans...");
-		
 		LoggerUtils.setVerbose(false);
 		Population population = new PopulationImpl(null);
 		for(Trajectory t : trajectories) {

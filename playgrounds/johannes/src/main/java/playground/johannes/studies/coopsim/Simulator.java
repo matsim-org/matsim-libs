@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -46,7 +47,9 @@ import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.SimEngine;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.JointActivityTask;
 import playground.johannes.coopsim.analysis.PlansWriterTask;
+import playground.johannes.coopsim.analysis.ScoreTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
@@ -61,6 +64,7 @@ import playground.johannes.coopsim.mental.choice.ChoiceSelectorComposite;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.mental.choice.DurationSelector;
 import playground.johannes.coopsim.mental.choice.EgoSelector;
+import playground.johannes.coopsim.mental.choice.EgosFacilities;
 import playground.johannes.coopsim.mental.choice.EgosHome;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
 import playground.johannes.coopsim.mental.choice.RandomAlter;
@@ -90,14 +94,14 @@ public class Simulator {
 	private static NetworkImpl network;
 	
 	private static ActivityFacilitiesImpl facilities;
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
+	
+	private static Config config;
+	
+	public static void main(String[] args) throws IOException {
 		LoggerUtils.setDisallowVerbose(false);
 		
 		LoggerUtils.setVerbose(false);
-		Config config = new Config();
+		config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader creader = new MatsimConfigReader(config);
 		creader.readFile(args[0]);
@@ -118,8 +122,8 @@ public class Simulator {
 		/*
 		 * do some pre-processing
 		 */
-		logger.info("Creating home facilities...");
-		HomeFacilityGenerator.generate(facilities, network, graph);
+		logger.info("Validating facilities...");
+		FacilityValidator.generate(facilities, network, graph);
 		
 		logger.info("Generation initial state...");
 		NetworkLegRouter router = initRouter(physical.getTravelTime());
@@ -148,7 +152,7 @@ public class Simulator {
 		 */
 		logger.info("Initializing evaluation engine...");
 		LoggerUtils.setVerbose(false);
-		EvalEngine eval = new EvalEngine(graph, (PlanCalcScoreConfigGroup) config.getModule("planCalcScore"), beta);
+		EvalEngine eval = new EvalEngine(graph, physical.getVisitorTracker(), (PlanCalcScoreConfigGroup) config.getModule("planCalcScore"), beta);
 		LoggerUtils.setVerbose(true);
 		/*
 		 * initialize simulation engine
@@ -160,7 +164,7 @@ public class Simulator {
 		/*
 		 * initialize analyzer tasks
 		 */
-		TrajectoryAnalyzerTask task = initAnalyzerTask();
+		TrajectoryAnalyzerTask task = initAnalyzerTask(physical, eval);
 		simEngine.setAnalyzerTask(task, output);
 		
 		simEngine.run(iterations);
@@ -204,7 +208,7 @@ public class Simulator {
 		return legRouter;
 	}
 	
-	private static ChoiceSelector initSelectors(Random random) {
+	private static ChoiceSelector initSelectors(Random random) throws IOException {
 		ChoiceSelectorComposite choiceSelector = new ChoiceSelectorComposite();
 		/*
 		 * initialize plan index selector
@@ -218,20 +222,38 @@ public class Simulator {
 		 * initialize activity type selector
 		 */
 		ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-		actTypeChoiceSet.addChoice("leisure", 1.0);
+//		actTypeChoiceSet.addChoice("leisure", 1.0);
+		actTypeChoiceSet.addChoice("visit", 36);
+		actTypeChoiceSet.addChoice("gastro", 18);
+		actTypeChoiceSet.addChoice("culture", 46);
 		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(actTypeChoiceSet);
 		choiceSelector.addComponent(actTypeSelector);
 		/*
 		 * initialize group selector
 		 */
 		ActivityGroupSelector groupSelector = new ActivityGroupSelector();
-		groupSelector.addGenerator("leisure", new RandomAlter(random));
+//		groupSelector.addGenerator("leisure", new RandomAlter(random));
+		groupSelector.addGenerator("visit", new RandomAlter(random));
+		groupSelector.addGenerator("gastro", new RandomAlter(random));
+		groupSelector.addGenerator("culture", new RandomAlter(random));
 		choiceSelector.addComponent(groupSelector);
 		/*
 		 * initialize facility selector
 		 */
 		ActivityFacilitySelector facilitySelector = new ActivityFacilitySelector();
-		facilitySelector.addGenerator("leisure", new EgosHome(random));
+//		facilitySelector.addGenerator("leisure", new EgosHome(random));
+		facilitySelector.addGenerator("visit", new EgosHome(random));
+//		FacilityChoiceSetGenerator generator = new FacilityChoiceSetGenerator(-1.4, 5, random, CartesianDistanceCalculator.getInstance());
+//		try {
+//			generator.write(generator.generate(graph, facilities, "gastro"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.gastro.txt");
+//			generator.write(generator.generate(graph, facilities, "culture"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.culture.txt");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		System.exit(0);
+		facilitySelector.addGenerator("gastro", new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_gastro"), graph), random));
+		facilitySelector.addGenerator("culture", new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_culture"), graph), random));
 		choiceSelector.addComponent(facilitySelector);
 		/*
 		 * initialize arrival time selector
@@ -274,13 +296,15 @@ public class Simulator {
 		return map;
 	}
 	
-	private static TrajectoryAnalyzerTask initAnalyzerTask() {
+	private static TrajectoryAnalyzerTask initAnalyzerTask(PhysicalEngine physical, EvalEngine eval) {
 		TrajectoryAnalyzerTaskComposite composite = new TrajectoryAnalyzerTaskComposite();
 		composite.addTask(new PlansWriterTask(network));
 		composite.addTask(new ArrivalTimeTask());
 		composite.addTask(new ActivityDurationTask());
 		composite.addTask(new TripDistanceTask(facilities));
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
+		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
+		composite.addTask(new ScoreTask(eval));
 		return composite;
 	}
 }

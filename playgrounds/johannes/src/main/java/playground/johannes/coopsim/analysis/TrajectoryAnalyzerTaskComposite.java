@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -34,6 +35,8 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class TrajectoryAnalyzerTaskComposite extends TrajectoryAnalyzerTask {
 
+	private static final Logger logger = Logger.getLogger(TrajectoryAnalyzerTaskComposite.class);
+	
 	private List<TrajectoryAnalyzerTask> tasks;
 	
 	public TrajectoryAnalyzerTaskComposite() {
@@ -53,6 +56,7 @@ public class TrajectoryAnalyzerTaskComposite extends TrajectoryAnalyzerTask {
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
 		for(TrajectoryAnalyzerTask task : tasks) {
+			logger.debug(String.format("Running task %1$s...", task.getClass().getSimpleName()));
 			task.analyze(trajectories, results);
 		}
 

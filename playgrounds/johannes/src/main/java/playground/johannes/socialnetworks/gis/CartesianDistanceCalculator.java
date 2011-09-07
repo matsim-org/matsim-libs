@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.gis;
 
+
 import com.vividsolutions.jts.geom.Point;
 
 /**

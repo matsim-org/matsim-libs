@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonImpl;
 
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
@@ -75,6 +76,8 @@ public class MentalEngine {
 		Set<Plan> plans = new HashSet<Plan>();
 		for(SocialVertex v : egos) {
 			Plan plan = v.getPerson().getPerson().copySelectedPlan();
+			if(plan == null)
+				throw new NullPointerException("Outch! This person appears to have no selected plan!");
 			plans.add(plan);
 		}
 		/*
@@ -142,7 +145,9 @@ public class MentalEngine {
 		 * remove plans
 		 */
 		for(Plan plan : remove) {
-			plan.getPerson().getPlans().remove(plan);
+			PersonImpl person = (PersonImpl) plan.getPerson();
+			person.getPlans().remove(plan);
+			person.setSelectedPlan(person.getPlans().get(0));
 		}
 		
 		return accept;

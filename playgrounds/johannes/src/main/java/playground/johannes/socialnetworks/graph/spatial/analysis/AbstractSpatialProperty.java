@@ -27,6 +27,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
+
 import com.vividsolutions.jts.geom.Point;
 
 /**

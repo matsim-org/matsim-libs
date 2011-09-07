@@ -68,7 +68,7 @@ public abstract class TrajectoryAnalyzerTask {
 			Histogram.normalize(hist);
 			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.txt", getOutputDirectory(), name, values.length / bins));
 		} else {
-			logger.warn("Cannot create histogram. No samples.");
+			logger.debug("Cannot create histogram. No samples.");
 		}
 	}
 	
