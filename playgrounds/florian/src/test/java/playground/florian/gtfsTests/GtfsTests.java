@@ -10,6 +10,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestCase;
@@ -70,7 +71,7 @@ public class GtfsTests extends MatsimTestCase {
 		for(Id stopId: ts1.getFacilities().keySet()){
 			assertEquals(ts1.getFacilities().get(stopId).getName(),ts2.getFacilities().get(stopId).getName());
 			assertEquals(ts1.getFacilities().get(stopId).getCoord(),ts2.getFacilities().get(stopId).getCoord());
-			assertEquals(ts1.getFacilities().get(stopId).getLinkId(),ts2.getFacilities().get(stopId).getLinkId());			
+			assertEquals(ts1.getFacilities().get(stopId).getLinkId(),ts2.getFacilities().get(stopId).getLinkId());
 		}
 		assertEquals(ts1.getTransitLines().size(),ts2.getTransitLines().size());
 		for(Id transitId: ts1.getTransitLines().keySet()){
@@ -79,6 +80,11 @@ public class GtfsTests extends MatsimTestCase {
 				TransitRoute tr1 = ts1.getTransitLines().get(transitId).getRoutes().get(routeId);
 				TransitRoute tr2 = ts2.getTransitLines().get(transitId).getRoutes().get(routeId);
 				assertEquals(tr1.getStops().size(),tr2.getStops().size());
+				for(TransitRouteStop trStop: tr1.getStops()){
+					assertEquals(trStop.isAwaitDepartureTime(),tr2.getStops().get(tr1.getStops().indexOf(trStop)).isAwaitDepartureTime());
+					assertEquals(trStop.getDepartureOffset(),tr2.getStops().get(tr1.getStops().indexOf(trStop)).getDepartureOffset());
+					assertEquals(trStop.getArrivalOffset(),tr2.getStops().get(tr1.getStops().indexOf(trStop)).getArrivalOffset());
+				}
 				assertEquals(tr1.getDepartures().size(),tr2.getDepartures().size());
 				assertEquals(tr1.getRoute().getLinkIds().size(),tr2.getRoute().getLinkIds().size());
 				assertEquals(RouteUtils.calcDistance(tr1.getRoute(), sc1.getNetwork()),RouteUtils.calcDistance(tr2.getRoute(), sc2.getNetwork()));

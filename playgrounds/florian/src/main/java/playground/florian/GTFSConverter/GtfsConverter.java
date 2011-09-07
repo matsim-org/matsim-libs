@@ -132,12 +132,14 @@ public class GtfsConverter {
 	@SuppressWarnings("deprecation")
 	public void convert(){
 		// Parse required Files
+		System.out.println("Parse required Files...");
 		GtfsSource stopsSource = GtfsSource.parseGtfsFile(filepath + "/stops.txt");
 		GtfsSource routesSource = GtfsSource.parseGtfsFile(filepath + "/routes.txt");
 		GtfsSource tripSource = GtfsSource.parseGtfsFile(filepath + "/trips.txt");
 		GtfsSource stopTimesSource = GtfsSource.parseGtfsFile(filepath + "/stop_times.txt");
 		
 		// Parse optional Files
+		System.out.println("Parse optional Files...");
 		String calendarFilename = filepath + "/calendar.txt";
 		GtfsSource calendarSource = null;
 		if((new File(calendarFilename)).exists()){
@@ -167,15 +169,13 @@ public class GtfsConverter {
 		// Create a config
 		this.createConfig();		
 		this.scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
-	
-		ts = scenario.getTransitSchedule();
+		this.ts = scenario.getTransitSchedule();
 	
 		// Put all stops in the Schedule
 		this.convertStops(stopsSource);
 	
 		// Get the Routenames and the assigned Trips
 		Map<Id,String> routeNames = getRouteNames(routesSource);
-		
 		Map<Id,Id> routeToTripAssignments = getRouteToTripAssignments(tripSource);
 	
 		// Create Transitlines
@@ -205,6 +205,7 @@ public class GtfsConverter {
 		List<Id> usedTripIds = this.getUsedTripIds(tripSource, usedServiceIds);
 		System.out.println("Reading of TripIds succesfull: " + usedTripIds);
 		
+		// Create the Network
 		System.out.println("Creating Network");
 		this.createNetworkOfStopsAndTrips(stopTimesSource, ts);
 	
@@ -253,7 +254,7 @@ public class GtfsConverter {
 		Set<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		config.transit().setVehiclesFile("transitVehicles.xml");
+		config.transit().setVehiclesFile("../playgrounds/florian/transitVehicles.xml");
 		config.transit().setTransitScheduleFile("../playgrounds/florian/transitSchedule.xml");
 		config.network().setInputFile("../playgrounds/florian/network.xml");
 	}
@@ -421,12 +422,12 @@ public class GtfsConverter {
 				if(tripIds.contains(tripId)){
 					TransitStopFacility stop = ts.getFacilities().get(stopId);
 					TransitRouteStop routeStop = ts.getFactory().createTransitRouteStop(stop, Time.parseTime(entries[arrivalTimeIndex].trim())-departureTime, Time.parseTime(entries[departureTimeIndex].trim())-departureTime);
-					routeStop.setAwaitDepartureTime(true);
 					stops.add(routeStop);		
 				}
 			}else{
 				if(tripIds.contains(currentTripId)){
 					//finish old route
+					stops = this.interpolateMissingDepartures(stops);
 					TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
 					TransitRoute tr = ts.getFactory().createTransitRoute(currentTripId, tripRoute.get(currentTripId), stops, "pt");
 					tr.addDeparture(departure);
@@ -451,11 +452,58 @@ public class GtfsConverter {
 		if(tripIds.contains(new IdImpl(currentTrip))){
 			Id currentTripId = new IdImpl(currentTrip);
 			//finish old route
+			stops = this.interpolateMissingDepartures(stops);
 			TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
 			TransitRoute tr = ts.getFactory().createTransitRoute(currentTripId, tripRoute.get(currentTripId), stops, "pt");
 			tr.addDeparture(departure);
 			tl.addRoute(tr);
 		}	
+	}
+
+	private List<TransitRouteStop> interpolateMissingDepartures(List<TransitRouteStop> stops) {
+		List<TransitRouteStop> result = new ArrayList<TransitRouteStop>();
+		List<TransitRouteStop> toBeInterpolated = new ArrayList<TransitRouteStop>();
+		Map<Integer,TransitRouteStop> toBeReplaced = new HashMap<Integer,TransitRouteStop>();
+		boolean properDeparture = true;
+		int lastProperDepartureIndex = 0;
+		for(Iterator<TransitRouteStop> it = stops.iterator(); it.hasNext(); ){
+			TransitRouteStop s = it.next();
+			if(Double.isInfinite(s.getDepartureOffset())){
+				toBeInterpolated.add(s);
+				properDeparture = false;
+			}else if(!properDeparture){
+				double totalLength = 0;
+				TransitRouteStop lastProperStop = stops.get(lastProperDepartureIndex);
+				for(TransitRouteStop sr: toBeInterpolated){
+					totalLength = CoordUtils.calcDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()) + totalLength;
+				}
+				totalLength = totalLength + CoordUtils.calcDistance(toBeInterpolated.get(toBeInterpolated.size()-1).getStopFacility().getCoord(), s.getStopFacility().getCoord());
+				double timeAvaible = s.getArrivalOffset() - lastProperStop.getDepartureOffset();
+				double oldDepartureOffset = lastProperStop.getDepartureOffset();
+				for(Iterator<TransitRouteStop> it2 = toBeInterpolated.iterator(); it2.hasNext();){
+					TransitRouteStop sr = it2.next();
+					double newDepartureOffset = (CoordUtils.calcDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()))/(totalLength) * timeAvaible + oldDepartureOffset;
+					oldDepartureOffset = newDepartureOffset;
+					TransitRouteStop newStop = ts.getFactory().createTransitRouteStop(sr.getStopFacility(), newDepartureOffset, newDepartureOffset);
+					toBeReplaced.put(stops.indexOf(sr), newStop);
+				}
+				toBeInterpolated = new ArrayList<TransitRouteStop>();
+				lastProperDepartureIndex = stops.indexOf(s);
+				properDeparture = true;
+			}else{
+				lastProperDepartureIndex = stops.indexOf(s);
+			}
+		}
+		for(TransitRouteStop s: stops){
+			if(toBeReplaced.containsKey(stops.indexOf(s))){
+				s.setAwaitDepartureTime(false);
+				result.add(toBeReplaced.get(stops.indexOf(s)));
+			}else{
+				s.setAwaitDepartureTime(true);
+				result.add(s);
+			}
+		}
+		return result;
 	}
 
 	private void convertStops(GtfsSource stopsSource){
@@ -578,7 +626,7 @@ public class GtfsConverter {
 						fromShapeDist = "0.0";
 					}
 				}else{
-					//						WARNING: Couldn't find shape_dist_traveled header in stop_times.txt. The converter will try to identify the Stations by its coordinates.
+					//WARNING: Couldn't find shape_dist_traveled header in stop_times.txt. The converter will try to identify the Stations by its coordinates.
 					this.alternativeStationToShapeAssignment = true;
 					fromShapeCoord = network.getNodes().get(fromNodeId).getCoord();
 				}
@@ -636,7 +684,7 @@ public class GtfsConverter {
 				if(addLink){
 					double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
 					Double freespeed = freespeedKmPerHour/3.6;
-					if((length > 0.0) && (departureTime != 0) && (arrivalTime != 0)){
+					if((length > 0.0) && (!Double.isInfinite(departureTime)) && (!Double.isInfinite(arrivalTime))){
 						freespeed = length/(arrivalTime - departureTime);
 						if(freespeed.isInfinite()){
 							freespeed = 50/3.6;

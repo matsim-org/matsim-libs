@@ -39,7 +39,7 @@
 		<transitRoute id="TEST_TRIP_WE">
 			<transportMode>pt</transportMode>
 			<routeProfile>
-				<stop refId="TEST_STOP_1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="TEST_STOP_1" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="true"/>
 				<stop refId="TEST_STOP_2" arrivalOffset="00:25:00" departureOffset="00:25:00" awaitDeparture="true"/>
 			</routeProfile>
 			<route>
