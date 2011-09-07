@@ -238,7 +238,7 @@ public class SpatialAveragingForLinkEmissionsScenarioComparison {
 			Map<Id, Map<String, Double>> delta = new HashMap<Id, Map<String, Double>>();
 
 			for(Entry<Id, Map<String, Double>> entry1 : linkId2emissions.entrySet()){
-				if (!entry1.getValue().get(pollutant).toString().equals("0.0")){
+				if (!entry1.getValue().get(pollutant).equals(0.0)){
 					Id linkId = entry1.getKey();
 					Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
 					for(String pollutant : entry1.getValue().keySet()){
