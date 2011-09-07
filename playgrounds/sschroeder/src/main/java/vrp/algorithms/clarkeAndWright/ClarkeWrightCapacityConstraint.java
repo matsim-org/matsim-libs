@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011 Stefan Schršder.
+ * Copyright (C) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
  * 
  *     This program is free software: you can redistribute it and/or modify

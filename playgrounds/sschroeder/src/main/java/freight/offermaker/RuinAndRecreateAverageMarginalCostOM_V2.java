@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierCostFunction;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
 import playground.mzilske.freight.CarrierVehicle;
@@ -25,7 +25,7 @@ import freight.vrp.VRPTransformation;
 
 public class RuinAndRecreateAverageMarginalCostOM_V2 implements OfferMaker{
 
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	private CarrierVehicle carrierVehicle;
 
@@ -47,7 +47,7 @@ public class RuinAndRecreateAverageMarginalCostOM_V2 implements OfferMaker{
 	}
 
 
-	public RuinAndRecreateAverageMarginalCostOM_V2(CarrierImpl carrier, Locations locations) {
+	public RuinAndRecreateAverageMarginalCostOM_V2(Carrier carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();

@@ -10,6 +10,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import freight.CarrierPlanReader;
@@ -23,9 +24,9 @@ public class TestRRSolver {
 		config.addCoreModules();
 		ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("networks/grid.xml");
-		Collection<CarrierImpl> carrierImpls = new ArrayList<CarrierImpl>();
+		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
 		new CarrierPlanReader(carrierImpls).read("anotherInput/testCarriers.xml");
-		for(CarrierImpl carrier : carrierImpls){
+		for(Carrier carrier : carrierImpls){
 			RRCarrierPlanBuilder carrierPlanBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 			CarrierPlan plan = carrierPlanBuilder.buildPlan();
 			if(plan != null){

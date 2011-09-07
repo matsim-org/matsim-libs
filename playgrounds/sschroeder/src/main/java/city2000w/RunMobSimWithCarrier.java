@@ -21,7 +21,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgent;
+import playground.mzilske.freight.CarrierAgentImpl;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.DriverEventWriter;
@@ -40,9 +42,10 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		}
 		
 		@Override
-		public CarrierAgent createAgent(CarrierAgentTracker tracker,CarrierImpl carrier) {
-			CarrierAgent agent = new CarrierAgent(tracker, carrier, router);
+		public CarrierAgentImpl createAgent(CarrierAgentTracker tracker,Carrier carrier) {
+			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router);
 			agent.setCarrierAgentTracker(tracker);
+			
 			return agent;
 		}
 		
@@ -93,15 +96,16 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		Collection<CarrierImpl> carrierImpls = new ArrayList<CarrierImpl>();
+		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
 		new CarrierPlanReader(carrierImpls).read("/Users/stefan/Documents/Spielwiese/data/carrierPlans_Stueckgut_AfterPlanningAndRenaming.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
 		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
 		driverEventWriter = new DriverEventWriter();
-		driverEventWriter.setFilename("/Users/stefan/Documents/Spielwiese/data/driverEvents_stueckgut.txt");
-		carrierAgentTracker.getEventListeners().add(driverEventWriter);
+		driverEventWriter.setFilename("/Users/stefan/Documents/Spielwiese/data/driverEvents_stueckgut_new.txt");
+		carrierAgentTracker.getEventsManager().addHandler(driverEventWriter);
+//		carrierAgentTracker.getEventListeners().add(driverEventWriter);
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);

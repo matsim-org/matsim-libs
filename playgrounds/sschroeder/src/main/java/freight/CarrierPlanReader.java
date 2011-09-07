@@ -1,25 +1,22 @@
 package freight;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
@@ -61,7 +58,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 	
 	private static final String CAPACITY = "cap";
 	
-	public CarrierImpl currentCarrier = null;
+	public Carrier currentCarrier = null;
 	
 	public CarrierVehicle currentVehicle = null;
 	
@@ -77,9 +74,9 @@ public class CarrierPlanReader extends MatsimXmlParser{
 	
 	public CarrierPlan currentPlan = null;
 	
-	public Collection<CarrierImpl> carriers;
+	public Collection<Carrier> carriers;
 	
-	public CarrierPlanReader(Collection<CarrierImpl> carriers) {
+	public CarrierPlanReader(Collection<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}

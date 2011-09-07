@@ -14,8 +14,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
 import playground.mzilske.freight.Contract;
@@ -239,7 +239,7 @@ public class ShipperPlanStrategy {
 		Set<Id> carriers = getCarriersToReplan(oldContracts,newContracts);
 		logger.info("carrierSize=" + carriers.size());
 		for(Id id : carriers){
-			CarrierImpl carrier = carrierAgentTracker.getCarrier(id);
+			Carrier carrier = carrierAgentTracker.getCarrier(id);
 			CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);

@@ -8,7 +8,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import freight.utils.OfferRecorder;
 
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.OfferMaker;
 
@@ -18,7 +18,7 @@ public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 	
 	List<Double> weights = new ArrayList<Double>();
 
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	private OfferRecorder offerRecorder;
 	
@@ -26,7 +26,7 @@ public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 		this.offerRecorder = offerRecorder;
 	}
 
-	public RuinAndRecreateOfferMakingStrategy(CarrierImpl carrier) {
+	public RuinAndRecreateOfferMakingStrategy(Carrier carrier) {
 		this.carrier = carrier;
 	}
 

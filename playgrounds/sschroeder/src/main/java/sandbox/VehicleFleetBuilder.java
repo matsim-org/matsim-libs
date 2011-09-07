@@ -9,7 +9,7 @@ import kid.ScheduledVehicles;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.log4j.Logger;
 
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.Carrier;
 import sandbox.Classifier.FrequencyClass;
 import sandbox.SandBoxTrafficGenerator.Company;
 import stats.EmpiricalWalker;
@@ -115,7 +115,7 @@ public class VehicleFleetBuilder {
 		
 	}
 
-	public void buildVehicleFleet(Company company, CarrierImpl carrier){
+	public void buildVehicleFleet(Company company, Carrier carrier){
 		company.getnOfEmployees();
 		
 	}

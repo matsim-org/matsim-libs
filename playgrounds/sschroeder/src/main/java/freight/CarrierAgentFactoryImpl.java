@@ -7,23 +7,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
-import freight.offermaker.RuinAndRecreateAverageMarginalCostOM_V2;
-import freight.offermaker.RuinAndRecreateMarginalCostOM;
-import freight.offermaker.RuinAndRecreateOfferMakingStrategy;
-import freight.utils.OfferRecorder;
-import freight.vrp.LocationsImpl;
-
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgent;
+import playground.mzilske.freight.CarrierAgentImpl;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierCostCalculatorImpl;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierTimeDistanceCostFunction;
 import playground.mzilske.freight.CostMemoryConsolePrinter;
 import playground.mzilske.freight.CostMemoryImpl;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.TollCalculator;
 import playground.mzilske.freight.api.CarrierAgentFactory;
+import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
+import freight.offermaker.RuinAndRecreateAverageMarginalCostOM_V2;
+import freight.offermaker.RuinAndRecreateMarginalCostOM;
+import freight.offermaker.RuinAndRecreateOfferMakingStrategy;
+import freight.utils.OfferRecorder;
+import freight.vrp.LocationsImpl;
 
 public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 
@@ -33,14 +33,14 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 		
 		double tollPerKm = 0.2;
 		
-		CarrierImpl carrier;
+		Carrier carrier;
 		
 		public MotorwayTollCalc(Network network) {
 			super();
 			this.network = network;
 		}
 		
-		public void iniCarrier(CarrierImpl carrier){
+		public void iniCarrier(Carrier carrier){
 			this.carrier = carrier;
 		}
 
@@ -82,8 +82,9 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 	}
 
 	@Override
-	public CarrierAgent createAgent(CarrierAgentTracker tracker,CarrierImpl carrier) {
-		CarrierAgent carrierAgent = new CarrierAgent(tracker, carrier, router);
+	public CarrierAgent createAgent(CarrierAgentTracker tracker,Carrier carrier) {
+		
+		CarrierAgentImpl carrierAgent = new CarrierAgentImpl(tracker, carrier, router);
 		CarrierTimeDistanceCostFunction costFunction = new CarrierTimeDistanceCostFunction();
 		costFunction.init(carrier);
 		carrierAgent.setCostFunction(costFunction);

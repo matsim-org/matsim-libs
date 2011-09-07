@@ -27,6 +27,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
@@ -97,7 +98,6 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
 		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
-		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(true);
@@ -160,7 +160,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 	}
 
 	private void createCarrierPlans() {
-		for(CarrierImpl carrier : carriers.getCarriers().values()){
+		for(Carrier carrier : carriers.getCarriers().values()){
 			RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);
@@ -176,7 +176,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 	}
 
 	private void readCarriers() {
-		Collection<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+		Collection<Carrier> carriers = new ArrayList<Carrier>();
 		new CarrierPlanReader(carriers).read(CARRIERNPLAN_FILENAME);
 		this.carriers = new Carriers(carriers);
 	}

@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierVehicle;
 
@@ -78,7 +79,7 @@ public class SandBoxTrafficGenerator {
 		
 		private Id regionId;
 		
-		private CarrierImpl carrier;
+		private Carrier carrier;
 		
 		public Id getId() {
 			return id;
@@ -89,7 +90,7 @@ public class SandBoxTrafficGenerator {
 			this.id = id;
 		}
 
-		public void setCarrier(CarrierImpl carrier) {
+		public void setCarrier(Carrier carrier) {
 			this.carrier = carrier;
 		}
 
@@ -109,7 +110,7 @@ public class SandBoxTrafficGenerator {
 			this.nOfEmployees = nOfEmployees;
 		}
 
-		public CarrierImpl getCarrier() {
+		public Carrier getCarrier() {
 			return carrier;
 		}
 
@@ -138,11 +139,11 @@ public class SandBoxTrafficGenerator {
 	
 	private TourGenerator tourGenerator;
 	
-	private List<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+	private List<Carrier> carriers = new ArrayList<Carrier>();
 
 	private CompanyGenerator companyGenerator;
 
-	public SandBoxTrafficGenerator(List<CarrierImpl> carriers) {
+	public SandBoxTrafficGenerator(List<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}

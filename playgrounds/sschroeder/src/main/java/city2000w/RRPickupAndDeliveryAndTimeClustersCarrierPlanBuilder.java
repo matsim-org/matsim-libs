@@ -13,8 +13,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierCapabilities;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
@@ -155,9 +155,9 @@ public class RRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder {
 	
 	private VRPTransformation vrpTrafo;
 	
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
-	public void setCarrier(CarrierImpl carrier) {
+	public void setCarrier(Carrier carrier) {
 		this.carrier = carrier;
 	}
 

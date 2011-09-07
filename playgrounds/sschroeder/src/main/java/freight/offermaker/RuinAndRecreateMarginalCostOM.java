@@ -11,8 +11,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import freight.CarrierUtils;
 import freight.vrp.Locations;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierCostFunction;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
@@ -30,7 +30,7 @@ import vrp.basics.VrpUtils;
 
 public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	private CarrierVehicle carrierVehicle;
 
@@ -53,7 +53,7 @@ public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 	}
 
 
-	public RuinAndRecreateMarginalCostOM(CarrierImpl carrier, Locations locations) {
+	public RuinAndRecreateMarginalCostOM(Carrier carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();

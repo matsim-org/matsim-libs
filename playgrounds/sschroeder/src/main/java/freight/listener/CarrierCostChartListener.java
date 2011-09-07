@@ -12,9 +12,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.mzilske.freight.CarrierTotalCostListener;
+import playground.mzilske.freight.CarrierTotalCostHandler;
 
-public class CarrierCostChartListener implements CarrierTotalCostListener {
+public class CarrierCostChartListener implements CarrierTotalCostHandler {
 
 	public Map<Id,List<CarrierCostEvent>> costEventMap = new HashMap<Id, List<CarrierCostEvent>>();
 	
@@ -27,14 +27,14 @@ public class CarrierCostChartListener implements CarrierTotalCostListener {
 	}
 
 	@Override
-	public void inform(Id carrierId, CarrierCostEvent costEvent) {
-		if(costEventMap.containsKey(carrierId)){
-			costEventMap.get(carrierId).add(costEvent);
+	public void handleEvent(CarrierCostEvent costEvent) {
+		if(costEventMap.containsKey(costEvent.getCarrierId())){
+			costEventMap.get(costEvent.getCarrierId()).add(costEvent);
 		}
 		else{
 			List<CarrierCostEvent> costList = new ArrayList<CarrierCostEvent>();
 			costList.add(costEvent);
-			costEventMap.put(carrierId, costList);
+			costEventMap.put(costEvent.getCarrierId(), costList);
 		}
 	}
 
@@ -62,7 +62,7 @@ public class CarrierCostChartListener implements CarrierTotalCostListener {
 			double totalDist = 0.0;
 			for(Id id : costEventMap.keySet()){
 				Collection<CarrierCostEvent> costEvents = costEventMap.get(id);
-				List<CarrierCostEvent> list = new ArrayList<CarrierTotalCostListener.CarrierCostEvent>();
+				List<CarrierCostEvent> list = new ArrayList<CarrierTotalCostHandler.CarrierCostEvent>();
 				list.addAll(costEvents);
 				CarrierCostEvent event = list.get(list.size()-1);
 

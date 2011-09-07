@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
@@ -162,7 +162,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 	
 	private static Logger logger = Logger.getLogger(AverageMarginalCostOM.class);
 	
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	private CarrierVehicle carrierVehicle;
 
@@ -186,7 +186,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 		this.network = network;
 	}
 
-	public AverageMarginalCostOM(CarrierImpl carrier, Locations locations) {
+	public AverageMarginalCostOM(Carrier carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();

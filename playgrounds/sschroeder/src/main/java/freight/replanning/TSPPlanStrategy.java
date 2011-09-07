@@ -8,8 +8,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
 import playground.mzilske.freight.Contract;
@@ -91,7 +91,7 @@ public class TSPPlanStrategy {
 
 		Set<Id> carriers = getCarriersToReplan(oldContracts,newContracts);
 		for(Id id : carriers){
-			CarrierImpl carrier = carrierAgentTracker.getCarrier(id);
+			Carrier carrier = carrierAgentTracker.getCarrier(id);
 			CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrier.getContracts());
 			carrier.setSelectedPlan(plan);
 		}		

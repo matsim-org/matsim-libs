@@ -3,6 +3,7 @@ package freight;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierCapabilities;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierKnowledge;
@@ -22,7 +23,7 @@ public class CarrierUtils {
 		return carrier;
 	}
 
-	public static CarrierVehicle createAndAddVehicle(CarrierImpl carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity){
+	public static CarrierVehicle createAndAddVehicle(Carrier carrier, String vehicleId, String vehicleLocationId, int vehicleCapacity){
 		CarrierVehicle vehicle = new CarrierVehicle(makeId(vehicleId), makeId(vehicleLocationId));
 		vehicle.setCapacity(vehicleCapacity);
 		if(carrier.getCarrierCapabilities() != null){
@@ -56,7 +57,7 @@ public class CarrierUtils {
 		return new TimeWindow(start, end);
 	}
 
-	public static void createAndAddContract(CarrierImpl carrier, Shipment shipment, Offer offer){
+	public static void createAndAddContract(Carrier carrier, Shipment shipment, Offer offer){
 		Contract contract = createContract(shipment, offer);
 		carrier.getContracts().add(contract);
 	}

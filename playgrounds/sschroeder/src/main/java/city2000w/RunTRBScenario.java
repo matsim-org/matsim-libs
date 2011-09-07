@@ -41,25 +41,37 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierEventHandler;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
-import playground.mzilske.freight.CarrierTotalCostListener;
+import playground.mzilske.freight.CarrierTotalCostHandler;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPPlan;
+import playground.mzilske.freight.TSPPlanBuilder;
 import playground.mzilske.freight.TSPTotalCostListener;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
-import playground.mzilske.freight.TSPPlanBuilder;
 import freight.CarrierAgentFactoryImpl;
 import freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;
+import freight.ShipperAgentFactoryImpl;
+import freight.ShipperAgentTracker;
+import freight.ShipperContract;
+import freight.ShipperImpl;
+import freight.ShipperPlan;
+import freight.ShipperPlanReader;
+import freight.ShipperPlanWriter;
+import freight.Shippers;
+import freight.TSPAgentFactoryImpl;
+import freight.TSPPlanReader;
+import freight.TSPPlanWriter;
 import freight.api.ShipperAgentFactory;
 import freight.listener.CarrierCostChartListener;
 import freight.listener.ComFlowCostChartListener;
@@ -74,17 +86,6 @@ import freight.replanning.ShipperPlanStrategy;
 import freight.replanning.TSPPlanStrategy;
 import freight.utils.OfferRecorder;
 import freight.utils.OfferRecorder.OfferRecord;
-import freight.ShipperAgentFactoryImpl;
-import freight.ShipperAgentTracker;
-import freight.ShipperContract;
-import freight.ShipperImpl;
-import freight.ShipperPlan;
-import freight.ShipperPlanReader;
-import freight.ShipperPlanWriter;
-import freight.Shippers;
-import freight.TSPAgentFactoryImpl;
-import freight.TSPPlanReader;
-import freight.TSPPlanWriter;
 
 /**
  * @author schroeder
@@ -152,6 +153,8 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	
 	private int iteration = 0;
 	
+	private List<CarrierEventHandler> carrierEventHandlers = new ArrayList<CarrierEventHandler>();
+	
 	/**
 	 * @param args
 	 */
@@ -210,7 +213,10 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		CarrierAgentFactoryImpl carrierAgentFactory = new CarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm());
 		carrierAgentFactory.setOfferRecorder(offerRecorder);
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
-		carrierAgentTracker.getTotalCostListeners().add(new CarrierCostChartListener(outputDirectory.getAbsolutePath() + "/trbCarrierCosts.png"));
+		CarrierCostChartListener chartHandler = new CarrierCostChartListener(outputDirectory.getAbsolutePath() + "/trbCarrierCosts.png");
+		carrierAgentTracker.getEventsManager().addHandler(chartHandler);
+		carrierEventHandlers.add(chartHandler);
+//		carrierAgentTracker.getTotalCostListeners().add(new CarrierCostChartListener(outputDirectory.getAbsolutePath() + "/trbCarrierCosts.png"));
 		
 		
 		TSPAgentFactoryImpl tspAgentFactory = new TSPAgentFactoryImpl(carrierAgentTracker);
@@ -228,7 +234,6 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		tspAgentTracker.getTotalCostListeners().add(new TSPCostChartListener(outputDirectory.getAbsolutePath() + "/trbTSPCosts.png"));
 		
 		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
-		carrierAgentTracker.getCostListeners().add(tspAgentTracker);
 		
 		createShipperPlans();
 		
@@ -263,7 +268,7 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	}
 
 	private void setNoGoLocationForCarriers() {
-		CarrierImpl carrier = carriers.getCarriers().get(new IdImpl("carrier_heavy"));
+		Carrier carrier = carriers.getCarriers().get(new IdImpl("carrier_heavy"));
 		Set<Id> noGo = new HashSet<Id>();
 		for(ShipperImpl s : shippers.getShippers()){
 			for(ShipperContract c : s.getContracts()){
@@ -472,7 +477,7 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	}
 
 	private void createCarrierPlans() {
-		for(CarrierImpl carrier : carriers.getCarriers().values()){
+		for(Carrier carrier : carriers.getCarriers().values()){
 //			MarginalCostCalculator costCalculator = new MarginalCostCalculator();
 			RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder planBuilder = 
 				new RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder(scenario.getNetwork());
@@ -500,12 +505,12 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	}
 
 	private void readCarriers() {
-		Collection<CarrierImpl> carriers = new ArrayList<CarrierImpl>();
+		Collection<Carrier> carriers = new ArrayList<Carrier>();
 		new CarrierPlanReader(carriers).read(CARRIERNPLAN_FILENAME);
 		this.carriers = new Carriers(carriers);
 	}
 	
-	private void setNoGoLocations(CarrierImpl carrier){
+	private void setNoGoLocations(Carrier carrier){
 		
 	}
 
@@ -519,13 +524,13 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		new ShipperPlanWriter(shippers.getShippers()).write(outputDirectory.getAbsolutePath() + "/trbShippersAfterIteration.xml");
 		new TSPPlanWriter(transportServiceProviders.getTransportServiceProviders()).write(outputDirectory.getAbsolutePath() + "/trbTspAfterIteration.xml");
 		new CarrierPlanWriter(carriers.getCarriers().values()).write(outputDirectory.getAbsolutePath() + "/trbCarrierAfterIteration.xml");
+		for(CarrierEventHandler h : carrierEventHandlers){
+			h.finish();
+		}
 		for(ShipperTotalCostListener l : shipperAgentTracker.getTotalCostListeners()){
 			l.finish();
 		}
 		for(ShipperDetailedCostListener l : shipperAgentTracker.getDetailedCostListeners()){
-			l.finish();
-		}
-		for(CarrierTotalCostListener l : carrierAgentTracker.getTotalCostListeners()){
 			l.finish();
 		}
 		for(TSPTotalCostListener l : tspAgentTracker.getTotalCostListeners()){

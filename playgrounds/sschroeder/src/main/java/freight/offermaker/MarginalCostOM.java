@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
@@ -89,7 +89,7 @@ public class MarginalCostOM implements OfferMaker{
 	
 	private static Logger logger = Logger.getLogger(MarginalCostOM.class);
 	
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	private CarrierVehicle carrierVehicle;
 
@@ -107,7 +107,7 @@ public class MarginalCostOM implements OfferMaker{
 	
 	private Map<ServiceProvider,Tour> tours = new HashMap<ServiceProvider, Tour>();
 	
-	public MarginalCostOM(CarrierImpl carrier, Locations locations) {
+	public MarginalCostOM(Carrier carrier, Locations locations) {
 		super();
 		this.carrier = carrier;
 		carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();

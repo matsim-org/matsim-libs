@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierVehicle;
@@ -32,11 +33,11 @@ public class TourGenerator {
 	
 	private List<Company> companies;
 	
-	private List<CarrierImpl> carriers;
+	private List<Carrier> carriers;
 	
 	private VehicleFleetBuilder vehicleFleetBuilder;
 	
-	public TourGenerator(List<Region> regions, List<Company> companies, List<CarrierImpl> carriers) {
+	public TourGenerator(List<Region> regions, List<Company> companies, List<Carrier> carriers) {
 		super();
 		this.regions = regions;
 		this.companies = companies;
@@ -63,7 +64,7 @@ public class TourGenerator {
 	}
 	
 	
-	private void buildVehicleFleet(CarrierImpl carrier) {
+	private void buildVehicleFleet(Carrier carrier) {
 		
 		
 	}
@@ -77,7 +78,7 @@ public class TourGenerator {
 		}
 	}
 
-	private CarrierVehicle getCarrierVehicle(CarrierImpl carrier, int i) {
+	private CarrierVehicle getCarrierVehicle(Carrier carrier, int i) {
 		CarrierVehicle vehicle = new CarrierVehicle(makeId(carrier.getId().toString() + "_" + i), carrier.getDepotLinkId());
 		return vehicle;
 	}

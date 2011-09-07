@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
+import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.FreightConstants;
@@ -26,13 +27,13 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 
 	private static Logger logger = Logger.getLogger(CarrierPlanWriter.class);
 
-	private Collection<CarrierImpl> carriers;
+	private Collection<Carrier> carriers;
 	
 	private int idCounter = 0;
 	
 	private Map<Shipment,Id> registeredShipments = new HashMap<Shipment, Id>();
 
-	public CarrierPlanWriter(Collection<CarrierImpl> carriers) {
+	public CarrierPlanWriter(Collection<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}
@@ -43,7 +44,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 			openFile(filename);
 			writeXmlHead();
 			startCarriers(this.writer);
-			for(CarrierImpl carrier : carriers){
+			for(Carrier carrier : carriers){
 				startCarrier(carrier,this.writer);
 				endCarrier(this.writer);
 			}
@@ -63,7 +64,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		registeredShipments.clear();
 	}
 
-	private void startCarrier(CarrierImpl carrier, BufferedWriter writer) throws IOException {
+	private void startCarrier(Carrier carrier, BufferedWriter writer) throws IOException {
 		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\" linkId=\"" + carrier.getDepotLinkId() + "\">\n");
 		startVehicles(writer);
 		for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
