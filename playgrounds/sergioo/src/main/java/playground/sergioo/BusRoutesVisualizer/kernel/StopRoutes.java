@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.sergioo.GTFS.Stop;
+import playground.sergioo.GTFS2PTSchedule.Stop;
 
 public class StopRoutes {
 	

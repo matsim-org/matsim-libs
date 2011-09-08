@@ -32,7 +32,7 @@ public class MatchingProcess {
 		matchingSteps.add(networksStep);
 	}
 
-	public void execute(Network networkA, Network networkB, int a) {
+	public void execute(Network networkA, Network networkB) {
 		MatchingComposedNetwork cNetworkA = MatchingComposedNetwork.convert(networkA);
 		MatchingComposedNetwork cNetworkB = MatchingComposedNetwork.convert(networkB);
 		for(NetworksStep step:matchingSteps) {
@@ -63,7 +63,12 @@ public class MatchingProcess {
 	public Network getFinalNetworkB() {
 		return finalNetworkB;
 	}
-
+	
+	public List<Network> getAllNetworks() {
+		//TODO
+		return null;
+	}
+	
 	public Network getNetworkA(int stepNumber) {
 		return matchingSteps.get(stepNumber).getNetworkA();
 	}

@@ -17,8 +17,8 @@ public abstract class MatchingStep extends NetworksStep {
 	
 	//Methods
 
-	public MatchingStep(Region region) {
-		super(region);
+	public MatchingStep(String name, Region region) {
+		super(name, region);
 		nodesMatchings = new HashSet<NodesMatching>();
 	}
 

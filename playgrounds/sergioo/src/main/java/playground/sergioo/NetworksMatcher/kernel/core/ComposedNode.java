@@ -87,6 +87,10 @@ public class ComposedNode implements Node, Cloneable {
 	public List<Link> getIncidentLinks() {
 		return incidentLinks;
 	}
+	
+	public void setIncidentLinks(List<Link> incidentLinks) {
+		this.incidentLinks = incidentLinks;
+	}
 
 	public void setIncidentLinks() {
 		incidentLinks = new ArrayList<Link>();
@@ -233,7 +237,11 @@ public class ComposedNode implements Node, Cloneable {
 	}
 	
 	public ComposedNode clone() {
-		return new ComposedNode(nodes);
+		ComposedNode node = new ComposedNode(nodes);
+		node.setContainerNode(containerNode);
+		node.setIncidentLinks(incidentLinks);
+		node.setType(type);
+		return node;
 	}
 
 }

@@ -25,7 +25,7 @@ public class CrossingReductionStep extends NetworksStep {
 
 	
 	public CrossingReductionStep(Region region, Set<NodesMatching> nodesMatchings) {
-		super(region);
+		super("Crossing reduction step", region);
 		this.nodesMatchings = nodesMatchings;
 	}
 
@@ -52,6 +52,9 @@ public class CrossingReductionStep extends NetworksStep {
 							composedLink.setFromNode(fromNode);
 							composedLink.setToNode(composedNodeA);
 							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							composedLink.setFromMatched(((MatchingComposedLink)link).isFromMatched());
+							composedLink.setToMatched(((MatchingComposedLink)link).isToMatched());
+							composedLink.setIncident(((MatchingComposedLink)link).isIncident());
 							networks[0].addLink(composedLink);
 						}
 					}
@@ -69,6 +72,9 @@ public class CrossingReductionStep extends NetworksStep {
 								toNode = networks[0].getNodes().get(((ComposedNode)composedLink.getToNode()).getContainerNode().getId());
 							composedLink.setToNode(toNode);
 							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							composedLink.setFromMatched(((MatchingComposedLink)link).isFromMatched());
+							composedLink.setToMatched(((MatchingComposedLink)link).isToMatched());
+							composedLink.setIncident(((MatchingComposedLink)link).isIncident());
 							networks[0].addLink(composedLink);
 						}
 					}			
@@ -93,6 +99,9 @@ public class CrossingReductionStep extends NetworksStep {
 							composedLink.setFromNode(fromNode);
 							composedLink.setToNode(composedNodeB);
 							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							composedLink.setFromMatched(((MatchingComposedLink)link).isFromMatched());
+							composedLink.setToMatched(((MatchingComposedLink)link).isToMatched());
+							composedLink.setIncident(((MatchingComposedLink)link).isIncident());
 							networks[1].addLink(composedLink);
 						}
 					}
@@ -110,6 +119,9 @@ public class CrossingReductionStep extends NetworksStep {
 								toNode = networks[1].getNodes().get(((ComposedNode)composedLink.getToNode()).getContainerNode().getId());
 							composedLink.setToNode(toNode);
 							composedLink.getLinks().addAll(((ComposedLink)link).getLinks());
+							composedLink.setFromMatched(((MatchingComposedLink)link).isFromMatched());
+							composedLink.setToMatched(((MatchingComposedLink)link).isToMatched());
+							composedLink.setIncident(((MatchingComposedLink)link).isIncident());
 							networks[1].addLink(composedLink);
 						}
 					}			

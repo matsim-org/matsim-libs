@@ -1,4 +1,4 @@
-package playground.sergioo.GTFS;
+package playground.sergioo.GTFS2PTSchedule;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,10 +52,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
-import playground.sergioo.GTFS.auxiliar.LinkStops;
-import playground.sergioo.PathEditor.gui.Window;
-import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
+import playground.sergioo.GTFS2PTSchedule.auxiliar.LinkStops;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.gui.Window;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutesPathsGenerator;
+import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 

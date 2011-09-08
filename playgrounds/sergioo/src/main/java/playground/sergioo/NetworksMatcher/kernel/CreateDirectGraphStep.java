@@ -25,7 +25,7 @@ public class CreateDirectGraphStep extends NetworksStep {
 	//Methods
 
 	public CreateDirectGraphStep(Region region) {
-		super(region);
+		super("Create direct graph step", region);
 		
 	}
 

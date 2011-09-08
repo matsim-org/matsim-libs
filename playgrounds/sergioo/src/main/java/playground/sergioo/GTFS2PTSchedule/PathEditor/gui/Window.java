@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.PathEditor.gui;
+package playground.sergioo.GTFS2PTSchedule.PathEditor.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -52,10 +52,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.GTFS.Stop;
-import playground.sergioo.GTFS.Trip;
-import playground.sergioo.PathEditor.kernel.RoutePath;
-import playground.sergioo.PathEditor.kernel.RoutesPathsGenerator;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutePath;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutesPathsGenerator;
+import playground.sergioo.GTFS2PTSchedule.Stop;
+import playground.sergioo.GTFS2PTSchedule.Trip;
 import util.geometry.Point2D;
 
 public class Window extends JFrame implements ActionListener {

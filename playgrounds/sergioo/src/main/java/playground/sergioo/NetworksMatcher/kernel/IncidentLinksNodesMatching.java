@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 
 public class IncidentLinksNodesMatching extends NodesMatching {
@@ -50,6 +51,8 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 			linksSmall = linksBig;
 			linksBig = linksTemp;
 		}
+		for(Link linkBig:linksBig)
+			((MatchingComposedLink)linkBig).setIncident(true);
 		return linksAnglesMatches(linksSmall, linksBig, new ArrayList<Integer>());
 	}
 
@@ -63,6 +66,17 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 				numChanges++;
 			if(numChanges==1) {
 				linksMatchingIndices = indicesBig;
+				for(int i:indicesBig)
+					if(smallABigB)
+						if(composedNodeB.getId().equals(linksBig.get(i).getFromNode().getId()))
+							((MatchingComposedLink)linksBig.get(i)).setFromMatched(true);
+						else
+							((MatchingComposedLink)linksBig.get(i)).setToMatched(true);
+					else
+						if(composedNodeA.getId().equals(linksBig.get(i).getFromNode().getId()))
+							((MatchingComposedLink)linksBig.get(i)).setFromMatched(true);
+						else
+							((MatchingComposedLink)linksBig.get(i)).setToMatched(true);
 				return true;
 			}
 			else
@@ -75,6 +89,17 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 					anglesDifference = 2*Math.PI - anglesDifference;
 				if(!indicesBig.contains(b) && anglesDifference<minAngle) {
 					List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
+					if(smallABigB)
+						if(composedNodeA.getId().equals(linksSmall.get(0).getFromNode().getId()))
+							((MatchingComposedLink)linksSmall.get(0)).setFromMatched(true);
+						else
+							((MatchingComposedLink)linksSmall.get(0)).setToMatched(true);
+					else
+						if(composedNodeB.getId().equals(linksSmall.get(0).getFromNode().getId()))
+							((MatchingComposedLink)linksSmall.get(0)).setFromMatched(true);
+						else
+							((MatchingComposedLink)linksSmall.get(0)).setToMatched(true);
+					((MatchingComposedLink)linksSmall.get(0)).setIncident(true);
 					newLinksSmall.remove(linksSmall.get(0));
 					List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
 					newIndicesBig.add(b);

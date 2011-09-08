@@ -1,4 +1,4 @@
-package playground.sergioo.GTFS.auxiliar;
+package playground.sergioo.GTFS2PTSchedule.auxiliar;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,7 +14,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.sergioo.GTFS.Stop;
+import playground.sergioo.GTFS2PTSchedule.Stop;
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 

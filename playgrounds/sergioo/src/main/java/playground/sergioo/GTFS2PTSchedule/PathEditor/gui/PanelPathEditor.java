@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.PathEditor.gui;
+package playground.sergioo.GTFS2PTSchedule.PathEditor.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.PathEditor.gui.Window.Option;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.gui.Window.Option;
 import util.geometry.Point2D;
 
 public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {

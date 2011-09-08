@@ -1,8 +1,8 @@
-package playground.sergioo.GTFS;
+package playground.sergioo.GTFS2PTSchedule;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 
 public class Stop {
 	

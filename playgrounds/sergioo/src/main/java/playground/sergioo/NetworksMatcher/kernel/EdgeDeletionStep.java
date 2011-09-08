@@ -1,31 +1,36 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.api.core.v01.network.Link;
 
+import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedNetwork;
 import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
-import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 
 public class EdgeDeletionStep extends NetworksStep {
 
 	
-	//Attributes
-
-	private Set<NodesMatching> incidentLinksNodesMatchings;
-
-
 	//Methods
 	
-	public EdgeDeletionStep(Region region, Set<NodesMatching> incidentLinksNodesMatchings) {
-		super(region);
-		this.incidentLinksNodesMatchings = incidentLinksNodesMatchings;
+	public EdgeDeletionStep(Region region) {
+		super("Edge deletion step", region);
 	}
 
 	@Override
+	protected MatchingComposedNetwork[] execute() {
+		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA.clone(), networkB.clone()};
+		for(Link link:networkA.getLinks().values()) {
+			if(((MatchingComposedLink)link).isIncident() && !((MatchingComposedLink)link).isFromMatched() && !((MatchingComposedLink)link).isToMatched())
+				networks[0].removeLink(link.getId());
+		}
+		for(Link link:networkB.getLinks().values()) {
+			if(((MatchingComposedLink)link).isIncident() && !((MatchingComposedLink)link).isFromMatched() && !((MatchingComposedLink)link).isToMatched())
+				networks[1].removeLink(link.getId());
+		}
+		return networks;
+	}
+	
+	/*@Override
 	protected MatchingComposedNetwork[] execute() {
 		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA.clone(), networkB.clone()};
 		for(Link link:networkA.getLinks().values()) {
@@ -66,10 +71,10 @@ public class EdgeDeletionStep extends NetworksStep {
 				}
 			}
 			if(numFree==2)
-				networks[0].removeLink(link.getId());
+				networks[1].removeLink(link.getId());
 		}
 		return networks;
-	}
+	}*/
 
 
 }

@@ -1,4 +1,4 @@
-package playground.sergioo.PathEditor.gui;
+package playground.sergioo.GTFS2PTSchedule.PathEditor.gui;
 
 import util.geometry.Point2D;
 import util.geometry.Vector2D;

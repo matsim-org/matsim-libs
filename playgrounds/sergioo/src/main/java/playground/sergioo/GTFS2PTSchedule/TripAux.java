@@ -1,4 +1,4 @@
-package playground.sergioo.GTFS;
+package playground.sergioo.GTFS2PTSchedule;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -149,15 +149,13 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
 		if(networksSeparated) {
-			panelsPanel.remove(layersPanels.get(PanelIds.DOUBLE));
 			layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
-			panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
-			panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
+			this.remove(layersPanels.get(PanelIds.DOUBLE));
+			this.add(panelsPanel);
 		}
 		else {
-			panelsPanel.remove(layersPanels.get(PanelIds.A));
-			panelsPanel.remove(layersPanels.get(PanelIds.B));
-			panelsPanel.add(layersPanels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
+			this.remove(panelsPanel);
+			this.add(layersPanels.get(PanelIds.DOUBLE), BorderLayout.CENTER);
 		}
 		setVisible(true);
 		repaint();

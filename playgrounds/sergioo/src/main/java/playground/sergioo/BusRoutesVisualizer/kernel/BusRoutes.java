@@ -16,8 +16,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.BusRoutesVisualizer.gui.Window;
-import playground.sergioo.GTFS.GTFSDefinitions;
-import playground.sergioo.GTFS.Stop;
+import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions;
+import playground.sergioo.GTFS2PTSchedule.Stop;
 
 public class BusRoutes {
 	

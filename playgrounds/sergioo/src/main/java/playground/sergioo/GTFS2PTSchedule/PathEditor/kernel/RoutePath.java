@@ -1,4 +1,4 @@
-package playground.sergioo.PathEditor.kernel;
+package playground.sergioo.GTFS2PTSchedule.PathEditor.kernel;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,10 +29,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.sergioo.GTFS.Shape;
-import playground.sergioo.GTFS.Stop;
-import playground.sergioo.GTFS.StopTime;
-import playground.sergioo.GTFS.Trip;
+import playground.sergioo.GTFS2PTSchedule.Shape;
+import playground.sergioo.GTFS2PTSchedule.Stop;
+import playground.sergioo.GTFS2PTSchedule.StopTime;
+import playground.sergioo.GTFS2PTSchedule.Trip;
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 import util.geometry.Vector2D;

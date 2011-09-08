@@ -1,9 +1,9 @@
-package playground.sergioo.GTFS;
+package playground.sergioo.GTFS2PTSchedule;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 
 public class Route {
 	                           

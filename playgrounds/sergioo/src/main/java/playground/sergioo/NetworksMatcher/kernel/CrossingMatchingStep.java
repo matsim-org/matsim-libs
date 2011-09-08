@@ -23,11 +23,13 @@ public class CrossingMatchingStep extends MatchingStep {
 	//Methods
 
 	public CrossingMatchingStep(Region region, double radius, double minAngle) {
-		super(region);
+		super("Crossing matching step", region);
 		nodesMatchings = new HashSet<NodesMatching>();
 		this.radius = radius;
 		ComposedNode.radius = radius;
 		IncidentLinksNodesMatching.minAngle = minAngle;
+		networkSteps.add(new CreateDirectGraphStep(region));
+		internalStepPosition = 1;
 	}
 
 	public void setRadius(double radius) {
@@ -60,9 +62,7 @@ public class CrossingMatchingStep extends MatchingStep {
 
 	@Override
 	protected MatchingComposedNetwork[] execute() {
-		System.out.println("Beginning");
-		MatchingComposedNetwork[] networks = new CreateDirectGraphStep(region).execute(networkA, networkB);
-		System.out.println("Types reduction");
+		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA.clone(), networkB.clone()};
 		Set<Node> alreadyReducedA = new HashSet<Node>();
 		Set<Node> alreadyReducedB = new HashSet<Node>();
 		for(Node node:networks[0].getNodes().values())
@@ -97,11 +97,8 @@ public class CrossingMatchingStep extends MatchingStep {
 							}
 				}
 			}
-		System.out.println("Matching");
-		networks = new CrossingReductionStep(region, nodesMatchings).execute(networks[0], networks[1]);
-		System.out.println("Matched nodes reduction");
-		networks = new EdgeDeletionStep(region, nodesMatchings).execute(networks[0], networks[1]);
-		System.out.println("Edges reduction");
+		networkSteps.add(new CrossingReductionStep(region, nodesMatchings));
+		networkSteps.add(new EdgeDeletionStep(region));
 		return networks;
 	}
 

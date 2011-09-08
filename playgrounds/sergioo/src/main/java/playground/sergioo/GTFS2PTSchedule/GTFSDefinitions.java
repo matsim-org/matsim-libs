@@ -1,4 +1,4 @@
-package playground.sergioo.GTFS;
+package playground.sergioo.GTFS2PTSchedule;
 
 public enum GTFSDefinitions {
 	

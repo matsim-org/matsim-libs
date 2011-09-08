@@ -32,11 +32,14 @@ public abstract class LayersPanel extends JPanel {
 	private int frameSize=10;
 	protected byte activeLayer = 0;
 	protected byte principalLayer = 0;
+	private LayersInternalPanel layersInternalPanel;
 	
 	//Methods
 	public LayersPanel() {
 		layers = new ArrayList<Layer>();
 		camera = new Camera();
+		layersInternalPanel = new LayersInternalPanel(this);
+		this.add(layersInternalPanel);
 	}
 	public Camera getCamera() {
 		return camera;
@@ -100,10 +103,6 @@ public abstract class LayersPanel extends JPanel {
 				yMax = y;
 		}
 	}
-	public void setBounds(int x, int y, int width, int height) {
-        super.setBounds(x, y, width, height);
-        setAspectRatio();
-    }
 	protected void setPreferredSize(double maxWidth, double maxHeight) {
 		double aspectRatio = (xMax-xMin)/(yMax-yMin);
 		double width = maxHeight*aspectRatio;
@@ -112,7 +111,7 @@ public abstract class LayersPanel extends JPanel {
 		int heightInt=(int) (1/aspectRatio>maxHeight/maxWidth?maxHeight:height);
 		setPreferredSize(new Dimension(widthInt, heightInt));
 	}
-	private void setAspectRatio() {
+	void setAspectRatio() {
 		width = this.getWidth()-2*frameSize;
 		height = this.getHeight()-2*frameSize;
 		double aspectRatioPanel = ((double)width)/((double)height);

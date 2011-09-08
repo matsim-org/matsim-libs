@@ -25,10 +25,10 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.sergioo.GTFS.GTFSDefinitions.RouteTypes;
+import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport.LinkDrawInformation;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity.LinkDrawInformation;
 
 public class PublicTransportNetworkPainter extends NetworkPainter {
 	

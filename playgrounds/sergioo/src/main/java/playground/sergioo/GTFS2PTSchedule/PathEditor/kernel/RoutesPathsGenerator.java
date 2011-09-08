@@ -1,4 +1,4 @@
-package playground.sergioo.PathEditor.kernel;
+package playground.sergioo.GTFS2PTSchedule.PathEditor.kernel;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -22,11 +22,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.GTFS.Route;
-import playground.sergioo.GTFS.Stop;
-import playground.sergioo.GTFS.StopTime;
-import playground.sergioo.GTFS.Trip;
-import playground.sergioo.PathEditor.gui.Window;
+import playground.sergioo.GTFS2PTSchedule.PathEditor.gui.Window;
+import playground.sergioo.GTFS2PTSchedule.Route;
+import playground.sergioo.GTFS2PTSchedule.Stop;
+import playground.sergioo.GTFS2PTSchedule.StopTime;
+import playground.sergioo.GTFS2PTSchedule.Trip;
 
 public class RoutesPathsGenerator {
 	

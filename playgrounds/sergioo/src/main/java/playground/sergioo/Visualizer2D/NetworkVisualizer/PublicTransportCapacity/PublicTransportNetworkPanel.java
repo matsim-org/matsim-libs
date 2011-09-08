@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport;
+package playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity;
 
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -38,7 +38,7 @@ import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransport.PublicTransportNetworkWindow.Option;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity.PublicTransportNetworkWindow.Option;
 
 public class PublicTransportNetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, KeyListener {
 	

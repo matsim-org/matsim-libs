@@ -13,7 +13,7 @@ public class MatchingComposedLink extends ComposedLink {
 	
 	private boolean fromMatched = false;
 	private boolean toMatched = false;
-	
+	private boolean isIncident = false;
 	
 	//Methods
 	
@@ -39,6 +39,14 @@ public class MatchingComposedLink extends ComposedLink {
 
 	public void setToMatched(boolean toMatched) {
 		this.toMatched = toMatched;
+	}
+
+	public boolean isIncident() {
+		return isIncident;
+	}
+
+	public void setIncident(boolean isIncident) {
+		this.isIncident = isIncident;
 	}
 
 	public void applyProperties(MatchingComposedLink fullLink) {
