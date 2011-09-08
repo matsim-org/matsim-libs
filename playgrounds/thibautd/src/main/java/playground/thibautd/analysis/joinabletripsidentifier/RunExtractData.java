@@ -47,7 +47,6 @@ public class RunExtractData {
 		ScenarioUtils.loadScenario(scenario);
 		Network network = scenario.getNetwork();
 
-		// TODO: log pour voir ou probleme (module.getValue(DIST) retourne null)
 		Module module = config.getModule(MODULE);
 		String eventFile = module.getValue(EVENTS);
 		double acceptableDist = Double.parseDouble(module.getValue(DIST));

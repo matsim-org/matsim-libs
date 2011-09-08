@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -75,7 +76,15 @@ public class JoinableTrips {
 		identifyJoinableTrips(tripReconstructor);
 	}
 
-	// TODO: constructor "from file"
+	public JoinableTrips(
+			final double distanceRadius,
+			final double timeRadius,
+			final Map<Id, TripRecord> tripRecords) {
+		this.distanceRadius = distanceRadius;
+		this.timeRadius = timeRadius;
+
+		this.tripRecords.putAll(tripRecords);
+	}
 	
 	// /////////////////////////////////////////////////////////////////////////
 	// Joinable trip identification methods
@@ -257,6 +266,35 @@ public class JoinableTrips {
 			this.joinableTrips = Collections.unmodifiableList(joinableTrips);
 		}
 
+		TripRecord(
+				final String tripId,
+				final String agentId,
+				final String mode,
+				final String originLinkId,
+				final String originActivityType,
+				final String departureTime,
+				final String destinationLinkId,
+				final String destinationActivityType,
+				final String arrivalTime,
+				final String legNumber,
+				final List<JoinableTrip> joinableTrips) {
+			this.tripId = new IdImpl(tripId);
+			this.agentId = new IdImpl(agentId);
+			this.mode = mode;
+
+			this.originLinkId = new IdImpl(originLinkId);
+			this.originActivityType = originActivityType;
+			this.departureTime = Double.parseDouble(departureTime);
+
+			this.destinationLinkId = new IdImpl(destinationLinkId);
+			this.destinationActivityType = destinationActivityType;
+			this.arrivalTime = Double.parseDouble(arrivalTime);
+
+			this.legNumber = Integer.valueOf(legNumber);
+			this.joinableTrips = joinableTrips;
+		}
+
+
 		/**
 		 * Gets the trip Id for this instance.
 		 *
@@ -373,11 +411,11 @@ public class JoinableTrips {
 
 		private List<Passage> passages = new ArrayList<Passage>();
 
-		private JoinableTrip(final Id tripId) {
+		JoinableTrip(final Id tripId) {
 			this.tripId = tripId;
 		}
 
-		private void addPassage(
+		void addPassage(
 				final Passage.Type type,
 				final double distance,
 				final double timeDifference) {
