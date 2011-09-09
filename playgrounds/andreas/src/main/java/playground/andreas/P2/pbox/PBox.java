@@ -28,6 +28,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -167,7 +168,7 @@ public class PBox {
 	 * 
 	 * @param event
 	 */
-	public void score(IterationEndsEvent event) {
+	public void score(ScoringEvent event) {
 		TreeMap<Id, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Cooperative cooperative : this.cooperatives) {
 			cooperative.score(driverId2ScoreMap);

@@ -22,11 +22,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -56,7 +56,7 @@ import playground.andreas.osmBB.extended.TransitScheduleImpl;
  * 
  * @author aneumann
  */
-public class PTransitRouterImplFactory implements TransitRouterFactory, IterationStartsListener, IterationEndsListener, StartupListener{
+public class PTransitRouterImplFactory implements TransitRouterFactory, IterationStartsListener, StartupListener, ScoringListener{
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterImplFactory.class);
 
@@ -130,8 +130,8 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	}
 	
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		this.pBox.score(event);		
+	public void notifyScoring(ScoringEvent event) {
+		this.pBox.score(event);	
 	}
 
 	private TransitSchedule addPTransitScheduleToOriginalOne(PTransitSchedule baseSchedule, TransitSchedule pSchedule) {
