@@ -45,6 +45,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
@@ -155,22 +156,26 @@ public class TripReconstructor implements
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
+		if (isPtEvent(event)) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent( event );
 	}
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
+		if (isPtEvent(event)) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkEnterEvent event) {
+		if (isPtEvent(event)) return;
 		//TODO: check if the entry exists
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
+		if (isPtEvent(event)) return;
 		//TODO: check if the entry exists
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
@@ -194,11 +199,15 @@ public class TripReconstructor implements
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
+	public void handleEvent(final ActivityEndEvent event) {
 		//TODO: test wether a value was at this key
 		this.agentsData.put(
 				event.getPersonId(),
 				new TripData(event) );
+	}
+
+	private boolean isPtEvent(final PersonEvent event) {
+		return event.getPersonId().toString().matches("pt_.*");
 	}
 }
 
