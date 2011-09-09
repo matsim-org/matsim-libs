@@ -2,23 +2,12 @@ package freight.listener;
 
 import org.apache.log4j.Logger;
 
-import freight.ShipperAgent.DetailedCost;
-import freight.ShipperAgent.TotalCost;
+import freight.DetailedCostStatusEvent;
+import freight.TotalCostStatusEvent;
 
-public class ShipperCostConsolePrinter implements ShipperDetailedCostListener, ShipperTotalCostListener{
+public class ShipperCostConsolePrinter implements ShipperDetailedCostStatusHandler, ShipperTotalCostStatusHandler{
 
 	private static Logger logger = Logger.getLogger(ShipperCostConsolePrinter.class);
-	
-	@Override
-	public void inform(DetailedCost detailedCost) {
-		logger.info(detailedCost.shipperId + "; comFlow=" + detailedCost.comFlow + "; size=" + detailedCost.shipmentSize + "; freq=" + detailedCost.frequency + 
-				"; tlc=" + detailedCost.tlc + "; transportation=" + detailedCost.transportation + "; inventory=" + detailedCost.inventory);
-	}
-
-	@Override
-	public void inform(TotalCost totalCost) {
-		logger.info(totalCost.shipperId + "; totCosts=" + totalCost.totCost);
-	}
 
 	@Override
 	public void reset(int iteration) {
@@ -30,6 +19,18 @@ public class ShipperCostConsolePrinter implements ShipperDetailedCostListener, S
 	public void finish() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void handleEvent(ShipperTotalCostStatusEvent event) {
+		logger.info(event.getShipperId()+ "; totCosts=" + event.getTotalCosts());
+		
+	}
+
+	@Override
+	public void handleEvent(DetailedCostStatusEvent event) {
+		logger.info(event.getShipperId() + "; comFlow=" + event.getComFlow() + "; size=" + event.getShipmentSize() + "; freq=" + event.getFrequency() + 
+				"; tlc=" + event.getTlc() + "; transportation=" + event.getTransportation() + "; inventory=" + event.getInventory());
 	}
 
 }

@@ -19,39 +19,6 @@ import playground.mzilske.freight.TSPShipment;
 
 public class ShipperAgent {
 	
-	public static class DetailedCost {
-		public Id shipperId;
-		public CommodityFlow comFlow;
-		public int shipmentSize;
-		public int frequency;
-		public double tlc;
-		public double transportation;
-		public double inventory;
-		public DetailedCost(Id shipperId, CommodityFlow comFlow,
-				int shipmentSize, int frequency, double tlc,
-				double transportation, double inventory) {
-			super();
-			this.shipperId = shipperId;
-			this.comFlow = comFlow;
-			this.shipmentSize = shipmentSize;
-			this.frequency = frequency;
-			this.tlc = tlc;
-			this.transportation = transportation;
-			this.inventory = inventory;
-		}
-	}
-	
-	public static class TotalCost {
-		public Id shipperId;
-		public double totCost;
-		public TotalCost(Id shipperId, double totCost) {
-			super();
-			this.shipperId = shipperId;
-			this.totCost = totCost;
-		}
-		
-	}
-	
 	private ShipperImpl shipper;
 	
 	private Id id;
@@ -140,12 +107,12 @@ public class ShipperAgent {
 	}
 
 	private void informTotalCost(double score) {
-		shipperAgentTracker.informTotalCost(new TotalCost(id, score));
+		shipperAgentTracker.processEvent(new TotalCostStatusEvent(id, score));
 	}
 
 	private void informDetailedCosts(CommodityFlow commodityFlow, double tlc, double transportation, double inventory, int shipmentSize,
 			int frequency) {
-		DetailedCost detailedCost = new DetailedCost(this.id, commodityFlow, shipmentSize, frequency, tlc, transportation, inventory);
-		shipperAgentTracker.informDetailedCost(detailedCost);
+		DetailedCostStatusEvent detailedCost = new DetailedCostStatusEvent(this.id, commodityFlow, shipmentSize, frequency, tlc, transportation, inventory);
+		shipperAgentTracker.processEvent(detailedCost);
 	}
 }

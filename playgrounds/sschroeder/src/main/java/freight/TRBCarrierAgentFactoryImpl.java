@@ -12,8 +12,9 @@ import playground.mzilske.freight.CarrierAgent;
 import playground.mzilske.freight.CarrierAgentImpl;
 import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierCostCalculatorImpl;
+import playground.mzilske.freight.CarrierDriverAgentFactory;
 import playground.mzilske.freight.CarrierTimeDistanceCostFunction;
-import playground.mzilske.freight.CostMemoryConsolePrinter;
+import playground.mzilske.freight.CostMemoryStatusConsolePrinter;
 import playground.mzilske.freight.CostMemoryImpl;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.TollCalculator;
@@ -25,7 +26,7 @@ import freight.offermaker.RuinAndRecreateOfferMakingStrategy;
 import freight.utils.OfferRecorder;
 import freight.vrp.LocationsImpl;
 
-public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
+public class TRBCarrierAgentFactoryImpl implements CarrierAgentFactory{
 
 	class MotorwayTollCalc implements TollCalculator {
 
@@ -64,15 +65,16 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 	
 	private LocationsImpl locations;
 
-	private OfferRecorder offerRecorder;
+	private CarrierDriverAgentFactory carrierDriverAgentFactory;
 	
 	public void setOfferMaker(OfferMaker offerMaker) {
 	}
 
-	public CarrierAgentFactoryImpl(Network network, PlanAlgorithm router) {
+	public TRBCarrierAgentFactoryImpl(Network network, PlanAlgorithm router, CarrierDriverAgentFactory driverAgentFactory) {
 		super();
 		this.network = network;
 		this.router = router;
+		this.carrierDriverAgentFactory = driverAgentFactory;
 		makeLocations();
 	}
 
@@ -84,7 +86,7 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 	@Override
 	public CarrierAgent createAgent(CarrierAgentTracker tracker,Carrier carrier) {
 		
-		CarrierAgentImpl carrierAgent = new CarrierAgentImpl(tracker, carrier, router);
+		CarrierAgentImpl carrierAgent = new CarrierAgentImpl(tracker, carrier, router, carrierDriverAgentFactory);
 		CarrierTimeDistanceCostFunction costFunction = new CarrierTimeDistanceCostFunction();
 		costFunction.init(carrier);
 		carrierAgent.setCostFunction(costFunction);
@@ -98,7 +100,6 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 		CostMemoryImpl.learningRate = 0.3;
 		carrierAgent.setCostMemory(costMemory);
 		RuinAndRecreateOfferMakingStrategy strategy = new RuinAndRecreateOfferMakingStrategy(carrier);
-		strategy.setOfferRecorder(offerRecorder);
 		RuinAndRecreateMarginalCostOM marginalCostOM = new RuinAndRecreateMarginalCostOM(carrier, locations);
 		marginalCostOM.setCarrierCostCalculator(costFunction);
 		marginalCostOM.setCarrierPlanBuilder(new RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder(network));
@@ -113,13 +114,11 @@ public class CarrierAgentFactoryImpl implements CarrierAgentFactory{
 		
 		carrierAgent.setOfferMaker(strategy);
 		carrierAgent.setCarrierAgentTracker(tracker);
-		carrierAgent.getCostMemoryListeners().add(new CostMemoryConsolePrinter());
 		carrierAgent.setNetwork(network);
 		return carrierAgent;
 	}
 
 	public void setOfferRecorder(OfferRecorder offerRecorder) {
-		this.offerRecorder = offerRecorder;
 		
 	}
 

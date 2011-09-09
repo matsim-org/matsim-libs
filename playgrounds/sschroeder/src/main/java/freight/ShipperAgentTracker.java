@@ -6,13 +6,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 
 import playground.mzilske.freight.TSPContract;
-import freight.ShipperAgent.DetailedCost;
-import freight.ShipperAgent.TotalCost;
 import freight.api.ShipperAgentFactory;
-import freight.listener.ShipperDetailedCostListener;
-import freight.listener.ShipperTotalCostListener;
+import freight.listener.ShipperDetailedCostStatusHandler;
+import freight.listener.ShipperTotalCostStatusHandler;
 
 public class ShipperAgentTracker {
 	
@@ -23,24 +24,15 @@ public class ShipperAgentTracker {
 	private Collection<ShipperAgent> shipperAgents = new ArrayList<ShipperAgent>();
 	
 	private ShipperAgentFactory shipperAgentFactory;
-
-	private Collection<ShipperTotalCostListener> totalCostListeners = new ArrayList<ShipperTotalCostListener>();
-
-	private Collection<ShipperDetailedCostListener> detailedCostListeners = new ArrayList<ShipperDetailedCostListener>();
-
-	public Collection<ShipperDetailedCostListener> getDetailedCostListeners() {
-		return detailedCostListeners;
-	}
-
-	public Collection<ShipperTotalCostListener> getTotalCostListeners() {
-		return totalCostListeners;
-	}
+	
+	private EventsManager eventsManager;
 
 	public ShipperAgentTracker(Collection<ShipperImpl> shippers, ShipperAgentFactory shipperAgentFactory) {
 		super();
 		this.shipperAgentFactory = shipperAgentFactory;
 		this.shippers = shippers;
 		createShipperAgents();
+		eventsManager = EventsUtils.createEventsManager();
 	}
 
 	private void createShipperAgents() {
@@ -100,21 +92,15 @@ public class ShipperAgentTracker {
 	public ShipperAgent getShipperAgent(Id id) {
 		return findShipperAgent(id);
 	}
-
-	public void informTotalCost(TotalCost totalCost) {
-		for(ShipperTotalCostListener l : totalCostListeners ){
-			l.inform(totalCost);
-		}
-		
-	}
-
-	public void informDetailedCost(DetailedCost detailedCost) {
-		for(ShipperDetailedCostListener l : detailedCostListeners ){
-			l.inform(detailedCost);
-		}
-		
+	
+	public EventsManager getEventsManager() {
+		return eventsManager;
 	}
 	
+	public void processEvent(Event event){
+		eventsManager.processEvent(event);
+	}
+
 	public void scorePlans(){
 		for(ShipperImpl s : shippers){
 			findShipperAgent(s.getId()).scoreSelectedPlan();

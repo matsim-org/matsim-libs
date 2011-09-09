@@ -2,6 +2,7 @@ package freight;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -110,10 +111,24 @@ public class TSPPlanReader extends MatsimXmlParser{
 			currentChains.add(currentChainBuilder.build());
 		}
 		if(name.equals("transportServiceProvider")){
-			TSPPlan plan = new TSPPlan(currentChains);
+			TSPPlan plan = null;
+			if(currentChains != null){
+				plan = new TSPPlan(currentChains);
+			}
+			else{
+				plan = new TSPPlan(Collections.EMPTY_LIST);
+			}
 			tsp.setSelectedPlan(plan);
 			tsps.add(tsp);
+			reset();
 		}
+	}
+
+	private void reset() {
+		currentShipments = null;
+		currentChainBuilder = null;
+		currentChains = null;
+		tsp = null;
 	}
 
 	private int getInt(String value) {

@@ -6,8 +6,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
-import freight.utils.OfferRecorder;
-
 import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.OfferMaker;
@@ -20,12 +18,6 @@ public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 
 	private Carrier carrier;
 	
-	private OfferRecorder offerRecorder;
-	
-	public void setOfferRecorder(OfferRecorder offerRecorder) {
-		this.offerRecorder = offerRecorder;
-	}
-
 	public RuinAndRecreateOfferMakingStrategy(Carrier carrier) {
 		this.carrier = carrier;
 	}
@@ -66,7 +58,6 @@ public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 		}
 		OfferMaker om = selectOM();
 		CarrierOffer requestOffer = om.requestOffer(from, to, shimpentSize, startPickup, endPickup, startDelivery, endDelivery, null);
-		offerRecorder.add(carrier.getId(),from,to,shimpentSize,requestOffer.getPrice(),om.getClass().toString());
 		return requestOffer;
 	}
 

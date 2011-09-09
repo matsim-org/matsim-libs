@@ -12,9 +12,9 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import freight.ShipperAgent;
-import freight.ShipperAgent.TotalCost;
+import freight.TotalCostStatusEvent;
 
-public class TLCCostChartListener implements ShipperTotalCostListener{
+public class TLCCostChartListener implements ShipperTotalCostStatusHandler{
 
 	private Map<Id,List<Double>> costMap = new HashMap<Id, List<Double>>();
 	
@@ -26,15 +26,15 @@ public class TLCCostChartListener implements ShipperTotalCostListener{
 	}
 
 	@Override
-	public void inform(TotalCost totalCost) {
-		if(costMap.containsKey(totalCost.shipperId)){
-			costMap.get(totalCost.shipperId).add(totalCost.totCost);
+	public void handleEvent(ShipperTotalCostStatusEvent event) {
+		if(costMap.containsKey(event.getShipperId())){
+			costMap.get(event.getShipperId()).add(event.getTotalCosts());
 		}
 		else{
 			List<Double> costs = new ArrayList<Double>();
-			costs.add(totalCost.totCost);
-			costMap.put(totalCost.shipperId, costs);
-		}	
+			costs.add(event.getTotalCosts());
+			costMap.put(event.getShipperId(), costs);
+		}
 	}
 
 	@Override

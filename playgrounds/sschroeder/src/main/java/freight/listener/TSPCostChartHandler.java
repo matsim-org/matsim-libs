@@ -11,28 +11,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.mzilske.freight.TSPTotalCostListener;
+import playground.mzilske.freight.TSPTotalCostHandler;
 
-public class TSPCostChartListener implements TSPTotalCostListener{
+public class TSPCostChartHandler implements TSPTotalCostHandler{
 	
 	private Map<Id,List<TSPCostEvent>> costEventMap = new HashMap<Id, List<TSPCostEvent>>();
 
 	private String filename;
 
-	public TSPCostChartListener(String filename) {
+	public TSPCostChartHandler(String filename) {
 		super();
 		this.filename = filename;
 	}
 
 	@Override
-	public void inform(TSPCostEvent costEvent) {
-		if(costEventMap.containsKey(costEvent.id)){
-			costEventMap.get(costEvent.id).add(costEvent);
+	public void handleEvent(TSPCostEvent event) {
+		if(costEventMap.containsKey(event.getTspId())){
+			costEventMap.get(event.getTspId()).add(event);
 		}
 		else{
-			List<TSPCostEvent> list = new ArrayList<TSPTotalCostListener.TSPCostEvent>();
-			list.add(costEvent);
-			costEventMap.put(costEvent.id, list);
+			List<TSPCostEvent> list = new ArrayList<TSPTotalCostHandler.TSPCostEvent>();
+			list.add(event);
+			costEventMap.put(event.getTspId(), list);
 		}
 		
 	}
@@ -59,8 +59,8 @@ public class TSPCostChartListener implements TSPTotalCostListener{
 			for(Id tspId : costEventMap.keySet()){
 				List<TSPCostEvent> l = costEventMap.get(tspId);
 				TSPCostEvent cost = l.get(l.size()-1);
-				writer.write(tspId.toString() + ";" + cost.volume + "\n");
-				total += cost.volume;
+				writer.write(tspId.toString() + ";" + cost.getVolume() + "\n");
+				total += cost.getVolume();
 			}
 			writer.write("total;"+total+"\n");
 			writer.close();
@@ -103,7 +103,7 @@ public class TSPCostChartListener implements TSPTotalCostListener{
 		for(int i=0;i<size;i++){
 			double totPerformance = 0.0;
 			for(Id carrierId : costEventMap.keySet()){
-				totPerformance += costEventMap.get(carrierId).get(i).volume;
+				totPerformance += costEventMap.get(carrierId).get(i).getVolume();
 			}
 			totArr[i] = totPerformance;
 		}
@@ -113,7 +113,7 @@ public class TSPCostChartListener implements TSPTotalCostListener{
 	private double[] getVolumeArr(List<TSPCostEvent> list) {
 		double[] arr = new double[list.size()];
 		for(int i=0;i<list.size();i++){
-			arr[i]=list.get(i).volume;
+			arr[i]=list.get(i).getVolume();
 		}
 		return arr;
 	}

@@ -9,12 +9,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import freight.CommodityFlow;
-import freight.ShipperAgent;
-import freight.ShipperAgent.DetailedCost;
+import freight.DetailedCostStatusEvent;
 
-public class ComFlowCostChartListener implements ShipperDetailedCostListener {
+public class ComFlowCostChartListener implements ShipperDetailedCostStatusHandler {
 
-	private Map<Id,Map<CommodityFlow,List<DetailedCost>>> costMap = new HashMap<Id, Map<CommodityFlow,List<DetailedCost>>>();
+	private Map<Id,Map<CommodityFlow,List<DetailedCostStatusEvent>>> costMap = new HashMap<Id, Map<CommodityFlow,List<DetailedCostStatusEvent>>>();
 	
 	private String filename;
 	
@@ -25,25 +24,26 @@ public class ComFlowCostChartListener implements ShipperDetailedCostListener {
 	}
 
 	@Override
-	public void inform(DetailedCost detailedCost) {
-		if(costMap.containsKey(detailedCost.shipperId)){
-			Map<CommodityFlow, List<DetailedCost>> innerMap = costMap.get(detailedCost.shipperId);
-			if(innerMap.containsKey(detailedCost.comFlow)){
-				innerMap.get(detailedCost.comFlow).add(detailedCost);
+	public void handleEvent(DetailedCostStatusEvent event) {
+		if(costMap.containsKey(event.getShipperId())){
+			Map<CommodityFlow, List<DetailedCostStatusEvent>> innerMap = costMap.get(event.getShipperId());
+			if(innerMap.containsKey(event.getComFlow())){
+				innerMap.get(event.getComFlow()).add(event);
 			}
 			else{
-				List<DetailedCost> costList = new ArrayList<ShipperAgent.DetailedCost>();
-				costList.add(detailedCost);
-				innerMap.put(detailedCost.comFlow, costList);
+				List<DetailedCostStatusEvent> costList = new ArrayList<DetailedCostStatusEvent>();
+				costList.add(event);
+				innerMap.put(event.getComFlow(), costList);
 			}
 		}
 		else{
-			Map<CommodityFlow,List<DetailedCost>> innerMap = new HashMap<CommodityFlow, List<DetailedCost>>();
-			List<DetailedCost> costList = new ArrayList<ShipperAgent.DetailedCost>();
-			costList.add(detailedCost);
-			innerMap.put(detailedCost.comFlow, costList);
-			costMap.put(detailedCost.shipperId, innerMap);
+			Map<CommodityFlow,List<DetailedCostStatusEvent>> innerMap = new HashMap<CommodityFlow, List<DetailedCostStatusEvent>>();
+			List<DetailedCostStatusEvent> costList = new ArrayList<DetailedCostStatusEvent>();
+			costList.add(event);
+			innerMap.put(event.getComFlow(), costList);
+			costMap.put(event.getShipperId(), innerMap);
 		}
+		
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class ComFlowCostChartListener implements ShipperDetailedCostListener {
 		double[] iterations = getIterArr();
 		XYLineChart chart = new XYLineChart("TLC per ComFlow","iteration","costs");
 		for(Id shipperId : costMap.keySet()){
-			Map<CommodityFlow, List<DetailedCost>> innerMap = costMap.get(shipperId);
+			Map<CommodityFlow, List<DetailedCostStatusEvent>> innerMap = costMap.get(shipperId);
 			for(CommodityFlow flow : innerMap.keySet()){
 				double[] tlc = getTLCArr(innerMap.get(flow));
 				chart.addSeries((shipperId.toString() + "_" + flow.toString()), iterations, tlc);
@@ -65,10 +65,10 @@ public class ComFlowCostChartListener implements ShipperDetailedCostListener {
 		chart.saveAsPng(filename, 800, 600);
 	}
 
-	private double[] getTLCArr(List<DetailedCost> list) {
+	private double[] getTLCArr(List<DetailedCostStatusEvent> list) {
 		double[] tlcArr = new double[list.size()];
 		for(int i=0;i<list.size();i++){
-			tlcArr[i]=list.get(i).tlc;
+			tlcArr[i]=list.get(i).getTlc();
 		}
 		return tlcArr;
 	}
