@@ -26,6 +26,7 @@ import java.util.List;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips;
 
@@ -35,6 +36,7 @@ import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips;
 public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 	private final JoinableTrips toWrite;
 
+	private final Counter count = new Counter("Dumping trip #");
 	// /////////////////////////////////////////////////////////////////////////
 	// Constructor
 	// /////////////////////////////////////////////////////////////////////////
@@ -55,34 +57,46 @@ public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 	private void write() {
 		this.writeXmlHead();
 		this.writeStartTag(
-				JoinableTripsXmlSchemaNames.TAG,
-				getGlobalAttributes());
+				JoinableTripsXmlSchemaNames.ROOT_TAG,
+				null);
+		this.writeConditions();
 		this.writeTrips();
-		this.writeEndTag(JoinableTripsXmlSchemaNames.TAG);
+		this.writeEndTag(JoinableTripsXmlSchemaNames.ROOT_TAG);
 	}
 
-	private List<Tuple<String, String>> getGlobalAttributes() {
-		List<Tuple<String, String>> output = new ArrayList<Tuple<String, String>>();
+	private void writeConditions() {
+		this.writeStartTag(JoinableTripsXmlSchemaNames.CONDITIONS_TAG, null);
 
-		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.DIST,
-					toWrite.getDistanceRadius()));
-		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.TIME,
-					toWrite.getAcceptableTimeDifference()));
+		for (AcceptabilityCondition condition : toWrite.getConditions()) {
+			this.writeStartTag(
+					JoinableTripsXmlSchemaNames.CONDITION_TAG,
+					getAttributes(condition),
+					true);
+		}
 
-		return output;
+		this.writeEndTag(JoinableTripsXmlSchemaNames.CONDITIONS_TAG);
+	}
+
+	private List<Tuple<String, String>> getAttributes(
+			final AcceptabilityCondition condition) {
+		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+
+		atts.add(createTuple(JoinableTripsXmlSchemaNames.TIME, condition.getTime()));
+		atts.add(createTuple(JoinableTripsXmlSchemaNames.DIST, condition.getDistance()));
+
+		return atts;
 	}
 
 	private void writeTrips() {
 		Collection<JoinableTrips.TripRecord> records = toWrite.getTripRecords().values();
 
 		for ( JoinableTrips.TripRecord record : records ) {
+			count.incCounter();
 			this.writeStartTag(
-					JoinableTripsXmlSchemaNames.Trip.TAG,
+					JoinableTripsXmlSchemaNames.TRIP_TAG,
 					getAttributes(record));
 			this.writeJoinableTrips(record);
-			this.writeEndTag(JoinableTripsXmlSchemaNames.Trip.TAG);
+			this.writeEndTag(JoinableTripsXmlSchemaNames.TRIP_TAG);
 		}
 	}
 
@@ -91,34 +105,34 @@ public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 		List<Tuple<String, String>> output = new ArrayList<Tuple<String, String>>();
 
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.TRIP_ID,
+					JoinableTripsXmlSchemaNames.TRIP_ID,
 					record.getId().toString()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.AGENT_ID,
+					JoinableTripsXmlSchemaNames.AGENT_ID,
 					record.getAgentId().toString()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.MODE,
+					JoinableTripsXmlSchemaNames.MODE,
 					record.getMode()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.ORIGIN,
+					JoinableTripsXmlSchemaNames.ORIGIN,
 					record.getOriginLinkId().toString()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.ORIGIN_ACT,
+					JoinableTripsXmlSchemaNames.ORIGIN_ACT,
 					record.getOriginActivityType()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.DESTINATION,
+					JoinableTripsXmlSchemaNames.DESTINATION,
 					record.getDestinationLinkId().toString()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.DESTINATION_ACT,
+					JoinableTripsXmlSchemaNames.DESTINATION_ACT,
 					record.getDestinationActivityType()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.DEPARTURE_TIME,
+					JoinableTripsXmlSchemaNames.DEPARTURE_TIME,
 					""+record.getDepartureTime()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.ARRIVAL_TIME,
+					JoinableTripsXmlSchemaNames.ARRIVAL_TIME,
 					""+record.getArrivalTime()));
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.LEG_NR,
+					JoinableTripsXmlSchemaNames.LEG_NR,
 					""+record.getLegNumber()));
 
 		return output;
@@ -127,19 +141,15 @@ public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 	private void writeJoinableTrips(final JoinableTrips.TripRecord record) {
 		List<JoinableTrips.JoinableTrip> joinableTrips = record.getJoinableTrips();
 
-		this.writeStartTag(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.TAG, null);
-
 		for (JoinableTrips.JoinableTrip trip : joinableTrips) {
 			this.writeStartTag(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.TAG,
+					JoinableTripsXmlSchemaNames.JOINABLE_TAG,
 					getAttributes(trip));
 
-			this.writePassages(trip);
+			this.writeFullfilledConditions(trip);
 
-			this.writeEndTag(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.TAG);
+			this.writeEndTag(JoinableTripsXmlSchemaNames.JOINABLE_TAG);
 		}
-
-		this.writeEndTag(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.TAG);
 	}
 
 	private List<Tuple<String, String>> getAttributes(
@@ -147,32 +157,20 @@ public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 		List<Tuple<String, String>> output = new ArrayList<Tuple<String, String>>();
 
 		output.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.ID,
+					JoinableTripsXmlSchemaNames.TRIP_ID,
 					trip.getTripId().toString()));
 
 		return output;
 	}
 
-	private void writePassages(final JoinableTrips.JoinableTrip trip) {
-		List<JoinableTrips.Passage> passages = trip.getPassages();
+	private void writeFullfilledConditions(final JoinableTrips.JoinableTrip trip) {
+		List<AcceptabilityCondition> conditions = trip.getFullfilledConditions();
 
-		for ( JoinableTrips.Passage passage : passages ) {
-			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>();
-
-			attributes.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TYPE,
-					passage.getType().toString()));
-			attributes.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.DISTANCE,
-					""+passage.getDistance()));
-			attributes.add(createTuple(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TIME,
-					""+passage.getTimeDifference()));
-
+		for ( AcceptabilityCondition condition : conditions ) {
 			this.writeStartTag(
-					JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TAG,
-					attributes,
-					true); // close
+					JoinableTripsXmlSchemaNames.CONDITION_TAG,
+					getAttributes(condition),
+					true);
 		}
 	}
 }

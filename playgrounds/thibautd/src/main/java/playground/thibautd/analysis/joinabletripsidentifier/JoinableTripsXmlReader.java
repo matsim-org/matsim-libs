@@ -28,6 +28,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 /**
@@ -36,21 +37,24 @@ import org.xml.sax.Attributes;
  */
 public class JoinableTripsXmlReader extends MatsimXmlParser {
 
-	private double distance = Double.NaN;
-	private double time = Double.NaN;
+	private List<AcceptabilityCondition> conditions =
+		new ArrayList<AcceptabilityCondition>();
 	private Map<Id, JoinableTrips.TripRecord> trips =
 		new HashMap<Id, JoinableTrips.TripRecord>();
 
 	private List<JoinableTrips.JoinableTrip> currentJoinableTrips = null;
 	private JoinableTrips.JoinableTrip currentJoinableTrip = null;
+	private Id currentPassengerTrip = null;
+
+	private final Counter count = new Counter("Import of trip #");
 
 	public JoinableTripsXmlReader() {
 		super(false);
 	}
 
 	private void reset() {
-		distance = Double.NaN;
-		time = Double.NaN;
+		count.reset();
+		conditions = new ArrayList<AcceptabilityCondition>();
 		trips = new HashMap<Id, JoinableTrips.TripRecord>();
 		currentJoinableTrips = null;
 		currentJoinableTrip = null;
@@ -61,42 +65,38 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 			final String name,
 			final Attributes atts,
 			final Stack<String> context) {
-		if ( name.equals(JoinableTripsXmlSchemaNames.TAG) ) {
-			this.distance = Double.parseDouble(atts.getValue(
-					JoinableTripsXmlSchemaNames.DIST));
-			this.time = Double.parseDouble(atts.getValue(
-					JoinableTripsXmlSchemaNames.TIME));
+		if ( name.equals(JoinableTripsXmlSchemaNames.CONDITION_TAG) ) {
+			if (context.firstElement().equals(JoinableTripsXmlSchemaNames.CONDITIONS_TAG)) {
+				conditions.add(getCondition(atts));
+			}
+			else {
+				currentJoinableTrip.getFullfilledConditions().add(getCondition(atts));
+			}
 		}
-		else if ( name.equals(JoinableTripsXmlSchemaNames.Trip.TAG) ) {
+		else if ( name.equals(JoinableTripsXmlSchemaNames.TRIP_TAG) ) {
+			count.incCounter();
 			currentJoinableTrips = new ArrayList<JoinableTrips.JoinableTrip>();
+			currentPassengerTrip = new IdImpl(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID));
 			trips.put(
-					new IdImpl(atts.getValue(JoinableTripsXmlSchemaNames.Trip.TRIP_ID)),
+					currentPassengerTrip,
 					new JoinableTrips.TripRecord(
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.TRIP_ID),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.AGENT_ID),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.MODE),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.ORIGIN),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.ORIGIN_ACT),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.DEPARTURE_TIME),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.DESTINATION),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.DESTINATION_ACT),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.ARRIVAL_TIME),
-							atts.getValue(JoinableTripsXmlSchemaNames.Trip.LEG_NR),
+							atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID),
+							atts.getValue(JoinableTripsXmlSchemaNames.AGENT_ID),
+							atts.getValue(JoinableTripsXmlSchemaNames.MODE),
+							atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN),
+							atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN_ACT),
+							atts.getValue(JoinableTripsXmlSchemaNames.DEPARTURE_TIME),
+							atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION),
+							atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION_ACT),
+							atts.getValue(JoinableTripsXmlSchemaNames.ARRIVAL_TIME),
+							atts.getValue(JoinableTripsXmlSchemaNames.LEG_NR),
 							currentJoinableTrips));
 		}
-		else if ( name.equals(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.TAG) ) {
+		else if ( name.equals(JoinableTripsXmlSchemaNames.JOINABLE_TAG) ) {
 			currentJoinableTrip = new JoinableTrips.JoinableTrip(
-					new IdImpl( atts.getValue(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.ID) ) );
+					currentPassengerTrip,
+					new IdImpl( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) ) );
 			currentJoinableTrips.add(currentJoinableTrip);
-		}
-		else if ( name.equals(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TAG) ) {
-			currentJoinableTrip.addPassage(
-					JoinableTrips.Passage.Type.valueOf(
-						atts.getValue(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TYPE)),
-					Double.parseDouble(
-						atts.getValue(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.DISTANCE)),
-					Double.parseDouble(
-						atts.getValue(JoinableTripsXmlSchemaNames.Trip.JoinableTrips.JoinableTrip.Passage.TIME)));
 		}
 	}
 
@@ -107,8 +107,17 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 			final Stack<String> context) {
 	}
 
+	private AcceptabilityCondition getCondition(final Attributes atts) {
+		AcceptabilityCondition condition = new AcceptabilityCondition(
+				Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.DIST)),
+				Double.parseDouble(atts.getValue(JoinableTripsXmlSchemaNames.TIME)));
+
+		int i = conditions.indexOf(condition);
+		return i == -1 ? condition : conditions.get(i);
+	}
+
 	public JoinableTrips getJoinableTrips() {
-		return new JoinableTrips(distance, time, trips);
+		return new JoinableTrips(conditions, trips);
 	}
 }
 

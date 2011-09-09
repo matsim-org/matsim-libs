@@ -52,6 +52,8 @@ public class JoinableTrips {
 	private final double distanceRadius;
 	private final double timeRadius;
 
+	private final List<AcceptabilityCondition> conditions;
+
 	private final Map<Id, TripRecord> tripRecords = new HashMap<Id, TripRecord>();
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -66,22 +68,32 @@ public class JoinableTrips {
 	 * and/or later arrival time)
 	 */
 	public JoinableTrips(
-			final double distanceRadius,
-			final double timeRadius,
+			List<AcceptabilityCondition> conditions,
 			final TripReconstructor tripReconstructor) {
-		this.distanceRadius = distanceRadius;
-		this.timeRadius = timeRadius;
+		this.conditions = conditions;
+
+		// get the "general" acceptability conditions
+		double maxDist = Double.NEGATIVE_INFINITY;
+		double maxTime = Double.NEGATIVE_INFINITY;
+
+		for (AcceptabilityCondition condition : conditions) {
+			maxDist = Math.max(maxDist, condition.getDistance());
+			maxTime = Math.max(maxTime, condition.getTime());
+		}
+
+		this.distanceRadius = maxDist;
+		this.timeRadius = maxTime;
 
 		// externalize to an "identifier"?
 		identifyJoinableTrips(tripReconstructor);
 	}
 
 	public JoinableTrips(
-			final double distanceRadius,
-			final double timeRadius,
+			final List<AcceptabilityCondition> conditions,
 			final Map<Id, TripRecord> tripRecords) {
-		this.distanceRadius = distanceRadius;
-		this.timeRadius = timeRadius;
+		this.distanceRadius = Double.NaN;
+		this.timeRadius = Double.NaN;
+		this.conditions = conditions;
 
 		this.tripRecords.putAll(tripRecords);
 	}
@@ -175,6 +187,10 @@ public class JoinableTrips {
 					}
 				}
 			}
+
+			// now that all possible passengers were identified, perform some
+			// cleanup
+			joinableTrips.cleanUnacceptedTrips(conditions);
 		}
 
 		return joinableTrips;
@@ -190,18 +206,25 @@ public class JoinableTrips {
 		for (Trip trip : tripReconstructor.getTrips()) {
 			List<JoinableTrip> identifiedTrips = 
 				tripsPerPassenger.remove(trip.getId());
-			List<JoinableTrip> validTrips =
-				new ArrayList<JoinableTrip>();
 
-			if ( identifiedTrips != null ) {
-				for (JoinableTrip joinableTrip : identifiedTrips) {
-					if (joinableTrip.isValidTrip()) {
-						validTrips.add(joinableTrip);
-					}
-				}
-			}
+			// not necessary anymore (cleanup performed at the upper level)
+			//List<JoinableTrip> validTrips =
+			//	new ArrayList<JoinableTrip>();
 
-			TripRecord old = tripRecords.put(trip.getId(), new TripRecord(trip, validTrips));
+			//if ( identifiedTrips != null ) {
+			//	for (JoinableTrip joinableTrip : identifiedTrips) {
+			//		if (joinableTrip.isValidTrip()) {
+			//			validTrips.add(joinableTrip);
+			//		}
+			//	}
+			//}
+
+			//TripRecord old = tripRecords.put(trip.getId(), new TripRecord(trip, validTrips));
+			TripRecord old = tripRecords.put(
+					trip.getId(),
+					new TripRecord(
+						trip,
+						identifiedTrips != null ? identifiedTrips : new ArrayList<JoinableTrip>(0)));
 
 			if ( old != null ) {
 				throw new RuntimeException("same trip added twice");
@@ -222,6 +245,10 @@ public class JoinableTrips {
 
 	public double getAcceptableTimeDifference() {
 		return this.timeRadius;
+	}
+
+	public List<AcceptabilityCondition> getConditions() {
+		return this.conditions;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -405,14 +432,18 @@ public class JoinableTrips {
 	 */
 	public static class JoinableTrip {
 		private final Id tripId;
+		private final Id passengerTripId;
 
 		private boolean hasPU = false;
 		private boolean hasDO = false;
 
 		private List<Passage> passages = new ArrayList<Passage>();
+		private final List<AcceptabilityCondition> fullfilledConditions =
+			new ArrayList<AcceptabilityCondition>();
 
-		JoinableTrip(final Id tripId) {
+		JoinableTrip(final Id passengerTripId, final Id tripId) {
 			this.tripId = tripId;
+			this.passengerTripId = passengerTripId;
 		}
 
 		void addPassage(
@@ -435,13 +466,42 @@ public class JoinableTrips {
 			return this.tripId;
 		}
 
-		public List<Passage> getPassages() {
-			return passages;
+		public Id getPassengerTripId() {
+			return this.passengerTripId;
 		}
 
-		private boolean isValidTrip() {
-			return hasPU && hasDO;
+		//public List<Passage> getPassages() {
+		//	return passages;
+		//}
+
+		/**
+		 * Checks conditions, stores results and clean the list of passages.
+		 *
+		 * @return true if at least one condition is fullfilled, false if no
+		 * condition is.
+		 */
+		private boolean checkConditions(
+				final List<AcceptabilityCondition> conditions) {
+
+			for (AcceptabilityCondition condition : conditions) {
+				if (condition.isFullfilled(passages)) {
+					fullfilledConditions.add(condition);
+				}
+			}
+
+			// delete all the heavy not-needed-anymore information
+			passages = null;
+
+			return fullfilledConditions.size() > 0;
 		}
+
+		public List<AcceptabilityCondition> getFullfilledConditions() {
+			return fullfilledConditions;
+		}
+
+		//private boolean isValidTrip() {
+		//	return hasPU && hasDO;
+		//}
 	}
 
 	public static class Passage {
@@ -509,6 +569,8 @@ public class JoinableTrips {
 		private final Map<Id, Map<Id, JoinableTrip>> joinableTrips = new HashMap<Id, Map<Id, JoinableTrip>>();
 		private final Map<Id, List<JoinableTrip>> joinableTripsPerPassengerTrip = new HashMap<Id, List<JoinableTrip>>();
 
+		private List<JoinableTrip> currentlyExaminedTrips = new ArrayList<JoinableTrip>();
+
 		private Map<Id, JoinableTrip> driverMap = null;
 		private Id lastDriverTrip = null;
 
@@ -528,7 +590,8 @@ public class JoinableTrips {
 			}
 
 			if (trip == null) {
-				trip = new JoinableTrip(driver);
+				trip = new JoinableTrip(passenger, driver);
+				currentlyExaminedTrips.add(trip);
 				driverMap.put(passenger, trip);
 
 				List<JoinableTrip> passengerJoinableTrips =
@@ -544,6 +607,19 @@ public class JoinableTrips {
 			}
 
 			return trip;
+		}
+
+		public void cleanUnacceptedTrips(
+				final List<AcceptabilityCondition> conditions) {
+			for (JoinableTrip trip : currentlyExaminedTrips) {
+				if (!trip.checkConditions(conditions)) {
+					joinableTrips.get(trip.getTripId()).remove(trip.getPassengerTripId());
+					joinableTripsPerPassengerTrip.get(trip.getPassengerTripId()).remove(trip);
+				}
+			}
+
+			// reset
+			currentlyExaminedTrips = new ArrayList<JoinableTrip>();
 		}
 
 		/**
