@@ -66,9 +66,9 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 	private final static int N_GEN = 30;
 	private final static int N_PLANS = 5;
 
-	private final static int MIN_MEMBERS = 3;
-	private final static int MAX_MEMBERS = 20;
-	private final static int MAX_PLANS_PER_SIZE = 1;
+	//private final static int MIN_MEMBERS = 3;
+	//private final static int MAX_MEMBERS = 20;
+	//private final static int MAX_PLANS_PER_SIZE = 1;
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
@@ -98,32 +98,45 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		List<JointPlan> output = new ArrayList<JointPlan>(N_PLANS);
 		JointPlan currentPlan;
 
-		log.debug("drawing "+N_PLANS+" test instances.");
-		log.debug("minimum members of clique: "+MIN_MEMBERS);
-		log.debug("maximum members of clique: "+MAX_MEMBERS);
+		//log.debug("drawing "+N_PLANS+" test instances.");
+		//log.debug("minimum members of clique: "+MIN_MEMBERS);
+		//log.debug("maximum members of clique: "+MAX_MEMBERS);
 
-		int count = 0;
-		int[] counts = new int[MAX_MEMBERS - MIN_MEMBERS + 1];
+		//int count = 0;
+		//int[] counts = new int[MAX_MEMBERS - MIN_MEMBERS + 1];
 
-		for (int j = 0; j < counts.length; j++) {
-			counts[j] = 0;
-		}
+		//for (int j = 0; j < counts.length; j++) {
+		//	counts[j] = 0;
+		//}
 
-		int i = 0;
-		int size;
-		while (count < N_PLANS) {
-			currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
-			size = currentPlan.getClique().getMembers().size();;
-			i++;
+		//while (count < N_PLANS) {
+		//	currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
+		//	size = currentPlan.getClique().getMembers().size();;
+		//	i++;
 
-			// only consider joint plans satisfying the conditions
-			if (size >= MIN_MEMBERS &&
-					size <= MAX_MEMBERS &&
-					counts[size - MIN_MEMBERS] < MAX_PLANS_PER_SIZE) {
-				log.debug("adding test instance with "+size+" members.");
-				output.add(currentPlan);
-				count++;
-				counts[size - MIN_MEMBERS]++;
+		//	// only consider joint plans satisfying the conditions
+		//	if (size >= MIN_MEMBERS &&
+		//			size <= MAX_MEMBERS &&
+		//			counts[size - MIN_MEMBERS] < MAX_PLANS_PER_SIZE) {
+		//		log.debug("adding test instance with "+size+" members.");
+		//		output.add(currentPlan);
+		//		count++;
+		//		counts[size - MIN_MEMBERS]++;
+		//	}
+		//}
+
+		int[] sizes = {1,3,4,6,20,57};
+
+		for (int size : sizes) {
+			for (int i=0; i < cliques.size(); i++) {
+				currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
+				int currentSize = currentPlan.getClique().getMembers().size();;
+				i++;
+
+				if (currentSize == size) {
+					log.debug("adding test instance with "+size+" members.");
+					output.add(currentPlan);
+				}
 			}
 		}
 
@@ -157,22 +170,25 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		}
 
 		log.debug("always compute fitness = "+jgapConfig.isAlwaysCalculateFitness());
-		population.evolve(N_GEN);
+		for (int i=0; i < N_GEN; i++) {
+			population.evolve();
+			outputParameters(population.getFittestChromosome(), ""+i);
+		}
 
 		log.debug("optimizing parameters... DONE");
-		outputParameters(population.getFittestChromosome());
+		outputParameters(population.getFittestChromosome(), "final");
 	}
 
-	private void outputParameters(final IChromosome fittest) {
-		log.info("results: "+fittest.toString());
+	private void outputParameters(final IChromosome fittest, final String iter) {
+		log.info("outputting parameter set: "+fittest.toString());
 
 		JointReplanningConfigGroup optConf =
 			ParameterOptimizerFitness.fromChromosomeToConfig(fittest);
 
 		Config conf = new Config();
 		conf.addModule("optimizedJointReplanning", optConf);
-		(new ConfigWriter(conf)).write(outputFileName);
-		log.debug("results written in "+outputFileName);
+		(new ConfigWriter(conf)).write(iter+"."+outputFileName);
+		log.debug("results written in "+iter+"."+outputFileName);
 	}
 }
 

@@ -148,6 +148,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
 		log.debug("computing fitness: generation #"+this.jgapConfig.getGenerationNr());
+		log.debug("evaluating chromosome with value: "+toString(chromosome));
 		double[] scores = new double[nPlans];
 		long[] cpuTimesNanoSecs = new long[nPlans];
 		JointReplanningConfigGroup configGroup = fromChromosomeToConfig(chromosome);
@@ -241,6 +242,24 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		genes[HAMMING_GENE] = new BooleanGene(this.jgapConfig);
 
 		return new Chromosome(this.jgapConfig, genes);
+	}
+
+	private String toString(final IChromosome chromosome) {
+		Gene[] genes = chromosome.getGenes();
+		return
+				"[popSizeSlope = "+genes[POP_SLOPE_GENE]
+				+"; popSizeIntercept = "+genes[POP_INTERCEPT_GENE]
+				+"; mutationProb = "+genes[MUT_PROB_GENE]
+				+"; wholeCOprob = "+genes[WHOLE_PROB_GENE]
+				+"; simpleCOProb = "+genes[SIMPLE_PROB_GENE]
+				+"; singleCOProb = "+genes[SINGLE_PROB_GENE]
+				+"; discScale = "+genes[DISCRETE_SCALE_GENE]
+				+"; windowSizeSlope = "+genes[RTS_WINDOW_SLOPE_GENE]
+				+"; windowSizeIntercept = "+genes[RTS_WINDOW_INTERCEPT_GENE]
+				+"; mutationNonUniformity = "+genes[NON_UNIFORM_GENE]
+				+"; isMutationInPlace = "+genes[IN_PLACE_GENE]
+				+"; nonUniformMutationProb = "+genes[P_NON_UNIFORM_GENE]
+				+"; hammingOnly = "+genes[HAMMING_GENE];
 	}
 
 	/**
