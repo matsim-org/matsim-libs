@@ -43,22 +43,23 @@ import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
 import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierEventHandler;
+import playground.mzilske.freight.CarrierDriverAgentFactoryImpl;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
-import playground.mzilske.freight.CarrierTotalCostHandler;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.CostMemoryStatusConsolePrinter;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPPlanBuilder;
-import playground.mzilske.freight.TSPTotalCostListener;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
-import freight.CarrierAgentFactoryImpl;
+import playground.mzilske.freight.events.CarrierEventHandler;
+import playground.mzilske.freight.events.TSPEventHandler;
+import freight.TRBCarrierAgentFactoryImpl;
 import freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;
 import freight.ShipperAgentFactoryImpl;
@@ -76,10 +77,11 @@ import freight.api.ShipperAgentFactory;
 import freight.listener.CarrierCostChartListener;
 import freight.listener.ComFlowCostChartListener;
 import freight.listener.ShipperCostConsolePrinter;
-import freight.listener.ShipperDetailedCostListener;
-import freight.listener.ShipperTotalCostListener;
+import freight.listener.ShipperDetailedCostStatusHandler;
+import freight.listener.ShipperEventHandler;
+import freight.listener.ShipperTotalCostStatusHandler;
 import freight.listener.TLCCostChartListener;
-import freight.listener.TSPCostChartListener;
+import freight.listener.TSPCostChartHandler;
 import freight.offermaker.OfferSelectorImpl;
 import freight.replanning.AnotherShipperPlanStrategy;
 import freight.replanning.ShipperPlanStrategy;
@@ -141,7 +143,7 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	
 	private static long DEFAULT_SEED = 4711;
 	
-	private int nOfIteration = 50;
+	private int nOfIteration = 1;
 	
 	private File outputDirectory;
 	
@@ -155,12 +157,16 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	
 	private List<CarrierEventHandler> carrierEventHandlers = new ArrayList<CarrierEventHandler>();
 	
+	private List<TSPEventHandler> tspEventHandlers = new ArrayList<TSPEventHandler>();
+	
+	private List<ShipperEventHandler> shipperEventHandlers = new ArrayList<ShipperEventHandler>();
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(org.apache.log4j.Level.WARN);
-		int nOfIterations = 10;
+		int nOfIterations = 1;
 		for(int i=0;i<nOfIterations;i++){
 			RunTRBScenario runner = new RunTRBScenario();
 			runner.init(i);
@@ -177,7 +183,7 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 	public void notifyStartup(StartupEvent event) {
 		offerRecorder = new OfferRecorder();
 		
-		String outputFolder = "case_heavyProhibitions_toll/" + this.iteration + "/";
+		String outputFolder = "case_test/" + this.iteration + "/";
 //		SEED = Math.round(Long.MAX_VALUE/Math.PI);
 		MatsimRandom.getRandom().setSeed(SEED);
 		configRecorder.add("seed", ("" + SEED));
@@ -203,21 +209,25 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		
 		ShipperAgentFactory shipperAgentFactory = new ShipperAgentFactoryImpl();
 		shipperAgentTracker = new ShipperAgentTracker(shippers.getShippers(), shipperAgentFactory);
-		shipperAgentTracker.getDetailedCostListeners().add(new ShipperCostConsolePrinter());
+		ShipperCostConsolePrinter shipperCostConsolePrinter = new ShipperCostConsolePrinter();
+		shipperAgentTracker.getEventsManager().addHandler(shipperCostConsolePrinter);
+		shipperEventHandlers.add(shipperCostConsolePrinter);
 		
-		shipperAgentTracker.getDetailedCostListeners().add(new ComFlowCostChartListener(outputDirectory.getAbsolutePath() + "/trbComFlowTLC.png"));
-	
-		shipperAgentTracker.getTotalCostListeners().add(new ShipperCostConsolePrinter());
-		shipperAgentTracker.getTotalCostListeners().add(new TLCCostChartListener(outputDirectory.getAbsolutePath() + "/trbTLC.png"));
+		ComFlowCostChartListener comFlowCostChartListener = new ComFlowCostChartListener(outputDirectory.getAbsolutePath() + "/trbComFlowTLC.png");
+		shipperAgentTracker.getEventsManager().addHandler(comFlowCostChartListener);
+		shipperEventHandlers.add(comFlowCostChartListener);
 		
-		CarrierAgentFactoryImpl carrierAgentFactory = new CarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		TLCCostChartListener tlcCostChartListener = new TLCCostChartListener(outputDirectory.getAbsolutePath() + "/trbTLC.png");
+		shipperAgentTracker.getEventsManager().addHandler(tlcCostChartListener);
+		shipperEventHandlers.add(tlcCostChartListener);
+		
+		TRBCarrierAgentFactoryImpl carrierAgentFactory = new TRBCarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
 		carrierAgentFactory.setOfferRecorder(offerRecorder);
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		CarrierCostChartListener chartHandler = new CarrierCostChartListener(outputDirectory.getAbsolutePath() + "/trbCarrierCosts.png");
 		carrierAgentTracker.getEventsManager().addHandler(chartHandler);
+		carrierAgentTracker.getEventsManager().addHandler(new CostMemoryStatusConsolePrinter());
 		carrierEventHandlers.add(chartHandler);
-//		carrierAgentTracker.getTotalCostListeners().add(new CarrierCostChartListener(outputDirectory.getAbsolutePath() + "/trbCarrierCosts.png"));
-		
 		
 		TSPAgentFactoryImpl tspAgentFactory = new TSPAgentFactoryImpl(carrierAgentTracker);
 		tspAgentFactory.setNetwork(scenario.getNetwork());
@@ -231,9 +241,11 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		tspAgentFactory.setOfferSelector(carrierOfferSelector);
 		
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders(), tspAgentFactory);
-		tspAgentTracker.getTotalCostListeners().add(new TSPCostChartListener(outputDirectory.getAbsolutePath() + "/trbTSPCosts.png"));
+		TSPCostChartHandler tspCostChartHandler = new TSPCostChartHandler(outputDirectory.getAbsolutePath() + "/trbTSPCosts.png");
+		tspAgentTracker.getEventsManager().addHandler(tspCostChartHandler);
+		tspEventHandlers.add(tspCostChartHandler);
 		
-		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getEventsManager().addHandler(tspAgentTracker);
 		
 		createShipperPlans();
 		
@@ -524,17 +536,14 @@ public class RunTRBScenario implements ScoringListener, StartupListener, Shutdow
 		new ShipperPlanWriter(shippers.getShippers()).write(outputDirectory.getAbsolutePath() + "/trbShippersAfterIteration.xml");
 		new TSPPlanWriter(transportServiceProviders.getTransportServiceProviders()).write(outputDirectory.getAbsolutePath() + "/trbTspAfterIteration.xml");
 		new CarrierPlanWriter(carriers.getCarriers().values()).write(outputDirectory.getAbsolutePath() + "/trbCarrierAfterIteration.xml");
-		for(CarrierEventHandler h : carrierEventHandlers){
-			h.finish();
+		for(CarrierEventHandler handler : carrierEventHandlers){
+			handler.finish();
 		}
-		for(ShipperTotalCostListener l : shipperAgentTracker.getTotalCostListeners()){
-			l.finish();
+		for(TSPEventHandler handler : tspEventHandlers){
+			handler.finish();
 		}
-		for(ShipperDetailedCostListener l : shipperAgentTracker.getDetailedCostListeners()){
-			l.finish();
-		}
-		for(TSPTotalCostListener l : tspAgentTracker.getTotalCostListeners()){
-			l.finish();
+		for(ShipperEventHandler handler : shipperEventHandlers){
+			handler.finish();
 		}
 		writeConfiguration(outputDirectory.getAbsolutePath() + "/configuration.txt");
 		writeOffers(outputDirectory.getAbsolutePath() + "/offers.txt");

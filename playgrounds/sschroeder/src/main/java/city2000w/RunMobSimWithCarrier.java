@@ -25,6 +25,7 @@ import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgent;
 import playground.mzilske.freight.CarrierAgentImpl;
 import playground.mzilske.freight.CarrierAgentTracker;
+import playground.mzilske.freight.CarrierDriverAgentFactoryImpl;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.DriverEventWriter;
 import playground.mzilske.freight.api.CarrierAgentFactory;
@@ -43,9 +44,8 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		
 		@Override
 		public CarrierAgentImpl createAgent(CarrierAgentTracker tracker,Carrier carrier) {
-			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router);
+			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router, new CarrierDriverAgentFactoryImpl());
 			agent.setCarrierAgentTracker(tracker);
-			
 			return agent;
 		}
 		
@@ -61,6 +61,8 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	private DriverEventWriter driverEventWriter;
+	
+	private CarrierActivityWriter activityWriter;
 	
 	public static void main(String[] args) {
 		RunMobSimWithCarrier mobSim = new RunMobSimWithCarrier();
@@ -103,8 +105,11 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		agentFactory.setRouter(router);
 		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
 		driverEventWriter = new DriverEventWriter();
-		driverEventWriter.setFilename("/Users/stefan/Documents/Spielwiese/data/driverEvents_stueckgut_new.txt");
+		driverEventWriter.setFilename("/Users/stefan/Documents/Spielwiese/data/driverEvents_stueckgut.txt");
 		carrierAgentTracker.getEventsManager().addHandler(driverEventWriter);
+		
+		activityWriter = new CarrierActivityWriter("/Users/stefan/Documents/Spielwiese/data/carrierAct_stueckgut.txt");
+		carrierAgentTracker.getEventsManager().addHandler(activityWriter);
 //		carrierAgentTracker.getEventListeners().add(driverEventWriter);
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(false);
@@ -120,7 +125,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		driverEventWriter.finish();
-		
+		activityWriter.finish();
 	}
 
 	@Override

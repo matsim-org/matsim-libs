@@ -14,10 +14,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -26,19 +28,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.city2000w.AgentObserver;
 import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.city2000w.DefaultLSPShipmentTracker;
 import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierDriverAgentFactoryImpl;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.Contract;
+import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
+import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TransportServiceProviderImpl;
 import playground.mzilske.freight.TransportServiceProviders;
 import playground.mzilske.freight.api.CarrierAgentFactory;
+import playground.mzilske.freight.api.Offer;
 import playground.mzilske.freight.api.TSPAgentFactory;
-import freight.CarrierAgentFactoryImpl;
+import playground.mzilske.freight.events.OfferAcceptEvent;
+import playground.mzilske.freight.events.OfferRejectEvent;
+import playground.mzilske.freight.events.QueryOffersEvent;
+import playground.mzilske.freight.events.Service;
+import freight.TRBCarrierAgentFactoryImpl;
 import freight.CarrierPlanReader;
+import freight.CarrierUtils;
 import freight.TSPAgentFactoryImpl;
 import freight.TSPPlanReader;
 
@@ -46,7 +56,7 @@ import freight.TSPPlanReader;
  * @author schroeder
  *
  */
-public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener, ReplanningListener {
 
 	private static Logger logger = Logger.getLogger(RunKarlsruheScenario.class);
 	
@@ -72,7 +82,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
+		Logger.getRootLogger().setLevel(org.apache.log4j.Level.INFO);
 		RunKarlsruheScenario runner = new RunKarlsruheScenario();
 		runner.run();
 	}
@@ -86,7 +96,9 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		readTransportServiceProviders();
 		
-		CarrierAgentFactory carrierAgentFactory = new CarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm());
+		
+//		CarrierAgentFactory carrierAgentFactory = new TRBCarrierAgentFactoryImpl(scenario.getNetwork(), controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
+		CarrierAgentFactory carrierAgentFactory = new KarlsruheCarrierAgentFactory(controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
 		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		
 		TSPAgentFactory tspAgentFactory = new TSPAgentFactoryImpl(carrierAgentTracker);
@@ -97,10 +109,13 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		event.getControler().getScenario().addScenarioElement(carriers);
 		
-		carrierAgentTracker.getShipmentStatusListeners().add(tspAgentTracker);
+		carrierAgentTracker.getEventsManager().addHandler(tspAgentTracker);
+		carrierAgentTracker.getEventsManager().addHandler(new PickupAndDeliveryConsoleWriter());
+		
+		tspAgentTracker.getEventsManager().addHandler(carrierAgentTracker);
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		
 		agentObserver = new AgentObserver("foo",scenario.getNetwork());
@@ -137,7 +152,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		Config config = new Config();
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(1);
 		scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		NetworkCleaner networkCleaner = new NetworkCleaner();
@@ -184,6 +199,28 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 	private void readTransportServiceProviders() {
 		transportServiceProviders = new TransportServiceProviders();
 		new TSPPlanReader(transportServiceProviders.getTransportServiceProviders()).read(TSPPLAN_FILENAME);
+	}
+
+	@Override
+	public void notifyReplanning(ReplanningEvent event) {
+		for(TransportServiceProviderImpl tsp : transportServiceProviders.getTransportServiceProviders()){
+			TSPContract c  = tsp.getContracts().iterator().next();
+			Service s = new Service(c.getShipment().getFrom(),c.getShipment().getTo(), c.getShipment().getSize(), c.getShipment().getPickUpTimeWindow().getStart(),
+					c.getShipment().getPickUpTimeWindow().getEnd(),c.getShipment().getDeliveryTimeWindow().getStart(),c.getShipment().getDeliveryTimeWindow().getEnd());
+			Collection<Offer> offers = new ArrayList<Offer>();
+			QueryOffersEvent queryEvent = new QueryOffersEvent(offers, s);
+			tspAgentTracker.processEvent(queryEvent);
+			Offer bestOffer = queryEvent.getOffers().iterator().next();
+			Shipment shipment = CarrierUtils.createShipment(c.getShipment().getFrom(), c.getShipment().getTo(), c.getShipment().getSize(), c.getShipment().getPickUpTimeWindow().getStart(), 
+					c.getShipment().getPickUpTimeWindow().getEnd(), c.getShipment().getDeliveryTimeWindow().getStart(), c.getShipment().getDeliveryTimeWindow().getEnd());
+			tspAgentTracker.processEvent(new OfferAcceptEvent(new Contract(shipment,bestOffer)));
+			for(Offer o : offers){
+				if(o != bestOffer){
+					tspAgentTracker.processEvent(new OfferRejectEvent(o));
+				}
+			}
+		}
+		
 	}
 
 }
