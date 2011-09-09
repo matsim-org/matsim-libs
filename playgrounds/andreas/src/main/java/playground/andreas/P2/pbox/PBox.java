@@ -63,7 +63,7 @@ public class PBox {
 	
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
-	private List<Cooperative> cooperatives;
+	private LinkedList<Cooperative> cooperatives;
 	private PFranchise franchise;
 
 	TransitSchedule pStopsOnly;
@@ -114,7 +114,7 @@ public class PBox {
 	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			Cooperative cooperative = new Cooperative(new IdImpl("p_" + i), costPerVehicle, this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + i), costPerVehicle, this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
