@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.mzilske.freight.TSPTotalCostListener.TSPCostEvent;
+import playground.mzilske.freight.TSPTotalCostHandler.TSPCostEvent;
 
 
 /**
@@ -229,9 +229,8 @@ public class TSPAgent {
 				a.getNumberOfTranshipments()*tspShipment.getSize()*CostParameter.transshipmentHandlingCostPerUnit;
 			costMemory.memorizeCost(tspShipment.getFrom(), tspShipment.getTo(), tspShipment.getSize(), costOfChain);
 		}
-		TSPCostEvent costEvent = new TSPCostEvent(id);
-		costEvent.setVolume(volumes);
-		tspAgentTracker.informTotalCost(id,costEvent);
+		TSPCostEvent costEvent = new TSPCostEvent(id,volumes);
+		tspAgentTracker.processEvent(costEvent);
 	}
 
 	private void assertEqualTransportChainAgentsAndContracts(int nOfChainAgents, int nOfContracts) {

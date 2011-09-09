@@ -12,10 +12,10 @@ public class CarrierTimeDistanceCostFunction implements CarrierCostFunction {
 	
 	private static Logger logger = Logger.getLogger(CarrierTimeDistanceCostFunction.class);
 	
-	private CarrierImpl carrier;
+	private Carrier carrier;
 
 	@Override
-	public void init(CarrierImpl carrier) {
+	public void init(Carrier carrier) {
 		this.carrier = carrier;
 	}
 

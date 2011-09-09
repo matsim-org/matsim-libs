@@ -1,7 +1,9 @@
-package playground.mzilske.freight;
+package playground.mzilske.freight.events;
 
-public interface ShipmentStatusListener {
+import playground.mzilske.freight.Shipment;
 
+public interface ShipmentStatusHandler {
+	
 	public void shipmentPickedUp(Shipment shipment, double time);
 
 	public void shipmentDelivered(Shipment shipment, double time);

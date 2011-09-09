@@ -8,9 +8,12 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
-public class DriverEventWriter implements DriverEventListener{
+import playground.mzilske.freight.events.DriverEventHandler;
+import playground.mzilske.freight.events.DriverPerformanceEvent;
 
-	private Map<Id,DriverEvent> events = new HashMap<Id, DriverEvent>();
+public class DriverEventWriter implements DriverEventHandler{
+
+	private Map<Id,DriverPerformanceEvent> events = new HashMap<Id, DriverPerformanceEvent>();
 	
 	private String filename;
 	
@@ -20,7 +23,7 @@ public class DriverEventWriter implements DriverEventListener{
 	}
 
 	@Override
-	public void processEvent(DriverEvent event) {
+	public void handleEvent(DriverPerformanceEvent event) {
 		events.put(event.driverId, event);
 	}
 
@@ -28,7 +31,7 @@ public class DriverEventWriter implements DriverEventListener{
 	public void finish() {
 		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 		writeFirstLine(writer);
-		for(DriverEvent event : events.values()){
+		for(DriverPerformanceEvent event : events.values()){
 			writeEvent(event,writer);
 		}
 		close(writer);
@@ -62,11 +65,11 @@ public class DriverEventWriter implements DriverEventListener{
 		return ";";
 	}
 
-	private void writeEvent(DriverEvent event, BufferedWriter writer) {
+	private void writeEvent(DriverPerformanceEvent event, BufferedWriter writer) {
 		try {
 			writer.write(event.driverId.toString() + semicolon());
 			writer.write(event.carrierVehicleId.toString() + semicolon());
-			writer.write(event.carrierId.toString() + semicolon());
+			writer.write(event.getCarrierId().toString() + semicolon());
 			writer.write(Math.round(event.distance) + semicolon());
 			writer.write(Math.round(event.time) + semicolon());
 			writer.write(round(event.capacityUsage) + semicolon());
@@ -82,6 +85,12 @@ public class DriverEventWriter implements DriverEventListener{
 
 	private double round(double capacityUsage) {
 		return Math.round(capacityUsage*100)/100.0;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		
+		
 	}
 
 }

@@ -8,14 +8,14 @@ import org.matsim.api.core.v01.Id;
 
 public class Carriers {
 
-	private Map<Id, CarrierImpl> carriers = new HashMap<Id, CarrierImpl>();
+	private Map<Id, Carrier> carriers = new HashMap<Id, Carrier>();
 	
-	public Carriers(Collection<CarrierImpl> carriers){
+	public Carriers(Collection<Carrier> carriers){
 		makeMap(carriers);
 	}
 	
-	private void makeMap(Collection<CarrierImpl> carriers) {
-		for(CarrierImpl c : carriers){
+	private void makeMap(Collection<Carrier> carriers) {
+		for(Carrier c : carriers){
 			this.carriers.put(c.getId(), c);
 		}
 		
@@ -25,7 +25,7 @@ public class Carriers {
 		
 	}
 	
-	public Map<Id, CarrierImpl> getCarriers() {
+	public Map<Id, Carrier> getCarriers() {
 		return carriers;
 	}
 	

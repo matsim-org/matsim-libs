@@ -2,7 +2,7 @@ package playground.mzilske.freight;
 
 public interface CarrierCostFunction {
 
-	void init(CarrierImpl carrier);
+	void init(Carrier carrier);
 	
 	double calculateCost(CarrierVehicle carrierVehicle, double distance);
 	

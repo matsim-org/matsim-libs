@@ -9,16 +9,22 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 
-import playground.mzilske.freight.TSPTotalCostListener.TSPCostEvent;
 import playground.mzilske.freight.api.TSPAgentFactory;
+import playground.mzilske.freight.events.ShipmentDeliveredEvent;
+import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
+import playground.mzilske.freight.events.ShipmentPickedUpEvent;
+import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
 
 
 /**
  * @author stscr
  *
  */
-public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListener {
+public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler {
 	
 	private Logger logger = Logger.getLogger(TSPAgentTracker.class);	
 	
@@ -26,9 +32,7 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 	
 	private Collection<TSPAgent> tspAgents = new ArrayList<TSPAgent>();
 	
-	private Collection<TSPCostListener> costListeners = new ArrayList<TSPCostListener>();
-	
-	private Collection<TSPTotalCostListener> totalCostListeners = new ArrayList<TSPTotalCostListener>();
+	private EventsManager eventsManager;
 	
 	private TSPAgentFactory tspAgentFactory;
 	
@@ -36,10 +40,7 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		this.transportServiceProviders = transportServiceProviders;
 		this.tspAgentFactory = tspAgentFactory;
 		createTSPAgents();
-	}
-
-	public Collection<TSPCostListener> getCostListeners() {
-		return costListeners;
+		eventsManager = EventsUtils.createEventsManager();
 	}
 
 	public List<Contract> createCarrierContracts(){
@@ -51,13 +52,6 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		return carrierShipments;
 	}
 	
-	@Override
-	public void informCost(Shipment shipment, Double cost){
-		TSPAgent agent = findTSPAgentForShipment(shipment);
-		TransportChainAgent chainAgent = agent.getShipmentChainMap().get(shipment); 
-		chainAgent.informCost(cost);
-	}
-	
 	private TSPAgent findTSPAgentForShipment(Shipment shipment) {
 		for(TSPAgent agent : tspAgents){
 			if(agent.hasShipment(shipment)){
@@ -65,18 +59,6 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 			}
 		}
 		throw new RuntimeException("No TSPAgent found for shipment: " + shipment);
-	}
-
-	@Override
-	public void shipmentPickedUp(Shipment shipment, double time) {
-		TSPAgent agent = findTSPAgentForShipment(shipment);
-		agent.shipmentPickedUp(shipment,time);
-	}
-
-	@Override
-	public void shipmentDelivered(Shipment shipment, double time) {
-		TSPAgent agent = findTSPAgentForShipment(shipment);
-		agent.shipmentDelivered(shipment,time);
 	}
 
 	private void createTSPAgents() {
@@ -205,15 +187,36 @@ public class TSPAgentTracker implements CarrierCostListener, ShipmentStatusListe
 		}
 	}
 
-	public void informTotalCost(Id id, TSPCostEvent costEvent) {
-		for(TSPTotalCostListener l : totalCostListeners){
-			l.inform(costEvent);
-		}
+	public EventsManager getEventsManager() {
+		return eventsManager;
+	}
+	
+	public void processEvent(Event event){
+		eventsManager.processEvent(event);
+	}
+
+	@Override
+	public void finish() {
+		
 		
 	}
 
-	public Collection<TSPTotalCostListener> getTotalCostListeners() {
-		return totalCostListeners;
+	@Override
+	public void reset(int iteration) {
+		
+		
+	}
+
+	@Override
+	public void handleEvent(ShipmentDeliveredEvent event) {
+		TSPAgent agent = findTSPAgentForShipment(event.getShipment());
+		agent.shipmentDelivered(event.getShipment(),event.getTime());
+	}
+
+	@Override
+	public void handleEvent(ShipmentPickedUpEvent event) {
+		TSPAgent agent = findTSPAgentForShipment(event.getShipment());
+		agent.shipmentPickedUp(event.getShipment(),event.getTime());
 	}
 	
 }

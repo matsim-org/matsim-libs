@@ -10,67 +10,62 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import com.sleepycat.je.rep.monitor.NewMasterEvent;
 
 import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
-import playground.mzilske.freight.CarrierTotalCostListener.CarrierCostEvent;
 import playground.mzilske.freight.api.CarrierAgentFactory;
+import playground.mzilske.freight.events.OfferAcceptEvent;
+import playground.mzilske.freight.events.OfferAcceptEventHandler;
+import playground.mzilske.freight.events.OfferRejectEvent;
+import playground.mzilske.freight.events.OfferRejectEventHandler;
+import playground.mzilske.freight.events.QueryOffersEvent;
+import playground.mzilske.freight.events.QueryOffersEventHandler;
+import playground.mzilske.freight.events.ShipmentDeliveredEvent;
+import playground.mzilske.freight.events.ShipmentPickedUpEvent;
 
-public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler {
+public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, QueryOffersEventHandler, OfferAcceptEventHandler, OfferRejectEventHandler {
 	
 	private static Logger logger = Logger.getLogger(CarrierAgentTracker.class);
 	
-	private Collection<CarrierImpl> carriers;
+	private Collection<Carrier> carriers;
 
 	private Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
-	
-	private Collection<CarrierCostListener> costListeners = new ArrayList<CarrierCostListener>();
-	
-	private Collection<ShipmentStatusListener> shipmentStatusListeners = new ArrayList<ShipmentStatusListener>();
 		
 	double weight = 1;
-
-	private PlanAlgorithm router;
 
 	private Network network;
 
 	private List<PlanAgent> agents;
 	
-	private double sumOfTotalDistance = 0.0;
-	
 	private CarrierAgentFactory carrierAgentFactory;
-
-	private Collection<CarrierTotalCostListener> totalCostListeners = new ArrayList<CarrierTotalCostListener>();
 	
-	private Collection<CarrierEventListener> eventListeners = new ArrayList<CarrierEventListener>();
+	private EventsManager eventsManager; 
 
-
-	public Collection<CarrierEventListener> getEventListeners() {
-		return eventListeners;
-	}
-
-
-	public Collection<CarrierTotalCostListener> getTotalCostListeners() {
-		return totalCostListeners;
-	}
-	
-
-	public CarrierAgentTracker(Collection<CarrierImpl> carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
+	public CarrierAgentTracker(Collection<Carrier> carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
 		this.carriers = carriers;
-		this.router = router;
 		this.network = network;
 		this.carrierAgentFactory = carrierAgentFactory;
 		createCarrierAgents();
+		eventsManager = EventsUtils.createEventsManager();
+	}
+	
+	public EventsManager getEventsManager(){
+		return eventsManager;
 	}
 
+	public void processEvent(Event event){
+		eventsManager.processEvent(event);
+	}
+	
 	@Override
 	public List<PlanAgent> getAgents() {
 		return agents;
@@ -89,7 +84,6 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	@Override
 	public void reset(int iteration) {
-		sumOfTotalDistance = 0.0;
 		resetCarrierAgents();
 	}
 
@@ -120,11 +114,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 				carrierAgent.tellDistance(personId, distance);
 				carrierAgent.tellLink(personId, linkId);
 			}
-		}
-		sumOfTotalDistance += distance/1000;
-//		logger.info("Link Enter: " + linkId + " CarrierId=" + event.getPersonId() + " length="+ distance);
-		// logger.info("totalDistanceTraveled = " + sumOfTotalDistance + " km");
-		
+		}		
 	}
 
 	@Override
@@ -136,46 +126,21 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 				carrierAgent.activityStartOccurs(personId, activityType, event.getTime());
 			}
 		}
-		
-	}
-
-//	public void calculateCostsScoreCarriersAndInform() {
-//		//inclusive cost per shipment
-//		for(CarrierAgent carrierAgent : carrierAgents){
-//			carrierAgent.scoreSelectedPlan();
-//			List<Tuple<Shipment,Double>> shipmentCostTuple = carrierAgent.calculateCostsPerShipment();
-//			for(Tuple<Shipment,Double> t : shipmentCostTuple){
-//				informCostListeners(t.getFirst(),t.getSecond());
-//			}
-//		}
-//		
-//	}
-
-	public Collection<CarrierCostListener> getCostListeners() {
-		return costListeners;
-	}
-
-	public Collection<ShipmentStatusListener> getShipmentStatusListeners() {
-		return shipmentStatusListeners;
 	}
 
 	private void createCarrierAgents() {
-		for (CarrierImpl carrier : carriers) {
+		for (Carrier carrier : carriers) {
 			CarrierAgent carrierAgent = carrierAgentFactory.createAgent(this,carrier);
 			carrierAgents.add(carrierAgent);
 		}
 	}
 
-	public void notifyPickup(Shipment shipment, double time) {
-		for (ShipmentStatusListener listener: shipmentStatusListeners) {
-			listener.shipmentPickedUp(shipment, time);
-		}
+	public void notifyPickup(Id carrierId, Id driverId, Shipment shipment, double time) {
+		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment, time));
 	}
 
-	public void notifyDelivery(Shipment shipment, double time) {
-		for (ShipmentStatusListener listener: shipmentStatusListeners) {
-			listener.shipmentDelivered(shipment, time);
-		}
+	public void notifyDelivery(Id carrierId, Id driverId, Shipment shipment, double time) {
+		processEvent(new ShipmentDeliveredEvent(carrierId, driverId, shipment, time));
 	}
 	
 	public Collection<CarrierOffer> getOffers(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {
@@ -194,7 +159,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	public void removeContracts(Collection<Contract> contracts) {
 		for(Contract c : contracts){
-			CarrierImpl carrier = findCarrier(c.getOffer().getId());
+			Carrier carrier = findCarrier(c.getOffer().getId());
 			if(carrier != null){
 				carrier.getContracts().remove(c);
 				logger.info("remove contract: " + c.getShipment());
@@ -205,8 +170,8 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		}
 	}
 
-	private CarrierImpl findCarrier(Id carrierId) {
-		for(CarrierImpl carrier : carriers){
+	private Carrier findCarrier(Id carrierId) {
+		for(Carrier carrier : carriers){
 			if(carrier.getId().equals(carrierId)){
 				return carrier;
 			}
@@ -216,7 +181,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 
 	public void addContracts(Collection<Contract> contracts) {
 		for(Contract c : contracts){
-			CarrierImpl carrier = findCarrier(c.getOffer().getId());
+			Carrier carrier = findCarrier(c.getOffer().getId());
 			if(carrier != null){
 				carrier.getContracts().add(c);
 				logger.info("add contract: " + c.getShipment());
@@ -228,7 +193,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		
 	}
 
-	public CarrierImpl getCarrier(Id id) {
+	public Carrier getCarrier(Id id) {
 		return findCarrier(id);
 	}
 	
@@ -241,35 +206,40 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		return null;
 	}
 
-	public void memorizeCost(Id id, Id from, Id to, int size, Double cost) {
-		CarrierAgent agent = findCarrierAgent(id);
-		if(agent != null){
-			agent.memorizeCost(from, to, size, cost);
-		}
-		
-	}
-
 	public void calculateCosts() {
-		for(CarrierImpl carrier : carriers){
+		for(Carrier carrier : carriers){
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
 			agent.calculateCosts();
 		}
 		
 	}
-	
 
-	public void informTotalCost(Id id, CarrierCostEvent costEvent) {
-		for(CarrierTotalCostListener l : totalCostListeners ){
-			l.inform(id,costEvent);
-		}
-	}
-	
-	public void processEvents(DriverEvent event){
-		for(CarrierEventListener l : eventListeners){
-			if(l instanceof DriverEventListener){
-				((DriverEventListener)l).processEvent(event);
+	@Override
+	public void handleEvent(QueryOffersEvent event) {
+		for (CarrierAgent carrierAgent : carrierAgents) {
+			CarrierOffer offer = carrierAgent.requestOffer(event.getService().getFrom(), event.getService().getTo(), event.getService().getSize(), 
+					event.getService().getStartPickup(), event.getService().getEndPickup(), event.getService().getStartDelivery(), event.getService().getEndDelivery());
+			if(offer instanceof NoOffer){
+				continue;
+			}
+			else {
+				event.getOffers().add(offer);
 			}
 		}
 	}
-	
+
+	@Override
+	public void handleEvent(OfferRejectEvent event) {
+		Id carrierId = event.getOffer().getId();
+		CarrierAgent agent = findCarrierAgent(carrierId);
+		agent.informOfferRejected(event.getOffer());
+	}
+
+	@Override
+	public void handleEvent(OfferAcceptEvent event) {
+		Id carrierId = event.getContract().getOffer().getId();
+		CarrierAgent agent = findCarrierAgent(carrierId);
+		agent.informOfferAccepted(event.getContract());
+		
+	}
 }

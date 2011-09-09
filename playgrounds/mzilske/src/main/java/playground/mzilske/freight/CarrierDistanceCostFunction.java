@@ -2,10 +2,10 @@ package playground.mzilske.freight;
 
 public class CarrierDistanceCostFunction implements CarrierCostFunction{
 
-	private CarrierImpl carrier;
+	private Carrier carrier;
 	
 	@Override
-	public void init(CarrierImpl carrier) {
+	public void init(Carrier carrier) {
 		this.carrier = carrier;
 		
 	}
