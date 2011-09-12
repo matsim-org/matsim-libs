@@ -86,12 +86,12 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.pBox.init(controler);
-		
+		this.pBox.notifyStartup(event);
 		this.routerNetwork = null;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
-		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.replan(event.getControler(), 0));
+		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 		((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
-		addPVehiclesToOriginalOnes(event.getControler());
+		this.addPVehiclesToOriginalOnes(event.getControler());
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
 				event.getControler().getScenario().getConfig().vspExperimental());
@@ -102,11 +102,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		if(event.getIteration() == 0){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
-			this.pBox.reset(event);
+			this.pBox.notifyIterationStarts(event);
 			this.routerNetwork = null;
-			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.replan(event.getControler(), event.getIteration()));
+			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
 			((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
-			addPVehiclesToOriginalOnes(event.getControler());
+			this.addPVehiclesToOriginalOnes(event.getControler());
 			
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for (Person person : this.controler.getPopulation().getPersons().values()) {
@@ -125,13 +125,13 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 				}
 			});
 
-			dumpTransitScheduleAndVehicles(event.getIteration());
+			this.dumpTransitScheduleAndVehicles(event.getIteration());
 		}
 	}
 	
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		this.pBox.score(event);	
+		this.pBox.notifyScoring(event);	
 	}
 
 	private TransitSchedule addPTransitScheduleToOriginalOne(PTransitSchedule baseSchedule, TransitSchedule pSchedule) {

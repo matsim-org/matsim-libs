@@ -26,9 +26,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -61,7 +64,7 @@ import playground.andreas.osmBB.extended.TransitScheduleImpl;
  * @author aneumann
  *
  */
-public class PBox {
+public class PBox implements StartupListener, IterationStartsListener, ScoringListener{
 	
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
@@ -104,6 +107,128 @@ public class PBox {
 		}
 	}	
 	
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		// This is the first iteration - collect the transit schedules from all cooperatives
+		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
+			this.pTransitSchedule.addStopFacility(stop);
+		}
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+		}
+		
+		this.franchise.reset(this.pTransitSchedule);
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		// Replan all cooperatives
+		if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
+			// adapt the number of cooperatives
+			adaptNumberOfCooperatives(event.getIteration());
+		}		
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			cooperative.replan(this.strategyManager, event.getIteration());
+		}
+		
+		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
+			this.pTransitSchedule.addStopFacility(stop);
+		}
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+		}
+		
+		this.franchise.reset(this.pTransitSchedule);
+		
+	}
+
+	@Override
+	public void notifyScoring(ScoringEvent event) {
+		TreeMap<Id, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
+		for (Cooperative cooperative : this.cooperatives) {
+			cooperative.score(driverId2ScoreMap);
+		}
+		
+		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
+		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
+			this.pTransitSchedule.addStopFacility(stop);
+		}
+		
+		for (Cooperative cooperative : this.cooperatives) {
+			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+		}
+		
+		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
+	}
+
+	public TransitSchedule getpTransitSchedule() {
+		return this.pTransitSchedule;
+	}
+
+	/**
+	 * Create vehicles for each departure.
+	 * 
+	 * @return Vehicles of paratranit
+	 */
+	public Vehicles getVehicles(){		
+		Vehicles vehicles = new VehiclesImpl();		
+		VehiclesFactory vehFactory = vehicles.getFactory();
+		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
+		VehicleCapacity capacity = new VehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(11)); // july 2011 the driver takes one seat
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehType.setCapacity(capacity);
+		vehType.setAccessTime(2.0);
+		vehType.setEgressTime(1.0);
+		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
+	
+		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (Departure departure : route.getDepartures().values()) {
+					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
+					vehicles.getVehicles().put(vehicle.getId(), vehicle);
+				}
+			}
+		}
+		
+		return vehicles;
+	}
+
+	public ScorePlansHandler getScorePlansHandler() {
+		return scorePlansHandler;
+	}
+
+	public List<Cooperative> getCooperatives() {
+		return cooperatives;
+	}
+
+	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
+		writer.write(iterationFilename);		
+	}
+
+	private void addTransitRoutesToArchiv(int iteration) {
+		
+		if(pTransitScheduleArchiv == null){
+			pTransitScheduleArchiv = this.pTransitSchedule;
+		}
+		
+		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
+			if(!this.pTransitScheduleArchiv.getTransitLines().containsKey(line.getId())){
+				this.pTransitScheduleArchiv.addTransitLine(line);
+			} else {
+				for (TransitRoute route : line.getRoutes().values()) {
+					pTransitScheduleArchiv.getTransitLines().get(line.getId()).addRoute(route);
+				}
+			}
+		}		
+	}
+
 	private PRouteProvider getRouteProvider(NetworkImpl network, PConfigGroup pConfig, TransitSchedule pStopsOnly) {
 		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
 			return new SimpleBackAndForthScheduleProvider(pStopsOnly, network, 0);
@@ -124,54 +249,6 @@ public class PBox {
 		}		
 	}
 
-	/**
-	 * Is called whenever a new iteration starts and thus a new schedule can be applied 
-	 * @param controler The current matsim controller
-	 * @param iteration Number of iteration, zero if initial iteration, otherwise positive 
-	 * @return Transit schedule for paratransit lines valid for the current iteration
-	 */
-	public TransitSchedule replan(Controler controler, int iteration){
-		// Two cases: First "initial iteration", Second "any other one"
-		
-		if(iteration == controler.getFirstIteration()){
-			// initial iteration
-			
-			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
-			for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
-				this.pTransitSchedule.addStopFacility(stop);
-			}
-			
-			for (Cooperative cooperative : this.cooperatives) {
-				this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
-			}
-
-		} else {
-			// any other iteration
-			
-			if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
-				// adapt the number of cooperatives
-				adaptNumberOfCooperatives(iteration);
-			}		
-			
-			for (Cooperative cooperative : this.cooperatives) {
-				cooperative.replan(this.strategyManager, iteration);
-			}
-			
-			this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
-			for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
-				this.pTransitSchedule.addStopFacility(stop);
-			}
-			
-			for (Cooperative cooperative : this.cooperatives) {
-				this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
-			}
-		}
-		
-		this.franchise.reset(this.pTransitSchedule);
-				
-		return this.pTransitSchedule;
-	}
-	
 	private void adaptNumberOfCooperatives(int iteration) {
 		
 		int numberOfProfitableCooperatives = 0;		
@@ -224,90 +301,6 @@ public class PBox {
 		return;
 	}
 
-	/**
-	 * Scoring
-	 * 
-	 * @param event
-	 */
-	public void score(ScoringEvent event) {
-		TreeMap<Id, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
-		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.score(driverId2ScoreMap);
-		}
-		
-		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
-		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
-			this.pTransitSchedule.addStopFacility(stop);
-		}
-		
-		for (Cooperative cooperative : this.cooperatives) {
-			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
-		}
-		
-		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
-	}
-
-	/**
-	 * Create vehicles for each departure.
-	 * 
-	 * @return Vehicles of paratranit
-	 */
-	public Vehicles getVehicles(){		
-		Vehicles vehicles = new VehiclesImpl();		
-		VehiclesFactory vehFactory = vehicles.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(11)); // july 2011 the driver takes one seat
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehType.setCapacity(capacity);
-		vehType.setAccessTime(2.0);
-		vehType.setEgressTime(1.0);
-		vehicles.getVehicleTypes().put(vehType.getId(), vehType);
 	
-		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (Departure departure : route.getDepartures().values()) {
-					Vehicle vehicle = vehFactory.createVehicle(departure.getVehicleId(), vehType);
-					vehicles.getVehicles().put(vehicle.getId(), vehicle);
-				}
-			}
-		}
-		
-		return vehicles;
-	}
-
-	public ScorePlansHandler getScorePlansHandler() {
-		return scorePlansHandler;
-	}
-
-	public List<Cooperative> getCooperatives() {
-		return cooperatives;
-	}
-
-	public void reset(IterationStartsEvent event) {
-		log.info("nothing to do, yet.");		
-	}
-
-	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
-		writer.write(iterationFilename);		
-	}
-
-	private void addTransitRoutesToArchiv(int iteration) {
-		
-		if(pTransitScheduleArchiv == null){
-			pTransitScheduleArchiv = this.pTransitSchedule;
-		}
-		
-		for (TransitLine line : this.pTransitSchedule.getTransitLines().values()) {
-			if(!this.pTransitScheduleArchiv.getTransitLines().containsKey(line.getId())){
-				this.pTransitScheduleArchiv.addTransitLine(line);
-			} else {
-				for (TransitRoute route : line.getRoutes().values()) {
-					pTransitScheduleArchiv.getTransitLines().get(line.getId()).addRoute(route);
-				}
-			}
-		}		
-	}
-
+	
 }
