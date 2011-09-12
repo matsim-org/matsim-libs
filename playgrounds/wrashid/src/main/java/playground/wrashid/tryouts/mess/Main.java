@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+import net.sourceforge.jeval.EvaluationException;
+import net.sourceforge.jeval.Evaluator;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -24,6 +27,15 @@ public class Main {
 			System.out.println("bad");
 		} else {
 			System.out.println("good");
+		}
+		
+		Evaluator eval=new Evaluator();
+		
+		try {
+			System.out.println(eval.evaluate("1+1"));
+		} catch (EvaluationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
