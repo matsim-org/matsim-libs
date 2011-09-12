@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * TrajectoryPlanBuilder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.analysis;
+package playground.johannes.mz2005.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -35,33 +34,40 @@ import playground.johannes.coopsim.pysical.Trajectory;
  * @author illenberger
  *
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public class TrajectoryPlanBuilder {
 
-	private final BidiMap trajectories;
-	
-	private final TrajectoryProperty delegate;
-	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
+	public Map<Plan, Trajectory> buildTrajectory(Set<Plan> plans) {
+		Map<Plan, Trajectory> trajectories = new HashMap<Plan, Trajectory>();
+		for(Plan plan : plans) {
+//			if(plan.getPlanElements().size() % 2 == 0) {
+//				System.out.println("Invalid plan.");
+//			} else {
+			Trajectory t = new Trajectory(plan.getPerson());
+			for(int i = 0; i < plan.getPlanElements().size(); i++) {
+				if(i % 2 == 0) {
+					Activity act = (Activity) plan.getPlanElements().get(i);
+					double endTime = act.getEndTime();
+					if(Double.isInfinite(endTime)) {
+						endTime = 86400;
+						if(i > 0) {
+							endTime = Math.max(t.getTransitions().get(i), 86400);
+						}
+					}
+					t.addElement(act, endTime);
+				} else {
+					Leg leg = (Leg) plan.getPlanElements().get(i);
+					Activity act = (Activity) plan.getPlanElements().get(i + 1);
+					double endTime = act.getStartTime();
+					if(Double.isInfinite(endTime) || endTime == 0)
+						endTime = leg.getDepartureTime() + leg.getTravelTime();
+					
+					t.addElement(leg, endTime);
+				}
+			}
+			trajectories.put(plan, t);
+//			}
 		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
 		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
-			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
-		}
-		
-		return pValues;
+		return trajectories;
 	}
 }

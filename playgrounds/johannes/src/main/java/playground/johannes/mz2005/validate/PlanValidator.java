@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * PlanValidator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.analysis;
+package playground.johannes.mz2005.validate;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * @author illenberger
  *
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public interface PlanValidator {
 
-	private final BidiMap trajectories;
+	public boolean validate(Plan plan);
 	
-	private final TrajectoryProperty delegate;
-	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
-		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
-		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
-			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
-		}
-		
-		return pValues;
-	}
 }

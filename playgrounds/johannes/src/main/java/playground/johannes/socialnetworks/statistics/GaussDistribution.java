@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * GaussDistribution.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.analysis;
+package playground.johannes.socialnetworks.statistics;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-
+import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
 
 /**
  * @author illenberger
  *
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public class GaussDistribution implements UnivariateRealFunction {
 
-	private final BidiMap trajectories;
+	private final double sigma;
 	
-	private final TrajectoryProperty delegate;
+	private final double mu;
 	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
-		this.delegate = delegate;
+	private final double scale;
+	
+	public GaussDistribution(double sigma, double mu, double scale) {
+		this.sigma = sigma;
+		this.mu = mu;
+		this.scale = scale;
 	}
 	
 	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
-		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
-		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
-			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
-		}
-		
-		return pValues;
+	public double value(double x) throws FunctionEvaluationException {
+		return scale/(sigma * Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * Math.pow((x - mu)/sigma, 2.0));
 	}
+
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WGS84DistanceCalculator.java
+ * TripContainer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
+package playground.johannes.mz2005.io;
 
-import org.geotools.referencing.GeodeticCalculator;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
+import java.util.LinkedList;
+import java.util.List;
 
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author illenberger
  *
  */
-public class WGS84DistanceCalculator implements DistanceCalculator {
+class TripDataContaienr {
 
-	private static WGS84DistanceCalculator instance;
+	public String personId;
 	
-	public static WGS84DistanceCalculator getInstance() {
-		if(instance == null)
-			instance = new WGS84DistanceCalculator();
-		
-		return instance;
-	}
+	public String tripId;
 	
-	private final GeodeticCalculator geoCalc = new GeodeticCalculator(DefaultGeographicCRS.WGS84);
+	public double distance;
 	
-	@Override
-	public double distance(Point p1, Point p2) {
-		geoCalc.setStartingGeographicPoint(p1.getX(), p1.getY());
-		geoCalc.setDestinationGeographicPoint(p2.getX(), p2.getY());
-		return geoCalc.getOrthodromicDistance();
-	}
-
+	public double duration;
+	
+	public boolean outwardTrip;
+	
+	public int accompanists;
+	
+	public int leisureType;
+	
+	public int type;
+	
+	public int startTime;
+	
+	public int endTime;
+	
+	public int mode;
+	
+	public boolean roundTrip;
+	
+	public List<LegDataContainer> legs = new LinkedList<LegDataContainer>();
+	
+	public LegMode aggrMode;
+	
+	public double[] startCoord;
+	
+	public double[] destCoord;
 }

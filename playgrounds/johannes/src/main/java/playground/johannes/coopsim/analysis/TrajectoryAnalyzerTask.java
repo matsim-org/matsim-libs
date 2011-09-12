@@ -42,6 +42,18 @@ public abstract class TrajectoryAnalyzerTask {
 
 	private static final Logger logger = Logger.getLogger(TrajectoryAnalyzerTask.class);
 	
+	private static boolean overwrite = false;
+	
+	private static int overwriteBins;
+	
+	private static int overwriteMinsize;
+	
+	public static void overwriteStratification(int bins, int minsize) {
+		overwrite = true;
+		overwriteBins = bins;
+		overwriteMinsize = minsize;
+	}
+	
 	private String output;
 	
 	public void setOutputDirectory(String outputDir) {
@@ -66,6 +78,12 @@ public abstract class TrajectoryAnalyzerTask {
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();
 		if (values.length > 0) {
+			if(overwrite) {
+				logger.warn("Overwriting stratification!");
+				bins = overwriteBins;
+				minsize = overwriteMinsize;
+			}
+			
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(values, minsize, bins), true);
 			Histogram.normalize(hist);
 			TXTWriter.writeMap(hist, name, "p", String.format("%1$s/%2$s.strat.txt", getOutputDirectory(), name, values.length / bins));

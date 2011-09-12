@@ -55,7 +55,7 @@ public class Trajectory {
 		return transitions;
 	}
 	
-	void addElement(PlanElement element, double endTime) {
+	public void addElement(PlanElement element, double endTime) {
 		if(elements.isEmpty()) {
 			/*
 			 * This is the first element, set start time to 0.
@@ -66,7 +66,7 @@ public class Trajectory {
 		}
 	}
 	
-	void addElement(PlanElement element, double startTime, double endTime) {
+	public void addElement(PlanElement element, double startTime, double endTime) {
 		if(endTime < startTime) {
 			throw new RuntimeException("Start time must not be greater than end time!");
 		}

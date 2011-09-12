@@ -54,6 +54,7 @@ public class VertexPersonPropertyAdaptor extends AbstractVertexProperty {
 	
 	@Override
 	public TObjectDoubleHashMap<Vertex> values(Set<? extends Vertex> vertices) {
+		@SuppressWarnings("unchecked")
 		Set<SocialVertex> socialVertices = (Set<SocialVertex>) vertices;
 		
 		Set<Person> personSet = new HashSet<Person>(vertices.size());

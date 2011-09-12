@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * GeneratePopulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.analysis;
+package playground.johannes.studies.mz2005;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-
+import playground.johannes.mz2005.io.EscortData;
+import playground.johannes.mz2005.io.RawDataToPopulation;
 
 /**
  * @author illenberger
- *
+ * 
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public class GeneratePopulation {
 
-	private final BidiMap trajectories;
-	
-	private final TrajectoryProperty delegate;
-	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
-		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		String basedir = "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/";
+		RawDataToPopulation generator = new RawDataToPopulation();
+		List<Integer> days = new ArrayList<Integer>();
+		for(int i = 1; i < 6; i++)
+			days.add(i);
+//		days.add(6);
+//		days.add(7);
+		Population pop = generator.create(basedir, days);
 		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
-			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
-		}
+		PopulationWriter writer = new PopulationWriter(pop, null);
+		writer.write(basedir + "/07-09-2011/plans.wkday.xml");
 		
-		return pValues;
+		EscortData escortData = generator.getEscortData();
+		escortData.write(basedir + "/07-09-2011/escort.wkday.txt");
 	}
+
 }

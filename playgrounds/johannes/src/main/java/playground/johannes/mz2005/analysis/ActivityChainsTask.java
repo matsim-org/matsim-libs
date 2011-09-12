@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PersonTrajectoryPropertyAdaptor.java
+ * ActivityChainsTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,51 +17,61 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.analysis;
+package playground.johannes.mz2005.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
 
-import java.util.HashSet;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.BidiMap;
-import org.matsim.api.core.v01.population.Person;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.sna.math.DummyDiscretizer;
+import org.matsim.contrib.sna.util.TXTWriter;
 
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
-
 
 /**
  * @author illenberger
  *
  */
-public class PersonTrajectoryPropertyAdaptor extends AbstractPersonProperty {
+public class ActivityChainsTask extends TrajectoryAnalyzerTask {
 
-	private final BidiMap trajectories;
-	
-	private final TrajectoryProperty delegate;
-	
-	public PersonTrajectoryPropertyAdaptor(BidiMap trajectories, TrajectoryProperty delegate) {
-		this.trajectories = trajectories;
-		this.delegate = delegate;
-	}
+	private static final String KEY = "n_act";
 	
 	@Override
-	public TObjectDoubleHashMap<Person> values(Set<? extends Person> persons) {
-		Set<Trajectory> traj = new HashSet<Trajectory>(persons.size());
-		for(Person person : persons) {
-			traj.add((Trajectory) trajectories.get(person));
-		}
-	
-		TObjectDoubleHashMap<Trajectory> tValues = delegate.values(traj);
-		TObjectDoubleHashMap<Person> pValues = new TObjectDoubleHashMap<Person>(tValues.size());
+	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
 		
-		TObjectDoubleIterator<Trajectory> it = tValues.iterator();
-		for(int i = 0; i < tValues.size(); i++) {
-			it.advance();
-			pValues.put((Person) trajectories.getKey(it.key()), it.value());
+		for(Trajectory trajectory : trajectories) {
+			StringBuilder builder = new StringBuilder();
+			for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+				String type = ((Activity) trajectory.getElements().get(i)).getType();
+				builder.append(type);
+				builder.append("-");
+			}
+			
+			String chain = builder.toString();
+			chains.adjustOrPutValue(chain, 1, 1);
+			
+			stats.addValue((trajectory.getElements().size() + 1)/2);
 		}
 		
-		return pValues;
+		results.put(KEY, stats);
+		
+		if(outputDirectoryNotNull()) {
+			try {
+				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/actchains.txt", true);
+				
+				writeHistograms(stats, new DummyDiscretizer(), KEY, false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
+
 }

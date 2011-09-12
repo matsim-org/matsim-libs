@@ -39,11 +39,13 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.johannes.mz2005.validate.PlanValidator;
+
 /**
  * @author illenberger
  * 
  */
-public class ActivityRandomizer2 implements PlanFilter {
+public class ActivityRandomizer2 implements PlanValidator {
 
 	private final List<Link> links;
 
@@ -69,7 +71,7 @@ public class ActivityRandomizer2 implements PlanFilter {
 	}
 
 	@Override
-	public boolean apply(Plan plan) {
+	public boolean validate(Plan plan) {
 		boolean result = false;
 
 		for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
@@ -112,7 +114,7 @@ public class ActivityRandomizer2 implements PlanFilter {
 		ActivityRandomizer2 randomizer = new ActivityRandomizer2(scenario.getPopulation().getFactory(),
 				scenario.getNetwork(), router, "leisure", 4711);
 		
-		PlanFilterEngine.apply(scenario.getPopulation(), randomizer);
+//		PlanFilterEngine.apply(scenario.getPopulation(), randomizer);
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(scenario.getConfig().getParam("popfilter", "outputPlansFile"));
 	}

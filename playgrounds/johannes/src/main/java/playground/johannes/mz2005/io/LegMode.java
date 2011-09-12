@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WGS84DistanceCalculator.java
+ * AggregatedMode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.gis;
-
-import org.geotools.referencing.GeodeticCalculator;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-
-import com.vividsolutions.jts.geom.Point;
+package playground.johannes.mz2005.io;
 
 /**
  * @author illenberger
  *
  */
-public class WGS84DistanceCalculator implements DistanceCalculator {
-
-	private static WGS84DistanceCalculator instance;
-	
-	public static WGS84DistanceCalculator getInstance() {
-		if(instance == null)
-			instance = new WGS84DistanceCalculator();
-		
-		return instance;
-	}
-	
-	private final GeodeticCalculator geoCalc = new GeodeticCalculator(DefaultGeographicCRS.WGS84);
-	
-	@Override
-	public double distance(Point p1, Point p2) {
-		geoCalc.setStartingGeographicPoint(p1.getX(), p1.getY());
-		geoCalc.setDestinationGeographicPoint(p2.getX(), p2.getY());
-		return geoCalc.getOrthodromicDistance();
-	}
-
+public enum LegMode {
+	car, pt, other
 }

@@ -19,17 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.sim.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.util.TXTWriter;
 
 /**
  * @author illenberger
@@ -52,28 +48,29 @@ public class TrajectoryAnalyzer {
 	}
 	
 	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
-		
-		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
-		writer.newLine();
-		SortedMap<String, DescriptiveStatistics> sortedMap = new TreeMap<String, DescriptiveStatistics>(statsMap);
-		for(Entry<String, DescriptiveStatistics> entry : sortedMap.entrySet()) {
-			writer.write(entry.getKey());
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getMean()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getMin()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getMax()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getN()));
-			writer.write("\t");
-			writer.write(String.valueOf(entry.getValue().getVariance()));
-			writer.newLine();
-		}
-		
-		writer.close();
+//		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+//		
+//		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
+//		writer.newLine();
+//		SortedMap<String, DescriptiveStatistics> sortedMap = new TreeMap<String, DescriptiveStatistics>(statsMap);
+//		for(Entry<String, DescriptiveStatistics> entry : sortedMap.entrySet()) {
+//			writer.write(entry.getKey());
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getMean()));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getMin()));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getMax()));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getN()));
+//			writer.write("\t");
+//			writer.write(String.valueOf(entry.getValue().getVariance()));
+//			writer.newLine();
+//		}
+//		
+//		writer.close();
+		TXTWriter.writeStatistics(statsMap, filename);
 	}
 }
