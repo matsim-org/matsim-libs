@@ -81,17 +81,15 @@ public class BasicCooperative implements Cooperative{
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
-		if(this.bestPlan != null){
-			scorePlan(driverId2ScoreMap, this.bestPlan);
-			this.budget += this.bestPlan.getScore();
-			for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
-				route.setDescription(this.bestPlan.toString(this.budget));
+		for (PPlan plan : this.getAllPlans()) {
+			scorePlan(driverId2ScoreMap, plan);
+			this.budget += plan.getScore();
+			for (TransitRoute route : plan.getLine().getRoutes().values()) {
+				route.setDescription(plan.toString(this.budget));
 			}
 		}
-		scorePlan(driverId2ScoreMap, this.testPlan);
-		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
-			route.setDescription(this.testPlan.toString(this.budget));
-		}
+		// TODO Testing for free
+		this.budget -= this.testPlan.getScore();
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	

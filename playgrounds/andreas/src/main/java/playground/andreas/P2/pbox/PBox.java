@@ -45,6 +45,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehiclesImpl;
 
 import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.plan.SimpleBackAndForthScheduleProvider;
 import playground.andreas.P2.plan.SimpleCircleScheduleProvider;
@@ -65,6 +66,9 @@ public class PBox {
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
 	private LinkedList<Cooperative> cooperatives;
+	private int counter = 0;
+	
+	private final PConfigGroup pConfig;
 	private PFranchise franchise;
 
 	TransitSchedule pStopsOnly;
@@ -77,24 +81,23 @@ public class PBox {
 	private PRouteProvider routeProvider;
 	
 	public PBox(PConfigGroup pConfig) {
-		this.scorePlansHandler = new ScorePlansHandler(pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, pConfig.getCostPerKilometer() / 1000.0);
-		this.franchise = new PFranchise(pConfig.getUseFranchise());
+		this.pConfig = pConfig;		
+		this.scorePlansHandler = new ScorePlansHandler(this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0, this.pConfig.getCostPerKilometer() / 1000.0);
+		this.franchise = new PFranchise(this.pConfig.getUseFranchise());
 		this.strategyManager = new PStrategyManager();
 	}
 
 	public void init(Controler controler){
-		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
-
-		this.strategyManager.init(pConfig);
+		this.strategyManager.init(this.pConfig);
 		
 		this.scorePlansHandler.init(controler.getNetwork());
 		controler.getEvents().addHandler(this.scorePlansHandler);
 		
 		// create stops
-		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), pConfig);
+		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), this.pConfig);
 		
-		this.routeProvider = getRouteProvider(controler.getNetwork(), pConfig, this.pStopsOnly);	
-		createCooperatives(pConfig.getNumberOfCooperatives(), pConfig.getCostPerVehicle());
+		this.routeProvider = getRouteProvider(controler.getNetwork(), this.pConfig, this.pStopsOnly);	
+		createCooperatives(this.pConfig.getNumberOfCooperatives());
 		
 		for (Cooperative cooperative : this.cooperatives) {
 			cooperative.init(this.routeProvider, controler.getFirstIteration());
@@ -112,10 +115,11 @@ public class PBox {
 		}
 	}
 
-	private void createCooperatives(int numberOfCooperatives, double costPerVehicle) {
+	private void createCooperatives(int numberOfCooperatives) {
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + i), costPerVehicle, this.franchise);
+			this.counter++;
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig.getCostPerVehicle(), this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
@@ -144,6 +148,11 @@ public class PBox {
 		} else {
 			// any other iteration
 			
+			if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
+				// adapt the number of cooperatives
+				adaptNumberOfCooperatives(iteration);
+			}		
+			
 			for (Cooperative cooperative : this.cooperatives) {
 				cooperative.replan(this.strategyManager, iteration);
 			}
@@ -163,6 +172,58 @@ public class PBox {
 		return this.pTransitSchedule;
 	}
 	
+	private void adaptNumberOfCooperatives(int iteration) {
+		
+		int numberOfProfitableCooperatives = 0;		
+		for (Cooperative cooperative : this.cooperatives) {			
+			List<PPlan> plans = cooperative.getAllPlans();			
+			double tempSumScoreML = 0.0;
+			for (PPlan plan : plans) {
+				tempSumScoreML += plan.getScore();					
+			}
+			
+			if(tempSumScoreML > 0){
+				numberOfProfitableCooperatives++;
+			}
+		}
+		
+		if((double) numberOfProfitableCooperatives / (double) this.cooperatives.size() < this.pConfig.getShareOfCooperativesWithProfit()){
+			// too few with profit, decrease by one company
+			
+			if(this.cooperatives.size() <= this.pConfig.getNumberOfCooperatives()){
+				// do not remove any, we already have the minimum number of cooperatives
+				return;
+			}
+			
+			Cooperative cooperativeToRemove = null;
+			double budgetOfThatCooperative = Double.MAX_VALUE;
+			
+			// find cooperative with lowest score
+			for (Cooperative cooperative : this.cooperatives) {
+				List<PPlan> plans = cooperative.getAllPlans();			
+				double tempSumScoreML = 0.0;
+				for (PPlan plan : plans) {
+					tempSumScoreML += plan.getScore();					
+				}
+				
+				if(tempSumScoreML < budgetOfThatCooperative){
+					cooperativeToRemove = cooperative;
+					budgetOfThatCooperative = tempSumScoreML;
+				}
+			}
+			
+			this.cooperatives.remove(cooperativeToRemove);
+		} else {
+			// too many with profit, there should be some market niche left, increase by one company
+			this.counter++;
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig.getCostPerVehicle(), this.franchise);
+			cooperative.init(this.routeProvider, iteration - 1);
+			this.cooperatives.add(cooperative);
+		}
+		
+		return;
+	}
+
 	/**
 	 * Scoring
 	 * 

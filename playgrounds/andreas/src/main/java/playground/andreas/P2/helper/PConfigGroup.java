@@ -61,6 +61,8 @@ public class PConfigGroup extends Module{
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS = "writeStats";
 	private static final String ROUTE_PROVIDER = "routeProvider";
+	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
+	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -78,6 +80,8 @@ public class PConfigGroup extends Module{
 	private boolean useFranchise = false;
 	private boolean writeStats = false;
 	private String routeProvider = "SimpleCircleScheduleProvider";
+	private boolean useAdaptiveNumberOfCooperatives = false;
+	private double shareOfCooperativesWithProfit = 0.50;
 
 	// Strategies
 	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<Id, PStrategySettings>();
@@ -115,6 +119,10 @@ public class PConfigGroup extends Module{
 			this.writeStats = Boolean.parseBoolean(value);
 		} else if (ROUTE_PROVIDER.equals(key)){
 			this.routeProvider = value;
+		} else if (USE_ADAPTIVE_NUMBER_OF_COOPERATIVES.equals(key)){
+			this.useAdaptiveNumberOfCooperatives = Boolean.parseBoolean(value);
+		} else if (SHARE_OF_COOPERATIVES_WITH_PROFIT.equals(key)){
+			this.shareOfCooperativesWithProfit = Double.parseDouble(value);
 		} else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
 			settings.setModuleName(value);
@@ -144,6 +152,8 @@ public class PConfigGroup extends Module{
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS, Boolean.toString(this.writeStats));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
+		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
+		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -169,6 +179,8 @@ public class PConfigGroup extends Module{
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS, "will write statistics if set to true");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
+		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
+		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
 		
 		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -223,6 +235,14 @@ public class PConfigGroup extends Module{
 		return this.routeProvider;
 	}
 	
+	public boolean getUseAdaptiveNumberOfCooperatives() {
+		return this.useAdaptiveNumberOfCooperatives;
+	}
+
+	public double getShareOfCooperativesWithProfit() {
+		return this.shareOfCooperativesWithProfit;
+	}
+
 	public Collection<PStrategySettings> getStrategySettings() {
 		return this.strategies.values();
 	}

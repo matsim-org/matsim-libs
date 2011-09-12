@@ -59,13 +59,22 @@ import playground.andreas.P2.plan.PPlan;
 public class PStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(PStats.class);
-	final private static int INDEX_ML = 0;
-	final private static int INDEX_MLPOS = 1;
-	final private static int INDEX_BUDGET = 2;
-	final private static int INDEX_VEHICLES = 3;
-	final private static int INDEX_SCOREPERVEHICLE = 4;
-	final private static int INDEX_PASSENGERSSERVED = 5;
-	final private static int INDEX_POSCOOPS = 6;
+	
+	final private static int INDEX_NCOOPS = 0;
+	final private static int INDEX_NCOOPSPOS = 1;
+	final private static int INDEX_NPAX = 2;
+	final private static int INDEX_NPAXPOS = 3;
+	final private static int INDEX_NVEH = 4;
+	final private static int INDEX_NVEHPOS = 5;
+	final private static int INDEX_NBUDGET = 6;
+	final private static int INDEX_NBUDGETPOS = 7;
+	final private static int INDEX_NSCORE = 8;
+	final private static int INDEX_NSCOREPOS = 9;
+	
+	final private static int INDEX_SHAREPOSCOOP = 10;
+	final private static int INDEX_SHAREPOSPAX = 11;
+	final private static int INDEX_SHAREPOSVEH = 12;
+
 
 	private BufferedWriter pStatsWriter;
 
@@ -87,7 +96,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 		if(this.pConfig.getWriteStats()){
 			this.pStatsWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pStats.txt"));
 			try {
-				this.pStatsWriter.write("ITERATION\tavg. SCORE\tavg. POSITIVE SCORE\tavg. BUDGET\tavg. FLEET SIZE\tavg. SCORE PER VEHICLE\tavg. PASSENGERS SERVED\n");
+				this.pStatsWriter.write("iter\tcoops\t+coops\tpax\t+pax\tveh\t+veh\tbudget\t+budget\tscore\t+score\tsharePosCoop\tsharePosPax\tsharePosVeh\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -99,66 +108,59 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 		int maxIter = controler.getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 10000) iterations = 10000; // limit the history size
-		this.history = new double[7][iterations+1];
+		this.history = new double[14][iterations+1];
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(this.pConfig.getWriteStats()){
 			
-			int nofCooperatives = this.pBox.getCooperatives().size();
-			
-			double sumScoreML = 0.0;
-			double sumScoreMLPos = 0.0;
-			double sumBudget = 0.0;
-			double sumVehicle = 0.0;
-			double sumScorePerVehicle = 0.0;
-			int sumPassengersServed = 0;
-			double posCooperatives = 0.0;
+			double coop = 0.0;
+			double coopPos = 0.0;
+			double pax = 0.0;
+			double paxPos = 0.0;
+			double veh = 0.0;
+			double vehPos = 0.0;
+			double budget = 0.0;
+			double budgetPos = 0.0;
+			double score = 0.0;
+			double scorePos = 0.0;
 
 			for (Cooperative cooperative : this.pBox.getCooperatives()) {
-				
 				List<PPlan> plans = cooperative.getAllPlans();
 				
-				double tempSumScoreML = 0.0;
-				double tempSumVehicle = 0.0;
-				double tempSumScorePerVehicle = 0.0;
-				int tempSumPassengersServed = 0;
-				
-				int tempNofVehicle = 0;
+				double coopPax = 0.0;
+				double coopVeh = 0.0;
+				double coopScore = 0.0;				
 
 				for (PPlan plan : plans) {
-					tempSumScoreML += plan.getScore();					
-					tempSumScorePerVehicle += (tempNofVehicle * tempSumScorePerVehicle + plan.getVehicleIds().size() * plan.getScorePerVehicle()) / (tempSumScorePerVehicle + plan.getVehicleIds().size());
-					tempSumVehicle += plan.getVehicleIds().size();
-					tempSumPassengersServed += plan.getTripsServed();
+					coopPax += plan.getTripsServed();
+					coopVeh += plan.getVehicleIds().size();
+					coopScore += plan.getScore();
 				}
 				
-				sumScoreML += tempSumScoreML;
-				if(tempSumScoreML > 0){
-					sumScoreMLPos += tempSumScoreML;
-					posCooperatives++;
-				}
-				sumBudget += cooperative.getBudget();
-				sumVehicle += tempSumVehicle;
-				sumScorePerVehicle += tempSumScorePerVehicle;
-				sumPassengersServed += tempSumPassengersServed;
+				coop++;
+				pax += coopPax;				
+				veh += coopVeh;
+				budget += cooperative.getBudget();
+				score += coopScore;				
 				
-			
+				if(coopScore > 0){
+					coopPos++;
+					paxPos += coopPax;
+					vehPos += coopVeh;
+					budgetPos += cooperative.getBudget();
+					scorePos += coopScore;					
+				}				
 			}
 			
-			log.info("-- avg. score of the cooperatives: " + (sumScoreML / nofCooperatives));
-			log.info("-- avg. positive score of the cooperatives: " + (sumScoreMLPos / nofCooperatives));
-			log.info("-- avg. budget of the cooperatives: " + (sumBudget / nofCooperatives));
-			log.info("-- avg. vehicle fleet size of the cooperatives: " + (sumVehicle / nofCooperatives));
-			log.info("-- avg. score per vehicle: " + (sumScorePerVehicle / nofCooperatives));	
-			log.info("-- avg. number of trips served: " + (sumPassengersServed / nofCooperatives));
-			log.info("-- percentage of cooperatives with positive score: " + ((posCooperatives / (double) nofCooperatives) * 100.0));	
-
+			double sharePosCoop = coopPos / coop * 100.0;
+			double sharePosPax = paxPos / pax * 100.0;
+			double sharePosVeh = vehPos / veh * 100.0;
+			
 			try {
-				this.pStatsWriter.write(event.getIteration() + "\t" + (sumScoreML / nofCooperatives) + "\t" +
-						(sumScoreMLPos / nofCooperatives) + "\t" + (sumBudget / nofCooperatives) + "\t" + (sumVehicle / nofCooperatives) + "\t" +
-						(sumScorePerVehicle / nofCooperatives) + "\t" + (sumPassengersServed / nofCooperatives) + "\t" + ((posCooperatives / (double) nofCooperatives) * 100.0) + "\n");
+				this.pStatsWriter.write(event.getIteration() + "\t" + (int) coop + "\t" + (int) coopPos + "\t" + (int) pax + "\t" + (int) paxPos + "\t" + (int) veh + "\t" + (int) vehPos + "\t" +
+						budget + "\t" + budgetPos + "\t" + score + "\t" + scorePos + "\t" + sharePosCoop + "\t" + sharePosPax + "\t" + sharePosVeh + "\n");
 				this.pStatsWriter.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -166,38 +168,70 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 
 			if (this.history != null) {
 				int index = event.getIteration() - this.minIteration;
-				this.history[INDEX_ML][index] = (sumScoreML / nofCooperatives);
-				this.history[INDEX_MLPOS][index] = (sumScoreMLPos / nofCooperatives);
-				this.history[INDEX_BUDGET][index] = (sumBudget / nofCooperatives);
-				this.history[INDEX_VEHICLES][index] = (sumVehicle / nofCooperatives);
-				this.history[INDEX_SCOREPERVEHICLE][index] = (sumScorePerVehicle / nofCooperatives);
-				this.history[INDEX_PASSENGERSSERVED][index] = (sumPassengersServed / nofCooperatives);
-				this.history[INDEX_POSCOOPS][index] = ((posCooperatives / (double) nofCooperatives) * 100.0);
+				
+				this.history[INDEX_NCOOPS][index] = coop;
+				this.history[INDEX_NCOOPSPOS][index] = coopPos;
+				this.history[INDEX_NPAX][index] = pax;
+				this.history[INDEX_NPAXPOS][index] = paxPos;
+				this.history[INDEX_NVEH][index] = veh;
+				this.history[INDEX_NVEHPOS][index] = vehPos;
+				this.history[INDEX_NBUDGET][index] = budget;
+				this.history[INDEX_NBUDGETPOS][index] = budgetPos;
+				this.history[INDEX_NSCORE][index] = score;
+				this.history[INDEX_NSCOREPOS][index] = scorePos;
+				
+				this.history[INDEX_SHAREPOSCOOP][index] = sharePosCoop;
+				this.history[INDEX_SHAREPOSPAX][index] = sharePosPax;
+				this.history[INDEX_SHAREPOSVEH][index] = sharePosVeh;
 
 				if (event.getIteration() != this.minIteration) {
 					// create chart when data of more than one iteration is available.
-					XYLineChart chart = new XYLineChart("Paratransit Statistics", "iteration", "score/budget/fleet size/trips");
+					
+					XYLineChart size = new XYLineChart("Paratransit Statistics", "iteration", "coops/fleet size");
+					XYLineChart scores = new XYLineChart("Paratransit Statistics", "iteration", "score/budget");
+					XYLineChart shares = new XYLineChart("Paratransit Statistics", "iteration", "shares of positive coops");
+					
 					double[] iterations = new double[index + 1];
 					for (int i = 0; i <= index; i++) {
 						iterations[i] = i + this.minIteration;
 					}
 					double[] values = new double[index + 1];
-					System.arraycopy(this.history[INDEX_ML], 0, values, 0, index + 1);
-					chart.addSeries("avg. score", iterations, values);
-					System.arraycopy(this.history[INDEX_MLPOS], 0, values, 0, index + 1);
-					chart.addSeries("avg. positive score", iterations, values);
-					System.arraycopy(this.history[INDEX_BUDGET], 0, values, 0, index + 1);
-					chart.addSeries("avg. budget", iterations, values);
-					System.arraycopy(this.history[INDEX_VEHICLES], 0, values, 0, index + 1);
-					chart.addSeries("avg. fleet size", iterations, values);
-					System.arraycopy(this.history[INDEX_SCOREPERVEHICLE], 0, values, 0, index + 1);
-					chart.addSeries("avg. score per vehicle", iterations, values);
-					System.arraycopy(this.history[INDEX_PASSENGERSSERVED], 0, values, 0, index + 1);
-					chart.addSeries("avg. number of trips served", iterations, values);
-					System.arraycopy(this.history[INDEX_POSCOOPS], 0, values, 0, index + 1);
-					chart.addSeries("percentage of cooperatives with positive score", iterations, values);
-					chart.addMatsimLogo();
-					chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats.png"), 800, 600);
+					
+					System.arraycopy(this.history[INDEX_NCOOPS], 0, values, 0, index + 1);
+					size.addSeries("N coops", iterations, values);
+					System.arraycopy(this.history[INDEX_NCOOPSPOS], 0, values, 0, index + 1);
+					size.addSeries("N pos coops", iterations, values);
+					System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
+					System.arraycopy(this.history[INDEX_NVEH], 0, values, 0, index + 1);
+					size.addSeries("N veh", iterations, values);
+					System.arraycopy(this.history[INDEX_NVEHPOS], 0, values, 0, index + 1);
+					size.addSeries("N pos veh", iterations, values);
+					
+					System.arraycopy(this.history[INDEX_NBUDGET], 0, values, 0, index + 1);
+					scores.addSeries("budget", iterations, values);
+					System.arraycopy(this.history[INDEX_NBUDGETPOS], 0, values, 0, index + 1);
+					scores.addSeries("pos budget", iterations, values);
+					System.arraycopy(this.history[INDEX_NSCORE], 0, values, 0, index + 1);
+					scores.addSeries("score", iterations, values);
+					System.arraycopy(this.history[INDEX_NSCOREPOS], 0, values, 0, index + 1);
+					scores.addSeries("pos score", iterations, values);
+					scores.addSeries("N pax", iterations, values);
+					System.arraycopy(this.history[INDEX_NPAXPOS], 0, values, 0, index + 1);
+					scores.addSeries("N pos pax", iterations, values);	
+					
+					System.arraycopy(this.history[INDEX_SHAREPOSCOOP], 0, values, 0, index + 1);
+					shares.addSeries("share pos coop", iterations, values);
+					System.arraycopy(this.history[INDEX_SHAREPOSPAX], 0, values, 0, index + 1);
+					shares.addSeries("share pos pax", iterations, values);
+					System.arraycopy(this.history[INDEX_SHAREPOSVEH], 0, values, 0, index + 1);
+					shares.addSeries("share pos veh", iterations, values);
+										
+					size.addMatsimLogo();
+					scores.addMatsimLogo();
+					shares.addMatsimLogo();
+					size.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_size.png"), 800, 600);
+					scores.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_score.png"), 800, 600);
+					shares.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_shares.png"), 800, 600);
 				}
 				if (index == (this.history[0].length - 1)) {
 					// we cannot store more information, so disable the graph feature.
