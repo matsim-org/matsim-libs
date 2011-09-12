@@ -20,12 +20,11 @@
 package org.matsim.contrib.sna.graph.spatial.io;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.opengis.kml._2.IconStyleType;
 import net.opengis.kml._2.LinkType;
@@ -34,7 +33,6 @@ import net.opengis.kml._2.StyleType;
 
 import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.kml.KMZWriter;
 
 /**

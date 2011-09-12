@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.geotools.factory.Hints;
 import org.geotools.referencing.CRS;
 import org.opengis.metadata.Identifier;
 import org.opengis.referencing.FactoryException;

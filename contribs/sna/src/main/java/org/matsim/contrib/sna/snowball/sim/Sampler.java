@@ -353,6 +353,7 @@ public class Sampler<G extends Graph, V extends Vertex, E extends Edge> {
 			return projection;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public TaggedVertex getOpposite(Vertex v) {
 			return (TaggedVertex) super.getOpposite(v);

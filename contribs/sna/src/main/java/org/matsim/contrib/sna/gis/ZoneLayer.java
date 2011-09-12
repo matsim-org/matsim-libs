@@ -92,9 +92,9 @@ public class ZoneLayer<T> {
 		if(point.getSRID() != srid)
 			point = transformPoint(point);
 		
-		List<Zone> result = quadtree.query(point.getEnvelopeInternal());
+		List<Zone<T>> result = quadtree.query(point.getEnvelopeInternal());
 		List<Zone<T>> zones = new ArrayList<Zone<T>>(result.size());
-		for(Zone z : result) {
+		for(Zone<T> z : result) {
 			if(z.getGeometry().contains(point))
 				zones.add(z);
 		}
