@@ -30,8 +30,9 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
-	public static <T> List<T>[]split(Set<T> set, int n) {
+	public static <T> List<T>[] split(Set<T> set, int n) {
 		if(set.size() >= n) {
+			@SuppressWarnings("unchecked")
 			List<T>[] arrays = new List[n];
 			int minSegmentSize = (int) Math.floor(set.size()/(double)n);
 			

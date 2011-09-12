@@ -106,7 +106,7 @@ public class ErgmSimulator {
 		double theta_distance = Double.parseDouble(config.getParam(MODULE_NAME, "theta_distance"));
 		double theta_age = Double.parseDouble(config.getParam(MODULE_NAME, "theta_age"));
 		double theta_gender = Double.parseDouble(config.getParam(MODULE_NAME, "theta_gender"));
-		double theta_triangles = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangles"));
+//		double theta_triangles = Double.parseDouble(config.getParam(MODULE_NAME, "theta_triangles"));
 		
 		boolean conservePk = Boolean.parseBoolean(config.getParam(MODULE_NAME, "conservePk"));
 		/*
@@ -182,7 +182,7 @@ public class ErgmSimulator {
 			double mu = Double.parseDouble(config.getParam(MODULE_NAME, "k_mu"));
 			int k_max = Integer.parseInt(config.getParam(MODULE_NAME, "k_max"));
 			UnivariateRealFunction function = new LogNormalDistribution(sigma, mu, 1);
-			RandomGraphGenerator generator = new RandomGraphGenerator(function, builder, randomSeed);
+			RandomGraphGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new RandomGraphGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(function, builder, randomSeed);
 			graph = (SocialSparseGraph) generator.generate(persons.size(), k_max);
 			
 		} else if("empty".equalsIgnoreCase(type)) {

@@ -37,9 +37,11 @@ import playground.johannes.socialnetworks.graph.generators.RandomGraphGenerator;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphFactory;
+import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;
 
 /**
  * @author illenberger
@@ -68,7 +70,7 @@ public class RandomGraph {
 		double mu = 2.5;
 		int k_max = 41;
 		UnivariateRealFunction function = new LogNormalDistribution(sigma, mu, 1);
-		RandomGraphGenerator generator = new RandomGraphGenerator(function, builder, randomSeed);
+		RandomGraphGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> generator = new RandomGraphGenerator<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>(function, builder, randomSeed);
 		SocialSparseGraph graph = (SocialSparseGraph) generator.generate(persons.size(), k_max);
 		
 		SocialGraphMLWriter writer = new SocialGraphMLWriter();

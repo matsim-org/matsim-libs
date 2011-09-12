@@ -43,7 +43,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
-import playground.johannes.socialnetworks.snowball2.analysis.ClosenessSeed2Seed;
 import playground.johannes.socialnetworks.snowball2.analysis.IterationTask;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
@@ -75,7 +74,7 @@ public class ConnectionSim {
 		 * Init random seed generator.
 		 */
 		int numSeeds = Integer.parseInt(config.getParam(MODULENAME, "seeds"));
-		VertexFilter seedGenerator = new FixedSizeRandomPartition(numSeeds, randomSeed);
+		VertexFilter<Vertex> seedGenerator = new FixedSizeRandomPartition<Vertex>(numSeeds, randomSeed);
 		/*
 		 * Init response rate generator.
 		 */
@@ -87,7 +86,7 @@ public class ConnectionSim {
 		} else
 			responseRate = Double.parseDouble(str);
 		
-		VertexFilter reponseGenerator = new RandomPartition(responseRate, randomSeed);
+		VertexFilter<Vertex> reponseGenerator = new RandomPartition<Vertex>(responseRate, randomSeed);
 		/*
 		 * Init estimators.
 		 */

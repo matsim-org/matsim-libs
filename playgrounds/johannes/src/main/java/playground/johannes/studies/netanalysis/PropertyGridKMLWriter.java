@@ -23,7 +23,6 @@ import org.matsim.contrib.sna.gis.ZoneLayer;
 
 import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.analysis.Age;
 import playground.johannes.socialnetworks.graph.social.analysis.GenderNumeric;
 import playground.johannes.socialnetworks.survey.ivt2009.analysis.VertexPropertyGrid;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;

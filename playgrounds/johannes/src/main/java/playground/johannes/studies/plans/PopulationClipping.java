@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.johannes.socialnetworks.utils;
+package playground.johannes.studies.plans;
 
 import java.util.LinkedList;
 import java.util.List;

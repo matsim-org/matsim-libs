@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.utils;
+package playground.johannes.studies.plans;
 
 import java.io.IOException;
 

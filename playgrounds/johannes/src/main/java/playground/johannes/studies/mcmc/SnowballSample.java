@@ -48,7 +48,6 @@ import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
-import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbabilityTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptancePropaCategoryTask;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.graph.spatial.analysis.CachedAccessibility;
@@ -60,7 +59,6 @@ import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.snowball2.spatial.analysis.ObservedAccessibility;
-import playground.johannes.socialnetworks.survey.ivt2009.analysis.ObservedAcceptanceProbability;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
