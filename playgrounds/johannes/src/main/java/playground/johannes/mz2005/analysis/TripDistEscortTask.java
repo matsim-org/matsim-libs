@@ -35,9 +35,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.io.EscortData;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 
 /**
  * @author illenberger

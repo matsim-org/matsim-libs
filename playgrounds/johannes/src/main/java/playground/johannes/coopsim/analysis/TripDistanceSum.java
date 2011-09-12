@@ -30,9 +30,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
-import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 
 /**
  * @author illenberger

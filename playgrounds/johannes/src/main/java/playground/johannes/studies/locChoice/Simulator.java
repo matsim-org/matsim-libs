@@ -68,6 +68,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 import playground.johannes.coopsim.analysis.TripDistanceAccessibilityTask;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
@@ -92,7 +93,6 @@ import playground.johannes.socialnetworks.sim.analysis.TrajectoryEventsBuilder;
 import playground.johannes.socialnetworks.sim.analysis.VisitorAnalyzerTask;
 import playground.johannes.socialnetworks.sim.gis.ActDistFacilityCalculator;
 import playground.johannes.socialnetworks.sim.gis.ActivityDistanceCalculator;
-import playground.johannes.socialnetworks.sim.gis.MatsimCoordUtils;
 import playground.johannes.socialnetworks.sim.interaction.JointActivityScorer;
 import playground.johannes.socialnetworks.sim.interaction.JointActivityScoringFunctionFactory;
 import playground.johannes.socialnetworks.sim.interaction.MarkovChain;

@@ -21,6 +21,7 @@ package playground.johannes.socialnetworks.sim.gis;
 
 import org.matsim.api.core.v01.population.Activity;
 
+import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
