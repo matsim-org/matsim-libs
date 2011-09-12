@@ -201,7 +201,6 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 					size.addSeries("N coops", iterations, values);
 					System.arraycopy(this.history[INDEX_NCOOPSPOS], 0, values, 0, index + 1);
 					size.addSeries("N pos coops", iterations, values);
-					System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
 					System.arraycopy(this.history[INDEX_NVEH], 0, values, 0, index + 1);
 					size.addSeries("N veh", iterations, values);
 					System.arraycopy(this.history[INDEX_NVEHPOS], 0, values, 0, index + 1);
@@ -215,6 +214,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 					scores.addSeries("score", iterations, values);
 					System.arraycopy(this.history[INDEX_NSCOREPOS], 0, values, 0, index + 1);
 					scores.addSeries("pos score", iterations, values);
+					System.arraycopy(this.history[INDEX_NPAX], 0, values, 0, index + 1);
 					scores.addSeries("N pax", iterations, values);
 					System.arraycopy(this.history[INDEX_NPAXPOS], 0, values, 0, index + 1);
 					scores.addSeries("N pos pax", iterations, values);	
