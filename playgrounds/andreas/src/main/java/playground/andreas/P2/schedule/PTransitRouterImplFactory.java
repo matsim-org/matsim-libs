@@ -66,13 +66,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 	private TransitRouterNetwork routerNetwork;
 
 	private PBox pBox;
-	private Controler controler;
 
 	public PTransitRouterImplFactory(Controler controler) {
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
-		this.controler = controler;
-		this.controler.addControlerListener(new PStats(this.pBox, pConfig));
+		controler.addControlerListener(new PStats(this.pBox, pConfig));
 	}
 
 	@Override
@@ -85,12 +83,11 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.pBox.init(controler);
 		this.pBox.notifyStartup(event);
 		this.routerNetwork = null;
 		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
 		this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
-		((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
+		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 		this.addPVehiclesToOriginalOnes(event.getControler());
 		this.config = new TransitRouterConfig(event.getControler().getScenario().getConfig().planCalcScore()
 				, event.getControler().getScenario().getConfig().plansCalcRoute(), event.getControler().getScenario().getConfig().transitRouter(),
@@ -99,17 +96,18 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+		final Controler controler = event.getControler();
 		if(event.getIteration() == 0){
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			this.pBox.notifyIterationStarts(event);
 			this.routerNetwork = null;
 			this.schedule = addPTransitScheduleToOriginalOne(new PTransitSchedule(this.baseSchedule), this.pBox.getpTransitSchedule());
-			((PScenarioImpl) this.controler.getScenario()).setTransitSchedule(this.schedule);
+			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
 			this.addPVehiclesToOriginalOnes(event.getControler());
 			
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
-			for (Person person : this.controler.getPopulation().getPersons().values()) {
+			for (Person person : event.getControler().getPopulation().getPersons().values()) {
 				for (Plan plan : person.getPlans()) {
 					transitActsRemover.run(plan);
 				}
@@ -117,7 +115,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 //				transitActsRemover.run(person.getSelectedPlan());
 			}
 
-			ParallelPersonAlgorithmRunner.run(this.controler.getPopulation(), this.controler.getConfig().global().getNumberOfThreads(),
+			ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(),
 					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 				@Override
 				public AbstractPersonAlgorithm getPersonAlgorithm() {
@@ -125,7 +123,7 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 				}
 			});
 
-			this.dumpTransitScheduleAndVehicles(event.getIteration());
+			this.dumpTransitScheduleAndVehicles(event);
 		}
 	}
 	
@@ -167,12 +165,12 @@ public class PTransitRouterImplFactory implements TransitRouterFactory, Iteratio
 		controler.getScenario().getVehicles().getVehicles().putAll(pVeh.getVehicles());
 	}
 	
-	private void dumpTransitScheduleAndVehicles(int iteration){
+	private void dumpTransitScheduleAndVehicles(IterationStartsEvent event){
 		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(schedule);
-		writer.write(this.controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
+		writer.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitSchedule.xml.gz"));
 		
-		VehicleWriterV1 writer2 = new VehicleWriterV1(this.controler.getScenario().getVehicles());
-		writer2.writeFile(this.controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
+		VehicleWriterV1 writer2 = new VehicleWriterV1(event.getControler().getScenario().getVehicles());
+		writer2.writeFile(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "vehicles.xml.gz"));
 	}
 
 }

@@ -90,26 +90,27 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.strategyManager = new PStrategyManager();
 	}
 
-	public void init(Controler controler){
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		// This is the first iteration
+		
+		// initialize		
 		this.strategyManager.init(this.pConfig);
 		
-		this.scorePlansHandler.init(controler.getNetwork());
-		controler.getEvents().addHandler(this.scorePlansHandler);
+		this.scorePlansHandler.init(event.getControler().getNetwork());
+		event.getControler().getEvents().addHandler(this.scorePlansHandler);
 		
 		// create stops
-		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(controler.getNetwork(), this.pConfig);
+		this.pStopsOnly = CreateStopsForAllCarLinks.createStopsForAllCarLinks(event.getControler().getNetwork(), this.pConfig);
 		
-		this.routeProvider = getRouteProvider(controler.getNetwork(), this.pConfig, this.pStopsOnly);	
+		this.routeProvider = getRouteProvider(event.getControler().getNetwork(), this.pConfig, this.pStopsOnly);	
 		createCooperatives(this.pConfig.getNumberOfCooperatives());
 		
 		for (Cooperative cooperative : this.cooperatives) {
-			cooperative.init(this.routeProvider, controler.getFirstIteration());
-		}
-	}	
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		// This is the first iteration - collect the transit schedules from all cooperatives
+			cooperative.init(this.routeProvider, event.getControler().getFirstIteration());
+		}		
+		
+		// collect the transit schedules from all cooperatives
 		this.pTransitSchedule = new TransitScheduleImpl(this.pStopsOnly.getFactory());
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
