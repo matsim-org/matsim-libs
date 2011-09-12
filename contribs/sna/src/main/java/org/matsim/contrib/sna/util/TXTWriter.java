@@ -33,6 +33,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -210,6 +214,44 @@ public class TXTWriter {
 			writer.write(String.valueOf(stats.getMax()));
 			writer.write(TAB);
 			writer.write(String.valueOf(stats.getN()));
+			writer.newLine();
+		}
+		
+		writer.close();
+	}
+	
+	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		
+		writer.write("property");
+		writer.write(TAB);
+		writer.write("mean");
+		writer.write(TAB);
+		writer.write("median");
+		writer.write(TAB);
+		writer.write("min");
+		writer.write(TAB);
+		writer.write("max");
+		writer.write(TAB);
+		writer.write("n");
+		writer.newLine();
+		writer.newLine();
+		
+		SortedMap<String, DescriptiveStatistics> sortedMap = new TreeMap<String, DescriptiveStatistics>(statsMap);
+		for(Entry<String, DescriptiveStatistics> entry : sortedMap.entrySet()) {
+			writer.write(entry.getKey());
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMean()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getPercentile(50)));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMin()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getMax()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getN()));
+			writer.write("\t");
+			writer.write(String.valueOf(entry.getValue().getVariance()));
 			writer.newLine();
 		}
 		
