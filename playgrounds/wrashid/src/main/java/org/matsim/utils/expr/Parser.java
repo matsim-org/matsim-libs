@@ -65,8 +65,8 @@ public class Parser {
 		return parseString(input);
 	}
 	
-	public Expr parse() throws SyntaxException{
-		return parse(this.input);
+	public double parse() throws SyntaxException{
+		return parse(this.input).value();
 	}
 
 	public Parser(String input){
