@@ -114,36 +114,42 @@ public class TestParser extends TestCase {
 	}
 	
 	public void testMultipleVariables(){
-		Parser parser1=new Parser("x+y");
+		Parser parser=new Parser("x+y");
 		
-		parser1.setVariable("x", 1);
-		parser1.setVariable("y", 2);
+		parser.setVariable("x", 1);
+		parser.setVariable("y", 2);
 		
-		expect(3.0, parser1);
+		expect(3.0, parser);
+	}
+	
+	public void testVariableValueChange(){
+		Parser parser=new Parser("x");
+		
+		parser.setVariable("x", 1);
+		expect(1.0, parser);
+		
+		parser.setVariable("x", 2);
+		expect(2.0, parser);
 	}
 
 	private static void expect(double expected, Parser parser) {
-		Expr expr;
 		try {
-			expr = parser.parse();
+			double result = parser.parse();
+			assertEquals(expected, result);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}
 
-		double result = expr.value();
-		assertEquals(expected, result);
 	}
 	
 	private static void expect(double expected, String input) {
-		Expr expr;
 		try {
-			expr = new Parser(input).parse();
+			double result = new Parser(input).parse();
+			assertEquals(expected, result);
 		} catch (SyntaxException e) {
 			throw new Error(e.explain());
 		}
 
-		double result = expr.value();
-		assertEquals(expected, result);
 	}
 
 }
