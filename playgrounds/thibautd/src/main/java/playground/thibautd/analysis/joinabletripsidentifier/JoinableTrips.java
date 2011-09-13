@@ -239,13 +239,13 @@ public class JoinableTrips {
 		return tripRecords;
 	}
 
-	public double getDistanceRadius() {
-		return this.distanceRadius;
-	}
+	//public double getDistanceRadius() {
+	//	return this.distanceRadius;
+	//}
 
-	public double getAcceptableTimeDifference() {
-		return this.timeRadius;
-	}
+	//public double getAcceptableTimeDifference() {
+	//	return this.timeRadius;
+	//}
 
 	public List<AcceptabilityCondition> getConditions() {
 		return this.conditions;
