@@ -112,6 +112,15 @@ public class TestParser extends TestCase {
 		expect(1.0, parser1);
 		expect(2.0, parser2);
 	}
+	
+	public void testMultipleVariables(){
+		Parser parser1=new Parser("x+y");
+		
+		parser1.setVariable("x", 1);
+		parser1.setVariable("y", 2);
+		
+		expect(3.0, parser1);
+	}
 
 	private static void expect(double expected, Parser parser) {
 		Expr expr;
