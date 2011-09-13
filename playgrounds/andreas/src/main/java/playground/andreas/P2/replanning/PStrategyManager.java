@@ -49,6 +49,8 @@ public class PStrategyManager {
 			strategy = new RandomStartTimeAllocator(settings.getParametersAsArrayList());
 		} else if (name.equals(RandomEndTimeAllocator.STRATEGY_NAME)) {
 			strategy = new RandomEndTimeAllocator(settings.getParametersAsArrayList());
+		} else if (name.equals(IncreaseNumberOfVehicles.STRATEGY_NAME)) {
+			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
 		}
 		
 		if (strategy == null) {

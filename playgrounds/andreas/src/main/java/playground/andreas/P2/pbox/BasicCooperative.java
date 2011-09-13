@@ -69,15 +69,14 @@ public class BasicCooperative implements Cooperative{
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
 	
-		this.bestPlan = null;
-
 		PPlanStrategy strategy = new CreateNewPlan(new ArrayList<String>());
-		this.testPlan = strategy.run(this);
+		this.bestPlan = strategy.run(this);
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
-		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
+		for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
 			this.currentTransitLine.addRoute(route);
-		}		
+		}
+		this.testPlan = null;
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
@@ -88,73 +87,65 @@ public class BasicCooperative implements Cooperative{
 				route.setDescription(plan.toString(this.budget));
 			}
 		}
-		// TODO Testing for free
-		this.budget -= this.testPlan.getScore();
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
-		if(this.budget <= 0 && this.bestPlan != null){
-			// decrease number of vehicles
-			
-			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) (this.budget / this.costPerVehicle));
-			
-			if(this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell < 1){
-				log.info("Best Plan set to null - restarting line " + this.id);
-				this.bestPlan = null;
-				this.budget = 0.0;
-			} else {
-				PPlan plan = new PPlan(this.bestPlan.getId(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getStartTime(), this.bestPlan.getEndTime());
-				plan.setScore(this.bestPlan.getScore());
-				plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-				
-				this.budget += this.costPerVehicle * numberOfVehiclesToSell;
-				log.info("Sold " + numberOfVehiclesToSell + " from line " + this.id);
-				this.bestPlan = plan;
-			}
-		}
-		
-		if(this.bestPlan == null){
-			this.bestPlan = this.testPlan;
-			this.testPlan = null;
-		} else if (this.testPlan.getScorePerVehicle() > this.bestPlan.getScorePerVehicle()){
-			// apply modification to bestPlan
-			PPlan plan = new PPlan(this.bestPlan.getId(), this.testPlan.getStartStop(), this.testPlan.getEndStop(), this.testPlan.getStartTime(), this.testPlan.getEndTime());
-			plan.setScore(this.bestPlan.getScore());
-			
-			if(this.bestPlan.isSameButVehSize(this.testPlan)){
-				if(this.budget > this.costPerVehicle){
-					plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
-					this.budget -= this.costPerVehicle;
-					this.bestPlan = plan;
-					this.testPlan = null;
-				} 
-			} else if(this.bestPlan.isSameButOperationTime(this.testPlan)){
-				plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size(), plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
+		if(this.testPlan != null){
+			// compare score per vehicles TODO This should be the score per vehicle from the last iteration
+			if (this.testPlan.getScorePerVehicle() > this.bestPlan.getScorePerVehicle()){
+				// testPlan scores better, apply its modification to bestPlan
+				PPlan plan = new PPlan(this.bestPlan.getId(), this.testPlan.getStartStop(), this.testPlan.getEndStop(), this.testPlan.getStartTime(), this.testPlan.getEndTime());
+				plan.setScore(this.bestPlan.getScore() + this.testPlan.getScore());
+
+				// Transfer the vehicle from the testPlan to the bestPlan
+				plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() + 1, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
 				this.bestPlan = plan;
 				this.testPlan = null;
-			}			
+			} else {
+				// testPlan scores worse, delete it and sell the vehicle
+				this.budget += this.costPerVehicle;
+				this.testPlan = null;
+			}
+		}
+
+		// balance the budget
+		if(this.budget < 0){
+			// insufficient, sell vehicles
+			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) (this.budget / this.costPerVehicle));
+			
+			if(this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell < 1){ // TODO include testPlan as well ?
+				// can not balance the budget by selling vehicles, bankrupt
+				return;
+			}
+
+			// can balance the budget, so sell vehicles
+			PPlan plan = new PPlan(this.bestPlan.getId(), this.bestPlan.getStartStop(), this.bestPlan.getEndStop(), this.bestPlan.getStartTime(), this.bestPlan.getEndTime());
+			plan.setScore(this.bestPlan.getScore());
+			plan.setLine(this.routeProvider.createTransitLine(this.id, plan.getStartTime(), plan.getEndTime(), this.bestPlan.getVehicleIds().size() - numberOfVehiclesToSell, plan.getStartStop(), plan.getEndStop(), this.bestPlan.getId()));
+			
+			this.budget += this.costPerVehicle * numberOfVehiclesToSell;
+			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
+			this.bestPlan = plan;			
 		}
 		
-		// replanning
-		if(bestPlan.getScore() > 0){
+		if(this.budget < 0){
+			log.error("There should be no inbalanced budget at this time.");
+		}
+
+		if(this.budget > this.costPerVehicle){
+			// get a new testPlan
 			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
 			this.testPlan = strategy.run(this);
-		} else {
-			// create complete new route
-			PPlanStrategy strategy = new CreateNewPlan(new ArrayList<String>());
-			this.testPlan = strategy.run(this);
+			this.budget -= this.costPerVehicle;
 		}
 		
 		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
-		if(this.bestPlan != null){
-			for (TransitRoute route : this.bestPlan.getLine().getRoutes().values()) {
+		for (PPlan plan : this.getAllPlans()) {
+			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				this.currentTransitLine.addRoute(route);
 			}
-		}
-		for (TransitRoute route : this.testPlan.getLine().getRoutes().values()) {
-			this.currentTransitLine.addRoute(route);
 		}
 	}
 	
