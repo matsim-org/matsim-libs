@@ -24,7 +24,12 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkChangeEvent;
+import org.matsim.core.api.experimental.events.LinkChangeFlowCapacityEvent;
+import org.matsim.core.api.experimental.events.LinkChangeFreespeedEvent;
+import org.matsim.core.api.experimental.events.LinkChangeLanesEvent;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.xml.sax.Attributes;
@@ -170,6 +175,31 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			String state = atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_STATE);
 			SignalGroupState newState = SignalGroupState.valueOf(state);
 			this.events.processEvent(this.builder.createSignalGroupStateChangedEvent(time, systemId, groupId, newState));
+		} 
+		else if (LinkChangeFlowCapacityEvent.EVENT_TYPE.equals(eventType)) {
+			String changeTypeString = atts.getValue(LinkChangeEvent.CHANGETYPE);
+			NetworkChangeEvent.ChangeType changeType = null;
+			if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEABSOLUTE)) changeType = NetworkChangeEvent.ChangeType.ABSOLUTE;
+			else if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEFACTOR)) changeType = NetworkChangeEvent.ChangeType.FACTOR;
+			double value = Double.valueOf(atts.getValue(LinkChangeEvent.CHANGEVALUE));
+			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
+			this.events.processEvent(this.builder.createLinkChangeFlowCapacityEvent(time, new IdImpl(atts.getValue(LinkChangeEvent.ATTRIBUTE_LINK)), changeValue));
+		} else if (LinkChangeFreespeedEvent.EVENT_TYPE.equals(eventType)) {
+			String changeTypeString = atts.getValue(LinkChangeEvent.CHANGETYPE);
+			NetworkChangeEvent.ChangeType changeType = null;
+			if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEABSOLUTE)) changeType = NetworkChangeEvent.ChangeType.ABSOLUTE;
+			else if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEFACTOR)) changeType = NetworkChangeEvent.ChangeType.FACTOR;
+			double value = Double.valueOf(atts.getValue(LinkChangeEvent.CHANGEVALUE));
+			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
+			this.events.processEvent(this.builder.createLinkChangeFreespeedEvent(time, new IdImpl(atts.getValue(LinkChangeEvent.ATTRIBUTE_LINK)), changeValue));
+		} else if (LinkChangeLanesEvent.EVENT_TYPE.equals(eventType)) {
+			String changeTypeString = atts.getValue(LinkChangeEvent.CHANGETYPE);
+			NetworkChangeEvent.ChangeType changeType = null;
+			if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEABSOLUTE)) changeType = NetworkChangeEvent.ChangeType.ABSOLUTE;
+			else if (changeTypeString.equals(LinkChangeEvent.CHANGETYPEFACTOR)) changeType = NetworkChangeEvent.ChangeType.FACTOR;
+			double value = Double.valueOf(atts.getValue(LinkChangeEvent.CHANGEVALUE));
+			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
+			this.events.processEvent(this.builder.createLinkChangeLanesEvent(time, new IdImpl(atts.getValue(LinkChangeEvent.ATTRIBUTE_LINK)), changeValue));
 		}
 	}
 

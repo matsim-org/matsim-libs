@@ -17,11 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
-
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 /**
  * Builder for basic events.
@@ -34,6 +35,12 @@ public interface EventsFactory extends MatsimFactory {
 
 	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
 
+	LinkChangeEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue);
+	
+	LinkChangeEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue);
+	
+	LinkChangeEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue);
+	
 	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode);
 
 	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);

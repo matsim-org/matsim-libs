@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -37,7 +36,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -70,12 +68,12 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
 		// add a lanes change to 2 at 8am.
-		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
+		NetworkChangeEvent change1 = nf.createNetworkChangeEvent(8*3600.0);
 		change1.addLink(link);
 		change1.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
 		network.addNetworkChangeEvent(change1);
 		// scale lanes by 0.5 at 10am.
-		NetworkChangeEvent change2 = new NetworkChangeEvent(10*3600.0);
+		NetworkChangeEvent change2 = nf.createNetworkChangeEvent(10*3600.0);
 		change2.addLink(link);
 		change2.setLanesChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);
@@ -123,12 +121,12 @@ public class TimeVariantQueueLinkImplTest extends MatsimTestCase {
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
 		Link link = network.createAndAddLink(new IdImpl("1"), node1, node2, 75, 10, 3600, 4);
 		// add a flow capacity change to 2 Veh/s at 8am.
-		NetworkChangeEvent change1 = new NetworkChangeEvent(8*3600.0);
+		NetworkChangeEvent change1 = nf.createNetworkChangeEvent(8*3600.0);
 		change1.addLink(link);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 2));
 		network.addNetworkChangeEvent(change1);
 		// add a flow capacity change factor of 0.5 at 10am.
-		NetworkChangeEvent change2 = new NetworkChangeEvent(10*3600.0);
+		NetworkChangeEvent change2 = nf.createNetworkChangeEvent(10*3600.0);
 		change2.addLink(link);
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 0.5));
 		network.addNetworkChangeEvent(change2);

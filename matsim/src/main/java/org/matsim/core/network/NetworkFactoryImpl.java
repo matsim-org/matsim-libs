@@ -44,9 +44,11 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	private final static Logger log = Logger.getLogger(NetworkFactoryImpl.class);
 
 	private LinkFactory linkFactory = null;
-
+	
 	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
+
+	private NetworkChangeEventFactory networkChangeEventFactory = new NetworkChangeEventFactoryImpl();
 
 	private final Network network;
 
@@ -110,6 +112,16 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	}
 
 	/**
+	 * @param time the time when the NetworkChangeEvent occurs
+	 * @return a new NetworkChangeEvent
+	 *
+	 * @see #setNetworkChangeEventFactory(NetworkChangeEventFactory)
+	 */
+	public NetworkChangeEvent createNetworkChangeEvent(double time) {
+		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
+	}
+	
+	/**
 	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
 	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
 	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
@@ -133,6 +145,10 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		this.linkFactory = factory;
 	}
 
+	public void setNetworkChangeEventFactory(NetworkChangeEventFactory networkChangeEventFactory) {
+		this.networkChangeEventFactory = networkChangeEventFactory;
+	}
+	
 	public boolean isTimeVariant() {
 		return (this.linkFactory instanceof TimeVariantLinkFactory);
 	}

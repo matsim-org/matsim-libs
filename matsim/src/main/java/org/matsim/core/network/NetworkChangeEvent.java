@@ -89,7 +89,7 @@ public class NetworkChangeEvent {
 	 * @param startTime
 	 *            the time at which the event occurs.
 	 */
-	public NetworkChangeEvent(double startTime) {
+	/*package*/ NetworkChangeEvent(double startTime) {
 		this.startTime = startTime;
 	}
 

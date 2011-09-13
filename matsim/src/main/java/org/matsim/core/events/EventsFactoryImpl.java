@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.Id;
@@ -28,10 +29,11 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.LinkChangeEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.signalsystems.model.SignalGroupState;
-
 
 /**
  * @author dgrether
@@ -108,6 +110,21 @@ public class EventsFactoryImpl implements EventsFactory {
 	
 	public SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
 		return new SignalGroupStateChangedEventImpl(time, systemId, groupId, newState);
+	}
+
+	@Override
+	public LinkChangeEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeFlowCapacityEventImpl(time, linkId, changeValue);
+	}
+
+	@Override
+	public LinkChangeEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeFreespeedEventImpl(time, linkId, changeValue);
+	}
+
+	@Override
+	public LinkChangeEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
+		return new LinkChangeLanesEventImpl(time, linkId, changeValue);
 	}
 
 }

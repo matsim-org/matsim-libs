@@ -73,21 +73,21 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase {
 
 
 		//first event at 3:20am ==> 106800
-		NetworkChangeEvent e0 = new NetworkChangeEvent(3 * 3600 + 60 * 20);
+		NetworkChangeEvent e0 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 20);
 		e0.addLink(l0);
 		e0.addLink(l1);
 		e0.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e0);
 
 		//second event at 3:30am ==> 106200
-		NetworkChangeEvent e1 = new NetworkChangeEvent(3 * 3600 + 60 * 30);
+		NetworkChangeEvent e1 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 30);
 		e1.addLink(l1);
 		e1.addLink(l2);
 		e1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e1);
 
 		//third event at 3:10am ==> 107400
-		NetworkChangeEvent e2 = new NetworkChangeEvent(3 * 3600 + 60 * 10);
+		NetworkChangeEvent e2 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 10);
 		e2.addLink(l2);
 		e2.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e2);
@@ -138,21 +138,21 @@ public class RiskCostFromNetworkChangeEventsTest extends MatsimTestCase {
 
 
 		//first event at 3:20am ==> 106800
-		NetworkChangeEvent e0 = new NetworkChangeEvent(3 * 3600 + 60 * 20);
+		NetworkChangeEvent e0 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 20);
 		e0.addLink(l0);
 		e0.addLink(l1);
 		e0.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e0);
 
 		//second event at 3:30am ==> 106200
-		NetworkChangeEvent e1 = new NetworkChangeEvent(3 * 3600 + 60 * 30);
+		NetworkChangeEvent e1 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 30);
 		e1.addLink(l1);
 		e1.addLink(l2);
 		e1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e1);
 
 		//third event at 3:10am ==> 107400
-		NetworkChangeEvent e2 = new NetworkChangeEvent(3 * 3600 + 60 * 10);
+		NetworkChangeEvent e2 = nf.createNetworkChangeEvent(3 * 3600 + 60 * 10);
 		e2.addLink(l2);
 		e2.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE,0.));
 		nc.add(e2);
