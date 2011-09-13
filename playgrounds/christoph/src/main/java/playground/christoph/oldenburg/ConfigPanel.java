@@ -689,7 +689,7 @@ public class ConfigPanel extends JPanel {
 				 */
 				double time = DemoConfig.evacuationTime + (selected - 1) * 1800;
 				
-				NetworkChangeEvent newEvent = new NetworkChangeEvent(time);
+				NetworkChangeEvent newEvent = controller.getNetwork().getFactory().createNetworkChangeEvent(time);
 				
 				// clone event parameter
 				for (Link link : networkChangeEvent.getLinks()) newEvent.addLink(link);
