@@ -136,6 +136,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 				if (currentSize == size) {
 					log.debug("adding test instance with "+size+" members.");
 					output.add(currentPlan);
+					break;
 				}
 			}
 		}
