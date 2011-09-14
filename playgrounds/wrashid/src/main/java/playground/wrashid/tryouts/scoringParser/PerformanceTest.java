@@ -4,9 +4,6 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.utils.expr.Parser;
 import org.matsim.utils.expr.SyntaxException;
 
-import net.sourceforge.jeval.EvaluationException;
-import net.sourceforge.jeval.Evaluator;
-
 public class PerformanceTest {
 
 	public static void main(String[] args) throws SyntaxException {
