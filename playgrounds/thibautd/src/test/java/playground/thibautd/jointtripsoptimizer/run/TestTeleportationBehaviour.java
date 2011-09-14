@@ -59,6 +59,7 @@ public class TestTeleportationBehaviour {
 	private String inputPath;
 	private String outputPath;
 	private Controler jdeqsimControler;
+	private Controler qsimControler;
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -71,9 +72,13 @@ public class TestTeleportationBehaviour {
 		this.inputPath = getParentDirectory(utils.getPackageInputDirectory());
 		this.outputPath = utils.getOutputDirectory();
 
-		jdeqsimControler = JointControlerUtils.createControler(inputPath+"/config.xml");
+		jdeqsimControler = JointControlerUtils.createControler(inputPath+"/config-jdeqsim.xml");
 		jdeqsimControler.getConfig().controler().setOutputDirectory(outputPath);
 		jdeqsimControler.getConfig().controler().setMobsim("jdeqsim");
+
+		qsimControler = JointControlerUtils.createControler(inputPath+"/config-qsim.xml");
+		qsimControler.getConfig().controler().setOutputDirectory(outputPath);
+		qsimControler.getConfig().controler().setMobsim("qsim");
 	}
 
 	private String getParentDirectory(final String path) {
@@ -101,13 +106,26 @@ public class TestTeleportationBehaviour {
 	 */
 	@Test
 	public void testJDEQSimTeleportationTime() {
-		PassengerListener listener = new PassengerListener();
-		jdeqsimControler.getConfig().controler().setFirstIteration(0);
-		jdeqsimControler.getConfig().controler().setLastIteration(0);
-		jdeqsimControler.addControlerListener(listener);
-		jdeqsimControler.run();
+		testTeleportationTime(jdeqsimControler);
+	}
 
-		Map<Id, ? extends Person> persons = jdeqsimControler.getPopulation().getPersons();
+	/**
+	 * Tests whether the passengers are teleported accoding to the leg travel
+	 * time when using QSim
+	 */
+	@Test
+	public void testQSimTeleportationTime() {
+		testTeleportationTime(qsimControler);
+	}
+
+	public void testTeleportationTime(final Controler controler) {
+		PassengerListener listener = new PassengerListener();
+		controler.getConfig().controler().setFirstIteration(0);
+		controler.getConfig().controler().setLastIteration(0);
+		controler.addControlerListener(listener);
+		controler.run();
+
+		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
 		double duration;
 		double expectedDuration;
 	

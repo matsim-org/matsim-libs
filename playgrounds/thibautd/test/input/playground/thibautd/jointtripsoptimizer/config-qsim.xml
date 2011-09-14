@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd" [
+<!ENTITY replanningPackage "playground.thibautd.jointtripsoptimizer.replanning">
+<!ENTITY dir "test/input/playground/thibautd/jointtripsoptimizer">
+]>
+<config>
+
+	<module name="global">
+		<param name="randomSeed" value="4711" />
+		<param name="coordinateSystem" value="Atlantis" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&dir;/network.xml" />
+	</module>
+
+	<module name="plans">
+		<!--
+		  <param name="inputPlansFile" value="testcases/equil/plans2.xml" />
+		-->
+		<param name="inputPlansFile" value="&dir;/plansWithJointTrips.xml" />
+		<!--
+		<param name="inputPlansFile" value="testcases/matings/2-Population.xml.gz" />
+		-->
+		<!--
+		<param name="inputPlansFile" value="output/equil/output_plans.xml.gz" />
+		-->
+	</module>
+
+	<module name="controler">
+		<!--
+		<param name="outputDirectory" value="./output/trash" />
+		-->
+		<param name="writeEventsInterval" value="10" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="2" />
+		<param name="mobsim" value="qsim" />
+		<param name="writeEventsInterval" value="1" />
+		<param name="writePlansInterval" value="1" />
+	</module>
+
+	<module name="simulation">
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="00:00:00" />
+	
+		<param name = "snapshotperiod"	value = "00:30:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "OTFVis"/>
+	</module>
+
+	<module name="JDEQSim">
+		<param name="flowCapacityFactor" value="1"/>
+		<param name="storageCapacityFactor" value="1"/>
+	</module>
+
+	<module name="qsim">
+		<param name="flowCapacityFactor" value="1"/>
+		<param name="storageCapacityFactor" value="1"/>
+	</module>
+
+	<module name="planCalcScore">
+		<!--
+       <param name="performing" value="2.26" />
+       <param name="traveling" value="0.0" />
+       <param name="travelingPt" value="-0.1" />
+       <param name="travelingWalk" value="-3.523" />
+       <param name="marginalUtlOfDistanceCar" value="-0.2" />
+       <param name="marginalUtlOfDistancePt" value="-0.0535" />
+       <param name="marginalUtlOfDistanceWalk" value="0.0" />
+       <param name="earlyDeparture" value="-180.0" />
+       <param name="waiting" value="0.0" />
+	   -->
+
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="0" />
+
+		<param name="lateArrival" value="-18" />
+		<param name="earlyDeparture" value="-0" />
+		<param name="performing" value="+6" />
+		<param name="traveling" value="-16" />
+		<param name="waiting" value="-0" />
+		
+		<param name="activityType_0"            value="h" /> <!-- home -->
+		<param name="activityPriority_0"        value="1" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+		<param name="activityMinimalDuration_0" value="08:00:00" />
+	
+		<param name="activityType_1"            value="w" /> <!-- work -->
+		<param name="activityPriority_1"        value="1" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="06:00:00" />
+		<param name="activityOpeningTime_1"     value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="09:00:00" />
+		<param name="activityEarliestEndTime_1" value="" />
+		<param name="activityClosingTime_1"     value="18:00:00" />
+
+		<param name="activityType_2"            value="pick_up" />
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="00:01:00" />
+		<param name="activityMinimalDuration_2" value="00:00:00" />
+		<param name="activityOpeningTime_2"     value="00:00:00" />
+		<param name="activityLatestStartTime_2" value="24:00:00" />
+		<param name="activityEarliestEndTime_2" value="00:00:01" />
+		<param name="activityClosingTime_2"     value="00:00:01" />
+
+		<param name="activityType_3"            value="drop_off" />
+		<param name="activityPriority_3"        value="1" />
+		<param name="activityTypicalDuration_3" value="00:01:00" />
+		<param name="activityMinimalDuration_3" value="00:00:00" />
+		<param name="activityOpeningTime_3"     value="00:00:00" />
+		<param name="activityLatestStartTime_3" value="24:00:00" />
+		<param name="activityEarliestEndTime_3" value="00:00:01" />
+		<param name="activityClosingTime_3"     value="00:00:01" />
+
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="2" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.9" />
+		<param name="Module_1" value="&replanningPackage;.ReplanningStrategy" />
+
+		<param name="ModuleProbability_3" value="0.9" />
+		<param name="Module_3" value="&replanningPackage;.BestScoreStrategy" />
+
+		<param name="ModuleProbability_2" value="0.3" />
+		<param name="Module_2" value="&replanningPackage;.ReRouteStrategy" />
+	</module>
+
+	<!-- parametres du module "jointoptimizer" -->
+
+	<!-- fichier contenant les infos sur les hh -->
+	<module name="Cliques">
+		<param name="inputCliquesFile" value="&dir;/fakeHouseholds.XML"/>
+	</module>
+
+</config>
