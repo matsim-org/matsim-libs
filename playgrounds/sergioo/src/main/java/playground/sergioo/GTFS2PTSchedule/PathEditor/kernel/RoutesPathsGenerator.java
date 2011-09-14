@@ -76,14 +76,32 @@ public class RoutesPathsGenerator {
 		allLinks = new HashSet<List<Link>>();
 		bases = new HashMap<String, String[]>();
 		finishedTrips = new HashMap<String, String[]>();
-		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[1]));
+		if(!PREFILES[0].exists())
+			if(!PREFILES[0].createNewFile())
+				throw new IOException();
+		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[0]));
 		String line = reader.readLine();
+		while(line!=null) {
+			Stop stop = stops.get(line);
+			stop.setLinkId(reader.readLine());
+			stop.setFixedLinkId();
+			line = reader.readLine();
+		}
+		reader.close();
+		if(!PREFILES[1].exists())
+			if(!PREFILES[1].createNewFile())
+				throw new IOException();
+		reader = new BufferedReader(new FileReader(PREFILES[1]));
+		line = reader.readLine();
 		while(line!=null) {
 			String[] links = reader.readLine().split(";");
 			bases.put(line, links);
 			line = reader.readLine();
 		}
 		reader.close();
+		if(!PREFILES[2].exists())
+			if(!PREFILES[2].createNewFile())
+				throw new IOException();
 		reader = new BufferedReader(new FileReader(PREFILES[2]));
 		line = reader.readLine();
 		while(line!=null) {
@@ -92,15 +110,7 @@ public class RoutesPathsGenerator {
 			line = reader.readLine();
 		}
 		reader.close();
-		reader = new BufferedReader(new FileReader(PREFILES[0]));
-		line = reader.readLine();
-		while(line!=null) {
-			Stop stop = stops.get(line);
-			stop.setLinkId(reader.readLine());
-			stop.setFixedLinkId();
-			line = reader.readLine();
-		}
-		reader.close();
+		
 	}
 	public void run() throws IOException {
 		System.out.println("Total number of routes: "+routes.size());

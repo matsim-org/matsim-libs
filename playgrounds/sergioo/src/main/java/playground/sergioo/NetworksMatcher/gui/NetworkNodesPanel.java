@@ -105,7 +105,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	public String getLabelText(Labels label) {
 		try {
-			return (String) NetworkNodesManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkManager(), new Object[0]);
+			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -142,12 +142,12 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODE);
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODE);
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
 				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
@@ -164,6 +164,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	public void mousePressed(MouseEvent e) {
 		this.requestFocus();
 		doubleNetworkWindow.setActivePanel(this);
+		doubleNetworkWindow.refreshLabel(Labels.ACTIVE);
 		iniX = e.getX();
 		iniY = e.getY();
 	}
@@ -181,7 +182,6 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		doubleNetworkWindow.setActivePanel(this);
 		camera.move(getWorldX(e.getX()),getWorldX(iniX),getWorldY(e.getY()),getWorldY(iniY));
 		iniX = e.getX();
 		iniY = e.getY();

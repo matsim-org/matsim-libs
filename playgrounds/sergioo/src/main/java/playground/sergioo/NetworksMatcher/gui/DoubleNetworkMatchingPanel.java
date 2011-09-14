@@ -56,7 +56,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	}
 	public String getLabelText(Labels label) {
 		try {
-			return (String) NetworkNodesManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
+			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -76,12 +76,12 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODE);
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODE);
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
 				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));

@@ -10,15 +10,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkManager;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
-public class NetworkNodesManager extends NetworkManager {
+public class NetworkNodesPainterManager extends NetworkPainterManager {
 
+	private static final String SEPARATOR = " & ";
 	//Attributes
 	private Collection<Id> selectedNodesId;
 	
 	//Methods
-	public NetworkNodesManager(Network network) {
+	public NetworkNodesPainterManager(Network network) {
 		super(network);
 		selectedNodesId = new HashSet<Id>();
 	}
@@ -32,7 +33,8 @@ public class NetworkNodesManager extends NetworkManager {
 		selectedNodesId.add(getIdNearestNode(x, y));
 	}
 	public void unselectNodeFromCollection(double x, double y) {
-		selectedNodesId.remove(getIdNearestSelectedNode(x, y));
+		if(selectedNodesId.size()>0)
+			selectedNodesId.remove(getIdNearestSelectedNode(x, y));
 	}
 	private Id getIdNearestSelectedNode(double x, double y) {
 		Coord coord = new CoordImpl(x, y);
@@ -47,6 +49,12 @@ public class NetworkNodesManager extends NetworkManager {
 			}
 		}
 		return nearest.getId();
+	}
+	public String refreshNodes() {
+		String text = "";
+		for(Id selectedNodeId:selectedNodesId)
+			text += selectedNodeId.toString()+SEPARATOR;
+		return text;
 	}
 
 }

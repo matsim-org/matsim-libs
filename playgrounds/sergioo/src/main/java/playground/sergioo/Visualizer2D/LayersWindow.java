@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 
 public abstract class LayersWindow extends JFrame {
 	
@@ -30,7 +31,7 @@ public abstract class LayersWindow extends JFrame {
 	
 	//Attributes
 	protected Options option;
-	protected JLabel[] labels;
+	protected JTextField[] labels;
 	protected JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	protected boolean readyToExit = false;
 	protected final Map<PanelIds, LayersPanel> layersPanels = new HashMap<PanelIds, LayersPanel>();

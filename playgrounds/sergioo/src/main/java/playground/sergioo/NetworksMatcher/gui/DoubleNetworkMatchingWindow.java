@@ -2,6 +2,7 @@ package playground.sergioo.NetworksMatcher.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -10,8 +11,8 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
@@ -51,6 +52,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	public enum Labels implements LayersWindow.Labels {
 		LINK("Link"),
 		NODE("Node"),
+		NODES("Nodes"),
 		ACTIVE("Active");
 		private String text;
 		private Labels(String text) {
@@ -90,13 +92,15 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		readyButton.setActionCommand(READY_TO_EXIT);
 		infoPanel.add(readyButton, BorderLayout.WEST);
 		JPanel labelsPanel = new JPanel();
-		labelsPanel.setLayout(new GridLayout(1,Labels.values().length));
+		labelsPanel.setLayout(new FlowLayout());
 		labelsPanel.setBorder(new TitledBorder("Information"));
-		labels = new JLabel[Labels.values().length];
-		labels[0]=new JLabel("");
-		labelsPanel.add(labels[0]);
-		labels[1]=new JLabel("");
-		labelsPanel.add(labels[1]);
+		labels = new JTextField[Labels.values().length];
+		for(int i=0; i<Labels.values().length; i++) {
+			labels[i]=new JTextField("");
+			labels[i].setEditable(false);
+			labels[i].setBackground(null);
+			labelsPanel.add(labels[i]);
+		}
 		infoPanel.add(labelsPanel, BorderLayout.CENTER);JPanel coordsPanel = new JPanel();
 		coordsPanel.setLayout(new GridLayout(1,2));
 		coordsPanel.setBorder(new TitledBorder("Coordinates"));
@@ -180,7 +184,11 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		layersPanels.put(PanelIds.ACTIVE, panel);
 	}
 	public void refreshLabel(Labels label) {
-		labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
+		if(label.equals(Labels.ACTIVE))
+			labels[label.ordinal()].setText(layersPanels.get(PanelIds.ACTIVE)==layersPanels.get(PanelIds.A)?"A":"B");
+		else
+			labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
+		repaint();
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {

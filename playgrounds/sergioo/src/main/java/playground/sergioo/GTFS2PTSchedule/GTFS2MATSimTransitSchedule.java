@@ -23,7 +23,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,10 +30,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -59,7 +58,7 @@ import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 
-public class GTFS2MATSimTransitScheduleFileWriter {
+public class GTFS2MATSimTransitSchedule {
 	
 	//Constants
 	/**
@@ -108,7 +107,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * @param root
 	 * @param network
 	 */
-	public GTFS2MATSimTransitScheduleFileWriter(File[] roots, Network network, String[] serviceIds) {
+	public GTFS2MATSimTransitSchedule(File[] roots, Network network, String[] serviceIds) {
 		super();
 		this.roots = roots;
 		this.network = network;
@@ -178,7 +177,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 					line = reader.readLine();
 					while(line!=null) {
 						String[] parts = line.split(",");
-						Method m = GTFS2MATSimTransitScheduleFileWriter.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
+						Method m = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
 						m.invoke(this, new Object[]{parts,indices,publicSystemNumber});
 						line = reader.readLine();
 					}
@@ -716,7 +715,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 	 * Writes the MATSim public transport file
 	 * @param filename
 	 */
-	public void write(String filename, CoordinateTransformation coordinateTransformation) {
+	public TransitSchedule getTransitSchedule(CoordinateTransformation coordinateTransformation) {
 			loadGTFSFiles();
 			try {
 				calculateUnknownInformation(coordinateTransformation);
@@ -746,7 +745,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 							if(trip.getValue().getService().equals(services[publicSystemNumber].get(serviceId)))
 								isService = true;
 						if(isService) {
-							NetworkRoute networkRoute = (NetworkRoute) ((NetworkFactoryImpl)network.getFactory()).createRoute(/*TODO*/TransportMode.car, trip.getValue().getLinks().get(0).getId(), trip.getValue().getLinks().get(trip.getValue().getLinks().size()-1).getId());
+							NetworkRoute networkRoute = new LinkNetworkRouteImpl(trip.getValue().getLinks().get(0).getId(), trip.getValue().getLinks().get(trip.getValue().getLinks().size()-1).getId());
 							List<Id> intermediate = new ArrayList<Id>();
 							for(Link link:trip.getValue().getLinks())
 								intermediate.add(link.getId());
@@ -789,7 +788,7 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 						}
 					}
 				}
-			(new TransitScheduleWriter(transitSchedule)).writeFile(filename);
+			return transitSchedule;
 	}
 	/**
 	 * Writes the Transit Schedule file
@@ -909,10 +908,10 @@ public class GTFS2MATSimTransitScheduleFileWriter {
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile(args[1]);
 		Network network = scenario.getNetwork();
-		GTFS2MATSimTransitScheduleFileWriter g2m = new GTFS2MATSimTransitScheduleFileWriter(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
+		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
 		//Transformation for Singapore
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_SVY21);
-		g2m.write(args[0],coordinateTransformation);
+		(new TransitScheduleWriter(g2m.getTransitSchedule(coordinateTransformation))).writeFile(args[0]);
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);

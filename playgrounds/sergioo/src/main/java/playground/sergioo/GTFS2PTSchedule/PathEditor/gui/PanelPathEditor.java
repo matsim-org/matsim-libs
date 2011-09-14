@@ -57,15 +57,15 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private Camera camera;
 	private Window window;
 	private Color backgroundColor = Color.WHITE;
-	private Color pointsColor = new Color(0.6f,0.6f,1f);
+	private Color pointsColor = Color.BLUE;
 	private Color pointsColor2 = Color.RED;
 	private Color linesColor = Color.BLACK;
-	private Color linesColor2 = new Color(0.7f,0.7f,0.7f);
+	private Color linesColor2 = Color.YELLOW;
 	private Color selectedColor = Color.GREEN;
 	private Color nodeSelectedColor = Color.MAGENTA;
 	private Color networkColor = new Color(0.9f,0.9f,0.9f);
 	private int pointsSize = 2;
-	private Stroke pointsStroke = new BasicStroke(2f);
+	private Stroke pointsStroke = new BasicStroke(1f);
 	private Stroke linesStroke = new BasicStroke(1f);
 	private Stroke selectedStroke = new BasicStroke(2f);
 	private Stroke networkStroke = new BasicStroke(0.5f);
@@ -149,9 +149,9 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		else {
 			if(withNetwork)
 				paintNetwork(g2);
-			paintPoints(g2);
 			if(withLines)
 				paintLines(g2);
+			paintPoints(g2);
 			paintSelected(g2);
 		}
 	}
@@ -175,8 +175,8 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		if(withStops) {
 			g2.setColor(pointsColor2);
 			for(Coord point:window.getStopPoints()) {
-				g2.drawLine(camera.getIntX(point.getX())-3*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+3*pointsSize, camera.getIntY(point.getY()));
-				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-3*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+3*pointsSize);
+				g2.drawLine(camera.getIntX(point.getX())-2*pointsSize, camera.getIntY(point.getY()), camera.getIntX(point.getX())+2*pointsSize, camera.getIntY(point.getY()));
+				g2.drawLine(camera.getIntX(point.getX()), camera.getIntY(point.getY())-2*pointsSize, camera.getIntX(point.getX()), camera.getIntY(point.getY())+2*pointsSize);
 			}
 		}
 	}

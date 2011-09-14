@@ -27,8 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import playground.sergioo.Visualizer2D.LayersWindow;
@@ -57,11 +57,11 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 			return caption;
 		}
 	}
-	public enum Label implements LayersWindow.Labels {
+	public enum Labels implements LayersWindow.Labels {
 		LINK("Link"),
 		NODE("Node");
 		private String text;
-		private Label(String text) {
+		private Labels(String text) {
 			this.text = text;
 		}
 		@Override
@@ -98,13 +98,16 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 		readyButton.setActionCommand(READY_TO_EXIT);
 		infoPanel.add(readyButton, BorderLayout.WEST);
 		JPanel labelsPanel = new JPanel();
-		labelsPanel.setLayout(new GridLayout(1,Label.values().length));
+		labelsPanel.setLayout(new GridLayout(1,Labels.values().length));
 		labelsPanel.setBorder(new TitledBorder("Information"));
-		labels = new JLabel[Label.values().length];
-		labels[0]=new JLabel("");
-		labelsPanel.add(labels[0]);
-		labels[1]=new JLabel("");
-		labelsPanel.add(labels[1]);
+		labels = new JTextField[Labels.values().length];
+		for(int i=0; i<Labels.values().length; i++) {
+			labels[i]=new JTextField("");
+			labels[i].setEditable(false);
+			labels[i].setBackground(null);
+			labels[i].setBorder(null);
+			labelsPanel.add(labels[i]);
+		}
 		infoPanel.add(labelsPanel, BorderLayout.CENTER);JPanel coordsPanel = new JPanel();
 		coordsPanel.setLayout(new GridLayout(1,2));
 		coordsPanel.setBorder(new TitledBorder("Coordinates"));

@@ -18,42 +18,42 @@ public class NetworkPainter extends Painter {
 	
 	//Attributes
 	protected final NetworkByCamera networkByCamera;
-	protected final NetworkManager networkManager;
+	protected final NetworkPainterManager networkManager;
 	private Color networkColor = Color.LIGHT_GRAY;
 	private Stroke networkStroke = new BasicStroke(0.5f);
 	
 	//Methods
 	public NetworkPainter(Network network) {
 		networkByCamera =  new NetworkByCamera(network);
-		networkManager = new NetworkManager(network);
+		networkManager = new NetworkPainterManager(network);
 	}
 	public NetworkPainter(Network network, Color networkColor) {
 		networkByCamera =  new NetworkByCamera(network);
-		networkManager = new NetworkManager(network);
+		networkManager = new NetworkPainterManager(network);
 		this.networkColor = networkColor;
 	}
 	public NetworkPainter(Network network, Color networkColor, Stroke networkStroke) {
 		networkByCamera =  new NetworkByCamera(network);
-		networkManager = new NetworkManager(network);
+		networkManager = new NetworkPainterManager(network);
 		this.networkColor = networkColor;
 		this.networkStroke = networkStroke;
 	}
-	public NetworkPainter(Network network, NetworkManager networkManager) {
+	public NetworkPainter(Network network, NetworkPainterManager networkManager) {
 		networkByCamera =  new NetworkByCamera(network);
 		this.networkManager = networkManager;
 	}
-	public NetworkPainter(Network network, NetworkManager networkManager, Color networkColor) {
+	public NetworkPainter(Network network, NetworkPainterManager networkManager, Color networkColor) {
 		networkByCamera =  new NetworkByCamera(network);
 		this.networkManager = networkManager;
 		this.networkColor = networkColor;
 	}
-	public NetworkPainter(Network network, NetworkManager networkManager, Color networkColor, Stroke networkStroke) {
+	public NetworkPainter(Network network, NetworkPainterManager networkManager, Color networkColor, Stroke networkStroke) {
 		networkByCamera =  new NetworkByCamera(network);
 		this.networkManager = networkManager;
 		this.networkColor = networkColor;
 		this.networkStroke = networkStroke;
 	}
-	public NetworkManager getNetworkManager() {
+	public NetworkPainterManager getNetworkManager() {
 		return networkManager;
 	}
 	public Camera getCamera() {

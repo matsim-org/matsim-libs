@@ -11,7 +11,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkManager {
+public class NetworkPainterManager {
 	
 	//Attributes
 	protected final Network network;
@@ -22,7 +22,7 @@ public class NetworkManager {
 	/**
 	 * @param network
 	 */
-	public NetworkManager(Network network) {
+	public NetworkPainterManager(Network network) {
 		super();
 		this.network = network;
 	}
