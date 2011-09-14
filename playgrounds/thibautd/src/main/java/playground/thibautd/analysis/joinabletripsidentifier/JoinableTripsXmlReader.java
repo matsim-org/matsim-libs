@@ -66,7 +66,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 			final Attributes atts,
 			final Stack<String> context) {
 		if ( name.equals(JoinableTripsXmlSchemaNames.CONDITION_TAG) ) {
-			if (context.firstElement().equals(JoinableTripsXmlSchemaNames.CONDITIONS_TAG)) {
+			if (context.peek().equals(JoinableTripsXmlSchemaNames.CONDITIONS_TAG)) {
 				conditions.add(getCondition(atts));
 			}
 			else {
