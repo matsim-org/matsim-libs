@@ -157,8 +157,8 @@ class ConditionValidator implements DriverTripValidator {
 
 	@Override
 	public String getConditionDescription() {
-		return "acceptable distance = "+condition.getDistance()+
-			"acceptable time = "+condition.getTime();
+		return "any driver\nacceptable distance = "+condition.getDistance()+
+			"\nacceptable time = "+condition.getTime();
 	}
 }
 
