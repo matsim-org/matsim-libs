@@ -72,7 +72,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 			
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -93,7 +93,7 @@ public class MessageToNCE {
 				output.add(message1);
 				
 				double startTime2 = aa.transformer(currentM.endTime);
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				double factor = 0;
 				factor = 1.0/currentM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor);
@@ -128,7 +128,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 				
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -148,7 +148,7 @@ public class MessageToNCE {
 				output.add(message1);
 				
 				double startTime2 = aa.transformer(nextM.endTime);
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				double factor = 0;
 				factor = 1.0/currentM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor);
@@ -183,7 +183,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 				
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -209,7 +209,7 @@ public class MessageToNCE {
 				factor1 = (1/currentM.factor) * nextM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor1);
 				
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				
 				if (currentM.link.equals(linkS1)){
 					message2.addLink(link1);
@@ -231,7 +231,7 @@ public class MessageToNCE {
 				
 				
 				double startTime3 = aa.transformer(nextM2.endTime);
-				NetworkChangeEvent message3 = new NetworkChangeEvent (startTime3);
+				NetworkChangeEvent message3 = net.getFactory().createNetworkChangeEvent(startTime3);
 				double factor3 = 0;
 				
 				factor3 = 1.0/nextM.factor;
@@ -277,7 +277,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 			
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -298,7 +298,7 @@ public class MessageToNCE {
 				output.add(message1);
 				
 				double startTime2 = aa.transformer(currentM.endTime);
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				double factor = 0;
 				factor = 1.0/currentM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor);
@@ -331,7 +331,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 				
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -351,7 +351,7 @@ public class MessageToNCE {
 				output.add(message1);
 				
 				double startTime2 = aa.transformer(nextM.endTime);
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				double factor = 0;
 				factor = 1.0/currentM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor);
@@ -392,7 +392,7 @@ public class MessageToNCE {
 				ChangeType  type = ChangeType.FACTOR;
 				ChangeValue cv1 = new ChangeValue (type, currentM.factor);
 				
-				NetworkChangeEvent message1 = new NetworkChangeEvent (startTime1);
+				NetworkChangeEvent message1 = net.getFactory().createNetworkChangeEvent(startTime1);
 			
 				if (currentM.link.equals(linkS1)){
 					message1.addLink(link1);
@@ -413,7 +413,7 @@ public class MessageToNCE {
 				output.add(message1);
 				
 				double startTime2 = aa.transformer(currentM.endTime);
-				NetworkChangeEvent message2 = new NetworkChangeEvent (startTime2);
+				NetworkChangeEvent message2 = net.getFactory().createNetworkChangeEvent(startTime2);
 				double factor = 0;
 				factor = 1.0/currentM.factor;
 				ChangeValue cv2 = new ChangeValue (type, factor);
