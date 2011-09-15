@@ -39,6 +39,7 @@
 	<modules>
 		<module>sna</module>
 		<module>evacuation</module>
+		<module>gtfs2matsimtransitschedule</module>
 	</modules>
 	<repositories>
 		<repository>
