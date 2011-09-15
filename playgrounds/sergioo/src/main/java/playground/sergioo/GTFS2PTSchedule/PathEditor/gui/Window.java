@@ -159,7 +159,7 @@ public class Window extends JFrame implements ActionListener {
 	private JLabel[] lblCoords = {new JLabel(),new JLabel()};
 	private JCheckBox[] checks;
 	private Wait wait;
-	public Link nearestLink;
+	
 	//Methods
 	public Window(String title, Network network, Trip trip, Map<String,Stop> stops) {
 		setTitle(title);
@@ -344,14 +344,8 @@ public class Window extends JFrame implements ActionListener {
 		return selectedStopId+"("+routePath.getIndexStop(selectedStopId)+")";
 	}
 	public void selectLink(double x, double y) {
-		if(!panel.paintAll) {
-			selectedLinkIndex = routePath.getIndexNearestLink(x, y);
-			labels[Label.LINK.ordinal()].setText(refreshLink());
-		}
-		else {
-			nearestLink = routesPathsGenerator.getNearestLink(x, y);
-			labels[Label.LINK.ordinal()].setText(nearestLink.getId()+"");
-		}
+		selectedLinkIndex = routePath.getIndexNearestLink(x, y);
+		labels[Label.LINK.ordinal()].setText(refreshLink());
 	}
 	public void unselectLink() {
 		selectedLinkIndex = -1;
@@ -400,6 +394,7 @@ public class Window extends JFrame implements ActionListener {
 		case ADD_NEXT:
 			routePath.addLinkNext(selectedLinkIndex, second);
 			selectedLinkIndex++;
+			panel.waitSecondCoord();
 			break;
 		case ADD_LINK:
 			Node firstNode = selectedNode;
@@ -550,10 +545,6 @@ public class Window extends JFrame implements ActionListener {
 		saveButton.setEnabled(false);
 		panel.centerCamera(coord.getX(), coord.getY());
 	}
-	/*public void setVisible(boolean visible) {
-		if(!(saveButton.isEnabled() && visible))
-			super.setVisible(visible);
-	}*/
 	public void save() {
 		if(links.size() == 0)
 			links.addAll(routePath.getLinks());
@@ -573,10 +564,7 @@ public class Window extends JFrame implements ActionListener {
 		return routePath.getStopLinks();
 	}
 	public Link getSelectedLink() {
-		if(!panel.paintAll)
-			return selectedLinkIndex==-1?null:routePath.getLink(selectedLinkIndex);
-		else
-			return nearestLink;
+		return selectedLinkIndex==-1?null:routePath.getLink(selectedLinkIndex);
 	}
 	public Coord getSelectedStop() {
 		return selectedStopId==""?null:routePath.getStop(selectedStopId);
@@ -614,9 +602,6 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
 		return routePath.getNetworkLinks(xMin, yMin, xMax, yMax);
-	}
-	public Collection<List<Link>> getAllLinks() {
-		return routesPathsGenerator.getAllLinks();
 	}
 	public Collection<Link> getAllStopLinks() {
 		return routesPathsGenerator.getAllStopLinks();

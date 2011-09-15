@@ -27,6 +27,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +45,7 @@ import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
 
 
-public class NetworkNodesPanel extends LayersPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class NetworkNodesPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
 	/**
 	 * 
@@ -66,6 +68,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
 	}
@@ -191,6 +194,14 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+	}
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if(e.getWheelRotation()<0)
+			camera.zoomIn();
+		else if(e.getWheelRotation()>0)
+			camera.zoomOut();
+		repaint();
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

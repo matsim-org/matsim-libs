@@ -5,6 +5,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
@@ -14,7 +16,7 @@ import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.DoubleNetwork.DoubleNetworkPanel;
 
-public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
 	/**
 	 * 
@@ -33,6 +35,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 		this.doubleNetworkWindow = doubleNetworkWindow;
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
 	}
 	public DoubleNetworkMatchingPanel(Collection<NodesMatching> nodesMatchings, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
@@ -118,6 +121,14 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		doubleNetworkWindow.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+	}
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if(e.getWheelRotation()<0)
+			camera.zoomIn();
+		else if(e.getWheelRotation()>0)
+			camera.zoomOut();
+		repaint();
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

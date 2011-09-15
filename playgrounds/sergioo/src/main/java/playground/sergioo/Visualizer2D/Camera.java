@@ -35,6 +35,16 @@ public class Camera {
 		this.size.setX(size.getX());
 		this.size.setY(size.getY());
 	}
+	public void zoomIn() {
+		Vector2D difCorners = new Vector2D(size.getX()*(1-1/ZOOM_RATE)/2,size.getY()*(1-1/ZOOM_RATE)/2);
+		upLeftCorner.translate(difCorners);
+		size.scale(1/ZOOM_RATE);
+	}
+	public void zoomOut() {
+		Vector2D difCorners = new Vector2D(size.getX()*(1-ZOOM_RATE)/2,size.getY()*(1-ZOOM_RATE)/2);
+		upLeftCorner.translate(difCorners);
+		size.scale(ZOOM_RATE);
+	}
 	public void zoomIn(double x, double y) {
 		Vector2D difCenters = new Vector2D(getCenter(),new Point2D(x, y));
 		Vector2D difCorners = new Vector2D(size.getX()*(1-1/ZOOM_RATE)/2,size.getY()*(1-1/ZOOM_RATE)/2);

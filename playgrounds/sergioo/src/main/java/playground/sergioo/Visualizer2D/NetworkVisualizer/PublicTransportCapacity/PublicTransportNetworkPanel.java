@@ -27,6 +27,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -40,7 +42,7 @@ import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.Network
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.PublicTransport.PublicTransportNetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.PublicTransportCapacity.PublicTransportNetworkWindow.Option;
 
-public class PublicTransportNetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class PublicTransportNetworkPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
 	/**
 	 * 
@@ -64,6 +66,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
 	}
@@ -120,6 +123,14 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		window.setCoords(getWorldX(e.getX()),getWorldY(e.getY()));
+	}
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		if(e.getWheelRotation()<0)
+			camera.zoomIn();
+		else if(e.getWheelRotation()>0)
+			camera.zoomOut();
+		repaint();
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {

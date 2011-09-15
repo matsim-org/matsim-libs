@@ -15,12 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.GTFS2PTSchedule.PathEditor.gui.Window;
 import playground.sergioo.GTFS2PTSchedule.Route;
@@ -60,8 +57,6 @@ public class RoutesPathsGenerator {
 	 */
 	private Map<String, String[]> finishedTrips;
 
-	private Set<List<Link>> allLinks;
-
 	//Methods
 	/**
 	 * @param network
@@ -73,7 +68,6 @@ public class RoutesPathsGenerator {
 		this.network = network;
 		this.routes = routes;
 		this.stops = stops;
-		allLinks = new HashSet<List<Link>>();
 		bases = new HashMap<String, String[]>();
 		finishedTrips = new HashMap<String, String[]>();
 		if(!PREFILES[0].exists())
@@ -201,7 +195,6 @@ public class RoutesPathsGenerator {
 			link.setAllowedModes(modes);
 		}
 		tripEntry.getValue().setRoute(links);
-		allLinks.add(links);
 	}
 	/**
 	 * 
@@ -251,29 +244,12 @@ public class RoutesPathsGenerator {
 		}
 		writer.close();
 	}
-	public Collection<List<Link>> getAllLinks() {
-		return allLinks;
-	}
 	public Collection<Link> getAllStopLinks() {
 		Set<Link> allStopLinks = new HashSet<Link>();
 		for(Stop stop:stops.values())
 			if(stop.isFixedLinkId())
 				allStopLinks.add(network.getLinks().get(new IdImpl(stop.getLinkId())));
 		return allStopLinks;
-	}
-	public Link getNearestLink(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
-		double nearestDistance = Double.POSITIVE_INFINITY;
-		Link nearestLink =null;
-		for(List<Link> linksR:allLinks)
-			for(Link link:linksR) {
-				double distance = ((LinkImpl) link).calcDistance(coord); 
-				if(distance<nearestDistance) {
-					nearestDistance = distance;
-					nearestLink = link;
-				}
-			}
-		return nearestLink;
 	}
 	
 }
