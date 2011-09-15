@@ -34,10 +34,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.contrib.evacuation.flooding.FloodingInfo;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.evacuation.flooding.FloodingInfo;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.gregor.MY_STATIC_STUFF;

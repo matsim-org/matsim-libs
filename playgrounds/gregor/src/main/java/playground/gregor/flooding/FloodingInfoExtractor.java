@@ -20,8 +20,8 @@
 package playground.gregor.flooding;
 
 
-import org.matsim.evacuation.flooding.FloodingInfo;
-import org.matsim.evacuation.flooding.FloodingReader;
+import org.matsim.contrib.evacuation.flooding.FloodingInfo;
+import org.matsim.contrib.evacuation.flooding.FloodingReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

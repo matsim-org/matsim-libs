@@ -32,9 +32,9 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.contrib.evacuation.flooding.FloodingLine;
+import org.matsim.contrib.evacuation.flooding.FloodingReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.evacuation.flooding.FloodingLine;
-import org.matsim.evacuation.flooding.FloodingReader;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -26,10 +26,10 @@ import java.util.List;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
+import org.matsim.contrib.evacuation.base.Building;
+import org.matsim.contrib.evacuation.base.BuildingsShapeReader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.evacuation.base.Building;
-import org.matsim.evacuation.base.BuildingsShapeReader;
 
 public class BuildingsShapeReaderSheleterAllocation extends BuildingsShapeReader {
 

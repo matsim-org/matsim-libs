@@ -33,6 +33,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.evacuation.base.Building;
+import org.matsim.contrib.evacuation.base.EvacuationPopulationFromShapeFileLoader;
+import org.matsim.contrib.evacuation.base.EvacuationStartTimeCalculator;
+import org.matsim.contrib.evacuation.config.EvacuationConfigGroup;
+import org.matsim.contrib.evacuation.flooding.FloodingInfo;
+import org.matsim.contrib.evacuation.flooding.FloodingReader;
+import org.matsim.contrib.evacuation.travelcosts.PluggableTravelCostCalculator;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.Dijkstra;
@@ -41,13 +48,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.evacuation.base.Building;
-import org.matsim.evacuation.base.EvacuationPopulationFromShapeFileLoader;
-import org.matsim.evacuation.base.EvacuationStartTimeCalculator;
-import org.matsim.evacuation.config.EvacuationConfigGroup;
-import org.matsim.evacuation.flooding.FloodingInfo;
-import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.travelcosts.PluggableTravelCostCalculator;
 
 import com.vividsolutions.jts.geom.Envelope;
 

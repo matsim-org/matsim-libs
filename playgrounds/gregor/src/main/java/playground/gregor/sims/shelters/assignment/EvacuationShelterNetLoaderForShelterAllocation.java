@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.evacuation.base.Building;
+import org.matsim.contrib.evacuation.config.EvacuationConfigGroup;
+import org.matsim.contrib.evacuation.flooding.FloodingReader;
+import org.matsim.contrib.evacuation.shelters.EvacuationShelterNetLoader;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.evacuation.base.Building;
-import org.matsim.evacuation.config.EvacuationConfigGroup;
-import org.matsim.evacuation.flooding.FloodingReader;
-import org.matsim.evacuation.shelters.EvacuationShelterNetLoader;
 
 public class EvacuationShelterNetLoaderForShelterAllocation extends EvacuationShelterNetLoader {
 

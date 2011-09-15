@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.evacuation.flooding.FloodingInfo;
+import org.matsim.contrib.evacuation.flooding.FloodingReader;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
-import org.matsim.evacuation.flooding.FloodingInfo;
-import org.matsim.evacuation.flooding.FloodingReader;
 
 public class VisFloodingDataCreator extends AbstractMatsimWriter {
 	
