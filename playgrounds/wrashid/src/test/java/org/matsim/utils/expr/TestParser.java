@@ -62,13 +62,11 @@ public class TestParser extends TestCase {
 		expect(-3.0 * Math.pow(1.01, 100.1), "  -3 * 1.01^100.1  ");
 	}
 	
-	public void testsPI(){
+	public void testsBuiltinConstants(){
 		Parser parser = new Parser("sin(pi/2)");
-		parser.setVariable("pi", Math.PI);
 		expect(1, parser);
 		
 		parser = new Parser("tan(pi/4)");
-		parser.setVariable("pi", Math.PI);
 		expect(0.99999999999999989, parser);
 	}
 	

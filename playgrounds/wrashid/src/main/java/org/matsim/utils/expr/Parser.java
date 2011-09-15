@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.utils.expr;
 
 // Operator-precedence parser.
@@ -45,13 +64,8 @@ import java.util.Vector;
  */
 public class Parser {
 
-	// Built-in constants
-//	static private final Variable pi = Variable.make("pi");
-//
 	private final String input;
-//	static {
-//		pi.setValue(Math.PI);
-//	}
+
 
 	/**
 	 * Return the expression denoted by the input string.
@@ -64,15 +78,22 @@ public class Parser {
 	private Expr parse(String input) throws SyntaxException {
 		return parseString(input);
 	}
-	
-	public double parse() throws SyntaxException{
+
+	public double parse() throws SyntaxException {
 		return parse(this.input).value();
 	}
 
-	public Parser(String input){
+	public Parser(String input) {
 		this.input = input;
+		
+		//built-in constants
+		initializeBuiltinConstants();
 	}
-	
+
+	private void initializeBuiltinConstants() {
+		setVariable("pi", Math.PI);
+	}
+
 	/**
 	 * Set of Variables and values used in expression.
 	 */
@@ -95,7 +116,7 @@ public class Parser {
 	public void allow(Variable optVariable) {
 		if (null == allowedVariables) {
 			allowedVariables = new Hashtable();
-//			allowedVariables.put(pi, pi);
+			// allowedVariables.put(pi, pi);
 		}
 		if (null != optVariable)
 			allowedVariables.put(optVariable, optVariable);
