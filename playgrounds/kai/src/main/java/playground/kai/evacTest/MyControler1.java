@@ -22,7 +22,7 @@ package playground.kai.evacTest;
  * $Id: MyControler1.java,v 1.1 2007/11/14 12:00:28 nagel Exp $
  */
 
-import org.matsim.evacuation.run.EvacuationQSimControler;
+import org.matsim.contrib.evacuation.run.EvacuationQSimControler;
 
 
 
