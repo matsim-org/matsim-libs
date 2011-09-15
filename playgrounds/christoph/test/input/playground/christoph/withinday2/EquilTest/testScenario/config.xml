@@ -33,9 +33,6 @@
 		-->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
-
-		<param name="snapshotperiod" value="00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
-		<param name="snapshotFormat" value="netvis" /> <!-- netvis, googleearth, transims -->
 	</module>
 
 	<module name="qsim">

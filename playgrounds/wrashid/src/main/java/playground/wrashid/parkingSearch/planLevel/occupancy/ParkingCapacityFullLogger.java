@@ -101,7 +101,7 @@ public class ParkingCapacityFullLogger {
 	/**
 	 * checks, if parkings is full in specified interval
 	 * 
-	 * @param time
+	 * @param data.time
 	 * @param delta
 	 * @return
 	 */
