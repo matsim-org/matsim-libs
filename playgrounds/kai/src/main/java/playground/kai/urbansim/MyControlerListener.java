@@ -17,7 +17,7 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.toronto.ttimematrix.SpanningTree;
+import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
  *
@@ -40,7 +40,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		Controler controler = event.getControler() ;
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = controler.getNetwork() ;
 		double dpTime = 8.*3600 ;
