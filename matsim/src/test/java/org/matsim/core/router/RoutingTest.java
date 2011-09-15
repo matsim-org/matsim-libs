@@ -53,7 +53,7 @@ public class RoutingTest extends MatsimTestCase {
 		public String getName();
 		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinCost costCalc, TravelTime timeCalc);
 	}
-/*
+
 	public void testDijkstra() {
 		doTest(new RouterProvider() {
 			public String getName() {
@@ -123,7 +123,7 @@ public class RoutingTest extends MatsimTestCase {
 			}
 		});
 	}
-*/	
+
 	public void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			public String getName() {
