@@ -97,9 +97,9 @@ public class CopyOfHybridVis {
 		//		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-		WMSService wms = new WMSService("http://192.168.35.78:8080/geoserver/wms?service=WMS&","bln");
-		JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
-		//		JXMapOTFVisClient.run(scenario.getConfig(), server);
+		//		WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","hh");
+		//		JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
+		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 
 

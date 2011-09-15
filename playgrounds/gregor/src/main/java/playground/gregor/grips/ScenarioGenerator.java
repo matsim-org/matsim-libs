@@ -17,6 +17,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
@@ -61,6 +62,9 @@ public class ScenarioGenerator {
 		generateAndSavePopulation(sc);
 
 		log.info("saving simulation config file");
+
+		c.global().setCoordinateSystem("EPSG:32632");
+
 		c.controler().setLastIteration(0);
 		c.controler().setOutputDirectory(getGripsConfig(c).getOutputDir()+"/output");
 		new ConfigWriter(c).write(getGripsConfig(c).getOutputDir() + "/config.xml");
@@ -105,23 +109,23 @@ public class ScenarioGenerator {
 		// Step 1 raw network input
 		// for now grips network meta format is osm
 		// Hamburg example UTM32N. In future coordinate transformation should be performed beforehand
-		CoordinateTransformation ct =  new WGS84ToMercator.Project(18);
+		CoordinateTransformation ct =  new GeotoolsTransformation("WGS84", "EPSG: 32632");
 		OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct, false);
 		//		reader.setHighwayDefaults(1, "motorway",4, 5.0/3.6, 1.0, 10000,true);
 		//		reader.setHighwayDefaults(1, "motorway_link", 4,  5.0/3.6, 1.0, 10000,true);
-		reader.setHighwayDefaults(2, "trunk",         4,  5.0/3.6, 1.0, 10000);
-		reader.setHighwayDefaults(2, "trunk_link",    4,  5.0/3.6, 1.0, 10000);
-		reader.setHighwayDefaults(3, "primary",       4,  5.0/3.6, 1.0, 10000);
-		reader.setHighwayDefaults(3, "primary_link",  4,  5.0/3.6, 1.0, 10000);
-		reader.setHighwayDefaults(4, "secondary",     4,  5.0/3.6, 1.0, 10000);
-		reader.setHighwayDefaults(5, "tertiary",      4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6, "minor",         4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6, "unclassified",  4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6, "residential",   4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6, "living_street", 4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6,"path",           4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6,"cycleay",        4,  5.0/3.6, 1.0,  10000);
-		reader.setHighwayDefaults(6,"footway",        4,  5.0/3.6, 1.0,  10000);
+		reader.setHighwayDefaults(2, "trunk",         2,  5.0/3.6, 1., 10000);
+		reader.setHighwayDefaults(2, "trunk_link",    2,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(3, "primary",       2,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(3, "primary_link",  2,  5.0/3.6, 1.0, 10000);
+		reader.setHighwayDefaults(4, "secondary",     1,  5.0/3.6, 1.0, 5000);
+		reader.setHighwayDefaults(5, "tertiary",      1,  5.0/3.6, 1.0,  5000);
+		reader.setHighwayDefaults(6, "minor",         1,  5.0/3.6, 1.0,  5000);
+		reader.setHighwayDefaults(6, "unclassified",  1,  5.0/3.6, 1.0,  5000);
+		reader.setHighwayDefaults(6, "residential",   1,  5.0/3.6, 1.0,  5000);
+		reader.setHighwayDefaults(6, "living_street", 1,  5.0/3.6, 1.0,  5000);
+		reader.setHighwayDefaults(6,"path",           1,  5.0/3.6, 1.0,  2500);
+		reader.setHighwayDefaults(6,"cycleay",        1,  5.0/3.6, 1.0,  2500);
+		reader.setHighwayDefaults(6,"footway",        1,  5.0/3.6, 1.0,  1000);
 		reader.setKeepPaths(true);
 		reader.parse(gripsNetworkFile);
 

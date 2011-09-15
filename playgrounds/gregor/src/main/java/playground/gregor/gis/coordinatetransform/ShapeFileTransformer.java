@@ -12,6 +12,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator.Deproject;
 import org.matsim.core.utils.geometry.transformations.WGS84ToMercator.Project;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -25,8 +26,8 @@ public class ShapeFileTransformer {
 
 	public static void main(String [] args) throws IOException {
 		String shapeFile = "/Users/laemmel/svn/shared-svn/studies/countries/de/hh/hafen_fest_evacuation/GDIToMATSimData/population.shp";
-		CoordinateTransformation transform1 = TransformationFactory.getCoordinateTransformation("EPSG: 32632", "EPSG: 4326");
-		Project transform2 = new WGS84ToMercator.Project(17);
+		CoordinateTransformation transform1 = TransformationFactory.getCoordinateTransformation("EPSG: 4326","EPSG: 32632");
+		CoordinateTransformation transform2 = new WGS84ToMercator.Deproject(0);
 		FeatureSource fs = ShapeFileReader.readDataFile(shapeFile);
 
 		List<Feature> fts= new ArrayList<Feature>();
@@ -42,8 +43,8 @@ public class ShapeFileTransformer {
 				Coordinate[] coordinates = ggeo.getCoordinates();
 				for (Coordinate coordinate : coordinates) {
 					Coord c = MGC.coordinate2Coord(coordinate);
-					Coord cc = transform1.transform(c);
-					Coord ccc = transform2.transform(cc);
+					Coord cc = transform2.transform(c);
+					Coord ccc = transform1.transform(cc);
 					coordinate.setCoordinate(MGC.coord2Coordinate(ccc));
 				}
 			}

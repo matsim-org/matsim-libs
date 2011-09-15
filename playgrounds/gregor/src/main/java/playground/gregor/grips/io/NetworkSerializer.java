@@ -16,6 +16,7 @@ import net.opengis.gml.v_3_2_1.AbstractCurveType;
 import net.opengis.gml.v_3_2_1.CoordinatesType;
 import net.opengis.gml.v_3_2_1.CurvePropertyType;
 import net.opengis.gml.v_3_2_1.DirectPositionListType;
+import net.opengis.gml.v_3_2_1.DirectPositionType;
 import net.opengis.gml.v_3_2_1.FeatureArrayPropertyType;
 import net.opengis.gml.v_3_2_1.FeatureCollectionType;
 import net.opengis.gml.v_3_2_1.LineStringType;
@@ -201,7 +202,11 @@ public class NetworkSerializer {
 			p.setSrsDimension(new BigInteger("2"));
 			CoordinatesType c = this.gmlFac.createCoordinatesType();
 			c.setValue(node.getCoord().getX() + " " + node.getCoord().getY());
-			p.setCoordinates(c);
+			//			p.setCoordinates(c);
+			DirectPositionType dp = this.gmlFac.createDirectPositionType();
+			dp.getValue().add(node.getCoord().getX());
+			dp.getValue().add(node.getCoord().getY());
+			p.setPos(dp);
 			pp.setPoint(p);
 			rnt.setGeometry(pp);
 
