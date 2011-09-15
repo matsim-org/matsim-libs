@@ -260,18 +260,24 @@ public class PlanImpl implements Plan {
 		}
 //		setPerson(in.getPerson()); // do not copy person, but keep the person we're assigned to
 		for (PlanElement pe : in.getPlanElements()) {
-			if (pe instanceof ActivityImpl) {
-				ActivityImpl a = (ActivityImpl) pe;
+			if (pe instanceof Activity) {
+				//no need to cast to ActivityImpl here
+				Activity a = (Activity) pe;
 				getPlanElements().add(new ActivityImpl(a));
-			} else if (pe instanceof LegImpl) {
-				LegImpl l = (LegImpl) pe;
+			} else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
 				LegImpl l2 = createAndAddLeg(l.getMode());
 				l2.setDepartureTime(l.getDepartureTime());
 				l2.setTravelTime(l.getTravelTime());
-				l2.setArrivalTime(l.getArrivalTime());
+				if (pe instanceof LegImpl) {
+					// get the arrival time information only if available
+					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
+				}
 				if (l.getRoute() != null && l.getRoute() instanceof RouteWRefs) {
 					l2.setRoute(((RouteWRefs) l.getRoute()).clone());
 				}
+			} else {
+				throw new IllegalArgumentException("unrecognized plan element type discovered");
 			}
 		}
 	}

@@ -21,6 +21,7 @@
 package org.matsim.population.algorithms;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -251,10 +252,15 @@ public class PersonAnalyseTimesByActivityType extends AbstractPersonAlgorithm {
 
 //				System.out.println();
 
-			} else if (o instanceof LegImpl) {
-				depTime = ((LegImpl) o).getDepartureTime();
-				arrTime = ((LegImpl) o).getArrivalTime();
-
+			} else if (o instanceof Leg) {
+				depTime = ((Leg) o).getDepartureTime();
+				if (o instanceof LegImpl && 
+						((LegImpl) o).getArrivalTime() != Time.UNDEFINED_TIME) {
+					arrTime = ((LegImpl) o).getArrivalTime();
+				}
+				else {
+					arrTime = depTime + ((Leg) o).getTravelTime();
+				}
 			}
 		}
 	}

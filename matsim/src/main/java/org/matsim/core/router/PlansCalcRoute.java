@@ -209,7 +209,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 				if (fromAct == null) {
 					fromAct = (Activity) pe;
 				} else {
-					toAct = (ActivityImpl) pe;
+					toAct = (Activity) pe;
 
 					double endTime = fromAct.getEndTime();
 					double startTime = fromAct.getStartTime();

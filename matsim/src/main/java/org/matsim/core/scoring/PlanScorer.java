@@ -21,6 +21,7 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
@@ -48,10 +49,18 @@ public class PlanScorer {
 					firstActivityDone = true;
 				}
 				function.endActivity(act.getEndTime());
-			} else if (pe instanceof LegImpl) {
-				LegImpl leg = (LegImpl) pe;
+			} else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				function.startLeg(leg.getDepartureTime(), leg);
-				function.endLeg(leg.getArrivalTime());
+				if (pe instanceof LegImpl) {
+					// in order to have the same behaviour as before LegImpl
+					// enforcement removal. However, it may be a good idea to
+					// only keep the interface-based method (td)
+					function.endLeg(((LegImpl) pe).getArrivalTime());
+				}
+				else {
+					function.endLeg(leg.getDepartureTime() + leg.getTravelTime());
+				}
 			}
 		}
 		function.finish();

@@ -60,7 +60,7 @@ public class ActivityImpl implements Activity {
 		this.setCoord(coord);
 	}
 
-	public ActivityImpl(final ActivityImpl act) {
+	public ActivityImpl(final Activity act) {
 		this(act.getType());
 		// Act coord could be null according to first c'tor!
 		Coord c = act.getCoord() == null ? null : new CoordImpl(act.getCoord());

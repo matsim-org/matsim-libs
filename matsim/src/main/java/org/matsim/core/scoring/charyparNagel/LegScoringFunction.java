@@ -154,7 +154,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 	}
 
 	private void handleLeg(final double time) {
-		LegImpl leg = (LegImpl) this.plan.getPlanElements().get(this.index);
+		Leg leg = (Leg) this.plan.getPlanElements().get(this.index);
 		this.score += calcLegScore(this.lastTime, time, leg);
 		this.index += 2;
 	}

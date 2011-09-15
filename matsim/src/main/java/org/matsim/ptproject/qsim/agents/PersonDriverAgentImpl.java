@@ -307,9 +307,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	 * If this method is called to update a changed ActivityEndTime please
 	 * ensure, that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
-	void calculateDepartureTime(Activity tmpAct) {
+	void calculateDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-		ActivityImpl act = (ActivityImpl) tmpAct ; // since we need the duration.  kai, aug'10
 
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
