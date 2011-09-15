@@ -135,7 +135,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 
 				for (PPlan plan : plans) {
 					coopPax += plan.getTripsServed();
-					coopVeh += plan.getVehicleIds().size();
+					coopVeh += plan.getNVehciles();
 					coopScore += plan.getScore();
 				}
 				
@@ -145,7 +145,7 @@ public class PStats implements StartupListener, IterationEndsListener, ShutdownL
 				budget += cooperative.getBudget();
 				score += coopScore;				
 				
-				if(cooperative.getBudget() > 0){
+				if(cooperative.getBudget() >= 0){
 					coopPos++;
 					paxPos += coopPax;
 					vehPos += coopVeh;

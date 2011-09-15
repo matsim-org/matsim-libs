@@ -33,7 +33,7 @@ public class IncreaseNumberOfVehicles extends PStrategy implements PPlanStrategy
 		// sufficient founds, so buy one
 		PPlan plan = new PPlan(cooperative.getBestPlan().getId(), cooperative.getBestPlan().getStartStop(), cooperative.getBestPlan().getEndStop(), cooperative.getBestPlan().getStartTime(), cooperative.getBestPlan().getEndTime());
 		plan.setScore(cooperative.getBestPlan().getScore());
-		plan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), plan.getStartTime(), plan.getEndTime(), cooperative.getBestPlan().getVehicleIds().size() +1, plan.getStartStop(), plan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
+		plan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), plan.getStartTime(), plan.getEndTime(), cooperative.getBestPlan().getNVehciles() +1, plan.getStartStop(), plan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));
 		return plan;			
 	}
 

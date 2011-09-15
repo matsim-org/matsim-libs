@@ -48,6 +48,7 @@ public class PPlan {
 
 	private double startTime;
 	private double endTime;
+	private int nVehicles;
 	
 	private TransitStopFacility startStop;
 	private TransitStopFacility endStop;
@@ -94,6 +95,10 @@ public class PPlan {
 		return id;
 	}
 
+	public TransitLine getLine(){
+		return this.line;
+	}
+
 	public void setLine(TransitLine line) {
 		this.line = line;
 		this.vehicleIds = new TreeSet<Id>();
@@ -101,19 +106,16 @@ public class PPlan {
 			for (Departure departure : route.getDepartures().values()) {
 				this.vehicleIds.add(departure.getVehicleId());
 			}
-		}		
+		}
+		this.nVehicles = this.vehicleIds.size();
 	}
 	
-	public TransitLine getLine(){
-		return this.line;
-	}
-	
-	public void setStartTime(double startTime) {
-		this.startTime = startTime;
-	}
-
 	public double getStartTime() {
 		return startTime;
+	}
+
+	public void setStartTime(double startTime) {
+		this.startTime = startTime;
 	}
 
 	public double getEndTime() {
@@ -123,31 +125,39 @@ public class PPlan {
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}
-
-	public void setStartStop(TransitStopFacility startStop) {
-		this.startStop = startStop;
+	
+	public int getNVehciles(){
+		return this.nVehicles;
+	}
+	
+	public void setNVehicles(int nVehicles){
+		this.nVehicles = nVehicles;
 	}
 
 	public TransitStopFacility getStartStop() {
 		return startStop;
 	}
 
-	public void setEndStop(TransitStopFacility endStop) {
-		this.endStop = endStop;
+	public void setStartStop(TransitStopFacility startStop) {
+		this.startStop = startStop;
 	}
 
 	public TransitStopFacility getEndStop() {
 		return endStop;
 	}
 
-	public void setScore(double totalLineScore) {
-		this.score = totalLineScore;		
+	public void setEndStop(TransitStopFacility endStop) {
+		this.endStop = endStop;
 	}
 
 	public double getScore() {
 		return this.score;
 	}
-	
+
+	public void setScore(double totalLineScore) {
+		this.score = totalLineScore;		
+	}
+
 	public double getScorePerVehicle() {
 		return (this.score / this.vehicleIds.size());
 	}
@@ -156,12 +166,12 @@ public class PPlan {
 		return vehicleIds;
 	}
 
-	public void setTripsServed(int tripsServed) {
-		this.tripsServed = tripsServed;
-	}
-
 	public int getTripsServed() {
 		return tripsServed;
+	}
+
+	public void setTripsServed(int tripsServed) {
+		this.tripsServed = tripsServed;
 	}
 
 	public boolean isSameButVehSize(PPlan testPlan) {
@@ -193,7 +203,7 @@ public class PPlan {
 			return false;
 		}
 		
-		if(this.vehicleIds.size() != testPlan.getVehicleIds().size()){
+		if(this.nVehicles != testPlan.getNVehciles()){
 			return false;
 		}
 		
