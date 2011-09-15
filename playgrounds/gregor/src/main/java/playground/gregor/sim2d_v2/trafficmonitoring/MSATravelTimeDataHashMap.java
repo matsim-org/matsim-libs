@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sims.msa;
+package playground.gregor.sim2d_v2.trafficmonitoring;
 
 import java.util.Map;
 import java.util.Map.Entry;

@@ -30,7 +30,7 @@
 
 		<param name = "snapshotperiod"	value = "00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
 
-		<param name = "snapshotFormat"	value = "transims" /> <!-- netvis, googleearth, transims, plansfile -->
+
 
 	<!--	<param name ="evacuationTime" value = "02:59:59" /> --> <!-- make sure that the specific snapshot plans file exists -->
 		

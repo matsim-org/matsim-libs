@@ -1,4 +1,4 @@
-package playground.gregor.multiPedCrowds;
+package playground.gregor.multidestpeds.helper;
 
 import java.io.IOException;
 import java.util.Iterator;

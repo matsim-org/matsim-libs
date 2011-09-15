@@ -37,7 +37,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
-import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
+import playground.gregor.sim2d_v2.trafficmonitoring.MSATravelTimeCalculatorFactory;
 
 @Deprecated // should not be derived from Controler
 public class Controller2D extends Controler {
@@ -72,7 +72,7 @@ public class Controller2D extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			PersonalizableTravelCost travelCosts,
 			PersonalizableTravelTime travelTimes) {
-		PlansCalcRoute a = new PlansCalcRoute(config.plansCalcRoute(), network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory());
+		PlansCalcRoute a = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory());
 		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
 		return a;
 	}

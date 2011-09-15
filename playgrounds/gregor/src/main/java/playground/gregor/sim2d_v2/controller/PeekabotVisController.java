@@ -14,7 +14,7 @@ import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimat
 import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.ghostpopulation.GhostPopulationEngine;
 import playground.gregor.sim2d_v2.helper.UTurnRemover;
-import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
+//import playground.gregor.sims.msa.MSATravelTimeCalculatorFactory;
 
 public class PeekabotVisController extends Controller2D{
 
@@ -22,7 +22,7 @@ public class PeekabotVisController extends Controller2D{
 
 	public PeekabotVisController(Scenario sc) {
 		super(sc);
-		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+		//		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory()); // has been removed
 	}
 
 	@Override

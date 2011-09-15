@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCalculator.java
+ * MSATravelTimeDataHashMapFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.evacuation.traveltime;
+package playground.gregor.sim2d_v2.trafficmonitoring;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TravelTimeCalculator implements AgentArrivalEventHandler {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.trafficmonitoring.TravelTimeData;
+import org.matsim.core.trafficmonitoring.TravelTimeDataFactory;
+
+public class MSATravelTimeDataHashMapFactory implements TravelTimeDataFactory {
+
 	
-	int count = 0;
-	double time = 0;
+	private final Network network;
+	private final int binSize;
 	
-	public static void main(String [] args) {
-		String events = "/home/laemmel/devel/allocation/output/ITERS/it.150/150.events.xml.gz";
-		TravelTimeCalculator tt = new TravelTimeCalculator();
-		
-		EventsManager ev = EventsUtils.createEventsManager();
-		ev.addHandler(tt);
-		new EventsReaderXMLv1(ev).parse(events);
-		System.out.println(tt.time/tt.count);
+	private Map<Id, HashMap<Integer,Double>> msaTT = new HashMap<Id, HashMap<Integer,Double>>();
+
+	public MSATravelTimeDataHashMapFactory(Network network, int binSize) {
+		this.network = network;
+		this.binSize = binSize;
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		this.count++;
-		this.time += event.getTime()-3*3600;
-		
-	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+	public TravelTimeData createTravelTimeData(Id linkId) {
+		HashMap<Integer, Double> lmsa = this.msaTT.get(linkId);
+		if (lmsa == null) {
+			lmsa = new HashMap<Integer, Double>(7200/this.binSize);
+			this.msaTT.put(linkId, lmsa);
+		}
+		return new MSATravelTimeDataHashMap(this.network.getLinks().get(linkId),this.binSize, lmsa);
 	}
 
 }
