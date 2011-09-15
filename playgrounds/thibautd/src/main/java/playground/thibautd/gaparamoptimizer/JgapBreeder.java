@@ -50,7 +50,7 @@ public class JgapBreeder extends GABreeder {
 		int first = 0;
 
 		for (int i=0; i < N_THREADS; i++) {
-			(new Thread(new Scorer(toScore.subList(first, first + step)))).start();
+			(new Thread(new Scorer(toScore.subList(first, first + step), a_conf))).start();
 			first += step;
 		}
 	}
@@ -58,15 +58,19 @@ public class JgapBreeder extends GABreeder {
 
 class Scorer implements Runnable {
 	private final List<IChromosome> toScore;
+	private final ParameterOptimizerFitness fitness;
 
-	public Scorer(final List<IChromosome> toScore) {
+	public Scorer(
+			final List<IChromosome> toScore,
+			final Configuration jgapConfig) {
 		this.toScore = toScore;
+		this.fitness = ((ParameterOptimizerFitness) jgapConfig.getFitnessFunction()).clone();
 	}
 
 	@Override
 	public void run() {
 		for (IChromosome chrom : toScore) {
-			chrom.getFitnessValue();
+			chrom.setFitnessValueDirectly(fitness.evaluate(chrom));
 		}
 	}
 }

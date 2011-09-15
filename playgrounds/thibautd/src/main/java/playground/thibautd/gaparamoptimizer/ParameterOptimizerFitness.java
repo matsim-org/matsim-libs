@@ -39,6 +39,7 @@ import org.jgap.impl.IntegerGene;
 import org.jgap.InvalidConfigurationException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -94,6 +95,13 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int MAX_WINDOW_INTERCEPT = 20;
 	private static final double MAX_NON_UNIFORM = 50d;
 
+	// kept for cloning
+	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
+	private final Controler controler;
+	private final Network network;
+	private final String iterationOutputPath;
+
 	// instance fields
 	private final List<JointPlan> plans;
 	private final int nPlans;
@@ -106,15 +114,23 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			final List<JointPlan> plans,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
+			// final PlansCalcRoute routingAlgorithm,
+			final Controler controler,
 			final Network network,
 			final String iterationOutputPath
 			) {
+ 		this.scoringFunctionFactory = scoringFunctionFactory;
+ 		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
+ 		this.controler = controler;
+ 		this.network = network;
+ 		this.iterationOutputPath = iterationOutputPath;
+
 		this.jgapConfig = jgapConfig;
 		this.plans = Collections.unmodifiableList(plans);
 		this.nPlans = plans.size();
 		this.jpoAlgo = new JPOForOptimization(
-				scoringFunctionFactory, legTravelTimeEstimatorFactory, routingAlgorithm,
+				scoringFunctionFactory, legTravelTimeEstimatorFactory, 
+				(PlansCalcRoute) controler.createRoutingAlgorithm(),
 				network, iterationOutputPath);
 
 		this.cliqueSizes = new int[this.nPlans];
@@ -123,17 +139,28 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			this.cliqueSizes[i] = this.plans.get(i).getClique().getMembers().size();
 		}
 
-		log.debug("fitness function initialized");
-		//log.debug("max pop size: "+MAX_POP_SIZE);
-		log.debug("max pop slope: "+MAX_POP_SLOPE);
-		log.debug("max pop intercept: "+MAX_POP_INTERCEPT);
-		log.debug("max discrete scale: "+MAX_DISCRETE_SCALE);
-		//log.debug("max window size: "+MAX_WINDOW_SIZE);
-		log.debug("max window size slope: "+MAX_WINDOW_SLOPE);
-		log.debug("max window size intercept: "+MAX_WINDOW_INTERCEPT);
-		log.debug("max non uniformity: "+MAX_NON_UNIFORM);
-		log.debug("n plan execs: "+N_PLAN_EXEC);
-		log.debug("CHF per microsec: "+CHF_PER_MICROSEC);
+		// log.debug("fitness function initialized");
+		// //log.debug("max pop size: "+MAX_POP_SIZE);
+		// log.debug("max pop slope: "+MAX_POP_SLOPE);
+		// log.debug("max pop intercept: "+MAX_POP_INTERCEPT);
+		// log.debug("max discrete scale: "+MAX_DISCRETE_SCALE);
+		// //log.debug("max window size: "+MAX_WINDOW_SIZE);
+		// log.debug("max window size slope: "+MAX_WINDOW_SLOPE);
+		// log.debug("max window size intercept: "+MAX_WINDOW_INTERCEPT);
+		// log.debug("max non uniformity: "+MAX_NON_UNIFORM);
+		// log.debug("n plan execs: "+N_PLAN_EXEC);
+		// log.debug("CHF per microsec: "+CHF_PER_MICROSEC);
+	}
+
+	public ParameterOptimizerFitness clone() {
+		return new ParameterOptimizerFitness(
+			jgapConfig,
+			plans,
+			scoringFunctionFactory,
+			legTravelTimeEstimatorFactory,
+			controler,
+			network,
+			iterationOutputPath);
 	}
 
 	/**
@@ -170,7 +197,8 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 			cpuTimesNanoSecs[i] = 0L;
 			for (int j=0; j < N_PLAN_EXEC; j++) {
 				startTime = thread.getCurrentThreadCpuTime();
-				currentScore = this.jpoAlgo.run(configGroup, this.plans.get(i));
+				JointPlan plan = new JointPlan(this.plans.get(i));
+				currentScore = this.jpoAlgo.run(configGroup, plan);
 				endTime = thread.getCurrentThreadCpuTime();
 				currentTime = (endTime - startTime) / this.cliqueSizes[i];
 

@@ -40,6 +40,7 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.NaturalSelector;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -74,7 +75,8 @@ public class JgapParameterOptimizerConfig extends Configuration {
 			final List<JointPlan> plans,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
+			// final PlansCalcRoute routingAlgorithm,
+			final Controler controler,
 			final Network network,
 			final String iterationOutputPath
 			) {
@@ -87,7 +89,7 @@ public class JgapParameterOptimizerConfig extends Configuration {
 		Configuration.reset();
 		ParameterOptimizerFitness fitness = new ParameterOptimizerFitness(
 				this, plans, scoringFunctionFactory, legTravelTimeEstimatorFactory,
-				routingAlgorithm, network, iterationOutputPath);
+				controler, network, iterationOutputPath);
 
 		try {
 			// default JGAP objects initializations

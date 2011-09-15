@@ -35,6 +35,7 @@ import org.jgap.Population;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.router.PlansCalcRoute;
@@ -87,7 +88,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 					new DepartureDelayAverageCalculator(
 						network,
 						controler.getConfig().travelTimeCalculator().getTraveltimeBinSize())),
-				(PlansCalcRoute) controler.createRoutingAlgorithm(),
+				// (PlansCalcRoute) controler.createRoutingAlgorithm(),
+				controler,
 				network,
 				controler.getControlerIO().getIterationPath(event.getIteration()));
 	}
@@ -148,7 +150,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			final List<JointPlan> plans,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
+			//final PlansCalcRoute routingAlgorithm,
+			final Controler controler,
 			final Network network,
 			final String iterationOutputPath
 			) {
@@ -159,7 +162,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 				plans,
 				scoringFunctionFactory,
 				legTravelTimeEstimatorFactory,
-				routingAlgorithm,
+				controler,
 				network,
 				iterationOutputPath);
 
