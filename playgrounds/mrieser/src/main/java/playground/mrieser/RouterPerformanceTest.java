@@ -41,8 +41,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.v4.AStarLandmarksV4Factory;
-import org.matsim.core.router.v4.DijkstraV4Factory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -80,10 +78,10 @@ public class RouterPerformanceTest {
 				config.network().setInputFile(args2[0]);
 				config.plans().setInputFile(args2[1]);
 
-//				doTest(new DijkstraProvider(), config, limit);
-//				doTest(new AStarLandmarksProvider(), config, limit);
-				doTest(new DijkstraV4Provider(), config, limit);
-				doTest(new AStarLandmarksV4Provider(), config, limit);
+				doTest(new DijkstraProvider(), config, limit);
+				doTest(new AStarLandmarksProvider(), config, limit);
+//				doTest(new DijkstraV4Provider(), config, limit);
+//				doTest(new AStarLandmarksV4Provider(), config, limit);
 			}
 		}
 	}
@@ -101,17 +99,6 @@ public class RouterPerformanceTest {
 		@Override
 		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 			return new DijkstraFactory();
-		}
-	}
-
-	private static class DijkstraV4Provider implements RouterProvider {
-		@Override
-		public String getName() {
-			return "DijkstraV4";
-		}
-		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-			return new DijkstraV4Factory();
 		}
 	}
 
@@ -147,17 +134,6 @@ public class RouterPerformanceTest {
 		@Override
 		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 			return new AStarLandmarksFactory(network, costCalc);
-		}
-	}
-
-	private static class AStarLandmarksV4Provider implements RouterProvider {
-		@Override
-		public String getName() {
-			return "AStarLandmarksV4";
-		}
-		@Override
-		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-			return new AStarLandmarksV4Factory(network, costCalc);
 		}
 	}
 
