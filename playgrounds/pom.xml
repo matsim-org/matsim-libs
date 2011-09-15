@@ -108,6 +108,7 @@
 		<module>yalcin</module>
 		<module>yu</module>
 		<module>fuerbas</module>
+		<module>ucsb</module>
 	</modules>
 	<repositories>
 		<repository>
