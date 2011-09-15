@@ -152,6 +152,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		// log.debug("CHF per microsec: "+CHF_PER_MICROSEC);
 	}
 
+	@Override
 	public ParameterOptimizerFitness clone() {
 		return new ParameterOptimizerFitness(
 			jgapConfig,
@@ -205,7 +206,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 				scores[i] += currentScore;
 				cpuTimesNanoSecs[i] += currentTime;
 				info.scores.add(currentScore);
-				info.times.add(currentTime*1E-9);
+				info.times.add((double) currentTime);
 			}
 		}
 
