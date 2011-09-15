@@ -38,6 +38,7 @@
 
 	<modules>
 		<module>sna</module>
+		<module>evacuation</module>
 	</modules>
 	<repositories>
 		<repository>
