@@ -21,8 +21,9 @@ package playground.thibautd.analysis.joinabletripsidentifier;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.utils.BoxAndWhiskersChart;
 
@@ -66,6 +67,43 @@ public class DataPloter {
 			}
 
 			chart.add(trip.getDepartureTime() / 3600d, count);
+		}
+
+		return chart;
+	}
+
+	public ChartUtil getBoxAndWhiskerChartPerTripLength(
+			final PassengerFilter filter,
+			final DriverTripValidator validator,
+			final Network network) {
+		List<JoinableTrips.TripRecord> filteredTrips =
+			filter.filterRecords(trips);
+		validator.setJoinableTrips(trips);
+
+		String title = "Number of possible joint trips per trip length\n"+
+			filter.getConditionDescription()+"\n"+
+			validator.getConditionDescription();
+
+		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
+			title,
+			"trip length (km)",
+			"number of joinable trips",
+			1);
+
+		for (JoinableTrips.TripRecord trip : filteredTrips) {
+			int count = 0;
+
+			for (JoinableTrips.JoinableTrip driverTrip : trip.getJoinableTrips()) { 
+				if (validator.isValid(driverTrip)) {
+					count++;
+				}
+			}
+
+			double tripLength = CoordUtils.calcDistance(
+					network.getLinks().get(trip.getOriginLinkId()).getCoord(),
+					network.getLinks().get(trip.getDestinationLinkId()).getCoord());
+
+			chart.add(tripLength / 1000d, count);
 		}
 
 		return chart;

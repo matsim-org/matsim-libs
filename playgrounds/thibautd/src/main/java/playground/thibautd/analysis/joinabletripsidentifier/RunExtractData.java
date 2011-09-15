@@ -76,7 +76,7 @@ public class RunExtractData {
 			Logger.getRootLogger().addAppender(appender);
 
 			IOUtils.initOutputDirLogging(
-				config.controler().getOutputDirectory(),
+				outputDir,
 				appender.getLogEvents());
 		} catch (IOException e) {
 			// do NOT continue without proper logging!

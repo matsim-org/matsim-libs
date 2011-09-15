@@ -26,6 +26,7 @@ import java.util.List;
  * @author thibautd
  */
 public class AcceptabilityCondition {
+	private static final double EPSILON = 1E-7;
 	private final double distance;
 	private final double time;
 
@@ -86,7 +87,9 @@ public class AcceptabilityCondition {
 			return false;
 		}
 
-		return (this.distance == condition.distance) && (this.time == condition.time);
+		double distDiff = Math.abs(this.distance - condition.distance);
+		double timeDiff = Math.abs(this.time - condition.time);
+		return (distDiff < EPSILON) && (timeDiff < EPSILON) ;
 	}
 
 	@Override

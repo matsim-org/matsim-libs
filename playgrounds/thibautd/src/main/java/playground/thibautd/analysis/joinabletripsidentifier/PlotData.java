@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -46,6 +47,9 @@ import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRe
  * @author thibautd
  */
 public class PlotData {
+	private static final Logger log =
+		Logger.getLogger(PlotData.class);
+
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
 	private static final String DIST = "acceptableDistance_.*";
@@ -56,6 +60,7 @@ public class PlotData {
 	private static final int HEIGHT = 800;
 
 	public static void main(final String[] args) {
+		//TODO: import network
 		String configFile = args[0];
 		Config config = ConfigUtils.loadConfig(configFile);
 
@@ -78,7 +83,7 @@ public class PlotData {
 			Logger.getRootLogger().addAppender(appender);
 
 			IOUtils.initOutputDirLogging(
-				config.controler().getOutputDirectory(),
+				outputDir,
 				appender.getLogEvents());
 		} catch (IOException e) {
 			// do NOT continue without proper logging!
@@ -106,6 +111,7 @@ public class PlotData {
 
 		int count = 0;
 		for (ConditionValidator condition : conditions) {
+			log.info("creating charts for condition "+condition);
 			count++;
 			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(filter, condition);
 			chart.saveAsPng(outputDir+count+"-plot.png", WIDTH, HEIGHT);
@@ -157,8 +163,8 @@ class ConditionValidator implements DriverTripValidator {
 
 	@Override
 	public String getConditionDescription() {
-		return "any driver\nacceptable distance = "+condition.getDistance()+
-			"\nacceptable time = "+condition.getTime();
+		return "all drivers\nacceptable distance = "+condition.getDistance()+" m"+
+			"\nacceptable time = "+(condition.getTime()/60d)+" min";
 	}
 }
 

@@ -46,7 +46,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	private JoinableTrips.JoinableTrip currentJoinableTrip = null;
 	private Id currentPassengerTrip = null;
 
-	private final Counter count = new Counter("Import of trip #");
+	private final Counter count = new Counter("Import of trip # ");
 
 	public JoinableTripsXmlReader() {
 		super(false);
