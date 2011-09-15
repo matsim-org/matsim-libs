@@ -34,14 +34,13 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.dgrether.DgPaths;
 import playground.dgrether.utils.DgNet2Shape;
 import playground.dgrether.visualization.KmlNetworkVisualizer;
-import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
 
 public class DgPrognose2025Network2WGS84Converter {
-	
+
 	public static void main(String[] args) {
-		
-//		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab";
+
+		//		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_ab";
 		String netbase = DgPaths.SHAREDSVN + "studies/countries/de/prognose_2025/demand/network_pv_cleaned";
 		String net = netbase + ".xml.gz";
 		String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
@@ -58,18 +57,18 @@ public class DgPrognose2025Network2WGS84Converter {
 			c = transform.getTransformed(n.getCoord());
 			n.getCoord().setXY(c.getX(), c.getY());
 		}
-		
+
 		NetworkWriter netWriter = new NetworkWriter(sc.getNetwork());
 		netWriter.write(netOut);
-		
+
 		KmlNetworkVisualizer kmlwriter = new KmlNetworkVisualizer(sc.getNetwork());
 		kmlwriter.write(netbase + ".kmz", new GeotoolsTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
-		
+
 		//write shape file
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84);
 		new DgNet2Shape().write(sc.getNetwork(), netbase + "_wgs84.shp", crs);
-		
-		
+
+
 	}
-	
+
 }

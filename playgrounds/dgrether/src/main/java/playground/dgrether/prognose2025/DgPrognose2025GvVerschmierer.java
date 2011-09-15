@@ -39,7 +39,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
-import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
 
 /**
@@ -48,34 +47,34 @@ import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransfor
  */
 public class DgPrognose2025GvVerschmierer {
 
-	public static final String LANDKREISE = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/osm_zellen/landkreise.shp"; 
-	
+	public static final String LANDKREISE = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/osm_zellen/landkreise.shp";
+
 	public static final String GV_POPULATION = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_1pct_raw.xml";
-	
+
 	public static final String GV_POPULATION_VERSCHMIERT = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/demand/population_gv_1pct_verschmiert.xml";
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025GvVerschmierer.class);
-	
-	private String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
-	private ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
 
-//	private CoordinateTransformation wgs84ToWgs84Utm35S = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S); 
-//	private CoordinateTransformation wgs84Utm35SToWgs84 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84);
-	private CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4); 
-	private CoordinateTransformation dhdnGk4ToWgs84 = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
-	
+	private final String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
+	private final ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(this.f);
+
+	//	private CoordinateTransformation wgs84ToWgs84Utm35S = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM35S);
+	//	private CoordinateTransformation wgs84Utm35SToWgs84 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84);
+	private final CoordinateTransformation wgs84ToDhdnGk4 = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+	private final CoordinateTransformation dhdnGk4ToWgs84 = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
+
 	public DgPrognose2025GvVerschmierer(){
-		
+
 	}
-	
+
 	public void verschmierePopulation(){
 		Verschmierer verschmierer = new Verschmierer(LANDKREISE);
-		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(GV_POPULATION);
-		
-		Scenario newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population newPopulation = newScenario.getPopulation();
 		PopulationFactory popFac = newPopulation.getFactory();
 		for (Person person : scenario.getPopulation().getPersons().values()){
@@ -87,13 +86,13 @@ public class DgPrognose2025GvVerschmierer {
 				if (pe instanceof Activity){
 					ActivityImpl act = (ActivityImpl) pe;
 					Coord coord = act.getCoord();
-					Coord wgs84Coord = transform.getTransformed(coord);
+					Coord wgs84Coord = this.transform.getTransformed(coord);
 					act.setCoord(wgs84Coord);
-					Coord projectedCoord = wgs84ToDhdnGk4.transform(wgs84Coord);
+					Coord projectedCoord = this.wgs84ToDhdnGk4.transform(wgs84Coord);
 					Coord newWgs84Coord = verschmierer.shootIntoSameZoneOrLeaveInPlace(projectedCoord);
-					newWgs84Coord = dhdnGk4ToWgs84.transform(newWgs84Coord);
-//					log.info("Old coord: " + wgs84Coord + " new coord:  " + newWgs84Coord);
-					Activity newAct = popFac.createActivityFromCoord(act.getType(), newWgs84Coord); 
+					newWgs84Coord = this.dhdnGk4ToWgs84.transform(newWgs84Coord);
+					//					log.info("Old coord: " + wgs84Coord + " new coord:  " + newWgs84Coord);
+					Activity newAct = popFac.createActivityFromCoord(act.getType(), newWgs84Coord);
 					newAct.setEndTime(act.getEndTime());
 					newPlan.addActivity(newAct);
 				}
@@ -105,15 +104,15 @@ public class DgPrognose2025GvVerschmierer {
 		}
 		PopulationWriter popWriter = new PopulationWriter(newPopulation, null);
 		popWriter.write(GV_POPULATION_VERSCHMIERT);
-		
+
 		DgActivities2KmlWriter kmlWriter = new DgActivities2KmlWriter();
 		kmlWriter.writeKml(GV_POPULATION + ".kml", scenario.getPopulation());
 		kmlWriter.writeKml(GV_POPULATION_VERSCHMIERT + ".kml", newPopulation);
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * @param args
 	 */

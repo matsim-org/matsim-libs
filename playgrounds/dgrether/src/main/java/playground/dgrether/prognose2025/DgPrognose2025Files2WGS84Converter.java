@@ -30,7 +30,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.dgrether.DgPaths;
-import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransformation;
 
 
 /**
@@ -40,29 +39,29 @@ import playground.gregor.gis.coordinatetransform.ApproximatelyCoordianteTransfor
 public class DgPrognose2025Files2WGS84Converter {
 
 	private static final Logger log = Logger.getLogger(DgPrognose2025Files2WGS84Converter.class);
-	
-	private String knoten2004strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten.csv";
-	private String knoten2004strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
-	private String knoten2004wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten.csv";
-	private String knoten2004wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten_wgs84.csv";
-	private String knoten2004schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten.csv";
-	private String knoten2004schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten_wgs84.csv";
-	private String knoten2004luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten.csv";
-	private String knoten2004luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten_wgs84.csv";
-	
-	private String knoten2025strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten.csv";
-	private String knoten2025strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten_wgs84.csv";
-	private String knoten2025wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten.csv";
-	private String knoten2025wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten_wgs84.csv";
-	private String knoten2025schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten.csv";
-	private String knoten2025schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten_wgs84.csv";
-	private String knoten2025luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten.csv";
-	private String knoten2025luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten_wgs84.csv";
-	
-	
-	private String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
-	private ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(f);
-	
+
+	private final String knoten2004strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten.csv";
+	private final String knoten2004strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
+	private final String knoten2004wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten.csv";
+	private final String knoten2004wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/wasser/knoten_wgs84.csv";
+	private final String knoten2004schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten.csv";
+	private final String knoten2004schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/schiene/knoten_wgs84.csv";
+	private final String knoten2004luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten.csv";
+	private final String knoten2004luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/luft/knoten_wgs84.csv";
+
+	private final String knoten2025strasse = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten.csv";
+	private final String knoten2025strasseOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/strasse/knoten_wgs84.csv";
+	private final String knoten2025wasser = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten.csv";
+	private final String knoten2025wasserOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/wasser/knoten_wgs84.csv";
+	private final String knoten2025schiene = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten.csv";
+	private final String knoten2025schieneOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/schiene/knoten_wgs84.csv";
+	private final String knoten2025luft = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten.csv";
+	private final String knoten2025luftOut = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2025/luft/knoten_wgs84.csv";
+
+
+	private final String f = DgPaths.REPOS + "shared-svn/studies/countries/de/prognose_2025/orig/netze/coordinateTransformationLookupTable.csv";
+	private final ApproximatelyCoordianteTransformation transform = new ApproximatelyCoordianteTransformation(this.f);
+
 	private void startConversion(String file, String outFile, int indexX, int indexY) {
 		log.info("Conversion of " + file + " to " + outFile + " ...");
 		try {
@@ -82,15 +81,15 @@ public class DgPrognose2025Files2WGS84Converter {
 			line = reader.readLine();
 			while (line != null) {
 				columns = line.split(";");
-				
+
 				//get and transform the coordinate
 				xCoordString = columns[indexX];
 				yCoordString = columns[indexY];
 				xCoord = Double.parseDouble(xCoordString);
 				yCoord = Double.parseDouble(yCoordString);
 				coord = new CoordImpl(xCoord, yCoord);
-				coord = transform.getTransformed(coord);
-				
+				coord = this.transform.getTransformed(coord);
+
 				//create the new String with the transformed Coordinate
 				StringBuilder b = new StringBuilder();
 				for (int i = 0; i < columns.length; i++){
@@ -107,13 +106,13 @@ public class DgPrognose2025Files2WGS84Converter {
 				}
 				writer.write(b.toString());
 				writer.newLine();
-				
+
 				line = reader.readLine();
 			} // end while
-			
+
 			reader.close();
 			writer.close();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -122,22 +121,22 @@ public class DgPrognose2025Files2WGS84Converter {
 		log.info("Conversion done.");
 	}
 
-	
-	private void startConversion() {
-		this.startConversion(knoten2004strasse, knoten2004strasseOut, 2, 3);
-		this.startConversion(knoten2004schiene, knoten2004schieneOut, 3, 4);
-		this.startConversion(knoten2004wasser, knoten2004wasserOut, 2, 3);
-		this.startConversion(knoten2004luft, knoten2004luftOut, 3, 4);
 
-		this.startConversion(knoten2025strasse, knoten2025strasseOut, 2, 3);
-		this.startConversion(knoten2025schiene, knoten2025schieneOut, 3, 4);
-		this.startConversion(knoten2025wasser, knoten2025wasserOut, 2, 3);
-		this.startConversion(knoten2025luft, knoten2025luftOut, 3, 4);
+	private void startConversion() {
+		this.startConversion(this.knoten2004strasse, this.knoten2004strasseOut, 2, 3);
+		this.startConversion(this.knoten2004schiene, this.knoten2004schieneOut, 3, 4);
+		this.startConversion(this.knoten2004wasser, this.knoten2004wasserOut, 2, 3);
+		this.startConversion(this.knoten2004luft, this.knoten2004luftOut, 3, 4);
+
+		this.startConversion(this.knoten2025strasse, this.knoten2025strasseOut, 2, 3);
+		this.startConversion(this.knoten2025schiene, this.knoten2025schieneOut, 3, 4);
+		this.startConversion(this.knoten2025wasser, this.knoten2025wasserOut, 2, 3);
+		this.startConversion(this.knoten2025luft, this.knoten2025luftOut, 3, 4);
 
 	}
-	
-	
-	
+
+
+
 	/**
 	 * @param args
 	 */
