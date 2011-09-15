@@ -18,13 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.scoring;
+package playground.mfeil;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * @author dgrether
@@ -48,19 +49,11 @@ public class PlanScorer {
 					function.startActivity(act.getStartTime(), act);
 					firstActivityDone = true;
 				}
-				function.endActivity(act.getEndTime());
-			} else if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
+				function.endActivity(act.getEndTime(), act);
+			} else if (pe instanceof LegImpl) {
+				LegImpl leg = (LegImpl) pe;
 				function.startLeg(leg.getDepartureTime(), leg);
-				if (pe instanceof LegImpl) {
-					// in order to have the same behaviour as before LegImpl
-					// enforcement removal. However, it may be a good idea to
-					// only keep the interface-based method (td)
-					function.endLeg(((LegImpl) pe).getArrivalTime());
-				}
-				else {
-					function.endLeg(leg.getDepartureTime() + leg.getTravelTime());
-				}
+				function.endLeg(leg.getArrivalTime());
 			}
 		}
 		function.finish();

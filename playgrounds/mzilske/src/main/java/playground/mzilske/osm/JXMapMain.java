@@ -18,18 +18,18 @@ public class JXMapMain {
 
 
 	public static void main(String[] args) {
-		String filename = "/Users/zilske/gregor-scenario-11-09-08/network.xml";
+		String filename = "/Users/zilske/Documents/osm-bayarea/network-4.xml";
 		Config config = ConfigUtils.createConfig();
 		config.otfVis().setMaximumZoom(17);
-		config.global().setCoordinateSystem("EPSG:32633");
+		config.global().setCoordinateSystem("EPSG:32710");
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-		WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:poly");
-		// JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
+		// WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:poly");
+		//JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
 		JXMapOTFVisClient.run(scenario.getConfig(), server);
 		qSim.run();
 	}

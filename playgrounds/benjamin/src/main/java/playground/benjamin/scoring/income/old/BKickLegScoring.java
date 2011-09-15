@@ -44,8 +44,11 @@ public class BKickLegScoring extends LegScoringFunction {
 
 	private double incomePerTrip;
 
+	private Plan plan;
+
 	public BKickLegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb) {
-		super(plan, params);
+		super(params);
+		this.plan = plan;
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerTrip = this.calculateIncomePerTrip(income);
 

@@ -47,7 +47,7 @@ public class CharyparNagelScoringFunctionFactory4PC2 implements
 		ScoringFunctionAccumulator4PC2 scoringFunctionAccumulator = new ScoringFunctionAccumulator4PC2(
 				params);
 		scoringFunctionAccumulator
-				.addScoringFunction(new ActivityScoringFunction(plan, params));
+				.addScoringFunction(new ActivityScoringFunction(params));
 		scoringFunctionAccumulator
 				.addScoringFunction(new LegScoringFunction4PC2(plan, config,
 						network));

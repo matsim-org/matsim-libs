@@ -76,6 +76,10 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
+	
+	private Plan plan;
+	private CharyparNagelScoringParameters params;
+	
 	static {
 		OpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
@@ -84,9 +88,11 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
 
 	public ActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
-		super(plan, params);
+		super(params);
+		this.params = params;
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
+		this.plan = plan;
 	}
 
 	/*
@@ -217,35 +223,17 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	@Override
 	public void finish() {
-		
-		/*
-		 * workaround for correct handling of activity plans which have only one activity and no legs
-		 * TODO consider correction of standard implementations of scoring functions, as well as simplification of code
-		 */
-		if (this.lastActIndex > 0) {
-			super.finish();
+		super.finish();
+		if (plan.getPlanElements().size() == 1) {
+			// One Activity only. Regular scoring does not handle this because
+			// the activity never ends and never starts.
+			this.score += calcActScore(0, 24*3600.0, (Activity) plan.getPlanElements().get(0)); // SCENARIO_DURATION
 		}
 		this.score += this.getTooShortDurationScore();
 		this.score += this.getWaitingTimeScore();
 		this.score += this.getPerformanceScore();
 		this.score += this.getFacilityPenaltiesScore();
 		this.score += this.getNegativeDurationScore();
-
-	}
-
-	@Override
-	protected void handleAct(double time) {
-		
-		/*
-		 * workaround for correct handling of activity plans which have only one activity and no legs
-		 * TODO consider correction of standard implementations of scoring functions, as well as simplification of code
-		 */
-		if (this.lastActIndex == 0) {
-			Activity act = (Activity)this.plan.getPlanElements().get(this.index);
-			this.score += calcActScore(time, time + 24*3600, act);
-		} else {
-			super.handleAct(time);
-		}
 	}
 	
 	public double getFacilityPenaltiesScore() {
@@ -266,7 +254,7 @@ org.matsim.core.scoring.charyparNagel.ActivityScoringFunction {
 
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = ((PersonImpl) this.person).getDesires().getActivityDuration(actType);
+		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;

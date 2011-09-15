@@ -22,8 +22,6 @@ package org.matsim.core.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -39,60 +37,66 @@ import org.matsim.core.utils.misc.Time;
 public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 
-	protected final Person person;
-	protected final Plan plan;
-
 	protected double score;
-	private double lastTime;
-	protected int index; // the current position in plan.actslegs
-	// yyyy [status pointer] weiteres Beispiel, wo ich das eigenständige Konstruieren des "status index" problematisch finde.  kai, jul'10
-	private double firstActTime;
-	protected final int lastActIndex;
+	private double currentActivityStartTime;
+	private double firstActivityEndTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final int INITIAL_INDEX = 0;
 	private static final double INITIAL_FIRST_ACT_TIME = Time.UNDEFINED_TIME;
 	private static final double INITIAL_SCORE = 0.0;
 
 	private static int firstLastActWarning = 0;
 
-	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	private final CharyparNagelScoringParameters params;
+	private Activity currentActivity;
+	private boolean firstAct = true;
+
+	private Activity firstActivity;
 
 	private static final Logger log = Logger.getLogger(ActivityScoringFunction.class);
 
-	public ActivityScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public ActivityScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
-
-		this.plan = plan;
-		this.person = this.plan.getPerson();
-		this.lastActIndex = this.plan.getPlanElements().size() - 1;
 	}
 
 	@Override
 	public void reset() {
-		this.lastTime = INITIAL_LAST_TIME;
-		this.index = INITIAL_INDEX;
-		this.firstActTime = INITIAL_FIRST_ACT_TIME;
+		this.currentActivityStartTime = INITIAL_LAST_TIME;
+		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
 	}
 
 	@Override
 	public void startActivity(final double time, final Activity act) {
-		this.lastTime = time;
+		assert act != null;
+		this.currentActivity = act;
+		this.currentActivityStartTime = time;
 	}
 
 	@Override
-	public void endActivity(final double time) {
-		handleAct(time);
-		this.lastTime = time;
+	public void endActivity(final double time, final Activity act) {
+		assert act != null;
+		if (this.currentActivity != null && act != this.currentActivity) {
+			throw new RuntimeException();
+		}
+		if (this.firstAct) {
+			this.firstActivityEndTime = time;
+			this.firstActivity = act;
+			this.firstAct = false;
+		} else {
+			this.score += calcActScore(this.currentActivityStartTime, time, act);
+		}
 	}
 
 	@Override
 	public void finish() {
-		if (this.index == this.lastActIndex) {
-			handleAct(24*3600); // handle the last act
+		if (this.currentActivity == null) {
+			// No activity has ended so far.
+			// This probably means that the plan contains at most one activity.
+			// We cannot handle that correctly, because we do not know what it is.
+		} else {
+			handleLastActivity(this.currentActivity); 
 		}
 	}
 
@@ -225,36 +229,26 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return openInterval;
 	}
 
-	protected void handleAct(final double time) {
-		Activity act = (Activity)this.plan.getPlanElements().get(this.index);
-		if (this.index == 0) {
-			this.firstActTime = time;
-		} else if (this.index == this.lastActIndex) {
-			String lastActType = act.getType();
-			if (lastActType.equals(((Activity) this.plan.getPlanElements().get(0)).getType())) {
-				// the first Act and the last Act have the same type
-				this.score += calcActScore(this.lastTime, this.firstActTime + 24*3600, act); // SCENARIO_DURATION
-			} else {
-				if (this.params.scoreActs) {
-				    if (firstLastActWarning <= 10) {
-				    	log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
-				        if (firstLastActWarning == 10) {
-				            log.warn("Additional warnings of this type are suppressed.");
-				        }
-				        firstLastActWarning++;
-				    }
-
-					// score first activity
-					Activity firstAct = (Activity)this.plan.getPlanElements().get(0);
-					this.score += calcActScore(0.0, this.firstActTime, firstAct);
-					// score last activity
-					this.score += calcActScore(this.lastTime, 24*3600, act); // SCENARIO_DURATION
-				}
-			}
+	private void handleLastActivity(Activity lastActivity) {
+		if (lastActivity.getType().equals(this.firstActivity.getType())) {
+			// the first Act and the last Act have the same type
+			this.score += calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity); // SCENARIO_DURATION
 		} else {
-			this.score += calcActScore(this.lastTime, time, act);
+			if (this.params.scoreActs) {
+			    if (firstLastActWarning <= 10) {
+			    	log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+			        if (firstLastActWarning == 10) {
+			            log.warn("Additional warnings of this type are suppressed.");
+			        }
+			        firstLastActWarning++;
+			    }
+
+				// score first activity
+				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+				// score last activity
+				this.score += calcActScore(this.currentActivityStartTime, 24*3600, lastActivity); // SCENARIO_DURATION
+			}
 		}
-		this.index+=2;
 	}
 
 }

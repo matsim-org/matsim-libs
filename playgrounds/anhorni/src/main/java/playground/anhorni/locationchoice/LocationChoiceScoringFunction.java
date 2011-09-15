@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.scoring;
+package playground.anhorni.locationchoice;
 
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.scoring.ActivityUtilityParameters;
+import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
@@ -39,9 +42,11 @@ public class LocationChoiceScoringFunction extends CharyparNagelOpenTimesScoring
 
 	private List<ScoringPenalty> penalty = null;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private CharyparNagelScoringParameters params;
 
 	public LocationChoiceScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
 		super(plan, params, facilities);
+		this.params = params;
 		this.penalty = new Vector<ScoringPenalty>();
 		this.facilityPenalties = facilityPenalties;
 	}

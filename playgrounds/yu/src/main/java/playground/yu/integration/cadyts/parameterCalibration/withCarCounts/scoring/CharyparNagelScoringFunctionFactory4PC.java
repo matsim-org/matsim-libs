@@ -44,7 +44,7 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 		ScoringFunctionAccumulator4PC scoringFunctionAccumulator = new ScoringFunctionAccumulator4PC(
 				params);
 		scoringFunctionAccumulator
-				.addScoringFunction(new ActivityScoringFunction(plan, params));
+				.addScoringFunction(new ActivityScoringFunction(params));
 		scoringFunctionAccumulator
 				.addScoringFunction(new LegScoringFunction4PC(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(

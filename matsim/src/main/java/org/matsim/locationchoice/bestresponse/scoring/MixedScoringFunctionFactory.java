@@ -44,7 +44,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 				this.controler.getFacilities(), this.controler.getFacilityPenalties(), this.controler.getConfig());
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
 	}

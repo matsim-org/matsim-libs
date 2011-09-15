@@ -48,16 +48,6 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	}
 
 	/**
-	 * Tells the scoring function that the agent stops with an activity.
-	 *
-	 * @param time The time at which the agent stops performing the current
-	 * activity.
-	 */
-	@Override
-	public void endActivity(final double time) {
-	}
-
-	/**
 	 * Tells the scoring function that the agents starts a new leg.
 	 *
 	 * @param time The time at which the agent starts the new leg.
@@ -135,4 +125,10 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	public void reset() {		
 		score = 0.0;
 	}
+
+	@Override
+	public void endActivity(double time, Activity activity) {
+		
+	}
+	
 }

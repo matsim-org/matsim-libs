@@ -48,7 +48,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 
 	public LegScoringFunction4PC(Plan plan,
 			CharyparNagelScoringParameters params, Network network) {
-		super(plan, params);
+		super(params);
 		this.network = network;
 	}
 

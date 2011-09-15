@@ -42,7 +42,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;

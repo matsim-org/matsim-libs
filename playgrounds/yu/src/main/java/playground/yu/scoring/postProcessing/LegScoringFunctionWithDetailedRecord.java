@@ -39,19 +39,21 @@ import playground.yu.utils.io.SimpleWriter;
 
 public class LegScoringFunctionWithDetailedRecord extends LegScoringFunction {
 	private static Map<String/* actType */, Tuple<List<Double>/*
-															 * departure times
-															 * [min]
-															 */, List<Double>/*
-																			 * travel
-																			 * times
-																			 * [
-																			 * s
-																			 * ]
-																			 */>> data = new HashMap<String, Tuple<List<Double>, List<Double>>>();
+	 * departure times
+	 * [min]
+	 */, List<Double>/*
+	 * travel
+	 * times
+	 * [
+	 * s
+	 * ]
+	 */>> data = new HashMap<String, Tuple<List<Double>, List<Double>>>();
+	private Plan plan;
 
 	public LegScoringFunctionWithDetailedRecord(Plan plan,
 			CharyparNagelScoringParameters params) {
-		super(plan, params);
+		super(params);
+		this.plan = plan;
 	}
 
 	@Override

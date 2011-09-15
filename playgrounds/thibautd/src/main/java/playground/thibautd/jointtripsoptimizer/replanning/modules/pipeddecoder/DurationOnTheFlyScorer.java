@@ -281,7 +281,7 @@ public class DurationOnTheFlyScorer {
 			individualValues.scoringFunction.startActivity(individualValues.getNow(), origin);
 			currentDuration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue();
 			individualValues.addToNow(currentDuration);
-			individualValues.scoringFunction.endActivity(individualValues.getNow());
+			individualValues.scoringFunction.endActivity(individualValues.getNow(), origin);
 
 			individualValues.addToIndexInPlan(1);
 			individualValues.addToIndexInChromosome(1);
@@ -424,7 +424,7 @@ public class DurationOnTheFlyScorer {
 				individualValues.getNow(),
 				destination);
 		individualValues.addToNow(currentDuration);
-		individualValues.scoringFunction.endActivity(individualValues.getNow());
+		individualValues.scoringFunction.endActivity(individualValues.getNow(), destination);
 		individualValues.addToIndexInChromosome(1);
 		individualValues.resetTravelTime();
 	}
@@ -457,7 +457,7 @@ public class DurationOnTheFlyScorer {
 					origin);
 			individualValues.addToNow(currentDuration);
 			individualValues.scoringFunction.endActivity(
-					individualValues.getNow());
+					individualValues.getNow(), origin);
 		}
 		else if (isDropOff(origin)) {
 			individualValues.scoringFunction.startActivity(
@@ -466,7 +466,7 @@ public class DurationOnTheFlyScorer {
 			individualValues.addToNow(DO_DURATION);
 			currentDuration = DO_DURATION;
 			individualValues.scoringFunction.endActivity(
-					individualValues.getNow());
+					individualValues.getNow(), origin);
 		}
 		else {
 			throw new RuntimeException("planning of a shared ride launched "+
@@ -520,7 +520,7 @@ public class DurationOnTheFlyScorer {
 				individualValues.addToNow(DO_DURATION);
 				currentTravelTime += DO_DURATION;
 				individualValues.scoringFunction.endActivity(
-						individualValues.getNow());
+						individualValues.getNow(), destination);
 
 				//restart planning at the egress trip
 				individualValues.addToIndexInPlan(3);

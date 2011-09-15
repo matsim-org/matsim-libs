@@ -68,8 +68,7 @@ public class MyControler extends Controler {
 		public ScoringFunction createNewScoringFunction(Plan plan) {
 			ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 			scoringFunctionAccumulator
-					.addScoringFunction(new ActivityScoringFunction(plan,
-							getParams()));
+					.addScoringFunction(new ActivityScoringFunction(getParams()));
 			scoringFunctionAccumulator
 					.addScoringFunction(new MyLegScoringFunction(plan,
 							getParams(), network));
@@ -91,7 +90,7 @@ public class MyControler extends Controler {
 
 		public MyLegScoringFunction(Plan plan,
 				CharyparNagelScoringParameters params, final Network network) {
-			super(plan, params);
+			super(params);
 			this.network = network;
 		}
 

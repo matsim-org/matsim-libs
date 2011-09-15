@@ -22,7 +22,7 @@
  * simulation to the agents' ScoringFunction-instance, which then calculates
  * the effective score. For the few cases where the expected (not the actual,
  * experienced) score of a plan should be calculated,
- * {@link org.matsim.core.scoring.PlanScorer} may be of help.
+ * {@link playground.mfeil.PlanScorer} may be of help.
  *
  * <h3>Typical Usage</h3>
  * If you are using the MATSim-{@linkplain org.matsim.core.controler.Controler} but

@@ -127,9 +127,9 @@ public class ScoringFunctionAccumulator4PC implements ScoringFunction {
 	}
 
 	@Override
-	public void endActivity(double time) {
+	public void endActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
-			activityScoringFunction.endActivity(time);
+			activityScoringFunction.endActivity(time, act);
 		}
 	}
 

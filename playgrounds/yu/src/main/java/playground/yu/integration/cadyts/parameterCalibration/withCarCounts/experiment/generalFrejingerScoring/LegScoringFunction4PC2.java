@@ -57,7 +57,7 @@ public class LegScoringFunction4PC2 extends LegScoringFunction {
 			nbIntersectionsAttr = 0;
 
 	public LegScoringFunction4PC2(Plan plan, Config config, Network network) {
-		super(plan, new CharyparNagelScoringParameters(config.planCalcScore()));
+		super(new CharyparNagelScoringParameters(config.planCalcScore()));
 		scoringParams = new ScoringParameters(config);
 		links = network.getLinks();
 	}

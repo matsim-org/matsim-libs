@@ -32,6 +32,6 @@ public interface ActivityScoring {
 
 	public void startActivity(final double time, final Activity act);
 
-	public void endActivity(final double time);
+	public void endActivity(final double time, final Activity act);
 
 }

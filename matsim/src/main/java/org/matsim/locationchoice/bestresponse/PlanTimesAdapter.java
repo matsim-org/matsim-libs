@@ -50,7 +50,7 @@ public class PlanTimesAdapter {
 			if (pe instanceof Activity) {
 				if (planElementIndex == 0) {
 					scoringFunction.startActivity(0.0, (ActivityImpl)pe);
-					scoringFunction.endActivity(((ActivityImpl)pe).getEndTime());
+					scoringFunction.endActivity(((ActivityImpl)pe).getEndTime(), (ActivityImpl)pe);
 					continue; 
 				}
 				else {
@@ -121,7 +121,7 @@ public class PlanTimesAdapter {
 					scoringFunction.endLeg(arrivalTime);
 										
 					scoringFunction.startActivity(arrivalTime, act);
-					scoringFunction.endActivity(arrivalTime + actDur);
+					scoringFunction.endActivity(arrivalTime + actDur, act);
 				}				
 			}
 		}

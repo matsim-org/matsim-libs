@@ -245,7 +245,7 @@ public class Planomat implements PlanAlgorithm {
 		for (int geneIndex = 1; geneIndex <= numLegs; geneIndex++) {
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				scoringFunction.endActivity(now);
+				scoringFunction.endActivity(now, origin);
 			}
 			now = Math.max(oldNow + 1.0, now);
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
@@ -259,7 +259,7 @@ public class Planomat implements PlanAlgorithm {
 			destination = ((PlanImpl) plan).getNextActivity(leg);
 
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				scoringFunction.startLeg(now, null);
+				scoringFunction.startLeg(now, leg);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				leg.setDepartureTime(now);
@@ -304,7 +304,7 @@ public class Planomat implements PlanAlgorithm {
 			// - minimum 1 second (no negative activity durations will be produced)
 			///////////////////////////////////////////////////////////////////////////////////////////
 			if (action.equals(StepThroughPlanAction.EVALUATE)) {
-				scoringFunction.startActivity(now, null);
+				scoringFunction.startActivity(now, destination);
 			}
 			if (action.equals(StepThroughPlanAction.WRITE_BACK)) {
 				destination.setStartTime(now);

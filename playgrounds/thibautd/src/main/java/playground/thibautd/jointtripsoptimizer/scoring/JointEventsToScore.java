@@ -426,7 +426,7 @@ public class JointEventsToScore implements
 		Activity activity = (Activity) individualPlan.getPlanElements().get(indexInPlan);
 
 		//if (!activity.getType().equals(JointActingTypes.PICK_UP)) {
-			this.getScoringFunctionForAgent(individualId).endActivity(time);
+			this.getScoringFunctionForAgent(individualId).endActivity(time, activity);
 			this.incrIndexInPlan(individualId);
 			this.incrIndexInEvents(individualId);
 		//}

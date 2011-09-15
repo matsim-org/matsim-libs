@@ -277,7 +277,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 					}
 					
 					@Override
-					public void endActivity(double time) {
+					public void endActivity(double time, Activity act) {
 						// TODO Auto-generated method stub
 						
 					}

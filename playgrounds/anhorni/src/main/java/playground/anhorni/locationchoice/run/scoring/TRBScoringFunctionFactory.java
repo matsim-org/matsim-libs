@@ -94,7 +94,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.charyparNagel.LegScoringFunction(plan, super.getParams()));
+				new org.matsim.core.scoring.charyparNagel.LegScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(

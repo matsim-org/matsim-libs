@@ -101,7 +101,7 @@ public class BkScoringFunction implements ScoringFunction {
 		// the activity is currently handled by startLeg()
 	}
 
-	public void endActivity(final double time) {
+	public void endActivity(final double time, final Activity act) {
 	}
 
 	public void startLeg(final double time, final Leg leg) {

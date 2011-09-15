@@ -404,7 +404,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		assertEquals(ActivityScoringFunction.class, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0).getClass());
 		ActivityScoringFunction asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0);
 
-		testee.endActivity(Time.parseTime("08:00:00"));
+		testee.endActivity(Time.parseTime("08:00:00"), (ActivityImpl) plan.getPlanElements().get(0));
 
 		assertEquals(0, asf.getAccumulatedDurations().size());
 		assertEquals(expectedTooShortDurationsSequence[0], Time.writeTime(asf.getAccumulatedTooShortDuration()));
@@ -414,7 +414,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.startLeg(Time.parseTime("08:00:00"), (LegImpl) plan.getPlanElements().get(1));
 		testee.endLeg(Time.parseTime("08:30:00"));
 		testee.startActivity(Time.parseTime("08:30:00"), (ActivityImpl) plan.getPlanElements().get(2));
-		testee.endActivity(Time.parseTime("14:30:00"));
+		testee.endActivity(Time.parseTime("14:30:00"), (ActivityImpl) plan.getPlanElements().get(2));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
@@ -428,7 +428,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.startLeg(Time.parseTime("14:30:00"), (LegImpl) plan.getPlanElements().get(3));
 		testee.endLeg(Time.parseTime("14:35:00"));
 		testee.startActivity(Time.parseTime("14:35:00"), (ActivityImpl) plan.getPlanElements().get(4));
-		testee.endActivity(Time.parseTime("14:55:00"));
+		testee.endActivity(Time.parseTime("14:55:00"), (ActivityImpl) plan.getPlanElements().get(4));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
@@ -442,7 +442,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.startLeg(Time.parseTime("14:55:00"), (LegImpl) plan.getPlanElements().get(5));
 		testee.endLeg(Time.parseTime("15:00:00"));
 		testee.startActivity(Time.parseTime("15:00:00"), (ActivityImpl) plan.getPlanElements().get(6));
-		testee.endActivity(Time.parseTime("17:00:00"));
+		testee.endActivity(Time.parseTime("17:00:00"), (ActivityImpl) plan.getPlanElements().get(6));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
@@ -456,7 +456,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.startLeg(Time.parseTime("17:00:00"), (LegImpl) plan.getPlanElements().get(7));
 		testee.endLeg(Time.parseTime("17:30:00"));
 		testee.startActivity(Time.parseTime("17:30:00"), (ActivityImpl) plan.getPlanElements().get(8));
-		testee.endActivity(Time.parseTime("20:00:00"));
+		testee.endActivity(Time.parseTime("20:00:00"), (ActivityImpl) plan.getPlanElements().get(8));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {
@@ -470,7 +470,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		testee.startLeg(Time.parseTime("20:00:00"), (LegImpl) plan.getPlanElements().get(9));
 		testee.endLeg(Time.parseTime("24:00:00"));
 		testee.startActivity(Time.parseTime("24:00:00"), (ActivityImpl) plan.getPlanElements().get(10));
-		testee.endActivity(Time.parseTime("30:00:00"));
+		testee.endActivity(Time.parseTime("30:00:00"), (ActivityImpl) plan.getPlanElements().get(10));
 
 		for (String actType : expectedAccumulatedActivityDurations.keySet()) {
 			if (asf.getAccumulatedDurations().containsKey(actType)) {

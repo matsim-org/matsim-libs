@@ -105,10 +105,6 @@ public class EventsToScoreTest extends MatsimTestCase {
 			this.cntStuck++;
 		}
 
-		public void endActivity(final double time) {
-			this.cntEndAct++;
-		}
-
 		public void endLeg(final double time) {
 			this.cntEndLeg++;
 		}
@@ -132,6 +128,11 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 		public void startLeg(final double time, final Leg leg) {
 			this.cntStartLeg++;
+		}
+
+		@Override
+		public void endActivity(double time, Activity activity) {
+			this.cntEndAct++;
 		}
 
 	}

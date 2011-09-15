@@ -46,7 +46,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params, this.facilities));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 

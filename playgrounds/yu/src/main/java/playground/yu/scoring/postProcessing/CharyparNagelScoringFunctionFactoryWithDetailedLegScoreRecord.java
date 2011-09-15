@@ -41,8 +41,7 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator
-				.addScoringFunction(new ActivityScoringFunction(plan,
-						getParams()));
+				.addScoringFunction(new ActivityScoringFunction(getParams()));
 
 		LegScoringFunctionWithDetailedRecord legScoring = new LegScoringFunctionWithDetailedRecord(
 				plan, getParams());

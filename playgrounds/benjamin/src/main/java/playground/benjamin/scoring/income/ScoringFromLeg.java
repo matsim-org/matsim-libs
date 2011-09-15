@@ -50,8 +50,11 @@ public class ScoringFromLeg extends LegScoringFunction {
 
 	private final Network network;
 
+	private Plan plan;
+
 	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, Network network, double householdIncomePerDay) {
-		super(plan, params);
+		super(params);
+		this.plan = plan;
 		this.incomePerDay = householdIncomePerDay;
 		this.network = network;
 		log.trace("Using BKickLegScoring...");

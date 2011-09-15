@@ -104,9 +104,9 @@ public class ScoringFunctionAccumulator4PC2 implements ScoringFunction {
 		}
 	}
 
-	public void endActivity(double time) {
+	public void endActivity(double time, Activity act) {
 		for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
-			activityScoringFunction.endActivity(time);
+			activityScoringFunction.endActivity(time, act);
 		}
 	}
 

@@ -82,8 +82,14 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	private ShoppingScoreAdditionals shoppingScoreAdditionals;
 	private final ActivityFacilities facilities;
 
+	private PlanImpl plan;
+
+	private CharyparNagelScoringParameters params;
+
 	public ActivityScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
-		super(plan, params);
+		super(params);
+		this.params = params;
+		this.plan = plan;
 		this.facilities = facilities;
 	}
 
@@ -214,7 +220,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.charyparNag
 	// ---------------------------------------------------------------------------------------------------
 	protected double getPerformanceScore(String actType, double duration) {
 
-		double typicalDuration = ((PersonImpl) this.person).getDesires().getActivityDuration(actType);
+		double typicalDuration = ((PersonImpl) this.plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		double zeroUtilityDuration;

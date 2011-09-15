@@ -135,7 +135,7 @@ public class JohScoringFunctionForChessboard implements ScoringFunction {
 	public void startActivity(final double time, final Activity act) {
 	}
 
-	public void endActivity(final double time) {
+	public void endActivity(final double time, final Activity act) {
 	}
 	
 	

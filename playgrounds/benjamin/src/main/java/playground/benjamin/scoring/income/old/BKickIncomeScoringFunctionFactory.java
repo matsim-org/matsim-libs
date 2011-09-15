@@ -51,7 +51,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
 
 		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb));
 

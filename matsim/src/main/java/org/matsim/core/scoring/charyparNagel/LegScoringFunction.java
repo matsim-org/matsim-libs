@@ -23,7 +23,6 @@ package org.matsim.core.scoring.charyparNagel;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.LegImpl;
@@ -40,41 +39,38 @@ import org.matsim.core.scoring.interfaces.LegScoring;
 public class LegScoringFunction implements LegScoring, BasicScoring {
 
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
-	protected final Plan plan;
 
 	protected double score;
 	private double lastTime;
-	private int index; // the current position in plan.actslegs
 
 	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final int INITIAL_INDEX = 1;
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
+	private Leg currentLeg;
 
-	public LegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public LegScoringFunction(final CharyparNagelScoringParameters params) {
 		this.params = params;
 		this.reset();
-
-		this.plan = plan;
 	}
 
 	@Override
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
-		this.index = INITIAL_INDEX;
 		this.score = INITIAL_SCORE;
 	}
 
 	@Override
 	public void startLeg(final double time, final Leg leg) {
+		assert leg != null;
 		this.lastTime = time;
+		this.currentLeg = leg;
 	}
 
 	@Override
 	public void endLeg(final double time) {
-		handleLeg(time);
+		handleLeg(this.currentLeg, time);
 		this.lastTime = time;
 	}
 
@@ -153,10 +149,8 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		return tmpScore;
 	}
 
-	private void handleLeg(final double time) {
-		Leg leg = (Leg) this.plan.getPlanElements().get(this.index);
+	private void handleLeg(Leg leg, final double time) {
 		this.score += calcLegScore(this.lastTime, time, leg);
-		this.index += 2;
 	}
 
 }

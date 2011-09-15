@@ -57,6 +57,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 	private final KtiConfigGroup ktiConfigGroup;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private Plan plan;
 
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
@@ -64,9 +65,10 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			CharyparNagelScoringParameters params,
 			Config config,
 			KtiConfigGroup ktiConfigGroup) {
-		super(plan, params);
+		super(params);
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
+		this.plan = plan;
 	}
 
 	@Override

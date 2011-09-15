@@ -259,7 +259,7 @@ public class EstimatedJohScoringFunction implements ScoringFunction {
 	}
 
 	@Override
-	public void endActivity(final double time) {
+	public void endActivity(final double time, final Activity act) {
 	}
 
 

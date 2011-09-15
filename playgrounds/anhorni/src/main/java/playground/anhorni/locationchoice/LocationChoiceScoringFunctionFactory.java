@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.scoring;
+package playground.anhorni.locationchoice;
 
 import java.util.TreeMap;
 
@@ -26,6 +26,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
@@ -56,7 +60,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties, this.facilities));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;

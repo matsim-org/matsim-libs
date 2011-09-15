@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -29,12 +30,15 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.events.AgentMoneyEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Test the correct working of the CharyparNagelScoringFunction according to the formulas in:
@@ -48,7 +52,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * TODO [MR] split this into multiple test classes for the specific parts, according to the newer, more modular scoring function
  * @author mrieser
  */
-public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTest {
+public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 
 	protected Config config = null;
 	private NetworkImpl network = null;
@@ -160,28 +164,33 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.plan = null;
 		super.tearDown();
 	}
+	
+	private ScoringFunction getScoringFunctionInstance(final PlanImpl somePlan) {
+		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore());
+		return charyparNagelScoringFunctionFactory.createNewScoringFunction(somePlan);
+	}
 
 	private double calcScore() {
-		ScoringFunction testee = getScoringFunctionInstance(this.plan);
-		testee.endActivity(07*3600);
+		ScoringFunction testee = getScoringFunctionInstance(new PlanImpl());
+		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
 		
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
 		
 		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(10*3600);
+		testee.endActivity(10*3600, (Activity) this.plan.getPlanElements().get(2));
 		
 		testee.startLeg(10*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.endLeg(10*3600 + 15*60);
 		
 		testee.startActivity(10*3600 + 15*60, (Activity) this.plan.getPlanElements().get(4));
-		testee.endActivity(13*3600);
+		testee.endActivity(13*3600, (Activity) this.plan.getPlanElements().get(4));
 		
 		testee.startLeg(13*3600, (Leg) this.plan.getPlanElements().get(5));
 		testee.endLeg(13*3600 + 30*60);
 		
 		testee.startActivity(13*3600 + 30*60, (Activity) this.plan.getPlanElements().get(6));
-		testee.endActivity(16*3600);
+		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(6));
 		
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(7));
 		testee.endLeg(16*3600 + 15*60);
@@ -417,11 +426,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 
 		ScoringFunction testee = getScoringFunctionInstance(this.plan);
-		testee.endActivity(07*3600);
+		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
 		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(16*3600);
+		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(2));
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
@@ -434,11 +443,11 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
 
 		testee = getScoringFunctionInstance(this.plan);
-		testee.endActivity(07*3600);
+		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
 		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
 		testee.endLeg(07*3600 + 30*60);
 		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(16*3600);
+		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(2));
 		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
 		testee.agentStuck(16*3600 + 7.5*60);
 		testee.finish();
@@ -500,4 +509,81 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 				+ Math.max(0.0, perf * 15.0 * Math.log(7.0 / zeroUtilDurH))
 				+ perf * 8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
 	}
+	
+	/**
+	 * Sets up the configuration to be useful for scoring plans. This implementation
+	 * sets the parameters for scoring functions returned by
+	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own
+	 * custom scoring function.
+	 *
+	 * @param config
+	 */
+	protected void setupScoringConfig(final Config config) {
+		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
+		scoring.setBrainExpBeta(2.0);
+		scoring.setLateArrival_utils_hr(-18.0);
+		scoring.setEarlyDeparture_utils_hr(0.0);
+		scoring.setPerforming_utils_hr(6.0);
+		scoring.setTraveling_utils_hr(-6.0);
+		scoring.setTravelingPt_utils_hr(0.0);
+
+//		scoring.setMarginalUtlOfDistanceCar(0.0);
+		scoring.setMonetaryDistanceCostRateCar(0.0) ;
+		scoring.setMarginalUtilityOfMoney(1.);
+
+		scoring.setWaiting_utils_hr(0.0);
+
+		// setup activity types h and w for scoring
+		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		params.setTypicalDuration(16*3600);
+		scoring.addActivityParams(params);
+
+		params = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		params.setTypicalDuration(8*3600);
+		scoring.addActivityParams(params);
+	}
+
+	/**
+	 * Tests if the scoring function correctly handles {@link AgentMoneyEventImpl}.
+	 * It generates one person with one plan having two activities (home, work)
+	 * and a car-leg in between. It then tests the scoring function by calling
+	 * several methods on an instance of the scoring function with the
+	 * aforementioned plan.
+	 */
+	public void testAddMoney() {
+		setupScoringConfig(this.config);
+
+		// score the same plan twice
+		PersonImpl person1 = new PersonImpl(new IdImpl(1));
+		PlanImpl plan1 = person1.createAndAddPlan(true);
+		Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
+		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
+		Activity act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		ScoringFunction sf1 = getScoringFunctionInstance(new PlanImpl());
+		sf1.startActivity(0, act1a);
+		sf1.endActivity(7*3600, act1a);
+		sf1.startLeg(7*3600, leg1);
+		sf1.endLeg(7*3600+100);
+		sf1.startActivity(7*3600+100, act1b);
+		sf1.endActivity(24*3600, act1b);
+		sf1.finish();
+		double score1 = sf1.getScore();
+
+		ScoringFunction sf2 = getScoringFunctionInstance(new PlanImpl());
+		sf2.startActivity(0, act1a);
+		sf2.addMoney(1.23);
+		sf2.endActivity(7*3600, act1a);
+		sf2.startLeg(7*3600, leg1);
+		sf2.addMoney(-2.46);
+		sf2.endLeg(7*3600+100);
+		sf2.startActivity(7*3600+100, act1b);
+		sf2.addMoney(4.86);
+		sf2.endActivity(24*3600, act1b);
+		sf2.addMoney(-0.28);
+		sf2.finish();
+		double score2 = sf2.getScore();
+
+		assertEquals(1.23 - 2.46 + 4.86 - 0.28, score2 - score1, EPSILON);
+	}
+	
 }

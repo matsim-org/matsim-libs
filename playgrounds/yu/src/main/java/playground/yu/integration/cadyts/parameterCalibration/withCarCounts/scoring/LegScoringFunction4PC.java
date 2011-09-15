@@ -34,7 +34,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 
 	public LegScoringFunction4PC(Plan plan,
 			CharyparNagelScoringParameters params) {
-		super(plan, params);
+		super(params);
 	}
 
 	public double getTravTimeAttrPt() {

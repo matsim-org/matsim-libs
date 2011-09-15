@@ -8,14 +8,17 @@ import org.matsim.pt.PtConstants;
 
 public class BvgActivityScoringFunction extends ActivityScoringFunction {
 
+	private CharyparNagelScoringParameters params;
+
 	public BvgActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params) {
-		super(plan, params);
+		super(params);
+		this.params = params;
 	}
 
 	@Override
 	protected double calcActScore(double arrivalTime, double departureTime, Activity act) {
 		if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-			return (departureTime - arrivalTime) * super.params.marginalUtilityOfWaiting_s;
+			return (departureTime - arrivalTime) * this.params.marginalUtilityOfWaiting_s;
 		} else {
 			return super.calcActScore(arrivalTime, departureTime, act);
 		}

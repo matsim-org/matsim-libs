@@ -70,12 +70,14 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	private Config config;
 	private Network network;
 	TravelScoringFunction travelScoring;
+	private Plan plan;
 	public LegScoringFunction(Plan plan,
 			CharyparNagelScoringParameters params,
 			Config config,
 			Network network,
 			HerbieConfigGroup ktiConfigGroup) {
-		super(plan, params);
+		super(params);
+		this.plan = plan;
 		travelScoring = new TravelScoringFunction(params, ktiConfigGroup);
 		this.config = config;
 		this.network = network;

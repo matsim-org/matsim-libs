@@ -96,7 +96,7 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 					currentActivity = (Activity) pe;
 					fitnessFunction.startActivity(now, currentActivity);
 					now = currentActivity.getEndTime();
-					fitnessFunction.endActivity(now);
+					fitnessFunction.endActivity(now, currentActivity);
 				}
 				else if (pe instanceof Leg) {
 					currentLeg = (Leg) pe;

@@ -41,7 +41,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.scoring.PlanScorer;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;

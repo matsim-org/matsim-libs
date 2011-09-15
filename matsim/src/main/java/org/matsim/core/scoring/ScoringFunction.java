@@ -53,11 +53,14 @@ public interface ScoringFunction {
 
 	/**
 	 * Tells the scoring function that the agent stops with an activity.
+	 * The activity is always the same one which started previously,
+	 * except if it is the first activity, which never starts.
 	 *
 	 * @param time The time at which the agent stops performing the current
 	 * activity.
+	 * @param activity 
 	 */
-	public void endActivity(final double time);
+	public void endActivity(final double time, Activity activity);
 
 	/**
 	 * Tells the scoring function that the agents starts a new leg.
