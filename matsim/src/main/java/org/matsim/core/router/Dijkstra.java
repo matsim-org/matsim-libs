@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -91,7 +92,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 */
 	final TravelTime timeFunction;
 
-	final private HashMap<Id, DijkstraNodeData> nodeData;
+	final HashMap<Id, DijkstraNodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -110,7 +111,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * Determines whether we should mark nodes in dead ends during a
 	 * pre-processing step so they won't be expanded during routing.
 	 */
-	private final boolean pruneDeadEnds;
+	/*package*/ final boolean pruneDeadEnds;
 
 	/**
 	 * Comparator that defines how to order the nodes in the pending nodes queue
@@ -224,7 +225,24 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			}
 		}
 
-		// now construct the path
+		// now construct and return the path
+		return constructPath(fromNode, toNode, startTime, arrivalTime);
+
+	}
+
+	/**
+	 * Constructs the path after the algorithm has been run.
+	 *
+	 * @param fromNode
+	 *            The node where the path starts.
+	 * @param toNode
+	 *            The node where the path ends.
+	 * @param startTime
+	 *            The time when the trip starts.
+	 * @param preProcessData
+	 *            The time when the trip ends.
+	 */
+	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ArrayList<Link> links = new ArrayList<Link>();
 
@@ -245,7 +263,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 		return path;
 	}
-
+	
 	/**
 	 * Initializes the first node of a route.
 	 *
@@ -282,32 +300,48 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		double currCost = outData.getCost();
 		if (this.pruneDeadEnds) {
 			PreProcessDijkstra.DeadEndData ddOutData = getPreProcessData(outNode);
-			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
-					Node n = l.getToNode();
-					PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
 
-					/* IF the current node n is not in a dead end
-					 * OR it is in the same dead end as the fromNode
-					 * OR it is in the same dead end as the toNode
-					 * THEN we add the current node to the pending nodes */
-					if ((ddData.getDeadEndEntryNode() == null)
-							|| (ddOutData.getDeadEndEntryNode() != null)
-							|| ((this.deadEndEntryNode != null)
-									&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
-						addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
-					}
-				}
+			for (Link l : outNode.getOutLinks().values()) {
+				relaxNodeLogic(l, pendingNodes, currTime, currCost, toNode, ddOutData);
 			}
 		} else { // this.pruneDeadEnds == false
 			for (Link l : outNode.getOutLinks().values()) {
-				if (canPassLink(l)) {
-					addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
+				relaxNodeLogic(l, pendingNodes, currTime, currCost, toNode, null);
+			}				
+		}
+	}
+	
+	/**
+	 * Logic that was previously located in the relaxNode(...) method. 
+	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
+	 */
+	/*package*/ void relaxNodeLogic(final Link l, final PseudoRemovePriorityQueue<Node> pendingNodes,
+			final double currTime, final double currCost, final Node toNode,
+			final PreProcessDijkstra.DeadEndData ddOutData) {
+		if (this.pruneDeadEnds) {
+			if (canPassLink(l)) {
+				Node n = l.getToNode();
+				PreProcessDijkstra.DeadEndData ddData = getPreProcessData(n);
+
+				/* IF the current node n is not in a dead end
+				 * OR it is in the same dead end as the fromNode
+				 * OR it is in the same dead end as the toNode
+				 * THEN we add the current node to the pending nodes */
+				if ((ddData.getDeadEndEntryNode() == null)
+						|| (ddOutData.getDeadEndEntryNode() != null)
+						|| ((this.deadEndEntryNode != null)
+								&& (this.deadEndEntryNode.getId() == ddData.getDeadEndEntryNode().getId()))) {
+					
+					addToPendingNodes(l, n, pendingNodes, currTime, currCost, toNode);
 				}
+			}
+		} else {
+			if (canPassLink(l)) {
+				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
 			}
 		}
 	}
-
+	
 	/**
 	 * Adds some parameters to the given Node then adds it to the set of pending
 	 * nodes.
@@ -475,49 +509,6 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 
 	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
 		return this.preProcessData.getNodeData(n);
-	}
-
-	/**
-	 * A data structure to store temporarily information used
-	 * by the Dijkstra-algorithm.
-	 */
-	protected static class DijkstraNodeData {
-
-		private Link prev = null;
-
-		private double cost = 0;
-
-		private double time = 0;
-
-		private int iterationID = Integer.MIN_VALUE;
-
-		public void resetVisited() {
-			this.iterationID = Integer.MIN_VALUE;
-		}
-
-		public void visit(final Link comingFrom, final double cost, final double time,
-				final int iterID) {
-			this.prev = comingFrom;
-			this.cost = cost;
-			this.time = time;
-			this.iterationID = iterID;
-		}
-
-		public boolean isVisited(final int iterID) {
-			return (iterID == this.iterationID);
-		}
-
-		public double getCost() {
-			return this.cost;
-		}
-
-		public double getTime() {
-			return this.time;
-		}
-
-		public Link getPrevLink() {
-			return this.prev;
-		}
 	}
 
 }

@@ -180,21 +180,4 @@ public class WithinDayController extends Controler {
 		super.runMobSim();
 	}
 
-	/*
-	 * ===================================================================
-	 * main
-	 * ===================================================================
-	 */
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final ExampleWithinDayController controller = new ExampleWithinDayController(args);
-			controller.run();
-		}
-		System.exit(0);
-	}
-
 }

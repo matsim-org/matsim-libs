@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class ControlerConfigGroup extends Module {
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks}
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
 	public enum EventsFileFormat {txt, xml}
 
@@ -134,6 +134,12 @@ public class ControlerConfigGroup extends Module {
 			else if (RoutingAlgorithmType.AStarLandmarks.toString().equalsIgnoreCase(value)){
 				setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 			}
+			else if (RoutingAlgorithmType.FastDijkstra.toString().equalsIgnoreCase(value)){
+				setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
+			}
+			else if (RoutingAlgorithmType.FastAStarLandmarks.toString().equalsIgnoreCase(value)){
+				setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
+			}
 			else {
 				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + GROUP_NAME);
 			}
@@ -194,7 +200,8 @@ public class ControlerConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + " or " + RoutingAlgorithmType.AStarLandmarks);
+		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
+				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +

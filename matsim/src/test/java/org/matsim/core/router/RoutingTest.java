@@ -33,6 +33,9 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarEuclideanFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarEuclideanFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelMinCost;
@@ -50,7 +53,7 @@ public class RoutingTest extends MatsimTestCase {
 		public String getName();
 		public LeastCostPathCalculatorFactory getFactory(Network network, TravelMinCost costCalc, TravelTime timeCalc);
 	}
-
+/*
 	public void testDijkstra() {
 		doTest(new RouterProvider() {
 			public String getName() {
@@ -62,6 +65,17 @@ public class RoutingTest extends MatsimTestCase {
 		});
 	}
 
+	public void testFastDijkstra() {
+		doTest(new RouterProvider() {
+			public String getName() {
+				return "FastDijkstra";
+			}
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new FastDijkstraFactory();
+			}
+		});
+	}
+	
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			public String getName() {
@@ -75,6 +89,19 @@ public class RoutingTest extends MatsimTestCase {
 		});
 	}
 
+	public void testFastDijkstraPruneDeadEnds() {
+		doTest(new RouterProvider() {
+			public String getName() {
+				return "FastDijkstraPruneDeadends";
+			}
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
+				preProcessData.run(network);
+				return new FastDijkstraFactory(preProcessData);
+			}
+		});
+	}
+	
 	public void testAStarEuclidean() {
 		doTest(new RouterProvider() {
 			public String getName() {
@@ -86,6 +113,17 @@ public class RoutingTest extends MatsimTestCase {
 		});
 	}
 
+	public void testFastAStarEuclidean() {
+		doTest(new RouterProvider() {
+			public String getName() {
+				return "FastAStarEuclidean";
+			}
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new FastAStarEuclideanFactory(network, costCalc);
+			}
+		});
+	}
+*/	
 	public void testAStarLandmarks() {
 		doTest(new RouterProvider() {
 			public String getName() {
@@ -97,6 +135,17 @@ public class RoutingTest extends MatsimTestCase {
 		});
 	}
 
+	public void testFastAStarLandmarks() {
+		doTest(new RouterProvider() {
+			public String getName() {
+				return "FastAStarLandmarks";
+			}
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+				return new FastAStarLandmarksFactory(network, costCalc);
+			}
+		});
+	}
+	
 	private void doTest(final RouterProvider provider) {
 		Config config = loadConfig("test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/config.xml");
 

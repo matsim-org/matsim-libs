@@ -25,12 +25,12 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.misc.Time;
-
 
 /**
  * Implements the A* router algorithm for a given NetworkLayer

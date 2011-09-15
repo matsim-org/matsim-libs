@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.AStarNodeData;
+import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
@@ -81,7 +83,7 @@ public class AStarEuclidean extends Dijkstra {
 	protected final double overdoFactor;
 
 	private double minTravelCostPerLength;
-	private final HashMap<Id, AStarNodeData> nodeData;
+	/*package*/ final HashMap<Id, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -108,7 +110,6 @@ public class AStarEuclidean extends Dijkstra {
 			final TravelTime timeFunction, final double overdoFactor) {
 		this(network, preProcessData, preProcessData.getCostFunction(),
 				timeFunction, overdoFactor);
-
 	}
 
 	/**
@@ -259,42 +260,6 @@ public class AStarEuclidean extends Dijkstra {
 	@Override
 	protected double getPriority(final DijkstraNodeData data) {
 		return ((AStarNodeData) data).getExpectedCost();
-	}
-
-	/**
-	 * Holds AStarEuclidean specific information used during routing
-	 * associated with each node in the network.
-	 */
-	protected class AStarNodeData extends DijkstraNodeData {
-
-		private double expectedRemainingCost;
-
-		/**
-		 * @return The expected total travel cost from the start
-		 * node to the target node of the route when the associated node
-		 * is on that route.
-		 */
-		public double getExpectedCost() {
-			return this.expectedRemainingCost + getCost();
-		}
-
-		/**
-		 * Sets the expected travel cost from the associated
-		 * node to the target node of the route.
-		 *
-		 * @param expectedCost the expected cost
-		 */
-		public void setExpectedRemainingCost(final double expectedCost) {
-			this.expectedRemainingCost = expectedCost;
-		}
-
-		/**
-		 * @return The expected travel cost from the associated
-		 * node to the target node of the route.
-		 */
-		public double getExpectedRemainingCost() {
-			return this.expectedRemainingCost;
-		}
 	}
 
 }
