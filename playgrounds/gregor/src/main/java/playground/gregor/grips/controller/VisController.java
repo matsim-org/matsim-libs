@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.controller;
+package playground.gregor.grips.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -31,9 +31,9 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
 import playground.mzilske.osm.JXMapOTFVisClient;
 
-public class CopyOfHybridVis {
+public class VisController {
 
-	private static final Logger log = Logger.getLogger(CopyOfHybridVis.class);
+	private static final Logger log = Logger.getLogger(VisController.class);
 
 	public static void main (String [] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
