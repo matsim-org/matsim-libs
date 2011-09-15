@@ -38,7 +38,7 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.CommonMATSimUtilities;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
-import playground.toronto.ttimematrix.SpanningTree;
+import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
  *
@@ -83,7 +83,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		initCostfunctionParameter(sc);
 
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;

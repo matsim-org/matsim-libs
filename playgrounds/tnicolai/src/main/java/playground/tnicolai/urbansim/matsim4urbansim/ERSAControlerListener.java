@@ -71,8 +71,8 @@ import playground.tnicolai.urbansim.utils.ProgressBar;
 import playground.tnicolai.urbansim.utils.helperObjects.Benchmark;
 import playground.tnicolai.urbansim.utils.helperObjects.JobsObject;
 import playground.tnicolai.urbansim.utils.helperObjects.ZoneObject;
-import playground.toronto.ttimematrix.SpanningTree;
-import playground.toronto.ttimematrix.SpanningTree.NodeData;
+import playground.toronto.ttimematrix.LeastCostPathTree;
+import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -123,7 +123,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		Scenario sc = controler.getScenario();
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;
@@ -211,7 +211,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param st
 	 * @param toNode
 	 */
-	private double getZone2WorkplaceDistance(SpanningTree st, Node toNode) {
+	private double getZone2WorkplaceDistance(LeastCostPathTree st, Node toNode) {
 		HashMap<Id, NodeData> tree = st.getTree();
 		List<Node> nodeList = new ArrayList<Node>();
 		
@@ -343,7 +343,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * @param network <code>NetworkImpl</code>
 	 * @return coordinate of a given zone
 	 */
-	private Coord getStartingPointCoordinateAndRunSpanningTree(Zone<ZoneObject> startZone, SpanningTree st, NetworkImpl network) {
+	private Coord getStartingPointCoordinateAndRunSpanningTree(Zone<ZoneObject> startZone, LeastCostPathTree st, NetworkImpl network) {
 		// Was named "getStartingPointCoordinate".  As such, however, calling the spanning tree run method was a side effect.
 		// Changing the name somewhat improves the situation, but makes clear that this method has more than one function.
 		// Personally, I would prefer to have both `st' commands pushed up and have the `st' argument removed from the 

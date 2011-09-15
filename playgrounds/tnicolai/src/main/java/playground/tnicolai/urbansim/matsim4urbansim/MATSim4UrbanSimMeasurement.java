@@ -50,7 +50,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.helperObjects.MeasurementObject;
 import playground.tnicolai.urbansim.utils.io.ReadFromUrbansimParcelModel;
-import playground.toronto.ttimematrix.SpanningTree;
+import playground.toronto.ttimematrix.LeastCostPathTree;
 
 
 /**
@@ -202,7 +202,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 
 				TravelTime ttc = controler.getTravelTimeCalculator();
 				//SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc));
-				SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+				LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 				NetworkImpl network = controler.getNetwork() ;
 				double depatureTime = 8.*3600 ;

@@ -42,13 +42,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class SpanningTree {
+public class LeastCostPathTree {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final static Logger log = Logger.getLogger(SpanningTree.class);
+	private final static Logger log = Logger.getLogger(LeastCostPathTree.class);
 
 	private Node origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
@@ -61,7 +61,7 @@ public class SpanningTree {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public SpanningTree(TravelTime tt, TravelCost tc) {
+	public LeastCostPathTree(TravelTime tt, TravelCost tc) {
 		log.info("init " + this.getClass().getName() + " module...");
 		this.ttFunction = tt;
 		this.tcFunction = tc;
@@ -192,7 +192,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

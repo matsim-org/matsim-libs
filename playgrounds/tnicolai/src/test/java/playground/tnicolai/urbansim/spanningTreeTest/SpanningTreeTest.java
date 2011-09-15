@@ -21,8 +21,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.toronto.ttimematrix.SpanningTree;
-import playground.toronto.ttimematrix.SpanningTree.NodeData;
+import playground.toronto.ttimematrix.LeastCostPathTree;
+import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 public class SpanningTreeTest{
 	
@@ -40,8 +40,8 @@ public class SpanningTreeTest{
 		
 		TravelTime ttc = new TravelTimeCalculator(this.scenario.getNetwork(),60,30*3600, scenario.getConfig().travelTimeCalculator());
 		
-		SpanningTree spTime = new SpanningTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore()));
-		SpanningTree spDistance = new SpanningTree(ttc, new TravelDistanceCostCalculatorTest(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree spTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree spDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculatorTest(ttc, scenario.getConfig().planCalcScore()));
 	
 		assert(this.scenario.getNetwork() != null);
 		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
@@ -75,7 +75,7 @@ public class SpanningTreeTest{
 		System.out.println("Travel Times:" + tt + ", Travel Costs: " + tc);
 	}
 	
-	private List<Node> getVisitedNodes(SpanningTree st, Node destination, String costType) {
+	private List<Node> getVisitedNodes(LeastCostPathTree st, Node destination, String costType) {
 		
 		HashMap<Id, NodeData> tree = st.getTree();
 		List<Node> nodeList = new ArrayList<Node>();

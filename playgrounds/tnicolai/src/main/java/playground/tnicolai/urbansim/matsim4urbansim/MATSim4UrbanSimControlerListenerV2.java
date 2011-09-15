@@ -36,7 +36,7 @@ import playground.tnicolai.urbansim.constants.Constants;
 import playground.tnicolai.urbansim.utils.ProgressBar;
 import playground.tnicolai.urbansim.utils.helperObjects.AccessibilityHelperObject;
 import playground.tnicolai.urbansim.utils.helperObjects.WorkplaceObject;
-import playground.toronto.ttimematrix.SpanningTree;
+import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
  *
@@ -82,7 +82,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		SpanningTree stTravelTime = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree stTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
 		// SpanningTree stTravelDistance = new SpanningTree(ttc, new TravelDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		

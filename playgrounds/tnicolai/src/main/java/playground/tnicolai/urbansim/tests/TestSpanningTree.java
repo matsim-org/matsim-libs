@@ -19,8 +19,8 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
-import playground.toronto.ttimematrix.SpanningTree;
-import playground.toronto.ttimematrix.SpanningTree.NodeData;
+import playground.toronto.ttimematrix.LeastCostPathTree;
+import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 public class TestSpanningTree {
 	
@@ -32,7 +32,7 @@ public class TestSpanningTree {
 		
 		// init spanning tree here
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
-		SpanningTree st = new SpanningTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
 		
 		// than set the start node
 		Node origin = network.getNodes().get(new IdImpl(4224));

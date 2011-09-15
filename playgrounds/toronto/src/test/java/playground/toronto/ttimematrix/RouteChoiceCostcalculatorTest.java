@@ -19,8 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.toronto.ttimematrix.SpanningTree;
-import playground.toronto.ttimematrix.SpanningTree.NodeData;
+import playground.toronto.ttimematrix.LeastCostPathTree;
+import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 public class RouteChoiceCostcalculatorTest {
 	
@@ -41,8 +41,8 @@ public class RouteChoiceCostcalculatorTest {
 		TravelDistanceCostCalculator distanceCostCalculator = new TravelDistanceCostCalculator();
 		TravelTimeCostCalculator timeCostCalculator = new TravelTimeCostCalculator(ttc);
 		// init spanning trees
-		SpanningTree spDistance = new SpanningTree(ttc, distanceCostCalculator);
-		SpanningTree spTime = new SpanningTree(ttc, timeCostCalculator);
+		LeastCostPathTree spDistance = new LeastCostPathTree(ttc, distanceCostCalculator);
+		LeastCostPathTree spTime = new LeastCostPathTree(ttc, timeCostCalculator);
 		
 		assert(this.scenario.getNetwork() != null);
 		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
@@ -76,7 +76,7 @@ public class RouteChoiceCostcalculatorTest {
 		Assert.assertEquals(100.,timeTravelCost,1.e-8) ;
 	}
 	
-	private void printResults(double tt, double tc, String costType, SpanningTree st, Node destination){
+	private void printResults(double tt, double tc, String costType, LeastCostPathTree st, Node destination){
 		System.out.println("+++");
 		System.out.println(costType);
 		System.out.println("Travel Times:" + tt + ", Travel Costs: " + tc);

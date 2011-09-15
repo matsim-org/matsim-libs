@@ -49,7 +49,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	private final Map<Id,Id> l2zMapping;
 	private final Map<Id,Set<Id>> z2nMapping;
 	private final Set<Integer> hours;
-	private final SpanningTree st;
+	private final LeastCostPathTree st;
 	private final NetworkImpl network;
 
 	private int hour = 0;
@@ -62,7 +62,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final SpanningTree st, final NetworkImpl network) {
+	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final LeastCostPathTree st, final NetworkImpl network) {
 		log.info("init...");
 		this.l2zMapping = l2zMapping;
 		this.st = st;
@@ -211,7 +211,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		log.info("  done.");
 	}
 	
-	private final double calcAverageIntraZonalTravelTime(SpanningTree stLocal) {
+	private final double calcAverageIntraZonalTravelTime(LeastCostPathTree stLocal) {
 		Id originId = stLocal.getOrigin().getId();
 		Set<Id> nodeIds = z2nMapping.get(originId);
 		if (nodeIds == null) {
