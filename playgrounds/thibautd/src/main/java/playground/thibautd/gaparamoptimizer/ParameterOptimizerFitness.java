@@ -22,6 +22,7 @@ package playground.thibautd.gaparamoptimizer;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -147,8 +148,9 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	 */
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
-		log.debug("computing fitness: generation #"+this.jgapConfig.getGenerationNr());
-		log.debug("evaluating chromosome with value: "+toString(chromosome));
+		LogInfo info = new LogInfo();
+		info.generationNumber = this.jgapConfig.getGenerationNr();
+		info.chromValue = chromosome.toString();
 		double[] scores = new double[nPlans];
 		long[] cpuTimesNanoSecs = new long[nPlans];
 		JointReplanningConfigGroup configGroup = fromChromosomeToConfig(chromosome);
@@ -174,12 +176,30 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 
 				scores[i] += currentScore;
 				cpuTimesNanoSecs[i] += currentTime;
-				log.debug("plan score per member (CHF): "+currentScore);
-				log.debug("CPU time per member (s): "+(currentTime*1E-9));
+				info.scores.add(currentScore);
+				info.times.add(currentTime*1E-9);
 			}
 		}
 
+		info.log();
+
 		return getScore(scores, cpuTimesNanoSecs);
+	}
+
+	private static class LogInfo {
+		public int generationNumber;
+		public String chromValue;
+		public List<Double> scores = new ArrayList<Double>();
+		public List<Double> times  = new ArrayList<Double>();
+
+		private synchronized void log() {
+			log.debug("computing fitness: generation #"+generationNumber);
+			log.debug("evaluating chromosome with value: "+chromValue);
+			for (int i=0; i < scores.size(); i++) {
+				log.debug("plan score per member (CHF): "+scores.get(i));
+				log.debug("CPU time per member (s): "+(times.get(i)*1E-9));
+			}
+		}
 	}
 
 	private double getScore(

@@ -91,7 +91,7 @@ public class JgapParameterOptimizerConfig extends Configuration {
 
 		try {
 			// default JGAP objects initializations
-			this.setBreeder(new GABreeder());
+			this.setBreeder(new JgapBreeder());
 			this.setEventManager(new EventManager());
 
 			// seed the default JGAP pseudo-random generator with a matsim random
