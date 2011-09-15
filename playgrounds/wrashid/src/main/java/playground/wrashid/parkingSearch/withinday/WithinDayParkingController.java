@@ -97,13 +97,15 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 * main
 	 * ===================================================================
 	 */
-	public static void main(final String[] args) {
+	public static void main(String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
+			args=new String[]{"test/input/playground/wrashid/parkingSearch/withinday/config_plans1.xml"};
 			final WithinDayParkingController controller = new WithinDayParkingController(args);
+			controller.setOverwriteFiles(true);
 			controller.run();
 		}
 		System.exit(0);

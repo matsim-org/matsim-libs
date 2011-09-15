@@ -33,7 +33,7 @@ public class InsertParkingActivitiesReplanner extends WithinDayInitialReplanner 
 		 */
 		for (PlanElement planElement : executedPlan.getPlanElements()) {
 			if (planElement instanceof Activity) {
-				((Activity) planElement).setType("dummy");
+				//((Activity) planElement).setType("dummy");
 			}
 		}
 		
