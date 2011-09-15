@@ -8,12 +8,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -34,6 +34,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 
 	private static final Comparator<Departure> departureTimeComparator = new Comparator<Departure>() {
 
+		@Override
 		public int compare(Departure o1, Departure o2) {
 			return Double.compare(o1.getDepartureTime(), o2.getDepartureTime());
 		}
@@ -60,6 +61,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 		return true;
 	}
 
+	@Override
 	public ArrayList<Umlauf> build() {
 		if (!canBuild()) {
 			throw new IllegalArgumentException();
@@ -131,8 +133,7 @@ public class BackAndForthUmlaufBuilderImpl implements UmlaufBuilder {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRoute route = (NetworkRoute) this.network.getFactory()
-				.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(wendenPath.links), toLink.getId());
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}

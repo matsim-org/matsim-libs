@@ -32,6 +32,7 @@ import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -171,7 +172,7 @@ public class ScenarioLoaderImpl {
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
 			if (this.config.scenario().isUseTransit()) {
-				network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
 			new MatsimNetworkReader(this.scenario).parse(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {

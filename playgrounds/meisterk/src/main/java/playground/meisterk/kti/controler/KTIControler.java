@@ -2,6 +2,7 @@ package playground.meisterk.kti.controler;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -43,8 +44,8 @@ public class KTIControler extends Controler {
 
 		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), super.getConfig().planomat()));
+		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 	}
 
@@ -104,8 +105,8 @@ public class KTIControler extends Controler {
 					travelCosts,
 					travelTimes,
 					super.getLeastCostPathCalculatorFactory(),
+					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
 					this.plansCalcRouteKtiInfo);
-
 		}
 
 		return router;

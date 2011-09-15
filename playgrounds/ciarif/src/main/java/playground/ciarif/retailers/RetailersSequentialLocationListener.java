@@ -47,6 +47,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -83,12 +85,14 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 	
 	}
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		this.controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().planCalcScore());
-		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
+		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), routeFactory);
 		
 		// Make a table with all shop activities listed  
 		/*String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
@@ -145,6 +149,7 @@ public class RetailersSequentialLocationListener implements StartupListener, Ite
 		
 	}
 	
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		Controler controler = event.getControler();
 		Map<Id,ActivityFacility> movedFacilities = new TreeMap<Id,ActivityFacility>();

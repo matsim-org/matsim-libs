@@ -32,16 +32,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -181,33 +180,34 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 	 */
 	protected void initReplanningRouter(QSim sim) {
 		
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		AbstractMultithreadedModule router;
 
 		// BasicReplanners (Random, Tabu, Compass, ...)
 		// each replanner can handle an arbitrary number of persons
 		RandomRoute randomRoute = new RandomRoute(this.network);
-		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory(), routeFactory);
 		this.randomIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.randomReplanner);
 
 		TabuRoute tabuRoute = new TabuRoute(this.network);
-		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory(), routeFactory);
 		this.tabuIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.tabuReplanner);
 
 		CompassRoute compassRoute = new CompassRoute(this.network);
-		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory(), routeFactory);
 		this.compassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.compassReplanner);
 
 		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
-		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory(), routeFactory);
 		this.randomCompassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
@@ -215,7 +215,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 
 		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, this.travelCostFactory, this.travelTime);
 		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
-		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory());
+		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory(), routeFactory);
 		this.dijkstraIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
@@ -394,7 +394,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 
 			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
 				if (mobsimAgent instanceof MobsimAgent) {
-					MobsimAgent personAgent = (MobsimAgent) mobsimAgent;
+					MobsimAgent personAgent = mobsimAgent;
 					withinDayAgents.add((PlanBasedWithinDayAgent) personAgent);
 				} else {
 					log.warn("MobsimAgent was expected to be from type PersonAgent, but was from type " + mobsimAgent.getClass().toString());

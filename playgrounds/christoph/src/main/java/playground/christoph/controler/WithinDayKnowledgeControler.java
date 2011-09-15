@@ -25,6 +25,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -129,10 +131,12 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		SubNetworkDijkstraTravelCostWrapper subNetworkDijkstraTravelCostWrapper = new SubNetworkDijkstraTravelCostWrapper(travelCost);
 		
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		
 //		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
 //				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore())); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, travelTime, factory); 
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, travelTime, factory, routeFactory); 
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();

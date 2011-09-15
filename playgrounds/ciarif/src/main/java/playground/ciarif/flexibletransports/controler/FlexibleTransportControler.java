@@ -1,12 +1,13 @@
 package playground.ciarif.flexibletransports.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.controler.listeners.CarSharingListener;
 import playground.ciarif.flexibletransports.controler.listeners.FtPopulationPreparation;
@@ -17,12 +18,10 @@ import playground.ciarif.flexibletransports.router.PlansCalcRouteFT;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFtInfo;
 import playground.ciarif.flexibletransports.scenario.FtScenarioLoaderImpl;
 import playground.ciarif.flexibletransports.scoring.FtScoringFunctionFactory;
-import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.KtiLinkNetworkRouteFactory;
-import playground.meisterk.kti.scenario.KtiScenarioLoaderImpl;
 
 public class FlexibleTransportControler extends Controler
 {
@@ -42,10 +41,10 @@ public class FlexibleTransportControler extends Controler
    //super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
    super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
 //
-    this.getNetwork().getFactory().setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), super.getConfig().planomat()));
-    this.getNetwork().getFactory().setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
-    this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
-    this.getNetwork().getFactory().setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), super.getConfig().planomat()));
+    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+    ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
   }
 
   @Override
@@ -59,7 +58,8 @@ public class FlexibleTransportControler extends Controler
 	}
   }
   
-  protected void setUp()
+  @Override
+	protected void setUp()
   {
 //    if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
 //      log.info("Using ftRouter");
@@ -78,7 +78,8 @@ public class FlexibleTransportControler extends Controler
     super.setUp();
   }
 
-  protected void loadControlerListeners()
+  @Override
+	protected void loadControlerListeners()
   {
     super.loadControlerListeners();
 
@@ -90,7 +91,8 @@ public class FlexibleTransportControler extends Controler
     this.addControlerListener(new CarSharingListener(this.ftConfigGroup));
   }
 
-  public PlanAlgorithm createRoutingAlgorithm(PersonalizableTravelCost travelCosts, PersonalizableTravelTime travelTimes)
+  @Override
+	public PlanAlgorithm createRoutingAlgorithm(PersonalizableTravelCost travelCosts, PersonalizableTravelTime travelTimes)
   {
     PlanAlgorithm router = null;
 
@@ -103,7 +105,8 @@ public class FlexibleTransportControler extends Controler
         super.network, 
         travelCosts, 
         travelTimes, 
-        super.getLeastCostPathCalculatorFactory(), 
+        super.getLeastCostPathCalculatorFactory(),
+        ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
         this.plansCalcRouteFtInfo);
     }
 

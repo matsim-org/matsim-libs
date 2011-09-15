@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -109,7 +109,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		
 		// get Route
 		Path path = routingAlgo.calcLeastCostPath(startNode, endNode, startTime);
-		NetworkRoute route = (NetworkRoute) this.net.getFactory().createRoute(TransportMode.car, startStop.getLinkId(), endStop.getLinkId());
+		NetworkRoute route = new LinkNetworkRouteImpl(startStop.getLinkId(), endStop.getLinkId());
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(path.links), endStop.getLinkId());		
 		
 		// get stops at Route
@@ -140,6 +140,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		return transitRoute;
 	}
 	
+	@Override
 	public TransitStopFacility getRandomTransitStop(){
 		int i = this.scheduleWithStopsOnly.getFacilities().size();
 		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
@@ -151,6 +152,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		return null;
 	}
 	
+	@Override
 	public TransitLine createEmptyLine(Id id) {
 		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
 	}

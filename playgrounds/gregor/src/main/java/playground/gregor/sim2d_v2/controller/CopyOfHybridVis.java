@@ -1,9 +1,10 @@
-package playground.gregor.grips.controller;
+package playground.gregor.sim2d_v2.controller;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -30,9 +31,9 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
 import playground.mzilske.osm.JXMapOTFVisClient;
 
-public class VisController {
+public class CopyOfHybridVis {
 
-	private static final Logger log = Logger.getLogger(VisController.class);
+	private static final Logger log = Logger.getLogger(CopyOfHybridVis.class);
 
 	public static void main (String [] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
@@ -50,7 +51,7 @@ public class VisController {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		((PopulationFactoryImpl)scenario.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		ScenarioUtils.loadScenario(scenario);
 
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);

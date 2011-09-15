@@ -28,6 +28,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
@@ -88,11 +90,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners(QSim sim) {
-
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		TravelTimeCollector travelTime = super.getTravelTimeCollector();
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory, routeFactory);
 		costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData, travelTime);
 		this.events.addHandler(costNavigationTravelTimeLogger);
 		

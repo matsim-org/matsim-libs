@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -45,12 +45,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class PseudoTransitLegRouter implements LegRouter {
 
 	private final Network network;
-	private final NetworkFactoryImpl routeFactory;
+	private final ModeRouteFactory routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private final double speedFactor;
 	private final double beelineDistanceFactor;
 
-	public PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final NetworkFactoryImpl routeFactory) {
+	public PseudoTransitLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final double speedFactor, double beelineDistanceFactor, final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;

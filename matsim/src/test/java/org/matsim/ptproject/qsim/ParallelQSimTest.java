@@ -65,6 +65,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -107,7 +108,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -149,7 +150,7 @@ public class ParallelQSimTest extends TestCase {
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -192,7 +193,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg("other");
-		Route route = f.network.getFactory().createRoute("undefined", f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
+		Route route = ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute("undefined", f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
 		leg.setRoute(route);
 		leg.setTravelTime(15.0);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -241,7 +242,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
 		route.setLinkIds(f.link1.getId(), new ArrayList<Id>(0), f.link1.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link1.getId());
@@ -404,7 +405,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -427,7 +428,7 @@ public class ParallelQSimTest extends TestCase {
 			ActivityImpl a = plan.createAndAddActivity("h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -476,7 +477,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -489,7 +490,7 @@ public class ParallelQSimTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -537,7 +538,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600 - 500);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", f.link3.getId());
@@ -550,7 +551,7 @@ public class ParallelQSimTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -563,7 +564,7 @@ public class ParallelQSimTest extends TestCase {
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
 			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -608,11 +609,11 @@ public class ParallelQSimTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
 		l1.setTravelTime(10);
-		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link2.getId()));
+		l1.setRoute(((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link2.getId()));
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		LegImpl l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route2 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
 		plan.createAndAddActivity("l", f.link3.getId());
@@ -663,11 +664,11 @@ public class ParallelQSimTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg("other");
 		l1.setTravelTime(10);
-		l1.setRoute(f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
+		l1.setRoute(((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
 		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		LegImpl l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route2 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route2 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
 		plan.createAndAddActivity("l", f.link3.getId());
@@ -722,7 +723,7 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route1 = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+		NetworkRoute route1 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 		route1.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		route1.setVehicleId(id2);
 		l1.setRoute(route1);
@@ -782,7 +783,7 @@ public class ParallelQSimTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
-		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
+		NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link1.getId());
 		List<Id> routeLinks = new ArrayList<Id>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link1.getId());
@@ -840,7 +841,7 @@ public class ParallelQSimTest extends TestCase {
 		a1.setEndTime(7.0*3600);
 		LegImpl l1 = plan.createAndAddLeg(TransportMode.car);
 		l1.setTravelTime(10);
-		NetworkRoute netRoute = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+		NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 		List<Id> routeLinks = new ArrayList<Id>();
 		Collections.addAll(routeLinks, f.link2.getId(), f.link3.getId(), link4.getId(), f.link1.getId(), f.link2.getId());
 		netRoute.setLinkIds(f.link1.getId(), routeLinks, f.link3.getId());
@@ -989,7 +990,7 @@ public class ParallelQSimTest extends TestCase {
 		Link link5 = f.network.createAndAddLink(new IdImpl("5"), node5, node6, 100, 10, 60000, 9);
 		Link link6 = f.network.createAndAddLink(new IdImpl("6"), node6, node7, 100, 10, 60000, 9);
 
-		f.network.getFactory().setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
 		PersonImpl person = new PersonImpl(new IdImpl(0));
@@ -997,13 +998,13 @@ public class ParallelQSimTest extends TestCase {
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, f.link1.getId(), link5.getId());
+		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), link5.getId());
 		route.setLinkIds(new IdImpl(startLinkId), NetworkUtils.getLinkIds(linkIds), new IdImpl(endLinkId));
 		leg.setRoute(route);
 		ActivityImpl a2 = plan.createAndAddActivity("w", link5.getId());
 		a2.setEndTime(9*3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRoute) f.network.getFactory().createRoute(TransportMode.car, link5.getId(), link6.getId());
+		route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link5.getId(), link6.getId());
 		route.setLinkIds(link5.getId(), null, link6.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("h", link6.getId());
@@ -1035,7 +1036,7 @@ public class ParallelQSimTest extends TestCase {
 		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.getNodes().put(node1.getId(), node1);
 		network.getNodes().put(node2.getId(), node2);
-		Link link = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
 		network.addLink(link);
@@ -1105,11 +1106,11 @@ public class ParallelQSimTest extends TestCase {
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link1.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link1.setCapacity(2000.0);
 		network.addLink(link1);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
 		link2.setFreespeed(10.0); // freespeed-traveltime = 100s
 		link2.setCapacity(2000.0);
 		network.addLink(link2);

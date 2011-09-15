@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -198,7 +197,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startRoute() {
-		this.currroute = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
+		this.currroute = (NetworkRoute) ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(TransportMode.car, this.prevAct.getLinkId(), this.prevAct.getLinkId());
 		this.currleg.setRoute(this.currroute);
 	}
 

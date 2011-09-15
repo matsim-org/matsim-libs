@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -37,7 +39,7 @@ public class AdaptedLauncher {
 	final String routing = "routing ";
 	
 	public AdaptedLauncher(final String configFile) {
-		this((ScenarioImpl) new DataLoader().loadScenario(configFile)); 
+		this(new DataLoader().loadScenario(configFile)); 
 	}
 	
 	public AdaptedLauncher(final ScenarioImpl scenario) {
@@ -95,13 +97,15 @@ public class AdaptedLauncher {
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
 		FreespeedTravelTimeCost freespeedTravelTimeCost = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
+		
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) pop.getFactory()).getModeRouteFactory();
 
 		// yy The following comes from PlansCalcRoute; in consequence, one can configure the car router attributes.  In addition, one can configure _some_
 		// of the transit attributes from here (transitSchedule, transitConfig), but not some others.  Please describe the design reason for this.  kai, apr'10
 		// The design reason is, I guess, that these are the arguments that are used for the constructor of the super-class (designed by others)?  kai, apr'10
 		//Yes, it uses matsim.pt.router.PlansCalcTransitRoute class to keep the compatibility of potentially handling many TransportMode types. Manuel,.
 		AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
-				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, scenario.getTransitSchedule(), transitConfig, myTransitRouterConfig);
+				freespeedTravelTimeCost, freespeedTravelTimeCost, dijkstraFactory, routeFactory, scenario.getTransitSchedule(), transitConfig, myTransitRouterConfig);
 
 		
 		new PlanScoreNullifier().run(pop);

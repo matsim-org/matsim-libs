@@ -24,8 +24,8 @@ import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -358,7 +358,7 @@ public class QSimIntegrationTest {
 			network.addLink(link4);
 			network.addLink(link5);
 
-			((NetworkFactoryImpl) network.getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+			((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 			// setup: vehicles
 			String vehiclesXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +

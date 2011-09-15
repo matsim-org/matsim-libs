@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarEuclideanFactory;
@@ -40,6 +41,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.v4.AStarLandmarksV4Factory;
+import org.matsim.core.router.v4.DijkstraV4Factory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -77,10 +80,10 @@ public class RouterPerformanceTest {
 				config.network().setInputFile(args2[0]);
 				config.plans().setInputFile(args2[1]);
 
-				doTest(new DijkstraProvider(), config, limit);
-				doTest(new AStarLandmarksProvider(), config, limit);
-//				doTest(new DijkstraV4Provider(), config, limit);
-//				doTest(new AStarLandmarksV4Provider(), config, limit);
+//				doTest(new DijkstraProvider(), config, limit);
+//				doTest(new AStarLandmarksProvider(), config, limit);
+				doTest(new DijkstraV4Provider(), config, limit);
+				doTest(new AStarLandmarksV4Provider(), config, limit);
 			}
 		}
 	}
@@ -101,16 +104,16 @@ public class RouterPerformanceTest {
 		}
 	}
 
-//	private static class DijkstraV4Provider implements RouterProvider {
-//		@Override
-//		public String getName() {
-//			return "DijkstraV4";
-//		}
-//		@Override
-//		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-//			return new DijkstraV4Factory();
-//		}
-//	}
+	private static class DijkstraV4Provider implements RouterProvider {
+		@Override
+		public String getName() {
+			return "DijkstraV4";
+		}
+		@Override
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			return new DijkstraV4Factory();
+		}
+	}
 
 	private static class DijkstraPruneDeadEndsProvider implements RouterProvider {
 		@Override
@@ -147,16 +150,16 @@ public class RouterPerformanceTest {
 		}
 	}
 
-//	private static class AStarLandmarksV4Provider implements RouterProvider {
-//		@Override
-//		public String getName() {
-//			return "AStarLandmarksV4";
-//		}
-//		@Override
-//		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
-//			return new AStarLandmarksV4Factory(network, costCalc);
-//		}
-//	}
+	private static class AStarLandmarksV4Provider implements RouterProvider {
+		@Override
+		public String getName() {
+			return "AStarLandmarksV4";
+		}
+		@Override
+		public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
+			return new AStarLandmarksV4Factory(network, costCalc);
+		}
+	}
 
 	private static void doTest(final RouterProvider provider, final Config config, final int limit) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -168,9 +171,10 @@ public class RouterPerformanceTest {
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inPlansName);
-		log.info("# persons: " + population.getPersons().size());
+		log.info("### persons: " + population.getPersons().size());
+		log.info("### current limit: " + limit);
 
-		log.info("### calcRoute with router " + provider.getName());
+		log.info("### calcRoute with router \t" + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.planCalcScore());
 
@@ -178,10 +182,10 @@ public class RouterPerformanceTest {
 		long start = System.currentTimeMillis();
 		LeastCostPathCalculatorFactory algo = provider.getFactory(network, calculator, calculator);
 		long end = System.currentTimeMillis();
-		log.info("### Creating Router Factory took " + (end - start) + " ms");
+		log.info("### Creating Router Factory took \t" + (end - start) + "\t ms");
 		measureMemory("### before creating Router 1");
 		start = System.currentTimeMillis();
-		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo) {
+		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
 			int cnt = 0;
 			@Override
 			public void run(final Person person) {
@@ -206,10 +210,10 @@ public class RouterPerformanceTest {
 			}
 		};
 		end = System.currentTimeMillis();
-		log.info("### Creating Router 1 took " + (end - start) + " ms");
+		log.info("### Creating Router 1 took \t" + (end - start) + "\t ms");
 		measureMemory("### before creating Router 2");
 		start = System.currentTimeMillis();
-		PlansCalcRoute router2 = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo) {
+		PlansCalcRoute router2 = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, algo, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()) {
 			int cnt = 0;
 			@Override
 			public void run(final Person person) {
@@ -234,7 +238,7 @@ public class RouterPerformanceTest {
 			}
 		};
 		end = System.currentTimeMillis();
-		log.info("### Creating Router 2 took " + (end - start) + " ms");
+		log.info("### Creating Router 2 took \t" + (end - start) + "\t ms");
 		measureMemory("### before Routing 1");
 		start = System.currentTimeMillis();
 		try {
@@ -249,8 +253,8 @@ public class RouterPerformanceTest {
 		} catch (RuntimeException e) {
 		}
 		end = System.currentTimeMillis();
-		log.info("### Routing took " + (part1 + end - start) + " ms");
 		measureMemory("### after Routing");
+		log.info("### Routing took \t" + (part1 + end - start) + "\t ms");
 		System.out.println(router.hashCode()); // just some code to ensure that the router is not gc'ed before the end
 		System.out.println(router2.hashCode());
 	}
@@ -273,7 +277,7 @@ public class RouterPerformanceTest {
 		long totalMem = Runtime.getRuntime().totalMemory();
 		long freeMem = Runtime.getRuntime().freeMemory();
 		long usedMem = totalMem - freeMem;
-		log.info(message + " | used RAM: " + usedMem + " B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
+		log.info(message + " | used RAM: \t" + usedMem + "\t B = " + (usedMem/1024) + "kB = " + (usedMem/1024/1024) + "MB" +
 				"  free: " + freeMem + "B = " + (freeMem/1024/1024) + "MB  total: " + totalMem + "B = " + (totalMem/1024/1024) + "MB");
 	}
 

@@ -1,11 +1,6 @@
 package playground.ciarif.flexibletransports.router;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -13,21 +8,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.router.util.TravelTime;
 
-import playground.balmermi.world.Layer;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.network.MyLinkUtils;
-import playground.meisterk.kti.router.SwissHaltestelle;
-import playground.meisterk.kti.router.SwissHaltestellen;
 
 public class PlansCalcRouteFT extends PlansCalcRoute
 {
@@ -41,23 +31,25 @@ public class PlansCalcRouteFT extends PlansCalcRoute
 		  PersonalizableTravelCost costCalculator, 
 		  PersonalizableTravelTime timeCalculator, 
 		  LeastCostPathCalculatorFactory factory, 
+		  ModeRouteFactory routeFactory,
 		  PlansCalcRouteFtInfo ptRoutingInfo)
   {
-    super(group, network, costCalculator, timeCalculator, factory);
+    super(group, network, costCalculator, timeCalculator, factory, routeFactory);
     this.network = network;
     this.plansCalcRouteFtInfo = ptRoutingInfo;
     this.myLinkUtils = new MyLinkUtils(network);
   }
 
-  public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime)
+  @Override
+	public double handleLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime)
   {
     String mode = leg.getMode();
 
 
     double travelTime = 0.0D;
 
-    Link fromLink = (Link)this.network.getLinks().get(fromAct.getLinkId());
-    Link toLink = (Link)this.network.getLinks().get(toAct.getLinkId());
+    Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
+    Link toLink = this.network.getLinks().get(toAct.getLinkId());
     if (fromLink.equals(toLink))
     {
       Route route = getRouteFactory().createRoute(mode, fromLink.getId(), toLink.getId());

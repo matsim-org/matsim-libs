@@ -13,7 +13,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -24,7 +24,6 @@ import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 
 import playground.gregor.pedvis.OTFVisMobsimFeature;
-import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
@@ -49,7 +48,7 @@ public class HybridVis {
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		((NetworkImpl)scenario.getNetwork()).getFactory().setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl)scenario.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		ScenarioUtils.loadScenario(scenario);
 
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);

@@ -22,9 +22,8 @@ package playground.christoph.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
-import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -33,9 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSim;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -52,8 +49,6 @@ import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
  * This Controller should give an Example what is needed to run
@@ -123,6 +118,8 @@ public class WithinDayControler extends WithinDayController {
 	 */
 	protected void initReplanningRouter() {
 
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		
 		super.createAndInitReplanningManager(numReplanningThreads);
 
 		super.createAndInitTravelTimeCollector();
@@ -132,7 +129,7 @@ public class WithinDayControler extends WithinDayController {
 
 //		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);

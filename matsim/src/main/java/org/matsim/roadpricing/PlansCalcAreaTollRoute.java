@@ -29,18 +29,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -65,8 +65,8 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 	 * @param scheme
 	 */
 	public PlansCalcAreaTollRoute(PlansCalcRouteConfigGroup configGroup, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
-			LeastCostPathCalculatorFactory factory, final RoadPricingScheme scheme) {
-		super(configGroup, network, costCalculator, timeCalculator, factory);
+			LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final RoadPricingScheme scheme) {
+		super(configGroup, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.scheme = scheme;
 		this.timeCalculator = timeCalculator;
 		this.tollRouter =	factory.createPathCalculator(network, new TollTravelCostCalculator(costCalculator, scheme), timeCalculator);
@@ -112,7 +112,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 				Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 				Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-				NetworkRoute tollRoute = (NetworkRoute) ((NetworkImpl) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+				NetworkRoute tollRoute = (NetworkRoute) (this.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId()));
 				NetworkRoute noTollRoute = null;
 
 				// # start searching a route where agent may pay the toll
@@ -144,7 +144,7 @@ public class PlansCalcAreaTollRoute extends PlansCalcRoute {
 					 * will still be a route returned.
 					 */
 					Path path = this.tollRouter.calcLeastCostPath(startNode, endNode, depTimes[TOLL_INDEX][routeIndex]);
-					noTollRoute = (NetworkRoute) ((NetworkImpl) this.network).getFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
+					noTollRoute = (NetworkRoute) (this.getRouteFactory().createRoute(TransportMode.car, fromLink.getId(), toLink.getId()));
 					noTollRoute.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 					noTollRoute.setTravelTime((int) path.travelTime);
 					noTollRoute.setTravelCost(path.travelCost);

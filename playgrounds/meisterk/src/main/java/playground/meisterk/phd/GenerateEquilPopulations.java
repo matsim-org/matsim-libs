@@ -34,6 +34,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.replanning.modules.PlanomatModule;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
@@ -94,7 +95,7 @@ public class GenerateEquilPopulations {
 		// no activity facilities are used here
 		config.planomat().setTripStructureAnalysisLayer(PlanomatConfigGroup.TripStructureAnalysisLayerOption.link);
 
-		EventsManager emptyEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager emptyEvents = EventsUtils.createEventsManager();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
 		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.planCalcScore());
@@ -170,7 +171,8 @@ public class GenerateEquilPopulations {
 				scenario.getConfig(),
 				network,
 				travelCostCalculator,
-				travelTimeCalculator);
+				travelTimeCalculator,
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		router.prepareReplanning();
 		for (Person person : scenario.getPopulation().getPersons().values()) {

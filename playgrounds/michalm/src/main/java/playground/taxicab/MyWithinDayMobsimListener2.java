@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -76,7 +76,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
 		
 		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(), 
-				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
+				this.travCostCalc, this.travTimeCalc, new DijkstraFactory(), ((PopulationFactoryImpl) mobsim.getScenario().getPopulation().getFactory()).getModeRouteFactory());
 		
 		for ( MobsimAgent pa : agentsToReplan ) {
 			doReplanning( pa, mobsim ) ;

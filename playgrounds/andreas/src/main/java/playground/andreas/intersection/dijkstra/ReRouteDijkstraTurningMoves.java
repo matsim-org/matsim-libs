@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -44,20 +45,23 @@ public class ReRouteDijkstraTurningMoves extends AbstractMultithreadedModule {
 	Network originalNetwork = null;
 
 	PlansCalcRouteConfigGroup config = null;
+	
+	private final ModeRouteFactory routeFactory; 
 
 	public ReRouteDijkstraTurningMoves(Config config, final Network network, final PersonalizableTravelCost costCalculator,
-			final PersonalizableTravelTime timeCalculator) {
+			final PersonalizableTravelTime timeCalculator, final ModeRouteFactory routeFactory) {
 		super(config.global());
 		this.originalNetwork = network;
 		this.wrappedNetwork = NetworkWrapper.wrapNetwork(network);
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 		this.config = config.plansCalcRoute();
+		this.routeFactory = routeFactory;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config, wrappedNetwork, costCalculator, timeCalculator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config, wrappedNetwork, costCalculator, timeCalculator, routeFactory);
 		
 		DijkstraLegHandler dijkstraLegHandler = new DijkstraLegHandler(this.originalNetwork, this.wrappedNetwork, costCalculator, timeCalculator);	
 		plansCalcRoute.addLegHandler(TransportMode.car, dijkstraLegHandler);

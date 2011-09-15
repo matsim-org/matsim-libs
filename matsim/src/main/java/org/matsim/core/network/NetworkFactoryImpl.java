@@ -19,21 +19,13 @@
 
 package org.matsim.core.network;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.RouteFactory;
 
 /**
  * @author dgrether
@@ -45,8 +37,8 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 	
-	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
-	private RouteFactory defaultFactory = new GenericRouteFactory();
+//	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
+//	private RouteFactory defaultFactory = new GenericRouteFactory();
 
 	private NetworkChangeEventFactory networkChangeEventFactory = new NetworkChangeEventFactoryImpl();
 
@@ -55,9 +47,9 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	public NetworkFactoryImpl(final Network network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
-		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
-		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
-		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
+//		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
+//		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
+//		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 
 	@Override
@@ -95,21 +87,21 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
 
-	/**
-	 * @param transportMode the transport mode the route should be for
-	 * @param startLink the link where the route starts
-	 * @param endLink the link where the route ends
-	 * @return a new Route for the specified mode
-	 *
-	 * @see #setRouteFactory(String, RouteFactory)
-	 */
-	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
-		RouteFactory factory = this.routeFactories.get(transportMode);
-		if (factory == null) {
-			factory = this.defaultFactory;
-		}
-		return factory.createRoute(startLinkId, endLinkId);
-	}
+//	/**
+//	 * @param transportMode the transport mode the route should be for
+//	 * @param startLink the link where the route starts
+//	 * @param endLink the link where the route ends
+//	 * @return a new Route for the specified mode
+//	 *
+//	 * @see #setRouteFactory(String, RouteFactory)
+//	 */
+//	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
+//		RouteFactory factory = this.routeFactories.get(transportMode);
+//		if (factory == null) {
+//			factory = this.defaultFactory;
+//		}
+//		return factory.createRoute(startLinkId, endLinkId);
+//	}
 
 	/**
 	 * @param time the time when the NetworkChangeEvent occurs
@@ -121,25 +113,25 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
 	}
 	
-	/**
-	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
-	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
-	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
-	 *
-	 * @param transportMode
-	 * @param factory
-	 */
-	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
-		if (transportMode == null) {
-			this.defaultFactory = factory;
-		} else {
-			if (factory == null) {
-				this.routeFactories.remove(transportMode);
-			} else {
-				this.routeFactories.put(transportMode, factory);
-			}
-		}
-	}
+//	/**
+//	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
+//	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
+//	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
+//	 *
+//	 * @param transportMode
+//	 * @param factory
+//	 */
+//	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
+//		if (transportMode == null) {
+//			this.defaultFactory = factory;
+//		} else {
+//			if (factory == null) {
+//				this.routeFactories.remove(transportMode);
+//			} else {
+//				this.routeFactories.put(transportMode, factory);
+//			}
+//		}
+//	}
 
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;

@@ -2,6 +2,7 @@ package playground.mmoyo.zz_archive.TransitSimulation;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -44,7 +45,7 @@ public class MMoyoTransitControler extends Controler {
 	@Override
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 		return new MMoyoPlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), new TransitConfigGroup());
+				this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(), this.scenarioData.getTransitSchedule(), new TransitConfigGroup());
 	}
 	
 	public static void main(final String[] args) {

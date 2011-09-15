@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -47,7 +48,7 @@ public class MATSimRouterLauncher {
 				scenario.getConfig().vspExperimental());
 
 		PlansCalcRoute router = new PlansCalcTransitRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
-				timeCostCalculator, timeCostCalculator, dijkstraFactory, transitConfig, 
+				timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(), transitConfig, 
 				new TransitRouterImpl(scenario.getTransitSchedule(), tRConfig));
 	
 		Population population = scenario.getPopulation();

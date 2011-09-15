@@ -25,7 +25,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -60,7 +60,7 @@ public class TransitScheduleWriterTest extends MatsimTestCase {
 
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, null, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, new ModeRouteFactory(), ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
 		assertEquals(1, schedule2.getTransitLines().size());
 	}
 }

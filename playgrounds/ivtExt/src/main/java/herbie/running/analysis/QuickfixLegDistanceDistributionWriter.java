@@ -1,8 +1,8 @@
 package herbie.running.analysis;
 
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -10,12 +10,10 @@ import java.io.PrintStream;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -56,7 +54,7 @@ public class QuickfixLegDistanceDistributionWriter {
 		pop.setIsStreaming(true);
 		
 		Network network = scenario.getNetwork();
-		((NetworkImpl) network).getFactory().setRouteFactory("pt", new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) pop.getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
 
 		PrintStream out = null;
 		try {

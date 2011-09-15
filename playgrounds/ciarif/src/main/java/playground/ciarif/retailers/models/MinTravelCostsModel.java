@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -17,9 +18,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -28,6 +30,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.PersonPrimaryActivity;
 import playground.ciarif.retailers.data.PersonRetailersImpl;
@@ -67,10 +70,12 @@ public class MinTravelCostsModel extends RetailerModelImpl
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));
     Utils.setShopsQuadTree(Utils.createShopsQuadTree(this.controler));
 
+    ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
+    
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
-      String linkId = (String)this.first.get(i);
+      String linkId = this.first.get(i);
       double scoreSum = 0.0D;
-      LinkRetailersImpl link = new LinkRetailersImpl((Link)this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
@@ -82,13 +87,13 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
-        PlansCalcRoute pcr = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.controler.getLeastCostPathCalculatorFactory());
+        PlansCalcRoute pcr = new PlansCalcRoute(this.controler.getConfig().plansCalcRoute(), network, travelCost, travelTime, this.controler.getLeastCostPathCalculatorFactory(), routeFactory);
 
         LegImpl li = new LegImpl(TransportMode.car);
         li.setDepartureTime(0.0D);
         //log.info("fromLink " + link);
         //log.info("toLink " + (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()));
-        handleCarLeg(li, link, (Link)this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, pcr, routeAlgo);
+        handleCarLeg(li, link, this.controler.getNetwork().getLinks().get(ppa.getActivityLinkId()), network, pcr, routeAlgo);
 
         Plan plan = this.controler.getPopulation().getFactory().createPlan();
         plan.addActivity(null);
@@ -160,12 +165,13 @@ private double handleCarLeg(Leg leg, Link fromLink, Link toLink, Network network
     return travTime;
   }
 
-  public double computePotential(ArrayList<Integer> solution)
+  @Override
+	public double computePotential(ArrayList<Integer> solution)
   {
     Double Fitness = Double.valueOf(0.0D);
     for (int s = 0; s < this.retailerFacilities.size(); ++s) {
-      String linkId = (String)this.first.get(solution.get(s));
-      Fitness = Double.valueOf(Fitness.doubleValue() + ((LinkRetailersImpl)this.availableLinks.get(new IdImpl(linkId))).getPotentialCustomers());
+      String linkId = this.first.get(solution.get(s));
+      Fitness = Double.valueOf(Fitness.doubleValue() + this.availableLinks.get(new IdImpl(linkId)).getPotentialCustomers());
     }
 
     return Fitness.doubleValue();

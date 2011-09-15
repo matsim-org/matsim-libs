@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.IdFactory;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -54,8 +54,8 @@ import org.xml.sax.Attributes;
 public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final TransitSchedule schedule;
-	private final Network network;
 	private final IdFactory idf;
+	private final ModeRouteFactory routeFactory;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
@@ -64,11 +64,11 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	/**
 	 * @param schedule
 	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, Network, IdFactory)}
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory, IdFactory)}
 	 */
 	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, network, new IdFactory() {
+		this(schedule, new ModeRouteFactory(), new IdFactory() {
 			@Override
 			public Id createId(String id) {
 				return new IdImpl(id);
@@ -76,9 +76,18 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 		});
 	}
 
+	/**
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory, IdFactory)}
+	 */
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network, final IdFactory idf) {
 		this.schedule = schedule;
-		this.network = network;
+		this.routeFactory = new ModeRouteFactory();
+		this.idf = idf;
+	}
+
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final ModeRouteFactory routeFactory, final IdFactory idf) {
+		this.schedule = schedule;
+		this.routeFactory = routeFactory;
 		this.idf = idf;
 	}
 
@@ -166,7 +175,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 				if (this.currentRouteProfile.lastLinkId == null) {
 					this.currentRouteProfile.lastLinkId = this.currentRouteProfile.firstLinkId;
 				}
-				route = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory()).createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
+				route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car, this.currentRouteProfile.firstLinkId, this.currentRouteProfile.lastLinkId);
 				route.setLinkIds(this.currentRouteProfile.firstLinkId, this.currentRouteProfile.linkIds, this.currentRouteProfile.lastLinkId);
 			}
 			TransitRoute transitRoute = new TransitRouteImpl(this.currentTransitRoute.id, route, stops, this.currentTransitRoute.mode);

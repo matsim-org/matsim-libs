@@ -36,6 +36,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,9 +57,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 import playground.mrieser.pt.analysis.RouteTimeDiagram;
 import playground.mrieser.pt.analysis.TransitRouteAccessEgressAnalysis;
@@ -152,7 +151,7 @@ public class AccessEgressDemoSimple {
 		// transit line A		
 		Link startLinkA = this.scenario.getNetwork().getLinks().get(new IdImpl("0110"));
 		Link endLinkA = this.scenario.getNetwork().getLinks().get(new IdImpl("1314"));
-		NetworkRoute networkRouteA = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLinkA.getId(), endLinkA.getId());
+		NetworkRoute networkRouteA = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkA.getId(), endLinkA.getId());
 		
 		ArrayList<Id> linkListA = new ArrayList<Id>(); linkListA.add(new IdImpl("1011")); linkListA.add(new IdImpl("1112")); linkListA.add(new IdImpl("1213"));
 		
@@ -169,7 +168,7 @@ public class AccessEgressDemoSimple {
 		// transit line B		
 		Link startLinkB = this.scenario.getNetwork().getLinks().get(new IdImpl("0220"));
 		Link endLinkB = this.scenario.getNetwork().getLinks().get(new IdImpl("2324"));
-		NetworkRoute networkRouteB = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLinkB.getId(), endLinkB.getId());
+		NetworkRoute networkRouteB = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkB.getId(), endLinkB.getId());
 		
 		ArrayList<Id> linkListB = new ArrayList<Id>(); linkListB.add(new IdImpl("2021")); linkListB.add(new IdImpl("2122")); linkListB.add(new IdImpl("2223"));
 		

@@ -38,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -169,7 +170,7 @@ public class TwoLinesDemo {
 		schedule.addStopFacility(stop6);
 
 		TransitLine tLine1 = builder.createTransitLine(this.ids[1]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link1.getId(), link13.getId());
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link1.getId(), link13.getId());
 		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
 		Collections.addAll(linkIdList, link3.getId(), link5.getId(), link7.getId(), link8.getId(), link9.getId(), link11.getId());
 		networkRoute.setLinkIds(link1.getId(), linkIdList, link13.getId());
@@ -191,7 +192,7 @@ public class TwoLinesDemo {
 		schedule.addTransitLine(tLine1);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
-		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2.getId(), link12.getId());
+		networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
 		linkIdList = new ArrayList<Id>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
@@ -302,7 +303,7 @@ public class TwoLinesDemo {
 	}
 
 	private void runSim() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
 		TransitRoute route1 = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]);

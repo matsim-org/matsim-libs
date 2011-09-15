@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -51,7 +52,7 @@ public class OccupancyCounts {
 		ScenarioImpl scenario = (ScenarioImpl) sl.getScenario();
 
 		NetworkImpl network = scenario.getNetwork();
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		sl.loadScenario();
 		scenario.getConfig().simulation().setSnapshotPeriod(0.0);

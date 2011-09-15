@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -32,12 +32,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class TeleportationLegRouter implements LegRouter {
 
-	private final NetworkFactoryImpl routeFactory;
+	private final ModeRouteFactory routeFactory;
 	
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
 	
-	public TeleportationLegRouter(final NetworkFactoryImpl routeFactory, final double networkTravelSpeed, final double beelineDistanceFactor) {
+	public TeleportationLegRouter(final ModeRouteFactory routeFactory, final double networkTravelSpeed, final double beelineDistanceFactor) {
 		this.routeFactory = routeFactory;
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;

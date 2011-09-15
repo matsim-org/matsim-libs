@@ -12,6 +12,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -53,6 +54,7 @@ public class RunDetailedEvaluation {
 	
 		ParallelPersonAlgorithmRunner.run(backgroundScenario.getPopulation(), 1,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new AbstractPersonAlgorithm() {
 
@@ -79,9 +81,10 @@ public class RunDetailedEvaluation {
 		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, config.planCalcScore()), travelTimeCalculator, leastCostPathCalculatorFactory);
+		final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, config.planCalcScore()), travelTimeCalculator, leastCostPathCalculatorFactory, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 		ParallelPersonAlgorithmRunner.run(backgroundScenario.getPopulation(), 1,
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(routingAlgorithm, scenario.getNetwork());
 			}

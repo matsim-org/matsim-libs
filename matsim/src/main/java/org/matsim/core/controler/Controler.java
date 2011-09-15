@@ -91,8 +91,10 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.InvertedNetworkLegRouter;
@@ -402,7 +404,7 @@ public class Controler {
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-			this.getNetwork().getFactory().setRouteFactory(mode, factory);
+			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}
 	}
 
@@ -1144,21 +1146,22 @@ public class Controler {
 	 */
 	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
 		PlansCalcRoute plansCalcRoute = null;
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (this.population.getFactory())).getModeRouteFactory();
 
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
 			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-					.getLeastCostPathCalculatorFactory(), this.scenarioData.getRoadPricingScheme());
+					.getLeastCostPathCalculatorFactory(), routeFactory, this.scenarioData.getRoadPricingScheme());
 			log.warn("As roadpricing with area toll is enabled a leg router for area tolls is used. Other features, e.g. transit or multimodal simulation may not work" +
 					"as expected.");
 		} 	else if (this.config.scenario().isUseTransit()) {
 			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-					this.getLeastCostPathCalculatorFactory(), this.config.transit(), this.transitRouterFactory.createTransitRouter());
+					this.getLeastCostPathCalculatorFactory(), routeFactory, this.config.transit(), this.transitRouterFactory.createTransitRouter());
 			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, e.g. multimodal simulation, may not work" +
 					"as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-					travelTimes, this.getLeastCostPathCalculatorFactory());
+					travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory);
 
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes,
 					this.getLeastCostPathCalculatorFactory());
@@ -1168,11 +1171,11 @@ public class Controler {
 			}
 		} else {
 			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-					.getLeastCostPathCalculatorFactory());
+					.getLeastCostPathCalculatorFactory(), routeFactory);
 		}
 
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()){
-			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, network.getFactory(),
+			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
 					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), this.getConfig().planCalcScore(), travelTimes);
 			plansCalcRoute.addLegHandler(TransportMode.car, invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");

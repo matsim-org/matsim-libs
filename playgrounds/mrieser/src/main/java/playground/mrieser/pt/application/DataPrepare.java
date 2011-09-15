@@ -33,6 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -151,13 +152,14 @@ public class DataPrepare {
 		new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
 
 		DijkstraFactory dijkstraFactory = new DijkstraFactory();
+		ModeRouteFactory routeFactory = new ModeRouteFactory();
 		FreespeedTravelTimeCost timeCostCalculator = new FreespeedTravelTimeCost(this.scenario.getConfig().planCalcScore());
 		TransitConfigGroup transitConfig = new TransitConfigGroup();
 		TransitRouterConfig tRConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), 
 				this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
-				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
+				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, routeFactory,
 				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), tRConfig ));
 		log.info("start pt-router");
 		router.run(pop);

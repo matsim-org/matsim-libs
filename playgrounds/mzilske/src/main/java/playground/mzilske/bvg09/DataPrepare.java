@@ -36,6 +36,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -60,7 +61,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
@@ -164,7 +164,7 @@ public class DataPrepare {
 				this.scenario.getConfig().vspExperimental());
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(this.scenario.getConfig().plansCalcRoute(),
-				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory,
+				this.scenario.getNetwork(), timeCostCalculator, timeCostCalculator, dijkstraFactory, new ModeRouteFactory(),
 				transitConfig, new TransitRouterImpl(this.scenario.getTransitSchedule(), transitRouterConfig ));
 		log.info("start pt-router");
 		router.run(pop);

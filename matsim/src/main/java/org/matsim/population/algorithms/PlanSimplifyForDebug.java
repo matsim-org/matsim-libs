@@ -34,6 +34,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -65,7 +66,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 
-	public PlanSimplifyForDebug(final Network network) {
+	public PlanSimplifyForDebug(final Network network, final ModeRouteFactory routeFactory) {
 		this.homeActs = new HashSet<String>();
 		// this.homeActs.add("h0.5");
 
@@ -81,7 +82,7 @@ public class PlanSimplifyForDebug extends AbstractPersonAlgorithm {
 		// this.eduActs.add("uni");
 
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());
-		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory());
+		this.router = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, timeCostCalc, timeCostCalc, new DijkstraFactory(), routeFactory);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

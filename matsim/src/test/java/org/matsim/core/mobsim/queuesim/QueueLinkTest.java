@@ -288,7 +288,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		try {
 			plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link2.getId());
+			NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 			leg.setRoute(route);
 			route.setLinkIds(link1.getId(), null, link2.getId());
 			leg.setRoute(route);

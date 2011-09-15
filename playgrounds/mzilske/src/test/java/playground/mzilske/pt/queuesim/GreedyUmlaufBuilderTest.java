@@ -6,12 +6,12 @@ import java.util.Collections;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -107,7 +107,7 @@ public class GreedyUmlaufBuilderTest {
 		schedule.addStopFacility(stop8);
 
 		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link2.getId(), link12.getId());
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
 		ArrayList<Id> linkIdList = new ArrayList<Id>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());
@@ -122,7 +122,7 @@ public class GreedyUmlaufBuilderTest {
 		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
 		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
 
-		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, link17.getId(), link19.getId());
+		networkRoute = new LinkNetworkRouteImpl(link17.getId(), link19.getId());
 		linkIdList = new ArrayList<Id>(6);
 		Collections.addAll(linkIdList, link18.getId(), link14.getId(), link15.getId(), link16.getId());
 		networkRoute.setLinkIds(link17.getId(), linkIdList, link19.getId());

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.EnsureActivityReachability;
@@ -62,10 +63,10 @@ public class MultiModalControler extends Controler {
 		MultiModalConfigGroup configGroup = scenarioData.getConfig().multiModal();
 
 		log.info("replacing RouteFactories for non car modes...");
-		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
-		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
-		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
-		super.scenarioData.getNetwork().getFactory().setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) super.scenarioData.getPopulation().getFactory()).setRouteFactory(TransportMode.bike, new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) super.scenarioData.getPopulation().getFactory()).setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) super.scenarioData.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl) super.scenarioData.getPopulation().getFactory()).setRouteFactory(TransportMode.ride, new LinkNetworkRouteFactory());
 		log.info("done.");
 
 		super.loadData();

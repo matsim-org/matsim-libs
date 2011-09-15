@@ -34,6 +34,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -245,7 +246,7 @@ public class QLinkTest extends MatsimTestCase {
 		try {
 			plan.createAndAddActivity("h", link1.getId());
 			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link2.getId());
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.car, link1.getId(), link2.getId());
 			leg.setRoute(route);
 			route.setLinkIds(link1.getId(), null, link2.getId());
 			leg.setRoute(route);

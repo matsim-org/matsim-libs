@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -103,7 +104,7 @@ public class LoadedNetworkRouter {
 		TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 		PersonalizableTravelCost travelCostCalculator = travelCostCalculatorFactory.createTravelCostCalculator(travelTimeCalculator, this.config
 				.planCalcScore());
-		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator));
+		plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, travelCostCalculator, travelTimeCalculator, ((PopulationFactoryImpl) sl.getScenario().getPopulation().getFactory()).getModeRouteFactory()));
 
 		// add algorithm to write out the plans
 		plans.addAlgorithm(plansWriter);

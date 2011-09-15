@@ -3,11 +3,10 @@ package org.matsim.pt;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -55,8 +54,7 @@ public class UmlaufInterpolator {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRoute route = (NetworkRoute) ((NetworkFactoryImpl) this.network.getFactory())
-				.createRoute(TransportMode.car, fromLinkId, toLinkId);
+		NetworkRoute route = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
 		route.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(wendenPath.links), toLinkId);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}

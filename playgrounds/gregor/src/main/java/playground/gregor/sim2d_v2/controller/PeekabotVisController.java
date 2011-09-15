@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -57,7 +57,7 @@ public class PeekabotVisController extends Controller2D{
 		c.getQSimConfigGroup().setEndTime( 9*3600 + 20* 60);
 
 		Scenario sc = ScenarioUtils.createScenario(c);
-		((NetworkFactoryImpl)sc.getNetwork().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		ScenarioUtils.loadScenario(sc);
 
 

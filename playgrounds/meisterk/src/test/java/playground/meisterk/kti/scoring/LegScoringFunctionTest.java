@@ -31,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -50,6 +51,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 	private PersonImpl testPerson = null;
 	private PlanImpl testPlan = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
+	private PopulationFactoryImpl routeFactory = new PopulationFactoryImpl(null);
 
 	@Override
 	protected void setUp() throws Exception {
@@ -105,7 +107,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 		testPlan.addActivity(home);
 		testPlan.addLeg(testLeg);
 		testPlan.addActivity(work);
-
+		
 	}
 
 	@Override
@@ -160,9 +162,9 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 			this.plansCalcRouteKtiInfo.prepare(this.network);
 		}
 		RouteFactory ptRouteFactory = new KtiPtRouteFactory(this.plansCalcRouteKtiInfo);
-		this.network.getFactory().setRouteFactory(TransportMode.pt, ptRouteFactory);
+		this.routeFactory.setRouteFactory(TransportMode.pt, ptRouteFactory);
 
-		Route route = network.getFactory().createRoute(mode, startLink.getId(), endLink.getId());
+		Route route = this.routeFactory.createRoute(mode, startLink.getId(), endLink.getId());
 		testLeg.setRoute(route);
 		route.setDistance(10000.0);
 		if (route instanceof KtiPtRoute) {

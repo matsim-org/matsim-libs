@@ -32,6 +32,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -74,7 +75,7 @@ public class ScenarioPlayer {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/pt-tutorial/multimodalnetwork.xml");
 

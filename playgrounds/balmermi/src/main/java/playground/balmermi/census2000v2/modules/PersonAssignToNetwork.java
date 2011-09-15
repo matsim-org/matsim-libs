@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -50,11 +51,11 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignToNetwork(final NetworkImpl network, final ActivityFacilities facilities, final Config config) {
+	public PersonAssignToNetwork(final NetworkImpl network, final ActivityFacilities facilities, final Config config, final ModeRouteFactory routeFactory) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
-		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc));
+		this.router = new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc,timeCostCalc, new AStarLandmarksFactory(network, timeCostCalc), routeFactory);
 		log.info("    done.");
 	}
 
@@ -71,6 +72,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		this.run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

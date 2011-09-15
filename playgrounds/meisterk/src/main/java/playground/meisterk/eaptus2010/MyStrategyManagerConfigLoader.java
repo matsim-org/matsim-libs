@@ -11,6 +11,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.ChangeLegMode;
@@ -85,6 +87,7 @@ public class MyStrategyManagerConfigLoader {
 		PersonalizableTravelCost travelCostCalc = controler.createTravelCostCalculator();
 		PersonalizableTravelTime travelTimeCalc = controler.getTravelTimeCalculator();
 		Config config = controler.getConfig();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory();
 
 		PlanStrategyImpl strategy = null;
 		if (name.equals("KeepLastSelected")) {
@@ -94,10 +97,10 @@ public class MyStrategyManagerConfigLoader {
 			strategy.addStrategyModule(new ReRoute(controler));
 		} else if (name.equals("ReRoute_Dijkstra")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
+			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc, routeFactory));
 		} else if (name.equals("ReRoute_Landmarks")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore()), routeFactory));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
@@ -107,7 +110,7 @@ public class MyStrategyManagerConfigLoader {
 		} else if (name.equals("TimeAllocationMutator7200_ReRouteLandmarks")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new TimeAllocationMutator(config, 7200));
-			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore())));
+			strategy.addStrategyModule(new ReRouteLandmarks(config, network, travelCostCalc, travelTimeCalc, new FreespeedTravelTimeCost(config.planCalcScore()), routeFactory));
 		} else if (name.equals("ExternalModule")) {
 			externalCounter++;
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());

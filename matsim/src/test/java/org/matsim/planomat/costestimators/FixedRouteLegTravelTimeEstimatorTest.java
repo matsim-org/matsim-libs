@@ -44,6 +44,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -125,7 +126,7 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 			TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario.getNetwork(), this.config.travelTimeCalculator());
 			PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.config.planCalcScore());
 
-			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
+			PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 			LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 			FixedRouteLegTravelTimeEstimator testee = (FixedRouteLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -268,7 +269,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(),
 				linkTravelCostEstimator,
-				linkTravelTimeEstimator);
+				linkTravelTimeEstimator,
+				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 
@@ -330,7 +332,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(),
 				linkTravelCostEstimator,
-				linkTravelTimeEstimator);
+				linkTravelTimeEstimator,
+				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 
@@ -415,7 +418,8 @@ public class FixedRouteLegTravelTimeEstimatorTest extends MatsimTestCase {
 				this.scenario.getConfig().plansCalcRoute(),
 				this.scenario.getNetwork(),
 				linkTravelCostEstimator,
-				linkTravelTimeEstimator);
+				linkTravelTimeEstimator,
+				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 

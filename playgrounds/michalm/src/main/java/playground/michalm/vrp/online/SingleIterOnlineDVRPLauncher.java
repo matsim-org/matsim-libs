@@ -17,6 +17,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -224,14 +226,17 @@ public class SingleIterOnlineDVRPLauncher
         TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory
                 .createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 
+        ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
+        
         final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
                 scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(
                         travelTimeCalculator, config.planCalcScore()), travelTimeCalculator,
-                leastCostPathCalculatorFactory);
+                leastCostPathCalculatorFactory, routeFactory);
 
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 1,
                 new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-                    public AbstractPersonAlgorithm getPersonAlgorithm()
+                    @Override
+										public AbstractPersonAlgorithm getPersonAlgorithm()
                     {
                         return new PersonPrepareForSim(routingAlgorithm, network);
                     }

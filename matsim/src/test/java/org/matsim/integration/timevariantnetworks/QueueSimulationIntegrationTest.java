@@ -38,15 +38,16 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
-import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -84,7 +85,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		plans.addPerson(person2);
 
 		// run the simulation with the timevariant network and the two persons
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
@@ -144,7 +145,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		 * Run the simulation with the time-variant network and the two waves of
 		 * persons. Observe the last person of each wave.
 		 */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
@@ -209,7 +210,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			LegImpl leg1 = plan1.createAndAddLeg(TransportMode.car);
 			leg1.setDepartureTime(departureTime);
 			leg1.setTravelTime(10);
-			NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, depLink.getId(), destLink.getId());
+			NetworkRoute route = new LinkNetworkRouteImpl(depLink.getId(), destLink.getId());
 			route.setLinkIds(depLink.getId(), NetworkUtils.getLinkIds("2"), destLink.getId());
 			leg1.setRoute(route);
 			plan1.createAndAddActivity("w", destLink.getId());
@@ -241,6 +242,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			this.linkId = linkId;
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
@@ -252,6 +254,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			if (!event.getLinkId().equals(this.linkId)) {
 				return;
@@ -263,6 +266,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 			}
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			// nothing to do
 		}

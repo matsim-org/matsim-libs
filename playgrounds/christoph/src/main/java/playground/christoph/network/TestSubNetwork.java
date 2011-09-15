@@ -33,6 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -137,7 +138,7 @@ public class TestSubNetwork {
 		travelCostWrapper.checkNodeKnowledge(false);
 
 		dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), this.scenario.getNetwork(),
-				travelCostWrapper, travelTimeWrapper, new DijkstraFactory());
+				travelCostWrapper, travelTimeWrapper, new DijkstraFactory(), ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 	}
 
 	private void createSubNetworks() {

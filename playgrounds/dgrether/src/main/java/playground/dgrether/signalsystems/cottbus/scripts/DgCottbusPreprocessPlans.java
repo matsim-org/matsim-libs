@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -48,7 +49,7 @@ public class DgCottbusPreprocessPlans {
 		Scenario scenario = loader.loadScenario();
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory()));
+		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
 		((PopulationImpl) scenario.getPopulation()).runAlgorithms();
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		writer.write(popOutFile);

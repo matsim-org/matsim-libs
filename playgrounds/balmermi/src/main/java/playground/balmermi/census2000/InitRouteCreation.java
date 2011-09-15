@@ -27,6 +27,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -67,7 +68,7 @@ public class InitRouteCreation {
 		System.out.println("  adding person modules... ");
 		plans.addAlgorithm(new XY2Links(network));
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
-		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc));
+		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), network, timeCostCalc, timeCostCalc, ((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory()));
 		System.out.println("  done.");
 
 		//////////////////////////////////////////////////////////////////////

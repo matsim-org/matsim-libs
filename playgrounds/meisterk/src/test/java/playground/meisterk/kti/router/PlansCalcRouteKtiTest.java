@@ -29,6 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -41,6 +42,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 	private Config config = null;
 	private NetworkImpl network = null;
 	private PlansCalcRouteKtiInfo plansCalcRouteKtiInfo = null;
+	private final ModeRouteFactory routeFactory = new ModeRouteFactory();
 
 	@Override
 	protected void setUp() throws Exception {
@@ -69,7 +71,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		plansCalcRouteKtiInfo.prepare(network);
 
 		KtiPtRouteFactory ktiPtRouteFactory = new KtiPtRouteFactory(plansCalcRouteKtiInfo);
-		network.getFactory().setRouteFactory(TransportMode.pt, ktiPtRouteFactory);
+		this.routeFactory.setRouteFactory(TransportMode.pt, ktiPtRouteFactory);
 
 	}
 
@@ -94,6 +96,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 				null,
 				null,
 				new DijkstraFactory(),
+				this.routeFactory,
 				plansCalcRouteKtiInfo);
 
 
@@ -140,6 +143,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 				null,
 				null,
 				new DijkstraFactory(),
+				this.routeFactory,
 				plansCalcRouteKtiInfo);
 
 		testee.handleLeg(person, leg, home, work, Time.parseTime("12:34:56"));

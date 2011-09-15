@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarEuclideanFactory;
@@ -125,7 +126,7 @@ public class RoutingTest extends MatsimTestCase {
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.planCalcScore());
 
 		PlansCalcRoute router = null;
-		router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, provider.getFactory(network, calculator, calculator));
+		router = new PlansCalcRoute(config.plansCalcRoute(), network, calculator, calculator, provider.getFactory(network, calculator, calculator), ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory());
 		router.run(population);
 	}
 

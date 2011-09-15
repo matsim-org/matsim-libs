@@ -40,6 +40,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -139,7 +140,7 @@ public class BlockingStopDemo {
 
 		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks-1]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id> linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = 1; i < nOfLinks-1; i++) {
 			linkIdList.add(this.ids[i]);
@@ -166,7 +167,7 @@ public class BlockingStopDemo {
 
 		startLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks]);
 		endLink = this.scenario.getNetwork().getLinks().get(this.ids[2*nOfLinks-1]);
-		networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		linkIdList = new ArrayList<Id>(nOfLinks);
 		for (int i = nOfLinks+1; i < (2*nOfLinks - 1); i++) {
 			linkIdList.add(this.ids[i]);
@@ -250,9 +251,8 @@ public class BlockingStopDemo {
 		}
 
 		// car-drivers
-		NetworkImpl network = this.scenario.getNetwork();
-		NetworkRoute carRoute1 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
-		NetworkRoute carRoute2 = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
+		NetworkRoute carRoute1 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, this.ids[0], this.ids[nOfLinks-1]);
+		NetworkRoute carRoute2 = (NetworkRoute) ((PopulationFactoryImpl) population.getFactory()).createRoute(TransportMode.car, this.ids[nOfLinks], this.ids[2*nOfLinks-1]);
 		List<Id> linkIds1 = new ArrayList<Id>(nOfLinks-2);
 		List<Id> linkIds2 = new ArrayList<Id>(nOfLinks-2);
 		for (int i = 1; i<nOfLinks-1; i++) {
@@ -296,7 +296,7 @@ public class BlockingStopDemo {
 	}
 
 	private void runSim() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		Network network = this.scenario.getNetwork();
 
 		VehicleTracker vehTracker = new VehicleTracker();

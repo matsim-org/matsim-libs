@@ -40,6 +40,7 @@ import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -86,7 +87,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 	// constructor for PlanomatX (LegTravelTimeEstimatorFactory already initialized)
 	public TimeModeChoicer (Controler controler, LegTravelTimeEstimatorFactory estimatorFactory, PlanScorer scorer, Integer maxIterations){
 
-		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		this.scorer 				= scorer;
 		this.OFFSET					= Double.parseDouble(TimeModeChoicerConfigGroup.getOffset());
 		if (maxIterations!=null){
@@ -127,7 +128,7 @@ public class TimeModeChoicer implements org.matsim.population.algorithms.PlanAlg
 	// self-standing constructor (legTravelTimeEstimatorFactory not initialized yet)
 	public TimeModeChoicer (Controler controler, DepartureDelayAverageCalculator tDepDelayCalc){
 
-		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 
 		this.legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(controler.getTravelTimeCalculator(), tDepDelayCalc);

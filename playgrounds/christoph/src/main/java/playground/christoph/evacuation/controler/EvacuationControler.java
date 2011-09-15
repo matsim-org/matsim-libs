@@ -27,6 +27,8 @@ import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManager
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -170,6 +172,8 @@ public class EvacuationControler extends MultiModalControler {
 	 */
 	protected void initReplanningRouter() {
 
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		
 		// iterative
 		if (doIterations) {
 			travelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator());
@@ -190,7 +194,7 @@ public class EvacuationControler extends MultiModalControler {
 //		CloneablePlansCalcRoute router = new CloneablePlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
 //		MultiModalPlansCalcRoute router = new MultiModalPlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);

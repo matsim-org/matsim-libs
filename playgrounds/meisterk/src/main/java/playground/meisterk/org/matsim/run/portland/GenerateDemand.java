@@ -28,6 +28,7 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -77,7 +78,7 @@ public class GenerateDemand {
 
 		System.out.println("Setting up person modules...");
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());
-		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), networkLayer, timeCostCalc, timeCostCalc));
+		plans.addAlgorithm(new PlansCalcRoute(config.plansCalcRoute(), networkLayer, timeCostCalc, timeCostCalc, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
 		System.out.println("Setting up person modules...done.");
 
 		System.out.println("Reading, processing and writing plans...");

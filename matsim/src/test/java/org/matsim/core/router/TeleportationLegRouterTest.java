@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -41,7 +41,7 @@ public class TeleportationLegRouterTest {
 
 	@Test
 	public void testRouteLeg() {
-		NetworkFactoryImpl routeFactory = new NetworkFactoryImpl(null);
+		ModeRouteFactory routeFactory = new ModeRouteFactory();
 		routeFactory.setRouteFactory(TransportMode.walk, new GenericRouteFactory());
 		Person person = new PersonImpl(new IdImpl(1));
 		Leg leg = new LegImpl(TransportMode.walk);

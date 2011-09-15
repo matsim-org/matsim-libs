@@ -23,6 +23,7 @@ package org.matsim.core.replanning.modules;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -33,19 +34,21 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class ReRouteLandmarks extends ReRouteDijkstra {
 
 	private final AStarLandmarksFactory factory;
+	private final ModeRouteFactory routeFactory;
 	private PlansCalcRouteConfigGroup configGroup = null;
 
 	public ReRouteLandmarks(Config config, Network network, PersonalizableTravelCost costCalculator,
-			PersonalizableTravelTime timeCalculator, TravelMinCost minCostCalculator) {
-		super(config, network, costCalculator, timeCalculator);
+			PersonalizableTravelTime timeCalculator, TravelMinCost minCostCalculator, final ModeRouteFactory routeFactory) {
+		super(config, network, costCalculator, timeCalculator, routeFactory);
 		this.factory = new AStarLandmarksFactory(network, minCostCalculator);
+		this.routeFactory = routeFactory;
 		this.configGroup = config.plansCalcRoute();
 	}
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PlansCalcRoute(this.configGroup, 
-				this.network, this.costCalculator, this.timeCalculator, this.factory);
+				this.network, this.costCalculator, this.timeCalculator, this.factory, this.routeFactory);
 	}
 
 }

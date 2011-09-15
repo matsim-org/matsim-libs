@@ -50,6 +50,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
@@ -115,6 +116,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	/**
 	 * calculating accessibility indicators
 	 */
+	@Override
 	public void notifyShutdown(ShutdownEvent event){
 		log.info("Entering notifyShutdown ..." ) ;
 		
@@ -382,7 +384,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		
 		PlansCalcRoute plancalcrouter = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), 
 				controler.getTravelCostCalculatorFactory().createTravelCostCalculator(controler.getTravelTimeCalculator(),
-						controler.getConfig().planCalcScore()), controler.getTravelTimeCalculator(), new DijkstraFactory());
+						controler.getConfig().planCalcScore()), controler.getTravelTimeCalculator(), new DijkstraFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 
 		LeastCostPathCalculator lcpc = plancalcrouter.getLeastCostPathCalculator();
 		Path path = lcpc.calcLeastCostPath(fromNode, toNode, depatureTime);

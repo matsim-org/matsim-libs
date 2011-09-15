@@ -37,6 +37,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -94,7 +95,7 @@ public class TimeModeChoicerTest extends MatsimTestCase{
 		TravelTimeCalculator linkTravelTimeEstimator = new TravelTimeCalculator(this.scenario_input.getNetwork(), this.initializer.getControler().getConfig().travelTimeCalculator());
 		PersonalizableTravelCost linkTravelCostEstimator = new TravelTimeDistanceCostCalculator(linkTravelTimeEstimator, this.initializer.getControler().getConfig().planCalcScore());
 
-		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator);
+		this.router = new PlansCalcRoute(this.initializer.getControler().getConfig().plansCalcRoute(), this.scenario_input.getNetwork(), linkTravelCostEstimator, linkTravelTimeEstimator, ((PopulationFactoryImpl) this.initializer.getControler().getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 

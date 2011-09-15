@@ -31,6 +31,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -43,6 +44,7 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingPlanAlgorithm implements PlanAlgorithm {
 
+	@Override
 	public void run(final Plan plan) {
 		
 		// reason, that we do this: all the statistics regarding parking are based on the previous iteration
@@ -138,7 +140,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		
 		replaceParking(plan, targetActivity, newParking, GlobalRegistry.controler,
-				(NetworkImpl) GlobalRegistry.controler.getNetwork());
+				GlobalRegistry.controler.getNetwork());
 		
 		//ParkingGeneralLib.printAllParkingFacilityIds(plan);
 		
@@ -241,7 +243,7 @@ public class ParkingPlanAlgorithm implements PlanAlgorithm {
 		LeastCostPathCalculatorFactory leastCostFactory = controler.getLeastCostPathCalculatorFactory();
 
 		return new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(), travelCost, travelTime,
-				leastCostFactory);
+				leastCostFactory, ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 	}
 
 }

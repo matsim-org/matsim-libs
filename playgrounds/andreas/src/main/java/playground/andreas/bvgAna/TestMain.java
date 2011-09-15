@@ -30,6 +30,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -87,7 +88,7 @@ public class TestMain {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().getModule("scenario").addParam("useTransit", "true");
 		sc.getConfig().getModule("scenario").addParam("useVehicles", "true");
-		sc.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) sc.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
 		new MatsimNetworkReader(sc).readFile(netFile);
 		final PopulationImpl plans = (PopulationImpl) sc.getPopulation();

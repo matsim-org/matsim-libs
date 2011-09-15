@@ -33,8 +33,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -203,7 +203,7 @@ public class Simulator {
 		};
 		
 		LeastCostPathCalculator router = new Dijkstra(network, travelCost, travelTime);
-		NetworkLegRouter legRouter = new NetworkLegRouter(network, router, (NetworkFactoryImpl) network.getFactory());
+		NetworkLegRouter legRouter = new NetworkLegRouter(network, router, new ModeRouteFactory());
 		
 		return legRouter;
 	}
@@ -281,7 +281,7 @@ public class Simulator {
 //		ProgressLogger.init(graph.getVertices().size(), 1, 5);
 		
 		for(SocialVertex v : graph.getVertices()) {
-			double sample =(double) sampler.nextSample();
+			double sample =sampler.nextSample();
 //			writer.write(String.valueOf(sample));
 //			writer.newLine();
 			map.put(v, sample);

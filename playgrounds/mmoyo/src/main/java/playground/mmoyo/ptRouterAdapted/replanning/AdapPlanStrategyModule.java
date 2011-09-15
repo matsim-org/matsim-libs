@@ -1,8 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.ptRouterAdapted.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -40,13 +61,15 @@ public class AdapPlanStrategyModule extends AbstractMultithreadedModule{ //imple
 		myTransitRouterConfig.extensionRadius = 200.0; 
 		myTransitRouterConfig.allowDirectWalks= true;
 		
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getPopulation().getFactory()).getModeRouteFactory();
+		
 		//normal
 		//AdaptedPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new AdaptedPlansCalcTransitRoute(config.plansCalcRoute(), this.controler.getScenario().getNetwork(), freespeedTravelTimeCost, freespeedTravelTimeCost,  new DijkstraFactory(), this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), myTransitRouterConfig);
 		
 		//with a set of precalculated routes 
 		PrecalPlansCalcTransitRoute adaptedPlansCalcTransitRoute = new PrecalPlansCalcTransitRoute(config.plansCalcRoute(), 
 				this.controler.getScenario().getNetwork(), freespeedTravelTimeCost, freespeedTravelTimeCost,  
-				new DijkstraFactory(), this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), 
+				new DijkstraFactory(), routeFactory, this.controler.getScenario().getTransitSchedule(), new TransitConfigGroup(), 
 				myTransitRouterConfig);
 		
 		return adaptedPlansCalcTransitRoute;

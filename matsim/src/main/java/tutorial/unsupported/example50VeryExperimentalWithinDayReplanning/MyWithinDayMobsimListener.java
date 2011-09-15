@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -56,31 +57,31 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
-	private PlansCalcRoute routeAlgo ;
+	private PlansCalcRoute routeAlgo;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener ( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
-		this.travCostCalc = travelCostCalculator ;
-		this.travTimeCalc = travelTimeCalculator ;
+	MyWithinDayMobsimListener (PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator) {
+		this.travCostCalc = travelCostCalculator;
+		this.travTimeCalc = travelTimeCalculator;
 	}
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent event) {
 
-		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
+		Netsim mobsim = (Netsim) event.getQueueSimulation();
 		this.scenario = mobsim.getScenario();
 
-		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( mobsim ) ;
+		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim);
 
 		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(),
-				this.travCostCalc, this.travTimeCalc, new DijkstraFactory() );
+				this.travCostCalc, this.travTimeCalc, new DijkstraFactory(), ((PopulationFactoryImpl) mobsim.getScenario().getPopulation().getFactory()).getModeRouteFactory());
 
-		for ( MobsimAgent pa : agentsToReplan ) {
-			doReplanning( pa, mobsim ) ;
+		for (MobsimAgent pa : agentsToReplan) {
+			doReplanning(pa, mobsim);
 		}
 	}
 
-	private List<MobsimAgent> getAgentsToReplan(Netsim mobsim ) {
+	private List<MobsimAgent> getAgentsToReplan(Netsim mobsim) {
 
 		List<MobsimAgent> set = new ArrayList<MobsimAgent>();
 
@@ -89,7 +90,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
-				if ( true ) { // some condition ...
+				if (true) { // some condition ...
 					System.out.println("found agent");
 					set.add(agent);
 				}
@@ -100,19 +101,19 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 	}
 
-	private boolean doReplanning(MobsimAgent personAgent, Netsim mobsim ) {
+	private boolean doReplanning(MobsimAgent personAgent, Netsim mobsim) {
 
 		// preconditions:
 
-		if ( !(personAgent instanceof ExperimentalBasicWithindayAgent) ) {
-			log.error("agent of wrong type; returning ... " ) ;
+		if (!(personAgent instanceof ExperimentalBasicWithindayAgent)) {
+			log.error("agent of wrong type; returning ... ");
 		}
-		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent ;
+		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent;
 
-		Plan plan = withindayAgent.getModifiablePlan() ;
+		Plan plan = withindayAgent.getModifiablePlan();
 
 		if (plan == null) {
-			log.info( " we don't have a selected plan; returning ... ") ;
+			log.info(" we don't have a selected plan; returning ... ");
 			return false;
 		}
 
@@ -120,19 +121,19 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 		// =============================================================================================================
 		// since this is a use case, let us enumerate relevant data structure operations:
 
-		if ( withindayAgent.getCurrentPlanElement() instanceof Activity ) {
+		if (withindayAgent.getCurrentPlanElement() instanceof Activity) {
 
 			// (I) @ activity:
-			double oldTime = -1. ;
-			double newTime = -1. ;
-			mobsim.rescheduleActivityEnd(withindayAgent, oldTime, newTime) ;
+			double oldTime = -1.;
+			double newTime = -1.;
+			mobsim.rescheduleActivityEnd(withindayAgent, oldTime, newTime);
 			// might be nice to be able to actively remove the agent from the activity, but this is strictly
 			// speaking not necessary since the departure can be scheduled for immediately.  kai, nov'10
 
-		} else if ( withindayAgent.getCurrentPlanElement() instanceof Leg ) {
-			Leg leg = (Leg) withindayAgent.getCurrentPlanElement() ;
+		} else if (withindayAgent.getCurrentPlanElement() instanceof Leg) {
+			Leg leg = (Leg) withindayAgent.getCurrentPlanElement();
 
-			if ( TransportMode.car.equals( leg.getMode() ) ) {
+			if (TransportMode.car.equals(leg.getMode())) {
 
 				// (II) car leg
 
@@ -144,25 +145,25 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 				// But I am not sure.  kai, nov'10
 
 				// (c) on link and changing next link
-				// re-program chooseNextLinkId() ;
+				// re-program chooseNextLinkId();
 
-			} else if ( TransportMode.pt.equals( leg.getMode() )) {
+			} else if (TransportMode.pt.equals(leg.getMode())) {
 
 				// (III) pt leg
 
 				// (a) waiting for pt and changing the desired line:
-				// can be done via reprogramming getEnterTransitRoute() ;
+				// can be done via reprogramming getEnterTransitRoute();
 
 				// (b) aborting a wait for pt:
-				TransitStopFacility stop = null ;
+				TransitStopFacility stop = null;
 				((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop.getId());
 				// after this, it needs to start something else, e.g.:
-				mobsim.scheduleActivityEnd(withindayAgent) ;
+				mobsim.scheduleActivityEnd(withindayAgent);
 				// or
-				mobsim.arrangeAgentDeparture(withindayAgent) ;
+				mobsim.arrangeAgentDeparture(withindayAgent);
 
 				// (c) while inside vehicle and changing the desired stop to get off:
-				// can be done via reprogramming getExitAtStop() ;
+				// can be done via reprogramming getExitAtStop();
 			}
 
 		}

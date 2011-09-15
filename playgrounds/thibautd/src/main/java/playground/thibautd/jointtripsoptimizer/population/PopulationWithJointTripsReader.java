@@ -24,22 +24,21 @@ import java.util.Locale;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRoute;
@@ -55,7 +54,6 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.knowledges.KnowledgesImpl;
 import org.matsim.population.Desires;
-
 import org.xml.sax.Attributes;
 
 /**
@@ -368,7 +366,7 @@ public class PopulationWithJointTripsReader extends MatsimXmlParser implements P
 	}
 
 	private void startRoute(final Attributes atts) {
-		this.currRoute = ((NetworkFactoryImpl) this.network.getFactory()).createRoute(this.currleg.getMode(), null, null);
+		this.currRoute = ((PopulationFactoryImpl) this.plans.getFactory()).createRoute(this.currleg.getMode(), null, null);
 		this.currleg.setRoute(this.currRoute);
 		if (atts.getValue("dist") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));

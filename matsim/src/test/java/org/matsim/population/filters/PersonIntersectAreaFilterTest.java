@@ -32,6 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -74,7 +75,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		plan.createAndAddActivity("w", link5.getId());
 
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId());
+		NetworkRoute route = new LinkNetworkRouteImpl(link0.getId(), link5.getId());
 		leg.setRoute(route);
 
 		// prepare route
@@ -112,7 +113,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 
 		// prepare bee-line tests
 		leg.setMode(TransportMode.walk);
-		leg.setRoute(network.getFactory().createRoute(TransportMode.car, link0.getId(), link5.getId())); // empty route // TODO should be switched to WalkRoute once that exists...
+		leg.setRoute(new LinkNetworkRouteImpl(link0.getId(), link5.getId())); // empty route
 
 		// test bee-line without alternative aoi
 		aoi.clear();

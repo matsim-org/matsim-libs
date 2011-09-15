@@ -27,14 +27,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PlansCalcTransitRoute;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
@@ -48,10 +47,10 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
 	public AdaptedPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
+			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, MyTransitRouterConfig myTransitRouterConfig) {
 		//super(config, network, costCalculator, timeCalculator, factory);
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig, new AdaptedTransitRouter(myTransitRouterConfig, schedule));
+		super(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfig, new AdaptedTransitRouter(myTransitRouterConfig, schedule));
 
 		//this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRouteDijkstra;
@@ -56,7 +57,7 @@ public class LocationChoiceReRouteDijkstraPlanStrategy implements PlanStrategy {
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new LocationChoicePlanModule(scenario));
-		planStrategyDelegate.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
+		planStrategyDelegate.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc, ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
 	}
 	
 	@Override

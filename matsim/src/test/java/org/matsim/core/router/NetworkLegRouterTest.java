@@ -37,6 +37,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -55,7 +57,7 @@ public class NetworkLegRouterTest {
 	@Test
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
-		NetworkFactoryImpl routeFactory = ((NetworkImpl) f.s.getNetwork()).getFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeCost freespeed = new FreespeedTravelTimeCost(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
@@ -83,7 +85,7 @@ public class NetworkLegRouterTest {
 		Activity toAct = new ActivityImpl("h", new CoordImpl(0, 3000));
 		((ActivityImpl) toAct).setLinkId(f.s.createId("3"));
 		
-		NetworkFactoryImpl routeFactory = ((NetworkImpl) f.s.getNetwork()).getFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
 
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl()  ;
 		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()) ;

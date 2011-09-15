@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -98,32 +99,9 @@ public class TransitControler extends Controler {
 		params.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(params);
 
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 
-//		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
-//		addControlerListener(cl);
 	}
-
-//	@Override
-//	protected StrategyManager loadStrategyManager() {
-//		StrategyManager manager = new StrategyManager();
-//		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
-//		return manager;
-//	}
-
-//	@Override
-//	protected void runMobSim() {
-//		new QSim(this.scenarioData, this.events).run();
-////		new QueueSimulation(this.scenarioData, this.events).run();
-//	}
-
-//	@Override
-//	public PlanAlgorithm createRoutingAlgorithm(final PersonalizableTravelCost travelCosts, final PersonalizableTravelTime travelTimes) {
-//		// if I see this correctly, in the following the first 5 arguments are just passed through.  That is,
-//		// "getLeastCostPathCalculatorFactory()" just defines the (car) routing algo from the standard controler.  kai, nov'09
-//		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-//				this.getLeastCostPathCalculatorFactory(), this.scenarioData.getTransitSchedule(), this.transitConfig);
-//	}
 
 	public static class TransitControlerListener implements StartupListener {
 

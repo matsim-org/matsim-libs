@@ -35,6 +35,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -57,7 +58,7 @@ public class PlansCalcTransitRouteTest extends TestCase {
 				vspConfigGroup);
 		
 		PlansCalcTransitRoute router = new PlansCalcTransitRoute(routerConfig, f.network, ttc, ttc, new DijkstraFactory(), 
-				transitConfig, new TransitRouterImpl(f.schedule, transitRouterConfig ));
+				((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).getModeRouteFactory(), transitConfig, new TransitRouterImpl(f.schedule, transitRouterConfig ));
 
 		Coord fromCoord = f.scenario.createCoord(3800, 5100);
 		Coord toCoord = f.scenario.createCoord(16100, 10050);

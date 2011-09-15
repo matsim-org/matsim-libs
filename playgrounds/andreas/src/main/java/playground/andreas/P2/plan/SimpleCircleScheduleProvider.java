@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -62,6 +62,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 	}
 
+	@Override
 	public TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, TransitStopFacility startStop, TransitStopFacility endStop, Id routeId){
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
@@ -107,8 +108,8 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		completeLinkList.addAll(forth.links);
 		completeLinkList.add(this.net.getLinks().get(endStop.getLinkId()));
 		completeLinkList.addAll(back.links);
-		
-		NetworkRoute route = (NetworkRoute) this.net.getFactory().createRoute(TransportMode.car, startStop.getLinkId(), startStop.getLinkId());
+
+		NetworkRoute route = new LinkNetworkRouteImpl(startStop.getLinkId(), startStop.getLinkId());
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(completeLinkList), startStop.getLinkId());		
 		
 		// get stops at Route
@@ -141,6 +142,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		return transitRoute;
 	}
 
+	@Override
 	public TransitStopFacility getRandomTransitStop(){
 		int i = this.scheduleWithStopsOnly.getFacilities().size();
 		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
@@ -152,6 +154,7 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 		return null;
 	}
 
+	@Override
 	public TransitLine createEmptyLine(Id id) {
 		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
 	}

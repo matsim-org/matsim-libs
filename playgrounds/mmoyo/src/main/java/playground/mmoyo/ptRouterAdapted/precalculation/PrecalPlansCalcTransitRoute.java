@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -62,9 +63,9 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
 	public PrecalPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
+			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig, final MyTransitRouterConfig myTransitRouterConfig) {
-		super(config, network, costCalculator, timeCalculator, factory, transitConfig,
+		super(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfig,
 				new TransitRouterImpl(schedule, new TransitRouterConfig(null,null,null,null)));
 		this.adaptedTransitRouter = new AdaptedTransitRouter( myTransitRouterConfig, schedule);
 		throw new RuntimeException("this uses the standard TransitRouterConfig in parts of the code, and your " +

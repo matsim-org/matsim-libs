@@ -53,9 +53,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -96,7 +96,7 @@ public class RunAnalyses {
 
 	public void readNetwork() {
 		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
-		((NetworkFactoryImpl) this.scenario.getNetwork().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
 	public void readPopulation() {

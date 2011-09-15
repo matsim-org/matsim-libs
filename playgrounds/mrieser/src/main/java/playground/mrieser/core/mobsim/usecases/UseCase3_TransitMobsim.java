@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -46,10 +46,10 @@ public class UseCase3_TransitMobsim {
 
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 
-		((NetworkFactoryImpl) loader.getScenario().getNetwork().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) loader.getScenario().getPopulation().getFactory()).setRouteFactory("pt", new ExperimentalTransitRouteFactory());
 
 		Scenario scenario = loader.loadScenario();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterXML ew = new EventWriterXML("testEvents.xml");
 		events.addHandler(ew);
 

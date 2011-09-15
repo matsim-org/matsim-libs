@@ -30,6 +30,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -96,6 +98,8 @@ public class IterativeKnowledgeControler extends Controler{
 	private void initialReplanning() {
 		log.info("Do initial Replanning");
 
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory();
+		
 //		// Use a Wrapper - by doing this, already available MATSim
 //		// CostCalculators can be used
 //		TravelTime travelTime = new FreespeedTravelTimeCost(this.config.charyparNagelScoring());
@@ -110,7 +114,7 @@ public class IterativeKnowledgeControler extends Controler{
 		 */
 		PersonalizableTravelTime travelTime = new FreespeedTravelTimeCost(this.config.planCalcScore());
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
+		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime, routeFactory);
 		
 		for (Person person : this.getPopulation().getPersons().values())
 		{

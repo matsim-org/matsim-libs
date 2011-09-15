@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -138,7 +139,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		int numberOfSPNFans = numberOfFans - numberOfCbFans;
 		
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(sc.getConfig().planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory());
+		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory());
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());

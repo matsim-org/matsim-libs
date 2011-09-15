@@ -35,6 +35,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -101,15 +102,8 @@ public class TransitControler extends Controler {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
-		this.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
-
-//	@Override
-//	protected StrategyManager loadStrategyManager() {
-//		StrategyManager manager = new StrategyManager();
-//		TransitStrategyManagerConfigLoader.load(this, this.config, manager);
-//		return manager;
-//	}
 
 	@Override
 	protected void loadControlerListeners() {
@@ -157,7 +151,7 @@ public class TransitControler extends Controler {
 		TransitRouterConfig trConfig = new TransitRouterConfig(this.config.planCalcScore(), this.config.plansCalcRoute(), this.config.transitRouter(),
 				this.config.vspExperimental());
 		return new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-				this.getLeastCostPathCalculatorFactory(), this.transitConfig,
+				this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.transitConfig,
 				new TransitRouterImpl(this.scenarioData.getTransitSchedule(), trConfig) );
 	}
 

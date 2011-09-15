@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -46,7 +47,7 @@ public class HwhPlansMaker extends PlanSimplifyForDebug {
 	private final Config config;
 
 	public HwhPlansMaker(Network network, Config config, Population plans) {
-		super(network);
+		super(network, ((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory());
 		this.config = config;
 		for (int i = 0; i <= 24; i++) {
 			loadActType(homeActs, i);

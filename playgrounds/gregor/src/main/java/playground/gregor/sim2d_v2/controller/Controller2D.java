@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
@@ -72,7 +72,7 @@ public class Controller2D extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			PersonalizableTravelCost travelCosts,
 			PersonalizableTravelTime travelTimes) {
-		PlansCalcRoute a = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory());
+		PlansCalcRoute a = new PlansCalcRoute(config.plansCalcRoute(), network, travelCosts, travelTimes, getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory());
 		a.addLegHandler("walk2d", new NetworkLegRouter(this.network, a.getLeastCostPathCalculator(), a.getRouteFactory()));
 		return a;
 	}
@@ -100,7 +100,7 @@ public class Controller2D extends Controler {
 		c.getQSimConfigGroup().setEndTime( 9*3600 + 20* 60);
 
 		Scenario sc = ScenarioUtils.createScenario(c);
-		((NetworkFactoryImpl)sc.getNetwork().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
+		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		ScenarioUtils.loadScenario(sc);
 
 		Controler controller = new Controller2D(sc);

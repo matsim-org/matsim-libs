@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -62,11 +62,11 @@ public class InvertedNetworkLegRouter implements LegRouter{
 
 	private Network invertedNetwork = null;
 
-	private NetworkFactoryImpl routeFactory = null;
+	private ModeRouteFactory routeFactory = null;
 
 	private Network network = null;
 
-	public InvertedNetworkLegRouter(Network network, NetworkFactoryImpl routeFactory, 
+	public InvertedNetworkLegRouter(Network network, ModeRouteFactory routeFactory, 
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelCostCalculatorFactory travelCostCalculatorFactory, 
 			PlanCalcScoreConfigGroup cnScoringGroup, TravelTime travelTimes) {
 		this.network = network;

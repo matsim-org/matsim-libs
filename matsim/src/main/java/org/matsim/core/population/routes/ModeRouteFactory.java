@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,65 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.population.routes;
 
-import org.matsim.api.core.v01.Coord;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.population.routes.RouteFactory;
 
 /**
- * @author dgrether, mrieser
+ * @author mrieser / senozon
  */
-public class PopulationFactoryImpl implements PopulationFactory {
+public class ModeRouteFactory {
+	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
+	private RouteFactory defaultFactory = new GenericRouteFactory();
 
-	private final Scenario scenario;
-	
-	private final ModeRouteFactory routeFactory = new ModeRouteFactory();
-
-	public PopulationFactoryImpl(final Scenario scenario) {
-		this.scenario = scenario;
-	}
-
-	@Override
-	public Person createPerson(final Id id) {
-		PersonImpl p = new PersonImpl(id);
-		return p;
-	}
-
-	@Override
-	public Plan createPlan(){
-		return new PlanImpl();
-	}
-
-	@Override
-	public Activity createActivityFromCoord(final String actType, final Coord coord) {
-		ActivityImpl act = new ActivityImpl(actType, coord);
-		return act;
-	}
-
-	public Activity createActivityFromFacilityId(final String actType, final Id facilityId) {
-		ActivityImpl act = new ActivityImpl(actType);
-		act.setFacilityId(facilityId);
-		return act;
-	}
-
-	@Override
-	public Activity createActivityFromLinkId(final String actType, final Id linkId) {
-		ActivityImpl act = new ActivityImpl(actType, linkId);
-		return act;
-	}
-
-	@Override
-	public Leg createLeg(final String legMode) {
-		return new LegImpl(legMode);
+	public ModeRouteFactory() {
+		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
+		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
+		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 	
 	/**
@@ -87,7 +48,11 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	 * @see #setRouteFactory(String, RouteFactory)
 	 */
 	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
-		return this.routeFactory.createRoute(transportMode, startLinkId, endLinkId);
+		RouteFactory factory = this.routeFactories.get(transportMode);
+		if (factory == null) {
+			factory = this.defaultFactory;
+		}
+		return factory.createRoute(startLinkId, endLinkId);
 	}
 
 	/**
@@ -99,11 +64,15 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	 * @param factory
 	 */
 	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
-		this.routeFactory.setRouteFactory(transportMode, factory);
-	}
-	
-	public ModeRouteFactory getModeRouteFactory() {
-		return this.routeFactory;
+		if (transportMode == null) {
+			this.defaultFactory = factory;
+		} else {
+			if (factory == null) {
+				this.routeFactories.remove(transportMode);
+			} else {
+				this.routeFactories.put(transportMode, factory);
+			}
+		}
 	}
 
 }

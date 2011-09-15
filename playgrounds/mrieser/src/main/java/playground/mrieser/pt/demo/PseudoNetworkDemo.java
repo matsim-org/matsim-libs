@@ -34,6 +34,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -86,7 +87,7 @@ public class PseudoNetworkDemo {
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 //		NetworkFromTransitSchedule.createNetwork(schedule, network);
 
-		network.getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		Link link1 = network.getLinks().values().iterator().next();//getLink(scenario.createId("1"));
 
 		Population population = scenario.getPopulation();
@@ -99,7 +100,7 @@ public class PseudoNetworkDemo {
 		plan.addActivity(act);
 		Leg leg = population.getFactory().createLeg(TransportMode.walk);
 		leg.setTravelTime(15*3600.0);
-		leg.setRoute(network.getFactory().createRoute(TransportMode.walk, link1.getId(), link1.getId()));
+		leg.setRoute(((PopulationFactoryImpl) scenario.getPopulation().getFactory()).createRoute(TransportMode.walk, link1.getId(), link1.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(population.getFactory().createActivityFromLinkId("home", link1.getId()));
 

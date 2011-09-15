@@ -33,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -116,7 +117,7 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		pop.addAlgorithm(new PersonAssignToNetwork(network, facilities, config));
+		pop.addAlgorithm(new PersonAssignToNetwork(network, facilities, config, ((PopulationFactoryImpl) pop.getFactory()).getModeRouteFactory()));
 		log.info("  done.");
 
 		//////////////////////////////////////////////////////////////////////

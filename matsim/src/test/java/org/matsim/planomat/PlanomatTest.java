@@ -43,6 +43,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
@@ -147,7 +148,7 @@ public class PlanomatTest extends MatsimTestCase {
 		events.addHandler(tTravelEstimator);
 		events.addHandler(depDelayCalc);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 //		LegTravelTimeEstimator ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -296,7 +297,7 @@ public class PlanomatTest extends MatsimTestCase {
 		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, this.scenario.getConfig().planCalcScore());
 		DepartureDelayAverageCalculator depDelayCalc = new DepartureDelayAverageCalculator(this.scenario.getNetwork(), 900);
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(this.scenario.getConfig().plansCalcRoute(), this.scenario.getNetwork(), travelCostEstimator, tTravelEstimator, ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(tTravelEstimator, depDelayCalc);
 		ltte = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(

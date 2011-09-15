@@ -21,6 +21,7 @@ package playground.andreas.intersection.dijkstra;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -39,29 +40,35 @@ public class SignalSystemRoutePlanStrategy implements PlanStrategy {
 	public SignalSystemRoutePlanStrategy(Controler controler) {
 		this.psDelegate = new PlanStrategyImpl( new RandomPlanSelector());
 		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getConfig(), controler.getNetwork(),
-				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator()));
+				controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
 	}
 
+	@Override
 	public void addStrategyModule(PlanStrategyModule module) {
 		this.psDelegate.addStrategyModule(module);
 	}
 
+	@Override
 	public void finish() {
 		this.psDelegate.finish();
 	}
 
+	@Override
 	public int getNumberOfStrategyModules() {
 		return this.psDelegate.getNumberOfStrategyModules();
 	}
 
+	@Override
 	public PlanSelector getPlanSelector() {
 		return this.psDelegate.getPlanSelector();
 	}
 
+	@Override
 	public void init() {
 		this.psDelegate.init();
 	}
 
+	@Override
 	public void run(Person person) {
 		this.psDelegate.run(person);
 	}

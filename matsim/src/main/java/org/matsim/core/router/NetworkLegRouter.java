@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -42,10 +42,10 @@ import org.matsim.core.utils.misc.RouteUtils;
 public class NetworkLegRouter implements LegRouter {
 
 	private final Network network;
-	private final NetworkFactoryImpl routeFactory;
+	private final ModeRouteFactory routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
-	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final NetworkFactoryImpl routeFactory) {
+	public NetworkLegRouter(final Network network, final LeastCostPathCalculator routeAlgo, final ModeRouteFactory routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;

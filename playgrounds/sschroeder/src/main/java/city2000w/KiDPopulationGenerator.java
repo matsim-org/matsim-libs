@@ -13,30 +13,20 @@ import kid.KiDUtils;
 import kid.ScheduledVehicles;
 import kid.filter.And;
 import kid.filter.BerlinFilter;
-import kid.filter.BusinessSectorFilter;
 import kid.filter.GeoRegionFilterV2;
 import kid.filter.LogicVehicleFilter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
-import utils.LinkMerger;
-import utils.MergingConstraint;
-import utils.NetworkFuser;
 
 import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 
@@ -73,9 +63,9 @@ public class KiDPopulationGenerator {
 		
 		KiDPlanAgentCreator planAgentCreator = new KiDPlanAgentCreator(scheduledVehicles);
 		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM33N());
-		planAgentCreator.setNetwork((NetworkImpl)scen.getNetwork());
+		planAgentCreator.setNetwork(scen.getNetwork());
 		PlansCalcRoute router = new PlansCalcRoute(null, scen.getNetwork(), 
-				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0));
+				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
 		planAgentCreator.setRouter(router);
 		planAgentCreator.createPlanAgents();
 		planAgentCreator.writePlans("output/berlinPlans.xml");

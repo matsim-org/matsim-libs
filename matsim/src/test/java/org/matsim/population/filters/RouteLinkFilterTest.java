@@ -31,6 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -76,7 +77,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
@@ -87,7 +88,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
@@ -98,7 +99,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = plan.createAndAddLeg(TransportMode.car);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link20.getId());
+		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);
 		plan.createAndAddActivity("w", link20.getId());
@@ -109,6 +110,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 
 	/*package*/ static class TestAlgorithm implements PlanAlgorithm {
 
+		@Override
 		public void run(final Plan plan) {
 			assertTrue("1".equals(plan.getPerson().getId().toString())
 					|| "2".equals(plan.getPerson().getId().toString()));

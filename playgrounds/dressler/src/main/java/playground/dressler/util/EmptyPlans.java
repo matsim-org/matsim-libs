@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -113,7 +114,7 @@ public class EmptyPlans {
 		config.addCoreModules();
 
 		CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost());
+		PlansCalcRoute router = new PlansCalcRoute(config.plansCalcRoute(), network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory());
 		//PlansCalcRoute router = new PlansCalcRouteDijkstra(network, new FakeTravelTimeCost(), new FakeTravelTimeCost(), new FakeTravelTimeCost());
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getPlans().get(0);

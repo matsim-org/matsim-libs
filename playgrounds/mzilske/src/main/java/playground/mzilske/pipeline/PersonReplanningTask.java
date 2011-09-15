@@ -5,6 +5,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -52,6 +54,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 
 	@Override
 	public void process(Scenario scenario) {
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		StrategyManager manager = new StrategyManager();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 		Network network = scenario.getNetwork();
@@ -62,7 +65,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 			}
 			String classname = settings.getModuleName();
 
-			PlanStrategyImpl strategy = loadStrategy(classname, settings, network, travelTimeCalc.getTravelTimeCalculator(), travelCostCalc.getTravelCostCalculator());
+			PlanStrategyImpl strategy = loadStrategy(classname, settings, network, travelTimeCalc.getTravelTimeCalculator(), travelCostCalc.getTravelCostCalculator(), routeFactory);
 
 			if (strategy == null) {
 				Gbl.errorMsg("Could not initialize strategy named " + classname);
@@ -81,13 +84,13 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		sink.process(scenario);
 	}
 	
-	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, PersonalizableTravelTime travelTimeCalc, PersonalizableTravelCost travelCostCalc) {
+	private PlanStrategyImpl loadStrategy(final String name, final StrategyConfigGroup.StrategySettings settings, Network network, PersonalizableTravelTime travelTimeCalc, PersonalizableTravelCost travelCostCalc, final ModeRouteFactory routeFactory) {
 		PlanStrategyImpl strategy = null;
 		if (name.equals("KeepLastSelected")) {
 			strategy = new PlanStrategyImpl(new KeepSelected());
 		} else if (name.equals("ReRoute")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy.addStrategyModule(new ReRoute(network));
+			strategy.addStrategyModule(new ReRoute(network, routeFactory));
 		} else if (name.equals("TimeAllocationMutator") || name.equals("threaded.TimeAllocationMutator")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			TimeAllocationMutator tam = new TimeAllocationMutator(config);
@@ -103,7 +106,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 		} else if (name.equals("ChangeLegMode")) {
 			strategy = new PlanStrategyImpl(new RandomPlanSelector());
 			strategy.addStrategyModule(new ChangeLegMode(config));
-			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc));
+			strategy.addStrategyModule(new ReRouteDijkstra(config, network, travelCostCalc, travelTimeCalc, routeFactory));
 		}
 		return strategy;
 	}
@@ -119,15 +122,17 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 	private class ReRoute extends AbstractMultithreadedModule {
 	
 		private Network network;
+		private ModeRouteFactory routeFactory;
 	
-		public ReRoute(Network network) {
+		public ReRoute(Network network, final ModeRouteFactory routeFactory) {
 			super(1);
 			this.network = network;
+			this.routeFactory = routeFactory;
 		}
 	
 		@Override
 		public PlanAlgorithm getPlanAlgoInstance() {
-			return new PlansCalcRoute(config.plansCalcRoute(), network, travelCostCalc.getTravelCostCalculator(), travelTimeCalc.getTravelTimeCalculator(), leastCostPathCalculatorFactory);
+			return new PlansCalcRoute(config.plansCalcRoute(), network, travelCostCalc.getTravelCostCalculator(), travelTimeCalc.getTravelTimeCalculator(), leastCostPathCalculatorFactory, routeFactory);
 		}
 	
 	}

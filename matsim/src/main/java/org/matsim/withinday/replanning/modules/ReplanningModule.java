@@ -25,6 +25,7 @@ import java.util.Locale;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -40,10 +41,11 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 	protected PersonalizableTravelCost costCalculator;
 	protected PersonalizableTravelTime timeCalculator;
 	protected LeastCostPathCalculatorFactory factory;
+	private final ModeRouteFactory routeFactory;
 
 	public ReplanningModule(Config config, Network network,
 			PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator,
-			LeastCostPathCalculatorFactory factory) {
+			LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
 		super(config.global());
 
 		this.config = config;
@@ -51,12 +53,13 @@ public class ReplanningModule extends AbstractMultithreadedModule {
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
 		this.factory = factory;
+		this.routeFactory = routeFactory;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory);
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory, this.routeFactory);
 
 		if (config.multiModal().isMultiModalSimulationEnabled()) {
 			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, timeCalculator, factory);

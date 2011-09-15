@@ -20,7 +20,6 @@
 
 package playground.mrieser;
 
-import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
@@ -55,14 +54,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkFalsifier;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -70,12 +68,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
@@ -88,7 +84,6 @@ import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.PlansFilterByLegMode.FilterType;
 import org.matsim.population.algorithms.PlansFilterPersonHasPlans;
 import org.matsim.population.algorithms.XY2Links;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vis.kml.KMZWriter;
 
 public class MyRuns {
@@ -356,7 +351,7 @@ public class MyRuns {
 		population.addAlgorithm(new ActLocationFalsifier(200));
 		population.addAlgorithm(new XY2Links((NetworkImpl) network));
 		final FreespeedTravelTimeCost timeCostFunction = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
-		population.addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), network, timeCostFunction, timeCostFunction));
+		population.addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), network, timeCostFunction, timeCostFunction, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
 		population.addAlgorithm(plansWriter);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		population.printPlansCount();
@@ -829,26 +824,48 @@ public class MyRuns {
 //		Scenario s = new ScenarioLoaderImpl("examples/equil/config.xml").loadScenario();
 //		new PopulationWriter(s.getPopulation(), null).writeFileV5("/Users/cello/Desktop/p5test.xml");
 
-		System.out.println(new Color(255, 34, 17).getRGB());
-		System.out.println(new Color(0xFF2211).getRGB());
-		System.out.println(0xFFFF2211);
+//		System.out.println(new Color(255, 34, 17).getRGB());
+//		System.out.println(new Color(0xFF2211).getRGB());
+//		System.out.println(0xFFFF2211);
+//
+//		Class k1 = LinkLeaveEvent.class;
+//		Class k2 = LinkLeaveEventImpl.class;
+//
+//		System.out.println(k1.isAssignableFrom(k2));
+//		System.out.println(k2.isAssignableFrom(k1));
 
-		Class k1 = LinkLeaveEvent.class;
-		Class k2 = LinkLeaveEventImpl.class;
 
-		System.out.println(k1.isAssignableFrom(k2));
-		System.out.println(k2.isAssignableFrom(k1));
-
-		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
-		new TransitScheduleReader(scenario).readFile("/Users/cello/Downloads/pt.xml");
+//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		scenario.getConfig().scenario().setUseTransit(true);
+//		new TransitScheduleReader(scenario).readFile("/Users/cello/Downloads/pt.xml");
 //		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
 //		schedule.getFacilities(); // Map mit den Stop Facilities
 
 
+//		Date date = new Date();
+	// Time formate 01:12:53 AM
+//		  SimpleDateFormat formatter = new SimpleDateFormat("yyMMdd-HHmm");
+//		  String s = formatter.format(date);
+//		  System.out.println("hh:mm:ss a formate : " + s);
 
-		System.out.println("stop at " + (new Date()));
-		System.exit(0); // currently only used for calcRouteMT();
+		int argb = 0xff000000;
+		int alpha = (argb >> 24) & 0x000000ff;
+
+		int alpha2 = 0xff000000;
+
+		alpha2 = (alpha2 >> 24) & 0x000000ff;
+		System.out.println(alpha);
+		System.out.println(Integer.toHexString(alpha));
+
+		alpha = alpha * alpha2 / 255;
+		System.out.println(alpha);
+		System.out.println(Integer.toHexString(alpha));
+		alpha = alpha << 24;
+		System.out.println(Integer.toHexString(alpha));
+
+
+
+//		System.out.println("stop at " + (new Date()));
+//		System.exit(0); // currently only used for calcRouteMT();
 	}
 }

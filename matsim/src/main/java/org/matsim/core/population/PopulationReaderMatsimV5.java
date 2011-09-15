@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -268,9 +267,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	}
 
 	private void startRoute(final Attributes atts) {
-		// FIXME [MR] do not use network factory!
-//		if (atts.getValue(ATTR_ROUTE_TYPE) != null) {}
-		this.currRoute = ((NetworkFactoryImpl) this.scenario.getNetwork().getFactory()).createRoute(this.currleg.getMode(), null, null);
+		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
 		this.currleg.setRoute(this.currRoute);
 	}
 

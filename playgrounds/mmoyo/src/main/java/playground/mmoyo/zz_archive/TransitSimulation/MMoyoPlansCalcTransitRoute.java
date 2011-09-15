@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -50,9 +51,9 @@ public class MMoyoPlansCalcTransitRoute extends PlansCalcRoute {
 
 	public MMoyoPlansCalcTransitRoute(final PlansCalcRouteConfigGroup config, final Network network,
 			final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator,
-			final LeastCostPathCalculatorFactory factory, final TransitSchedule schedule,
+			final LeastCostPathCalculatorFactory factory, final ModeRouteFactory routeFactory, final TransitSchedule schedule,
 			final TransitConfigGroup transitConfig) {
-		super(config, network, costCalculator, timeCalculator, factory);
+		super(config, network, costCalculator, timeCalculator, factory, routeFactory);
 
 		this.schedule = schedule;
 		this.transitConfig = transitConfig;

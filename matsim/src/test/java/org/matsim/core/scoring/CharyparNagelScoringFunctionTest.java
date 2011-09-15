@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -117,7 +118,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		this.plan.createAndAddActivity("h", link1.getId());
 		Leg leg = this.plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link1.getId(), link3.getId());
+		NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 		leg.setRoute(route);
 		// does not match the network distances or travel times! WHY? --- benjamin mar'11
 		route.setDistance(25000.0);
@@ -125,7 +126,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		
 		this.plan.createAndAddActivity("w", link3.getId());
 		leg = this.plan.createAndAddLeg(TransportMode.pt);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link3.getId(), link5.getId());
+		route = new LinkNetworkRouteImpl(link3.getId(), link5.getId());
 		// (why is this "car"?  We found it that way. benjamin/kai, jun'11)
 		leg.setRoute(route);
 		// does not match the network distances or travel times! WHY? --- benjamin mar'11
@@ -134,7 +135,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 		
 		this.plan.createAndAddActivity("w", link5.getId());
 		leg = this.plan.createAndAddLeg(TransportMode.walk);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link5.getId(), link7.getId());
+		route = new LinkNetworkRouteImpl(link5.getId(), link7.getId());
 		leg.setRoute(route);
 		// does not match the network distances or travel times! WHY? --- benjamin mar'11
 		route.setDistance(25000.0);
@@ -142,7 +143,7 @@ public abstract class CharyparNagelScoringFunctionTest extends ScoringFunctionTe
 
 		this.plan.createAndAddActivity("w", link7.getId());
 		leg = this.plan.createAndAddLeg(TransportMode.bike);
-		route = (NetworkRoute) network.getFactory().createRoute(TransportMode.car, link7.getId(), link9.getId());
+		route = new LinkNetworkRouteImpl(link7.getId(), link9.getId());
 		leg.setRoute(route);
 		// does not match the network distances or travel times! WHY? --- benjamin mar'11
 		route.setDistance(20000.0);

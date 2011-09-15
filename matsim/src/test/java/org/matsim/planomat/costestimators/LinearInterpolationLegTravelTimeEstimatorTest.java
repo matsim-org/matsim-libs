@@ -35,6 +35,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -68,7 +69,8 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 				config.plansCalcRoute(),
 				network,
 				linkTravelCostEstimator,
-				linkTravelTimeEstimator);
+				linkTravelTimeEstimator,
+				new ModeRouteFactory());
 
 		LegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory = new LegTravelTimeEstimatorFactory(linkTravelTimeEstimator, tDepDelayCalc);
 		LinearInterpolationLegTravelTimeEstimator testee = (LinearInterpolationLegTravelTimeEstimator) legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -124,7 +126,7 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 
 		// now let's repeat the same stuff with some events that indicate a very long travel time on the highway
 		// the result must be the free speed travel time of the alternate route
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(linkTravelTimeEstimator);
 
 		events.processEvent(new LinkEnterEventImpl(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID));

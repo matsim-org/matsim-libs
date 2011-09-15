@@ -42,6 +42,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -83,7 +84,7 @@ public class VisualizeTransitPlans {
 			new MatsimNetworkReader(this.realScenario).readFile(NETWORK_FILE);
 		}
 		new TransitScheduleReader(this.realScenario).readFile(TRANSIT_SCHEDULE_FILE);
-		this.realScenario.getNetwork().getFactory().setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+		((PopulationFactoryImpl) this.realScenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 		new MatsimPopulationReader(this.realScenario).readFile(POPULATION_FILE);
 //		this.realScenario.getPopulation().printPlansCount();
 	}

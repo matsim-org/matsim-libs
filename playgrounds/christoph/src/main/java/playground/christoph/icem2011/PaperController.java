@@ -43,6 +43,8 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -145,12 +147,14 @@ public class PaperController extends WithinDayController implements StartupListe
 	 */
 	protected void initReplanners(QSim sim) {
 
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		
 		TravelTimeCollector travelTime = super.getTravelTimeCollector();
 		PersonalizableTravelCost travelCost = super.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime, this.config.planCalcScore());
 //		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 //		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		LeastCostPathCalculatorFactory factory = new DijkstraFactory(); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);

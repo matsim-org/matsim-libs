@@ -38,6 +38,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -102,7 +103,7 @@ public class AccessEgressDemo {
 			network.addNode(nodes[i]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			Link l = network.getFactory().createLink(this.ids[i], nodes[i].getId(), nodes[i+1].getId());
+			Link l = network.getFactory().createLink(this.ids[i], nodes[i], nodes[i+1]);
 			l.setLength(500.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(1000.0);
@@ -125,7 +126,7 @@ public class AccessEgressDemo {
 		}
 		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
 		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
-		NetworkRoute networkRoute = (NetworkRoute) this.scenario.getNetwork().getFactory().createRoute(TransportMode.car, startLink.getId(), endLink.getId());
+		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id> linkList = new ArrayList<Id>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
 			linkList.add(this.ids[i]);
@@ -191,7 +192,7 @@ public class AccessEgressDemo {
 	}
 
 	private void runSim() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]);
 		VehicleTracker vehTracker = new VehicleTracker();

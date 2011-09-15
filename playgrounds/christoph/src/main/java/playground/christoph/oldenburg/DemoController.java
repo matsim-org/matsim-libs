@@ -36,6 +36,8 @@ import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListene
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
@@ -103,10 +105,12 @@ public class DemoController extends WithinDayController implements SimulationIni
 	 */
 	protected void initReplanners(QSim sim) {
 
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		
 		TravelTimeCollector travelTime = super.getTravelTimeCollector();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 		this.initialReplanner = new CreateEvacuationPlanReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();

@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -89,7 +89,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	protected PlansCalcRouteConfigGroup configGroup = new PlansCalcRouteConfigGroup();
 
-	private final NetworkFactoryImpl routeFactory;
+	private final ModeRouteFactory routeFactory;
 
 	protected final Network network;
 
@@ -112,14 +112,14 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 */
 	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network,
 			final PersonalizableTravelCost costCalculator,
-			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory){
+			final PersonalizableTravelTime timeCalculator, LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
 		this.routeAlgo = factory.createPathCalculator(network, costCalculator, timeCalculator);
 		FreespeedTravelTimeCost ptTimeCostCalc = new FreespeedTravelTimeCost(-1.0, 0.0, 0.0);
 		this.routeAlgoPtFreeflow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
 		this.network = network;
 		this.costCalculator = costCalculator;
 		this.timeCalculator = timeCalculator;
-		this.routeFactory = (NetworkFactoryImpl) network.getFactory();
+		this.routeFactory = routeFactory;
 		if (group != null) {
 			this.configGroup = group;
 		}
@@ -137,8 +137,8 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 	 * <li> sets configGroup to <tt>group</tt> but it is not clear where this will be used.
 	 * </ul>
 	 */
-	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator) {
-		this(group, network, costCalculator, timeCalculator, new DijkstraFactory());
+	public PlansCalcRoute(final PlansCalcRouteConfigGroup group, final Network network, final PersonalizableTravelCost costCalculator, final PersonalizableTravelTime timeCalculator, ModeRouteFactory routeFactory) {
+		this(group, network, costCalculator, timeCalculator, new DijkstraFactory(), routeFactory);
 	}
 
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
@@ -253,7 +253,7 @@ public class PlansCalcRoute extends AbstractPersonAlgorithm implements PlanAlgor
 		}
 	}
 
-	public NetworkFactoryImpl getRouteFactory() {
+	public ModeRouteFactory getRouteFactory() {
 		return routeFactory;
 	}
 

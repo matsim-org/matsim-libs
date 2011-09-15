@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -84,7 +85,7 @@ public class CommuterDemandWriter {
 		this.demand = demand;
 		this.tranformFeaturesAndInitMunicipalityMap(gemeindenFeatures, featuresCrs, targetCrs);
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(sc.getConfig().planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory());
+		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
 		this.pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
 	}
 	

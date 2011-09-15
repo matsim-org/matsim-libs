@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -35,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -53,8 +52,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.droeder.DaFileReader;
 import playground.droeder.DaPaths;
-import playground.droeder.GeoCalculator;
-import playground.droeder.gis.DaShapeWriter;
 
 /**
  * @author droeder
@@ -177,8 +174,8 @@ public class MatchedLines2newSchedule {
 			}
 		}
 		log.info(r.getTransportMode());
-		networkForThisRoute.getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
-		NetworkRoute route = (NetworkRoute) networkForThisRoute.getFactory().createRoute(r.getTransportMode(), links.get(0), links.get(links.size()-1));
+//		networkForThisRoute.getFactory().setRouteFactory(TransportMode.pt, new LinkNetworkRouteFactory());
+		NetworkRoute route = new LinkNetworkRouteImpl(links.get(0), links.get(links.size()-1));
 		route.setLinkIds(links.get(0), links.subList(1, links.size()-1), links.get(links.size()-1));
 		return factory.createTransitRoute(r.getId(), route, stops, r.getTransportMode());
 	}

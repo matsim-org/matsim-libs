@@ -51,6 +51,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -89,12 +90,13 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 	public RetailersParallelLocationListener() {
 	}
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 
 		Controler controler = event.getControler();
 		this.controlerFacilities = controler.getFacilities().getFacilities();
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(controler.getConfig().planCalcScore());
-		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc));
+		pcrl = new PlansCalcRoute(controler.getConfig().plansCalcRoute(), controler.getNetwork(),timeCostCalc, timeCostCalc, new AStarLandmarksFactory(controler.getNetwork(), timeCostCalc), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		String popOutFile = controler.getConfig().findParam(CONFIG_GROUP,CONFIG_POP_SUM_TABLE);
 		if (popOutFile == null) { throw new RuntimeException("In config file, param = "+CONFIG_POP_SUM_TABLE+" in module = "+CONFIG_GROUP+" not defined!"); }
 		this.pst = new PlansSummaryTable (popOutFile);
@@ -153,6 +155,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 		Utils.setPersonQuadTree(this.createPersonQuadTree(controler));
 	}
 	
+	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		
 		
