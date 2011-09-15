@@ -1,4 +1,4 @@
-package playground.toronto;
+package playground.toronto.ttimematrix;
 
 import java.util.ArrayList;
 import java.util.HashMap;
