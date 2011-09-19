@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -69,14 +70,14 @@ public class AdaptedPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	}
 
 	@Override
-	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime, final Person person) {
 		// yyyy this is, in fact, a misnomer, since it handles a pt leg, not a pt plan.  kai, apr'10
 		// yy also, I would like a design explanation of why there is a "TransitRouter" between "plansCalcRoute" and
 		// "LeastCostPathAlgo"?  kai, apr'10
 		// yyyy but first step really is to remove code duplication as much as possible.  kai, apr'10
 
 		//List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
-		List<Leg> legs= ((AdaptedTransitRouter)this.getTransitRouter()).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+		List<Leg> legs= ((AdaptedTransitRouter)this.getTransitRouter()).calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 
 //		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 		super.getLegReplacements().add(new Tuple<Leg, List<Leg>>(leg, legs));

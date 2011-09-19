@@ -17,9 +17,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouter;
-import playground.mmoyo.ptRouterAdapted.AdaptedTransitRouterNetworkTravelTimeCost;
-import playground.mmoyo.ptRouterAdapted.MyTransitRouterConfig;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.Generic2ExpRouteConverter;
 
@@ -69,7 +66,7 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		Assert.assertEquals("different near final transit route:" , dataLoader.getTransitRoute("Blue Line.Blue.101.H", scenarioImpl.getTransitSchedule()) , trNode2.getRoute());
 		
 		//calculate a route and validate it 
-		List<Leg> route = adaptedTransitRouter.calcRoute(coord1, coord2, 28700);
+		List<Leg> route = adaptedTransitRouter.calcRoute(coord1, coord2, 28700, null);
 		assertNotNull("route not found:",route);
 		
 		Leg trWalk1Leg = route.get(0);

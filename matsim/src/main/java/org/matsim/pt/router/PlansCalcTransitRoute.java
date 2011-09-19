@@ -117,13 +117,13 @@ public class PlansCalcTransitRoute extends PlansCalcRoute {
 	@Override
 	public double handleLeg(Person person, final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
 		if (this.transitConfig.getTransitModes().contains(leg.getMode())) {
-			return this.handlePtPlan(leg, fromAct, toAct, depTime);
+			return this.handlePtPlan(leg, fromAct, toAct, depTime, person);
 		}
 		return super.handleLeg(person, leg, fromAct, toAct, depTime);
 	}
 
-	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
-		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime);
+	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime, final Person person) {
+		List<Leg> legs= this.transitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), depTime, person);
 		this.legReplacements.add(new Tuple<Leg, List<Leg>>(leg, legs));
 
 		double travelTime = 0.0;

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -75,7 +76,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 	}
 
 	@Override
-	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime) {
+	protected double handlePtPlan(final Leg leg, final Activity fromAct, final Activity toAct, final double depTime, final Person person) {
 		double travelTime = 0.0;
 		double vdTime = depTime;
 		Map <Id, StaticConnection> connectionMap = new HashMap <Id, StaticConnection>(); //a map that stores precalculated pt connections
@@ -83,7 +84,7 @@ public class PrecalPlansCalcTransitRoute extends PlansCalcTransitRoute {
 
 		//System.out.print("\npt connections from " + fromAct.getCoord().toString() + " to " + toAct.getCoord().toString());
 		for (vdTime = depTime+600; vdTime>=depTime-300; vdTime-=180){   //find all possible connections in next 10 mins
-			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime);
+			List<Leg> legs= this.adaptedTransitRouter.calcRoute(fromAct.getCoord(), toAct.getCoord(), vdTime, person);
 
 			//calculate travelTime and distance
 			travelTime = 0.0;

@@ -114,7 +114,7 @@ public class RouterTester {
 						if (pe instanceof Activity) {
 							Activity act = (Activity) pe;
 							if (prevAct != null) {
-								List<Leg> legs = router.calcRoute(prevAct.getCoord(), act.getCoord(), act.getStartTime());
+								List<Leg> legs = router.calcRoute(prevAct.getCoord(), act.getCoord(), act.getStartTime(), person);
 								out.write(person.getId() + " " + prevAct.getCoord() + " -> " + act.getCoord() + " @ " + Time.writeTime(act.getStartTime()) + " :\n");
 								if (legs != null) {
 									for (Leg l : legs) {
