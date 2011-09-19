@@ -688,7 +688,7 @@ public class GtfsConverter {
 						freespeed = length/(arrivalTime - departureTime);
 						if(freespeed.isInfinite()){
 							freespeed = 50/3.6;
-							System.out.println("The Difference between ArrivalTime at one Stop (" + toNodeId + ") and DepartureTime at the previous Stop (" + fromNodeId + ") is 0. That leads to high freespeeds.");
+							System.out.println("The Difference between ArrivalTime at one Stop " + ts.getFacilities().get(toNodeId).getName() + "(" + toNodeId + ") and DepartureTime at the previous Stop " + ts.getFacilities().get(fromNodeId).getName() + "(" + fromNodeId + ") is 0. That leads to high freespeeds.");
 						}
 					}
 					link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);						

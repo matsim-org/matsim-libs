@@ -25,11 +25,11 @@ class GtfsSource {
 		newFile.filename = filename;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
-			newFile.header = new ArrayList<String>(Arrays.asList(splitRow(br.readLine())));
+			newFile.header = new ArrayList<String>(Arrays.asList(splitRow(br.readLine(),true)));
 			newFile.content = new ArrayList<String[]>();
 			String row = br.readLine();
 			while(row!= null){
-				newFile.content.add(splitRow(row));
+				newFile.content.add(splitRow(row,false));
 				row = br.readLine();
 			};
 		} catch (FileNotFoundException e) {
@@ -54,7 +54,7 @@ class GtfsSource {
 		return newFile;
 	}
 
-	static String[] splitRow(String row){
+	static String[] splitRow(String row, boolean header){
 		List<String> entries = new ArrayList<String>();
 		boolean quotes = false;
 		StringBuilder sb = new StringBuilder();
@@ -65,7 +65,15 @@ class GtfsSource {
 				entries.add(sb.toString().trim());	
 				sb = new StringBuilder();
 			}else{
-				sb.append(row.charAt(i));
+				if(sb.length() == 0){
+					if(Character.isLetterOrDigit(row.charAt(i))){
+						sb.append(row.charAt(i));
+					}else if(!header){
+						sb.append(row.charAt(i));
+					}
+				}else if(Character.isDefined(row.charAt(i))){
+					sb.append(row.charAt(i));
+				}				
 			}
 		}
 		entries.add(sb.toString().trim());	
