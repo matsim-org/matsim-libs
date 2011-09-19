@@ -93,7 +93,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// This is the first iteration
 		
 		// initialize strategy manager
-		this.strategyManager.init(this.pConfig);
+		this.strategyManager.init(this.pConfig, event.getControler().getEvents());
 		
 		// init scorePlansHandler
 		this.scorePlansHandler.init(event.getControler().getNetwork());
@@ -184,7 +184,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfCooperatives; i++) {
 			this.counter++;
-			Cooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig.getCostPerVehicle(), this.franchise);
+			Cooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
 			cooperatives.add(cooperative);
 		}		
 	}
@@ -220,7 +220,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// recreate all other
 		for (int i = 0; i < numberOfNewCoopertives; i++) {
 			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig.getCostPerVehicle(), this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, iteration - 1);
 			this.cooperatives.add(cooperative);
 		}
@@ -228,7 +228,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// too few cooperatives in play, increase to the minimum specified in the config
 		for (int i = this.cooperatives.size(); i < this.pConfig.getNumberOfCooperatives(); i++) {
 			this.counter++;
-			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig.getCostPerVehicle(), this.franchise);
+			BasicCooperative cooperative = new BasicCooperative(new IdImpl("p_" + this.counter), this.pConfig, this.franchise);
 			cooperative.init(this.routeProvider, iteration - 1);
 			this.cooperatives.add(cooperative);
 		}

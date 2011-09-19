@@ -23,15 +23,13 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 	public static final String STRATEGY_NAME = "RandomEndTimeAllocator";
 	
 	private final int mutationRange;
-	private final int minimalOperatingTime;
 
 	public RandomEndTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 2){
-			log.error("Missing parameter: 1 - Mutation range in seconds, 2 - Minimal operating time in seconds");
+		if(parameter.size() != 1){
+			log.error("Missing parameter: 1 - Mutation range in seconds");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
-		this.minimalOperatingTime = Integer.parseInt(parameter.get(1));
 	}
 	
 	@Override
@@ -44,7 +42,7 @@ public class RandomEndTimeAllocator extends PStrategy implements PPlanStrategy{
 		
 		// get a valid new end time
 		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * this.mutationRange);
-		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + this.minimalOperatingTime);
+		newEndTime = Math.max(newEndTime, cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime());
 		newPlan.setEndTime(newEndTime);
 		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan.getStartTime(), newPlan.getEndTime(), 1, newPlan.getStartStop(), newPlan.getEndStop(), new IdImpl(cooperative.getCurrentIteration())));

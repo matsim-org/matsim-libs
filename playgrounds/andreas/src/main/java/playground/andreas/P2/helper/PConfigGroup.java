@@ -57,7 +57,9 @@ public class PConfigGroup extends Module{
 	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
 	private static final String COST_PER_KILOMETER = "costPerKilometer";
 	private static final String EARNINGS_PER_KILOMETER_AND_PASSENGER = "earningsPerKilometerAndPassenger";
-	private static final String COST_PER_VEHICLE = "costPerVehicle";
+	private static final String PRICE_PER_VEHICLE_BOUGHT = "pricePerVehicleBought";
+	private static final String PRICE_PER_VEHICLE_SOLD = "pricePerVehicleSold";
+	private static final String MIN_OPERATION_TIME = "minOperationTime";
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS = "writeStats";
 	private static final String ROUTE_PROVIDER = "routeProvider";
@@ -75,8 +77,10 @@ public class PConfigGroup extends Module{
 	private double maxY = Double.MAX_VALUE;
 	private int numberOfCooperatives = 1;
 	private double costPerKilometer = 0.30;
+	private double minOperationTime = 6 * 3600;
 	private double earningsPerKilometerAndPassenger = 0.50;
-	private double costPerVehicle = 1000.0;
+	private double pricePerVehicleBought = 1000.0;
+	private double pricePerVehicleSold = 1000.0;
 	private boolean useFranchise = false;
 	private boolean writeStats = false;
 	private String routeProvider = "SimpleCircleScheduleProvider";
@@ -111,8 +115,12 @@ public class PConfigGroup extends Module{
 			this.costPerKilometer = Double.parseDouble(value);
 		} else if (EARNINGS_PER_KILOMETER_AND_PASSENGER.equals(key)){
 			this.earningsPerKilometerAndPassenger = Double.parseDouble(value);
-		} else if (COST_PER_VEHICLE.equals(key)){
-			this.costPerVehicle = Double.parseDouble(value);
+		} else if (PRICE_PER_VEHICLE_BOUGHT.equals(key)){
+			this.pricePerVehicleBought = Double.parseDouble(value);
+		} else if (PRICE_PER_VEHICLE_SOLD.equals(key)){
+			this.pricePerVehicleSold = Double.parseDouble(value);
+		} else if (MIN_OPERATION_TIME.equals(key)){
+			this.minOperationTime = Double.parseDouble(value);
 		} else if (USEFRANCHISE.equals(key)){
 			this.useFranchise = Boolean.parseBoolean(value);
 		} else if (WRITESTATS.equals(key)){
@@ -148,7 +156,9 @@ public class PConfigGroup extends Module{
 		map.put(NUMBER_OF_COOPERATIVES, Integer.toString(this.numberOfCooperatives));
 		map.put(COST_PER_KILOMETER, Double.toString(this.costPerKilometer));
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, Double.toString(this.earningsPerKilometerAndPassenger));
-		map.put(COST_PER_VEHICLE, Double.toString(this.costPerVehicle));
+		map.put(PRICE_PER_VEHICLE_BOUGHT, Double.toString(this.pricePerVehicleBought));
+		map.put(PRICE_PER_VEHICLE_SOLD, Double.toString(this.pricePerVehicleSold));
+		map.put(MIN_OPERATION_TIME, Double.toString(this.minOperationTime));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS, Boolean.toString(this.writeStats));
 		map.put(ROUTE_PROVIDER, this.routeProvider);
@@ -175,7 +185,9 @@ public class PConfigGroup extends Module{
 		map.put(NUMBER_OF_COOPERATIVES, "number of cooperatives operating");
 		map.put(COST_PER_KILOMETER, "cost per vehicle and kilometer travelled");
 		map.put(EARNINGS_PER_KILOMETER_AND_PASSENGER, "earnings per passenger kilometer");
-		map.put(COST_PER_VEHICLE, "cost to purchase or sell a vehicle");
+		map.put(PRICE_PER_VEHICLE_BOUGHT, "price of one vehicle bought");
+		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
+		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS, "will write statistics if set to true");
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
@@ -219,10 +231,18 @@ public class PConfigGroup extends Module{
 		return this.earningsPerKilometerAndPassenger;
 	}
 		
-	public double getCostPerVehicle() {
-		return this.costPerVehicle;
+	public double getPricePerVehicleBought() {
+		return this.pricePerVehicleBought;
 	}
-	
+
+	public double getPricePerVehicleSold() {
+		return this.pricePerVehicleSold;
+	}
+
+	public double getMinOperationTime() {
+		return this.minOperationTime;
+	}
+
 	public boolean getUseFranchise() {
 		return this.useFranchise;
 	}

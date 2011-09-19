@@ -22,15 +22,13 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 	public static final String STRATEGY_NAME = "RandomStartTimeAllocator";
 	
 	private final int mutationRange;
-	private final int minimalOperatingTime;
 
 	public RandomStartTimeAllocator(ArrayList<String> parameter) {
 		super(parameter);
-		if(parameter.size() != 2){
-			log.error("Missing parameter: 1 - Mutation range in seconds, 2 - Minimal operating time in seconds");
+		if(parameter.size() != 1){
+			log.error("Missing parameter: 1 - Mutation range in seconds");
 		}
 		this.mutationRange = Integer.parseInt(parameter.get(0));
-		this.minimalOperatingTime = Integer.parseInt(parameter.get(1));
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class RandomStartTimeAllocator extends PStrategy implements PPlanStrategy
 		
 		// get a valid new start time
 		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() + (-0.5 + MatsimRandom.getRandom().nextDouble()) * this.mutationRange);
-		newStartTime = Math.min(newStartTime, cooperative.getBestPlan().getEndTime() - this.minimalOperatingTime);
+		newStartTime = Math.min(newStartTime, cooperative.getBestPlan().getEndTime() - cooperative.getMinOperationTime());
 		newPlan.setStartTime(newStartTime);
 		
 		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.plan.PPlan;
 import playground.andreas.P2.plan.PRouteProvider;
 import playground.andreas.P2.replanning.CreateNewPlan;
@@ -50,6 +51,7 @@ public class BasicCooperative implements Cooperative{
 	private PFranchise franchise;
 	private final double costPerVehicleBuy;
 	private final double costPerVehicleSell;
+	private final double minOperationTime;
 
 	private PPlan bestPlan;
 	private PPlan testPlan;
@@ -57,13 +59,17 @@ public class BasicCooperative implements Cooperative{
 	private TransitLine currentTransitLine;
 	private double budget;
 	private double budgetLastIteration;
+	private double scorePerVehicle;
+	private double scorePerVehicleLastIteration;
+	
 	private PRouteProvider routeProvider;
 	private int currentIteration;
 
-	public BasicCooperative(Id id, double costPerVehicle, PFranchise franchise){
+	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
-		this.costPerVehicleBuy = costPerVehicle;
-		this.costPerVehicleSell = 0.5 * this.costPerVehicleBuy; // TODO Why half the price?
+		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
+		this.costPerVehicleSell = pConfig.getPricePerVehicleSold();
+		this.minOperationTime = pConfig.getMinOperationTime();
 		this.franchise = franchise;
 	}
 
@@ -84,22 +90,27 @@ public class BasicCooperative implements Cooperative{
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
 		this.budgetLastIteration = this.budget;
+		this.scorePerVehicleLastIteration = scorePerVehicle;
+		int nVehicles = 0;
 		for (PPlan plan : this.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
 			this.budget += plan.getScore();
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				route.setDescription(plan.toString(this.budget));
 			}
+			nVehicles += plan.getNVehciles();
 		}
+		this.scorePerVehicle = (this.budget - this.budgetLastIteration) / nVehicles;
 	}
 
 	public void replan(PStrategyManager pStrategyManager, int iteration) {	
 		this.currentIteration = iteration;
 		
 		if(this.testPlan != null){
-			// compare score per vehicles TODO This should be the score per vehicle from the last iteration
-			if (this.testPlan.getScorePerVehicle() > this.bestPlan.getScorePerVehicle()){
-				// testPlan scores better, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
+			// compare score per vehicles
+//			if(this.scorePerVehicle > this.scorePerVehicleLastIteration){
+			if (this.budget > this.budgetLastIteration){
+				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
 				this.bestPlan.setStartStop(this.testPlan.getStartStop());
 				this.bestPlan.setEndStop(this.testPlan.getEndStop());
 				this.bestPlan.setStartTime(this.testPlan.getStartTime());
@@ -169,6 +180,11 @@ public class BasicCooperative implements Cooperative{
 	
 	public PFranchise getFranchise(){
 		return this.franchise;
+	}
+
+	@Override
+	public double getMinOperationTime() {
+		return this.minOperationTime;
 	}
 
 	public TransitLine getCurrentTransitLine() {		

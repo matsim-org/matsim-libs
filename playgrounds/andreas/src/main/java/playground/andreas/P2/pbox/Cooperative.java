@@ -57,5 +57,7 @@ public interface Cooperative {
 	public Id getId();
 
 	public PPlan getBestPlan();
+	
+	public double getMinOperationTime();
 
 }

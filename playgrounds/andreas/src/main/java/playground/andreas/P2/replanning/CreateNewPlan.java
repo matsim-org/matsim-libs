@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.pbox.Cooperative;
 import playground.andreas.P2.plan.PPlan;
@@ -32,7 +33,9 @@ public class CreateNewPlan extends PStrategy implements PPlanStrategy{
 		PPlan newPlan;		
 		
 		do {
-			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), cooperative.getRouteProvider().getRandomTransitStop(), cooperative.getRouteProvider().getRandomTransitStop(), 0.0, 24.0 * 3600); 
+			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
+			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
+			newPlan = new PPlan(new IdImpl(cooperative.getCurrentIteration()), cooperative.getRouteProvider().getRandomTransitStop(), cooperative.getRouteProvider().getRandomTransitStop(), startTime, endTime); 
 			while(newPlan.getStartStop() == newPlan.getEndStop()){
 				newPlan.setEndStop(cooperative.getRouteProvider().getRandomTransitStop());
 			}

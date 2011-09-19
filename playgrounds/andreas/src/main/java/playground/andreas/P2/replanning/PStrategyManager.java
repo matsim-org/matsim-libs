@@ -3,6 +3,7 @@ package playground.andreas.P2.replanning;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.helper.PConfigGroup;
@@ -26,21 +27,21 @@ public class PStrategyManager {
 		
 	}
 	
-	public void init(PConfigGroup pConfig) {
+	public void init(PConfigGroup pConfig, EventsManager eventsManager) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
 			}
 			String classname = settings.getModuleName();
-			PPlanStrategy strategy = loadStrategy(classname, settings);
+			PPlanStrategy strategy = loadStrategy(classname, settings, eventsManager);
 			this.addStrategy(strategy, rate);
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PPlanStrategy loadStrategy(final String name, final PStrategySettings settings) {
+	private PPlanStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager) {
 		PPlanStrategy strategy = null;
 		
 		if (name.equals(RemoveAllVehiclesButOne.STRATEGY_NAME)) {
@@ -51,6 +52,10 @@ public class PStrategyManager {
 			strategy = new RandomEndTimeAllocator(settings.getParametersAsArrayList());
 		} else if (name.equals(IncreaseNumberOfVehicles.STRATEGY_NAME)) {
 			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
+		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
+			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
+			eventsManager.addHandler(strat);
+			strategy = strat;
 		}
 		
 		if (strategy == null) {
