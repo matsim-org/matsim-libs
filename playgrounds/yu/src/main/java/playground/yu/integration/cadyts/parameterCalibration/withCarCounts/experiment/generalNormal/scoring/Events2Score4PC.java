@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.config.Config;
@@ -50,7 +51,7 @@ import cadyts.utilities.math.BasicStatistics;
 
 /**
  * @author yu
- *
+ * 
  */
 public abstract class Events2Score4PC extends EventsToScore implements
 		CadytsChoice {
@@ -139,7 +140,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		return data.getSecond().getScore();
 	}
 
-	protected Tuple<Plan, ScoringFunction> getScoringDataForAgent(
+	protected Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(
 			final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
 		if (data == null) {
@@ -157,7 +158,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	@Override
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(agentId);
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(agentId);
 		if (data == null) {
 			return null;
 		}
@@ -172,7 +173,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 *
+	 * 
 	 * @param person
 	 * @param monetaryDistanceCostRateCarStats
 	 */
@@ -352,13 +353,34 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
-		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
 			data.getSecond().startActivity(event.getTime(),
 					(Activity) data.getFirst().getPlanElements().get(index));
 		}
+	}
+
+	public void handleEvent(final ActivityEndEvent event) {
+		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event
+				.getPersonId());
+		if (planAndScoringFunction != null) {
+			int index = getAgentPlanElementIndex(event.getPersonId());
+			planAndScoringFunction.getSecond().endActivity(
+					event.getTime(),
+					(Activity) planAndScoringFunction.getFirst()
+							.getPlanElements().get(index));
+		}
+	}
+
+	private int getAgentPlanElementIndex(Id personId) {
+		Integer index = this.agentPlanElementIndex.get(personId);
+		if (index == null) {
+			this.agentPlanElementIndex.put(personId, Integer.valueOf(0));
+			return 0;
+		}
+		return index.intValue();
 	}
 
 	protected int increaseAgentPlanElementIndex(final Id personId) {
@@ -374,7 +396,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
-		Tuple<Plan, ScoringFunction> data = getScoringDataForAgent(event
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
