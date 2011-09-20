@@ -11,7 +11,12 @@
 </jxb:globalBindings>
 
 <jxb:schemaBindings>
-  <jxb:package name="org.matsim.jaxb.signalgroups20" />
+  <jxb:package name="org.matsim.jaxb.signalgroups20">
+    	<jxb:javadoc>
+    	<![CDATA[<p>This package was automatically generated and is part of MATSim. (c) 2011 by the members listed in the COPYING, LICENSE and WARRANTY file. Available under the terms of the GNU General Public License, version 2 or later.</p>]]>
+    </jxb:javadoc>
+  </jxb:package>
+  
   <jxb:nameXmlTransform>
     <jxb:elementName prefix="XML" />
     <jxb:typeName prefix="XML"  />
