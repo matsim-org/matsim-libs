@@ -44,6 +44,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.io.SimpleWriter;
 import cadyts.utilities.math.BasicStatistics;
 import cadyts.utilities.math.MultinomialLogit;
@@ -51,7 +52,7 @@ import cadyts.utilities.math.Vector;
 
 /**
  * @author yu
- *
+ * 
  */
 public class Events2Score4PC_mnl extends Events2Score4PC implements
 		MultinomialLogitChoice {
@@ -83,7 +84,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	 * set Attr. plans of a person. This method should be called after
 	 * removedPlans, i.e. there should be only choiceSetSize plans in the memory
 	 * of an agent.
-	 *
+	 * 
 	 * @param person
 	 */
 	@Override
@@ -242,7 +243,25 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				Object uc = plan.getCustomAttributes().get(
 						BseStrategyManager.UTILITY_CORRECTION);
-				mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
+
+				// add UC as ASC into MNL
+
+				boolean setUCinMNL = true;
+				String setUCinMNLStr = config
+						.findParam(
+								BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+								"setUCinMNL");
+				if (setUCinMNLStr != null) {
+					setUCinMNL = Boolean.parseBoolean(setUCinMNLStr);
+					System.out.println("BSE:\tsetUCinMNL\t=\t" + setUCinMNL);
+				} else {
+
+					System.out.println("BSE:\tsetUCinMNL\t= default value\t"
+							+ setUCinMNL);
+				}
+				
+				if (setUCinMNL)
+					mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
 			}
 		}
 	}
