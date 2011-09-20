@@ -64,11 +64,23 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	// private boolean outputCalcDetail = false;
 	private SimpleWriter writer = null;
 	private int iteration = -1;
+	boolean setUCinMNL = true;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
 			Population pop) {
 		super(config, sfFactory, pop);
 		mnl = createMultinomialLogit(config);
+
+		String setUCinMNLStr = config.findParam(
+				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				"setUCinMNL");
+		if (setUCinMNLStr != null) {
+			setUCinMNL = Boolean.parseBoolean(setUCinMNLStr);
+			System.out.println("BSE:\tsetUCinMNL\t=\t" + setUCinMNL);
+		} else {
+			System.out.println("BSE:\tsetUCinMNL\t= default value\t"
+					+ setUCinMNL);
+		}
 	}
 
 	@Override
@@ -246,20 +258,6 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				// add UC as ASC into MNL
 
-				boolean setUCinMNL = true;
-				String setUCinMNLStr = config
-						.findParam(
-								BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-								"setUCinMNL");
-				if (setUCinMNLStr != null) {
-					setUCinMNL = Boolean.parseBoolean(setUCinMNLStr);
-					System.out.println("BSE:\tsetUCinMNL\t=\t" + setUCinMNL);
-				} else {
-
-					System.out.println("BSE:\tsetUCinMNL\t= default value\t"
-							+ setUCinMNL);
-				}
-				
 				if (setUCinMNL)
 					mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
 			}
