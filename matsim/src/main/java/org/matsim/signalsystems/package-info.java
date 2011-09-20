@@ -66,8 +66,8 @@
  * Also have a look at the package-info.java documentation in the subpackages to get an idea how the components work and what can be 
  * customized.
  *
- * An example of an adaptive SignalControll implementation can be found in the package 
- * playground.dgrether.signalsystems.roedergershenson in the playground project. 
+ * An example of an adaptive signal control implementation can be found in the package 
+ * playground.dgrether.signalsystems.sylvia in the playground project. 
  * 
  *  @see org.matsim.signalsystems.data
  *  @see org.matsim.signalsystems.model
