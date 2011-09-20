@@ -13,8 +13,10 @@ import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import GTFS2PTSchedule.Stop;
+
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 
@@ -67,7 +69,7 @@ public class LinkStops {
 		Point2D lPoint = new Point2D(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
 		return linkLine.getNearestPoint(point).getDistance(lPoint);
 	}
-	public Link split(int i, Network network) throws Exception {
+	public Link split(int i, Network network, CoordinateTransformation coordinateTransformation) throws Exception {
 		Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 		Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		Line2D linkLine = new Line2D(fromPoint, toPoint);
@@ -81,6 +83,8 @@ public class LinkStops {
 		double length = -1;
 		if(((LinkImpl)link).getOrigId()!=null)
 			length=link.getLength()*CoordUtils.calcDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		else
+			length = CoordUtils.calcDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
 		Link newLink = new LinkFactoryImpl().createLink(new IdImpl(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		if(((LinkImpl)link).getOrigId()!=null)
 			((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());
