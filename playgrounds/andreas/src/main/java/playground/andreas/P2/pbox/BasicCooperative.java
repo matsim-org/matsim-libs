@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -119,22 +120,6 @@ public class BasicCooperative implements Cooperative{
 			this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() + 1);
 			this.testPlan = null;
 		}
-		
-		// plan scored negative sell one vehicle, plan scored positive try to buy one
-		if(this.budget < this.budgetLastIteration){
-			if(this.bestPlan.getNVehciles() > 1){
-				// can sell one vehicle
-				this.budget += this.costPerVehicleSell * 1;
-				this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
-			}
-		} else {
-			// plan scored positive
-			if(this.budget > this.costPerVehicleBuy){
-				// budget ok, buy one
-				this.budget -= this.costPerVehicleBuy * 1;
-				this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() + 1);
-			}
-		}
 
 		// balance the budget
 		if(this.budget < 0){
@@ -156,11 +141,31 @@ public class BasicCooperative implements Cooperative{
 			log.error("There should be no inbalanced budget at this time.");
 		}		
 
-		if(this.bestPlan.getNVehciles() > 1){
-			// can afford to use one vehicle for testing, get a new testPlan
-			PPlanStrategy strategy = pStrategyManager.chooseStrategy();
-			this.testPlan = strategy.run(this);
-			this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
+		if(MatsimRandom.getRandom().nextDouble() < 0.7){
+			// adapt fleet size
+			// plan scored negative sell one vehicle, plan scored positive try to buy one
+			if(this.budget < this.budgetLastIteration){
+				if(this.bestPlan.getNVehciles() > 1){
+					// can sell one vehicle
+					this.budget += this.costPerVehicleSell * 1;
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
+				}
+			} else {
+				// plan scored positive
+				if(this.budget > this.costPerVehicleBuy){
+					// budget ok, buy one
+					this.budget -= this.costPerVehicleBuy * 1;
+					this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() + 1);
+				}
+			}
+		} else {
+			// replan
+			if(this.bestPlan.getNVehciles() > 1){
+				// can afford to use one vehicle for testing, get a new testPlan
+				PPlanStrategy strategy = pStrategyManager.chooseStrategy();
+				this.testPlan = strategy.run(this);
+				this.bestPlan.setNVehicles(this.bestPlan.getNVehciles() - 1);
+			}
 		}
 		
 		// reinitialize the plan
