@@ -84,11 +84,11 @@ public class PhysicalFloor implements Floor {
 	private final EventsManager em;
 	private final Collection<? extends Link> links;
 
-	public PhysicalFloor(Scenario scenario, Collection<? extends Link> collection, EventsManager em, boolean emitEvents) {
+	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents) {
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
 		this.sim2DTimeStepSize = this.sim2DConfig.getTimeStepSize();
-		this.links = collection;
+		this.links = scenario.getNetwork().getLinks().values();
 		this.em = em;
 		this.emitXYZAzimuthEvents = emitEvents;
 

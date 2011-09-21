@@ -27,6 +27,7 @@ import playground.gregor.sim2d_v2.io.EnvironmentDistancesWriter;
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
+@Deprecated // depcrecated use EnvironmentDistanceVectorsGeneratorIII instead
 public class EnvironmentDistanceVectorsGeneratorII {
 
 	private static final Logger log = Logger.getLogger(EnvironmentDistanceVectorsGeneratorII.class);

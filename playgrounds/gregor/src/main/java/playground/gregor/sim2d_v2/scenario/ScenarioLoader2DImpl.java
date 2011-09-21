@@ -26,21 +26,16 @@ import java.util.List;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.EnvironmentDistanceVectorsGeneratorII;
+import playground.gregor.sim2d_v2.helper.EnvironmentDistanceVectorsGeneratorIII;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
-import playground.gregor.sim2d_v2.network.NetworkFromLsFile;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ScenarioLoader2DImpl  {
@@ -61,7 +56,6 @@ public class ScenarioLoader2DImpl  {
 
 	public void load2DScenario() {
 
-		loadMps();
 		loadStaticEnvironmentDistancesField();
 	}
 
@@ -88,33 +82,13 @@ public class ScenarioLoader2DImpl  {
 	//
 	//	}
 
-	private void loadMps() {
-		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getFloorShapeFile());
-
-		@SuppressWarnings("rawtypes")
-		Iterator it = null;
-		try {
-			it = fs.getFeatures().iterator();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		Feature ft = (Feature) it.next();
-		if (it.hasNext()) {
-			throw new RuntimeException("multiple floors are not supported yet");
-		}
-		Geometry geo = ft.getDefaultGeometry();
-		if (!(geo instanceof MultiPolygon)) {
-			throw new RuntimeException("MultiPolygon expected but got:" + geo);
-		}
-		List<Link> links = new ArrayList<Link>(this.scenarioData.getNetwork().getLinks().values());
-		this.scenarioData.getScenarioElement(MyDataContainer.class).getMps().put((MultiPolygon) geo, links);
-	}
 
 
 
 	private void loadStaticEnvironmentDistancesField() {
+
 		if (this.sim2DConfig.getStaticEnvFieldFile() == null) {
-			generateStaticEnvironmentDistancesField();
+			throw new RuntimeException("this mode is not longer supported!");
 		} else  {
 			loadStaticEnvironmentDistancesField(this.sim2DConfig.getStaticEnvFieldFile());
 		}
@@ -134,13 +108,13 @@ public class ScenarioLoader2DImpl  {
 
 	}
 
-	private void generateStaticEnvironmentDistancesField() {
-		EnvironmentDistanceVectorsGeneratorII gen = new EnvironmentDistanceVectorsGeneratorII(this.scenarioData.getConfig());
-		gen.setResolution(.20);
-		gen.setIncr(2*Math.PI/8);
-		this.sff = gen.generate();
-
-	}
+	//	private void generateStaticEnvironmentDistancesField() {
+	//		EnvironmentDistanceVectorsGeneratorIII gen = new EnvironmentDistanceVectorsGeneratorIII(this.scenarioData.getConfig());
+	//		gen.setResolution(.20);
+	//		gen.setIncr(2*Math.PI/8);
+	//		this.sff = gen.generate();
+	//
+	//	}
 
 
 }

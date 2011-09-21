@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/">
-		<!ENTITY OUTPUTBASE    "test/output/playground/gregor/sim2d_v2/Controller2DTest/testController2D/">
+		<!ENTITY INPUTBASE    "test/input/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/">
+		<!ENTITY OUTPUTBASE    "test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/">
 		<!ENTITY LOCALDTDBASE "./dtd">
 		<!ENTITY WEBDTDBASE   "http://www.matsim.org/files/dtd">
 	]
@@ -54,8 +54,7 @@
 ====================================================================== -->
 
 <module name="sim2d">
-	<!--  <param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" /> -->
-	<param name="floorShapeFile" value="&INPUTBASE;/testPolygons.shp"/>
+	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" />
 	<param name="lsShapeFile" value="&INPUTBASE;/testPaths.shp" />
 	<param name="eventsInterval" value="10" />
 </module>

@@ -50,6 +50,7 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
  * @author laemmel
  * 
  */
+@Deprecated //depcrecated use EnvironmentDistanceVectorsGeneratorIII instead
 public class EnvironmentDistanceVectorsGenerator {
 
 	private static final Logger log = Logger.getLogger(EnvironmentDistanceVectorsGenerator.class);
@@ -62,11 +63,11 @@ public class EnvironmentDistanceVectorsGenerator {
 
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	private double res;
+	private final double res;
 
-	private double sens;
+	private final double sens;
 
-	
+
 
 	public EnvironmentDistanceVectorsGenerator(MultiPolygon geo,
 			double sensingRange, double res) {
@@ -127,8 +128,8 @@ public class EnvironmentDistanceVectorsGenerator {
 			double cos = Math.cos(alpha);
 			double sin = Math.sin(alpha);
 
-			double x1 = x + cos * sens;
-			double y1 = y + sin * sens;
+			double x1 = x + cos * this.sens;
+			double y1 = y + sin * this.sens;
 			Coordinate c1 = new Coordinate(x1, y1);
 			coords[1] = c1;
 
@@ -136,8 +137,8 @@ public class EnvironmentDistanceVectorsGenerator {
 
 			cos = Math.cos(alpha);
 			sin = Math.sin(alpha);
-			double x2 = x + cos * sens;
-			double y2 = y + sin * sens;
+			double x2 = x + cos * this.sens;
+			double y2 = y + sin * this.sens;
 			Coordinate c2 = new Coordinate(x2, y2);
 			coords[2] = c2;
 			coords[3] = location;
@@ -164,7 +165,7 @@ public class EnvironmentDistanceVectorsGenerator {
 			double fX = tmp[1].x - tmp[0].x;
 			double fY = tmp[1].y - tmp[0].y;
 			double dist = Math.sqrt(Math.pow(fX, 2) + Math.pow(fY, 2));
-			if (dist > sens) {
+			if (dist > this.sens) {
 				throw new RuntimeException("this should not happen!!");
 			} else if (dist <= 0.01) {
 				return;
@@ -184,7 +185,7 @@ public class EnvironmentDistanceVectorsGenerator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		
+
 		String cf = args[0];
 		Config c = ConfigUtils.loadConfig(cf);
 		Module module = c.getModule("sim2d");
@@ -195,21 +196,21 @@ public class EnvironmentDistanceVectorsGenerator {
 			s = new Sim2DConfigGroup(module);
 		}
 		c.getModules().put("sim2d", s);
-		
-		
-//		String shape = "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/90grad.shp";
+
+
+		//		String shape = "test/input/playground/gregor/sim2d_v2/Controller2DTest/testController2D/90grad.shp";
 		@SuppressWarnings("unchecked")
 		Iterator<Feature> fs = ShapeFileReader.readDataFile(s.getFloorShapeFile()).getFeatures().iterator();
-		
-		
-		
+
+
+
 		double sensingRange = 5;
 		double res = 0.05;
 		while (fs.hasNext()) {
 			Feature ft = fs.next();
 			Geometry geo = ft.getDefaultGeometry();
 			StaticEnvironmentDistancesField fl = new EnvironmentDistanceVectorsGenerator((MultiPolygon) geo,sensingRange,res).loadDistanceVectors();
-//			System.out.println(tree.size());
+			//			System.out.println(tree.size());
 			new EnvironmentDistancesWriter().write(s.getStaticEnvFieldFile(), fl);
 		}
 	}

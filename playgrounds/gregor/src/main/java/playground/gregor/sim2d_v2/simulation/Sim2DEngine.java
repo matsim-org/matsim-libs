@@ -46,13 +46,13 @@ import playground.gregor.sim2d_v2.simulation.floor.Floor;
  */
 public class Sim2DEngine implements MobsimEngine {
 
-	private final List<Floor> floors = new ArrayList<Floor>();
 	private final Scenario scenario;
 
-	private final Map<Id, PhysicalFloor> linkIdFloorMapping = new HashMap<Id, PhysicalFloor>();
 	private final Sim2DConfigGroup sim2ConfigGroup;
 	private final double sim2DStepSize;
 	private final QSim sim;
+
+	private PhysicalFloor floor;
 
 	/**
 	 * @param sim
@@ -80,9 +80,7 @@ public class Sim2DEngine implements MobsimEngine {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
 			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
-			for (Floor floor : this.floors) {
-				floor.move(sim2DTime);
-			}
+			this.floor.move(sim2DTime);
 
 			sim2DTime += this.sim2DStepSize;
 			//			System.out.println("++++++++++++++++++");
@@ -112,18 +110,11 @@ public class Sim2DEngine implements MobsimEngine {
 		//			emitEvents = true;
 		//		}
 
-		Map<MultiPolygon, List<Link>> flm = this.scenario.getScenarioElement(MyDataContainer.class).getMps();
-		for (Entry<MultiPolygon, List<Link>> e : flm.entrySet()) {
-			PhysicalFloor f = new PhysicalFloor(this.scenario, e.getValue(), this.sim.getEventsManager(), emitEvents);
-			this.floors.add(f);
-			for (Link l : e.getValue()) {
-				if (this.linkIdFloorMapping.get(l.getId()) != null) {
-					throw new RuntimeException("Multiple floors per link not allowed! Link with Id: " + l.getId() + " already belongs to floor" + this.linkIdFloorMapping.get(l.getId()));
-				}
-				this.linkIdFloorMapping.put(l.getId(), f);
-			}
-			f.init();
-		}
+		//		Map<MultiPolygon, List<Link>> flm = this.scenario.getScenarioElement(MyDataContainer.class).getMps();
+		//		for (Entry<MultiPolygon, List<Link>> e : flm.entrySet()) {
+		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents);
+		this.floor.init();
+		//		}
 	}
 
 	/*
@@ -141,7 +132,7 @@ public class Sim2DEngine implements MobsimEngine {
 	 * @return
 	 */
 	public PhysicalFloor getFloor(Id currentLinkId) {
-		return this.linkIdFloorMapping.get(currentLinkId);
+		return this.floor;
 	}
 
 
