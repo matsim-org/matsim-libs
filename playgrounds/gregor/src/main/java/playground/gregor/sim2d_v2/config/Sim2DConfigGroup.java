@@ -302,7 +302,7 @@ public class Sim2DConfigGroup extends Module {
 	/**
 	 * @param value
 	 */
-	private void setFloorShapeFile(String value) {
+	public void setFloorShapeFile(String value) {
 		this.floorShapeFile = value;
 
 	}
