@@ -19,11 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.gaparamoptimizer;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import org.jgap.audit.IEvolutionMonitor;
+import org.jgap.Configuration;
 import org.jgap.Genotype;
+import org.jgap.Population;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,6 +51,8 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 public class JPOForOptimization {
 	private static final Logger log =
 		Logger.getLogger(JPOForOptimization.class);
+
+	private static final long MAX_TIME_PER_MEMBER = (long) (10 * 1E9);
 
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
@@ -73,6 +82,7 @@ public class JPOForOptimization {
 	public final double run(
 			final JointReplanningConfigGroup configGroup,
 			final JointPlan plan) {
+		int nMembers = plan.getClique().getMembers().size();
 
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
 			new JointPlanOptimizerJGAPConfiguration(
@@ -92,16 +102,20 @@ public class JPOForOptimization {
 
 		if (configGroup.getFitnessToMonitor()) {
 			//log.debug("monitoring fitness");
-			gaPopulation.evolve(jgapConfig.getEvolutionMonitor());
+			gaPopulation.evolve(
+					new EvolutionMonitorWithTime(
+						jgapConfig.getEvolutionMonitor(),
+						nMembers * MAX_TIME_PER_MEMBER));
 		}
 		else {
+			log.warn("running replanning without fitness monitoring!");
 			gaPopulation.evolve(configGroup.getMaxIterations());
 		}
 
 		//log.debug("best fitness: "+gaPopulation.getFittestChromosome().getFitnessValue());
 		//log.debug("clique size: "+plan.getClique().getMembers().size());
 		return gaPopulation.getFittestChromosome().getFitnessValue() /
-			plan.getClique().getMembers().size();
+			nMembers;
 	}
 
 	private boolean isOptimizablePlan(final JointPlan plan) {
@@ -112,6 +126,29 @@ public class JPOForOptimization {
 		}
 		return false;
 	}
-
 }
 
+class EvolutionMonitorWithTime implements IEvolutionMonitor {
+	private final IEvolutionMonitor initialMonitor;
+	private final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+	private final long maxRunningTime;
+	private long endTime = 0;
+
+	public EvolutionMonitorWithTime(
+			final IEvolutionMonitor initialMonitor,
+			final long maxRunningTimeNanoSecs) {
+		this.maxRunningTime = maxRunningTimeNanoSecs;
+		this.initialMonitor = initialMonitor;
+	}
+
+	@Override
+	public boolean nextCycle(final Population pop, final List<String> msgs) {
+		return initialMonitor.nextCycle(pop, msgs) && threadMXBean.getCurrentThreadCpuTime() < endTime;
+	}
+
+	@Override
+	public void start(final Configuration conf) {
+		initialMonitor.start(conf);
+		endTime = threadMXBean.getCurrentThreadCpuTime() + maxRunningTime;
+	}
+}
