@@ -266,6 +266,14 @@ class ConditionValidator implements TwofoldTripValidator {
 		public String toString() {
 			return name;
 		}
+
+		public int hashCode() {
+			return name.hashCode();
+		}
+
+		public boolean equals(final Object o) {
+			return name.equals(o);
+		}
 	}
 }
 
