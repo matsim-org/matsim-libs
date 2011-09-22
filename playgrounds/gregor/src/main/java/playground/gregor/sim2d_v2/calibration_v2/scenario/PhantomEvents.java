@@ -39,7 +39,6 @@ public class PhantomEvents {
 		for (int i = 0; i < this.eventsList.size(); i++) {
 			Event e = this.eventsList.get(i);
 			if (e instanceof PersonEvent) {
-				PersonEvent pe = (PersonEvent)e;
 				this.times[pointer] = e.getTime();
 				this.events[pointer++] = e;
 			}

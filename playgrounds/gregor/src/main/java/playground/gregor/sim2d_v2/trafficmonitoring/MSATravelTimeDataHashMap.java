@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.trafficmonitoring;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.trafficmonitoring.TravelTimeDataHashMap;
@@ -57,17 +56,17 @@ public class MSATravelTimeDataHashMap extends TravelTimeDataHashMap {
 		this.msaIt++;
 		super.resetTravelTimes();
 	}
-	
+
 	@Override
 	public double getTravelTime(final int timeSlice, final double now) {
-		 Double ret = this.msaTravelTimes.get(IntegerCache.getInteger(timeSlice));
-		 if (ret == null) {
-			 ret = super.getTravelTime(timeSlice, now);
-			 this.msaTravelTimes.put(timeSlice, ret);
-		 }
-		 return ret;
+		Double ret = this.msaTravelTimes.get(IntegerCache.getInteger(timeSlice));
+		if (ret == null) {
+			ret = super.getTravelTime(timeSlice, now);
+			this.msaTravelTimes.put(timeSlice, ret);
+		}
+		return ret;
 	}
-	
+
 	private double getTimeFromSlotIdx(int timeSlice) {
 		return timeSlice * this.binSize;
 	}

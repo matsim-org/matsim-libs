@@ -19,26 +19,15 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.TickEvent;
-import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
-import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
 /**
  * @author laemmel

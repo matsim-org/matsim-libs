@@ -18,7 +18,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import playground.gregor.sim2d_v2.calibration_v2.LLCalculator;
 import playground.gregor.sim2d_v2.calibration_v2.PhantomAgent2D;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.DynamicForceModule;
@@ -45,7 +44,7 @@ public class PhantomFloor extends PhysicalFloor {
 
 	double epsilon = 0.00001;
 	private final LLCalculator llCalc;
-	private final double deltaT;
+	//	private final double deltaT;
 
 	public PhantomFloor(PhantomEvents phantomEvents, Id calibrationAgentId, Collection<? extends Link> collection, Scenario scenario, LLCalculator llCalc, EventsManager em) {
 		super(scenario,em,true);
@@ -58,7 +57,7 @@ public class PhantomFloor extends PhysicalFloor {
 		this.llCalc = llCalc;
 
 
-		this.deltaT = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
+		//		this.deltaT = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 	}
 
 

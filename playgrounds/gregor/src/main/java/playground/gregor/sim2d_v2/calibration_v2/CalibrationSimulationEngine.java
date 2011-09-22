@@ -5,10 +5,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 
-import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.calibration_v2.floor.PhantomFloor;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
@@ -28,12 +26,6 @@ public class CalibrationSimulationEngine {
 		this.timeIncr = ((Sim2DConfigGroup)sc.getConfig().getModule("sim2d")).getTimeStepSize();
 		this.llCalc = llCalc;
 
-		//		this.vis = new PedVisPeekABot(0.1,this.sc);
-		//		//		this.vis.setOffsets(386128,5820182);
-		//		this.vis.setOffsets(this.sc.getNetwork());
-		//		this.vis.setFloorShapeFile(((Sim2DConfigGroup)this.sc.getConfig().getModule("sim2d")).getFloorShapeFile());
-		//		this.vis.drawNetwork(this.sc.getNetwork());
-		//		this.em.addHandler(this.vis);
 	}
 
 

@@ -19,24 +19,11 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.scenario;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.geotools.data.FeatureSource;
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.EnvironmentDistanceVectorsGeneratorIII;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class ScenarioLoader2DImpl  {
 
@@ -58,32 +45,6 @@ public class ScenarioLoader2DImpl  {
 
 		loadStaticEnvironmentDistancesField();
 	}
-
-
-	//	private void loadLsMp() {
-	//		FeatureSource fs = ShapeFileReader.readDataFile(this.sim2DConfig.getLSShapeFile());
-	//
-	//		@SuppressWarnings("rawtypes")
-	//		Iterator it = null;
-	//		try {
-	//			it = fs.getFeatures().iterator();
-	//		} catch (IOException e) {
-	//			throw new RuntimeException(e);
-	//		}
-	//
-	//
-	//		int idd = 0;
-	//		while (it.hasNext()) {
-	//			Feature ft = (Feature) it.next();
-	//			Id id = new IdImpl(idd++);
-	//			this.scenarioData.getScenarioElement(MyDataContainer.class).getLineStringMap().put(id, (LineString) ft.getDefaultGeometry().getGeometryN(0));
-	//
-	//		}
-	//
-	//	}
-
-
-
 
 	private void loadStaticEnvironmentDistancesField() {
 
@@ -107,14 +68,5 @@ public class ScenarioLoader2DImpl  {
 		this.sff = r.getEnvDistField();
 
 	}
-
-	//	private void generateStaticEnvironmentDistancesField() {
-	//		EnvironmentDistanceVectorsGeneratorIII gen = new EnvironmentDistanceVectorsGeneratorIII(this.scenarioData.getConfig());
-	//		gen.setResolution(.20);
-	//		gen.setIncr(2*Math.PI/8);
-	//		this.sff = gen.generate();
-	//
-	//	}
-
 
 }
