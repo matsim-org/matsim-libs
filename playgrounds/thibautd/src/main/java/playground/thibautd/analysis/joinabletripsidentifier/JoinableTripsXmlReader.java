@@ -76,17 +76,17 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 		else if ( name.equals(JoinableTripsXmlSchemaNames.TRIP_TAG) ) {
 			count.incCounter();
 			currentJoinableTrips = new ArrayList<JoinableTrips.JoinableTrip>();
-			currentPassengerTrip = new IdImpl(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID));
+			currentPassengerTrip = IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID));
 			trips.put(
 					currentPassengerTrip,
 					new JoinableTrips.TripRecord(
-							atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID),
-							atts.getValue(JoinableTripsXmlSchemaNames.AGENT_ID),
+							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID)),
+							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.AGENT_ID)),
 							atts.getValue(JoinableTripsXmlSchemaNames.MODE),
-							atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN),
+							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN)),
 							atts.getValue(JoinableTripsXmlSchemaNames.ORIGIN_ACT),
 							atts.getValue(JoinableTripsXmlSchemaNames.DEPARTURE_TIME),
-							atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION),
+							IdPool.getId(atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION)),
 							atts.getValue(JoinableTripsXmlSchemaNames.DESTINATION_ACT),
 							atts.getValue(JoinableTripsXmlSchemaNames.ARRIVAL_TIME),
 							atts.getValue(JoinableTripsXmlSchemaNames.LEG_NR),
@@ -95,7 +95,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 		else if ( name.equals(JoinableTripsXmlSchemaNames.JOINABLE_TAG) ) {
 			currentJoinableTrip = new JoinableTrips.JoinableTrip(
 					currentPassengerTrip,
-					new IdImpl( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) ) );
+					IdPool.getId( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) ) );
 			currentJoinableTrips.add(currentJoinableTrip);
 		}
 	}
@@ -121,3 +121,17 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	}
 }
 
+class IdPool {
+	private static Map<String, Id> map = new HashMap<String, Id>();
+
+	public static Id getId(final String string) {
+		Id id = map.get(string);
+
+		if (id == null) {
+			id = new IdImpl(string);
+			map.put(string, id);
+		}
+
+		return id;
+	}
+}

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -258,6 +259,8 @@ public class JoinableTrips {
 	 * Contains all pertinent data about a trip.
 	 */
 	public static class TripRecord implements Identifiable {
+		private static final double UNDEFINED_DISTANCE = Double.NEGATIVE_INFINITY;
+
 		private final Id tripId;
 		private final Id agentId;
 		private final String mode;
@@ -272,6 +275,8 @@ public class JoinableTrips {
 
 		private final int legNumber;
 		private final List<JoinableTrip> joinableTrips;
+
+		private double distance = UNDEFINED_DISTANCE;
 
 		private TripRecord(
 				final Trip trip,
@@ -294,27 +299,27 @@ public class JoinableTrips {
 		}
 
 		TripRecord(
-				final String tripId,
-				final String agentId,
+				final Id tripId,
+				final Id agentId,
 				final String mode,
-				final String originLinkId,
+				final Id originLinkId,
 				final String originActivityType,
 				final String departureTime,
-				final String destinationLinkId,
+				final Id destinationLinkId,
 				final String destinationActivityType,
 				final String arrivalTime,
 				final String legNumber,
 				final List<JoinableTrip> joinableTrips) {
-			this.tripId = new IdImpl(tripId);
-			this.agentId = new IdImpl(agentId);
-			this.mode = mode;
+			this.tripId = tripId;
+			this.agentId = agentId;
+			this.mode = mode.intern();
 
-			this.originLinkId = new IdImpl(originLinkId);
-			this.originActivityType = originActivityType;
+			this.originLinkId = originLinkId;
+			this.originActivityType = originActivityType.intern();
 			this.departureTime = Double.parseDouble(departureTime);
 
-			this.destinationLinkId = new IdImpl(destinationLinkId);
-			this.destinationActivityType = destinationActivityType;
+			this.destinationLinkId = destinationLinkId;
+			this.destinationActivityType = destinationActivityType.intern();
 			this.arrivalTime = Double.parseDouble(arrivalTime);
 
 			this.legNumber = Integer.valueOf(legNumber);
@@ -421,6 +426,25 @@ public class JoinableTrips {
 		public List<JoinableTrip> getJoinableTrips() {
 			return this.joinableTrips;
 		}
+
+		/**
+		 * "lazy" distance getter. The (bee fly) distance is computed
+		 * at the first call, using the coordinates defined in the argument
+		 * network. Nexts calls will just return the previously computed value
+		 * (even if a different network is passed as an argument).
+		 *
+		 * @param network the network from which coordinate information is retrieved
+		 * @return the bee-fly distance between the center of the origin and the destination links
+		 */
+		public double getDistance(final Network network) {
+			if (distance == UNDEFINED_DISTANCE) {
+				distance = CoordUtils.calcDistance(
+						network.getLinks().get(originLinkId).getCoord(),
+						network.getLinks().get(destinationLinkId).getCoord());
+			}
+
+			return distance;
+		}
 	}
 
 	/**
@@ -434,10 +458,7 @@ public class JoinableTrips {
 		private final Id tripId;
 		private final Id passengerTripId;
 
-		private boolean hasPU = false;
-		private boolean hasDO = false;
-
-		private List<Passage> passages = new ArrayList<Passage>();
+		private List<Passage> passages = null;
 		private final List<AcceptabilityCondition> fullfilledConditions =
 			new ArrayList<AcceptabilityCondition>();
 
@@ -450,16 +471,11 @@ public class JoinableTrips {
 				final Passage.Type type,
 				final double distance,
 				final double timeDifference) {
-			passages.add( new Passage(type, distance, timeDifference) );
-
-			switch ( type ) {
-				case pickUp:
-					hasPU = true;
-					break;
-				case dropOff:
-					hasDO = true;
-					break;
+			if (passages == null) {
+				passages = new ArrayList<Passage>();
 			}
+
+			passages.add( new Passage(type, distance, timeDifference) );
 		}
 
 		public Id getTripId() {
@@ -469,10 +485,6 @@ public class JoinableTrips {
 		public Id getPassengerTripId() {
 			return this.passengerTripId;
 		}
-
-		//public List<Passage> getPassages() {
-		//	return passages;
-		//}
 
 		/**
 		 * Checks conditions, stores results and clean the list of passages.
@@ -490,6 +502,7 @@ public class JoinableTrips {
 			}
 
 			// delete all the heavy not-needed-anymore information
+			// TODO: prevent re-creation of the list (ie boolean "locked")
 			passages = null;
 
 			return fullfilledConditions.size() > 0;
@@ -498,10 +511,6 @@ public class JoinableTrips {
 		public List<AcceptabilityCondition> getFullfilledConditions() {
 			return fullfilledConditions;
 		}
-
-		//private boolean isValidTrip() {
-		//	return hasPU && hasDO;
-		//}
 	}
 
 	public static class Passage {

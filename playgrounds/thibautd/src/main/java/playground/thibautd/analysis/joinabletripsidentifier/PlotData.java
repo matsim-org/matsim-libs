@@ -27,10 +27,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Logger;
 
+import org.jfree.chart.plot.XYPlot;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,6 +54,8 @@ public class PlotData {
 	private static final Logger log =
 		Logger.getLogger(PlotData.class);
 
+	private static double LONGER_DIST = 25;
+
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
 	private static final String DIST = "acceptableDistance_.*";
@@ -60,9 +66,11 @@ public class PlotData {
 	private static final int HEIGHT = 800;
 
 	public static void main(final String[] args) {
-		//TODO: import network
+		// TODO: define a set of minimal distances
 		String configFile = args[0];
 		Config config = ConfigUtils.loadConfig(configFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
 
 		Module module = config.getModule(MODULE);
 		String outputDir = module.getValue(DIR);
@@ -107,14 +115,18 @@ public class PlotData {
 		JoinableTripsXmlReader reader = new JoinableTripsXmlReader();
 		reader.parse(xmlFile);
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
-		CommutersFilter filter = new CommutersFilter();
+		CommutersFilter filter = new CommutersFilter(network, 0);
 
 		int count = 0;
 		for (ConditionValidator condition : conditions) {
 			log.info("creating charts for condition "+condition);
 			count++;
 			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(filter, condition);
-			chart.saveAsPng(outputDir+count+"-plot.png", WIDTH, HEIGHT);
+			chart.saveAsPng(outputDir+count+"-TimePlot.png", WIDTH, HEIGHT);
+			chart = ploter.getBoxAndWhiskerChartPerTripLength(filter, condition, network);
+			chart.saveAsPng(outputDir+count+"-DistancePlot.png", WIDTH, HEIGHT);
+			((XYPlot) chart.getChart().getPlot()).getDomainAxis().setRange(0,25);
+			chart.saveAsPng(outputDir+count+"-DistancePlot-l25.png", WIDTH, HEIGHT);
 		}
 	}
 }
@@ -122,6 +134,21 @@ public class PlotData {
 class CommutersFilter implements PassengerFilter {
 	private static final String WORK_REGEXP = "w.*";
 	private static final String HOME_REGEXP = "h.*";
+
+	private final Network network;
+	private final double distance;
+
+	/**
+	 * @param network the network to use to compute distance information
+	 * @param minTravelDistance the minimal trip length for a trip to be included
+	 * in the list of trips to treat. Negative or 0-valued means all trips are examined
+	 */
+	public CommutersFilter(
+			final Network network,
+			final double minTravelDistance) {
+		this.network = network;
+		this.distance = minTravelDistance;
+	}
 
 	@Override
 	public List<TripRecord> filterRecords(final JoinableTrips trips) {
@@ -133,7 +160,10 @@ class CommutersFilter implements PassengerFilter {
 					 record.getDestinationActivityType().matches(WORK_REGEXP)) ||
 					(record.getDestinationActivityType().matches(HOME_REGEXP) &&
 					 record.getOriginActivityType().matches(WORK_REGEXP)) ) {
-				filtered.add(record);
+				// check for distance
+				if ( (distance <= 0) || (distance <= record.getDistance(network)) ) {
+					filtered.add(record);
+				}
 			}
 		}
 
@@ -142,7 +172,14 @@ class CommutersFilter implements PassengerFilter {
 
 	@Override
 	public String getConditionDescription() {
-		return "commuter passengers only";
+		return "commuter passengers only"+
+			(distance > 0 ?
+				 ", trips longer than "+distance+"m" :
+				 "");
+	}
+
+	public String toString() {
+		return getConditionDescription();
 	}
 }
 
@@ -165,6 +202,10 @@ class ConditionValidator implements DriverTripValidator {
 	public String getConditionDescription() {
 		return "all drivers\nacceptable distance = "+condition.getDistance()+" m"+
 			"\nacceptable time = "+(condition.getTime()/60d)+" min";
+	}
+
+	public String toString() {
+		return getConditionDescription();
 	}
 }
 

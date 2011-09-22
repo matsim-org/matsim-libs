@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.utils.BoxAndWhiskersChart;
 
@@ -99,9 +98,7 @@ public class DataPloter {
 				}
 			}
 
-			double tripLength = CoordUtils.calcDistance(
-					network.getLinks().get(trip.getOriginLinkId()).getCoord(),
-					network.getLinks().get(trip.getDestinationLinkId()).getCoord());
+			double tripLength = trip.getDistance(network);
 
 			chart.add(tripLength / 1000d, count);
 		}
