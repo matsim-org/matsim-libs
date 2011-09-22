@@ -28,20 +28,18 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 
-import playground.droeder.ResizeLinksByCount.AbstractResizeLinksByCount;
-
 /**
  * @author benjamin
  *
  */
-public class RunResizeCounts extends AbstractResizeLinksByCount{
+public class RunResizeLinksByCount extends AbstractResizeLinksByCount{
 
 	/**
 	 * @param networkFile
 	 * @param counts
 	 * @param scaleFactor
 	 */
-	public RunResizeCounts(String networkFile, Counts counts, Double scaleFactor) {
+	public RunResizeLinksByCount(String networkFile, Counts counts, Double scaleFactor) {
 		super(networkFile, counts, scaleFactor);
 		// TODO Auto-generated constructor stub
 	}
@@ -55,13 +53,10 @@ public class RunResizeCounts extends AbstractResizeLinksByCount{
 		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
 		countsReader.parse(countsFile);
 
-		RunResizeCounts rrc = new RunResizeCounts(networkFile, counts, 1.1);
+		RunResizeLinksByCount rrc = new RunResizeLinksByCount(networkFile, counts, 1.1);
 		rrc.run(outputFile);
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.droeder.osm.AbstractResizeLinksByCount#resize()
-	 */
 	@Override
 	protected void resize() {
 		TreeMap<Id, Count> counts = this.getOriginalCounts().getCounts();
