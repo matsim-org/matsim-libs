@@ -23,30 +23,23 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
 import org.jgap.event.EventManager;
-import org.jgap.FitnessFunction;
-import org.jgap.Gene;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
-import org.jgap.impl.GABreeder;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.jgap.impl.WeightedRouletteSelector;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.NaturalSelector;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 
 /**
  * A simple jgap config to optimize the parameters of the JPO
@@ -58,7 +51,7 @@ public class JgapParameterOptimizerConfig extends Configuration {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int POP_SIZE = 40;
+	private static final int POP_SIZE = 30;
 	private static final int MUTATION_RATE = 10;
 	private static final double CO_RATE = 0.6d;
 	private static final double ORIG_RATE = 0.8d;

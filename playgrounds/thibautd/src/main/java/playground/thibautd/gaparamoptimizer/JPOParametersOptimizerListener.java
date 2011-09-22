@@ -63,7 +63,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 	private static final Logger log =
 		Logger.getLogger(JPOParametersOptimizerListener.class);
 
-	private String outputFileName = "optimizedConf.xml";
+	private final String outputFileName = "optimizedConf.xml";
+	private String outputDirectory = null;
 	private final static int N_GEN = 30;
 	private final static int N_PLANS = 5;
 
@@ -77,8 +78,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		PopulationWithCliques population = (PopulationWithCliques) controler.getPopulation();
 		PopulationOfCliques cliques = population.getCliques();
 		Network network = controler.getNetwork();
-		this.outputFileName =
-			controler.getControlerIO().getOutputPath() +"/"+ outputFileName;
+		this.outputDirectory =
+			controler.getControlerIO().getOutputPath() +"/";
 
 		optimizeParameters(
 				getSamplePlans(cliques),
@@ -191,8 +192,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 		Config conf = new Config();
 		conf.addModule("optimizedJointReplanning", optConf);
-		(new ConfigWriter(conf)).write(iter+"."+outputFileName);
-		log.debug("results written in "+iter+"."+outputFileName);
+		(new ConfigWriter(conf)).write(outputDirectory+iter+"."+outputFileName);
+		log.debug("results written in "+outputDirectory+iter+"."+outputFileName);
 	}
 }
 

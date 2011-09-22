@@ -32,6 +32,7 @@ import org.jgap.Population;
  * @author thibautd
  */
 public class JgapBreeder extends GABreeder {
+	private static final long serialVersionUID = 1L;
 	private static final int N_THREADS = 12;
 
 	@Override
@@ -49,9 +50,22 @@ public class JgapBreeder extends GABreeder {
 		int step = toScore.size() / N_THREADS;
 		int first = 0;
 
+		// launch fitness computing in threads
+		List<Thread> threads = new ArrayList<Thread>();
 		for (int i=0; i < N_THREADS; i++) {
-			(new Thread(new Scorer(toScore.subList(first, first + step), a_conf))).start();
+			Thread thread = new Thread(new Scorer(toScore.subList(first, first + step), a_conf));
+			threads.add(thread);
+			thread.start();
 			first += step;
+		}
+
+		// wait for all threads to be dead before exiting
+		for (Thread thread : threads) {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }
