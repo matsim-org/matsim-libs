@@ -19,12 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
+import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.utils.BoxAndWhiskersChart;
+import playground.thibautd.utils.WrapperChartUtil;
 
 /**
  * Class responsible for creating relevant plots from the data
@@ -106,6 +116,43 @@ public class DataPloter {
 		return chart;
 	}
 
+	/**
+	 * @param conditions a list of conditions to compare. they must implement
+	 * the equals and hashCode methods.
+	 */
+	public ChartUtil getTwofoldConditionComparisonChart(
+			final PassengerFilter filter,
+	 		final List<? extends TwofoldTripValidator> conditions) {
+		String title = "Number of possible joint trips for different criteria";
+
+		DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		
+		for (TwofoldTripValidator validator : conditions) {
+			List<JoinableTrips.TripRecord> filteredTrips =
+				filter.filterRecords(trips);
+			validator.setJoinableTrips(trips);
+
+			List<Integer> counts = new ArrayList<Integer>();
+			for (JoinableTrips.TripRecord trip : filteredTrips) {
+				int count = 0;
+
+				for (JoinableTrips.JoinableTrip driverTrip : trip.getJoinableTrips()) { 
+					if (validator.isValid(driverTrip)) {
+						count++;
+					}
+				}
+
+				counts.add(count);
+			}
+			dataset.add(counts, validator.getFirstCriterion(), validator.getSecondCriterion());
+		}
+
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				title, "", "number of possible joint trips", dataset, true);
+
+		return new WrapperChartUtil(chart);
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// nested interface
 	// /////////////////////////////////////////////////////////////////////////
@@ -143,5 +190,16 @@ public class DataPloter {
 
 		public String getConditionDescription();
 	}
+
+	/**
+	 * Provides additional information for a DriverTripValidator which uses at least two criterions
+	 * (as for example distance and time difference) to proceed to filtering
+	 */
+	public interface TwofoldTripValidator extends DriverTripValidator {
+		public String getFirstCriterion();
+		public String getSecondCriterion();
+	}
+
+
 }
 

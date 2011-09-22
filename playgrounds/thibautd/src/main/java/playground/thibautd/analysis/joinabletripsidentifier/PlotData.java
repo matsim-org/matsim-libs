@@ -40,8 +40,9 @@ import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.DriverTripValidator;
+import playground.thibautd.analysis.joinabletripsidentifier.DataPloter;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
+import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 
@@ -115,7 +116,8 @@ public class PlotData {
 		JoinableTripsXmlReader reader = new JoinableTripsXmlReader();
 		reader.parse(xmlFile);
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
-		CommutersFilter filter = new CommutersFilter(network, 0);
+		CommutersFilter filter = new CommutersFilter(network, -1, -1);
+		CommutersFilter shortFilter = new CommutersFilter(network, -1, 25);
 
 		int count = 0;
 		for (ConditionValidator condition : conditions) {
@@ -125,9 +127,12 @@ public class PlotData {
 			chart.saveAsPng(outputDir+count+"-TimePlot.png", WIDTH, HEIGHT);
 			chart = ploter.getBoxAndWhiskerChartPerTripLength(filter, condition, network);
 			chart.saveAsPng(outputDir+count+"-DistancePlot.png", WIDTH, HEIGHT);
-			((XYPlot) chart.getChart().getPlot()).getDomainAxis().setRange(0,25);
-			chart.saveAsPng(outputDir+count+"-DistancePlot-l25.png", WIDTH, HEIGHT);
+			chart = ploter.getBoxAndWhiskerChartPerTripLength(shortFilter, condition, network);
+			chart.saveAsPng(outputDir+count+"-DistancePlot-short.png", WIDTH, HEIGHT);
 		}
+
+		ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
+		chart.saveAsPng(outputDir+"comparisonPlot.png", WIDTH, HEIGHT);
 	}
 }
 
@@ -136,18 +141,23 @@ class CommutersFilter implements PassengerFilter {
 	private static final String HOME_REGEXP = "h.*";
 
 	private final Network network;
-	private final double distance;
+	private final double minDistance;
+	private final double maxDistance;
 
 	/**
 	 * @param network the network to use to compute distance information
 	 * @param minTravelDistance the minimal trip length for a trip to be included
-	 * in the list of trips to treat. Negative or 0-valued means all trips are examined
+	 * in the list of trips to treat. Negative or 0-valued means no lower bound
+	 * @param maxTravelDistance the maximal trip length for a trip to be included
+	 * in the list of trips to treat. Negative or 0-valued means no upper bound
 	 */
 	public CommutersFilter(
 			final Network network,
-			final double minTravelDistance) {
+			final double minTravelDistance,
+			final double maxTravelDistance) {
 		this.network = network;
-		this.distance = minTravelDistance;
+		this.minDistance = minTravelDistance;
+		this.maxDistance = minTravelDistance;
 	}
 
 	@Override
@@ -161,7 +171,8 @@ class CommutersFilter implements PassengerFilter {
 					(record.getDestinationActivityType().matches(HOME_REGEXP) &&
 					 record.getOriginActivityType().matches(WORK_REGEXP)) ) {
 				// check for distance
-				if ( (distance <= 0) || (distance <= record.getDistance(network)) ) {
+				if (( (minDistance <= 0) || (minDistance <= record.getDistance(network)) ) &&
+				 ( (maxDistance <= 0) || (minDistance >= record.getDistance(network)) )) {
 					filtered.add(record);
 				}
 			}
@@ -173,8 +184,11 @@ class CommutersFilter implements PassengerFilter {
 	@Override
 	public String getConditionDescription() {
 		return "commuter passengers only"+
-			(distance > 0 ?
-				 ", trips longer than "+distance+"m" :
+			(minDistance > 0 ?
+				 ", trips longer than "+minDistance+"m" :
+				 "")+
+			(maxDistance > 0 ?
+				 ", trips shorter than "+maxDistance+"m" :
 				 "");
 	}
 
@@ -183,7 +197,7 @@ class CommutersFilter implements PassengerFilter {
 	}
 }
 
-class ConditionValidator implements DriverTripValidator {
+class ConditionValidator implements TwofoldTripValidator {
 	private final AcceptabilityCondition condition;
 
 	public ConditionValidator(final double distance, final double time) {
@@ -206,6 +220,31 @@ class ConditionValidator implements DriverTripValidator {
 
 	public String toString() {
 		return getConditionDescription();
+	}
+
+	@Override
+	public String getFirstCriterion() {
+		return "acceptable distance: "+condition.getDistance()+"m";
+	}
+
+	@Override
+	public String getSecondCriterion() {
+		return "acceptable time "+(condition.getTime()/60d)+"min";
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if ( !(object instanceof ConditionValidator) ) {
+			return false;
+		}
+
+		AcceptabilityCondition otherCondition = ((ConditionValidator) object).condition;
+		return condition.equals(otherCondition);
+	}
+
+	@Override
+	public int hashCode() {
+		return condition.hashCode();
 	}
 }
 
