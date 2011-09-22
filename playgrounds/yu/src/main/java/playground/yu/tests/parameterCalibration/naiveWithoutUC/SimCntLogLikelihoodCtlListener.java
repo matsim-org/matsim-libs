@@ -200,4 +200,12 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 		}
 		return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) < distanceFilter;
 	}
+
+	public static void main(String[] args) {
+		Controler ctl = new Controler(args[0]);
+		ctl.addControlerListener(new SimCntLogLikelihoodCtlListener());
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
+	}
 }

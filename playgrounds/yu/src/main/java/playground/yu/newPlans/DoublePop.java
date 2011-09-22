@@ -103,9 +103,9 @@ public class DoublePop extends NewPopulation {
 		String networkFilename, plansFilename, outputPlansFilename;
 
 		if (args.length != 3) {
-			networkFilename = "test/input/2routes/network.xml";
-			plansFilename = "test/input/2routes/plan.xml";
-			outputPlansFilename = "test/input/2routes/pop100.xml";
+			networkFilename = "test/input/2car1ptRoutes/net2.xml";
+			plansFilename = "test/input/2car1ptRoutes/preparePop/1.xml";
+			outputPlansFilename = "test/input/2car1ptRoutes/preparePop/pop100.xml";
 		} else {
 			networkFilename = args[0];
 			plansFilename = args[1];

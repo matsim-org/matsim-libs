@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.choiceSetGeneration;
 
@@ -44,18 +44,20 @@ import playground.yu.utils.math.SimpleStatistics;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PathSizeFromPlanChoiceSet {
 	public static class Path {
+		/* container 4 leg Link IDs */
 		private List<List<Id>> legs;
 		private List<String> legModeChain = new ArrayList<String>();
+		/* container 4 leg linear distances */
 		private List<Double> legLinearDistanceChain = new ArrayList<Double>();
 		public Id personId;
 
 		/**
 		 * converts {@code Plan} to a {@code Path}
-		 * 
+		 *
 		 * @param plan
 		 */
 		public Path(Plan plan) {
@@ -188,14 +190,22 @@ public class PathSizeFromPlanChoiceSet {
 				pathSizes[planIdx] = legLinearDistChainSum != 0 ? pathSize
 						/ legLinearDistChainSum : 1/* only 1 stay home Plan */;
 
-				if (Double.isNaN(pathSizes[planIdx])) {
-					System.out.println("Person:\t"
-							+ paths.get(planIdx).personId
-							+ "\t|\tlegLinearDistChain:\t" + legLinearDistChain
-							+ "\t|\tplan-index:\t" + planIdx
-							+ "\t|\tlegModeChain:\t" + legModeChain
-							+ "\t|\tpath-size values:\t" + pathSizes);
-					throw new RuntimeException("path-size NaN!!!");
+//				if (pathSizes[planIdx] < 0.2) {
+//					System.out.println("ps<0.2???\tpath-size of planIdx\t"
+//							+ planIdx + "\t=\t" + pathSizes[planIdx]);
+//				}
+
+				if (pathSizes[planIdx] < 0.2) {
+					if (Double.isNaN(pathSizes[planIdx])) {
+						System.out.println("Person:\t"
+								+ paths.get(planIdx).personId
+								+ "\t|\tlegLinearDistChain:\t"
+								+ legLinearDistChain + "\t|\tplan-index:\t"
+								+ planIdx + "\t|\tlegModeChain:\t"
+								+ legModeChain + "\t|\tpath-size values:\t"
+								+ pathSizes);
+						throw new RuntimeException("path-size NaN!!!");
+					}
 				}
 			}
 		}
