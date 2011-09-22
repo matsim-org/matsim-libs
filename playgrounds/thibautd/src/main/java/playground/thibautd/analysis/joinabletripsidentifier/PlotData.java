@@ -157,7 +157,7 @@ class CommutersFilter implements PassengerFilter {
 			final double maxTravelDistance) {
 		this.network = network;
 		this.minDistance = minTravelDistance;
-		this.maxDistance = minTravelDistance;
+		this.maxDistance = maxTravelDistance;
 	}
 
 	@Override
@@ -172,7 +172,7 @@ class CommutersFilter implements PassengerFilter {
 					 record.getOriginActivityType().matches(WORK_REGEXP)) ) {
 				// check for distance
 				if (( (minDistance <= 0) || (minDistance <= record.getDistance(network)) ) &&
-				 ( (maxDistance <= 0) || (minDistance >= record.getDistance(network)) )) {
+				 ( (maxDistance <= 0) || (maxDistance >= record.getDistance(network)) )) {
 					filtered.add(record);
 				}
 			}
@@ -224,12 +224,12 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	@Override
 	public String getFirstCriterion() {
-		return "acceptable distance: "+condition.getDistance()+"m";
+		return condition.getDistance()+"m";
 	}
 
 	@Override
 	public String getSecondCriterion() {
-		return "acceptable time "+(condition.getTime()/60d)+"min";
+		return (condition.getTime()/60d)+"min";
 	}
 
 	@Override
