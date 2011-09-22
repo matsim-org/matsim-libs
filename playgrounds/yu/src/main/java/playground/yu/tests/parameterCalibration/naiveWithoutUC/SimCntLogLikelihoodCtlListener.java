@@ -31,23 +31,28 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+import playground.yu.utils.io.SimpleWriter;
 import cadyts.calibrators.Calibrator;
 
 public class SimCntLogLikelihoodCtlListener implements StartupListener,
-		AfterMobsimListener {
+		AfterMobsimListener, ShutdownListener {
 	private double minStdDev, llhSum = 0d, distanceFilter,
 			countsScaleFactor = 1d, varianceScale = 1d;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0, caliStartTime = 1,
 			caliEndTime = 24;
 	private Coord distanceFilterCenterNodeCoord = null;
+
+	private SimpleWriter writer = null;
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
@@ -95,10 +100,11 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 								double absLlh = (simVal - cntVal)
 										* (simVal - cntVal) / 2d / var;
 								llhSum -= absLlh;
-								System.out.println("Accumulated Llh over "
-										+ avgLlhOverIters
-										+ " iterations at it." + iter + " =\t"
+								writer.writeln("ITER\t" + iter
+										+ "\tAccumulated Llh over "
+										+ avgLlhOverIters + " iterations =\t"
 										+ llhSum + "\tadded llh =\t-" + absLlh);
+								writer.flush();
 							}
 						}
 					}
@@ -107,8 +113,9 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 			if (iter % writeLlhInterval == 0) {
 				// calculate avg. value of llh
 				double avgLlh = llhSum / avgLlhOverIters;
-				System.out.println("avgLlh over " + avgLlhOverIters
-						+ " iterations at it." + iter + " =\t" + avgLlh);
+				writer.writeln("ITER\t" + iter + "\tavgLlh over "
+						+ avgLlhOverIters + " iterations =\t" + avgLlh);
+				writer.flush();
 				llhSum = 0d;// refresh
 			}
 		}
@@ -185,6 +192,9 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 					+ Calibrator.DEFAULT_VARIANCE_SCALE);
 		}
 
+		// INITIALIZING WRITER
+		writer = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
+				"log-likelihood.log"));
 	}
 
 	private boolean isInRange(final Id linkid, final Network net) {
@@ -207,5 +217,10 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 		ctl.setCreateGraphs(false);
 		ctl.setOverwriteFiles(true);
 		ctl.run();
+	}
+
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		writer.close();
 	}
 }
