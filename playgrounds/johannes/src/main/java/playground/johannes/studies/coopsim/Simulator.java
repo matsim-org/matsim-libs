@@ -27,6 +27,7 @@ import java.util.Random;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -45,6 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.SimEngine;
+import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
 import playground.johannes.coopsim.analysis.JointActivityTask;
@@ -55,7 +57,9 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.eval.EvalEngine;
 import playground.johannes.coopsim.mental.MentalEngine;
+import playground.johannes.coopsim.mental.choice.ActTypeTimeSelector;
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
+import playground.johannes.coopsim.mental.choice.ActivityGroupGenerator;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ActivityTypeSelector;
 import playground.johannes.coopsim.mental.choice.ArrivalTimeSelector;
@@ -68,15 +72,19 @@ import playground.johannes.coopsim.mental.choice.EgosFacilities;
 import playground.johannes.coopsim.mental.choice.EgosHome;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
 import playground.johannes.coopsim.mental.choice.RandomAlter;
+import playground.johannes.coopsim.mental.choice.RandomAlters;
 import playground.johannes.coopsim.mental.planmod.ActivityDurationModAdaptor;
 import playground.johannes.coopsim.mental.planmod.ActivityFacilityModAdaptor;
 import playground.johannes.coopsim.mental.planmod.ActivityTypeModAdaptor;
 import playground.johannes.coopsim.mental.planmod.ArrivalTimeModAdaptor;
+import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorComposite;
+import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
+import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.ExponentialDistribution;
+import playground.johannes.socialnetworks.statistics.GaussDistribution;
 import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
@@ -96,6 +104,8 @@ public class Simulator {
 	private static ActivityFacilitiesImpl facilities;
 	
 	private static Config config;
+	
+	private static Map<String, Map<SocialVertex, Double>> desiredDurations;
 	
 	public static void main(String[] args) throws IOException {
 		LoggerUtils.setDisallowVerbose(false);
@@ -133,26 +143,43 @@ public class Simulator {
 		 */
 		logger.info("Initializing choice selectors...");
 		ChoiceSelector choiceSelector = initSelectors(random);
+		
+//		DurationChoiceLogger durLogger = new DurationChoiceLogger();
+//		((ChoiceSelectorComposite)choiceSelector).addComponent(durLogger);
 		/*
 		 * initialize adaptors
 		 */
 		logger.info("Initializing choice adaptors...");
-		Choice2ModAdaptorComposite adaptor = new Choice2ModAdaptorComposite();
-		adaptor.addComponent(new ActivityTypeModAdaptor());
-		adaptor.addComponent(new ActivityFacilityModAdaptor(facilities, router));
-		adaptor.addComponent(new ArrivalTimeModAdaptor());
-		adaptor.addComponent(new ActivityDurationModAdaptor());
+//		Choice2ModAdaptorComposite adaptor = new Choice2ModAdaptorComposite();
+//		adaptor.addComponent(new ActivityTypeModAdaptor());
+//		adaptor.addComponent(new ActivityFacilityModAdaptor(facilities, router));
+//		adaptor.addComponent(new ArrivalTimeModAdaptor());
+//		adaptor.addComponent(new ActivityDurationModAdaptor());
+		AdaptorFactory adaptorFactory = new AdaptorFactory(physical);
 		/*
 		 * initialize mental engine
 		 */
 		logger.info("Initializing mental engine...");
-		MentalEngine mental = new MentalEngine(graph, choiceSelector, adaptor, random);
+		int threads = config.global().getNumberOfThreads();
+		MultiThreading.setNumAllowedThreads(threads);
+		MentalEngine mental;
+		if(threads > 1)
+			mental = new MentalEngine(graph, choiceSelector, new ConcurrentPlanModEngine(adaptorFactory), random);
+		else
+			mental = new MentalEngine(graph, choiceSelector, adaptorFactory.create(), random);
 		/*
 		 * initialize scoring
 		 */
 		logger.info("Initializing evaluation engine...");
+		Map<String, Double> priorities = new HashMap<String, Double>();
+		priorities.put("home", Double.parseDouble(config.getParam("socialnets", "priority_home")));
+		priorities.put("visit", Double.parseDouble(config.getParam("socialnets", "priority_visit")));
+		priorities.put("culture", Double.parseDouble(config.getParam("socialnets", "priority_culture")));
+		priorities.put("gastro", Double.parseDouble(config.getParam("socialnets", "priority_gastro")));
+		priorities.put("sports", Double.parseDouble(config.getParam("socialnets", "priority_sports")));
+		
 		LoggerUtils.setVerbose(false);
-		EvalEngine eval = new EvalEngine(graph, physical.getVisitorTracker(), (PlanCalcScoreConfigGroup) config.getModule("planCalcScore"), beta);
+		EvalEngine eval = new EvalEngine(graph, physical.getVisitorTracker(), (PlanCalcScoreConfigGroup) config.getModule("planCalcScore"), beta, desiredDurations, priorities);
 		LoggerUtils.setVerbose(true);
 		/*
 		 * initialize simulation engine
@@ -164,7 +191,9 @@ public class Simulator {
 		/*
 		 * initialize analyzer tasks
 		 */
+		TrajectoryAnalyzerTask.overwriteStratification(30, 1);
 		TrajectoryAnalyzerTask task = initAnalyzerTask(physical, eval);
+//		((TrajectoryAnalyzerTaskComposite)task).addTask(durLogger);
 		simEngine.setAnalyzerTask(task, output);
 		
 		simEngine.run(iterations);
@@ -222,76 +251,121 @@ public class Simulator {
 		 * initialize activity type selector
 		 */
 		ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-//		actTypeChoiceSet.addChoice("leisure", 1.0);
-		actTypeChoiceSet.addChoice("visit", 36);
-		actTypeChoiceSet.addChoice("gastro", 18);
-		actTypeChoiceSet.addChoice("culture", 46);
+//		actTypeChoiceSet.addChoice("visit", 41);
+//		actTypeChoiceSet.addChoice("gastro", 20);
+//		actTypeChoiceSet.addChoice("culture", 26);
+//		actTypeChoiceSet.addChoice("sports", 13);
+		actTypeChoiceSet.addChoice("visit");
+		actTypeChoiceSet.addChoice("gastro");
+		actTypeChoiceSet.addChoice("culture");
+		actTypeChoiceSet.addChoice("sports");
 		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(actTypeChoiceSet);
 		choiceSelector.addComponent(actTypeSelector);
 		/*
 		 * initialize group selector
 		 */
 		ActivityGroupSelector groupSelector = new ActivityGroupSelector();
-//		groupSelector.addGenerator("leisure", new RandomAlter(random));
-		groupSelector.addGenerator("visit", new RandomAlter(random));
-		groupSelector.addGenerator("gastro", new RandomAlter(random));
-		groupSelector.addGenerator("culture", new RandomAlter(random));
+		ActivityGroupGenerator generator = null;
+		String type = config.getParam("socialnets", "groupGenerator");
+		if(type.equals("randomAlter"))
+			generator = new RandomAlter(random);
+		else if(type.equals("randomAlters")) {
+			double p = Double.parseDouble(config.getParam("socialnets", "alterProba"));
+			generator = new RandomAlters(p, random);
+		} else {
+			throw new IllegalArgumentException(String.format("Activity group generator \"%1$s\" unknown.", type));
+		}
+		
+		groupSelector.addGenerator("visit", generator);
+		groupSelector.addGenerator("gastro", generator);
+		groupSelector.addGenerator("culture", generator);
+		groupSelector.addGenerator("sports", generator);
 		choiceSelector.addComponent(groupSelector);
 		/*
 		 * initialize facility selector
 		 */
 		ActivityFacilitySelector facilitySelector = new ActivityFacilitySelector();
-//		facilitySelector.addGenerator("leisure", new EgosHome(random));
+
 		facilitySelector.addGenerator("visit", new EgosHome(random));
 //		FacilityChoiceSetGenerator generator = new FacilityChoiceSetGenerator(-1.4, 5, random, CartesianDistanceCalculator.getInstance());
 //		try {
 //			generator.write(generator.generate(graph, facilities, "gastro"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.gastro.txt");
 //			generator.write(generator.generate(graph, facilities, "culture"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.culture.txt");
-//		} catch (IOException e) {
+//			generator.write(generator.generate(graph, facilities, "sports"), "/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.sports.txt");
+////		} catch (IOException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //		System.exit(0);
 		facilitySelector.addGenerator("gastro", new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_gastro"), graph), random));
 		facilitySelector.addGenerator("culture", new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_culture"), graph), random));
+		facilitySelector.addGenerator("sports", new EgosFacilities(FacilityChoiceSetGenerator.read(config.getParam("socialnets", "choiceset_sports"), graph), random));
 		choiceSelector.addComponent(facilitySelector);
 		/*
 		 * initialize arrival time selector
 		 */
-		UnivariateRealFunction pdf = new LogNormalDistribution(0.3, 10.8, 1162);
-		Map<SocialVertex, Double> times = initTimes(pdf, 28800, 86400, random);
-		choiceSelector.addComponent(new ArrivalTimeSelector(times, random));
+		ActTypeTimeSelector arrTimeSelector = new ActTypeTimeSelector();
+		choiceSelector.addComponent(arrTimeSelector);
+		// visit
+		AdditiveDistribution arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(3169.5, 41787.8, 274.3));
+		arrTimePDF.addComponent(new GaussDistribution(7619.2, 56968.2, 729.4));
+		arrTimeSelector.addSelector("visit", new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
+		//culture
+		arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(2133.7, 35387.5, 356.5));
+		arrTimePDF.addComponent(new GaussDistribution(8273.9, 54870.2, 1133.4));
+		arrTimeSelector.addSelector("culture", new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
+		//gastro
+		arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(2023.9, 43138.4, 289.9));
+		arrTimePDF.addComponent(new GaussDistribution(13158.8, 59829.9, 811.3));
+		arrTimeSelector.addSelector("gastro", new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
+		//sports
+		arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(4386.6, 36623.6, 486.3));
+		arrTimePDF.addComponent(new GaussDistribution(6263.0, 52594.0, 860.7));
+		arrTimeSelector.addSelector("sports", new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
 		/*
 		 * initialize duration selector
 		 */
-		pdf = new ExponentialDistribution(-0.0001, 0.06);
-		times = initTimes(pdf, 0, 43200, random);
-		choiceSelector.addComponent(new DurationSelector(times, random));
+		ActTypeTimeSelector durTimeSelector = new ActTypeTimeSelector();
+		choiceSelector.addComponent(durTimeSelector);
+		
+		desiredDurations = new HashMap<String, Map<SocialVertex,Double>>();
+		//visit
+		LogNormalDistribution durPDF = new LogNormalDistribution(1.027, 9.743, 1455.990);
+//		LogNormalDistribution durPDF = new LogNormalDistribution(0.7, 9.3, 970);
+//		desiredDurations.put("visit", initTimes(durPDF, 86400, random));
+		desiredDurations.put("visit", initTimes(durPDF, 13*3600, random));
+		//culture
+		durPDF = new LogNormalDistribution(0.4816, 8.8678, 509.9828);
+		desiredDurations.put("culture", initTimes(durPDF, 14*3600, random));
+		//gastro
+		durPDF = new LogNormalDistribution(0.6344, 8.7971, 885.4643);
+		desiredDurations.put("gastro", initTimes(durPDF, 8*3600, random));
+		//sports
+		durPDF = new LogNormalDistribution(0.832, 9.647, 1013.939);
+//		durPDF = new LogNormalDistribution(0.6, 9.4, 675);
+		desiredDurations.put("sports", initTimes(durPDF, 11*3600, random));
+		
+		durTimeSelector.addSelector("visit", new DurationSelector(desiredDurations.get("visit"), random));
+		durTimeSelector.addSelector("culture", new DurationSelector(desiredDurations.get("culture"), random));
+		durTimeSelector.addSelector("gastro", new DurationSelector(desiredDurations.get("gastro"), random));
+		durTimeSelector.addSelector("sports", new DurationSelector(desiredDurations.get("sports"), random));
 		
 		
 		return choiceSelector;
 	}
 	
-	private static Map<SocialVertex, Double> initTimes(UnivariateRealFunction pdf, int min, int max, Random random) {
+	private static Map<SocialVertex, Double> initTimes(UnivariateRealFunction pdf, int max, Random random) {
 		TimeSampler sampler = new TimeSampler(pdf, max, random);
 		Map<SocialVertex, Double> map = new HashMap<SocialVertex, Double>(graph.getVertices().size());
-//		BufferedWriter writer;
-//		try {
-//			writer = new BufferedWriter(new FileWriter("/Users/jillenberger/Work/socialnets/locationChoice/output/samples.txt"));
-//		ProgressLogger.init(graph.getVertices().size(), 1, 5);
-		
+
 		for(SocialVertex v : graph.getVertices()) {
-			double sample =sampler.nextSample();
-//			writer.write(String.valueOf(sample));
-//			writer.newLine();
+			double sample =(double) sampler.nextSample();
 			map.put(v, sample);
-//			ProgressLogger.step();
 		}
-//		writer.close();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		
 		return map;
 	}
@@ -305,6 +379,30 @@ public class Simulator {
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
 		composite.addTask(new ScoreTask(eval));
+		composite.addTask(new ActTypeShareTask());
+		
+//		composite.addTask(new ActivityDurationPlanTask());
+		
 		return composite;
+	}
+	
+	private static class AdaptorFactory implements Choice2ModAdaptorFactory {
+
+		private final PhysicalEngine physical;
+		
+		public AdaptorFactory(PhysicalEngine physical) {
+			this.physical = physical;
+		}
+		
+		@Override
+		public Choice2ModAdaptor create() {
+			Choice2ModAdaptorComposite adaptor = new Choice2ModAdaptorComposite();
+			adaptor.addComponent(new ActivityTypeModAdaptor());
+			adaptor.addComponent(new ActivityFacilityModAdaptor(facilities, initRouter(physical.getTravelTime())));
+			adaptor.addComponent(new ArrivalTimeModAdaptor());
+			adaptor.addComponent(new ActivityDurationModAdaptor());
+			return adaptor;
+		}
+		
 	}
 }
