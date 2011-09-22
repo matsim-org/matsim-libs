@@ -391,10 +391,7 @@ public class IOUtils {
 
     try {
     	copyFile(fromFile, toFile2);
-    } catch (FileNotFoundException e) {
-    	if (toFile2.exists()) toFile2.delete();
-    	return false;
-    } catch (IOException e) {
+    } catch (UncheckedIOException e) {
     	if (toFile2.exists()) toFile2.delete();
     	return false;
     }
@@ -410,18 +407,19 @@ public class IOUtils {
 	 *
 	 * @param fromFile The file containing the data to be copied
 	 * @param toFile The file the data should be written to
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * @throws UncheckedIOException
 	 *
 	 * @author mrieser
 	 */
-	public static void copyFile(final File fromFile, final File toFile) throws FileNotFoundException, IOException {
+	public static void copyFile(final File fromFile, final File toFile) throws UncheckedIOException {
 		InputStream from = null;
 		OutputStream to = null;
 		try {
 			from = new FileInputStream(fromFile);
 			to = new FileOutputStream(toFile);
 			copyStream(from, to);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		} finally {
 			if (from != null) {
 				try {
