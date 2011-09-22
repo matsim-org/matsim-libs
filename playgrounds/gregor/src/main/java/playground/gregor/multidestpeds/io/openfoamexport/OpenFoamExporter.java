@@ -26,7 +26,7 @@ import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimat
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 
 
@@ -270,7 +270,7 @@ public class OpenFoamExporter implements DoubleValueStringKeyAtCoordinateEventHa
 		NNGaussianKernelEstimator densityEst = fac.createDensityEstimator(queryCoords);
 		manager.addHandler(densityEst);
 
-		new XYZEventsFileReader(manager).parse(events);
+		new XYVxVyEventsFileReader(manager).parse(events);
 	}
 
 	private static void initSim2dConfig(Config c) {

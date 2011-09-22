@@ -34,10 +34,10 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
-public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
+public class OTFVisMobsimFeature implements VisMobsimFeature,XYVxVyEventsHandler{
 
 	protected OnTheFlyServer server = null;
 	private final VisMobsim queueSimulation;
@@ -162,7 +162,7 @@ public class OTFVisMobsimFeature implements VisMobsimFeature,XYZEventsHandler{
 	}
 
 	@Override
-	public void handleEvent(XYZAzimuthEvent event) {
+	public void handleEvent(XYVxVyEvent event) {
 		XYZAzimuthPositionInfo info = new XYZAzimuthPositionInfo(event.getPersonId(), event.getCoordinate(), event.getVX(), event.getVY(), event.getTime());
 		this.visData.put(event.getPersonId(), info);
 	}

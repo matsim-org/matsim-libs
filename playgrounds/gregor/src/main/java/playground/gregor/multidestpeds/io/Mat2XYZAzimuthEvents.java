@@ -22,25 +22,20 @@ package playground.gregor.multidestpeds.io;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -50,9 +45,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d_v2.events.XYZEventsManager;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -125,7 +119,7 @@ public class Mat2XYZAzimuthEvents {
 				Coordinate v = ped.velocities.get(time);
 
 
-				XYZAzimuthEvent ev = new XYZAzimuthEventImpl(id, c, v.x, v.y, time);
+				XYVxVyEvent ev = new XYVxVyEventImpl(id, c, v.x, v.y, time);
 				manager.processEvent(ev);
 
 				if (checkForNextLink(ped,c)) {

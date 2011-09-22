@@ -18,7 +18,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import playground.gregor.sim2d_v2.calibration_v2.LLCalculator;
 import playground.gregor.sim2d_v2.calibration_v2.PhantomAgent2D;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.Force;
@@ -101,8 +101,8 @@ public class PhantomFloor extends PhysicalFloor {
 					getEventsManager().processEvent(e);
 				}
 
-			} else if (e instanceof XYZAzimuthEvent) {
-				XYZAzimuthEvent event = (XYZAzimuthEvent)e;
+			} else if (e instanceof XYVxVyEvent) {
+				XYVxVyEvent event = (XYVxVyEvent)e;
 				AgentInfo ai = this.agentsMap.get(event.getPersonId());
 				if (ai.lastUpdate < 0) {
 					ai.agent.setCurrentVelocity(0, 0);

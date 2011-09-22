@@ -44,8 +44,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -233,7 +233,7 @@ public class PhysicalFloor implements Floor {
 		agent.moveToPostion(newPos);
 
 		if (this.emitXYZAzimuthEvents ) {
-			XYZAzimuthEvent e = new XYZAzimuthEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);
+			XYVxVyEvent e = new XYVxVyEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);
 			this.em.processEvent(e);
 		}
 		//			if (Sim2DConfig.DEBUG) {

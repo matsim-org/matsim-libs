@@ -13,11 +13,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
-public class ASCIITableWriter implements XYZEventsHandler {
+public class ASCIITableWriter implements XYVxVyEventsHandler {
 
 
 	private final String outputFile;
@@ -40,7 +40,7 @@ public class ASCIITableWriter implements XYZEventsHandler {
 	}
 
 	@Override
-	public void handleEvent(XYZAzimuthEvent event) {
+	public void handleEvent(XYVxVyEvent event) {
 		if (!this.fileInitialized) {
 			init();
 		}
@@ -98,7 +98,7 @@ public class ASCIITableWriter implements XYZEventsHandler {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(tableWriter);
 
-		XYZEventsFileReader reader = new XYZEventsFileReader(manager);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
 		reader.parse(inputFile);
 
 		tableWriter.finish();

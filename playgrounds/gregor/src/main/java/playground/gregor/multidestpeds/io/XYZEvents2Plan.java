@@ -47,15 +47,15 @@ import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
 /**
  * @author laemmel
  * 
  */
-public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandler {
+public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHandler {
 
 	private final ScenarioImpl sc;
 
@@ -76,7 +76,7 @@ public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandle
 	 * .gregor.sim2d.events.XYZAzimuthEvent)
 	 */
 	@Override
-	public void handleEvent(XYZAzimuthEvent event) {
+	public void handleEvent(XYVxVyEvent event) {
 		Id id = event.getPersonId();
 		if (!this.lastPosition.containsKey(id)) {
 			P p = new P();
@@ -140,7 +140,7 @@ public class XYZEvents2Plan implements XYZEventsHandler, AgentArrivalEventHandle
 		EventsManager mgr = EventsUtils.createEventsManager();
 		XYZEvents2Plan planGen = new XYZEvents2Plan();
 		mgr.addHandler(planGen);
-		XYZEventsFileReader reader = new XYZEventsFileReader(mgr);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(mgr);
 		reader.parse(eventsFile);
 		planGen.write("/Users/laemmel/devel/dfg/data/90gradPlans.xml");
 	}

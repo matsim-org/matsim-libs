@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZAzimuthEvent.java
+ * XYZEventsHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,27 +19,10 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.events;
 
-import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-import com.vividsolutions.jts.geom.Coordinate;
+public interface XYVxVyEventsHandler extends EventHandler {
 
-/**
- * @author laemmel
- * 
- */
-@Deprecated //rename this class since Azimuth is no longer an attribute of this event type [GL Jul-2011]
-public interface XYZAzimuthEvent extends PersonEvent {
+	public void handleEvent(XYVxVyEvent event);
 
-	public double getX();
-
-	public double getY();
-
-	public double getZ();
-
-	public double getVX();
-
-	public double getVY();
-
-	// convenience method
-	public Coordinate getCoordinate();
 }

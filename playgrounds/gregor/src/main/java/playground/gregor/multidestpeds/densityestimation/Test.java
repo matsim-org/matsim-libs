@@ -8,7 +8,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 
 public class Test {
 
@@ -24,7 +24,7 @@ public class Test {
 
 		events.addHandler(est);
 
-		XYZEventsFileReader reader = new XYZEventsFileReader(events);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(events);
 		reader.parse("/Users/laemmel/devel/dfg/output/ITERS/it.0/0.events.xml.gz");
 
 	}

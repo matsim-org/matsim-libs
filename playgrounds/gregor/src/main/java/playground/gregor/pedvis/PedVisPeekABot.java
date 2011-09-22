@@ -56,9 +56,9 @@ import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimat
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
 import playground.gregor.sim2d_v2.helper.GEO;
@@ -75,7 +75,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author laemmel
  * 
  */
-public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, DoubleValueStringKeyAtCoordinateEventHandler, IterationEndsListener {
+public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, DoubleValueStringKeyAtCoordinateEventHandler, IterationEndsListener {
 
 	private final PeekABotClient pc;
 	private String file;
@@ -248,7 +248,7 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 		ev.addHandler(this);
 		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc,0.25).createDensityEstimator();
 		ev.addHandler(est);
-		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(ev);
 		try {
 			reader.parse(this.file);
 		} catch (Exception e) {
@@ -257,10 +257,10 @@ public class PedVisPeekABot implements XYZEventsHandler, AgentDepartureEventHand
 	}
 
 	@Override
-	public void handleEvent(XYZAzimuthEvent e) {
+	public void handleEvent(XYVxVyEvent e) {
 		testWait(e.getTime());
 		//		System.out.println(e.getPersonId().toString().hashCode());
-		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (e.getZ()* this.scale), (float) (GEO.getAzimuth(e.getVX(),e.getVY())),(float)this.scale);
+		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (0* this.scale), (float) (GEO.getAzimuth(e.getVX(),e.getVY())),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
 	}

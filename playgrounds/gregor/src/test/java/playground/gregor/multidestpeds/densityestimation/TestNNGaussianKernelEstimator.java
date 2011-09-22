@@ -19,7 +19,7 @@ import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory
 import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
+import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
@@ -100,16 +100,16 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		double [] gy = {0., -2.000, -3.000,-5.000,-3.500,-5.000};
 		for (int i = 0; i < rx.length; i++) {
 			Coordinate cr = new Coordinate(rx[i],ry[i]);
-			XYZAzimuthEventImpl er = new XYZAzimuthEventImpl(sc.createId("r" + Integer.toString(i)),cr, 0., 0., 0.);
+			XYVxVyEventImpl er = new XYVxVyEventImpl(sc.createId("r" + Integer.toString(i)),cr, 0., 0., 0.);
 			events.processEvent(er);
 
 			Coordinate cg = new Coordinate(gx[i],gy[i]);
-			XYZAzimuthEventImpl eg = new XYZAzimuthEventImpl(sc.createId("g" + Integer.toString(i)),cg, 0., 0., 0.);
+			XYVxVyEventImpl eg = new XYVxVyEventImpl(sc.createId("g" + Integer.toString(i)),cg, 0., 0., 0.);
 			events.processEvent(eg);
 		}
 
 		//Density estimation is only performed after a time increment
-		XYZAzimuthEventImpl dummy = new XYZAzimuthEventImpl(sc.createId("dummy"),new Coordinate(Double.NaN,Double.NaN), 0., 0., 1.);
+		XYVxVyEventImpl dummy = new XYVxVyEventImpl(sc.createId("dummy"),new Coordinate(Double.NaN,Double.NaN), 0., 0., 1.);
 		events.processEvent(dummy);
 	}
 

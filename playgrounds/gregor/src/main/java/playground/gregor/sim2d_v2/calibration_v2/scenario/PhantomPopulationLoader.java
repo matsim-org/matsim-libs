@@ -30,15 +30,15 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
 /**
  * @author laemmel
  * 
  */
-public class PhantomPopulationLoader implements XYZEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler {
+public class PhantomPopulationLoader implements XYVxVyEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler {
 
 	private final String file;
 	//	private List<Event> phantomPopulation;
@@ -57,13 +57,13 @@ public class PhantomPopulationLoader implements XYZEventsHandler, AgentDeparture
 	public PhantomEvents getPhantomPopulation() {
 		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
-		XYZEventsFileReader reader = new XYZEventsFileReader(ev);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(ev);
 		reader.parse(this.file);
 		return this.pe;
 	}
 
 	@Override
-	public void handleEvent(XYZAzimuthEvent event) {
+	public void handleEvent(XYVxVyEvent event) {
 		this.pe.addEvent(event);
 	}
 

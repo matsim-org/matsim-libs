@@ -38,22 +38,21 @@ import org.xml.sax.Attributes;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
- * Events file reader that handles xyzAzimuth, link leave, link enter, departure
+ * Events file reader that handles XYVxVyEvents, link leave, link enter, departure
  * and arrival events its a lot of copy and paste code from EventsReaderXMLv1
- * The xyzAzimuth part is to be merged into EventsReaderXMLv1 some day
+ * The XYVxVy part is to be merged into EventsReaderXMLv1 some day
  * 
  * @author laemmel
  * 
  */
-@Deprecated
-public class XYZEventsFileReader extends MatsimXmlParser {
+public class XYVxVyEventsFileReader extends MatsimXmlParser {
 
 	private final EventsManager events;
-	private final XYZAzimuthEventsFactoryImpl builder;
+	private final XYVxVyEventsFactoryImpl builder;
 
-	public XYZEventsFileReader(EventsManager events) {
+	public XYVxVyEventsFileReader(EventsManager events) {
 		this.events = events;
-		this.builder = new XYZAzimuthEventsFactoryImpl(events.getFactory());
+		this.builder = new XYVxVyEventsFactoryImpl(events.getFactory());
 		setValidating(false);// events-files have no DTD, thus they cannot
 		// validate
 	}
@@ -87,14 +86,13 @@ public class XYZEventsFileReader extends MatsimXmlParser {
 			String legMode = atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.getFactory().createAgentDepartureEvent(time, new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)), mode));
-		} else if (XYZAzimuthEventImpl.EVENT_TYPE.equals(eventType)) {
-			String x = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_X);
-			String y = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_Y);
-			String z = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_Z);
-			String vx = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_VX);
-			String vy = atts.getValue(XYZAzimuthEventImpl.ATTRIBUTE_VY);
+		} else if (XYVxVyEventImpl.EVENT_TYPE.equals(eventType)) {
+			String x = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X);
+			String y = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y);
+			String vx = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VX);
+			String vy = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VY);
 			String id = atts.getValue(PersonEventImpl.ATTRIBUTE_PERSON);
-			Event e = this.builder.createXYZAzimuthEvent(x, y, z, vx,vy, id, atts.getValue("time"));
+			Event e = this.builder.createXYZAzimuthEvent(x, y, vx,vy, id, atts.getValue("time"));
 			this.events.processEvent(e);
 		} else if (DoubleValueStringKeyAtCoordinateEvent.EVENT_TYPE.equals(eventType)) {
 			String x = atts.getValue(DoubleValueStringKeyAtCoordinateEvent.ATTRIBUTE_CENTER_X);

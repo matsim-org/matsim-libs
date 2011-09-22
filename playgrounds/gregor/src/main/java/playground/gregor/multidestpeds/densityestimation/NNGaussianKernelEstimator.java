@@ -16,8 +16,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZEventsHandler;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
@@ -26,10 +26,10 @@ import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesFie
  * @author laemmel
  *
  */
-public class NNGaussianKernelEstimator implements XYZEventsHandler{
+public class NNGaussianKernelEstimator implements XYVxVyEventsHandler{
 
 
-	Stack<XYZAzimuthEvent> events = new Stack<XYZAzimuthEvent>();
+	Stack<XYVxVyEvent> events = new Stack<XYVxVyEvent>();
 	List<String> groupIDs = new ArrayList<String>();
 
 	List<Coordinate> queryCoordinates = null;// = new ArrayList<Coordinate>();
@@ -60,7 +60,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 	}
 
 	@Override
-	public void handleEvent(XYZAzimuthEvent event) {
+	public void handleEvent(XYVxVyEvent event) {
 		double eventTime = event.getTime();
 		if (eventTime > this.time) {
 			processFrame();
@@ -77,7 +77,7 @@ public class NNGaussianKernelEstimator implements XYZEventsHandler{
 		Map<String, List<PersonInfo>> groupsDists = new HashMap<String,List<PersonInfo>>();
 		List<Coordinate> all = new ArrayList<Coordinate>();
 		while (!this.events.isEmpty()) {
-			XYZAzimuthEvent e = this.events.pop();
+			XYVxVyEvent e = this.events.pop();
 			String key = getKeyFromPersonId(e.getPersonId());
 			all.add(e.getCoordinate());
 			List<Coordinate> l = groups.get(key);

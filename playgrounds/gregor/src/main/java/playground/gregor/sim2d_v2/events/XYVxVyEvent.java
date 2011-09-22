@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * XYZEventsManager.java
+ * XYZAzimuthEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,21 +19,26 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.events;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.core.api.experimental.events.PersonEvent;
 
-public class XYZEventsManager {
+import com.vividsolutions.jts.geom.Coordinate;
 
-	private final List<XYZEventsHandler> handler = new ArrayList<XYZEventsHandler>();
+/**
+ * Event that describes the coordinate (x,y) and the velocity (vx,vy) of an entity in the simulation
+ * 
+ * @author laemmel
+ * 
+ */
+public interface XYVxVyEvent extends PersonEvent {
 
-	public void processXYZEvent(XYZAzimuthEvent e) {
-		for (XYZEventsHandler h : this.handler) {
-			h.handleEvent(e);
-		}
-	}
+	public double getX();
 
-	public void addHandler(XYZEventsHandler h) {
-		this.handler.add(h);
-	}
+	public double getY();
 
+	public double getVX();
+
+	public double getVY();
+
+	// convenience method
+	public Coordinate getCoordinate();
 }

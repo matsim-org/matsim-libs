@@ -26,38 +26,34 @@ import org.matsim.core.events.PersonEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEvent {
+public class XYVxVyEventImpl extends PersonEventImpl implements XYVxVyEvent {
 
-	public static final String EVENT_TYPE = "XYZAzimuth";
+	public static final String EVENT_TYPE = "XYVxVyEvent";
 	public static final String ATTRIBUTE_X = "x";
 	public static final String ATTRIBUTE_Y = "y";
-	public static final String ATTRIBUTE_Z = "z";
 	public static final String ATTRIBUTE_VX = "vx";
 	public static final String ATTRIBUTE_VY = "vy";
 
 	private final Coordinate c;
 	private final double x;
 	private final double y;
-	private final double z;
 	private final double vx;
 	private final double vy;
 
-	public XYZAzimuthEventImpl(Id id, double x, double y, double z, double vx, double vy, double time) {
+	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time) {
 		super(time, id);
-		this.c = new Coordinate(x, y, z);
+		this.c = new Coordinate(x, y);
 		this.x = x;
 		this.y = y;
-		this.z = z;
 		this.vx = vx;
 		this.vy = vy;
 	}
 
-	public XYZAzimuthEventImpl(Id id, Coordinate c, double vx, double vy, double time) {
+	public XYVxVyEventImpl(Id id, Coordinate c, double vx, double vy, double time) {
 		super(time, id);
 		this.c = c;
 		this.x = c.x;
 		this.y = c.y;
-		this.z = c.z;
 		this.vx = vx;
 		this.vy = vy;
 	}
@@ -77,7 +73,6 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_X, Double.toString(this.x));
 		attr.put(ATTRIBUTE_Y, Double.toString(this.y));
-		attr.put(ATTRIBUTE_Z, Double.toString(this.z));
 		attr.put(ATTRIBUTE_VX, Double.toString(this.vx));
 		attr.put(ATTRIBUTE_VY, Double.toString(this.vy));
 		return attr;
@@ -101,16 +96,6 @@ public class XYZAzimuthEventImpl extends PersonEventImpl implements XYZAzimuthEv
 	@Override
 	public double getY() {
 		return this.y;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d.events.XYZAzimuthEvent#getZ()
-	 */
-	@Override
-	public double getZ() {
-		return this.z;
 	}
 
 

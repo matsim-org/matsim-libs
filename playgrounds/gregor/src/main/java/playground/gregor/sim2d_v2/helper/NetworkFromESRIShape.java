@@ -1,4 +1,4 @@
-package playground.gregor.multidestpeds.io;
+package playground.gregor.sim2d_v2.helper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -204,12 +204,12 @@ public class NetworkFromESRIShape {
 	}
 
 	public static void main(String [] args) {
-		String networkShape = "/Users/laemmel/devel/dfg/data/links.shp";
+		String networkShape = "/Users/laemmel/devel/sim2DDemo/input/network.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		new NetworkFromESRIShape(sc).processShapeFile(networkShape);
 
-		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/dfg/data/90gradNetwork.xml");
+		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/sim2DDemo/input/network.xml");
 	}
 
 }

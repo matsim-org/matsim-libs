@@ -16,9 +16,9 @@ import org.matsim.core.events.EventsUtils;
 
 import playground.gregor.sim2d_v2.events.TickEvent;
 import playground.gregor.sim2d_v2.events.TickEventHandler;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEvent;
-import playground.gregor.sim2d_v2.events.XYZAzimuthEventImpl;
-import playground.gregor.sim2d_v2.events.XYZEventsFileReader;
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 
 public class GhostPopulationEngine implements TickEventHandler {
 
@@ -38,7 +38,7 @@ public class GhostPopulationEngine implements TickEventHandler {
 		EventsManager manager = EventsUtils.createEventsManager();
 		this.ghostPopulationEvents = new GhostPopulationEvents();
 		manager.addHandler(this.ghostPopulationEvents);
-		XYZEventsFileReader reader = new XYZEventsFileReader(manager);
+		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
 		try {
 			reader.parse(ghostPopulationEventsFile);
 		} catch (Exception e) {
@@ -89,9 +89,9 @@ public class GhostPopulationEngine implements TickEventHandler {
 					AgentDepartureEvent depart = (AgentDepartureEvent)e;
 					AgentDepartureEventImpl ghost = new AgentDepartureEventImpl(depart.getTime(), id, depart.getLinkId(), depart.getLegMode());
 					events.processEvent(ghost);
-				} else if (e instanceof XYZAzimuthEvent) {
-					XYZAzimuthEvent xyz = (XYZAzimuthEvent)e;
-					XYZAzimuthEventImpl ghost = new XYZAzimuthEventImpl(id, xyz.getCoordinate(), xyz.getVX(), xyz.getVY(), xyz.getTime());
+				} else if (e instanceof XYVxVyEvent) {
+					XYVxVyEvent xyz = (XYVxVyEvent)e;
+					XYVxVyEventImpl ghost = new XYVxVyEventImpl(id, xyz.getCoordinate(), xyz.getVX(), xyz.getVY(), xyz.getTime());
 					events.processEvent(ghost);
 				} else if (e instanceof AgentArrivalEvent) {
 					AgentArrivalEvent arr = (AgentArrivalEvent)e;

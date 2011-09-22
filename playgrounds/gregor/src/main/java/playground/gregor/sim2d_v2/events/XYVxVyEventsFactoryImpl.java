@@ -27,11 +27,11 @@ import org.matsim.core.basic.v01.IdImpl;
  * @author laemmel
  * 
  */
-public class XYZAzimuthEventsFactoryImpl {
+public class XYVxVyEventsFactoryImpl {
 
 	private final EventsFactory factory;
 
-	public XYZAzimuthEventsFactoryImpl(EventsFactory factory) {
+	public XYVxVyEventsFactoryImpl(EventsFactory factory) {
 		this.factory = factory;
 	}
 
@@ -44,15 +44,14 @@ public class XYZAzimuthEventsFactoryImpl {
 	 * 
 	 * @param x
 	 * @param y
-	 * @param z
 	 * @param vx
 	 * @param vy
 	 * @param id
 	 * @param time
 	 * @return
 	 */
-	public Event createXYZAzimuthEvent(String x, String y, String z, String vx, String vy, String id, String time) {
-		XYZAzimuthEventImpl e = new XYZAzimuthEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y),Double.parseDouble(z), Double.parseDouble(vx), Double.parseDouble(vy), Double.parseDouble(time));
+	public Event createXYZAzimuthEvent(String x, String y, String vx, String vy, String id, String time) {
+		XYVxVyEventImpl e = new XYVxVyEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(vx), Double.parseDouble(vy), Double.parseDouble(time));
 		return e;
 	}
 
