@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * RadomAlters.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.coopsim.mental.choice;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+public class RandomAlters implements ActivityGroupGenerator {
 
-	private final PseudoSim pseudoSim;
+	private final Random random;
 	
-	private final Network network;
+	private final double proba;
 	
-	private final TravelTime travelTime;
-	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
+	public RandomAlters(double proba, Random random) {
+		this.proba = proba;
+		this.random = random;
 	}
 	
-	public TravelTime getTravelTime() {
-		return travelTime;
-	}
-	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
-	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
+	@Override
+	public List<SocialVertex> generate(SocialVertex ego) {
+		List<SocialVertex> group = new ArrayList<SocialVertex>(ego.getNeighbours().size() + 1);
+		group.add(ego);
 		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
+		for(int i = 0; i < ego.getNeighbours().size(); i++) {
+			if(random.nextDouble() < proba) {
+				group.add(ego.getNeighbours().get(i));
+			}
+		}
 		
-		eventsManager.removeHandler(tracker);
+		return group;
 	}
+
 }

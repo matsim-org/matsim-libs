@@ -46,7 +46,7 @@ public class ClosenessSeed2Seed extends AnalyzerTask {
 		 * seed 2 seed
 		 */
 		Centrality centrality = new Centrality();
-		centrality.init(sampledGraph, seeds, seeds, false);
+		centrality.init(sampledGraph, seeds, seeds, false, false);
 		
 		DescriptiveStatistics closeness = centrality.closenessDistribution();		
 		results.put("closeness_s2s", closeness);
@@ -57,7 +57,7 @@ public class ClosenessSeed2Seed extends AnalyzerTask {
 		 * ego 2 ego
 		 */
 		centrality = new Centrality();
-		centrality.init(sampledGraph, egos, egos, false);
+		centrality.init(sampledGraph, egos, egos, false, false);
 		
 		closeness = centrality.closenessDistribution();		
 		results.put("closeness_e2e", closeness);
@@ -68,7 +68,7 @@ public class ClosenessSeed2Seed extends AnalyzerTask {
 		 * all
 		 */
 		centrality = new Centrality();
-		centrality.init(sampledGraph, false);
+		centrality.init(sampledGraph, false, false);
 		
 		closeness = centrality.closenessDistribution();		
 		results.put("closeness", closeness);

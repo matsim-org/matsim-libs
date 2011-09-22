@@ -69,7 +69,7 @@ public class JointActivityScoringFactory extends CharyparNagelScoringFunctionFac
 		ScoringFunctionAccumulator accumulator = accumulators.get(person);
 		
 		if(accumulator == null) {
-			accumulator = (ScoringFunctionAccumulator) super.createNewScoringFunction(plan);
+			accumulator = (ScoringFunctionAccumulator) super.createNewScoringFunction(plan); //FIXME act type will always be home
 			
 			SocialVertex ego = personVertexMap.get(person);
 			JointActivityScoring jointActScoring = new JointActivityScoring(ego, tracker, beta);

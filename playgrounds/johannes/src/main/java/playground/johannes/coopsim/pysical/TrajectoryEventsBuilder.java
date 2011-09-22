@@ -19,9 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.pysical;
 
-import gnu.trove.TObjectIntHashMap;
-
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,27 +39,32 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
  */
 public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
-	private Map<Id, Trajectory> trajectories;
+	private Map<Id, PersonData> personData;
 	
-	private TObjectIntHashMap<Id> indices;
-	
-	private Map<Id, Person> persons;
-	
-	public TrajectoryEventsBuilder(Set<Plan> plans) {
-		persons = new HashMap<Id, Person>(plans.size());
-		for(Plan plan : plans) {
-			persons.put(plan.getPerson().getId(), plan.getPerson());
+	public TrajectoryEventsBuilder(Set<Person> persons) {
+		personData = new HashMap<Id, TrajectoryEventsBuilder.PersonData>(persons.size());
+		for(Person person : persons) {
+			PersonData data = new PersonData();
+			data.person = person;
+			personData.put(person.getId(), data);
 		}
 	}
 	
-	public Map<Id, Trajectory> getTrajectories() {
+	public Set<Trajectory> trajectories() {
+		Set<Trajectory> trajectories = new HashSet<Trajectory>(personData.size());
+		for(PersonData data : personData.values()) {
+			if(data.trajectory != null)
+				trajectories.add(data.trajectory);
+		}
 		return trajectories;
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		trajectories = new HashMap<Id, Trajectory>(persons.size());
-		indices = new TObjectIntHashMap<Id>(persons.size());
+		for(PersonData data : personData.values()) {
+			data.trajectory = null;
+			data.planIndex = 0;
+		}
 	}
 
 	@Override
@@ -74,13 +78,14 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 	}
 
 	private void addElement(AgentEvent event) {
-		Trajectory t = trajectories.get(event.getPersonId());
-		int index = indices.get(event.getPersonId());
-		Person person = persons.get(event.getPersonId());
+		PersonData data = personData.get(event.getPersonId());
+		Trajectory t = data.trajectory;
+		int index = data.planIndex;
+		Person person = data.person;
+		
 		if(t == null) {
 			t = new Trajectory(person);
-			trajectories.put(event.getPersonId(), t);
-			indices.put(event.getPersonId(), 0);
+			data.trajectory = t;
 		}
 		
 		Plan plan = person.getSelectedPlan();
@@ -90,9 +95,18 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 			/*
 			 * This is the last element.
 			 */
-			t.addElement(plan.getPlanElements().get(index + 1), Math.max(86400, event.getTime() + 1));
+			t.addElement(plan.getPlanElements().get(index + 1), Math.max(86400, event.getTime() + 1)); //FIXME Without +1 sec plan scores can be NaN. Probably because the last act has zero duration.
 		}
 		
-		indices.increment(event.getPersonId());
+		data.planIndex++;
+	}
+	
+	private class PersonData {
+		
+		private Trajectory trajectory;
+		
+		private Person person;
+		
+		private int planIndex; 
 	}
 }

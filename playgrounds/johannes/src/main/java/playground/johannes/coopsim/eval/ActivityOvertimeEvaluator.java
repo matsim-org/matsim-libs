@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * ActivityOvertimeEvaluator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.coopsim.eval;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+public class ActivityOvertimeEvaluator implements Evaluator {
 
-	private final PseudoSim pseudoSim;
+	private final static String HOME = "home";
 	
-	private final Network network;
+	private final double beta;
 	
-	private final TravelTime travelTime;
+	private final Map<String, Map<Person, Double>> desiredDurations;
 	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
+	public ActivityOvertimeEvaluator(double beta, Map<String, Map<Person, Double>> desiredDurations) {
+		this.beta = beta;
+		this.desiredDurations = desiredDurations;
 	}
 	
-	public TravelTime getTravelTime() {
-		return travelTime;
-	}
-	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
-	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
+	@Override
+	public double evaluate(Trajectory trajectory) {
+		double score = 0;
+		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+			Activity act = (Activity)trajectory.getElements().get(i);
+			
+			if(!act.getType().equals(HOME)) {
+				double duration = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
+				double desiredDuration = desiredDurations.get(act.getType()).get(trajectory.getPerson());
+				
+				double delta = duration / desiredDuration;
+				if(delta > 1) {
+					score -= Math.exp(beta * delta);
+				}
+			}
+		}
 		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
-		
-		eventsManager.removeHandler(tracker);
+		return score;
 	}
+
 }

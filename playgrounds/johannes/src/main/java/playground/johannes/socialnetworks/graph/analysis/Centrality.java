@@ -45,22 +45,23 @@ public class Centrality {
 	
 	private Set<? extends Vertex> sources;
 	
-	public void init(Graph graph, boolean calcBetweenness) {
+	public void init(Graph graph, boolean calcBetweenness, boolean calcAPLDistribution) {
 		y = new AdjacencyMatrix<Vertex>(graph);
 		mCentrality = new MatrixCentrality();
 		mCentrality.setCalcBetweenness(calcBetweenness);
+		mCentrality.setCalcAPLDistribution(calcAPLDistribution);
 		mCentrality.run(y);
 	}
 	
 	public void init(Graph graph) {
-		init(graph, true);
+		init(graph, true, true);
 	}
 	
 	public void init(Graph graph, Set<? extends Vertex> sources, Set<? extends Vertex> targets) {
-		init(graph, sources, targets, true);
+		init(graph, sources, targets, true, true);
 	}
 	
-	public void init(Graph graph, Set<? extends Vertex> sources, Set<? extends Vertex> targets, boolean calcBetweenness) {
+	public void init(Graph graph, Set<? extends Vertex> sources, Set<? extends Vertex> targets, boolean calcBetweenness, boolean calcAPLDistribution) {
 		this.sources = sources;
 		y = new AdjacencyMatrix<Vertex>(graph);
 		
@@ -81,6 +82,7 @@ public class Centrality {
 		
 		mCentrality = new MatrixCentrality();
 		mCentrality.setCalcBetweenness(calcBetweenness);
+		mCentrality.setCalcAPLDistribution(calcAPLDistribution);
 		mCentrality.run(y, sourceIndices, targetIndices);
 	}
 	

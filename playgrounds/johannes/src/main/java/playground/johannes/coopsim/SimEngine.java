@@ -21,17 +21,18 @@ package playground.johannes.coopsim;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
@@ -60,6 +61,8 @@ public class SimEngine {
 	private final EvalEngine evalEngine;
 
 	private final EventsManager eventsManager;
+	
+	private final TrajectoryEventsBuilder trajectoryBuilder;
 
 	private int sampleInterval = 500;
 
@@ -68,18 +71,33 @@ public class SimEngine {
 	private TrajectoryAnalyzerTask analyzerTask;
 
 	private String outpurDirectory;
+	
+	private long preprocessTime;
+	
+	private long postprocessTime;
+	
+	private long mentalTime;
+	
+	private long phyiscalTime;
 
 	public SimEngine(SocialGraph graph, MentalEngine mentalEngine, PhysicalEngine physicalEngine, EvalEngine evalEngine) {
 		this.graph = graph;
 		this.mentalEngine = mentalEngine;
 		this.physicalEngine = physicalEngine;
 		this.evalEngine = evalEngine;
-
+		
+		Set<Person> persons = new HashSet<Person>(graph.getVertices().size());
+		for(SocialVertex vertex : graph.getVertices())
+			persons.add(vertex.getPerson().getPerson());
+		trajectoryBuilder = new TrajectoryEventsBuilder(persons);
+		
 		this.eventsManager = EventsUtils.createEventsManager();
 
 		LoggerUtils.setVerbose(false);
 		for (EventHandler handler : evalEngine.getEventHandler())
 			eventsManager.addHandler(handler);
+		
+		eventsManager.addHandler(trajectoryBuilder);
 		LoggerUtils.setVerbose(true);
 	}
 
@@ -125,10 +143,13 @@ public class SimEngine {
 		/*
 		 * run mental layer
 		 */
-		Set<SocialVertex> egos = mentalEngine.nextState();
+		long time = System.currentTimeMillis();
+		List<SocialVertex> egos = mentalEngine.nextState();
+		mentalTime += System.currentTimeMillis() - time;
 		/*
 		 * get alters
 		 */
+		time = System.currentTimeMillis();
 		Set<SocialVertex> altersLevel1 = new HashSet<SocialVertex>();
 		for (SocialVertex ego : egos) {
 			for (SocialVertex alter : ego.getNeighbours()) {
@@ -149,33 +170,43 @@ public class SimEngine {
 		/*
 		 * get plans for physical layer
 		 */
-		Set<Plan> plans = new HashSet<Plan>();
+		List<Plan> plans = new ArrayList<Plan>(egos.size() + altersLevel1.size() + altersLevel2.size());
 		for (SocialVertex ego : egos)
 			plans.add(ego.getPerson().getPerson().getSelectedPlan());
 
-		Map<Plan, Double> alter1Scores = new HashMap<Plan, Double>(altersLevel1.size());
+		List<Tuple<Plan, Double>> alter1Scores = new ArrayList<Tuple<Plan,Double>>(altersLevel1.size());
+//		Map<Plan, Double> alter1Scores = new HashMap<Plan, Double>(altersLevel1.size());
 		for (SocialVertex alter : altersLevel1) {
 			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
 			plans.add(plan);
-			alter1Scores.put(plan, plan.getScore());
+			alter1Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
+//			alter1Scores.put(plan, plan.getScore());
 		}
 
-		Map<Plan, Double> alter2Scores = new HashMap<Plan, Double>(altersLevel2.size());
+		List<Tuple<Plan, Double>> alter2Scores = new ArrayList<Tuple<Plan,Double>>(altersLevel2.size());
+//		Map<Plan, Double> alter2Scores = new HashMap<Plan, Double>(altersLevel2.size());
 		for (SocialVertex alter : altersLevel2) {
 			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
 			plans.add(plan);
-			alter2Scores.put(plan, plan.getScore());
+			alter2Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
+//			alter2Scores.put(plan, plan.getScore());
 		}
-
+		preprocessTime += System.currentTimeMillis() - time;
 		/*
 		 * run physical layer
 		 */
+		time = System.currentTimeMillis();
 		evalEngine.init();
+		trajectoryBuilder.reset(0);
 		physicalEngine.run(plans, eventsManager);
+		
+		phyiscalTime += System.currentTimeMillis() - time;
 		/*
 		 * evaluate plans
 		 */
-		evalEngine.run();
+		time = System.currentTimeMillis();
+//		evalEngine.run();
+		evalEngine.evaluate(trajectoryBuilder.trajectories());
 		/*
 		 * accept/reject state
 		 */
@@ -183,20 +214,36 @@ public class SimEngine {
 		/*
 		 * reset scores of level 2 alters
 		 */
-		for(Entry<Plan, Double> entry : alter2Scores.entrySet()) {
-			entry.getKey().setScore(entry.getValue());
+//		for(Entry<Plan, Double> entry : alter2Scores.entrySet()) {
+//			entry.getKey().setScore(entry.getValue());
+//		}
+		for(int i = 0; i < alter2Scores.size(); i++) {
+			Tuple<Plan, Double> tuple = alter2Scores.get(i);
+			tuple.getFirst().setScore(tuple.getSecond());
 		}
 		/*
 		 * if state rejected, reset scores of level 1 alters
 		 */
 		if(!accept) {
-			for(Entry<Plan, Double> entry : alter1Scores.entrySet()) {
-				entry.getKey().setScore(entry.getValue());
+//			for(Entry<Plan, Double> entry : alter1Scores.entrySet()) {
+//				entry.getKey().setScore(entry.getValue());
+//			}
+			for(int i = 0; i < alter1Scores.size(); i++) {
+				Tuple<Plan, Double> tuple = alter1Scores.get(i);
+				tuple.getFirst().setScore(tuple.getSecond());
 			}
 		}
+		
+		postprocessTime += System.currentTimeMillis() - time;
 	}
 
 	public void drawSample(int iter) {
+		logger.info(String.format("Mental time = %1$s; Preprocess time = %2$s; Sim time = %3$s; postrocess time = %4$s.", mentalTime, preprocessTime, phyiscalTime, postprocessTime));
+		mentalTime = 0;
+		preprocessTime = 0;
+		phyiscalTime = 0;
+		postprocessTime = 0;
+		
 		LoggerUtils.setVerbose(false);
 
 		evalEngine.init();
@@ -206,17 +253,13 @@ public class SimEngine {
 			plans.add(v.getPerson().getPerson().getSelectedPlan());
 		}
 
-		TrajectoryEventsBuilder builder = new TrajectoryEventsBuilder(plans);
-		builder.reset(iter);
-		eventsManager.addHandler(builder);
-
+		trajectoryBuilder.reset(iter);
 		physicalEngine.run(plans, eventsManager);
 
-		eventsManager.removeHandler(builder);
+		Set<Trajectory> trajectories = trajectoryBuilder.trajectories();//new HashSet<Trajectory>(builder.getTrajectories().values());
 
-		Set<Trajectory> trajectories = new HashSet<Trajectory>(builder.getTrajectories().values());
-
-		evalEngine.run();
+//		evalEngine.run();
+		evalEngine.evaluate(trajectories);
 
 		LoggerUtils.setVerbose(true);
 		try {

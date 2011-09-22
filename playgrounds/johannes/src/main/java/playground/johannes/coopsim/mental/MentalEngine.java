@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,7 +33,8 @@ import org.matsim.core.population.PersonImpl;
 import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
 import playground.johannes.coopsim.mental.choice.ChoiceSelector;
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
-import playground.johannes.coopsim.mental.planmod.PlanModifier;
+import playground.johannes.coopsim.mental.planmod.PlanModEngine;
+import playground.johannes.coopsim.mental.planmod.SingleThreadedModEngine;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -46,56 +48,70 @@ public class MentalEngine {
 	
 	private final ChoiceSelector choiceSelector;
 	
-	private final Choice2ModAdaptor adaptor;
+	private final PlanModEngine modEngine;
 	
 	private int acceptedStates;
 	
 	private double piSum;
 	
+//	private long choiceTime;
+//	
+//	private long modTime;
+//	
+//	private long prepareModTime;
+	
 	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, Choice2ModAdaptor adaptor, Random random) {
 		this.choiceSelector = choiceSelector;
-		this.adaptor = adaptor;
 		this.random = random;
+		
+		modEngine = new SingleThreadedModEngine(adaptor);
 	}
 	
-	public Set<SocialVertex> nextState() {
+	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, PlanModEngine modEngine, Random random) {
+		this.choiceSelector = choiceSelector;
+		this.random = random;		
+		this.modEngine = modEngine;
+	}
+	
+	public List<SocialVertex> nextState() {
+//		long time = System.currentTimeMillis();
 		/*
 		 * make choices
 		 */
 		Map<String, Object> choices = new HashMap<String, Object>();
 		choices = choiceSelector.select(choices);
-		/*
-		 * convert choices to plan modifiers 
-		 */
-		PlanModifier mod = adaptor.convert(choices);
+		
+//		choiceTime += System.currentTimeMillis() - time;
 		/*
 		 * get plans do modify
 		 */
+//		time = System.currentTimeMillis();
 		@SuppressWarnings("unchecked")
-		Set<SocialVertex> egos = (Set<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
-		Set<Plan> plans = new HashSet<Plan>();
+		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
+		List<Plan> plans = new ArrayList<Plan>(egos.size());
 		for(SocialVertex v : egos) {
 			Plan plan = v.getPerson().getPerson().copySelectedPlan();
 			if(plan == null)
 				throw new NullPointerException("Outch! This person appears to have no selected plan!");
 			plans.add(plan);
 		}
+//		prepareModTime += System.currentTimeMillis() - time;
 		/*
 		 * apply modifications
 		 */
-		for(Plan plan : plans)
-			mod.apply(plan);
-		
+//		time = System.currentTimeMillis();
+		modEngine.run(plans, choices);
+//		modTime += System.currentTimeMillis() - time;
 		return egos;
 	}
 	
-	public boolean acceptRejectState(Set<SocialVertex> egos) {
+	public boolean acceptRejectState(Collection<SocialVertex> egos) {
 		boolean accept;
 		/*
 		 * get new and old plans
 		 */
-		Set<Plan> newState = new HashSet<Plan>();
-		Set<Plan> oldState = new HashSet<Plan>();
+		List<Plan> newState = new ArrayList<Plan>(egos.size());
+		List<Plan> oldState = new ArrayList<Plan>(egos.size());
 		
 		for(SocialVertex ego : egos) {
 			Person person = ego.getPerson().getPerson();
@@ -111,22 +127,24 @@ public class MentalEngine {
 		 * get scores
 		 */
 		double newScore = 0;
-		for(Plan plan : newState)
-			newScore +=  plan.getScore();
+		for(int i = 0; i < newState.size(); i++)
+			newScore +=  newState.get(i).getScore();
 		
 		double oldScore = 0;
-		for(Plan plan : oldState)
-			oldScore += plan.getScore();
+		for(int i = 0; i < oldState.size(); i++)
+			oldScore += oldState.get(i).getScore();
 		/*
 		 * calculate transition probability
 		 */
 		double delta = oldScore - newScore;
 		double pi = 1 / (1 + Math.exp(delta));
+//		if(Double.isNaN(pi))
+//			System.err.println();
 		piSum += pi;
 		/*
 		 * accept/reject
 		 */
-		Set<Plan> remove = null;
+		List<Plan> remove = null;
 		if(random.nextDouble() < pi) {
 			/*
 			 * accept state
@@ -144,7 +162,8 @@ public class MentalEngine {
 		/*
 		 * remove plans
 		 */
-		for(Plan plan : remove) {
+		for(int i = 0; i < remove.size(); i++) {
+			Plan plan = remove.get(i);
 			PersonImpl person = (PersonImpl) plan.getPerson();
 			person.getPlans().remove(plan);
 			person.setSelectedPlan(person.getPlans().get(0));
@@ -164,5 +183,10 @@ public class MentalEngine {
 	public void clearStatistics() {
 		acceptedStates = 0;
 		piSum = 0;
+		
+//		System.out.println(String.format("Choice time = %1$s, modifier time = %2$s, prepare mod time = %3$s.", choiceTime, modTime, prepareModTime));
+//		choiceTime = 0;
+//		modTime = 0;
+		
 	}
 }

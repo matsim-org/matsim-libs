@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * JointActivityEvaluator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.coopsim.eval;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+public class JointActivityEvaluator implements Evaluator {
 
-	private final PseudoSim pseudoSim;
+	private final double beta;
 	
-	private final Network network;
-	
-	private final TravelTime travelTime;
-	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
+	public JointActivityEvaluator(double beta) {
+		this.beta = beta;
 	}
 	
-	public TravelTime getTravelTime() {
-		return travelTime;
+	@Override
+	public double evaluate(Trajectory trajectory) {
+		double score = 0;
+		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
+			score += beta * t;
+		}
+		return score;
 	}
-	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
-	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
-		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
-		
-		eventsManager.removeHandler(tracker);
-	}
+
 }

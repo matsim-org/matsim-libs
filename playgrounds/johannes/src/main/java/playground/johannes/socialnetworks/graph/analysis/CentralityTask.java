@@ -38,53 +38,39 @@ public class CentralityTask extends ModuleAnalyzerTask<Centrality> {
 	
 	public static final String CLOSENESS = "closeness"; 
 	
-//	public static final String MEAN_CLOSENESS = "close_mean";
-//	
-//	public static final String MIN_CLOSENESS = "close_min";
-//	
-//	public static final String MAX_CLOSENESS = "close_max";
-	
 	public static final String BETWEENNESS = "betweenness";
 	
-//	public static final String MEAN_BETWEENNESS = "between_mean";
-//	
-//	public static final String MIN_BETWEENNESS = "between_min";
-//	
-//	public static final String MAX_BETWEENNESS = "between_max";
-//	
 	public static final String DIAMETER = "diameter";
 	
 	public static final String RADIUS = "radius";
+	
+	private boolean calcBetweenness = true;
+	
+	private boolean calcAPLDistribution = true;
 	
 	public CentralityTask() {
 		setModule(new Centrality());
 	}
 	
+	public void setCalcBetweenness(boolean calcBetweenness) {
+		this.calcBetweenness = calcBetweenness;
+	}
+
+	public void setCalcAPLDistribution(boolean calcAPLDistribution) {
+		this.calcAPLDistribution = calcAPLDistribution;
+	}
+
 	@Override
 	public void analyze(Graph graph, Map<String, DescriptiveStatistics> statsMap) {
-		module.init(graph);
+		module.init(graph, calcBetweenness, calcAPLDistribution);
 		
 		DescriptiveStatistics cDistr = module.closenessDistribution();
-//		double c_mean = cDistr.mean();
-//		double c_min = cDistr.min();
-//		double c_max = cDistr.max();
-//		stats.put(MEAN_CLOSENESS, c_mean);
-//		stats.put(MIN_CLOSENESS, c_min);
-//		stats.put(MAX_CLOSENESS, c_max);
 		statsMap.put(CLOSENESS, cDistr);
 		printStats(cDistr, CLOSENESS);
-//		logger.info(String.format("close_mean = %1$.4f, close_min = %2$.4f, close_max = %3$.4f", c_mean, c_min, c_max));
 		
 		DescriptiveStatistics bDistr = module.vertexBetweennessDistribution();
-//		double b_mean = bDistr.mean();
-//		double b_min = bDistr.min();
-//		double b_max = bDistr.max();
-//		stats.put(MEAN_BETWEENNESS, b_mean);
-//		stats.put(MIN_BETWEENNESS, b_min);
-//		stats.put(MAX_BETWEENNESS, b_max);
 		statsMap.put(BETWEENNESS, bDistr);
 		printStats(bDistr, BETWEENNESS);
-//		logger.info(String.format("between_mean = %1$s, between_min = %2$s, between_max = %4$s", b_mean, b_min, b_max));
 		
 		statsMap.put("apl", module.getAPL());
 		printStats(module.getAPL(), "apl");

@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -38,8 +38,8 @@ public class RandomAlter implements ActivityGroupGenerator {
 	}
 	
 	@Override
-	public Set<SocialVertex> generate(SocialVertex ego) {
-		Set<SocialVertex> group = new HashSet<SocialVertex>(2);
+	public List<SocialVertex> generate(SocialVertex ego) {
+		List<SocialVertex> group = new ArrayList<SocialVertex>(2);
 		group.add(ego);
 		group.add(ego.getNeighbours().get(random.nextInt(ego.getNeighbours().size())));
 		

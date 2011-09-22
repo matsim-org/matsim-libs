@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EgosHome.java
+ * ActivityEvaluator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,38 +17,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.mental.choice;
+package playground.johannes.coopsim.eval;
 
-import java.util.Collection;
-import java.util.Random;
+import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
  *
  */
-public class EgosHome implements FacilityChoiceSetGenerator {
+public class ActivityEvaluator implements Evaluator {
 
-	private final Random random;
+	private final static String HOME = "home";
 	
-	public EgosHome(Random random) {
-		this.random = random;
+	private final static double SCALE = -1.0;
+	
+	private final double beta;
+	
+	private final Map<String, Map<Person, Double>> desiredDurations;
+	
+	private final Map<String, Double> priorities;
+	
+	public ActivityEvaluator(double beta, Map<String, Map<Person, Double>> desiredDurations, Map<String, Double> priorities) {
+		this.beta = beta;
+		this.desiredDurations = desiredDurations;
+		this.priorities = priorities;
 	}
 	
 	@Override
-	public ChoiceSet<Id> generate(Collection<SocialVertex> egos) {
-		ChoiceSet<Id> choiceSet = new ChoiceSet<Id>(random);
-		
-		for(SocialVertex ego : egos) {
-			Activity home = (Activity) ego.getPerson().getPerson().getSelectedPlan().getPlanElements().get(0);
-			choiceSet.addChoice(home.getFacilityId());
+	public double evaluate(Trajectory trajectory) {
+		double score = 0;
+		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
+			Activity act =  (Activity) trajectory.getElements().get(i);
+			
+			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
+			
+			double t_star = t;
+			if(!act.getType().equals(HOME)) {
+				t_star = desiredDurations.get(act.getType()).get(trajectory.getPerson());
+			}
+			
+			double priority = getPriority(act.getType());
+			
+			double t_zero = t_star * Math.exp(SCALE/(t_star * priority * beta));
+			t_zero = Math.max(t_zero, 1.0);
+
+			score += beta * t_star * Math.log(t/t_zero);
 		}
 		
-		return choiceSet;
+		return score;
+	}
+	
+	private double getPriority(String type) {
+		return priorities.get(type);
 	}
 
 }

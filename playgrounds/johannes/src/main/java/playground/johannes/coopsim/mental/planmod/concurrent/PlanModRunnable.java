@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * PlanModRunnable.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.coopsim.mental.planmod.concurrent;
 
-import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+
+import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
+import playground.johannes.coopsim.mental.planmod.PlanModifier;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+class PlanModRunnable implements Runnable {
 
-	private final PseudoSim pseudoSim;
+	private final Map<String, Object> choices;
+
+	private final Plan plan;
 	
-	private final Network network;
+	private Choice2ModAdaptor adaptor;
 	
-	private final TravelTime travelTime;
-	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
+	PlanModRunnable(Map<String, Object> choices, Plan plan) {
+		this.choices = choices;
+		this.plan = plan;
 	}
 	
-	public TravelTime getTravelTime() {
-		return travelTime;
+	void setAdaptor(Choice2ModAdaptor adaptor) {
+		this.adaptor = adaptor;
 	}
 	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
+	@Override
+	public void run() {
+		PlanModifier mod = adaptor.convert(choices);
+		mod.apply(plan);
 	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
-		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
-		
-		eventsManager.removeHandler(tracker);
-	}
+
 }

@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.pysical;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -45,7 +46,6 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.util.TravelTime;
 
 /**
@@ -96,8 +96,8 @@ public class PseudoSim {
 		}
 	};
 
-	public void run(Set<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
-		Queue<Event> eventQueue = new PriorityQueue<Event>(plans.size() * 100, comparator);
+	public void run(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
+		Queue<Event> eventQueue = new LinkedList<Event>();// PriorityQueue<Event>(plans.size() * 100, comparator);
 
 		logger.debug("Creating events...");
 
@@ -135,15 +135,16 @@ public class PseudoSim {
 						 * If act end time is not specified...
 						 */
 						if (Double.isInfinite(actEndTime)) {
-							double duration = ((ActivityImpl) act).getMaximumDuration();
-							if(Double.isInfinite(duration)) {
-								/*
-								 * Duration is not specified, set end time to the end of day.
-								 */
-								actEndTime = 86400;
-							} else {
-								actEndTime = arrivalTime + duration; 
-							}
+							throw new RuntimeException("I think this is discuraged.");
+//							double duration = ((ActivityImpl) act).getMaximumDuration();
+//							if(Double.isInfinite(duration)) {
+//								/*
+//								 * Duration is not specified, set end time to the end of day.
+//								 */
+//								actEndTime = 86400;
+//							} else {
+//								actEndTime = arrivalTime + duration; 
+//							}
 						}
 						/*
 						 * Make sure that the activity does not end before the
@@ -162,7 +163,7 @@ public class PseudoSim {
 					
 					if (idx < elements.size() - 1) {
 						/*
-						 * Id this is not the last activity, send activity end and departure events.
+						 * This is not the last activity, send activity end and departure events.
 						 */
 						ActivityEvent endEvent = new ActivityEndEventImpl(actEndTime, plan.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType());
 						eventQueue.add(endEvent);

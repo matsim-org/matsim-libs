@@ -44,6 +44,10 @@ public class ActivityFacilityMod implements PlanModifier {
 	private int planIndex;
 
 	private ActivityFacility facility;
+	
+//	private long routingTime;
+	
+//	private int count;
 
 	public ActivityFacilityMod(ActivityFacilities facilities, NetworkLegRouter router) {
 		this.facilities = facilities;
@@ -73,14 +77,24 @@ public class ActivityFacilityMod implements PlanModifier {
 		if (planIndex > 1) {
 			Activity prev = (Activity) plan.getPlanElements().get(planIndex - 2);
 			Leg toLeg = (Leg) plan.getPlanElements().get(planIndex - 1);
+//			long time = System.currentTimeMillis();
 			router.routeLeg(plan.getPerson(), toLeg, prev, newAct, prev.getEndTime());
+//			routingTime += System.currentTimeMillis() - time;
 		}
 
 		if (planIndex < plan.getPlanElements().size() - 2) {
 			Leg fromLeg = (Leg) plan.getPlanElements().get(planIndex + 1);
 			Activity next = (Activity) plan.getPlanElements().get(planIndex + 2);
+//			long time = System.currentTimeMillis();
 			router.routeLeg(plan.getPerson(), fromLeg, newAct, next, newAct.getEndTime());
+//			routingTime += System.currentTimeMillis() - time;
 		}
+		
+//		count++;
+//		if(count % 500 == 0) {
+//			System.out.println(String.format("routing time = %1$s", routingTime));
+//			routingTime = 0;
+//		}
 	}
 
 }

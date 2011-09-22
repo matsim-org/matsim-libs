@@ -64,9 +64,11 @@ public class Analyzer {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/plans.sun.xml");
+//		reader.readFile("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/plans.sun.xml");
+		reader.readFile("/Users/jillenberger/Work/socialnets/locationChoice/output/10000/plans.xml.gz");
 		
-		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/escort.sun.txt", scenario.getPopulation());
+		
+//		EscortData escortData = EscortData.read("/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/rawdata/07-09-2011/escort.sun.txt", scenario.getPopulation());
 		
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		FacilityFromActivity.createActivities(scenario.getPopulation(), facilities);
@@ -100,10 +102,11 @@ public class Analyzer {
 		composite.addTask(new TripDistanceTask(facilities, WGS84DistanceCalculator.getInstance()));
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		composite.addTask(new ActivityChainsTask());
-		composite.addTask(new TripDistEscortTask(escortData, facilities, WGS84DistanceCalculator.getInstance()));
-		composite.addTask(new EscortsActivtyTypeTask(escortData));
+//		composite.addTask(new TripDistEscortTask(escortData, facilities, WGS84DistanceCalculator.getInstance()));
+//		composite.addTask(new EscortsActivtyTypeTask(escortData));
 		
-		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/07-09-2011/sun/car/");
+//		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/data/schweiz/mz2005/analysis/07-09-2011/sun/car/");
+		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/output/10000/");
 	}
 
 }

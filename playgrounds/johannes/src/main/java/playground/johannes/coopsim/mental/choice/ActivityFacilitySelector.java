@@ -20,8 +20,8 @@
 package playground.johannes.coopsim.mental.choice;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -51,7 +51,7 @@ public class ActivityFacilitySelector implements ChoiceSelector {
 		FacilityChoiceSetGenerator generator = generators.get(type);
 		
 		@SuppressWarnings("unchecked")
-		Set<SocialVertex> egos = (Set<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
+		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
 		
 		ChoiceSet<Id> choiceSet = generator.generate(egos);
 		Id facility = choiceSet.randomChoice();

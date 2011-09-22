@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -48,7 +47,7 @@ public class TimeSelector implements ChoiceSelector {
 	@Override
 	public Map<String, Object> select(Map<String, Object> choices) {
 		@SuppressWarnings("unchecked")
-		Set<SocialVertex> egos = (Set<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
+		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
 		
 		List<Double> choiceSet = new ArrayList<Double>(egos.size());
 		for(SocialVertex ego : egos)

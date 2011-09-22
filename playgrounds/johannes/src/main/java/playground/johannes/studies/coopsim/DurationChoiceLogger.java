@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityGroupSelector.java
+ * DurationChoiceLogger.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.mental.choice;
+package playground.johannes.studies.coopsim;
 
-import java.util.HashMap;
-import java.util.List;
+import gnu.trove.TDoubleDoubleHashMap;
+
+import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
+import org.matsim.contrib.sna.math.Histogram;
+import org.matsim.contrib.sna.util.TXTWriter;
+
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.mental.choice.ChoiceSelector;
+import playground.johannes.coopsim.mental.choice.DurationSelector;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityGroupSelector implements ChoiceSelector {
+public class DurationChoiceLogger extends TrajectoryAnalyzerTask implements ChoiceSelector {
 
-	public static final String KEY = "egos";
-	
-	private final Map<String, ActivityGroupGenerator> generators;
-	
-	public ActivityGroupSelector() {
-		generators = new HashMap<String, ActivityGroupGenerator>();
-	}
-	
-	public void addGenerator(String type, ActivityGroupGenerator generator) {
-		generators.put(type, generator);
-	}
+	private DescriptiveStatistics stats = new DescriptiveStatistics();
 	
 	@Override
 	public Map<String, Object> select(Map<String, Object> choices) {
-		String type = (String)choices.get(ActivityTypeSelector.KEY);
-		
-		ActivityGroupGenerator generator = generators.get(type);
-		
-		SocialVertex ego = (SocialVertex) choices.get(EgoSelector.KEY);
-		List<SocialVertex> group = generator.generate(ego);
-		choices.put(KEY, group);
-		
+		Double t = (Double) choices.get(DurationSelector.KEY);
+		stats.addValue(t);
 		return choices;
 	}
+
+	@Override
+	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		try {
+			if(stats.getN() > 0) {
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 30), true);
+			TXTWriter.writeMap(hist, "t", "n", getOutputDirectory() + "dur.choices.txt");
+			stats.clear();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 
 }

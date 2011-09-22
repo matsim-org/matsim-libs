@@ -69,6 +69,8 @@ public class MatrixCentrality {
 	private DijkstraFactory dijkstraFactory;
 	
 	private boolean calcBetweenness = true;
+	
+	private boolean calcAPLDistribution = true;
 
 	/**
 	 * Creates a new MatrixCentrality object that uses multiple threads for
@@ -96,6 +98,10 @@ public class MatrixCentrality {
 	
 	public void setCalcBetweenness(boolean calcBetweenness) {
 		this.calcBetweenness = calcBetweenness;
+	}
+	
+	public void setCalcAPLDistribution(boolean calcAPLDistribution) {
+		this.calcAPLDistribution = calcAPLDistribution;
 	}
 	
 	/**
@@ -244,11 +250,18 @@ public class MatrixCentrality {
 		double aplSum = 0;
 		double cnt = 0;
 		for (CentralityThread thread : threads) {
-			for(int i = 0; i < thread.pathLengths.size(); i++) {
-//				apl.addValue(thread.pathLengths.get(i));
-				aplSum += thread.pathLengths.get(i);
-				cnt++;
+
+			if (calcAPLDistribution) {
+				for (int i = 0; i < thread.pathLengths.size(); i++) {
+					apl.addValue(thread.pathLengths.get(i));
+				}
+			} else {
+				for (int i = 0; i < thread.pathLengths.size(); i++) {
+					aplSum += thread.pathLengths.get(i);
+				}
 			}
+
+			cnt++;
 			
 			for (int i = 0; i < n; i++) {
 				/*
@@ -292,8 +305,8 @@ public class MatrixCentrality {
 		 */
 		meanVertexCloseness = StatUtils.mean(vertexCloseness);
 		
-//		apl = totalPathLength/(double)totalPathCount;
-		apl.addValue(aplSum/cnt);
+		if(!calcAPLDistribution)
+			apl.addValue(aplSum/cnt);
 		
 		double sum = 0;
 		for (int i = 0; i < y.getVertexCount(); i++)

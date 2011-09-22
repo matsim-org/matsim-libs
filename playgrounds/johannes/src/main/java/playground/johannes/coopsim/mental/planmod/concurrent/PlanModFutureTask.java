@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * PlanModFutureTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.coopsim.mental.planmod.concurrent;
 
-import java.util.Collection;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import java.util.concurrent.FutureTask;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+class PlanModFutureTask extends FutureTask<Object> {
 
-	private final PseudoSim pseudoSim;
+	private final PlanModRunnable runnable;
 	
-	private final Network network;
-	
-	private final TravelTime travelTime;
-	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
+	PlanModFutureTask(PlanModRunnable runnable) {
+		super(runnable, null);
+		this.runnable = runnable;
 	}
 	
-	public TravelTime getTravelTime() {
-		return travelTime;
+	PlanModRunnable getRunnable() {
+		return runnable;
 	}
-	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
-	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
-		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
-		
-		eventsManager.removeHandler(tracker);
-	}
+
 }

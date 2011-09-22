@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -44,7 +44,7 @@ public class EgosFacilities implements FacilityChoiceSetGenerator {
 	}
 	
 	@Override
-	public ChoiceSet<Id> generate(Set<SocialVertex> egos) {
+	public ChoiceSet<Id> generate(Collection<SocialVertex> egos) {
 		ChoiceSet<Id> choiceSet = new ChoiceSet<Id>(random);
 		
 		for(SocialVertex ego : egos) {

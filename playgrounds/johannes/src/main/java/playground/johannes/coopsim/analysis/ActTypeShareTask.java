@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScoreTask.java
+ * ActTypeShareTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,43 +20,63 @@
 package playground.johannes.coopsim.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.TObjectIntHashMap;
+import gnu.trove.TObjectIntIterator;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.sna.util.TXTWriter;
 
-import playground.johannes.coopsim.eval.EvalEngine;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class ScoreTask extends TrajectoryAnalyzerTask {
+public class ActTypeShareTask extends TrajectoryAnalyzerTask {
 
-	private final EvalEngine eval;
-	
-	public ScoreTask(EvalEngine eval) {
-		this.eval = eval;
-	}
-	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		DescriptiveStatistics joinScoreStats = new DescriptiveStatistics();
-		DescriptiveStatistics totalScoreStats = new DescriptiveStatistics();
-		
-//		TObjectDoubleHashMap<Person> values = eval.getJointActivityScores();
+		TObjectIntHashMap<String> hist = new TObjectIntHashMap<String>();
 		
 		for(Trajectory t : trajectories) {
-//			joinScoreStats.addValue(values.get(t.getPerson()));
-			totalScoreStats.addValue(t.getPerson().getSelectedPlan().getScore());
+			for(int i = 0; i < t.getElements().size(); i += 2) {
+				Activity act = (Activity) t.getElements().get(i);
+				hist.adjustOrPutValue(act.getType(), 1, 1);
+			}
 		}
 		
-		results.put("score", totalScoreStats);
-//		results.put("score_join", joinScoreStats);
-
+		TObjectIntIterator<String> it = hist.iterator();
+		int sumHome = 0;
+		int sum = 0;
+		for(int i = 0; i < hist.size(); i++) {
+			it.advance();
+			sumHome += it.value();
+			if(!it.key().equals("home"))
+				sum += it.value();
+		}
+		
+		TObjectDoubleHashMap<String> histWHome = new TObjectDoubleHashMap<String>();
+		TObjectDoubleHashMap<String> histWOHome = new TObjectDoubleHashMap<String>();
+		it = hist.iterator();
+		for(int i = 0; i < hist.size(); i++) {
+			it.advance();
+			histWHome.put(it.key(), it.value()/(double)sumHome);
+			if(!it.key().equals("home"))
+				histWOHome.put(it.key(), it.value()/(double)sum);
+		}
+		
+		
+		try {
+			TXTWriter.writeMap(histWOHome, "type", "p", String.format("%1$s/actTypeShare.nohome.txt", getOutputDirectory()));
+			TXTWriter.writeMap(histWHome, "type", "p", String.format("%1$s/actTypeShare.txt", getOutputDirectory()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

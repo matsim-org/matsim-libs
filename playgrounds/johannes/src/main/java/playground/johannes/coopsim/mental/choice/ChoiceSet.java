@@ -20,6 +20,8 @@
 package playground.johannes.coopsim.mental.choice;
 
 import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleIntHashMap;
+import gnu.trove.TDoubleIntIterator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,5 +75,24 @@ public class ChoiceSet<T> {
 		}
 		
 		return null;
+	}
+	
+	public static void main(String args[]) {
+		ChoiceSet<Double> set = new ChoiceSet<Double>(new Random());
+		set.addChoice(2.0, 2.0);
+		set.addChoice(1.0, 1.0);
+		set.addChoice(4.0, 4.0);
+		set.addChoice(3.0, 3.0);
+		
+		TDoubleIntHashMap map = new TDoubleIntHashMap();
+		for(int i = 0; i < 1000000; i++) {
+			map.adjustOrPutValue(set.randomWeightedChoice(), 1, 1);
+		}
+		
+		TDoubleIntIterator it = map.iterator();
+		for(int i = 0; i < map.size(); i++) {
+			it.advance();
+			System.out.println(String.format("Choice %1$s selected %2$s times.", it.key(), it.value()));
+		}
 	}
 }

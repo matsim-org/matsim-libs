@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PhysicalEngine.java
+ * ActivityDurationTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.pysical;
+package playground.johannes.studies.coopsim;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
+
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
  *
  */
-public class PhysicalEngine {
+public class ActivityDurationPlanTask extends TrajectoryAnalyzerTask {
 
-	private final PseudoSim pseudoSim;
-	
-	private final Network network;
-	
-	private final TravelTime travelTime;
-	
-	private final VisitorTracker tracker;
-	
-	public PhysicalEngine(Network network) {
-		this.network = network;
-		this.pseudoSim = new PseudoSim();
-		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
-		this.tracker = new VisitorTracker();
-	}
-	
-	public TravelTime getTravelTime() {
-		return travelTime;
-	}
-	
-	public VisitorTracker getVisitorTracker() {
-		return tracker;
-	}
-	
-	public void run(Collection<Plan> plans, EventsManager eventsManager) {
-		eventsManager.addHandler(tracker);
-		tracker.reset(0);
+	@Override
+	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+		Set<String> purposes = new HashSet<String>();
+		for(Trajectory t : trajectories) {
+			for(int i = 0; i < t.getElements().size(); i += 2) {
+				purposes.add(((Activity)t.getElements().get(i)).getType());
+			}
+		}
 		
-		pseudoSim.run(plans, network, travelTime, eventsManager);
-		
-		eventsManager.removeHandler(tracker);
+		for(String purpose : purposes) {
+			ActivityDurationPlan duration = new ActivityDurationPlan(purpose);
+			DescriptiveStatistics stats = duration.statistics(trajectories, true);
+			
+			String key = "dur_act_plan_" + purpose;
+			results.put(key, stats);
+			
+			try {
+				writeHistograms(stats, new LinearDiscretizer(60.0), key, false);
+				writeHistograms(stats, key, 50, 50);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
+
 }

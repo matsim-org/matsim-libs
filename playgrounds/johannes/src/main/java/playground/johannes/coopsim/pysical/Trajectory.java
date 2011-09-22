@@ -107,12 +107,4 @@ public class Trajectory {
 			throw new RuntimeException("Previous end time and succeeding start time have to equal!");
 		}
 	}
-	
-//	void setElements(List<PlanElement> elements) {
-//		this.elements = Collections.unmodifiableList(new ArrayList<PlanElement>(elements));
-//	}
-//	
-//	void setTransitions(List<Double> transitions) {
-//		this.transitions = Collections.unmodifiableList(new ArrayList<Double>(transitions));
-//	}
 }

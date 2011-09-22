@@ -29,6 +29,10 @@ public class ExtendedTopologyAnalyzerTask extends AnalyzerTaskComposite {
 
 	public ExtendedTopologyAnalyzerTask() {
 		addTask(new ComponentsTask());
-		addTask(new CentralityTask());
+		
+		CentralityTask task = new CentralityTask();
+		task.setCalcAPLDistribution(false);
+		task.setCalcBetweenness(false);
+		addTask(task);
 	}
 }
