@@ -72,7 +72,6 @@ public class Sim2DEngine implements MobsimEngine {
 			this.floor.move(sim2DTime);
 
 			sim2DTime += this.sim2DStepSize;
-			//			System.out.println("++++++++++++++++++");
 		}
 	}
 
@@ -95,15 +94,8 @@ public class Sim2DEngine implements MobsimEngine {
 	public void onPrepareSim() {
 
 		boolean emitEvents = true;
-		//		if (this.sim.getIterationNumber() % this.sim2ConfigGroup.getEventsInterval() == 0) {
-		//			emitEvents = true;
-		//		}
-
-		//		Map<MultiPolygon, List<Link>> flm = this.scenario.getScenarioElement(MyDataContainer.class).getMps();
-		//		for (Entry<MultiPolygon, List<Link>> e : flm.entrySet()) {
 		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents);
 		this.floor.init();
-		//		}
 	}
 
 	/*

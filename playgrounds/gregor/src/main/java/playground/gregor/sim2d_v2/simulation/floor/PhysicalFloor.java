@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -353,7 +355,8 @@ public class PhysicalFloor implements Floor {
 		if (act.getCoord() != null) {
 			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
 		} else {
-			agent.setPostion(MGC.coord2Coordinate(this.scenario.getNetwork().getLinks().get(act.getLinkId()).getCoord()));
+			Coord coord = this.scenario.getNetwork().getLinks().get(act.getLinkId()).getCoord();
+			agent.setPostion(new Coordinate(coord.getX()+MatsimRandom.getRandom().nextDouble()*2-1,coord.getY()+MatsimRandom.getRandom().nextDouble()*2-1));
 		}
 		this.agents.add(agent);
 		for (DynamicForceModule m : this.dynamicForceModules) {

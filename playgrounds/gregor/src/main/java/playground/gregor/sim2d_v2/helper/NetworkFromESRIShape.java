@@ -204,7 +204,7 @@ public class NetworkFromESRIShape {
 	}
 
 	public static void main(String [] args) {
-		String networkShape = "/Users/laemmel/devel/sim2DDemo/input/network.shp";
+		String networkShape = "/Users/laemmel/devel/sim2DDemo/raw_input/network.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		new NetworkFromESRIShape(sc).processShapeFile(networkShape);
