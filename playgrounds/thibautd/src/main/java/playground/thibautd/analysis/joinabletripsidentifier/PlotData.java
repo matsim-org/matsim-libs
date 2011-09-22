@@ -223,13 +223,13 @@ class ConditionValidator implements TwofoldTripValidator {
 	}
 
 	@Override
-	public String getFirstCriterion() {
-		return condition.getDistance()+"m";
+	public Comparable getFirstCriterion() {
+		return new Label(condition.getDistance(), "", "m");
 	}
 
 	@Override
-	public String getSecondCriterion() {
-		return (condition.getTime()/60d)+"min";
+	public Comparable getSecondCriterion() {
+		return new Label (condition.getTime()/60d, "", "min");
 	}
 
 	@Override
@@ -245,6 +245,27 @@ class ConditionValidator implements TwofoldTripValidator {
 	@Override
 	public int hashCode() {
 		return condition.hashCode();
+	}
+
+	private static class Label implements Comparable {
+		private final double value;
+		private final String name;
+
+		public Label(
+				final double value,
+				final String prefix,
+				final String suffix) {
+			this.value = value;
+			this.name = prefix + value + suffix;
+		}
+
+		public int compareTo(final Object o) {
+			return Double.compare(value, ((Label) o).value);
+		}
+
+		public String toString() {
+			return name;
+		}
 	}
 }
 

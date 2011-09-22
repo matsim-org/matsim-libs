@@ -196,8 +196,8 @@ public class DataPloter {
 	 * (as for example distance and time difference) to proceed to filtering
 	 */
 	public interface TwofoldTripValidator extends DriverTripValidator {
-		public String getFirstCriterion();
-		public String getSecondCriterion();
+		public Comparable getFirstCriterion();
+		public Comparable getSecondCriterion();
 	}
 
 
