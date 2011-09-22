@@ -114,7 +114,8 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 				// calculate avg. value of llh
 				double avgLlh = llhSum / avgLlhOverIters;
 				writer.writeln("ITER\t" + iter + "\tavgLlh over "
-						+ avgLlhOverIters + " iterations =\t" + avgLlh);
+						+ avgLlhOverIters + " iterations =\t" + avgLlh
+						+ "\tsum of Llh =\t" + llhSum);
 				writer.flush();
 				llhSum = 0d;// refresh
 			}
