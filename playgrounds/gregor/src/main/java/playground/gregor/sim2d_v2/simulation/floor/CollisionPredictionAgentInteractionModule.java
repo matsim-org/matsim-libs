@@ -64,7 +64,7 @@ DynamicForceModule {
 		double t_i = getTi(l,agent);
 
 
-		if (t_i == Double.POSITIVE_INFINITY) {
+		if (t_i == Double.POSITIVE_INFINITY || t_i <= 0.0001) {
 			return;
 		}
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
@@ -79,7 +79,7 @@ DynamicForceModule {
 
 
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist > neighborhoodSensingRange) {
+			if (dist > neighborhoodSensingRange || dist < 0.1) {
 				continue;
 			}
 			double term1 = this.Ai * decel * Math.exp(-dist/this.Bi);
@@ -94,8 +94,6 @@ DynamicForceModule {
 
 			fx += anostropyWeight * term1 * v.x/projectedDist;
 			fy += anostropyWeight * term1 * v.y/projectedDist;
-
-
 
 		}
 
@@ -112,11 +110,13 @@ DynamicForceModule {
 		if (op.distance() >= dist) {
 			ls = this.geofac.createLineString(new Coordinate[]{agent.getPosition(),new Coordinate(agent.getPosition().x-agent.getVx()*1000,agent.getPosition().y-agent.getVy()*1000)});
 			op =  new DistanceOp(ls, this.geofac.createPoint(other.getPosition()));
-			double sinPhi = op.distance()/dist;
+			double sinPhi = Math.min(1, op.distance()/dist);
 			phi = Math.PI - Math.asin(sinPhi);
+
 		} else {
 			double sinPhi = op.distance()/dist;
 			phi = Math.asin(sinPhi);
+
 		}
 
 

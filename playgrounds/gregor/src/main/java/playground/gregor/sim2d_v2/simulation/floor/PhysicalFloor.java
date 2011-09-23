@@ -26,6 +26,10 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,13 +40,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
@@ -59,6 +62,11 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  */
 public class PhysicalFloor implements Floor {
+
+
+	//profiling
+	private long forceTime = 0;
+	private long movementTime = 0;
 
 
 	// needed to generated "finish lines"
@@ -85,6 +93,10 @@ public class PhysicalFloor implements Floor {
 	private final Sim2DConfigGroup sim2DConfig;
 	private final EventsManager em;
 	private final Collection<? extends Link> links;
+
+
+	private static final boolean MS_FORCE_UPDATE = true;
+	private static final int MAX_NUM_OF_THREADS = 4;
 
 	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents) {
 		this.scenario = scenario;
@@ -181,9 +193,16 @@ public class PhysicalFloor implements Floor {
 	@Override
 	public void move(double time) {
 
-		updateForces(time);
-		moveAgents(time);
 
+		long now = System.currentTimeMillis();
+		updateForces(time);
+		long then = System.currentTimeMillis();
+		this.forceTime += then-now;
+
+		now = System.currentTimeMillis();
+		moveAgents(time);
+		then = System.currentTimeMillis();
+		this.movementTime += then-now;
 	}
 
 	/**
@@ -234,7 +253,7 @@ public class PhysicalFloor implements Floor {
 
 		agent.moveToPostion(newPos);
 
-		if (this.emitXYZAzimuthEvents ) {
+		if (this.emitXYZAzimuthEvents) {
 			XYVxVyEvent e = new XYVxVyEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);
 			this.em.processEvent(e);
 		}
@@ -245,7 +264,6 @@ public class PhysicalFloor implements Floor {
 	}
 	private void validateVelocity(Force f, double v0) {
 		double v = Math.sqrt(Math.pow(f.getVx(), 2)+Math.pow(f.getVy(), 2));
-		//		System.out.println("v:" + v);
 		if (v > 1.25*v0) {
 			double scale = (1.25*v0)/v;
 			f.setVx(f.getVx()*scale);
@@ -263,10 +281,6 @@ public class PhysicalFloor implements Floor {
 		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
 		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
 		if (trajectory.crosses(finishLine)) {
-			if (agent.getId().equals(new IdImpl("1"))){
-				int stop = 0;
-				stop++;
-			}
 			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId());
 			this.em.processEvent(e);
 
@@ -300,35 +314,69 @@ public class PhysicalFloor implements Floor {
 			m.update(time);
 		}
 
-		for (Agent2D agent : this.agents) {
-			updateForces(agent,time);
 
+		if (MS_FORCE_UPDATE) {
+			updateForcesMultiThreaded(time);
+		} else {
+			for (Agent2D agent : this.agents) {
+				updateForces(agent,time);
+			}
 		}
+
+
 	}
 
+	private void updateForcesMultiThreaded(double time) {
+		if (this.agents.size() == 0) {
+			return;
+		}
+
+		int numOfThreads = Math.min(MAX_NUM_OF_THREADS, this.agents.size() / 25 + 1);
+
+		BlockingQueue<Agent2D> queue = new ArrayBlockingQueue<Agent2D>(this.agents.size(),false,this.agents);
+		//		ArrayBlockingQueue<Runnable> queueII = new ArrayBlockingQueue<Runnable>(5);
+		//		ThreadPoolExecutor threadPool = new ThreadPoolExecutor(numOfThreads, numOfThreads, 100, TimeUnit.SECONDS,queueII);
+		//		for (int i = 0; i < 1; i++) {
+		//			MultiThreadedForceUpdater t1 = new MultiThreadedForceUpdater(queue,this.forceModules,this.dynamicForceModules);
+		//			threadPool.execute(t1);
+		//			//			t1.run();
+		//		}
+		//		threadPool.shutdown();
+
+		List<Thread> threads = new ArrayList<Thread>();
+
+		for (int i = 0; i < numOfThreads; i++) {
+			MultiThreadedForceUpdater t1 = new MultiThreadedForceUpdater(queue,this.forceModules,this.dynamicForceModules);
+			Thread th1 = new Thread(t1);
+			th1.start();
+			threads.add(th1);
+		}
+
+		for (int i = 0; i < numOfThreads; i++) {
+			try {
+				threads.get(i).join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				//			}
+			}
+		}
+	}
 	protected void updateForces(Agent2D agent, double time) {
+
+
+
 		for (ForceModule m : this.dynamicForceModules) {
 			m.run(agent);
-
-			//					if (Sim2DConfig.DEBUG) {
-			//						Force f = agent.getForce();
-			//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
-			//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
-			//							System.out.println("dv" + dv);
-			//						}
-			//					}
 		}
+
+
+
 		for (ForceModule m : this.forceModules) {
 			m.run(agent);
-			//					if (Sim2DConfig.DEBUG) {
-			//						Force f = agent.getForce();
-			//						double dv = Math.sqrt(Math.pow(f.getXComponent(), 2)+Math.pow(f.getYComponent(), 2));
-			//						if (dv*Sim2DConfig.TIME_STEP_SIZE > 2 ) {
-			//							System.out.println("dv" + dv);
-			//						}
-			//					}
 		}
 	}
+
 
 	/**
 	 * 
@@ -390,5 +438,11 @@ public class PhysicalFloor implements Floor {
 	protected EventsManager getEventsManager() {
 		return this.em;
 	}
+
+
+	//	public void printTimings() {
+	//		System.err.println("force calculation took: " + this.forceTime);
+	//		System.err.println("movement took: " + this.movementTime);
+	//	}
 
 }
