@@ -49,7 +49,7 @@ public class TopoAnalyzer {
 			output = args[1];
 
 		AnalyzerTaskComposite composite = new AnalyzerTaskComposite();
-		composite.addTask(new TopologyAnalyzerTask());
+//		composite.addTask(new TopologyAnalyzerTask());
 		composite.addTask(new ExtendedTopologyAnalyzerTask());
 		
 		if(output != null)

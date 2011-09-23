@@ -19,7 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.api.core.v01.population.Person;
+
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.coopsim.pysical.VisitorTracker;
+import playground.johannes.socialnetworks.graph.social.SocialGraph;
+import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
@@ -29,18 +39,38 @@ public class JointActivityEvaluator implements Evaluator {
 
 	private final double beta;
 	
-	public JointActivityEvaluator(double beta) {
+	private final VisitorTracker tracker;
+	
+	private final Map<Person, SocialVertex> vertices;
+	
+	private final Map<Person, List<Person>> alters;
+	
+	public JointActivityEvaluator(double beta, VisitorTracker tracker, SocialGraph graph) {
 		this.beta = beta;
+		this.tracker = tracker;
+		
+		vertices = new HashMap<Person, SocialVertex>(graph.getVertices().size());
+		alters = new HashMap<Person, List<Person>>(graph.getVertices().size());
+		for(SocialVertex v : graph.getVertices()) {
+			vertices.put(v.getPerson().getPerson(), v);
+			List<Person> neighbours = new ArrayList<Person>(v.getNeighbours().size());
+			for(SocialVertex alter : v.getNeighbours()) {
+				neighbours.add(alter.getPerson().getPerson());
+			}
+			alters.put(v.getPerson().getPerson(), neighbours);
+		}
 	}
 	
 	@Override
 	public double evaluate(Trajectory trajectory) {
-		double score = 0;
-		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
-			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
-			score += beta * t;
-		}
-		return score;
+		double time = 0;
+//		SocialVertex ego = vertices.get(trajectory.getPerson());
+		
+//		for(SocialVertex alter : ego.getNeighbours()) {
+//			time += tracker.timeOverlap(trajectory.getPerson(), alter.getPerson().getPerson());
+//		}
+		time = tracker.timeOverlap(trajectory.getPerson(), alters.get(trajectory.getPerson()));
+		return time * beta;
 	}
 
 }

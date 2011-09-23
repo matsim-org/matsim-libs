@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.pysical;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,11 +41,9 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	private static final Logger logger = Logger.getLogger(VisitorTracker.class);
 
-	private Map<Id, Visitor> startEvents;
+	private Map<Id, PersonData> personData;
 	
-	private Map<Id, Set<Visit>> visits;
-	
-	private Map<Id, Set<Visitor>> visitors;
+	private Map<Id, List<Visitor>> facilityData;
 	
 	private String ignoreType = "home";
 	
@@ -56,52 +55,51 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	public void handleEvent(ActivityStartEvent event) {
 		if (!event.getActType().equals(ignoreType)) {
 			Visitor visitor = new Visitor();
-			visitor.person = event.getPersonId();
+			visitor.personId = event.getPersonId();
 			visitor.startEvent = event;
 			visitor.endEvent = null;
 
-			startEvents.put(event.getPersonId(), visitor);
+			PersonData data = personData.get(event.getPersonId());
+			if(data == null) {
+				data = new PersonData();
+				data.visits = new ArrayList<VisitorTracker.Visit>();
+				personData.put(event.getPersonId(), data);
+			}
+			data.currentVisitor = visitor;
 			/*
 			 * add visitor to facility
 			 */
-			Set<Visitor> facilityVisitors = visitors.get(event.getFacilityId());
-			if (facilityVisitors == null) {
-				facilityVisitors = new HashSet<Visitor>();
-				visitors.put(event.getFacilityId(), facilityVisitors);
+			List<Visitor> visitors = facilityData.get(event.getFacilityId());
+			if (visitors == null) {
+				visitors = new ArrayList<Visitor>(100);
+				facilityData.put(event.getFacilityId(), visitors);
 			}
-			facilityVisitors.add(visitor);
+			visitors.add(visitor);
 		}
 	}
 
 	@Override
 	public void reset(int iteration) {
-		startEvents = new HashMap<Id, Visitor>();
-		visits = new HashMap<Id, Set<Visit>>();
-		visitors = new HashMap<Id, Set<Visitor>>();
+		personData = new HashMap<Id, VisitorTracker.PersonData>();
+		facilityData = new HashMap<Id, List<Visitor>>();
 
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (!event.getActType().equals(ignoreType)) {
-			Visitor visitor = startEvents.get(event.getPersonId());
-			if (visitor != null) {
-				visitor.endEvent = event;
+			PersonData data = personData.get(event.getPersonId());
+			if (data != null) {
+				data.currentVisitor.endEvent = event;
 				/*
 				 * add visit to person
 				 */
-				Set<Visit> facilityVisits = visits.get(event.getPersonId());
-				if (facilityVisits == null) {
-					facilityVisits = new HashSet<Visit>();
-					visits.put(event.getPersonId(), facilityVisits);
-				}
-
 				Visit visit = new Visit();
-				visit.facility = event.getFacilityId();
-				visit.startEvent = visitor.startEvent;
+				visit.facilityId = event.getFacilityId();
+				visit.startEvent = data.currentVisitor.startEvent;
 				visit.endEvent = event;
 
-				facilityVisits.add(visit);
+				data.visits.add(visit);
 			} else {
 				logger.warn(String.format("No visitor found for person %1$s.", event.getPersonId()));
 			}
@@ -110,15 +108,15 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	}
 	
 	public double timeOverlap(Person person, Person alter) {
-		Set<Visit> facilityVisits = visits.get(person.getId());
-		if (facilityVisits == null)
+		PersonData data = personData.get(person.getId());
+		if(data == null)
 			return 0;
-
+		
 		double sum = 0;
-		for (Visit visit : facilityVisits) {
-			Set<Visitor> facilityVisitors = visitors.get(visit.facility);
-			for (Visitor visitor : facilityVisitors) {
-				if (alter.getId().equals(visitor.person)) {
+		for (Visit visit : data.visits) {
+			List<Visitor> visitors = facilityData.get(visit.facilityId);
+			for (Visitor visitor : visitors) {
+				if (alter.getId().equals(visitor.personId)) {
 					double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
 					double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
 					double delta = Math.max(0.0, end - start);
@@ -132,17 +130,17 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 		return sum;
 	}
 	
-	public double timeOverlap(Person person, Set<Person> alters) {
-		Set<Visit> facilityVisits = visits.get(person.getId());
-		if (facilityVisits == null)
+	public double timeOverlap(Person person, Collection<Person> alters) {
+		PersonData data = personData.get(person.getId());
+		if(data == null)
 			return 0;
 
 		double sum = 0;
-		for (Visit visit : facilityVisits) {
-			Set<Visitor> facilityVisitors = visitors.get(visit.facility);
-			for (Visitor visitor : facilityVisitors) {
+		for (Visit visit : data.visits) {
+			List<Visitor> visitors = facilityData.get(visit.facilityId);
+			for (Visitor visitor : visitors) {
 				for (Person alter : alters) {
-					if (alter.getId().equals(visitor.person)) {
+					if (alter.getId().equals(visitor.personId)) {
 						double start = Math.max(visit.startEvent.getTime(), visitor.startEvent.getTime());
 						double end = Math.min(visit.endEvent.getTime(), visitor.endEvent.getTime());
 						double delta = Math.max(0.0, end - start);
@@ -157,9 +155,17 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 		return sum;
 	}
 	
+	private class PersonData {
+		
+		private Visitor currentVisitor;
+		
+		private List<Visit> visits;
+		
+	}
+	
 	private class Visit {
 		
-		private Id facility;
+		private Id facilityId;
 		
 		private ActivityStartEvent startEvent;
 		
@@ -168,7 +174,7 @@ public class VisitorTracker implements ActivityStartEventHandler, ActivityEndEve
 	
 	private class Visitor {
 		
-		private Id person;
+		private Id personId;
 		
 		private ActivityStartEvent startEvent;
 		

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExtendedTopologyAnalyzerTask.java
+ * Profiler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.socialnetworks.graph.analysis;
+package playground.johannes.coopsim;
 
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
+import org.apache.log4j.Logger;
+
+import gnu.trove.TObjectLongHashMap;
 
 /**
  * @author illenberger
  *
  */
-public class ExtendedTopologyAnalyzerTask extends AnalyzerTaskComposite {
+public class Profiler {
 
-	public ExtendedTopologyAnalyzerTask() {
-		addTask(new ComponentsTask());
-		
-//		CentralityTask task = new CentralityTask();
-//		task.setCalcAPLDistribution(false);
-//		task.setCalcBetweenness(false);
-//		addTask(task);
-		
-		addTask(new APLTask(false));
+	private static final Logger logger = Logger.getLogger(Profiler.class);
+	
+	private static final TObjectLongHashMap<Object> starts = new TObjectLongHashMap<Object>();
+	
+	private static final TObjectLongHashMap<Object> measures = new TObjectLongHashMap<Object>();
+	
+	public static void start(Object obj) {
+		starts.put(obj, System.currentTimeMillis());
 	}
+	
+	public static long stop(Object obj) {
+		return stop(obj, false);
+	}
+	
+	public static long stop(Object obj, boolean print) {
+		long time = System.currentTimeMillis() - starts.get(obj);
+		time += measures.get(obj);
+		
+		starts.remove(obj);
+		measures.remove(obj);
+		
+		if(print)
+			logger.info(String.format("Profiling time for \"%1$s\": %2$.3f secs.", obj.toString(), time/1000.0));
+		
+		return time;
+	}
+	
+	public static void pause(Object obj) {
+		long time = System.currentTimeMillis() - starts.get(obj);
+		measures.adjustOrPutValue(obj, time, time);
+	}
+	
+	public static void resume(Object obj) {
+		start(obj);
+	}
+	
 }

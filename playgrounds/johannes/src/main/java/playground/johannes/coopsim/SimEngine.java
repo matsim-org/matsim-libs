@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
@@ -72,14 +71,6 @@ public class SimEngine {
 
 	private String outpurDirectory;
 	
-	private long preprocessTime;
-	
-	private long postprocessTime;
-	
-	private long mentalTime;
-	
-	private long phyiscalTime;
-
 	public SimEngine(SocialGraph graph, MentalEngine mentalEngine, PhysicalEngine physicalEngine, EvalEngine evalEngine) {
 		this.graph = graph;
 		this.mentalEngine = mentalEngine;
@@ -94,9 +85,6 @@ public class SimEngine {
 		this.eventsManager = EventsUtils.createEventsManager();
 
 		LoggerUtils.setVerbose(false);
-		for (EventHandler handler : evalEngine.getEventHandler())
-			eventsManager.addHandler(handler);
-		
 		eventsManager.addHandler(trajectoryBuilder);
 		LoggerUtils.setVerbose(true);
 	}
@@ -143,13 +131,13 @@ public class SimEngine {
 		/*
 		 * run mental layer
 		 */
-		long time = System.currentTimeMillis();
+		Profiler.resume("mental engine");
 		List<SocialVertex> egos = mentalEngine.nextState();
-		mentalTime += System.currentTimeMillis() - time;
+		Profiler.pause("mental engine");
 		/*
 		 * get alters
 		 */
-		time = System.currentTimeMillis();
+		Profiler.resume("step preprocessing");
 		Set<SocialVertex> altersLevel1 = new HashSet<SocialVertex>();
 		for (SocialVertex ego : egos) {
 			for (SocialVertex alter : ego.getNeighbours()) {
@@ -175,37 +163,30 @@ public class SimEngine {
 			plans.add(ego.getPerson().getPerson().getSelectedPlan());
 
 		List<Tuple<Plan, Double>> alter1Scores = new ArrayList<Tuple<Plan,Double>>(altersLevel1.size());
-//		Map<Plan, Double> alter1Scores = new HashMap<Plan, Double>(altersLevel1.size());
 		for (SocialVertex alter : altersLevel1) {
 			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
 			plans.add(plan);
 			alter1Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
-//			alter1Scores.put(plan, plan.getScore());
 		}
 
 		List<Tuple<Plan, Double>> alter2Scores = new ArrayList<Tuple<Plan,Double>>(altersLevel2.size());
-//		Map<Plan, Double> alter2Scores = new HashMap<Plan, Double>(altersLevel2.size());
 		for (SocialVertex alter : altersLevel2) {
 			Plan plan = alter.getPerson().getPerson().getSelectedPlan();
 			plans.add(plan);
 			alter2Scores.add(new Tuple<Plan, Double>(plan, plan.getScore()));
-//			alter2Scores.put(plan, plan.getScore());
 		}
-		preprocessTime += System.currentTimeMillis() - time;
+		Profiler.pause("step preprocessing");
 		/*
 		 * run physical layer
 		 */
-		time = System.currentTimeMillis();
-		evalEngine.init();
+		Profiler.resume("physical engine");
 		trajectoryBuilder.reset(0);
 		physicalEngine.run(plans, eventsManager);
-		
-		phyiscalTime += System.currentTimeMillis() - time;
+		Profiler.pause("physical engine");
 		/*
 		 * evaluate plans
 		 */
-		time = System.currentTimeMillis();
-//		evalEngine.run();
+		Profiler.resume("evaluation & postprocessing");
 		evalEngine.evaluate(trajectoryBuilder.trajectories());
 		/*
 		 * accept/reject state
@@ -214,9 +195,6 @@ public class SimEngine {
 		/*
 		 * reset scores of level 2 alters
 		 */
-//		for(Entry<Plan, Double> entry : alter2Scores.entrySet()) {
-//			entry.getKey().setScore(entry.getValue());
-//		}
 		for(int i = 0; i < alter2Scores.size(); i++) {
 			Tuple<Plan, Double> tuple = alter2Scores.get(i);
 			tuple.getFirst().setScore(tuple.getSecond());
@@ -225,30 +203,24 @@ public class SimEngine {
 		 * if state rejected, reset scores of level 1 alters
 		 */
 		if(!accept) {
-//			for(Entry<Plan, Double> entry : alter1Scores.entrySet()) {
-//				entry.getKey().setScore(entry.getValue());
-//			}
 			for(int i = 0; i < alter1Scores.size(); i++) {
 				Tuple<Plan, Double> tuple = alter1Scores.get(i);
 				tuple.getFirst().setScore(tuple.getSecond());
 			}
 		}
 		
-		postprocessTime += System.currentTimeMillis() - time;
+		Profiler.pause("evaluation & postprocessing");
 	}
 
 	public void drawSample(int iter) {
-		logger.info(String.format("Mental time = %1$s; Preprocess time = %2$s; Sim time = %3$s; postrocess time = %4$s.", mentalTime, preprocessTime, phyiscalTime, postprocessTime));
-		mentalTime = 0;
-		preprocessTime = 0;
-		phyiscalTime = 0;
-		postprocessTime = 0;
+		Profiler.stop("mental engine", true);
+		Profiler.stop("step preprocessing", true);
+		Profiler.stop("physical engine", true);
+		Profiler.stop("evaluation & postprocessing", true);
 		
 		LoggerUtils.setVerbose(false);
 
-		evalEngine.init();
-
-		Set<Plan> plans = new HashSet<Plan>();
+		List<Plan> plans = new ArrayList<Plan>(graph.getVertices().size());
 		for (SocialVertex v : graph.getVertices()) {
 			plans.add(v.getPerson().getPerson().getSelectedPlan());
 		}
@@ -258,7 +230,6 @@ public class SimEngine {
 
 		Set<Trajectory> trajectories = trajectoryBuilder.trajectories();//new HashSet<Trajectory>(builder.getTrajectories().values());
 
-//		evalEngine.run();
 		evalEngine.evaluate(trajectories);
 
 		LoggerUtils.setVerbose(true);
