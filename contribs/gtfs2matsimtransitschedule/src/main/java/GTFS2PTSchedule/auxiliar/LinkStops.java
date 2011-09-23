@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -16,12 +17,14 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import GTFS2PTSchedule.Stop;
-
 import util.geometry.Line2D;
 import util.geometry.Point2D;
 
 public class LinkStops {
 	
+	//Constants
+	private final static Logger log = Logger.getLogger(LinkStops.class);
+
 	//Attributes
 	private Link link;
 	private List<Stop> stops;
@@ -69,14 +72,16 @@ public class LinkStops {
 		Point2D lPoint = new Point2D(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
 		return linkLine.getNearestPoint(point).getDistance(lPoint);
 	}
-	public Link split(int i, Network network, CoordinateTransformation coordinateTransformation) throws Exception {
+	public Link split(int i, Network network, CoordinateTransformation coordinateTransformation) {
 		Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 		Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		Line2D linkLine = new Line2D(fromPoint, toPoint);
 		Point2D point = new Point2D(stops.get(i).getPoint().getX(),stops.get(i).getPoint().getY());
 		Point2D nearestPoint = linkLine.getNearestPoint(point);
-		if(linkLine.getParameter(nearestPoint)<0)
-			throw new Exception("Bad position of stop according to the link");
+		if(linkLine.getParameter(nearestPoint)<0) {
+			log.warn("Bad position of stop "+stops.get(i).getName()+" according to the link " + link.getId());
+			return null;
+		}
 		Node toNode = network.getFactory().createNode(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i),new CoordImpl(nearestPoint.getX(), nearestPoint.getY()));
 		if(network.getNodes().get(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i))==null)
 			network.addNode(toNode);
@@ -94,6 +99,7 @@ public class LinkStops {
 		newLink.setAllowedModes(modes);
 		network.addLink(newLink);
 		link.setFromNode(toNode);
+		link.setLength(link.getLength()-newLink.getLength());
 		stops.get(i).forceSetLinkId(link.getId().toString()+"_"+i);
 		return newLink;
 	}
