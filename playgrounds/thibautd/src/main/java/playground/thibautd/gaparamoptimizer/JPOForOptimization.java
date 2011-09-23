@@ -52,7 +52,7 @@ public class JPOForOptimization {
 	private static final Logger log =
 		Logger.getLogger(JPOForOptimization.class);
 
-	private static final long MAX_TIME_PER_MEMBER = (long) (10 * 1E9);
+	private static final long MAX_TIME_PER_MEMBER = (long) (8 * 1E9);
 
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;

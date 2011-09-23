@@ -88,9 +88,11 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// bounds
 	//private static final int MAX_POP_SIZE = 100;
 	private static final double MAX_POP_INTERCEPT = 20;
-	private static final double MAX_POP_SLOPE = 2;
+	private static final double MIN_POP_SLOPE = 1;
+	private static final double MAX_POP_SLOPE = 10;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	//private static final int MAX_WINDOW_SIZE = 20;
+	private static final double MIN_WINDOW_SLOPE = 0;
 	private static final int MAX_WINDOW_SLOPE = 2;
 	private static final int MAX_WINDOW_INTERCEPT = 5;
 	private static final double MAX_NON_UNIFORM = 50d;
@@ -178,7 +180,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	protected double evaluate(final IChromosome chromosome) {
 		LogInfo info = new LogInfo();
 		info.generationNumber = this.jgapConfig.getGenerationNr();
-		info.chromValue = chromosome.toString();
+		info.chromValue = toString(chromosome);
 		double[] scores = new double[nPlans];
 		long[] cpuTimesNanoSecs = new long[nPlans];
 		JointReplanningConfigGroup configGroup = fromChromosomeToConfig(chromosome);
@@ -275,7 +277,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		Gene[] genes = new Gene[CHROM_LENGTH];
 
 		//genes[POP_SIZE_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_POP_SIZE);
-		genes[POP_SLOPE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_POP_SLOPE);
+		genes[POP_SLOPE_GENE] = new DoubleGene(this.jgapConfig, MIN_POP_SLOPE, MAX_POP_SLOPE);
 		genes[POP_INTERCEPT_GENE] = new DoubleGene(this.jgapConfig, 2d, MAX_POP_INTERCEPT);
 		genes[MUT_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[WHOLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
@@ -283,7 +285,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		genes[SINGLE_PROB_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[DISCRETE_SCALE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_DISCRETE_SCALE);
 		//genes[RTS_WINDOW_GENE] = new IntegerGene(this.jgapConfig, 2, MAX_WINDOW_SIZE);
-		genes[RTS_WINDOW_SLOPE_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_WINDOW_SLOPE);
+		genes[RTS_WINDOW_SLOPE_GENE] = new DoubleGene(this.jgapConfig, MIN_WINDOW_SLOPE, MAX_WINDOW_SLOPE);
 		genes[RTS_WINDOW_INTERCEPT_GENE] = new DoubleGene(this.jgapConfig, 2d, MAX_WINDOW_INTERCEPT);
 		genes[NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, MAX_NON_UNIFORM);
 		genes[IN_PLACE_GENE] = new BooleanGene(this.jgapConfig);

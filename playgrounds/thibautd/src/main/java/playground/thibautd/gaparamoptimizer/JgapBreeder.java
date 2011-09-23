@@ -33,7 +33,7 @@ import org.jgap.Population;
  */
 public class JgapBreeder extends GABreeder {
 	private static final long serialVersionUID = 1L;
-	private static final int N_THREADS = 12;
+	//private static final int N_THREADS = 20;
 
 	@Override
 	protected void updateChromosomes(
@@ -47,16 +47,22 @@ public class JgapBreeder extends GABreeder {
 			}
 		}
 
-		int step = toScore.size() / N_THREADS;
-		int first = 0;
+		//int step = toScore.size() / N_THREADS;
+		//int first = 0;
 
 		// launch fitness computing in threads
 		List<Thread> threads = new ArrayList<Thread>();
-		for (int i=0; i < N_THREADS; i++) {
-			Thread thread = new Thread(new Scorer(toScore.subList(first, first + step), a_conf));
+		//for (int i=0; i < N_THREADS; i++) {
+		//	Thread thread = new Thread(new Scorer(toScore.subList(first, first + step), a_conf));
+		//	threads.add(thread);
+		//	thread.start();
+		//	first += step;
+		//}
+
+		for (IChromosome chrom : toScore) {
+			Thread thread = new Thread(new IndividualScorer(chrom, a_conf));
 			threads.add(thread);
 			thread.start();
-			first += step;
 		}
 
 		// wait for all threads to be dead before exiting
@@ -70,12 +76,12 @@ public class JgapBreeder extends GABreeder {
 	}
 }
 
-class Scorer implements Runnable {
-	private final List<IChromosome> toScore;
+class IndividualScorer implements Runnable {
+	private final IChromosome toScore;
 	private final ParameterOptimizerFitness fitness;
 
-	public Scorer(
-			final List<IChromosome> toScore,
+	public IndividualScorer(
+			final IChromosome toScore,
 			final Configuration jgapConfig) {
 		this.toScore = toScore;
 		this.fitness = ((ParameterOptimizerFitness) jgapConfig.getFitnessFunction()).clone();
@@ -83,8 +89,25 @@ class Scorer implements Runnable {
 
 	@Override
 	public void run() {
-		for (IChromosome chrom : toScore) {
-			chrom.setFitnessValueDirectly(fitness.evaluate(chrom));
-		}
+		toScore.setFitnessValueDirectly(fitness.evaluate(toScore));
 	}
 }
+
+//class Scorer implements Runnable {
+//	private final List<IChromosome> toScore;
+//	private final ParameterOptimizerFitness fitness;
+//
+//	public Scorer(
+//			final List<IChromosome> toScore,
+//			final Configuration jgapConfig) {
+//		this.toScore = toScore;
+//		this.fitness = ((ParameterOptimizerFitness) jgapConfig.getFitnessFunction()).clone();
+//	}
+//
+//	@Override
+//	public void run() {
+//		for (IChromosome chrom : toScore) {
+//			chrom.setFitnessValueDirectly(fitness.evaluate(chrom));
+//		}
+//	}
+//}
