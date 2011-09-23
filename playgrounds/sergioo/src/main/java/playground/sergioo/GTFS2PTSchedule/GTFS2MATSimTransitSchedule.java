@@ -26,12 +26,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.LinkFactoryImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -54,6 +55,7 @@ import playground.sergioo.GTFS2PTSchedule.auxiliar.LinkStops;
 import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutesPathsGenerator;
 import playground.sergioo.GTFS2PTSchedule.GTFSDefinitions.RouteTypes;
 
+
 public class GTFS2MATSimTransitSchedule {
 	
 	//Constants
@@ -61,7 +63,7 @@ public class GTFS2MATSimTransitSchedule {
 	 * Maximum distance allowed between an stop and the end of the corresponding link
 	 */
 	private static final double MAX_DISTANCE_STOP_LINK = 50*180/(6371000*Math.PI);
-	private static final double DEFAULT_FREE_SPEED = 20;
+	private static final double DEFAULT_FREE_SPEED = 6;
 	private static final double DEFAULT_CAPACITY = 500;
 	
 	//Attributes
@@ -82,7 +84,7 @@ public class GTFS2MATSimTransitSchedule {
 	 */
 	private Map<String, Stop>[] stops;
 	/**
-	 * The calendar sevices
+	 * The calendar services
 	 */
 	private Map<String, Service>[] services;
 	/**
@@ -97,18 +99,23 @@ public class GTFS2MATSimTransitSchedule {
 	 * The time format 
 	 */
 	private SimpleDateFormat timeFormat;
+	/**
+	 * Desired coordinates system
+	 */
+	private CoordinateTransformation coordinateTransformation;
 	
 	//Methods
 	/**
 	 * @param root
 	 * @param network
 	 */
-	public GTFS2MATSimTransitSchedule(File[] roots, Network network, String[] serviceIds) {
+	public GTFS2MATSimTransitSchedule(File[] roots, Network network, String[] serviceIds, String outCoordinateSystem) {
 		super();
 		this.roots = roots;
 		this.network = network;
-		updateNetwork();
 		this.serviceIds = serviceIds;
+		this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outCoordinateSystem);
+		updateNetwork();
 	}
 	/**
 	 * @return the network
@@ -118,6 +125,9 @@ public class GTFS2MATSimTransitSchedule {
 	}
 	private void updateNetwork() {
 		try {
+			if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.exists())
+				if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.createNewFile())
+					throw new IOException();
 			BufferedReader reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE));
 			String line = reader.readLine();
 			while(line!=null) {
@@ -126,12 +136,17 @@ public class GTFS2MATSimTransitSchedule {
 				line = reader.readLine();
 			}
 			reader.close();
+			if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.exists())
+				if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.createNewFile())
+					throw new IOException();
 			reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE));
 			line = reader.readLine();
+			LinkFactory linkFactory = new LinkFactoryImpl();
 			while(line!=null) {
-				String fromNode = reader.readLine(), toNode = reader.readLine();
-				double distance = CoordUtils.calcDistance(network.getNodes().get(new IdImpl(fromNode)).getCoord(),network.getNodes().get(new IdImpl(toNode)).getCoord());
-				Link link = new LinkFactoryImpl().createLink(new IdImpl(line), network.getNodes().get(new IdImpl(fromNode)), network.getNodes().get(new IdImpl(toNode)), network, distance, DEFAULT_FREE_SPEED, DEFAULT_CAPACITY, 1);
+				Node fromNode = network.getNodes().get(new IdImpl(reader.readLine()));
+				Node toNode = network.getNodes().get(new IdImpl(reader.readLine()));
+				double length = CoordUtils.calcDistance(coordinateTransformation.transform(fromNode.getCoord()),coordinateTransformation.transform(toNode.getCoord()));
+				Link link = linkFactory.createLink(new IdImpl(line), fromNode, toNode, network, length, DEFAULT_FREE_SPEED, DEFAULT_CAPACITY, 1);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");
 				modes.add(RouteTypes.BUS.name);
@@ -267,7 +282,7 @@ public class GTFS2MATSimTransitSchedule {
 	 * From the loaded information calculates all the necessary information for MATSim
 	 * @throws IOException 
 	 */
-	private void calculateUnknownInformation(CoordinateTransformation coordinateTransformation) throws IOException {
+	private void calculateUnknownInformation() throws IOException {
 		//Setting Route types to the stops
 		for(int publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++)
 			for(Route route:routes[publicSystemNumber].values())
@@ -277,28 +292,17 @@ public class GTFS2MATSimTransitSchedule {
 							stops[publicSystemNumber].get(stopTime.getValue().getStopId()).setRouteType(route.getRouteType());
 		//Interactive tool for calculating routes path and stops link
 		for(byte publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++) {
-			RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, routes[publicSystemNumber], stops[publicSystemNumber]);
+			RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, roots[publicSystemNumber], routes[publicSystemNumber], stops[publicSystemNumber]);
 			routesPathsGenerator.run();
 			//Splitting of stop-links
-			splitStopLinks(publicSystemNumber, MAX_DISTANCE_STOP_LINK);
-			
-		}
-		//Coordinates system of the network
-		for(Node node:network.getNodes().values())
-			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
-		for(Link link:network.getLinks().values()) {
-			if(((LinkImpl)link).getOrigId()!=null)
-				((LinkImpl)link).setLength(((LinkImpl)link).getLength()*1000);
-			else
-				((LinkImpl)link).setLength(CoordUtils.calcDistance(link.getFromNode().getCoord(),link.getToNode().getCoord()));
-			link.setFreespeed(link.getFreespeed()/3.6);
+			splitStopLinks(publicSystemNumber);
 		}
 	}
 	/**
 	 * Modifies the network avoiding big distances between stops and the end of the related links
 	 * @param maxDistanceStopLink
 	 */
-	private void splitStopLinks(byte publicTransportSystem, double maxDistanceStopLink) {
+	private void splitStopLinks(byte publicTransportSystem) {
 		Map<String,LinkStops> linksStops = new HashMap<String,LinkStops>();
 		for(Stop stop:stops[publicTransportSystem].values()) {
 			if(stop.getLinkId()!=null) {
@@ -313,13 +317,13 @@ public class GTFS2MATSimTransitSchedule {
 		for(LinkStops linkStops:linksStops.values()) {
 			for(int i=0; i<linkStops.getNumStops()-1; i++)
 				try {
-					changeTrips(linkStops.getLink(),linkStops.split(i,network), false, publicTransportSystem);
+					changeTrips(linkStops.getLink(),linkStops.split(i,network, coordinateTransformation), false, publicTransportSystem);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			if(linkStops.getLastDistance()>MAX_DISTANCE_STOP_LINK)
 				try {
-					changeTrips(linkStops.getLink(),linkStops.split(linkStops.getNumStops()-1,network), true, publicTransportSystem);
+					changeTrips(linkStops.getLink(),linkStops.split(linkStops.getNumStops()-1,network, coordinateTransformation), true, publicTransportSystem);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}	
@@ -340,16 +344,19 @@ public class GTFS2MATSimTransitSchedule {
 					}
 	}
 	/**
-	 * @param coordinateTransformation applied to the network and to the transit stops
+	 * @param outCoordinateSystem the desired output coordinate system of the network nodes and the transit schedule stops
 	 * @return the MATSim transit schedule
 	 */
-	public TransitSchedule getTransitSchedule(CoordinateTransformation coordinateTransformation) {
+	public TransitSchedule getTransitSchedule() {
 			loadGTFSFiles();
 			try {
-				calculateUnknownInformation(coordinateTransformation);
+				calculateUnknownInformation();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			//Coordinates system of the network
+			for(Node node:network.getNodes().values())
+				((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 			//Public Transport Schedule
 			TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();
 			TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();
@@ -428,13 +435,17 @@ public class GTFS2MATSimTransitSchedule {
 	 */
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
-		matsimNetworkReader.readFile(args[1]);
+		(new MatsimNetworkReader(scenario)).readFile(args[1]);
 		Network network = scenario.getNetwork();
-		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"});
-		//Transformation for Singapore
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_SVY21);
-		(new TransitScheduleWriter(g2m.getTransitSchedule(coordinateTransformation))).writeFile(args[0]);
+		//Convert lengths of the link from km to m and speeds from km/h to m/s
+		for(Link link:network.getLinks().values()) {
+			link.setLength(link.getLength()*1000);
+			link.setFreespeed(link.getFreespeed()/3.6);
+		}
+		//Construct conversion object
+		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"}, TransformationFactory.WGS84_SVY21);
+		//Convert
+		(new TransitScheduleWriter(g2m.getTransitSchedule())).writeFile(args[0]);
 		//Write modified network
 		((NetworkImpl)network).setName(args[3]);
 		NetworkWriter networkWriter =  new NetworkWriter(network);

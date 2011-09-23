@@ -31,9 +31,9 @@ public class RoutesPathsGenerator {
 	/**
 	 * Pre-processed information files
 	 */
-	private final static File[] PREFILES = {new File("./data/paths/fixedStops.txt"),new File("./data/paths/bases.txt"),new File("./data/paths/finishedTrips.txt")};
-	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes.txt");
-	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks.txt");
+	private final static String[] PREFILES = {"fixedStops.txt","bases.txt","finishedTrips.txt"};
+	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes2.txt");
+	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks2.txt");
 	
 	//Attributes
 	/**
@@ -63,17 +63,20 @@ public class RoutesPathsGenerator {
 	 * @param stops
 	 * @throws IOException 
 	 */
-	public RoutesPathsGenerator(Network network, Map<String, Route> routes, Map<String, Stop> stops) throws IOException {
+	public RoutesPathsGenerator(Network network, File root, Map<String, Route> routes, Map<String, Stop> stops) throws IOException {
 		super();
 		this.network = network;
 		this.routes = routes;
 		this.stops = stops;
-		bases = new HashMap<String, String[]>();
-		finishedTrips = new HashMap<String, String[]>();
-		if(!PREFILES[0].exists())
-			if(!PREFILES[0].createNewFile())
+		File  tempFolder = new File(root.getPath()+"/temp");
+		if(!tempFolder.exists())
+			if(!tempFolder.mkdir())
 				throw new IOException();
-		BufferedReader reader = new BufferedReader(new FileReader(PREFILES[0]));
+		File fixedStopsFile = new File(tempFolder.getPath()+"/"+PREFILES[0]);
+		if(!fixedStopsFile.exists())
+			if(!fixedStopsFile.createNewFile())
+				throw new IOException();
+		BufferedReader reader = new BufferedReader(new FileReader(fixedStopsFile));
 		String line = reader.readLine();
 		while(line!=null) {
 			Stop stop = stops.get(line);
@@ -82,10 +85,12 @@ public class RoutesPathsGenerator {
 			line = reader.readLine();
 		}
 		reader.close();
-		if(!PREFILES[1].exists())
-			if(!PREFILES[1].createNewFile())
+		bases = new HashMap<String, String[]>();
+		File basesFile = new File(tempFolder.getPath()+"/"+PREFILES[1]);
+		if(!basesFile.exists())
+			if(!basesFile.createNewFile())
 				throw new IOException();
-		reader = new BufferedReader(new FileReader(PREFILES[1]));
+		reader = new BufferedReader(new FileReader(basesFile));
 		line = reader.readLine();
 		while(line!=null) {
 			String[] links = reader.readLine().split(";");
@@ -93,10 +98,12 @@ public class RoutesPathsGenerator {
 			line = reader.readLine();
 		}
 		reader.close();
-		if(!PREFILES[2].exists())
-			if(!PREFILES[2].createNewFile())
+		finishedTrips = new HashMap<String, String[]>();
+		File finishedTripsFile = new File(tempFolder.getPath()+"/"+PREFILES[2]);
+		if(!finishedTripsFile.exists())
+			if(!finishedTripsFile.createNewFile())
 				throw new IOException();
-		reader = new BufferedReader(new FileReader(PREFILES[2]));
+		reader = new BufferedReader(new FileReader(finishedTripsFile));
 		line = reader.readLine();
 		while(line!=null) {
 			String[] links = reader.readLine().split(";");
