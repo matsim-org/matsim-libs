@@ -218,6 +218,7 @@ class ConditionValidator implements TwofoldTripValidator {
 			"\nacceptable time = "+(condition.getTime()/60d)+" min";
 	}
 
+	@Override
 	public String toString() {
 		return getConditionDescription();
 	}
@@ -229,7 +230,7 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	@Override
 	public Comparable getSecondCriterion() {
-		return new Label (condition.getTime()/60d, "", "min");
+		return new Label(condition.getTime()/60d, "", "min");
 	}
 
 	@Override
@@ -249,30 +250,43 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	private static class Label implements Comparable {
 		private final double value;
-		private final String name;
+		private final String prefix;
+		private final String suffix;
 
 		public Label(
 				final double value,
 				final String prefix,
 				final String suffix) {
 			this.value = value;
-			this.name = prefix + value + suffix;
+			this.prefix = prefix;
+			this.suffix = suffix;
 		}
 
+		/**
+		 * if the prefix and suffix are the same, compares the value; otherwise,
+		 * compares string representation.
+		 */
+		@Override
 		public int compareTo(final Object o) {
-			return Double.compare(value, ((Label) o).value);
+			if ( ((Label) o).prefix.equals(prefix) && ((Label) o).suffix.equals(suffix) ) {
+				return Double.compare(value, ((Label) o).value);
+			}
+			return toString().compareTo(o.toString());
 		}
 
+		@Override
 		public String toString() {
-			return name;
+			return prefix + value + suffix;
 		}
 
+		@Override
 		public int hashCode() {
-			return name.hashCode();
+			return toString().hashCode();
 		}
 
+		@Override
 		public boolean equals(final Object o) {
-			return name.equals(o);
+			return toString().equals(o.toString());
 		}
 	}
 }
