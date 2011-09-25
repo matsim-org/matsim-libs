@@ -144,8 +144,8 @@ public class RoutesPathsGenerator {
 				finishedTrips.put(line, links);
 				line = reader.readLine();
 			}
+			reader.close();
 		}
-		reader.close();
 	}
 	/**
 	 * Executes the semi-automatic procedure for each route
@@ -156,7 +156,7 @@ public class RoutesPathsGenerator {
 		int i=0;
 		for(Entry<String,Route> route:routes.entrySet()) {
 			for(Entry<String,Trip> tripEntry:route.getValue().getTrips().entrySet())
-				calculateBusLinksSequence(tripEntry, route.getValue());
+				calculateLinksSequence(tripEntry, route.getValue());
 			i++;
 			System.out.println(i+". "+route.getKey()+" ("+route.getValue().getTrips().size()+")");
 		}
@@ -168,7 +168,7 @@ public class RoutesPathsGenerator {
 	 * @param route
 	 * @throws IOException
 	 */
-	private void calculateBusLinksSequence(Entry<String,Trip> tripEntry, Route route) throws IOException {
+	private void calculateLinksSequence(Entry<String,Trip> tripEntry, Route route) throws IOException {
 		List<Link> links;
 		String[] linksS = finishedTrips.get(tripEntry.getKey());
 		if(linksS==null) {

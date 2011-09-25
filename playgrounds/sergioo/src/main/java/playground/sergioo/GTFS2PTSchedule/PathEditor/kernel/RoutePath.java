@@ -20,9 +20,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
@@ -55,7 +53,7 @@ public class RoutePath {
 	private double minDistance = 40*180/(6371000*Math.PI);
 	private int numCandidates = 3;
 	private boolean withAngleShape = false;
-	private boolean withShapeCost = true;
+	private boolean withShapeCost = false;
 	private boolean withInsideStops = true;
 	private boolean us = true;
 	private boolean reps = true;
@@ -76,9 +74,11 @@ public class RoutePath {
 	public RoutePath(Network network, String mode, Trip trip, Map<String, Stop> stops, List<Link> links) {
 		super();
 		this.network = network;
+		this.mode = mode;
 		this.trip = trip;
 		this.stops = stops;
 		this.links = links;
+		setWithShapeCost();
 	}
 	public boolean isWithAngleShape() {
 		return withAngleShape;
@@ -584,9 +584,10 @@ public class RoutePath {
 		stops.get(selectedStopId).setLinkId(null);
 	}
 	public void setWithShapeCost() {
+		withShapeCost = !withShapeCost;
 		TravelMinCost travelMinCost = null;
 		PreProcessEuclidean preProcessData = null;
-		if(withShapeCost || trip.getShape()==null) {
+		if(!withShapeCost || trip.getShape()==null) {
 			travelMinCost = new TravelMinCost() {
 				public double getLinkGeneralizedTravelCost(Link link, double time) {
 					return getLinkMinimumTravelCost(link);
@@ -615,72 +616,6 @@ public class RoutePath {
 			}
 		};
 		leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
-		withShapeCost = !withShapeCost;
-	}
-	public void setWithShapeCost2() {
-		TravelMinCost travelMinCost = null;
-		PreProcessDijkstra preProcessData = null;
-		if(withShapeCost) {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
-				}
-				public double getLinkMinimumTravelCost(Link link) {
-					return link.getLength()/link.getFreespeed();
-				}
-			};
-			
-		}
-		else {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
-				}
-				public double getLinkMinimumTravelCost(Link link) {
-					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
-				}
-			};	
-		}
-		preProcessData = new PreProcessDijkstra();
-		preProcessData.run(network);
-		TravelTime timeFunction = new TravelTime() {	
-			public double getLinkTravelTime(Link link, double time) {
-				return link.getLength()/link.getFreespeed();
-			}
-		};
-		leastCostPathCalculator = new Dijkstra(network, travelMinCost, timeFunction, preProcessData);
-		withShapeCost = !withShapeCost;
-	}
-	public void setWithShapeCost3() {
-		TravelMinCost travelMinCost = null;
-		if(withShapeCost) {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
-				}
-				public double getLinkMinimumTravelCost(Link link) {
-					return link.getLength()/link.getFreespeed();
-				}
-			};
-			
-		}
-		else {
-			travelMinCost = new TravelMinCost() {
-				public double getLinkGeneralizedTravelCost(Link link, double time) {
-					return getLinkMinimumTravelCost(link);
-				}
-				public double getLinkMinimumTravelCost(Link link) {
-					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
-				}
-			};	
-		}
-		TravelTime timeFunction = new TravelTime() {	
-			public double getLinkTravelTime(Link link, double time) {
-				return link.getLength()/link.getFreespeed();
-			}
-		};
-		leastCostPathCalculator = new Dijkstra(network, travelMinCost, timeFunction);
-		withShapeCost = !withShapeCost;
 	}
 	
 }
