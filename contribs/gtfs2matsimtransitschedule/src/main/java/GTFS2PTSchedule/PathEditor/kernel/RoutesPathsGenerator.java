@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -29,11 +30,16 @@ public class RoutesPathsGenerator {
 	
 	//Constants
 	/**
+	 * Log
+	 */
+	private final static Logger log = Logger.getLogger(RoutesPathsGenerator.class);
+	/**
 	 * Pre-processed information files
 	 */
 	private final static String[] PREFILES = {"fixedStops.txt","bases.txt","finishedTrips.txt"};
-	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes2.txt");
-	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks2.txt");
+	public static final String NEW_NETWORK_FOLDER = "./data/networkTemp/";
+	public static final File NEW_NETWORK_NODES_FILE = new File(NEW_NETWORK_FOLDER+"newNetworkNodes.txt");
+	public static final File NEW_NETWORK_LINKS_FILE = new File(NEW_NETWORK_FOLDER+"newNetworkLinks.txt");
 	
 	//Attributes
 	/**
@@ -57,7 +63,7 @@ public class RoutesPathsGenerator {
 	 */
 	private Map<String, String[]> finishedTrips;
 	/**
-	 * Temporal folder in which the finalized routes and stop-link relationships are going to be saved
+	 * Temporal folder in which the finalised routes and stop-link relationships are going to be saved
 	 */
 	private File tempFolder;
 	/**
@@ -80,15 +86,18 @@ public class RoutesPathsGenerator {
 		this.stops = stops;
 		tempFolder = new File(root.getPath()+"/temp");
 		if(!tempFolder.exists())
-			if(!tempFolder.mkdir())
+			if(!tempFolder.mkdir()) {
+				log.error("It was not possible to create the solution temporal folder");
 				throw new IOException();
+			}
 		BufferedReader reader = null;
 		String line = null;
 		File fixedStopsFile = new File(tempFolder.getPath()+"/"+PREFILES[0]);
 		if(!fixedStopsFile.exists()) {
-			if(!fixedStopsFile.createNewFile())
+			if(!fixedStopsFile.createNewFile()) {
+				log.error("It was not possible to create the fixed stops temporal file");
 				throw new IOException();
-
+			}
 		}
 		else {
 			reader = new BufferedReader(new FileReader(fixedStopsFile));
@@ -104,8 +113,10 @@ public class RoutesPathsGenerator {
 		bases = new HashMap<String, String[]>();
 		File basesFile = new File(tempFolder.getPath()+"/"+PREFILES[1]);
 		if(!basesFile.exists()) {
-			if(!basesFile.createNewFile())
+			if(!basesFile.createNewFile()) {
+				log.error("It was not possible to create the bases temporal file");
 				throw new IOException();
+			}
 		}
 		else {
 			reader = new BufferedReader(new FileReader(basesFile));
@@ -120,8 +131,10 @@ public class RoutesPathsGenerator {
 		finishedTrips = new HashMap<String, String[]>();
 		File finishedTripsFile = new File(tempFolder.getPath()+"/"+PREFILES[2]);
 		if(!finishedTripsFile.exists()) {
-			if(!finishedTripsFile.createNewFile())
+			if(!finishedTripsFile.createNewFile()) {
+				log.error("It was not possible to create the finished trips temporal file");
 				throw new IOException();
+			}
 		}
 		else {
 			reader = new BufferedReader(new FileReader(finishedTripsFile));
@@ -131,8 +144,8 @@ public class RoutesPathsGenerator {
 				finishedTrips.put(line, links);
 				line = reader.readLine();
 			}
+			reader.close();
 		}
-		reader.close();
 	}
 	/**
 	 * Executes the semi-automatic procedure for each route
@@ -143,7 +156,7 @@ public class RoutesPathsGenerator {
 		int i=0;
 		for(Entry<String,Route> route:routes.entrySet()) {
 			for(Entry<String,Trip> tripEntry:route.getValue().getTrips().entrySet())
-				calculateBusLinksSequence(tripEntry, route.getValue());
+				calculateLinksSequence(tripEntry, route.getValue());
 			i++;
 			System.out.println(i+". "+route.getKey()+" ("+route.getValue().getTrips().size()+")");
 		}
@@ -155,7 +168,7 @@ public class RoutesPathsGenerator {
 	 * @param route
 	 * @throws IOException
 	 */
-	private void calculateBusLinksSequence(Entry<String,Trip> tripEntry, Route route) throws IOException {
+	private void calculateLinksSequence(Entry<String,Trip> tripEntry, Route route) throws IOException {
 		List<Link> links;
 		String[] linksS = finishedTrips.get(tripEntry.getKey());
 		if(linksS==null) {
