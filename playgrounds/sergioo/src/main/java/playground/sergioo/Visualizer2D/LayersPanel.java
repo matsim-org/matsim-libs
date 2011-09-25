@@ -50,8 +50,11 @@ public abstract class LayersPanel extends JPanel {
 	protected void addLayer(Layer layer) {
 		layers.add(layer);
 	}
-	protected void removeLastLayer() {
-		layers.remove(layers.size()-1);
+	protected Layer removeFirstLayer() {
+		return layers.remove(0);
+	}
+	protected Layer removeLastLayer() {
+		return layers.remove(layers.size()-1);
 	}
 	protected Layer getActiveLayer() {
 		return layers.get(activeLayer);

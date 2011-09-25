@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
@@ -29,11 +30,16 @@ public class RoutesPathsGenerator {
 	
 	//Constants
 	/**
+	 * Log
+	 */
+	private final static Logger log = Logger.getLogger(RoutesPathsGenerator.class);
+	/**
 	 * Pre-processed information files
 	 */
 	private final static String[] PREFILES = {"fixedStops.txt","bases.txt","finishedTrips.txt"};
-	public static final File NEW_NETWORK_NODES_FILE = new File("./data/paths/newNetworkNodes2.txt");
-	public static final File NEW_NETWORK_LINKS_FILE = new File("./data/paths/newNetworkLinks2.txt");
+	public static final String NEW_NETWORK_FOLDER = "./data/paths/";
+	public static final File NEW_NETWORK_NODES_FILE = new File(NEW_NETWORK_FOLDER+"newNetworkNodes.txt");
+	public static final File NEW_NETWORK_LINKS_FILE = new File(NEW_NETWORK_FOLDER+"newNetworkLinks.txt");
 	
 	//Attributes
 	/**
@@ -56,63 +62,95 @@ public class RoutesPathsGenerator {
 	 * Trips with established paths
 	 */
 	private Map<String, String[]> finishedTrips;
+	/**
+	 * Temporal folder in which the finalized routes and stop-link relationships are going to be saved
+	 */
+	private File tempFolder;
+	/**
+	 * Network mode of this public transport system
+	 */
+	private String mode;
 
 	//Methods
 	/**
 	 * @param network
+	 * @param mode 
 	 * @param stops
 	 * @throws IOException 
 	 */
-	public RoutesPathsGenerator(Network network, File root, Map<String, Route> routes, Map<String, Stop> stops) throws IOException {
+	public RoutesPathsGenerator(Network network, File root, String mode, Map<String, Route> routes, Map<String, Stop> stops) throws IOException {
 		super();
 		this.network = network;
+		this.mode = mode;
 		this.routes = routes;
 		this.stops = stops;
-		File  tempFolder = new File(root.getPath()+"/temp");
+		tempFolder = new File(root.getPath()+"/temp");
 		if(!tempFolder.exists())
-			if(!tempFolder.mkdir())
+			if(!tempFolder.mkdir()) {
+				log.error("It was not possible to create the solution temporal folder");
 				throw new IOException();
+			}
+		BufferedReader reader = null;
+		String line = null;
 		File fixedStopsFile = new File(tempFolder.getPath()+"/"+PREFILES[0]);
-		if(!fixedStopsFile.exists())
-			if(!fixedStopsFile.createNewFile())
+		if(!fixedStopsFile.exists()) {
+			if(!fixedStopsFile.createNewFile()) {
+				log.error("It was not possible to create the fixed stops temporal file");
 				throw new IOException();
-		BufferedReader reader = new BufferedReader(new FileReader(fixedStopsFile));
-		String line = reader.readLine();
-		while(line!=null) {
-			Stop stop = stops.get(line);
-			stop.setLinkId(reader.readLine());
-			stop.setFixedLinkId();
-			line = reader.readLine();
+			}
 		}
-		reader.close();
+		else {
+			reader = new BufferedReader(new FileReader(fixedStopsFile));
+			line = reader.readLine();
+			while(line!=null) {
+				Stop stop = stops.get(line);
+				stop.setLinkId(reader.readLine());
+				stop.setFixedLinkId();
+				line = reader.readLine();
+			}
+			reader.close();
+		}
 		bases = new HashMap<String, String[]>();
 		File basesFile = new File(tempFolder.getPath()+"/"+PREFILES[1]);
-		if(!basesFile.exists())
-			if(!basesFile.createNewFile())
+		if(!basesFile.exists()) {
+			if(!basesFile.createNewFile()) {
+				log.error("It was not possible to create the bases temporal file");
 				throw new IOException();
-		reader = new BufferedReader(new FileReader(basesFile));
-		line = reader.readLine();
-		while(line!=null) {
-			String[] links = reader.readLine().split(";");
-			bases.put(line, links);
-			line = reader.readLine();
+			}
 		}
-		reader.close();
+		else {
+			reader = new BufferedReader(new FileReader(basesFile));
+			line = reader.readLine();
+			while(line!=null) {
+				String[] links = reader.readLine().split(";");
+				bases.put(line, links);
+				line = reader.readLine();
+			}
+			reader.close();
+		}
 		finishedTrips = new HashMap<String, String[]>();
 		File finishedTripsFile = new File(tempFolder.getPath()+"/"+PREFILES[2]);
-		if(!finishedTripsFile.exists())
-			if(!finishedTripsFile.createNewFile())
+		if(!finishedTripsFile.exists()) {
+			if(!finishedTripsFile.createNewFile()) {
+				log.error("It was not possible to create the finished trips temporal file");
 				throw new IOException();
-		reader = new BufferedReader(new FileReader(finishedTripsFile));
-		line = reader.readLine();
-		while(line!=null) {
-			String[] links = reader.readLine().split(";");
-			finishedTrips.put(line, links);
+			}
+		}
+		else {
+			reader = new BufferedReader(new FileReader(finishedTripsFile));
 			line = reader.readLine();
+			while(line!=null) {
+				String[] links = reader.readLine().split(";");
+				finishedTrips.put(line, links);
+				line = reader.readLine();
+			}
 		}
 		reader.close();
-		
 	}
+	/**
+	 * Executes the semi-automatic procedure for each route
+	 * @throws IOException
+	 */
 	public void run() throws IOException {
 		System.out.println("Total number of routes: "+routes.size());
 		int i=0;
@@ -140,9 +178,9 @@ public class RoutesPathsGenerator {
 			links = new ArrayList<Link>();
 			Window window;
 			if(linksS==null)
-				window = new Window(tripEntry.getKey(),network,tripEntry.getValue(),stops,links,this);
+				window = new Window(tripEntry.getKey(), network, mode, tripEntry.getValue(), stops, links, this);
 			else {
-				window = new Window(tripEntry.getKey(),network,tripEntry.getValue(),stops,linksS,links,this);
+				window = new Window(tripEntry.getKey(), network, mode, tripEntry.getValue(), stops, linksS, links, this);
 				withBase = true;
 			}
 			window.setVisible(true);
@@ -153,7 +191,7 @@ public class RoutesPathsGenerator {
 					e.printStackTrace();
 				}
 			window.setVisible(false);
-			PrintWriter writer = new PrintWriter(new FileWriter(PREFILES[0],true));
+			PrintWriter writer = new PrintWriter(new FileWriter(tempFolder.getPath()+"/"+PREFILES[0],true));
 			for(StopTime stopTime: tripEntry.getValue().getStopTimes().values()) {
 				Stop stop = stops.get(stopTime.getStopId());
 				if(!stop.isFixedLinkId()) {
@@ -164,7 +202,7 @@ public class RoutesPathsGenerator {
 			}
 			writer.close();
 			if(!withBase) {
-				writer = new PrintWriter(new FileWriter(PREFILES[1],true));
+				writer = new PrintWriter(new FileWriter(tempFolder.getPath()+"/"+PREFILES[1],true));
 				writer.println(baseId);
 				String[] linksA = new String[links.size()];
 				int i=0;
@@ -177,7 +215,7 @@ public class RoutesPathsGenerator {
 				writer.close();
 				bases.put(baseId, linksA);
 			}
-			writer = new PrintWriter(new FileWriter(PREFILES[2],true));
+			writer = new PrintWriter(new FileWriter(tempFolder.getPath()+"/"+PREFILES[2],true));
 			writer.println(tripEntry.getKey());
 			String linksT = "";
 			String[] linksA = new String[links.size()];

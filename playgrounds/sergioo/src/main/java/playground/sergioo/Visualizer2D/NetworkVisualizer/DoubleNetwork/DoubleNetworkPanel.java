@@ -39,5 +39,10 @@ public class DoubleNetworkPanel extends LayersPanel {
 			}
 		super.calculateBoundaries(coords);
 	}
+	public void setNetworkPainters(NetworkPainter networkPainterA, NetworkPainter networkPainterB) {
+		removeFirstLayer();
+		removeFirstLayer();
+		//TODO
+	}
 	
 }

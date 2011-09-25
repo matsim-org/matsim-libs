@@ -161,9 +161,9 @@ public class Window extends JFrame implements ActionListener {
 	private Wait wait;
 	
 	//Methods
-	public Window(String title, Network network, Trip trip, Map<String,Stop> stops) {
+	public Window(String title, Network network, String mode, Trip trip, Map<String,Stop> stops) {
 		setTitle(title);
-		routePath = new RoutePath(network, trip, stops, trip.getLinks());
+		routePath = new RoutePath(network, mode, trip, stops, trip.getLinks());
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		option = Option.ZOOM;
@@ -217,20 +217,20 @@ public class Window extends JFrame implements ActionListener {
 		this.add(infoPanel, BorderLayout.SOUTH);
 		isOk();
 	}
-	public Window(String title, Network network, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
-		this(title,network,trip,stops,null,links,routesPathsGenerator);
+	public Window(String title, Network network, String mode, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
+		this(title, network, mode, trip, stops, null, links, routesPathsGenerator);
 	}
-	public Window(String title, Network network, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, RoutesPathsGenerator routesPathsGenerator) {
+	public Window(String title, Network network, String mode, Trip trip, Map<String, Stop> stops,String[] linksS, List<Link> linksE, RoutesPathsGenerator routesPathsGenerator) {
 		setTitle(title);
 		this.routesPathsGenerator = routesPathsGenerator;
 		this.links = linksE;
 		if(linksS==null)
-			routePath = new RoutePath(network, trip, stops);
+			routePath = new RoutePath(network, mode, trip, stops);
 		else{
 			List<Link> links = new ArrayList<Link>();
 			for(String link:linksS)
 				links.add(network.getLinks().get(new IdImpl(link)));
-			routePath = new RoutePath(network, trip, stops, links);
+			routePath = new RoutePath(network, mode, trip, stops, links);
 		}
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());

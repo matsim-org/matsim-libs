@@ -1,6 +1,5 @@
 package playground.sergioo.NetworksMatcher;
 
-import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
-import playground.sergioo.NetworksMatcher.gui.NetworkNodesPainter;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.InfiniteRegion;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
@@ -33,7 +31,7 @@ import playground.sergioo.Visualizer2D.LayersWindow;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class NetworksMatcher {
+public class NetworksShpXmlMatcherMain {
 
 
 	//Main

@@ -72,14 +72,16 @@ public class LinkStops {
 		Point2D lPoint = new Point2D(link.getToNode().getCoord().getX(),link.getToNode().getCoord().getY());
 		return linkLine.getNearestPoint(point).getDistance(lPoint);
 	}
-	public Link split(int i, Network network, CoordinateTransformation coordinateTransformation) throws Exception {
+	public Link split(int i, Network network, CoordinateTransformation coordinateTransformation) {
 		Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 		Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 		Line2D linkLine = new Line2D(fromPoint, toPoint);
 		Point2D point = new Point2D(stops.get(i).getPoint().getX(),stops.get(i).getPoint().getY());
 		Point2D nearestPoint = linkLine.getNearestPoint(point);
-		if(linkLine.getParameter(nearestPoint)<0)
+		if(linkLine.getParameter(nearestPoint)<0) {
 			log.warn("Bad position of stop "+stops.get(i).getName()+" according to the link " + link.getId());
+			return null;
+		}
 		Node toNode = network.getFactory().createNode(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i),new CoordImpl(nearestPoint.getX(), nearestPoint.getY()));
 		if(network.getNodes().get(new IdImpl(link.getId().toString()+"_"+link.getToNode().getId().toString()+"_"+i))==null)
 			network.addNode(toNode);
@@ -97,6 +99,7 @@ public class LinkStops {
 		newLink.setAllowedModes(modes);
 		network.addLink(newLink);
 		link.setFromNode(toNode);
+		link.setLength(link.getLength()-newLink.getLength());
 		stops.get(i).forceSetLinkId(link.getId().toString()+"_"+i);
 		return newLink;
 	}

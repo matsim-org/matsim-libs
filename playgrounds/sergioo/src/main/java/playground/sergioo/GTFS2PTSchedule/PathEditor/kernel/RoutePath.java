@@ -20,7 +20,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.AStarEuclidean;
+import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
@@ -41,45 +43,37 @@ public class RoutePath {
 	
 	//Constants
 	private static final double MIN_DISTANCE_DELTA = 20*180/(6371000*Math.PI);
-	private static final String ROAD_MODE = "car";
+	
 	//Attributes
 	private Map<String, Stop> stops;
 	public List<Link> links;
 	private final Network network;
 	private final Trip trip;
+	private String mode;
+	
 	//Parameters
 	private double minDistance = 40*180/(6371000*Math.PI);
 	private int numCandidates = 3;
 	private boolean withAngleShape = false;
-	private boolean withShapeCost = false;
+	private boolean withShapeCost = true;
 	private boolean withInsideStops = true;
 	private boolean us = true;
 	private boolean reps = true;
 	private boolean inStops = true;
-	private PreProcessEuclidean preProcessData;
-
-	
+	private LeastCostPathCalculator leastCostPathCalculator;
 	
 	//Methods
-	public RoutePath(Network network, Trip trip, Map<String, Stop> stops) {
+	public RoutePath(Network network, String mode, Trip trip, Map<String, Stop> stops) {
 		super();
 		this.network = network;
+		this.mode = mode;
 		this.trip = trip;
 		this.stops = stops;
 		links = new ArrayList<Link>();
-		TravelMinCost travelMinCost = new TravelMinCost() {
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				return getLinkMinimumTravelCost(link);
-			}
-			public double getLinkMinimumTravelCost(Link link) {
-				return link.getLength()/link.getFreespeed();
-			}
-		};
-		preProcessData = new PreProcessEuclidean(travelMinCost);
-		preProcessData.run(network);
+		setWithShapeCost();
 		calculatePath();
 	}
-	public RoutePath(Network network, Trip trip, Map<String, Stop> stops, List<Link> links) {
+	public RoutePath(Network network, String mode, Trip trip, Map<String, Stop> stops, List<Link> links) {
 		super();
 		this.network = network;
 		this.trip = trip;
@@ -328,27 +322,18 @@ public class RoutePath {
 	}
 	public void addShortestPath(int indexI) {
 		if(indexI<links.size()-1) {
-			TravelTime timeFunction = new TravelTime() {	
-				public double getLinkTravelTime(Link link, double time) {
-					return link.getLength()/link.getFreespeed();
-				}
-			};
-			LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
 			Path path = leastCostPathCalculator.calcLeastCostPath(links.get(indexI).getToNode(), links.get(indexI+1).getFromNode(), 0);
-			int i=1;
-			for(Link link:path.links) {
-				links.add(indexI+i,link);
-				i++;
+			if(path!=null) {
+				int i=1;
+				for(Link link:path.links) {
+					links.add(indexI+i,link);
+					i++;
+				}
 			}
 		}
 	}
 	public void calculatePath() {
 		links.clear();
-		TravelTime timeFunction = new TravelTime() {	
-			public double getLinkTravelTime(Link link, double time) {
-				return link.getLength()/link.getFreespeed();
-			}
-		};
 		Iterator<StopTime> prev=trip.getStopTimes().values().iterator(), next=trip.getStopTimes().values().iterator();
 		List<Link> prevLL, nextLL;
 		Link prevL = null, nextL = null;
@@ -379,8 +364,9 @@ public class RoutePath {
 					if(prevL==nextL)
 						path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 					else {
-						LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
 						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
+						if(path == null)
+							path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 						path.links.add(0,prevL);
 					}
 					path.links.add(nextL);
@@ -410,9 +396,11 @@ public class RoutePath {
 				if(prevL.equals(nextL))
 					bestPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 				else {
-					LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
 					bestPath = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
-					bestPath.links.add(0,prevL);
+					if(bestPath == null)
+						bestPath = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
+					else
+						bestPath.links.add(0,prevL);
 				}
 				bestPath.links.add(nextL);
 			}
@@ -425,9 +413,11 @@ public class RoutePath {
 					if(prevL.equals(nextL))
 						path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
 					else {
-						LeastCostPathCalculator leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
 						path = leastCostPathCalculator.calcLeastCostPath(prevL.getToNode(), nextL.getFromNode(), 0);
-						path.links.add(0,prevL);
+						if(path == null)
+							path = new Path(new ArrayList<Node>(), new ArrayList<Link>(), 0.0, 0.0);
+						else
+							path.links.add(0,prevL);
 					}
 					path.links.add(nextL);
 					paths.add(new Tuple<Path,Link>(path,nextL));
@@ -453,7 +443,7 @@ public class RoutePath {
 		List<Link> nearestLinks = new ArrayList<Link>();
 		for(double minDistance=this.minDistance;nearestLinks.size()<numCandidates;minDistance+=MIN_DISTANCE_DELTA)
 			for(Link link:network.getLinks().values())
-				if(link.getAllowedModes().contains(ROAD_MODE)) {
+				if(link.getAllowedModes().contains(mode)) {
 					Point2D fromPoint = new Point2D(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 					Point2D toPoint = new Point2D(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 					Vector2D linkVector = new Vector2D(fromPoint, toPoint);
@@ -595,7 +585,8 @@ public class RoutePath {
 	}
 	public void setWithShapeCost() {
 		TravelMinCost travelMinCost = null;
-		if(withShapeCost) {
+		PreProcessEuclidean preProcessData = null;
+		if(withShapeCost || trip.getShape()==null) {
 			travelMinCost = new TravelMinCost() {
 				public double getLinkGeneralizedTravelCost(Link link, double time) {
 					return getLinkMinimumTravelCost(link);
@@ -604,8 +595,7 @@ public class RoutePath {
 					return link.getLength()/link.getFreespeed();
 				}
 			};
-			preProcessData = new PreProcessEuclidean(travelMinCost);
-			preProcessData.run(network);
+			
 		}
 		else {
 			travelMinCost = new TravelMinCost() {
@@ -616,9 +606,80 @@ public class RoutePath {
 					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
 				}
 			};
-			preProcessData = new PreProcessEuclidean(travelMinCost);
-			preProcessData.run(network);
 		}
+		preProcessData = new PreProcessEuclidean(travelMinCost);
+		preProcessData.run(network);
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength()/link.getFreespeed();
+			}
+		};
+		leastCostPathCalculator = new AStarEuclidean(network, preProcessData, timeFunction);
+		withShapeCost = !withShapeCost;
+	}
+	public void setWithShapeCost2() {
+		TravelMinCost travelMinCost = null;
+		PreProcessDijkstra preProcessData = null;
+		if(withShapeCost) {
+			travelMinCost = new TravelMinCost() {
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
+					return getLinkMinimumTravelCost(link);
+				}
+				public double getLinkMinimumTravelCost(Link link) {
+					return link.getLength()/link.getFreespeed();
+				}
+			};
+			
+		}
+		else {
+			travelMinCost = new TravelMinCost() {
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
+					return getLinkMinimumTravelCost(link);
+				}
+				public double getLinkMinimumTravelCost(Link link) {
+					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
+				}
+			};	
+		}
+		preProcessData = new PreProcessDijkstra();
+		preProcessData.run(network);
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength()/link.getFreespeed();
+			}
+		};
+		leastCostPathCalculator = new Dijkstra(network, travelMinCost, timeFunction, preProcessData);
+		withShapeCost = !withShapeCost;
+	}
+	public void setWithShapeCost3() {
+		TravelMinCost travelMinCost = null;
+		if(withShapeCost) {
+			travelMinCost = new TravelMinCost() {
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
+					return getLinkMinimumTravelCost(link);
+				}
+				public double getLinkMinimumTravelCost(Link link) {
+					return link.getLength()/link.getFreespeed();
+				}
+			};
+			
+		}
+		else {
+			travelMinCost = new TravelMinCost() {
+				public double getLinkGeneralizedTravelCost(Link link, double time) {
+					return getLinkMinimumTravelCost(link);
+				}
+				public double getLinkMinimumTravelCost(Link link) {
+					return (link.getLength()/link.getFreespeed())*Math.pow(trip.getShape().getDistance(link),1);
+				}
+			};	
+		}
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength()/link.getFreespeed();
+			}
+		};
+		leastCostPathCalculator = new Dijkstra(network, travelMinCost, timeFunction);
 		withShapeCost = !withShapeCost;
 	}
 	

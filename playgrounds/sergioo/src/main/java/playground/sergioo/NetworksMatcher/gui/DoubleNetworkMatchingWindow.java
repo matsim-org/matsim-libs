@@ -168,6 +168,12 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		else
 			layersPanels.get(PanelIds.DOUBLE).requestFocus();
 	}
+	public void nextNetwork() {
+		
+	}
+	public void previousNetwork() {
+		
+	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
 			if(layersPanels.get(PanelIds.ACTIVE)==layersPanels.get(PanelIds.A)) {

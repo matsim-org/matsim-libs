@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +33,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,6 +60,10 @@ public class GTFS2MATSimTransitSchedule {
 	
 	//Constants
 	/**
+	 * Log
+	 */
+	private final static Logger log = Logger.getLogger(GTFS2MATSimTransitSchedule.class);
+	/**
 	 * Maximum distance allowed between an stop and the end of the corresponding link
 	 */
 	private static final double MAX_DISTANCE_STOP_LINK = 50*180/(6371000*Math.PI);
@@ -71,6 +75,10 @@ public class GTFS2MATSimTransitSchedule {
 	 * The folder root of the GTFS files
 	 */
 	private File[] roots;
+	/**
+	 * Network modes for each public transport system
+	 */
+	private String[] modes;
 	/**
 	 * The network where the public transport will be performed
 	 */
@@ -109,9 +117,10 @@ public class GTFS2MATSimTransitSchedule {
 	 * @param root
 	 * @param network
 	 */
-	public GTFS2MATSimTransitSchedule(File[] roots, Network network, String[] serviceIds, String outCoordinateSystem) {
+	public GTFS2MATSimTransitSchedule(File[] roots, String[] modes, Network network, String[] serviceIds, String outCoordinateSystem) {
 		super();
 		this.roots = roots;
+		this.modes = modes;
 		this.network = network;
 		this.serviceIds = serviceIds;
 		this.coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outCoordinateSystem);
@@ -125,9 +134,17 @@ public class GTFS2MATSimTransitSchedule {
 	}
 	private void updateNetwork() {
 		try {
-			if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.exists())
-				if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.createNewFile())
+			File networkFolder = new File(RoutesPathsGenerator.NEW_NETWORK_FOLDER);
+			if(!networkFolder.exists())
+				if(!networkFolder.mkdir()) {
+					log.error("It was not possible to create the network temporal folder");
 					throw new IOException();
+				}
+			if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.exists())
+				if(!RoutesPathsGenerator.NEW_NETWORK_NODES_FILE.createNewFile()) {
+					log.error("It was not possible to create the network temporal nodes file");
+					throw new IOException();
+				}
 			BufferedReader reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_NODES_FILE));
 			String line = reader.readLine();
 			while(line!=null) {
@@ -137,8 +154,10 @@ public class GTFS2MATSimTransitSchedule {
 			}
 			reader.close();
 			if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.exists())
-				if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.createNewFile())
+				if(!RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE.createNewFile()) {
+					log.error("It was not possible to create the network temporal links file");
 					throw new IOException();
+				}
 			reader = new BufferedReader(new FileReader(RoutesPathsGenerator.NEW_NETWORK_LINKS_FILE));
 			line = reader.readLine();
 			LinkFactory linkFactory = new LinkFactoryImpl();
@@ -183,16 +202,18 @@ public class GTFS2MATSimTransitSchedule {
 				routes[publicSystemNumber]=new TreeMap<String, Route>();
 				for(GTFSDefinitions gtfs:GTFSDefinitions.values()) {
 					File file = new File(root.getPath()+"/"+gtfs.fileName);
-					reader = new BufferedReader(new FileReader(file));
-					int[] indices = gtfs.getIndices(reader.readLine());
-					line = reader.readLine();
-					while(line!=null) {
-						String[] parts = line.split(",");
-						Method m = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
-						m.invoke(this, new Object[]{parts,indices,publicSystemNumber});
+					if(file.exists()) {
+						reader = new BufferedReader(new FileReader(file));
+						int[] indices = gtfs.getIndices(reader.readLine());
 						line = reader.readLine();
+						while(line!=null) {
+							String[] parts = line.split(",");
+							Method m = GTFS2MATSimTransitSchedule.class.getMethod(gtfs.getFunction(), new Class[] {String[].class,int[].class,int.class});
+							m.invoke(this, new Object[]{parts,indices,publicSystemNumber});
+							line = reader.readLine();
+						}
+						reader.close();
 					}
-					reader.close();
 				}
 				publicSystemNumber++;
 			}
@@ -292,10 +313,14 @@ public class GTFS2MATSimTransitSchedule {
 							stops[publicSystemNumber].get(stopTime.getValue().getStopId()).setRouteType(route.getRouteType());
 		//Interactive tool for calculating routes path and stops link
 		for(byte publicSystemNumber=0; publicSystemNumber<roots.length; publicSystemNumber++) {
-			RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, roots[publicSystemNumber], routes[publicSystemNumber], stops[publicSystemNumber]);
+			RoutesPathsGenerator routesPathsGenerator = new RoutesPathsGenerator(network, roots[publicSystemNumber], modes[publicSystemNumber], routes[publicSystemNumber], stops[publicSystemNumber]);
 			routesPathsGenerator.run();
 			//Splitting of stop-links
 			splitStopLinks(publicSystemNumber);
+			new NetworkWriter(network).write(RoutesPathsGenerator.NEW_NETWORK_FOLDER+"nTemp.xml");
+			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			(new MatsimNetworkReader(scenario)).readFile(RoutesPathsGenerator.NEW_NETWORK_FOLDER+"nTemp.xml");
+			network = scenario.getNetwork();
 		}
 	}
 	/**
@@ -315,18 +340,16 @@ public class GTFS2MATSimTransitSchedule {
 			}
 		}
 		for(LinkStops linkStops:linksStops.values()) {
-			for(int i=0; i<linkStops.getNumStops()-1; i++)
-				try {
-					changeTrips(linkStops.getLink(),linkStops.split(i,network, coordinateTransformation), false, publicTransportSystem);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			if(linkStops.getLastDistance()>MAX_DISTANCE_STOP_LINK)
-				try {
-					changeTrips(linkStops.getLink(),linkStops.split(linkStops.getNumStops()-1,network, coordinateTransformation), true, publicTransportSystem);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}	
+			for(int i=0; i<linkStops.getNumStops()-1; i++) {
+				Link link = linkStops.split(i,network, coordinateTransformation);
+				if(link!=null)
+					changeTrips(linkStops.getLink(), link, false, publicTransportSystem);
+			}
+			if(linkStops.getLastDistance()>MAX_DISTANCE_STOP_LINK) {
+				Link link  = linkStops.split(linkStops.getNumStops()-1,network, coordinateTransformation);
+				if(link!=null)
+					changeTrips(linkStops.getLink(), link, true, publicTransportSystem);
+			}
 		}	
 	}
 	private void changeTrips(Link link, Link split, boolean last, byte publicTransporSystem) {
@@ -443,7 +466,7 @@ public class GTFS2MATSimTransitSchedule {
 			link.setFreespeed(link.getFreespeed()/3.6);
 		}
 		//Construct conversion object
-		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, network, new String[]{"weekday","weeksatday","daily"}, TransformationFactory.WGS84_SVY21);
+		GTFS2MATSimTransitSchedule g2m = new GTFS2MATSimTransitSchedule(new File[]{new File("./data/gtfs/buses"),new File("./data/gtfs/trains")}, new String[]{"car","car"}, network, new String[]{"weekday","weeksatday","daily"}, TransformationFactory.WGS84_SVY21);
 		//Convert
 		(new TransitScheduleWriter(g2m.getTransitSchedule())).writeFile(args[0]);
 		//Write modified network

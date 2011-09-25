@@ -133,11 +133,19 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 	@Override
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
-		case 'a':
-			changeActiveLayer();
+		case 's':
+			((NetworkNodesPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
+			break;
+		case 'o':
+			((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkManager().selectOppositeLink();
+			doubleNetworkWindow.refreshLabel(Labels.LINK);
 			break;
 		case 'n':
 			getActiveLayer().changeVisible();
+			break;
+		case 'v':
+			viewAll();
+			doubleNetworkWindow.cameraChange(camera);
 			break;
 		case 'm':
 			doubleNetworkWindow.setNetworksSeparated();
