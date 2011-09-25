@@ -38,20 +38,24 @@ public class TransitScheduleWriter {
 		generator.setStopTime(30);
 		generator.setTravelTimeBus(3*60);
 		generator.setNetworkFile("../../shared-svn/studies/ihab/busCorridor/input/network_busline.xml");
-		generator.setScheduleFile("../../shared-svn/studies/ihab/busCorridor/input/transitscheduleTEST_22.xml");
-		generator.setVehicleFile("../../shared-svn/studies/ihab/busCorridor/input/transitVehiclesTEST_22.xml");
+		generator.setScheduleFile("../../shared-svn/studies/ihab/busCorridor/input/transitschedule10buses.xml");
+		generator.setVehicleFile("../../shared-svn/studies/ihab/busCorridor/input/transitVehicles10buses.xml");
 		
 		generator.setTransitLineId(new IdImpl("Bus Line"));
 		generator.setRouteId1(new IdImpl("West-Ost"));
 		generator.setRouteId2(new IdImpl("Ost-West"));
 		
 		generator.setVehTypeId(new IdImpl("Bus"));
-		generator.setVehicleId(new IdImpl("bus_1"));
 		generator.setSeats(15);
 		generator.setStandingRoom(20);
-
-		generator.createSchedule();
+		
+		generator.setNumberOfBusses(10); // Anzahl der Busse
+		generator.setStartTime(8*3600);
+		generator.setEndTime(18*3600);
+		
 		generator.createVehicles();
+		generator.createSchedule();
+		
 		generator.writeScheduleFile();
 		generator.writeVehicleFile();
 	}

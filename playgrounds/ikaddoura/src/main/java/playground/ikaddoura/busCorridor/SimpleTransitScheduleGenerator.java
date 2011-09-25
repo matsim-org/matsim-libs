@@ -151,10 +151,10 @@ public class SimpleTransitScheduleGenerator {
 			veh.getVehicles().put(vehicleId, veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId)));
 			
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
-		scheduleWriter.write("../../shared-svn/studies/ihab/busCorridor/input/transitscheduleTEST.xml");
+		scheduleWriter.write("../../shared-svn/studies/ihab/busCorridor/input/transitscheduleTESTX.xml");
 
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
-		vehicleWriter.writeFile("../../shared-svn/studies/ihab/busCorridor/input/transitVehiclesTEST.xml");
+		vehicleWriter.writeFile("../../shared-svn/studies/ihab/busCorridor/input/transitVehiclesTESTX.xml");
 
 		}
 }
