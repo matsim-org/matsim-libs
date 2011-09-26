@@ -33,7 +33,7 @@ import org.jgap.Population;
  */
 public class JgapBreeder extends GABreeder {
 	private static final long serialVersionUID = 1L;
-	private static final int N_THREADS = 20;
+	private static final int N_THREADS = 10;
 
 	@Override
 	protected void updateChromosomes(
