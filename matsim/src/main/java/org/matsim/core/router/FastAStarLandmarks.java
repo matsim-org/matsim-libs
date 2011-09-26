@@ -78,6 +78,12 @@ public class FastAStarLandmarks extends AStarLandmarks {
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 
+		if (this.landmarks.length >= 2) {
+			initializeActiveLandmarks(routingNetworkFromNode, routingNetworkToNode, 2);
+		} else {
+			initializeActiveLandmarks(routingNetworkFromNode, routingNetworkToNode, this.landmarks.length);
+		}
+		
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime);
 	}
 	
@@ -97,6 +103,15 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 */
 	@Override
 	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+		this.controlCounter++;
+		if (this.controlCounter == controlInterval) {
+			int newLandmarkIndex = checkToAddLandmark(outNode, toNode);
+			if (newLandmarkIndex > 0) {
+				updatePendingNodes(newLandmarkIndex, toNode, pendingNodes);
+			}
+			this.controlCounter = 0;
+		}
+		
 		fastRouter.relaxNode(outNode, toNode, pendingNodes);
 	}
 	

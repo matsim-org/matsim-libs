@@ -95,7 +95,7 @@ public class FastRouterDelegate {
 	 * the routing network in an array instead of a map. Therefore we have
 	 * to iterate over an array instead of over a map. 
 	 */
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	/*package*/ void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 
 		RoutingNetworkNode routingNetworkNode = (RoutingNetworkNode) outNode;
 		NodeData outData = getData(routingNetworkNode);

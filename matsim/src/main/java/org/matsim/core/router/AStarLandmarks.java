@@ -67,8 +67,8 @@ public class AStarLandmarks extends AStarEuclidean {
 
 	protected final Node[] landmarks;
 
-	private static final int controlInterval = 40;
-	private int controlCounter = 0;
+	/*package*/ static final int controlInterval = 40;
+	/*package*/ int controlCounter = 0;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -145,7 +145,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param actLandmarkCount The number of active landmarks landmarks to
 	 * set.
 	 */
-	private void initializeActiveLandmarks(final Node fromNode, final Node toNode,
+	/*package*/ void initializeActiveLandmarks(final Node fromNode, final Node toNode,
 			final int actLandmarkCount) {
 		final PreProcessLandmarks.LandmarksData fromData = getPreProcessData(fromNode);
 		final PreProcessLandmarks.LandmarksData toData = getPreProcessData(toNode);
@@ -218,7 +218,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param toNode The target node of the route to be calculated.
 	 * @param pendingNodes The nodes visited so far.
 	 */
-	private void updatePendingNodes(final int newLandmarkIndex,
+	/*package*/ void updatePendingNodes(final int newLandmarkIndex,
 			final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
 		Iterator<Node> it = pendingNodes.iterator();
 		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
@@ -259,7 +259,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @return The index of the landmark that has been added to the set of
 	 * active landmarks, or -1 if no landmark was added.
 	 */
-	private int checkToAddLandmark(final Node fromNode, final Node toNode) {
+	/*package*/ int checkToAddLandmark(final Node fromNode, final Node toNode) {
 		double bestTravCostEst = estimateRemainingTravelCost(fromNode, toNode);
 		PreProcessLandmarks.LandmarksData fromRole
 			= getPreProcessData(fromNode);
