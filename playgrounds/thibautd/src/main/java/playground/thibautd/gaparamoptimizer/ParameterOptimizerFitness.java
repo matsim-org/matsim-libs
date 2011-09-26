@@ -88,8 +88,8 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// bounds
 	//private static final int MAX_POP_SIZE = 100;
 	private static final double MAX_POP_INTERCEPT = 20;
-	private static final double MIN_POP_SLOPE = 1;
-	private static final double MAX_POP_SLOPE = 10;
+	private static final double MIN_POP_SLOPE = 0;
+	private static final double MAX_POP_SLOPE = 5;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	//private static final int MAX_WINDOW_SIZE = 20;
 	private static final double MIN_WINDOW_SLOPE = 0;
