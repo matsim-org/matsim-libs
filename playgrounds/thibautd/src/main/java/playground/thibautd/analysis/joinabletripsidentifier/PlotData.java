@@ -55,7 +55,7 @@ public class PlotData {
 	private static final Logger log =
 		Logger.getLogger(PlotData.class);
 
-	private static double LONGER_DIST = 25;
+	private static double LONGER_DIST = 25 * 1000;
 
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
@@ -117,7 +117,7 @@ public class PlotData {
 		reader.parse(xmlFile);
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
 		CommutersFilter filter = new CommutersFilter(network, -1, -1);
-		CommutersFilter shortFilter = new CommutersFilter(network, -1, 25);
+		CommutersFilter shortFilter = new CommutersFilter(network, -1, LONGER_DIST);
 
 		int count = 0;
 		for (ConditionValidator condition : conditions) {
@@ -258,8 +258,8 @@ class ConditionValidator implements TwofoldTripValidator {
 				final String prefix,
 				final String suffix) {
 			this.value = value;
-			this.prefix = prefix;
-			this.suffix = suffix;
+			this.prefix = prefix.intern();
+			this.suffix = suffix.intern();
 		}
 
 		/**

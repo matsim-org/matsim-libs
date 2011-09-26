@@ -20,6 +20,8 @@
 package playground.thibautd.analysis.joinabletripsidentifier;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +128,7 @@ public class DataPloter {
 		String title = "Number of possible joint trips for different criteria";
 
 		DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		Collections.sort(conditions, new ConditionComparator());
 		
 		for (TwofoldTripValidator validator : conditions) {
 			List<JoinableTrips.TripRecord> filteredTrips =
@@ -198,6 +201,17 @@ public class DataPloter {
 	public interface TwofoldTripValidator extends DriverTripValidator {
 		public Comparable getFirstCriterion();
 		public Comparable getSecondCriterion();
+	}
+
+	private static class ConditionComparator implements Comparator<TwofoldTripValidator> {
+		@Override
+		public int compare(
+				final TwofoldTripValidator v1,
+				final TwofoldTripValidator v2) {
+			int comp = v1.getSecondCriterion().compareTo(v2.getSecondCriterion());
+			if (comp == 0) comp = v1.getFirstCriterion().compareTo(v2.getFirstCriterion());
+			return comp;
+		}
 	}
 
 
