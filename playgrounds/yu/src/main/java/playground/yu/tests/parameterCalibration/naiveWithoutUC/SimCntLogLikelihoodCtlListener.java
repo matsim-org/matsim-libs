@@ -193,6 +193,9 @@ public class SimCntLogLikelihoodCtlListener implements StartupListener,
 					+ Calibrator.DEFAULT_VARIANCE_SCALE);
 		}
 
+		// SETTING COUNTS_SCALE_FACTOR
+		countsScaleFactor = config.counts().getCountsScaleFactor();
+
 		// INITIALIZING WRITER
 		writer = new SimpleWriter(ctl.getControlerIO().getOutputFilename(
 				"log-likelihood.log"));
