@@ -22,21 +22,19 @@ package playground.thibautd.analysis.joinabletripsidentifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.utils.BoxAndWhiskersChart;
 import playground.thibautd.utils.WrapperChartUtil;
+import playground.thibautd.utils.XYLineHistogramDataset;
 
 /**
  * Class responsible for creating relevant plots from the data
@@ -154,6 +152,48 @@ public class DataPloter {
 				title, "", "number of possible joint trips", dataset, true);
 
 		return new WrapperChartUtil(chart);
+	}
+
+	/**
+	 * @return a chart displaying the number of trips fulfilling the filter
+	 * conditions, per departure time.
+	 */
+	public ChartUtil getTripsForConditions(
+			final List<PassengerFilter> filters) {
+		double binWidth = 1d / 4d;
+		XYLineHistogramDataset dataset = new XYLineHistogramDataset(binWidth);
+	
+		for (PassengerFilter filter : filters) {
+			List<Double> departureTimes = new ArrayList<Double>();
+			List<JoinableTrips.TripRecord> filteredTrips =
+				filter.filterRecords(trips);
+			
+			for (JoinableTrips.TripRecord record : filteredTrips) {
+				departureTimes.add(record.getDepartureTime() / 3600d);
+			}
+
+			dataset.addSeries(filter.toString(), departureTimes);
+		
+		}
+
+		JFreeChart chart = ChartFactory.createXYLineChart(
+				"departures histogram",
+				"time (h)",
+				"number of departure",
+				dataset,
+				PlotOrientation.VERTICAL,
+				true, // display legend
+				false, //no tooltips
+				false); // no URLS
+
+		return new WrapperChartUtil(chart);
+	}
+
+	public ChartUtil getTripsForCondition(
+			final PassengerFilter filter) {
+		List<PassengerFilter> filters = new ArrayList<PassengerFilter>(1);
+		filters.add(filter);
+		return getTripsForConditions(filters);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

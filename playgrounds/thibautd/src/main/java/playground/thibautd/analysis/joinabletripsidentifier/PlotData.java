@@ -133,6 +133,8 @@ public class PlotData {
 
 		ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
 		chart.saveAsPng(outputDir+"comparisonPlot.png", WIDTH, HEIGHT);
+		chart = ploter.getTripsForCondition(filter);
+		chart.saveAsPng(outputDir+"departuresPerTimeSlotPlot.png", WIDTH, HEIGHT);
 	}
 }
 
