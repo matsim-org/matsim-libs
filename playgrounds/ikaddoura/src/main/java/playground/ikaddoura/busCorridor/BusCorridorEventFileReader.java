@@ -38,8 +38,8 @@ public class BusCorridorEventFileReader {
 
 	public static void main(String[] args) {
 		
-		String configFile = "daten/busCorridor/input/config_busline.xml";
-		String eventFile = "daten/busCorridor/output/busline_1/ITERS/it.0/0.events.xml.gz";
+		String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
+		String eventFile = "../../shared-svn/studies/ihab/busCorridor/output/busline_10buses/ITERS/it.0/0.events.xml.gz";
 
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
