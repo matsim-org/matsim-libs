@@ -21,8 +21,12 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,6 +62,7 @@ public class DoublePop extends NewPopulation {
 	 */
 	@Override
 	public void run(Person person) {
+		checkPlansIntegrity(person);
 
 		pw.writePerson(person);
 		// n++;
@@ -96,6 +101,23 @@ public class DoublePop extends NewPopulation {
 	private void createAndWriteNewPerson(Id newId) {
 		tmpPerson.setId(newId);
 		pw.writePerson(tmpPerson);
+	}
+
+	private void checkPlansIntegrity(Person person) {
+		for (Plan plan : person.getPlans()) {
+			for (PlanElement pe : plan.getPlanElements()) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getMode().equals(TransportMode.pt)) {
+						// TODO
+					}
+				}
+			}
+		}
+	}
+
+	private void checkPlan(Plan plan) {
+		// TODO
 	}
 
 	public static void main(final String[] args) {
