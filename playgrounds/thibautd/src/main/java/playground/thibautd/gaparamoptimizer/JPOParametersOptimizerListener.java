@@ -134,7 +134,6 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			for (int i=0; i < cliques.size(); i++) {
 				currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
 				int currentSize = currentPlan.getClique().getMembers().size();;
-				i++;
 
 				if (currentSize == size) {
 					log.debug("adding test instance with "+size+" members.");
