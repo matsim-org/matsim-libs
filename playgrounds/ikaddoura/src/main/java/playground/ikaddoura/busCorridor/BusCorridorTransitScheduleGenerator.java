@@ -79,11 +79,13 @@ public class BusCorridorTransitScheduleGenerator {
 	private int busSeats;
 	private int standingRoom;
 	
-	List<Id> nodeIDs = new ArrayList<Id>();
+	List<Id> nodeIDsRoute1 = new ArrayList<Id>();
+	List<Id> nodeIDsRoute2 = new ArrayList<Id>();
 	List<Id> stopFacilityIDsRoute1 = new ArrayList<Id>();
 	List<Id> stopFacilityIDsRoute2 = new ArrayList<Id>();
 	List<Id> linkIDsRoute1 = new ArrayList<Id>();
 	List<Id> linkIDsRoute2 = new ArrayList<Id>();
+	
 	List<Id> vehicleIDs = new ArrayList<Id>();
 	
 	Map<Id, List<Id>> routeId2linkIDs = new HashMap<Id, List<Id>>();
@@ -108,15 +110,30 @@ public class BusCorridorTransitScheduleGenerator {
 			scen.getConfig().scenario().setUseTransit(true);
 			scen.getConfig().scenario().setUseVehicles(true);
 										
-			nodeIDs.add(new IdImpl("2"));
-			nodeIDs.add(new IdImpl("3"));
-			nodeIDs.add(new IdImpl("4"));
-			nodeIDs.add(new IdImpl("5"));
-			nodeIDs.add(new IdImpl("6"));
-			nodeIDs.add(new IdImpl("7"));
-			nodeIDs.add(new IdImpl("8"));
-			nodeIDs.add(new IdImpl("9"));
-			nodeIDs.add(new IdImpl("10"));
+			getIDs();
+			
+			routeId2transitStopFacilities.put(this.routeId1, getTransitStopFacility(stopFacilityIDsRoute1, linkIDsRoute1, nodeIDsRoute1, network));
+			routeId2transitStopFacilities.put(this.routeId2, getTransitStopFacility(stopFacilityIDsRoute2, linkIDsRoute2, nodeIDsRoute2, network));
+			
+			this.routeId2TransitRouteStops = getRouteId2TransitRouteStops(this.stopTime, this.travelTimeBus);
+			this.routeId2networkRoute = getRouteId2NetworkRoute();
+			this.routeId2transitRoute = getRouteId2TransitRoute();
+		
+			setDepartureIDs();
+			setTransitLine();
+		}
+		
+		private void getIDs() {
+			
+			nodeIDsRoute1.add(new IdImpl("2"));
+			nodeIDsRoute1.add(new IdImpl("3"));
+			nodeIDsRoute1.add(new IdImpl("4"));
+			nodeIDsRoute1.add(new IdImpl("5"));
+			nodeIDsRoute1.add(new IdImpl("6"));
+			nodeIDsRoute1.add(new IdImpl("7"));
+			nodeIDsRoute1.add(new IdImpl("8"));
+			nodeIDsRoute1.add(new IdImpl("9"));
+			nodeIDsRoute1.add(new IdImpl("10"));
 			
 			stopFacilityIDsRoute1.add(new IdImpl("1to2"));
 			stopFacilityIDsRoute1.add(new IdImpl("2to3"));
@@ -138,15 +155,25 @@ public class BusCorridorTransitScheduleGenerator {
 			linkIDsRoute1.add(new IdImpl("8to9"));
 			linkIDsRoute1.add(new IdImpl("9to10"));
 			
-			stopFacilityIDsRoute2.add(new IdImpl("3to2"));
-			stopFacilityIDsRoute2.add(new IdImpl("4to3"));
-			stopFacilityIDsRoute2.add(new IdImpl("5to4"));
-			stopFacilityIDsRoute2.add(new IdImpl("6to5"));
-			stopFacilityIDsRoute2.add(new IdImpl("7to6"));
-			stopFacilityIDsRoute2.add(new IdImpl("8to7"));
-			stopFacilityIDsRoute2.add(new IdImpl("9to8"));
-			stopFacilityIDsRoute2.add(new IdImpl("10to9"));
+			nodeIDsRoute2.add(new IdImpl("10"));
+			nodeIDsRoute2.add(new IdImpl("9"));
+			nodeIDsRoute2.add(new IdImpl("8"));
+			nodeIDsRoute2.add(new IdImpl("7"));
+			nodeIDsRoute2.add(new IdImpl("6"));
+			nodeIDsRoute2.add(new IdImpl("5"));
+			nodeIDsRoute2.add(new IdImpl("4"));
+			nodeIDsRoute2.add(new IdImpl("3"));
+			nodeIDsRoute2.add(new IdImpl("2"));
+
 			stopFacilityIDsRoute2.add(new IdImpl("11to10"));
+			stopFacilityIDsRoute2.add(new IdImpl("10to9"));
+			stopFacilityIDsRoute2.add(new IdImpl("9to8"));
+			stopFacilityIDsRoute2.add(new IdImpl("8to7"));
+			stopFacilityIDsRoute2.add(new IdImpl("7to6"));
+			stopFacilityIDsRoute2.add(new IdImpl("6to5"));
+			stopFacilityIDsRoute2.add(new IdImpl("5to4"));
+			stopFacilityIDsRoute2.add(new IdImpl("4to3"));
+			stopFacilityIDsRoute2.add(new IdImpl("3to2"));
 			
 			linkIDsRoute2.add(new IdImpl("11to10"));
 			linkIDsRoute2.add(new IdImpl("10to9"));
@@ -160,22 +187,15 @@ public class BusCorridorTransitScheduleGenerator {
 			
 			routeId2linkIDs.put(this.routeId1,this.linkIDsRoute1);
 			routeId2linkIDs.put(this.routeId2,this.linkIDsRoute2);
-			
-			routeId2transitStopFacilities.put(this.routeId1, getTransitStopFacility(stopFacilityIDsRoute1, linkIDsRoute1, network));
-			routeId2transitStopFacilities.put(this.routeId2, getTransitStopFacility(stopFacilityIDsRoute2, linkIDsRoute2, network));
-			
-			this.routeId2TransitRouteStops = getRouteId2TransitRouteStops(this.stopTime, this.travelTimeBus);
-			this.routeId2networkRoute = getRouteId2NetworkRoute();
-			this.routeId2transitRoute = getRouteId2TransitRoute();
-		
-			setDepartureIDs(vehicleIDs);
-			
+		}
+
+		private void setTransitLine() {
 			TransitLine transitLine = sf.createTransitLine(this.transitLineId);
 			schedule.addTransitLine(transitLine);
 			transitLine.addRoute(routeId2transitRoute.get(this.routeId1));
 			transitLine.addRoute(routeId2transitRoute.get(this.routeId2));
 		}
-		
+
 		public void createVehicles() {
 			// Vehicle-Typ: Bus
 			VehicleType type = veh.getFactory().createVehicleType(this.vehTypeId);
@@ -207,7 +227,7 @@ public class BusCorridorTransitScheduleGenerator {
 			vehicleWriter.writeFile(vehicleFile);
 		}
 
-		private void setDepartureIDs(List<Id> vehicleIDs) {	
+		private void setDepartureIDs() {	
 			double routeNr = 0; 
 			double serviceTime = this.endTime - this.startTime; //sec
 			int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
@@ -279,7 +299,7 @@ public class BusCorridorTransitScheduleGenerator {
 			return routeId2transitRouteStops;
 		}
 
-		private List<TransitStopFacility> getTransitStopFacility(List<Id> stopFacilityIDsRoute, List<Id> linkIDsRoute, Network network) {
+		private List<TransitStopFacility> getTransitStopFacility(List<Id> stopFacilityIDsRoute, List<Id> linkIDsRoute, List<Id> nodeIDs, Network network) {
 			List<TransitStopFacility> transitStopFacilities = new ArrayList<TransitStopFacility>();
 			for (Id stopFacId : stopFacilityIDsRoute){
 				int index = stopFacilityIDsRoute.indexOf(stopFacId);
