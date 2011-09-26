@@ -50,8 +50,8 @@ public class TransitScheduleWriter {
 		generator.setStandingRoom(20);
 		
 		generator.setNumberOfBusses(10); // Anzahl der Busse
-		generator.setStartTime(8*3600);
-		generator.setEndTime(18*3600);
+		generator.setStartTime(7*3600);
+		generator.setEndTime(17*3600);
 		
 		generator.createVehicles();
 		generator.createSchedule();
