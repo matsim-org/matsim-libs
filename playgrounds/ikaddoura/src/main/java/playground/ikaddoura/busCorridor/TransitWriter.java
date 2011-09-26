@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitScheduleWriter.java
+ * TransitWriter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -34,7 +34,7 @@ import org.matsim.core.basic.v01.IdImpl;
 public class TransitWriter {
 
 	public static void main(String[] args) throws IOException {
-		BusCorridorTransitScheduleGenerator generator = new BusCorridorTransitScheduleGenerator();
+		BusCorridorScheduleVehiclesGenerator generator = new BusCorridorScheduleVehiclesGenerator();
 		generator.setStopTime(30);
 		generator.setTravelTimeBus(3*60);
 		generator.setNetworkFile("../../shared-svn/studies/ihab/busCorridor/input/network_busline.xml");
