@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
@@ -53,9 +53,9 @@ public class NetworkImpl implements Network, BasicLocations {
 
 	private double capperiod = 3600.0 ;
 
-	protected final Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	protected final Map<Id, Node> nodes = new LinkedHashMap<Id, Node>();
 
-	private Map<Id, Link> links = new TreeMap<Id, Link>();
+	private Map<Id, Link> links = new LinkedHashMap<Id, Link>();
 
 	protected QuadTree<Node> nodeQuadTree = null;
 

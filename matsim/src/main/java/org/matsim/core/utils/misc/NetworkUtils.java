@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -70,6 +71,14 @@ public class NetworkUtils {
 
 	/**
 	 * @param network
+	 * @return sorted map containing containing the links as values and their ids as keys.
+	 */
+	public static SortedMap<Id, Node> getSortedNodes(final Network network) {
+		return new TreeMap<Id, Node>(network.getNodes());
+	}
+	
+	/**
+	 * @param network
 	 * @param nodes list of node ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
@@ -95,6 +104,14 @@ public class NetworkUtils {
 		return nodesList;
 	}
 
+	/**
+	 * @param network
+	 * @return sorted map containing containing the links as values and their ids as keys.
+	 */
+	public static SortedMap<Id, Link> getSortedLinks(final Network network) {
+		return new TreeMap<Id, Link>(network.getLinks());
+	}
+	
 	/**
 	 * @param network
 	 * @param links list of link ids, separated by one or multiple whitespace (space, \t, \n)

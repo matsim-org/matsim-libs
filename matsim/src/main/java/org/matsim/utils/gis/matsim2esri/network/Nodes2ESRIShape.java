@@ -41,6 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Point;
@@ -70,7 +71,7 @@ public class Nodes2ESRIShape {
 
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (Node node : this.network.getNodes().values()) {
+		for (Node node : NetworkUtils.getSortedNodes(this.network).values()) {
 			features.add(getFeature(node));
 		}
 		ShapeFileWriter.writeGeometries(features, this.filename);

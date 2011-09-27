@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
@@ -61,14 +62,14 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 			handler.startNetwork(network, this.writer);
 			handler.writeSeparator(this.writer);
 			handler.startNodes(network, this.writer);
-			for (Node n : network.getNodes().values()) {
+			for (Node n : NetworkUtils.getSortedNodes(network).values()) {
 				handler.startNode(n, this.writer);
 				handler.endNode(this.writer);
 			}
 			handler.endNodes(this.writer);
 			handler.writeSeparator(this.writer);
 			handler.startLinks(network, this.writer);
-			for (Link l : network.getLinks().values()) {
+			for (Link l : NetworkUtils.getSortedLinks(network).values()) {
 				handler.startLink(l, this.writer);
 				handler.endLink(this.writer);
 			}
