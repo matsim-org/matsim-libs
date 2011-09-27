@@ -1,0 +1,140 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NewAgentPtPlan.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.yu.newPlans;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.algorithms.PlanAlgorithm;
+
+/**
+ * writes new populationfile, in which every person will has 2 plans, one with
+ * type "car" and the other with type "pt", whose leg mode will be "pt" and who
+ * will have only a blank {@code Route}
+ *
+ * @author ychen
+ *
+ */
+public class NewMeaningfullPtPop extends NewPopulation implements PlanAlgorithm {
+	private Person person;
+	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
+
+	public NewMeaningfullPtPop(final Network network,
+			final Population population, final String filename) {
+		super(network, population, filename);
+	}
+
+	@Override
+	public void run(final Person person) {
+		// if (Integer.parseInt(person.getId().toString()) < 1000000000) {
+		this.person = person;
+		for (Plan pl : person.getPlans()) {
+			run(pl);
+		}
+		person.getPlans().clear();
+
+		for (PlanImpl copyPlan : copyPlans) {
+			person.addPlan(copyPlan);
+		}
+		copyPlans.clear();
+		// }
+		pw.writePerson(person);
+	}
+
+	@Override
+	public void run(Plan plan) {
+		PlanImpl copyPlan = new PlanImpl(person);
+
+		for (PlanElement pe : plan.getPlanElements()) {
+
+			if (pe instanceof Activity) {
+				copyPlan.addActivity((ActivityImpl) pe);
+
+			} else if (pe instanceof Leg) {
+				LegImpl leg = (LegImpl) pe;
+
+				LegImpl ptLeg = new LegImpl(leg);
+				ptLeg.setMode(TransportMode.pt);
+				ptLeg.setRoute(null);
+				// -----------------------------------------------
+				// WITHOUT routeSetting!! traveltime of PT can be
+				// calculated automaticly!!
+				// -----------------------------------------------
+				copyPlan.addLeg(ptLeg);
+
+				// Leg walkLeg = new org.matsim.core.population.LegImpl(leg);
+				// walkLeg.setMode(TransportMode.walk);
+				// walkLeg.setRoute(null);
+				// walkPlan.addLeg(walkLeg);
+
+				if (!leg.getMode().equals(TransportMode.car)) {
+					leg.setRoute(null);
+					leg.setMode(TransportMode.car);
+				}
+			}
+		}
+		copyPlans.add(copyPlan);
+		// copyPlans.add(walkPlan);
+	}
+
+	public static void main(final String[] args) {
+		Gbl.startMeasurement();
+
+		final String netFilename = "../../matsim/examples/equil/network.xml";
+		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
+		final String outputFilename = "test/input/plans100withPt.xml";
+
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
+		NetworkImpl network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
+
+		Population population = scenario.getPopulation();
+		new MatsimPopulationReader(scenario).readFile(plansFilename);
+
+		NewMeaningfullPtPop npwp = new NewMeaningfullPtPop(network, population,
+				outputFilename);
+		npwp.run(population);
+		npwp.writeEndPlans();
+
+		System.out.println("--> Done!");
+		Gbl.printElapsedTime();
+		System.exit(0);
+	}
+}

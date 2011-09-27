@@ -21,12 +21,9 @@
 package playground.yu.newPlans;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -34,6 +31,8 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+
+import playground.yu.utils.CheckPseudoPtPlanIntegrity;
 
 /**
  * increases the amount of Agents in a new MATSim plansfile, by copying the old
@@ -62,7 +61,7 @@ public class DoublePop extends NewPopulation {
 	 */
 	@Override
 	public void run(Person person) {
-		checkPlansIntegrity(person);
+//		checkPseudoPtPlansIntegrity(person);
 
 		pw.writePerson(person);
 		// n++;
@@ -103,21 +102,10 @@ public class DoublePop extends NewPopulation {
 		pw.writePerson(tmpPerson);
 	}
 
-	private void checkPlansIntegrity(Person person) {
+	private void checkPseudoPtPlansIntegrity(Person person) {
 		for (Plan plan : person.getPlans()) {
-			for (PlanElement pe : plan.getPlanElements()) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
-					if (leg.getMode().equals(TransportMode.pt)) {
-						// TODO
-					}
-				}
-			}
+			CheckPseudoPtPlanIntegrity.check(network, plan);
 		}
-	}
-
-	private void checkPlan(Plan plan) {
-		// TODO
 	}
 
 	public static void main(final String[] args) {
