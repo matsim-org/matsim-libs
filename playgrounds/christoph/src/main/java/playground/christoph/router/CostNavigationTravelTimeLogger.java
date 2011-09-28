@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -40,7 +41,8 @@ import org.matsim.core.router.util.TravelTime;
 
 public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
 
-	private Scenario scenario;
+	private Population population;
+	private Network network;
 	private TravelTime travelTime;
 	
 	private Map<Id, PersonInfo> personInfos;
@@ -55,8 +57,9 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	
 //	protected double initialGamma = 0.5;
 		
-	public CostNavigationTravelTimeLogger(Scenario scenario, TravelTime travelTime) {
-		this.scenario = scenario;
+	public CostNavigationTravelTimeLogger(Population population, Network network, TravelTime travelTime) {
+		this.population = population;
+		this.network = network;
 		this.travelTime = travelTime;
 		
 		personInfos = new HashMap<Id, PersonInfo>();
@@ -71,7 +74,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	private void init() {
 		
 		// set initial trust for the whole population
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
+		for (Person person : this.population.getPersons().values()) {
 			personInfos.put(person.getId(), new PersonInfo());
 		}
 		
@@ -87,7 +90,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		double time = event.getTime();
 
 		enterTimes.put(personId, time);
-		expectedTravelTimes.put(personId, travelTime.getLinkTravelTime(scenario.getNetwork().getLinks().get(linkId), time));
+		expectedTravelTimes.put(personId, travelTime.getLinkTravelTime(this.network.getLinks().get(linkId), time));
 	}
 
 	@Override

@@ -33,8 +33,9 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
@@ -46,10 +47,12 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import playground.christoph.router.CostNavigationRouteFactory;
 import playground.christoph.router.CostNavigationTravelTimeLogger;
+import playground.christoph.router.traveltime.LookupNetwork;
+import playground.christoph.router.traveltime.LookupNetworkFactory;
+import playground.christoph.router.traveltime.LookupTravelTime;
 
 public class CostNavigationRouteController extends WithinDayController implements SimulationInitializedListener, StartupListener  {
 	/*
@@ -71,6 +74,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	
+	protected LookupNetwork lookupNetwork;
+	protected LookupTravelTime lookupTravelTime;
+	protected int updateLookupTravelTimeInterval = 15;
+	
 	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
 
 	public CostNavigationRouteController(String[] args) {
@@ -91,17 +98,19 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 */
 	protected void initReplanners(QSim sim) {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		TravelTimeCollector travelTime = super.getTravelTimeCollector();
+//		PersonalizableTravelTime travelTime = super.getTravelTimeCollector();
+		PersonalizableTravelTime travelTime = this.lookupTravelTime;
+		
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory, routeFactory);
-		costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData, travelTime);
+		costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime);
 		this.events.addHandler(costNavigationTravelTimeLogger);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplanner = new CostNavigationRouteFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0, costNavigationTravelTimeLogger, travelCostFactory, travelTime).createReplanner();
+		this.duringLegReplanner = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, sim.getAgentCounter(), router, 1.0, costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory()).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}
@@ -118,6 +127,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 		super.createAndInitLinkReplanningMap();
 		
 		checkNetwork();
+		
+		this.lookupNetwork = new LookupNetworkFactory().createLookupNetwork(this.network);
+		this.lookupTravelTime = new LookupTravelTime(lookupNetwork, this.getTravelTimeCollector(), scenarioData.getConfig().global().getNumberOfThreads());
+		this.lookupTravelTime.setUpdateInterval(this.updateLookupTravelTimeInterval);
+		this.getFixedOrderSimulationListener().addSimulationListener(lookupTravelTime);
 	}
 	
 	private void checkNetwork() {
@@ -180,14 +194,16 @@ public class CostNavigationRouteController extends WithinDayController implement
 			System.out.println("No argument given!");
 			System.out.println("Usage: CostNavigationRouteController config-file rerouting-share rerouting-threads");
 			System.out.println();
-		} else if (args.length != 3) {
+		} else if (args.length != 4) {
 			log.error("Unexpected number of input arguments!");
-			log.error("Expected path to a config file (String), rerouting share (double, 0.0 ... 1.0) and number of rerouting threads (1..n).");
+			log.error("Expected path to a config file (String), rerouting share (double, 0.0 ... 1.0), " +
+					"number of rerouting threads (1..n) and time interval to update the travel time lookup table (integer, 1..n).");
 			System.exit(0);
 		} else {
 			final CostNavigationRouteController controller = new CostNavigationRouteController(args);
 			controller.pDuringLegReplanning = Double.valueOf(args[1]);
 			controller.numReplanningThreads = Integer.valueOf(args[2]);
+			controller.updateLookupTravelTimeInterval = Integer.valueOf(args[3]);
 			controller.run();
 		}
 		System.exit(0);

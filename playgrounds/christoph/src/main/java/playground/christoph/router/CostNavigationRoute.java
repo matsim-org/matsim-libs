@@ -29,14 +29,15 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -45,6 +46,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	
+	protected Network network;
 	protected CostNavigationTravelTimeLogger travelTimeLogger;
 	protected LeastCostPathCalculator leastCostPathCalculator;
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
@@ -53,15 +55,16 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected PersonalizableTravelTime travelTime;
 	
 	
-	/*package*/ CostNavigationRoute(Id id, Scenario scenario, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
-			TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime) {
+	/*package*/ CostNavigationRoute(Id id, Scenario scenario, Network network, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
+			TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
 		super(id, scenario);
 		
+		this.network = network;
 		this.costNavigationTravelTimeLogger = costNavigationTravelTimeLogger;
 		this.travelCostFactory = travelCostFactory;
 		this.travelTime = travelTime;
 		this.travelCost = travelCostFactory.createTravelCostCalculator(travelTime, scenario.getConfig().planCalcScore());
-		this.leastCostPathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
+		this.leastCostPathCalculator = routerFactory.createPathCalculator(network, travelCost, travelTime);
 	}
 	
 	@Override
@@ -91,9 +94,9 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
-		Link currentLink = scenario.getNetwork().getLinks().get(currentLinkId);
+		Link currentLink = network.getLinks().get(currentLinkId);
 		Node nextNode = currentLink.getToNode();
-		Link endLink = scenario.getNetwork().getLinks().get(withinDayAgent.getCurrentLeg().getRoute().getEndLinkId());
+		Link endLink = network.getLinks().get(withinDayAgent.getCurrentLeg().getRoute().getEndLinkId());
 		Node endNode = endLink.getFromNode();
 		
 		Map<Id, ? extends Link> outLinksMap = nextNode.getOutLinks();
@@ -171,7 +174,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		if (nextLinkId.equals(leastCostLinkId)) costNavigationTravelTimeLogger.setFollowed(personId, true);
 		else {
 			costNavigationTravelTimeLogger.setFollowed(personId, false);
-			double c = travelCost.getLinkGeneralizedTravelCost(this.scenario.getNetwork().getLinks().get(nextLinkId), time);
+			double c = travelCost.getLinkGeneralizedTravelCost(network.getLinks().get(nextLinkId), time);
 			double expectedAlternativeCosts = c * leastCosts/nextPath.travelCost;
 			costNavigationTravelTimeLogger.setExpectedAlternativeTravelTime(personId, expectedAlternativeCosts);
 		}
