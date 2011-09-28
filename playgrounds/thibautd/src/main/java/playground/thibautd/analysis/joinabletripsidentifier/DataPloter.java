@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,9 +32,14 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
+import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
+import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.utils.BoxAndWhiskersChart;
 import playground.thibautd.utils.WrapperChartUtil;
 import playground.thibautd.utils.XYLineHistogramDataset;
@@ -49,6 +57,9 @@ public class DataPloter {
 		this.trips = trips;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// plotting methods
+	// /////////////////////////////////////////////////////////////////////////
 	public ChartUtil getBasicBoxAndWhiskerChart(
 			final PassengerFilter filter,
 			final DriverTripValidator validator) {
@@ -197,6 +208,61 @@ public class DataPloter {
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
+	// non-plotting analysis methods (which shoould be moved)
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Gets the list of locations which name matches a regexp, for agents for which
+	 * joint trips are identified with the given conditions.
+	 */
+	public List<Coord> getMatchingLocations(
+			final PassengerFilter filter,
+			final DriverTripValidator validator,
+			final Network network,
+			final boolean examineDepartures,
+			final boolean examineArrivals,
+			final String nameRegExp) {
+		List<TripRecord> records = filter.filterRecords(trips);
+		List<Coord> locations = new ArrayList<Coord>();
+		validator.setJoinableTrips(trips);
+
+		for (TripRecord record : records) {
+			boolean isValid = false;
+			for (JoinableTrip joinableTrip : record.getJoinableTrips()) {
+				if (validator.isValid(joinableTrip)) {
+					isValid = true;
+					break;
+				}
+			}
+			if (!isValid) continue;
+
+			if (examineDepartures && record.getOriginActivityType().matches(nameRegExp)) {
+				locations.add(network.getLinks().get(record.getOriginLinkId()).getCoord());
+			}
+			else if (examineArrivals && record.getDestinationActivityType().matches(nameRegExp)) {
+				locations.add(network.getLinks().get(record.getDestinationLinkId()).getCoord());
+			}
+		}
+
+		return locations;
+	}
+
+	public void writeViaXy(
+			final List<Coord> coords,
+			final String fileName) throws UncheckedIOException {
+		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
+
+		try {
+			for (Coord point : coords) {
+				writer.write(point.getX()+"\t"+point.getY()+"\n");
+			}
+
+			writer.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
 	// nested interface
 	// /////////////////////////////////////////////////////////////////////////
 	/**
@@ -208,7 +274,7 @@ public class DataPloter {
 		 * @param trips the instance containing raw data
 		 * @return a list of passenger trips satisfying the required criterion
 		 */
-		public List<JoinableTrips.TripRecord> filterRecords(final JoinableTrips trips);
+		public List<TripRecord> filterRecords(final JoinableTrips trips);
 
 		public String getConditionDescription();
 	}
@@ -253,7 +319,6 @@ public class DataPloter {
 			return comp;
 		}
 	}
-
 
 }
 

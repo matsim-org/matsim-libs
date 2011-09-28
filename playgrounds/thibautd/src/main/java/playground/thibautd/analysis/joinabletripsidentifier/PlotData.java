@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 
 import org.jfree.chart.plot.XYPlot;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -123,12 +124,37 @@ public class PlotData {
 		for (ConditionValidator condition : conditions) {
 			log.info("creating charts for condition "+condition);
 			count++;
+
 			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(filter, condition);
 			chart.saveAsPng(outputDir+count+"-TimePlot.png", WIDTH, HEIGHT);
+
 			chart = ploter.getBoxAndWhiskerChartPerTripLength(filter, condition, network);
 			chart.saveAsPng(outputDir+count+"-DistancePlot.png", WIDTH, HEIGHT);
+
 			chart = ploter.getBoxAndWhiskerChartPerTripLength(shortFilter, condition, network);
 			chart.saveAsPng(outputDir+count+"-DistancePlot-short.png", WIDTH, HEIGHT);
+
+			List<Coord> locations = ploter.getMatchingLocations(
+					filter,
+					condition,
+					network,
+					true,
+					true,
+					"h.*");
+			ploter.writeViaXy(
+					locations,
+					outputDir+condition.getFirstCriterion()+"-"+condition.getSecondCriterion()+"-homeLocations.xy");
+
+			locations = ploter.getMatchingLocations(
+					filter,
+					condition,
+					network,
+					true,
+					true,
+					"w.*");
+			ploter.writeViaXy(
+					locations,
+					outputDir+condition.getFirstCriterion()+"-"+condition.getSecondCriterion()+"-workLocations.xy");
 		}
 
 		ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
