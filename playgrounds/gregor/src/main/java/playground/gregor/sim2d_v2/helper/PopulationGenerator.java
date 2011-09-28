@@ -23,8 +23,8 @@ public class PopulationGenerator {
 
 
 	private static final int NUM_PERSONS = 100;
-	private static final Id fromLinkId = new IdImpl(33);
-	private static final Id toLinkId = new IdImpl(26);
+	private static final Id fromLinkId = new IdImpl(38);
+	private static final Id toLinkId = new IdImpl(123);
 	private static final int RATE = 5;
 
 	private final Scenario sc;

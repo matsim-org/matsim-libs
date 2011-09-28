@@ -1,8 +1,8 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class Skeleton {
 
-	private final Set<SkeletonLink> links = new HashSet<SkeletonLink>();
+	private final Set<SkeletonLink> links = new LinkedHashSet<SkeletonLink>();
 	private final QuadTree<SkeletonNode> nodes;
 
 	private static final double TOLERANCE = 0.000000001;

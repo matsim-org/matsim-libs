@@ -1,7 +1,7 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Puncher {
 
 	public void punchSkeleton(Skeleton skeleton, Envelope boundary) {
-		Set<SkeletonLink> links = new HashSet<SkeletonLink>();
+		Set<SkeletonLink> links = new LinkedHashSet<SkeletonLink>();
 		for (SkeletonLink link : skeleton.getLinks()) {
 			if (!boundary.contains(link.getFromNode().getCoord()) && !boundary.contains(link.getToNode().getCoord())) {
 				links.add(link);

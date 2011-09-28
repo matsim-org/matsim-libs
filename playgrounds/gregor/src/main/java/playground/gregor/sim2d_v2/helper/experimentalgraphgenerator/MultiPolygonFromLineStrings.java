@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -69,7 +69,22 @@ public class MultiPolygonFromLineStrings {
 					lsTree.put(tmp.getStartPoint().getX(), tmp.getStartPoint().getY(), tmp);
 					lsTree.put(tmp.getEndPoint().getX(), tmp.getEndPoint().getY(), tmp);
 				}
-			} else if (neighbors.size() >1) {
+			} else if (neighbors.size() == 1){
+				Iterator<LineString> it = neighbors.iterator();
+				LineString ls1 = it.next();
+				Coordinate [] coords = new Coordinate [ls1.getNumPoints() * 2];
+				for (int i = 0; i < ls1.getNumPoints(); i++) {
+					coords[i] = ls1.getCoordinateN(i);
+				}
+				int j = ls1.getNumPoints();
+				for (int i = ls1.getNumPoints()-1; i >= 0; i--) {
+					coords[j++] = ls1.getCoordinateN(i);
+				}
+				LinearRing lr = this.geofac.createLinearRing(coords);
+				Polygon polygon = (Polygon) this.geofac.createPolygon(lr, null).buffer(0.1);
+				ps.add(polygon);
+
+			}else if (neighbors.size() >1) {
 				throw new RuntimeException("size of the collections must either be 2 or 1");
 			}
 

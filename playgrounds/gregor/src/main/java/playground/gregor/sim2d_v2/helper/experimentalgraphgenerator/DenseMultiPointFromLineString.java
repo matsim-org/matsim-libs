@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
 import java.util.ArrayList;
 import java.util.List;

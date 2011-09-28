@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="138" x="0.250296964388657" y="3.8461957082122145" />
+		<node id="186" x="3.607664637520753" y="-0.1149695628112926" />
+		<node id="201" x="4.898687012727094" y="1.0487246490357705" />
+		<node id="262" x="4.952157081190377" y="3.8681756950649477" />
+		<node id="277" x="4.499999999999998" y="0.04999999999999988" />
+		<node id="299" x="5.947836930244148" y="2.0964248035875253" />
+		<node id="346" x="6.848185044829666" y="1.064026251656159" />
+		<node id="351" x="7.04979271002512" y="3.1531349748110187" />
+		<node id="582" x="3.02342798684664" y="1.9037100863481244" />
+		<node id="7" x="0.1570990063460057" y="0.1455097270218229" />
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="NaN">
+		<link id="0" from="277" to="186" length="0.907456531071938" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="1" from="186" to="277" length="0.907456531071938" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="10" from="7" to="582" length="3.36260469398247" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="11" from="582" to="7" length="3.36260469398247" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="12" from="138" to="582" length="3.3857799779175815" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="13" from="582" to="138" length="3.3857799779175815" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="14" from="201" to="582" length="2.060969798944736" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="15" from="582" to="201" length="2.060969798944736" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="16" from="186" to="582" length="2.1015232546705955" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="17" from="582" to="186" length="2.1015232546705955" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="2" from="346" to="299" length="1.3698443332976487" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="3" from="299" to="346" length="1.3698443332976487" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="4" from="299" to="351" length="1.5267425868691402" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="5" from="351" to="299" length="1.5267425868691402" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="6" from="299" to="582" length="2.9307518882471086" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="7" from="582" to="299" length="2.9307518882471086" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="8" from="262" to="582" length="2.753020349942799" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+		<link id="9" from="582" to="262" length="2.753020349942799" freespeed="1.34" capacity="1.0" permlanes="1.0" oneway="1" modes="car" />
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>

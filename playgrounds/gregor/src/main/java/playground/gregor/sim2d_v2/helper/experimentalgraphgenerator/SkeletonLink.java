@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
 
 public class SkeletonLink {
@@ -17,6 +17,17 @@ public class SkeletonLink {
 
 	public SkeletonNode getToNode() {
 		return this.toNode;
+	}
+
+	public double getLength() {
+		return this.fromNode.getGeometry().distance(this.toNode.getGeometry());
+	}
+
+	public boolean isDeadEnd() {
+		if (this.fromNode.getLinkedLinks().size() == 1 || this.toNode.getLinkedLinks().size() == 1) {
+			return true;
+		}
+		return false;
 	}
 
 }

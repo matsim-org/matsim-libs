@@ -1,6 +1,6 @@
-package playground.gregor.sim2d_v2.experimental;
+package playground.gregor.sim2d_v2.helper.experimentalgraphgenerator;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -13,7 +13,7 @@ public class SkeletonNode {
 
 	private final Point location;
 
-	private final Set<SkeletonLink> linkedLinks = new HashSet<SkeletonLink>();
+	private final Set<SkeletonLink> linkedLinks = new LinkedHashSet<SkeletonLink>();
 
 	private final Id id;
 
