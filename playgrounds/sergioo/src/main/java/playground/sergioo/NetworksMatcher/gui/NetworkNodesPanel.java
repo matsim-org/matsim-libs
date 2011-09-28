@@ -83,6 +83,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
 	}
@@ -197,10 +198,12 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
+		doubleNetworkWindow.setActivePanel(this);
 		if(e.getWheelRotation()<0)
 			camera.zoomIn();
 		else if(e.getWheelRotation()>0)
 			camera.zoomOut();
+		doubleNetworkWindow.cameraChange(camera);
 		repaint();
 	}
 	@Override
@@ -222,13 +225,24 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 			break;
 		case 'm':
 			doubleNetworkWindow.setNetworksSeparated();
-			break;	
+			break;
+		case 'f':
+			doubleNetworkWindow.finalNetworks();
+			break;
 		}
 		repaint();
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
+		switch(e.getKeyCode()) {
+		case KeyEvent.VK_UP:
+			doubleNetworkWindow.nextNetwork();
+			break;
+		case KeyEvent.VK_DOWN:
+			doubleNetworkWindow.previousNetwork();
+			break;
+		}
+		repaint();
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {

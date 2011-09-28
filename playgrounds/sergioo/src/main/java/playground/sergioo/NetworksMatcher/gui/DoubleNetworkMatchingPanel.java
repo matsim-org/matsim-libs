@@ -45,6 +45,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 		matchingsAdded = true;
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addMouseWheelListener(this);
 		addKeyListener(this);
 	}
 	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
@@ -149,13 +150,24 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			break;
 		case 'm':
 			doubleNetworkWindow.setNetworksSeparated();
-			break;	
+			break;
+		case 'f':
+			doubleNetworkWindow.finalNetworks();
+			break;
 		}
 		repaint();
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		
+		switch(e.getKeyCode()) {
+		case KeyEvent.VK_UP:
+			doubleNetworkWindow.nextNetwork();
+			break;
+		case KeyEvent.VK_DOWN:
+			doubleNetworkWindow.previousNetwork();
+			break;
+		}
+		repaint();
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {

@@ -38,8 +38,8 @@ public class NetworksShpXmlMatcherMain {
 
 	/**
 	 * @param args:
-	 *  0 - First network MATSim file
-	 *  1 - Second network shape file
+	 *  0 - First network MATSim file ("./data/currentSimulation/singapore.xml")
+	 *  1 - Second network shape file ("C:/Users/sergioo/Documents/2011/Work/FCL Old/Operations/Data/RoadCapacities/emme_links.shp")
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

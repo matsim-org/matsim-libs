@@ -64,11 +64,6 @@ public class MatchingProcess {
 		return finalNetworkB;
 	}
 	
-	public List<Network> getAllNetworks() {
-		//TODO
-		return null;
-	}
-	
 	public Network getNetworkA(int stepNumber) {
 		return matchingSteps.get(stepNumber).getNetworkA();
 	}
@@ -99,5 +94,9 @@ public class MatchingProcess {
 			return matchingSteps.get(matchingSteps.size()-1).getNodesMatchings();
 	}
 
+	public int getNumSteps() {
+		return matchingSteps.size();
+	}
+	
 	
 }

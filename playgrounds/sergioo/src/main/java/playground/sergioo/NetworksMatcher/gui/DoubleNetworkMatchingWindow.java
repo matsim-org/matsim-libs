@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -68,6 +69,8 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	private JButton readyButton;
 	private boolean networksSeparated = true;
 	private JPanel panelsPanel;
+	private MatchingProcess matchingProcess;
+	private int step;
 	
 	//Methods
 	private DoubleNetworkMatchingWindow(String title) {
@@ -125,9 +128,30 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
 	}
-	public DoubleNetworkMatchingWindow(String title, Collection<NodesMatching> nodesMatchings, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
+	public DoubleNetworkMatchingWindow(String title, MatchingProcess matchingProcess) {
 		this(title);
+		this.matchingProcess = matchingProcess;
+		this.step = matchingProcess.getNumSteps()-1;
+		initialise(true);
+	}
+	private void initialise(boolean finalNetworks) {
+		Set<NodesMatching> nodesMatchings = matchingProcess.getMatchings(step);
+		NetworkNodesPainter networkPainterA = null;
+		NetworkNodesPainter networkPainterB = null;
+		if(finalNetworks) {
+			networkPainterA = new NetworkNodesPainter(matchingProcess.getFinalNetworkA());
+			networkPainterB = new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN);
+		}
+		else {
+			networkPainterA = new NetworkNodesPainter(matchingProcess.getNetworkA(step));
+			networkPainterB = new NetworkNodesPainter(matchingProcess.getNetworkB(step), Color.BLACK, Color.CYAN);
+		}
 		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
+		if(layersPanels.get(PanelIds.DOUBLE)!=null)
+			this.remove(layersPanels.get(PanelIds.DOUBLE));
+		if(panelsPanel!=null)
+			this.remove(panelsPanel);
+		layersPanels.clear();
 		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, networkPainterA, colors));
 		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, networkPainterB, colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
@@ -140,9 +164,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
 		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
 		this.add(panelsPanel, BorderLayout.CENTER);
-	}
-	public DoubleNetworkMatchingWindow(String title, MatchingProcess matchingProcess) {
-		this(title, matchingProcess.getFinalMatchings(), new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN));
 	}
 	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
 		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
@@ -169,10 +190,26 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			layersPanels.get(PanelIds.DOUBLE).requestFocus();
 	}
 	public void nextNetwork() {
-		
+		step++;
+		if(step==matchingProcess.getNumSteps())
+			step = 0;
+		initialise(false);
+		setNetworksSeparated();
+		setNetworksSeparated();
 	}
 	public void previousNetwork() {
-		
+		step--;
+		if(step<0)
+			step = matchingProcess.getNumSteps()-1;
+		initialise(false);
+		setNetworksSeparated();
+		setNetworksSeparated();
+	}
+	public void finalNetworks() {
+		step = matchingProcess.getNumSteps()-1;
+		initialise(true);
+		setNetworksSeparated();
+		setNetworksSeparated();
 	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
