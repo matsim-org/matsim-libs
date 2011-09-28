@@ -36,35 +36,46 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.PtSpeedMode;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
- * if a {@code Plan} with pseudo pt {@code Leg} does NOT contain enough
- * information about pseudo pt {@code Leg}, e.g. distance, or the travel time of
- * a pseudo pt {@code Route} is not reliable any longer (e.g. because of change
- * of {@code Leg} {@code TransportMode}), this class will set the corresponding
- * beeline distance and -Infinity traveltime to the {@code Route}
+ * if a {@code Plan} with pseudo pt {@code Leg} does NOT contain @{@code Leg}
+ * traveltime or it is not reliable any longer (e.g. because of changing of
+ * {@code Leg} {@code TransportMode}), this class will set the corresponding
+ * beeline distance to the {@code Route} and estimated beeline traveltime to the
+ * {@code Leg}.
  *
  * @author yu
  *
  */
 public class CheckPseudoPtPlanIntegrity {
-	public static Plan check(Network network, Plan plan) {
+	public static Plan check(Network network, Plan plan, Config config) {
+		PlansCalcRouteConfigGroup pcrcg = config.plansCalcRoute();
+		if (!pcrcg.getPtSpeedMode().equals(PtSpeedMode.beeline)) {
+			throw new RuntimeException("Only beeline can be used here.");
+		}
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				if (leg.getMode().equals(TransportMode.pt)) {
 					Route route = leg.getRoute();
-					if (Double.isNaN(route.getDistance())) {
-						leg.setTravelTime(Double.NEGATIVE_INFINITY);
-						route.setTravelTime(Double.NEGATIVE_INFINITY);
-						route.setDistance(CalculateLegBeelineDistance
-								.getBeelineDistance(network, leg));
-						// route.setTravelTime(144);
-						leg.setRoute(route);
+					if (Double.isNaN(route.getDistance())
+							|| Double.isInfinite(leg.getTravelTime())) {
+						double distance = CalculateLegBeelineDistance
+								.getBeelineDistance(network, leg);
+
+						route.setDistance(distance);
+
+						leg.setTravelTime(pcrcg.getBeelineDistanceFactor()
+								* distance / pcrcg.getPtSpeed());
+
+						// leg.setRoute(route);
 					}
 				}
 			}
@@ -73,8 +84,14 @@ public class CheckPseudoPtPlanIntegrity {
 	}
 
 	public static void main(String[] args) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
-				.createConfig());
+		Config config = ConfigUtils.createConfig();
+
+		PlansCalcRouteConfigGroup pcrcg = config.plansCalcRoute();
+		pcrcg.setPtSpeedMode(PtSpeedMode.beeline);
+		pcrcg.setBeelineDistanceFactor(1.3);
+		pcrcg.setPtSpeed(25d / 3.6);// 25 [km/h]
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario)
 				.readFile("test/input/2car1ptRoutes/net2.xml");
 		new MatsimPopulationReader(scenario)
@@ -86,7 +103,8 @@ public class CheckPseudoPtPlanIntegrity {
 		for (Person person : pop.getPersons().values()) {
 			Set<Plan> tmpPlans = new HashSet<Plan>();
 			for (Plan plan : person.getPlans()) {
-				tmpPlans.add(CheckPseudoPtPlanIntegrity.check(net, plan));
+				tmpPlans.add(CheckPseudoPtPlanIntegrity.check(net, plan,
+						scenario.getConfig()));
 			}
 			person.getPlans().clear();
 			for (Plan plan : tmpPlans) {
