@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
+import java.lang.management.ManagementFactory;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -44,6 +46,9 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	private final int maxIterations;
 	private final Configuration jgapConfig;
 	private final double minImprovement;
+	private final long maxCpuTime;
+	private final boolean monitorTime;
+	private long maxEndTime = Long.MAX_VALUE;
 
 	private int iterationsToEval = 0;
 	private double oldBest = Double.NEGATIVE_INFINITY;
@@ -57,6 +62,8 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 		this.maxIterations = configGroup.getMaxIterations();
 		this.minImprovement = nMembers * configGroup.getMinImprovement();
 		this.jgapConfig = jgapConfig;
+		this.maxCpuTime = (long) nMembers * configGroup.getMaxCpuTimePerMemberNanoSecs();
+		this.monitorTime = (this.maxCpuTime >= 0); 
 	}
 
 	@Override
@@ -64,6 +71,9 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 		if (this.jgapConfig != config) {
 			throw new IllegalArgumentException("the monitor must be ran "+
 					"with the config used to initialize it");
+		}
+		if (monitorTime) {
+			this.maxEndTime = ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime() + this.maxCpuTime;
 		}
 	}
 
@@ -79,7 +89,8 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 		if (iteration == this.maxIterations) {
 			return false;
 		}
-		return enoughImprovement(population);
+
+		return enoughImprovement(population) && !timeIsElapsed();
 	}
 
 	private boolean enoughImprovement(final Population population) {
@@ -94,6 +105,10 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 
 		this.iterationsToEval--;
 		return true;
+	}
+
+	private boolean timeIsElapsed() {
+		return monitorTime && this.maxEndTime <= ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
 	}
 }
 

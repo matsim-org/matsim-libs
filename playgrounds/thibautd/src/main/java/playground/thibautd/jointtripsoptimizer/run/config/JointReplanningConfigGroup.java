@@ -151,6 +151,15 @@ public class JointReplanningConfigGroup extends Module {
 	public static final String POPULATION_INTERCEPT = "populationSizeIntercept";
 	public static final String WINDOW_SIZE_COEF = "windowSizeSlope";
 	public static final String WINDOW_SIZE_INTERCEPT = "windowSizeIntercept";
+	/**
+	 * Defines the max CPU time per clique member before stopping the GA,
+	 * in nanosecs. negative or null value means no limitation. The value
+	 * Should be set quite high, as the aim is to avoid loosing time on
+	 * anyway too hard instances: an annoying side effect of time based criteria
+	 * is that the optimisation of the very same instance with the very same random
+	 * seed may lead to sligthly different results.
+	 */
+	public static final String MAX_CPU_TIME = "maxCpuTimePerMemberNanoSecs";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -191,6 +200,9 @@ public class JointReplanningConfigGroup extends Module {
 	private boolean inPlaceMutation = false;
 	private double pNonUniform = 0.04032756452861985;
 	private boolean useOnlyHammingDistance = true;
+	// default: with or without?
+	private long maxCpuTimePerMember = (long) (10 * 1E9);
+	//private long maxCpuTimePerMember = -1;
 	//deprecated fields:
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
@@ -315,6 +327,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(WINDOW_SIZE_INTERCEPT)) {
 			this.setWindowSizeIntercept(value);
 		}
+		else if (param_name.equals(MAX_CPU_TIME)) {
+			this.setMaxCpuTimePerMemberNanoSecs(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -426,6 +441,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(WINDOW_SIZE_INTERCEPT)) {
 			return String.valueOf(this.getWindowSizeIntercept());
 		}
+		else if (param_name.equals(MAX_CPU_TIME)) {
+			return String.valueOf(this.getMaxCpuTimePerMemberNanoSecs());
+		}
 
 		return null;
 	}
@@ -465,6 +483,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, WINDOW_SIZE_COEF);
 		this.addParameterToMap(map, POPULATION_INTERCEPT);
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
+		this.addParameterToMap(map, MAX_CPU_TIME);
 		return map;
 	}
 
@@ -858,6 +877,13 @@ public class JointReplanningConfigGroup extends Module {
 		return windowSizeIntercept;
 	}
 
+	public void setMaxCpuTimePerMemberNanoSecs(final String value) {
+		this.maxCpuTimePerMember = Long.valueOf(value);
+	}
+
+	public long getMaxCpuTimePerMemberNanoSecs() {
+		return this.maxCpuTimePerMember;
+	}
 
 	// allow setting of GA params "directly"
 	public void setPopulationSize(final int populationSize) {
