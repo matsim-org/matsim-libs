@@ -60,10 +60,10 @@ import playground.ikaddoura.analysis.distance.Modus;
 
 public class BusCorridorControler {
 
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String outputDirectoryPath = "../../shared-svn/studies/ihab/busCorridor/output/outputSimulation";
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version1/network_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version1/population.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version1/config_busline.xml";
+	static String outputDirectoryPath = "../../shared-svn/studies/ihab/busCorridor/output_version1/outputSimulation";
 	static int lastInternalIteration = 0;
 	static double busStopTime = 30;
 	static double travelTimeBus = 3*60;
