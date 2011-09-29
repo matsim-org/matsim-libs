@@ -51,12 +51,10 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	private Map<Id, Double> expectedTravelTimes;
 	private Map<Id, Double> expectedAlternativeTravelTimes;
 	
-	protected double toleranceSlower = 1.25;
-	protected double toleranceFaster = 0.75;
-	protected double toleranceAlternativeRoute = 1.10;
+	public double toleranceSlower = 1.25;			// tau-
+	public double toleranceFaster = 0.75;			// tau+
+	public double toleranceAlternativeRoute = 1.10;	// tau
 	
-//	protected double initialGamma = 0.5;
-		
 	public CostNavigationTravelTimeLogger(Population population, Network network, TravelTime travelTime) {
 		this.population = population;
 		this.network = network;

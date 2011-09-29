@@ -50,6 +50,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 
 import playground.christoph.router.CostNavigationRouteFactory;
 import playground.christoph.router.CostNavigationTravelTimeLogger;
+import playground.christoph.router.NonLearningCostNavigationTravelTimeLogger;
 import playground.christoph.router.traveltime.LookupNetwork;
 import playground.christoph.router.traveltime.LookupNetworkFactory;
 import playground.christoph.router.traveltime.LookupTravelTime;
@@ -67,6 +68,15 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 */
 	/*package*/ int numReplanningThreads = 1;
 
+	/* 
+	 * Command line parameters
+	 */
+	/*package*/ boolean agentsLearn = true;
+	/*package*/ double gamma = 0.50;
+	/*package*/ double tau = 1.10;
+	/*package*/ double tauplus = 0.75;
+	/*package*/ double tauminus = 1.25;
+		
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
@@ -104,7 +114,17 @@ public class CostNavigationRouteController extends WithinDayController implement
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory, routeFactory);
-		costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime);
+		
+		if (agentsLearn) {
+			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime);			
+		} else {
+			costNavigationTravelTimeLogger = new NonLearningCostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime, this.gamma);
+			log.info("Agents learning is disabled - using constant gamma of " + this.gamma + "!");
+		}
+		costNavigationTravelTimeLogger.toleranceSlower = tauminus;
+		costNavigationTravelTimeLogger.toleranceFaster = tauplus;
+		costNavigationTravelTimeLogger.toleranceAlternativeRoute = tau;
+		
 		this.events.addHandler(costNavigationTravelTimeLogger);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
@@ -189,21 +209,82 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 * main
 	 * ===================================================================
 	 */
+	
+	private final static String NUMOFTHREADS = "-numofthreads";
+	private final static String REPLANNINGSHARE = "-replanningshare";
+	private final static String LOOKUPTABLEUPDATEINTERVAL = "-lookuptableupdateinterval";
+	private final static String AGENTSLEARN = "-agentslearn";
+	private final static String GAMMA = "-gamma";
+	private final static String TAU = "-tau";
+	private final static String TAUPLUS = "-tauplus";
+	private final static String TAUMINUS = "-tauminus";
+	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: CostNavigationRouteController config-file rerouting-share rerouting-threads");
-			System.out.println();
-		} else if (args.length != 4) {
-			log.error("Unexpected number of input arguments!");
-			log.error("Expected path to a config file (String), rerouting share (double, 0.0 ... 1.0), " +
-					"number of rerouting threads (1..n) and time interval to update the travel time lookup table (integer, 1..n).");
-			System.exit(0);
+			System.out.println("Usage: CostNavigationRouteController config-file parameters");
 		} else {
 			final CostNavigationRouteController controller = new CostNavigationRouteController(args);
-			controller.pDuringLegReplanning = Double.valueOf(args[1]);
-			controller.numReplanningThreads = Integer.valueOf(args[2]);
-			controller.updateLookupTravelTimeInterval = Integer.valueOf(args[3]);
+
+			// do not dump plans, network and facilities and the end
+			controller.setDumpDataAtEnd(false);
+						
+			// set parameter from command line
+			for (int i = 1; i < args.length; i++) {
+				if (args[i].equalsIgnoreCase(NUMOFTHREADS)) {
+					i++;
+					int threads = Integer.parseInt(args[i]);
+					if (threads < 1) threads = 1;
+					controller.numReplanningThreads = threads;
+					log.info("number of replanning threads: " + threads);
+				} else if (args[i].equalsIgnoreCase(REPLANNINGSHARE)) {
+					i++;
+					double share = Double.parseDouble(args[i]);
+					if (share > 1.0) share = 1.0;
+					else if (share < 0.0) share = 0.0;
+					controller.pDuringLegReplanning = share;
+					log.info("share of leg replanning agents: " + share);
+				} else if (args[i].equalsIgnoreCase(LOOKUPTABLEUPDATEINTERVAL)) {
+					i++;
+					int interval = Integer.parseInt(args[i]);
+					if (interval < 1) interval = 1;
+					controller.updateLookupTravelTimeInterval = interval;
+					log.info("travel time lookup table update interval: " + interval);
+				} else if (args[i].equalsIgnoreCase(AGENTSLEARN)) {
+					i++;
+					boolean agentsLearn = true;
+					if (args[i].toLowerCase().equals("false")) agentsLearn = false;
+					controller.agentsLearn = agentsLearn;
+					log.info("agents learn: " + agentsLearn);
+				} else if (args[i].equalsIgnoreCase(GAMMA)) {
+					i++;
+					double gamma = Double.parseDouble(args[i]);
+					if (gamma > 1.0) gamma = 1.0;
+					else if (gamma < 0.0) gamma = 0.0;
+					controller.gamma = gamma;
+					log.info("gamma: " + gamma);
+				} else if (args[i].equalsIgnoreCase(TAU)) {
+					i++;
+					double tau = Double.parseDouble(args[i]);
+					if (tau < 1.0) tau = 1.0;
+					controller.tau = tau;
+					log.info("tau: " + tau);
+				} else if (args[i].equalsIgnoreCase(TAUPLUS)) {
+					i++;
+					double tauplus = Double.parseDouble(args[i]);
+					if (tauplus > 1.0) tauplus = 1.0;
+					else if (tauplus < 0.0) tauplus = 0.0;
+					controller.tauplus = tauplus;
+					log.info("tauplus: " + tauplus);
+				} else if (args[i].equalsIgnoreCase(TAUMINUS)) {
+					i++;
+					double tauminus = Double.parseDouble(args[i]);
+					if (tauminus < 1.0) tauminus = 1.0;
+					controller.tauminus = tauminus;
+					log.info("tauminus: " + tauminus);
+				} else log.warn("Unknown Parameter: " + args[i]);
+			}
+			
 			controller.run();
 		}
 		System.exit(0);
