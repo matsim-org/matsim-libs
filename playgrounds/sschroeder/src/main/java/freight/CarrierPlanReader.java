@@ -13,12 +13,11 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.TourBuilder;
 
@@ -66,7 +65,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 	
 	public Double currentStartTime = null; 
 	
-	public Map<String,Shipment> currentShipments = null;
+	public Map<String,CarrierShipment> currentShipments = null;
 	
 	public Map<String,CarrierVehicle> vehicles = null;
 	
@@ -98,7 +97,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			currentCarrier = CarrierUtils.createCarrier(atts.getValue(ID), atts.getValue(LINKID));
 		}
 		if(name.equals(SHIPMENTS)){
-			currentShipments = new HashMap<String, Shipment>();
+			currentShipments = new HashMap<String, CarrierShipment>();
 		}
 		if(name.equals(SHIPMENT)){
 			Id from = makeId(atts.getValue(FROM));
@@ -108,7 +107,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			String endPickup = atts.getValue("endPickup");
 			String startDelivery = atts.getValue("startDelivery");
 			String endDelivery = atts.getValue("endDelivery");
-			Shipment shipment = null;
+			CarrierShipment shipment = null;
 			if(startPickup == null ){
 				shipment = CarrierUtils.createShipment(from, to, size, 0, 24*3600, 0, 24*3600);
 			}
@@ -129,6 +128,9 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			Integer cap = null;
 			if(capacity != null){
 				cap = getInt(capacity);
+				if(cap == 0){
+					logger.warn("vehicle " + vId + " capacity is 0.");
+				}
 			}
 			else{
 				throw new IllegalStateException("no capacity available");
@@ -151,12 +153,12 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			}
 			else if(atts.getValue(TYPE).equals("pickup")){
 				String id = atts.getValue(SHIPMENTID);
-				Shipment s = currentShipments.get(id);
+				CarrierShipment s = currentShipments.get(id);
 				currentTourBuilder.schedulePickup(s);
 			}
 			else if(atts.getValue(TYPE).equals("delivery")){
 				String id = atts.getValue(SHIPMENTID);
-				Shipment s = currentShipments.get(id);
+				CarrierShipment s = currentShipments.get(id);
 				currentTourBuilder.scheduleDelivery(s);
 			}
 			else if(atts.getValue(TYPE).equals("end")){

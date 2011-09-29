@@ -13,11 +13,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.CarrierCapabilities;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
@@ -124,7 +124,7 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 	static class TimeCluster {
 		TimeBin timeBin;
 		
-		public List<Contract> getContracts() {
+		public List<CarrierContract> getContracts() {
 			return contracts;
 		}
 
@@ -132,7 +132,7 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 			super();
 			this.timeBin = timeBin;
 		}
-		List<Contract> contracts = new ArrayList<Contract>();
+		List<CarrierContract> contracts = new ArrayList<CarrierContract>();
 	}
 	
 	private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryCarrierPlanBuilder.class);
@@ -167,7 +167,7 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 		locations.addAllLinks((Collection<Link>) network.getLinks().values());
 	}
 
-	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<Contract> contracts) {
+	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<CarrierContract> contracts) {
 		logger.info("build plan");
 		logger.info(contracts.size() + " number of contracts");
 		if(contracts.isEmpty()){
@@ -188,7 +188,7 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 			for(vrp.basics.Tour tour : vrpSolution){
 				List<TourElement> enRouteActivities = new ArrayList<Tour.TourElement>();
 				for(TourActivity act : tour.getActivities()){
-					Shipment shipment = getShipment(act.getCustomer());
+					CarrierShipment shipment = getShipment(act.getCustomer());
 					if(act instanceof vrp.basics.EnRouteDelivery){
 						enRouteActivities.add(new Delivery(shipment));
 					}
@@ -214,14 +214,14 @@ public class RAndRPickupAndDeliveryCarrierPlanBuilder {
 	}
 		
 
-	private void clusterContracts(Collection<Contract> contracts) {
-		for(Contract c : contracts){
+	private void clusterContracts(Collection<CarrierContract> contracts) {
+		for(CarrierContract c : contracts){
 			TimeCluster timeCluster = timeClusters.getCluster(c.getShipment().getPickupTimeWindow().getStart());
 			timeCluster.contracts.add(c);
 		}
 	}
 
-	private Shipment getShipment(Customer customer) {
+	private CarrierShipment getShipment(Customer customer) {
 		return vrpTrafo.getShipment(makeId(customer.getId()));
 	}
 

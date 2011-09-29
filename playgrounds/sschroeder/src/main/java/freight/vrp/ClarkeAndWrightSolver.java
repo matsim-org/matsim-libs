@@ -4,15 +4,13 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-
+import playground.mzilske.freight.CarrierContract;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.Shipment;
 import vrp.algorithms.clarkeAndWright.ClarkeAndWright;
 import vrp.algorithms.clarkeAndWright.ClarkeWrightCapacityConstraint;
 import vrp.api.VRP;
 import vrp.basics.Tour;
-import vrp.basics.VRPDistanceMatrixBuilder;
 
 public class ClarkeAndWrightSolver implements VRPSolver {
 
@@ -27,12 +25,12 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 	}
 
 	@Override
-	public void solve(Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
+	public void solve(Collection<CarrierContract> contracts, CarrierVehicle carrierVehicle) {
 		Id depotId = findDepotId(contracts);
 		VrpBuilder vrpBuilder = new VrpBuilder(depotId);
 		vrpBuilder.setConstraints(new ClarkeWrightCapacityConstraint(carrierVehicle.getCapacity()));
-		for(Contract c : contracts){
-			Shipment s = c.getShipment();
+		for(CarrierContract c : contracts){
+			CarrierShipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
 		vrpBuilder.setVRPTransformation(vrpTransformation);
@@ -42,8 +40,8 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 		tours.addAll(clarkAndWright.getSolution());
 	}
 	
-	private Id findDepotId(Collection<Contract> contracts) {
-		for(Contract c : contracts){
+	private Id findDepotId(Collection<CarrierContract> contracts) {
+		for(CarrierContract c : contracts){
 			return c.getShipment().getFrom();
 		}
 		throw new RuntimeException("no contracts or shipments");

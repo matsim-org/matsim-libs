@@ -23,7 +23,6 @@ package vrp.api;
 
 import java.util.Map;
 
-
 import vrp.basics.VehicleType;
 
 /**

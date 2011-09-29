@@ -9,17 +9,19 @@ import java.util.List;
 
 import kid.KiDDataReader;
 import kid.KiDPlanAgentCreator;
+import kid.KiDStatWriter;
 import kid.KiDUtils;
 import kid.ScheduledVehicles;
 import kid.filter.And;
-import kid.filter.BerlinFilter;
-import kid.filter.GeoRegionFilterV2;
+import kid.filter.AllActivitiesInSelectedRegionsFilter;
 import kid.filter.LogicVehicleFilter;
+import kid.filter.StuttgartRegionFilter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -50,25 +52,27 @@ public class KiDPopulationGenerator {
 //		andFilter.addFilter(new BusinessSectorFilter());
 		kidReader.setVehicleFilter(andFilter);
 		List<SimpleFeature> regions = new ArrayList<SimpleFeature>();
-		NutsRegionShapeReader regionReader = new NutsRegionShapeReader(regions, new BerlinFilter(), null);
+		NutsRegionShapeReader regionReader = new NutsRegionShapeReader(regions, new KarlsruheNetworkCreator.KarlsruheRegierungsBezirksFilter(), null);
 		regionReader.read(directory + "regions_europe_wgsUtm32N.shp");
-		kidReader.setScheduledVehicleFilter(new GeoRegionFilterV2(regions));
+		kidReader.setScheduledVehicleFilter(new AllActivitiesInSelectedRegionsFilter(regions));
 		kidReader.run();
 		
 		Config config = ConfigUtils.createConfig();
 		config.addCoreModules();
 		ScenarioImpl scen = (ScenarioImpl)ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scen).readFile("networks/berlinRoads.xml");
+		new MatsimNetworkReader(scen).readFile("networks/karlsruhe.xml");
+		NetworkCleaner cleaner = new NetworkCleaner();
+		cleaner.run(scen.getNetwork());
 		
 		KiDPlanAgentCreator planAgentCreator = new KiDPlanAgentCreator(scheduledVehicles);
-		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM33N());
+		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM32N());
 		planAgentCreator.setNetwork(scen.getNetwork());
 		PlansCalcRoute router = new PlansCalcRoute(null, scen.getNetwork(), 
 				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
 		planAgentCreator.setRouter(router);
 		planAgentCreator.createPlanAgents();
-		planAgentCreator.writePlans("output/berlinPlans.xml");
+		planAgentCreator.writePlans("output/karlsruhePlans.xml");
 		
 	}
 

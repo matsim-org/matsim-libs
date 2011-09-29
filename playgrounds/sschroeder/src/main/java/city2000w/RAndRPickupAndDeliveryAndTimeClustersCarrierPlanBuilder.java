@@ -11,13 +11,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.CarrierCapabilities;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.Shipment.TimeWindow;
+import playground.mzilske.freight.TimeWindow;
 import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
@@ -34,17 +35,17 @@ public class RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder implements 
 private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.class);
 	
 	public static class Schedule {
-		private Collection<Contract> contracts;
+		private Collection<CarrierContract> contracts;
 		
 		private double start;
 
-		public Schedule(Collection<Contract> contracts, double start) {
+		public Schedule(Collection<CarrierContract> contracts, double start) {
 			super();
 			this.contracts = contracts;
 			this.start = start;
 		}
 
-		public Collection<Contract> getContracts() {
+		public Collection<CarrierContract> getContracts() {
 			return contracts;
 		}
 
@@ -54,11 +55,11 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 	}
 	
 	static class TourCluster {
-		private Collection<Contract> contracts;
+		private Collection<CarrierContract> contracts;
 		
 		private Id clusterId;
 
-		public TourCluster(Id clusterId, Collection<Contract> contracts) {
+		public TourCluster(Id clusterId, Collection<CarrierContract> contracts) {
 			super();
 			this.contracts = contracts;
 			this.clusterId = clusterId;
@@ -68,7 +69,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 			return clusterId;
 		}
 
-		public Collection<Contract> getContracts() {
+		public Collection<CarrierContract> getContracts() {
 			return contracts;
 		}
 	}
@@ -97,7 +98,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 	 * @see city2000w.CarrierPlanBuilder#buildPlan(playground.mzilske.freight.CarrierCapabilities, java.util.Collection)
 	 */
 	@Override
-	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<Contract> carrierContracts) {
+	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<CarrierContract> carrierContracts) {
 		if(carrierContracts.isEmpty()){
 			return getEmptyPlan(carrierCapabilities);
 		}
@@ -108,7 +109,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 		List<Schedule> schedules = getSchedules(carrierContracts);
 		CarrierVehicle carrierVehicle = carrierCapabilities.getCarrierVehicles().iterator().next();
 		for(Schedule schedule : schedules){
-			Collection<Contract> contracts = schedule.getContracts();
+			Collection<CarrierContract> contracts = schedule.getContracts();
 			if(contracts.isEmpty()){
 				continue;
 			}
@@ -118,7 +119,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 			Id vehicleStartLocation = carrierVehicle.getLocation();
 			tourBuilder.scheduleStart(vehicleStartLocation);
 			for(TourCluster tourCluster : clusters){
-				Collection<Contract> clusteredContracts = tourCluster.getContracts();
+				Collection<CarrierContract> clusteredContracts = tourCluster.getContracts();
 				if(clusteredContracts.isEmpty()){
 					continue;
 				}
@@ -129,7 +130,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 				
 				for(vrp.basics.Tour tour : vrpSolution){
 					for(TourActivity act : tour.getActivities()){
-						Shipment shipment = getShipment(act.getCustomer());
+						CarrierShipment shipment = getShipment(act.getCustomer());
 						if(act instanceof vrp.basics.EnRouteDelivery){
 							assertShipmentNotNull(shipment);
 							tourBuilder.schedule(new Delivery(shipment));
@@ -162,10 +163,10 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 		return;
 	}
 
-	private List<TourCluster> getTourCluster(Collection<Contract> contracts) {
-		Collection<Contract> vorlauf = new ArrayList<Contract>();
-		Collection<Contract> nachlauf = new ArrayList<Contract>();
-		for(Contract c : contracts){
+	private List<TourCluster> getTourCluster(Collection<CarrierContract> contracts) {
+		Collection<CarrierContract> vorlauf = new ArrayList<CarrierContract>();
+		Collection<CarrierContract> nachlauf = new ArrayList<CarrierContract>();
+		for(CarrierContract c : contracts){
 			if(isVorlauf(c.getShipment())){
 				vorlauf.add(c);
 			}
@@ -189,7 +190,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 	}
 
 
-	private void assertSequenceOfTourElementsCorrect(List<TourElement> tourActivities, Collection<Contract> carrierContracts, List<TourCluster> clusters, List<Schedule> schedules) {
+	private void assertSequenceOfTourElementsCorrect(List<TourElement> tourActivities, Collection<CarrierContract> carrierContracts, List<TourCluster> clusters, List<Schedule> schedules) {
 		TimeWindow tw = null;
 		for(TourElement e : tourActivities){
 			if(tw == null){
@@ -209,11 +210,11 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 		
 	}
 
-	private List<Schedule> getSchedules(Collection<Contract> carrierContracts) {
+	private List<Schedule> getSchedules(Collection<CarrierContract> carrierContracts) {
 		List<Schedule> schedules = new ArrayList<RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule>();
-		List<Contract> forenoon = new ArrayList<Contract>();
-		List<Contract> afternoon = new ArrayList<Contract>();
-		for(Contract c : carrierContracts){
+		List<CarrierContract> forenoon = new ArrayList<CarrierContract>();
+		List<CarrierContract> afternoon = new ArrayList<CarrierContract>();
+		for(CarrierContract c : carrierContracts){
 			if(c.getShipment().getPickupTimeWindow().getStart() < WORKING_PERIOD){
 				forenoon.add(c);
 			}
@@ -226,7 +227,7 @@ private static Logger logger = Logger.getLogger(RAndRPickupAndDeliveryAndTimeClu
 		return schedules;
 	}
 
-	private Shipment getShipment(Customer customer) {
+	private CarrierShipment getShipment(Customer customer) {
 		return vrpTrafo.getShipment(makeId(customer.getId()));
 	}
 

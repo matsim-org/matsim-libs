@@ -4,9 +4,9 @@ import org.matsim.run.OTFVis;
 
 public class MVIVisualizer {
 	public static void main(String[] args) {
-		String network = "/Volumes/projekte/LogoTakt/SaWu/verkehrsangebot/germany_bigroads_fused.xml";
+		String network = "../playgrounds/sschroeder/networks/karlsruhe.xml";
 		String events = "output/ITERS/it.0/0.events.xml.gz";
-		String mvi = "../logotakt_sebastian/output/stueckgut.mvi";
+		String mvi =  "../playgrounds/sschroeder/output/karlsruhe.mvi";
 
 		
 //		OTFVis.playNetwork(network);

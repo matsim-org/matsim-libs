@@ -13,7 +13,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierImpl;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.FreightConstants;
 import playground.mzilske.freight.ScheduledTour;
@@ -31,7 +31,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 	
 	private int idCounter = 0;
 	
-	private Map<Shipment,Id> registeredShipments = new HashMap<Shipment, Id>();
+	private Map<CarrierShipment,Id> registeredShipments = new HashMap<CarrierShipment, Id>();
 
 	public CarrierPlanWriter(Collection<Carrier> carriers) {
 		super();
@@ -141,8 +141,8 @@ public class CarrierPlanWriter extends MatsimXmlWriter{
 		writer.write("\t\t\t<vehicles>\n");
 	}
 
-	private void registeredShipments(List<Shipment> shipments) {
-		for(Shipment s : shipments){
+	private void registeredShipments(List<CarrierShipment> shipments) {
+		for(CarrierShipment s : shipments){
 			Id shipmentId = createId();
 			registeredShipments.put(s, shipmentId);
 		}

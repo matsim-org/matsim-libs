@@ -7,7 +7,6 @@ import kid.ScheduledTransportChain;
 import kid.ScheduledVehicle;
 import kid.ScheduledVehicleFilter;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class GeoBoxFilter implements ScheduledVehicleFilter {

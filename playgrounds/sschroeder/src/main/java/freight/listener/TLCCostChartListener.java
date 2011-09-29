@@ -11,9 +11,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import freight.ShipperAgent;
-import freight.TotalCostStatusEvent;
-
 public class TLCCostChartListener implements ShipperTotalCostStatusHandler{
 
 	private Map<Id,List<Double>> costMap = new HashMap<Id, List<Double>>();

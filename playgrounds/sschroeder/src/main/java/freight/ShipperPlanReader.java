@@ -14,7 +14,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
 import playground.mzilske.freight.TSPOffer;
-import city2000w.TRBShippersContractGenerator.TimeProfile;
+import trbFolder.TRBShippersContractGenerator.TimeProfile;
 
 public class ShipperPlanReader extends MatsimXmlParser{
 
@@ -96,7 +96,7 @@ public class ShipperPlanReader extends MatsimXmlParser{
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equals("scheduledFlow")){
-			ScheduledCommodityFlow scheduledComFlow = ShipperUtils.createScheduledCommodityFlow(currentComFlow, currentShipments, currentTspOffer);
+			ScheduledCommodityFlow scheduledComFlow = ShipperUtils.createScheduledCommodityFlow(currentShipper.getId(), currentComFlow, currentShipments, currentTspOffer);
 			currentScheduledFlows.add(scheduledComFlow);
 		}
 		if(name.equals("scheduledFlows")){

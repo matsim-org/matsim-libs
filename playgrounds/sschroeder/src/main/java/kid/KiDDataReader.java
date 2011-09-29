@@ -26,7 +26,7 @@ import org.matsim.core.utils.io.IOUtils;
  * Chain-Data (KiD2002_Fahrtenketten-Datei.txt)
  * Leg-Data (KiD2002_(Einzel)Fahrten-Datei.txt)
  * 
- * Currently, transport-chains and legs must be in ascending order (as it does in the orginal data).
+ * Currently, transport-chains and legs must be in ascending order (as it is in the original data).
  * 
  * @author sschroeder
  *

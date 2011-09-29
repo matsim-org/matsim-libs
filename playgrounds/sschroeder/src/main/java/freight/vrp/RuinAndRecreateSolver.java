@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.CarrierContract;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.Shipment;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
@@ -42,7 +42,7 @@ public class RuinAndRecreateSolver implements VRPSolver {
 	 * @see freight.VRPSolver#solve(java.util.Collection, playground.mzilske.freight.CarrierVehicle)
 	 */
 	@Override
-	public void solve(Collection<Contract> contracts, CarrierVehicle carrierVehicle) {
+	public void solve(Collection<CarrierContract> contracts, CarrierVehicle carrierVehicle) {
 		vrpTransformation.clear();
 		vrpSolution = null;
 		Id depotId = carrierVehicle.getLocation();
@@ -51,8 +51,8 @@ public class RuinAndRecreateSolver implements VRPSolver {
 		costs.speed = 25;
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(new CapacityPickupsDeliveriesSequenceConstraint(carrierVehicle.getCapacity()));
-		for(Contract c : contracts){
-			Shipment s = c.getShipment();
+		for(CarrierContract c : contracts){
+			CarrierShipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
 		vrpBuilder.setVRPTransformation(vrpTransformation);

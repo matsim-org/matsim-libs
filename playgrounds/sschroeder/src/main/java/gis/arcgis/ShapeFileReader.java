@@ -3,8 +3,6 @@ package gis.arcgis;
 import java.io.File;
 import java.io.IOException;
 
-import kid.filter.SimpleFeatureFilter;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;

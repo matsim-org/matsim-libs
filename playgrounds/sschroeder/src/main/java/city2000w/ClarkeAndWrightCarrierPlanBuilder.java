@@ -11,11 +11,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.CarrierCapabilities;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
@@ -50,7 +50,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 		locations.addAllLinks((Collection<Link>) network.getLinks().values());
 	}
 
-	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<Contract> contracts) {
+	public CarrierPlan buildPlan(CarrierCapabilities carrierCapabilities, Collection<CarrierContract> contracts) {
 		if(contracts.isEmpty()){
 			return getEmptyPlan(carrierCapabilities);
 		}
@@ -67,7 +67,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 				List<Delivery> deliveriesAtDepot = new ArrayList<Delivery>();
 				List<TourElement> enRouteActivities = new ArrayList<Tour.TourElement>();
 				for(TourActivity act : tour.getActivities()){
-					Shipment shipment = getShipment(makeId(act.getCustomer().getId()));
+					CarrierShipment shipment = getShipment(makeId(act.getCustomer().getId()));
 					if(act instanceof vrp.basics.DepotDelivery){
 						pickupsAtDepot.add(new Pickup(shipment));
 						enRouteActivities.add(new Delivery(shipment));
@@ -102,7 +102,7 @@ public class ClarkeAndWrightCarrierPlanBuilder {
 		return new IdImpl(id);
 	}
 
-	private Shipment getShipment(Id customerId) {
+	private CarrierShipment getShipment(Id customerId) {
 		return vrpTrafo.getShipment(customerId);
 	}
 

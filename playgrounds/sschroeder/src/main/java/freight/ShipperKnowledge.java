@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import city2000w.TRBShippersContractGenerator.TimeProfile;
+import trbFolder.TRBShippersContractGenerator.TimeProfile;
+
 
 
 

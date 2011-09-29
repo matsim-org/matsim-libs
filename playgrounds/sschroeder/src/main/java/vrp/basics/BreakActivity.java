@@ -17,8 +17,6 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.Random;
-
 import vrp.api.Customer;
 
 public class BreakActivity extends TourActivity{

@@ -9,8 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import city2000w.TRBShippersContractGenerator.TimeProfile;
-
+import trbFolder.TRBShippersContractGenerator.TimeProfile;
 import utils.XmlWriterUtils;
 
 
@@ -130,16 +129,16 @@ public class ShipperPlanWriter extends MatsimXmlWriter{
 	private void startScheduledFlow(ScheduledCommodityFlow sCF, BufferedWriter writer) throws IOException {
 		writer.write(XmlWriterUtils.tabs(4) + "<scheduledFlow ");
 		writer.write("comFlowId=" + XmlWriterUtils.inQuotation(getComFlowId(sCF.getCommodityFlow())) + " ");
-		writer.write("tspId=" + XmlWriterUtils.inQuotation(sCF.getTspOffer().getId().toString()) + " ");
-		writer.write("price=" + XmlWriterUtils.inQuotation(sCF.getTspOffer().getPrice()) + ">" + XmlWriterUtils.newLine());
+		writer.write("tspId=" + XmlWriterUtils.inQuotation(sCF.getContracts().iterator().next().getOffer().getId().toString()) + " ");
+		writer.write("price=" + XmlWriterUtils.inQuotation(sCF.getContracts().iterator().next().getOffer().getPrice()) + ">" + XmlWriterUtils.newLine());
 	}
 
 	private void startAndEndShipments(Collection<ShipperShipment> shipments, BufferedWriter writer) throws IOException {
 		for(ShipperShipment s : shipments){
 			writer.write(XmlWriterUtils.tabs(5) + "<shipment ");
 			writer.write("size=" + XmlWriterUtils.inQuotation(s.getSize()) + " ");
-			writer.write("startPickup=" + XmlWriterUtils.inQuotation(s.getPickTimeWindow().getStart()) + " ");
-			writer.write("endPickup=" + XmlWriterUtils.inQuotation(s.getPickTimeWindow().getEnd()) + " ");
+			writer.write("startPickup=" + XmlWriterUtils.inQuotation(s.getPickupTimeWindow().getStart()) + " ");
+			writer.write("endPickup=" + XmlWriterUtils.inQuotation(s.getPickupTimeWindow().getEnd()) + " ");
 			writer.write("startDelivery=" + XmlWriterUtils.inQuotation(s.getDeliveryTimeWindow().getStart()) + " ");
 			writer.write("endDelivery=" + XmlWriterUtils.inQuotation(s.getDeliveryTimeWindow().getEnd()) + "/>" + XmlWriterUtils.newLine());
 		}

@@ -13,9 +13,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.mzilske.freight.CarrierContract;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour;
 import playground.mzilske.freight.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
@@ -31,9 +31,9 @@ import vrp.basics.MultipleDepotsInitialSolutionFactory;
 import vrp.basics.TourActivity;
 import vrp.basics.VehicleType;
 
-public class RRSolver implements VRPSolver{
+public class RRPDSolver implements VRPSolver{
 	
-	private static Logger logger = Logger.getLogger(RRSolver.class);
+	private static Logger logger = Logger.getLogger(RRPDSolver.class);
 	
 	private int capacity;
 	
@@ -41,7 +41,7 @@ public class RRSolver implements VRPSolver{
 	
 	private Network network;
 	
-	private Collection<Shipment> shipments;
+	private Collection<CarrierShipment> shipments;
 	
 	private Collection<CarrierVehicle> vehicles;
 	
@@ -81,7 +81,7 @@ public class RRSolver implements VRPSolver{
 		this.iniSolutionFactory = iniSolutionFactory;
 	}
 
-	public RRSolver(Collection<Shipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
+	public RRPDSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
 		super();
 		this.shipments = shipments;
 		this.vehicles = vehicles;
@@ -122,7 +122,7 @@ public class RRSolver implements VRPSolver{
 			TourBuilder tourBuilder = new TourBuilder();
 			boolean tourStarted = false;
 			for(TourActivity act : tour.getActivities()){
-				Shipment shipment = getShipment(act.getCustomer());
+				CarrierShipment shipment = getShipment(act.getCustomer());
 				if(act instanceof vrp.basics.OtherDepotActivity){
 					if(tourStarted){
 						tourBuilder.scheduleEnd(makeId(act.getCustomer().getLocation().getId()));
@@ -160,7 +160,7 @@ public class RRSolver implements VRPSolver{
 		});
 	}
 	
-	private Shipment getShipment(Customer customer) {
+	private CarrierShipment getShipment(Customer customer) {
 		return vrpTransformation.getShipment(makeId(customer.getId()));
 	}
 
@@ -173,7 +173,7 @@ public class RRSolver implements VRPSolver{
 		}
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(constraints);
-		for(Shipment s : shipments){
+		for(CarrierShipment s : shipments){
 			vrpTransformation.addShipment(s);
 		}
 		vrpBuilder.setVRPTransformation(vrpTransformation);
@@ -196,7 +196,7 @@ public class RRSolver implements VRPSolver{
 	}
 
 	@Override
-	public void solve(Collection<Contract> contracts,
+	public void solve(Collection<CarrierContract> contracts,
 			CarrierVehicle carrierVehicle) {
 		// TODO Auto-generated method stub
 		

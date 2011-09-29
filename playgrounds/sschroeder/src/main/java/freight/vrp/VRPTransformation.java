@@ -6,10 +6,9 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
-
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.Shipment;
 import vrp.api.Customer;
 import vrp.api.Node;
@@ -26,11 +25,11 @@ import vrp.basics.VrpUtils;
 
 public class VRPTransformation {
 	
-	private HashMap<Shipment,Id> fromCustomers = new HashMap<Shipment, Id>();
+	private HashMap<CarrierShipment,Id> fromCustomers = new HashMap<CarrierShipment, Id>();
 	
-	private HashMap<Shipment,Id> toCustomers = new HashMap<Shipment, Id>();
+	private HashMap<CarrierShipment,Id> toCustomers = new HashMap<CarrierShipment, Id>();
 	
-	private HashMap<Id, Shipment> shipments = new HashMap<Id, Shipment>();
+	private HashMap<Id, CarrierShipment> shipments = new HashMap<Id, CarrierShipment>();
 	
 	private HashMap<Id,Customer> customers = new HashMap<Id,Customer>();
 	
@@ -57,17 +56,17 @@ public class VRPTransformation {
 		customers.put(customerId, customer);
 	}
 
-	public void addShipments(Collection<Shipment> shipments){
-		for(Shipment s : shipments){
+	public void addShipments(Collection<CarrierShipment> shipments){
+		for(CarrierShipment s : shipments){
 			addShipment(s);
 		}
 	}
 
-	public void addShipment(Shipment shipment){
+	public void addShipment(CarrierShipment shipment){
 		addNewShipment(shipment);
 	}
 	
-	private void addNewShipment(Shipment shipment) {
+	private void addNewShipment(CarrierShipment shipment) {
 		Customer fromCustomer = makeFromCustomer(shipment);
 		Customer toCustomer = makeToCustomer(shipment);
 		fromCustomer.setRelation(VrpUtils.createRelation(toCustomer));
@@ -75,7 +74,7 @@ public class VRPTransformation {
 		updateMaps(shipment, fromCustomer, toCustomer);
 	}
 
-	public void removeShipments(Collection<Shipment> shipments){
+	public void removeShipments(Collection<CarrierShipment> shipments){
 		for(Shipment s : shipments){
 			removeShipment(s);
 		}
@@ -102,7 +101,7 @@ public class VRPTransformation {
 		return customers.get(id);
 	}
 
-	public Shipment getShipment(Id customerId){
+	public CarrierShipment getShipment(Id customerId){
 		return shipments.get(customerId);
 	}
 
@@ -122,7 +121,7 @@ public class VRPTransformation {
 		nodes.clear();
 	}
 
-	private void updateMaps(Shipment shipment, Customer fromCustomer,
+	private void updateMaps(CarrierShipment shipment, Customer fromCustomer,
 			Customer toCustomer) {
 		customers.put(makeId(fromCustomer.getId()),fromCustomer);
 		customers.put(makeId(toCustomer.getId()),toCustomer);

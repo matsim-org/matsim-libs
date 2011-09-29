@@ -11,7 +11,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierPlan;
 import freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;

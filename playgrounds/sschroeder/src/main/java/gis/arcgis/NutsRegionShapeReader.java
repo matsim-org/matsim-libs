@@ -1,6 +1,5 @@
 package gis.arcgis;
 
-import java.io.IOException;
 import java.util.List;
 
 import kid.GeotoolsTransformation;

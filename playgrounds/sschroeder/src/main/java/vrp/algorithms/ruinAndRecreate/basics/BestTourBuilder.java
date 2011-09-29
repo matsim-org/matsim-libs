@@ -18,6 +18,7 @@
 package vrp.algorithms.ruinAndRecreate.basics;
 
 import org.apache.log4j.Logger;
+
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.algorithms.ruinAndRecreate.api.TourBuilder;
 import vrp.api.Constraints;

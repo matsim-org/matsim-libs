@@ -5,7 +5,6 @@ import kid.WIVERMobsimFactory;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -41,8 +40,8 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 		config.addCoreModules();
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.addSimulationConfigGroup(new SimulationConfigGroup());
-		config.simulation().setEndTime(12*3600);
+//		config.addSimulationConfigGroup(new SimulationConfigGroup());
+//		config.simulation().setEndTime(12*3600);
 		scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		readNetwork(NETWORK_FILENAME);
 		readPopulation(PLAN_FILENAME);
@@ -56,8 +55,8 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/berlinRoads.xml";
-		PLAN_FILENAME = "../playgrounds/sschroeder/output/berlinPlans.xml";
+		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruhe.xml";
+		PLAN_FILENAME = "../playgrounds/sschroeder/output/karlsruhePlans.xml";
 	}
 
 	private void readNetwork(String networkFilename) {

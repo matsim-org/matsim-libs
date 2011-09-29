@@ -5,7 +5,10 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-public class ShipperImpl {
+import playground.mzilske.freight.api.Actor;
+
+
+public class ShipperImpl implements Actor{
 	private Id id;
 	
 	private ShipperPlan selectedPlan;

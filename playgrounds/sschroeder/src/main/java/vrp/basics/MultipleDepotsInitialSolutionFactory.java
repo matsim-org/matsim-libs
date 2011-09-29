@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
 import vrp.api.Customer;
 import vrp.api.VRP;
 

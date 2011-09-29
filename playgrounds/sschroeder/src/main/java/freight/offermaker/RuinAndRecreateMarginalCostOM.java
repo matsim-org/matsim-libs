@@ -1,32 +1,22 @@
 package freight.offermaker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-
-import freight.CarrierUtils;
-import freight.vrp.Locations;
 
 import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierCostFunction;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.OfferMaker;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.Tour.Delivery;
-import playground.mzilske.freight.Tour.Pickup;
-import playground.mzilske.freight.Tour.TourElement;
-import vrp.api.Customer;
-import vrp.basics.Tour;
-import vrp.basics.VrpUtils;
+import freight.CarrierUtils;
+import freight.vrp.Locations;
 
 public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 
@@ -77,8 +67,8 @@ public class RuinAndRecreateMarginalCostOM implements OfferMaker{
 //			}
 		}
 
-		Shipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
-		List<Contract> carrierContracts = new ArrayList<Contract>(carrier.getContracts());
+		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
+		List<CarrierContract> carrierContracts = new ArrayList<CarrierContract>(carrier.getContracts());
 		double scoreWithoutRequestedShipment = 0.0;
 		double mcCost;
 

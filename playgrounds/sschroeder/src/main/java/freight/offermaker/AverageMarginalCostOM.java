@@ -13,9 +13,10 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.ScheduledTour;
 import playground.mzilske.freight.Shipment;
@@ -39,13 +40,13 @@ import freight.vrp.VRPTransformation;
 public class AverageMarginalCostOM implements OfferMaker{
 	
 	public static class AvgMarginalCostCalculator {
-		private Collection<Contract> currentContracts;
+		private Collection<CarrierContract> currentContracts;
 		
 		private Network network;
 		
 		private Id depotLocation;
 
-		public AvgMarginalCostCalculator(Collection<Contract> currentContracts, Network network, Id depotLocation) {
+		public AvgMarginalCostCalculator(Collection<CarrierContract> currentContracts, Network network, Id depotLocation) {
 			super();
 			this.currentContracts = currentContracts;
 			this.network = network;
@@ -56,7 +57,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 			double sumOfWeights = 0.0;
 			double weightOfRequestedShipment = getBeeLineDistance(depotLocation, requestedShipment) * size(requestedShipment); 
 			sumOfWeights += weightOfRequestedShipment;
-			for(Contract c : currentContracts){
+			for(CarrierContract c : currentContracts){
 				sumOfWeights += getBeeLineDistance(depotLocation, c.getShipment()) * size(c.getShipment());
 			}
 			double avgMC = weightOfRequestedShipment/sumOfWeights * totalDistance;
@@ -68,7 +69,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 			double sumOfWeights = 0.0;
 			double weightOfRequestedShipment = getBeeLineTime(depotLocation, requestedShipment) * size(requestedShipment); 
 			sumOfWeights += weightOfRequestedShipment;
-			for(Contract c : currentContracts){
+			for(CarrierContract c : currentContracts){
 				sumOfWeights += getBeeLineTime(depotLocation, c.getShipment()) * size(c.getShipment());
 			}
 			double avgMC = weightOfRequestedShipment/sumOfWeights * totalTime;
@@ -201,8 +202,8 @@ public class AverageMarginalCostOM implements OfferMaker{
 		if(carrier.getSelectedPlan() == null){
 			return;
 		}
-		for(Contract c : carrier.getContracts()){
-			Shipment s = c.getShipment();
+		for(CarrierContract c : carrier.getContracts()){
+			CarrierShipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
 		for(ScheduledTour t : carrier.getSelectedPlan().getScheduledTours()){
@@ -241,7 +242,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 			offer.setPrice(memorizedPrice);
 			return offer;
 		}
-		Shipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
+		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
 		vrpTransformation.addShipment(requestedShipment);
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;

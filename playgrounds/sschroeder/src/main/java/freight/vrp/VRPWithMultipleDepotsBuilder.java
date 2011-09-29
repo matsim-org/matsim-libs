@@ -13,7 +13,6 @@ import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.Tour;
 import vrp.basics.VRPWithMultipleDepotsAndVehiclesImpl;
-import vrp.basics.VRPWithMultipleDepotsImpl;
 import vrp.basics.Vehicle;
 import vrp.basics.VehicleType;
 

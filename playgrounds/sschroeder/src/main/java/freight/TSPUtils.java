@@ -11,7 +11,8 @@ import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPKnowledge;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TSPShipment.TimeWindow;
+import playground.mzilske.freight.TimeWindow;
+import playground.mzilske.freight.TransportServiceProvider;
 import playground.mzilske.freight.TransportServiceProviderImpl;
 
 public class TSPUtils {
@@ -23,7 +24,7 @@ public class TSPUtils {
 		return tsp;
 	}
 	
-	public static void createAndAddTranshipmentCentre(TransportServiceProviderImpl tsp, String tccLocationId){
+	public static void createAndAddTranshipmentCentre(TransportServiceProvider tsp, String tccLocationId){
 		if(tsp.getTspCapabilities() != null){
 			tsp.getTspCapabilities().getTransshipmentCentres().add(makeId(tccLocationId));
 		}
@@ -49,7 +50,7 @@ public class TSPUtils {
 		return new TSPContract(shipment, new TSPOffer());
 	}
 	
-	public static void createAndAddTSPContract(TransportServiceProviderImpl tsp, TSPShipment shipment){
+	public static void createAndAddTSPContract(TransportServiceProvider tsp, TSPShipment shipment){
 		tsp.getContracts().add(createTSPContract(shipment));
 	}
 	
@@ -61,10 +62,10 @@ public class TSPUtils {
 			int nOfShipmentsWithMaxVehicleCap = (int)Math.floor(quotient);
 			int restOfShipment = nOfPallets % maxShipmentSize;
 			for(int i=0;i<nOfShipmentsWithMaxVehicleCap;i++){
-				shipments.add(createTSPShipment(shipment.getFrom(), shipment.getTo(), maxShipmentSize, shipment.getPickUpTimeWindow(), shipment.getDeliveryTimeWindow()));
+				shipments.add(createTSPShipment(shipment.getFrom(), shipment.getTo(), maxShipmentSize, shipment.getPickupTimeWindow(), shipment.getDeliveryTimeWindow()));
 			}
 			if(restOfShipment > 0){
-				shipments.add(createTSPShipment(shipment.getFrom(), shipment.getTo(), restOfShipment, shipment.getPickUpTimeWindow(), shipment.getDeliveryTimeWindow()));
+				shipments.add(createTSPShipment(shipment.getFrom(), shipment.getTo(), restOfShipment, shipment.getPickupTimeWindow(), shipment.getDeliveryTimeWindow()));
 			}
 		}
 		else{

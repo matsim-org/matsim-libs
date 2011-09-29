@@ -1,24 +1,21 @@
 package freight.offermaker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.gbl.MatsimRandom;
 
 import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierCostFunction;
+import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.OfferMaker;
-import playground.mzilske.freight.Shipment;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
-import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder.Schedule;
 import freight.CarrierUtils;
 import freight.vrp.Locations;
 import freight.vrp.VRPTransformation;
@@ -71,13 +68,13 @@ public class RuinAndRecreateAverageMarginalCostOM_V2 implements OfferMaker{
 //			}
 		}
 		VRPTransformation vrpTransformation = new VRPTransformation(locations);
-		for(Contract c : carrier.getContracts()){
-			Shipment s = c.getShipment();
+		for(CarrierContract c : carrier.getContracts()){
+			CarrierShipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
-		Shipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
+		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
 		vrpTransformation.addShipment(requestedShipment);
-		List<Contract> carrierContracts = new ArrayList<Contract>(carrier.getContracts());
+		List<CarrierContract> carrierContracts = new ArrayList<CarrierContract>(carrier.getContracts());
 		carrierContracts.add(CarrierUtils.createContract(requestedShipment, new CarrierOffer()));
 		CarrierPlan plan = carrierPlanBuilder.buildPlan(carrier.getCarrierCapabilities(), carrierContracts);
 		double tourCost = plan.getScore();

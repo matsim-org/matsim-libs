@@ -11,11 +11,17 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
 import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
+import playground.mzilske.freight.events.ShipperTSPContractAcceptEventHandler;
+import playground.mzilske.freight.events.ShipperTSPContractCanceledEvent;
+import playground.mzilske.freight.events.ShipperTSPContractCanceledEventHandler;
+import playground.mzilske.freight.events.TSPShipmentDeliveredEvent;
+import playground.mzilske.freight.events.TSPShipmentDeliveredEventHandler;
+import playground.mzilske.freight.events.TSPShipmentPickUpEvent;
+import playground.mzilske.freight.events.TSPShipmentPickUpEventHandler;
 import freight.api.ShipperAgentFactory;
-import freight.listener.ShipperDetailedCostStatusHandler;
-import freight.listener.ShipperTotalCostStatusHandler;
 
-public class ShipperAgentTracker {
+public class ShipperAgentTracker implements ShipperTSPContractAcceptEventHandler, ShipperTSPContractCanceledEventHandler, TSPShipmentPickUpEventHandler, TSPShipmentDeliveredEventHandler{
 	
 	private static Logger logger = Logger.getLogger(ShipperAgentTracker.class);
 	
@@ -51,23 +57,6 @@ public class ShipperAgentTracker {
 		return contracts;
 	}
 
-	public Collection<TSPContract> removeScheduledComFlowAndGetAffectedTspContracts(Id shipperId, ScheduledCommodityFlow flow) {
-		ShipperAgent agent = findShipperAgent(shipperId);
-		Collection<TSPContract> tspContracts = null;
-		if(agent != null){
-			if(agent.hasCommodityFlow(flow)){
-				tspContracts = agent.removeScheduledComFlowAndGetAffectedTspContracts(flow);
-			}
-			else{
-				logger.warn("cannot remove comFlow");
-			}
-		}
-		else{
-			throw new IllegalStateException("shipper " + shipperId + " does not exist");
-		}
-		return tspContracts;
-	}
-
 	private ShipperAgent findShipperAgent(Id shipperId) {
 		for(ShipperAgent agent : shipperAgents){
 			if(agent.getId().equals(shipperId)){
@@ -75,18 +64,6 @@ public class ShipperAgentTracker {
 			}
 		}
 		return null;
-	}
-
-	public Collection<TSPContract> registerScheduledComFlowAndGetAffectedTspContracts(Id shipperId, ScheduledCommodityFlow flow) {
-		ShipperAgent agent = findShipperAgent(shipperId);
-		Collection<TSPContract> tspContracts = null;
-		if(agent != null){
-			tspContracts = agent.registerScheduledComFlowAndGetAffectedTspContracts(flow);
-		}
-		else{
-			throw new IllegalStateException("shipper " + shipperId + " does not exist");
-		}
-		return tspContracts;
 	}
 
 	public ShipperAgent getShipperAgent(Id id) {
@@ -105,5 +82,33 @@ public class ShipperAgentTracker {
 		for(ShipperImpl s : shippers){
 			findShipperAgent(s.getId()).scoreSelectedPlan();
 		}
+	}
+
+	@Override
+	public void reset(int iteration) {
+		
+		
+	}
+
+	@Override
+	public void handleEvent(ShipperTSPContractAcceptEvent event) {
+		findShipperAgent(event.getContract().getBuyer()).informTSPContractAccept(event.getContract());
+	}
+
+	@Override
+	public void handleEvent(ShipperTSPContractCanceledEvent event) {
+		findShipperAgent(event.getContract().getBuyer()).informTSPContractCanceled(event.getContract());
+	}
+
+	@Override
+	public void handleEvent(TSPShipmentDeliveredEvent event) {
+		
+		
+	}
+
+	@Override
+	public void handleEvent(TSPShipmentPickUpEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 }

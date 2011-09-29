@@ -3,7 +3,6 @@ package freight.listener;
 import org.apache.log4j.Logger;
 
 import freight.DetailedCostStatusEvent;
-import freight.TotalCostStatusEvent;
 
 public class ShipperCostConsolePrinter implements ShipperDetailedCostStatusHandler, ShipperTotalCostStatusHandler{
 

@@ -1,25 +1,23 @@
 package freight.offermaker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.CarrierAgentTracker;
 import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.TSPAgent;
+import playground.mzilske.freight.TSPAgentImpl;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPOfferMaker;
 import playground.mzilske.freight.TSPPlan;
+import playground.mzilske.freight.TSPPlanBuilder;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportServiceProviderImpl;
-import playground.mzilske.freight.TSPPlanBuilder;
 import playground.mzilske.freight.TransportChain.ChainTriple;
+import playground.mzilske.freight.TransportServiceProvider;
 import freight.TSPUtils;
 
 public class CarrierCostRequester implements TSPOfferMaker{
@@ -39,9 +37,9 @@ public class CarrierCostRequester implements TSPOfferMaker{
 	
 	private static Logger logger = Logger.getLogger(CarrierCostRequester.class);
 	
-	private TransportServiceProviderImpl tsp;
+	private TransportServiceProvider tsp;
 	
-	private TSPAgent tspAgent;
+	private TSPAgentImpl tspAgent;
 	
 	private TSPPlanBuilder tspPlanBuilder;
 	
@@ -49,11 +47,11 @@ public class CarrierCostRequester implements TSPOfferMaker{
 		this.tspPlanBuilder = tspPlanBuilder;
 	}
 	
-	public void setTspAgent(TSPAgent tspAgent) {
+	public void setTspAgent(TSPAgentImpl tspAgent) {
 		this.tspAgent = tspAgent;
 	}
 
-	public void setTSP(TransportServiceProviderImpl tsp) {
+	public void setTSP(TransportServiceProvider tsp) {
 		this.tsp = tsp;
 	}
 
@@ -86,7 +84,7 @@ public class CarrierCostRequester implements TSPOfferMaker{
 		}
 		if(price != null){
 			tspOffer.setId(tsp.getId());
-			tspOffer.setPrice(price  + TSPAgent.CostParameter.transshipmentHandlingCostPerUnit*nOfTranshipments*size);
+			tspOffer.setPrice(price  + TSPAgentImpl.CostParameter.transshipmentHandlingCostPerUnit*nOfTranshipments*size);
 			tspAgent.memorizeOffer(tspOffer,carrierOffers);
 			return tspOffer;
 		}

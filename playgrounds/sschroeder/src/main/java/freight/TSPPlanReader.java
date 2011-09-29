@@ -13,29 +13,39 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TSPShipment.TimeWindow;
+import playground.mzilske.freight.TimeWindow;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChainBuilder;
-import playground.mzilske.freight.TransportServiceProviderImpl;
+import playground.mzilske.freight.TransportServiceProvider;
 
 public class TSPPlanReader extends MatsimXmlParser{
 
 	private Logger logger = Logger.getLogger(TSPPlanReader.class);
 	
-	private Collection<TransportServiceProviderImpl> tsps;
+	private Collection<TransportServiceProvider> tsps;
 	
 	private Map<String,TSPShipment> currentShipments = null;
 	
-	private TransportServiceProviderImpl tsp = null;
+	private TransportServiceProvider tsp = null;
 	
 	private Collection<TransportChain> currentChains = null;
 	
 	private TransportChainBuilder currentChainBuilder = null;
+
+	private Id lastPickupLocation;
+
+	private TimeWindow lastPickupTW;
+
+	private TSPShipment lastTSPShipment;
+
+	private CarrierOffer lastCarrierOffer;
 	
-	public TSPPlanReader(Collection<TransportServiceProviderImpl> tsps) {
+	public TSPPlanReader(Collection<TransportServiceProvider> tsps) {
 		super();
 		this.tsps = tsps;
 	}
@@ -74,6 +84,7 @@ public class TSPPlanReader extends MatsimXmlParser{
 		}
 		if(name.equals("transportChain")){
 			TSPShipment shipment = currentShipments.get(atts.getValue("shipmentId"));
+			lastTSPShipment = shipment;
 			currentChainBuilder = new TransportChainBuilder(shipment);
 		}
 		if(name.equals("act")){
@@ -92,17 +103,32 @@ public class TSPPlanReader extends MatsimXmlParser{
 				tw = new TimeWindow(0.0,Double.MAX_VALUE);
 			}
 			if(atts.getValue("type").equals("pickup")){	
+				lastPickupLocation = location;
+				lastPickupTW = tw;
 				currentChainBuilder.schedulePickup(location, tw);
 			}
 			if(atts.getValue("type").equals("delivery")){
+				CarrierShipment shipment = createShipment(location,tw);
+				CarrierContract contract = new CarrierContract(tsp.getId(), lastCarrierOffer.getId(), shipment, lastCarrierOffer);
+				currentChainBuilder.scheduleLeg(contract);
 				currentChainBuilder.scheduleDelivery(location, tw);
 			}
 		}
 		if(name.equals("leg")){
 			CarrierOffer offer = new CarrierOffer();
 			offer.setId(makeId(atts.getValue("carrierId")));
-			currentChainBuilder.scheduleLeg(offer);
+			Double price = null;
+			if(atts.getValue("price") != null){
+				price = Double.parseDouble(atts.getValue("price"));
+				offer.setPrice(price);
+			}
+			lastCarrierOffer = offer;
+//			currentChainBuilder.scheduleLeg(offer);
 		}
+	}
+
+	private CarrierShipment createShipment(Id location, TimeWindow tw) {
+		return CarrierUtils.createShipment(lastPickupLocation, location, lastTSPShipment.getSize(), lastPickupTW.getStart(), lastPickupTW.getEnd(), tw.getStart(), tw.getEnd());
 	}
 
 	@Override
@@ -129,6 +155,10 @@ public class TSPPlanReader extends MatsimXmlParser{
 		currentChainBuilder = null;
 		currentChains = null;
 		tsp = null;
+		lastPickupLocation = null;
+		lastPickupTW = null;
+		lastTSPShipment = null;
+		lastCarrierOffer = null;
 	}
 
 	private int getInt(String value) {

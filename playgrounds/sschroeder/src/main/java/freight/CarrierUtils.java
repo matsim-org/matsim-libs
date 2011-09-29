@@ -5,13 +5,13 @@ import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierCapabilities;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierImpl;
 import playground.mzilske.freight.CarrierKnowledge;
-import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.Shipment.TimeWindow;
+import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierVehicle;
+import playground.mzilske.freight.TimeWindow;
 import playground.mzilske.freight.api.Offer;
 
 public class CarrierUtils {
@@ -47,28 +47,34 @@ public class CarrierUtils {
 		return offer;
 	}
 	
-	public static Shipment createShipment(Id from, Id to, int size, double startPickup, double endPickup, double startDelivery, double endDelivery){
+	public static CarrierShipment createShipment(Id from, Id to, int size, double startPickup, double endPickup, double startDelivery, double endDelivery){
 		TimeWindow startTW = makeTW(startPickup, endPickup);
 		TimeWindow endTW = makeTW(startDelivery, endDelivery);
-		return new Shipment(from,to,size,startTW,endTW);
+		return new CarrierShipment(from,to,size,startTW,endTW);
+	}
+	
+	public static CarrierShipment createShipment(Id from, Id to, int size, TimeWindow startTW, TimeWindow endTW) {
+		return new CarrierShipment(from,to,size,startTW,endTW);
 	}
 	
 	private static TimeWindow makeTW(double start, double end) {
 		return new TimeWindow(start, end);
 	}
 
-	public static void createAndAddContract(Carrier carrier, Shipment shipment, Offer offer){
-		Contract contract = createContract(shipment, offer);
+	public static void createAndAddContract(Carrier carrier, CarrierShipment shipment, CarrierOffer offer){
+		CarrierContract contract = createContract(shipment, offer);
 		carrier.getContracts().add(contract);
 	}
 	
-	public static Contract createContract(Shipment shipment, Offer offer){
-		return new Contract(shipment,offer);
+	public static CarrierContract createContract(CarrierShipment shipment, CarrierOffer offer){
+		return new CarrierContract(shipment,offer);
 	}
 	
 	private static Id makeId(String depotLinkId) {
 		return new IdImpl(depotLinkId);
 	}
+
+	
 	
 	
 

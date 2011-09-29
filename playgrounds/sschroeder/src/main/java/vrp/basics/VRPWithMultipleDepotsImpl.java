@@ -19,7 +19,6 @@ package vrp.basics;
 
 import java.util.Collection;
 import java.util.HashMap;
-
 import java.util.Map;
 
 import vrp.api.Constraints;

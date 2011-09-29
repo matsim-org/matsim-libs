@@ -21,7 +21,7 @@ import playground.mzilske.freight.TransportChain.ChainElement;
 import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.TransportChain.Delivery;
 import playground.mzilske.freight.TransportChain.PickUp;
-import playground.mzilske.freight.TransportServiceProviderImpl;
+import playground.mzilske.freight.TransportServiceProvider;
 
 /**
  * @author stefan
@@ -31,7 +31,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 	
 	private static Logger log = Logger.getLogger(TSPPlanWriter.class);
 	
-	private Collection<TransportServiceProviderImpl> transportServiceProviders;
+	private Collection<TransportServiceProvider> transportServiceProviders;
 	
 	private Integer shipmentCounter = 0;
 	
@@ -40,8 +40,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 	private boolean noContracts = false;
 	
 
-	public TSPPlanWriter(
-			Collection<TransportServiceProviderImpl> transportServiceProviders) {
+	public TSPPlanWriter(Collection<TransportServiceProvider> transportServiceProviders) {
 		super();
 		this.transportServiceProviders = transportServiceProviders;
 	}
@@ -52,7 +51,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 			openFile(filename);
 			writeXmlHead();
 			startTSPs(writer);
-			for(TransportServiceProviderImpl tsp : transportServiceProviders){
+			for(TransportServiceProvider tsp : transportServiceProviders){
 				startTSP(tsp,writer);
 				writeCapabilities(tsp);
 				writeContracts(tsp);
@@ -70,7 +69,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 		}
 	}
 
-	private void writeTransportChains(TransportServiceProviderImpl tsp)
+	private void writeTransportChains(TransportServiceProvider tsp)
 			throws IOException {
 		if(tsp.getSelectedPlan() != null){
 			if(tsp.getSelectedPlan().getChains() == null){
@@ -103,7 +102,8 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 						}
 						if(element instanceof ChainLeg){
 							ChainLeg leg = (ChainLeg)element;
-							writer.write(tab(5) + "<leg carrierId=" + quotation() + leg.getAcceptedOffer().getId().toString() + quotation() + "/>" + newLine()); 
+							writer.write(tab(5) + "<leg carrierId=" + quotation() + leg.getContract().getOffer().getId().toString() + quotation() + 
+									" price=" + quotation() + leg.getContract().getOffer().getPrice() + quotation() + "/>" + newLine()); 
 						}
 					}
 					writer.write(tab(4) + "</transportChain>" + newLine());
@@ -116,7 +116,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 		}
 	}
 
-	private void writeCapabilities(TransportServiceProviderImpl tsp)
+	private void writeCapabilities(TransportServiceProvider tsp)
 			throws IOException {
 		if(!tsp.getTspCapabilities().getTransshipmentCentres().isEmpty()){
 			startTranshipmentCentres(writer);
@@ -127,7 +127,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 		}
 	}
 
-	private void writeContracts(TransportServiceProviderImpl tsp)
+	private void writeContracts(TransportServiceProvider tsp)
 			throws IOException {
 		if(!tsp.getContracts().isEmpty()){
 			startShipments(writer);
@@ -149,7 +149,7 @@ public class TSPPlanWriter extends MatsimXmlWriter{
 		}
 	}
 	
-	private void startTSP(TransportServiceProviderImpl tsp,BufferedWriter writer) throws IOException {
+	private void startTSP(TransportServiceProvider tsp,BufferedWriter writer) throws IOException {
 		writer.write(tab(2) + "<transportServiceProvider id=" + quotation() + tsp.getId() + quotation() + ">" + newLine());
 	}
 

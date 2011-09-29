@@ -1,7 +1,6 @@
 package facilities;
 
 import org.matsim.api.core.v01.Id;
-import org.opengis.observation.coverage.TimeInstant;
 
 
 public class FacilityRelation {

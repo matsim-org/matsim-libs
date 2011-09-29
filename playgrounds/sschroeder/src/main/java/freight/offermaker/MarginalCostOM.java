@@ -10,12 +10,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
+import playground.mzilske.freight.CarrierShipment;
 import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.Tour.Delivery;
 import playground.mzilske.freight.Tour.Pickup;
 import playground.mzilske.freight.Tour.TourElement;
@@ -122,8 +122,8 @@ public class MarginalCostOM implements OfferMaker{
 		if(carrier.getSelectedPlan() == null){
 			return;
 		}
-		for(Contract c : carrier.getContracts()){
-			Shipment s = c.getShipment();
+		for(CarrierContract c : carrier.getContracts()){
+			CarrierShipment s = c.getShipment();
 			vrpTransformation.addShipment(s);
 		}
 		for(ScheduledTour t : carrier.getSelectedPlan().getScheduledTours()){
@@ -162,7 +162,7 @@ public class MarginalCostOM implements OfferMaker{
 			offer.setPrice(memorizedPrice);
 			return offer;
 		}
-		Shipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
+		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
 		vrpTransformation.addShipment(requestedShipment);
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;

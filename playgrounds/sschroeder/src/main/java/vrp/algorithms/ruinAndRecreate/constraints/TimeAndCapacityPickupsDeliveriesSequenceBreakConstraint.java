@@ -24,12 +24,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.basics.DepotDelivery;
+import vrp.basics.DepotPickup;
 import vrp.basics.EnRouteDelivery;
 import vrp.basics.EnRoutePickup;
-import vrp.basics.DepotPickup;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.Vehicle;

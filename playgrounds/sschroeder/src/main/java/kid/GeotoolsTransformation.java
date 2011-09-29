@@ -4,10 +4,12 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.MismatchedDimensionException;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -16,6 +18,46 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GeotoolsTransformation {
+	
+	public static class TransformationFactory {
+		
+		public static final String WGS84_32N = "EPSG:32632";
+		
+		public static final String WGS84_33N = "EPSG:32633";
+		
+		public static final String WGS84 = "WGS84";
+		
+		public static GeotoolsTransformation create(String oldRefName, String newRefName){
+			GeotoolsTransformation geotoolsTransformation;
+			try {
+				geotoolsTransformation = new GeotoolsTransformation(CRS.decode(oldRefName),CRS.decode(newRefName));
+			} catch (NoSuchAuthorityCodeException e) {
+				e.printStackTrace();
+				throw new IllegalStateException(e.toString());
+				
+			} catch (FactoryException e) {
+				e.printStackTrace();
+				throw new IllegalStateException(e.toString());
+			}
+			return geotoolsTransformation;
+		}
+		
+		public static GeotoolsTransformation createFromWGS84To(String refName){
+			GeotoolsTransformation geotoolsTransformation;
+			try {
+				geotoolsTransformation = new GeotoolsTransformation(DefaultGeographicCRS.WGS84,CRS.decode(refName));
+			} catch (NoSuchAuthorityCodeException e) {
+				e.printStackTrace();
+				throw new IllegalStateException(e.toString());
+			} catch (FactoryException e) {
+				e.printStackTrace();
+				throw new IllegalStateException(e.toString());
+			}
+			return geotoolsTransformation;
+		}
+		
+		
+	}
 	
 	private CoordinateReferenceSystem oldReferenceSystem;
 	

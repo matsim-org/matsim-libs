@@ -7,7 +7,6 @@ import java.util.List;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.api.Offer;
 
 public class OfferSelectorImpl<T extends Offer>  {
