@@ -45,7 +45,6 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:30:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "OTFVis"/>
 	</module>
 
 	<module name="JDEQSim">
