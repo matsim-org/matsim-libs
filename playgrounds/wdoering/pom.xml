@@ -9,4 +9,11 @@
   <artifactId>wdoering</artifactId>
   <name>wdoering</name>
   <version>0.4.0-SNAPSHOT</version>
+	<dependencies>
+		<dependency>
+		 <groupId>processing</groupId>
+		 <artifactId>core</artifactId>
+		 <version>1.5.1</version>
+		</dependency>
+  	</dependencies>
 </project>
