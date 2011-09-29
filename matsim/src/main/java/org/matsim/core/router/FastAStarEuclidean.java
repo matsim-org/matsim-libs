@@ -46,8 +46,8 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  */
 public class FastAStarEuclidean extends AStarEuclidean {
 
-	private RoutingNetwork routingNetwork;
-	private FastRouterDelegate fastRouter;
+	private final RoutingNetwork routingNetwork;
+	private final FastRouterDelegate fastRouter;
 	
 	public FastAStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
 			final TravelTime timeFunction) {
@@ -64,11 +64,11 @@ public class FastAStarEuclidean extends AStarEuclidean {
 			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
-		this.routingNetwork = new RoutingNetworkFactory().createDijkstraNetwork(network);
+		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);
+		this.routingNetwork.setPreProcessDijkstra(preProcessData);
 		this.nodeData.clear();
 
-		this.fastRouter = new FastRouterDelegate(this, this.routingNetwork, new AStarNodeDataFactory());
-		this.fastRouter.prepareRoutingNetwork(preProcessData);
+		this.fastRouter = new FastRouterDelegate(this, new AStarNodeDataFactory());
 	}
 	
 	/*
@@ -77,6 +77,9 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+		
+		this.routingNetwork.initialize();
+		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 

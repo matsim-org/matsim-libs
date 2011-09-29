@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.NodeData;
 import org.matsim.core.router.util.NodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -43,25 +42,12 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  */
 public class FastRouterDelegate {
 
-	private final RoutingNetwork routingNetwork;
 	private final Dijkstra dijkstra;
 	private final NodeDataFactory nodeDataFactory;
 	
-	/*package*/ FastRouterDelegate(final Dijkstra dijkstra, final RoutingNetwork routingNetwork, 
-			final NodeDataFactory nodeDataFactory) {
+	/*package*/ FastRouterDelegate(final Dijkstra dijkstra, final NodeDataFactory nodeDataFactory) {
 		this.dijkstra = dijkstra;
-		this.routingNetwork = routingNetwork;
 		this.nodeDataFactory = nodeDataFactory;
-	}
-	
-	/*package*/ void prepareRoutingNetwork(PreProcessDijkstra preProcessData) {
-		if (preProcessData != null) {
-			if (preProcessData.containsData()) {
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));				
-				}
-			}
-		}
 	}
 	
 	/*

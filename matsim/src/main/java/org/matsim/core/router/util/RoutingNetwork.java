@@ -23,6 +23,7 @@ package org.matsim.core.router.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,26 +41,82 @@ import org.matsim.api.core.v01.network.Node;
  * @author cdobler
  */
 public class RoutingNetwork implements Network {
-
-	private Map<Id, RoutingNetworkNode> nodes = new HashMap<Id, RoutingNetworkNode>();
+	
+	private final static Logger log = Logger.getLogger(RoutingNetwork.class);
+	
+	private boolean isInitialized = false;
+	private final Map<Id, RoutingNetworkNode> nodes = new HashMap<Id, RoutingNetworkNode>();
 	private final Network network;
-		
+	private PreProcessDijkstra preProcessData;
+	
 	public RoutingNetwork(Network network) {
 		this.network = network;
 	}
 	
+	public void setPreProcessDijkstra(PreProcessDijkstra preProcessData) {
+		this.preProcessData = preProcessData;
+	}
+	
+	public void initialize() {
+		if (!isInitialized) {			
+			for (Node node : network.getNodes().values()) {
+				RoutingNetworkNode dijkstraNode = new RoutingNetworkNode(node);
+				this.addNode(dijkstraNode);
+			}
+			
+			Map<Id, RoutingNetworkLink> dijkstraLinks = new HashMap<Id, RoutingNetworkLink>();
+			for (Link link : network.getLinks().values()) {
+				RoutingNetworkNode fromNode = this.nodes.get(link.getFromNode().getId());
+				RoutingNetworkNode toNode = this.nodes.get(link.getToNode().getId());
+				RoutingNetworkLink dijkstraLink = new RoutingNetworkLink(link, fromNode, toNode);
+				dijkstraLinks.put(dijkstraLink.getId(), dijkstraLink);
+			}
+			
+			for (Node node : network.getNodes().values()) {
+				RoutingNetworkLink[] outLinks = new RoutingNetworkLink[node.getOutLinks().size()];
+				
+				int i = 0;
+				for (Link outLink : node.getOutLinks().values()) {
+					outLinks[i] = dijkstraLinks.remove(outLink.getId());
+					i++;
+				}
+				
+				RoutingNetworkNode dijkstraNode = this.nodes.get(node.getId());
+				dijkstraNode.setOutLinksArray(outLinks);
+			}
+			
+			if (dijkstraLinks.size() > 0) log.warn("Not all links have been use in the DijkstraNetwork - check connectivity of input network!");
+			dijkstraLinks.clear();
+			dijkstraLinks = null;
+			
+			if (preProcessData != null) {
+				if (preProcessData.containsData()) {
+					for (RoutingNetworkNode node : nodes.values()) {
+						node.setDeadEndData(preProcessData.getNodeData(node.getNode()));				
+					}
+				}
+			}
+			preProcessData = null;
+			
+			isInitialized = true;
+		}
+	}
+	
+	@Override
 	public NetworkFactory getFactory() {
 		return network.getFactory();
 	}
 
+	@Override
 	public Map<Id, RoutingNetworkNode> getNodes() {
 		return nodes;
 	}
 
-	public void addNode(RoutingNetworkNode node) {
+	private void addNode(RoutingNetworkNode node) {
 		this.nodes.put(node.getId(), node);
 	}
 
+	@Override
 	public RoutingNetworkNode removeNode(Id nodeId) {
 		return nodes.remove(nodeId);
 	}

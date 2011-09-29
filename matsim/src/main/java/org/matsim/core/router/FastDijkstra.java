@@ -60,27 +60,22 @@ public class FastDijkstra extends Dijkstra {
 			final PreProcessDijkstra preProcessData) {
 		super(network, costFunction, timeFunction, preProcessData);
 		
-		this.routingNetwork = new RoutingNetworkFactory().createDijkstraNetwork(network);
+		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);
+		this.routingNetwork.setPreProcessDijkstra(preProcessData);
 		this.nodeData.clear();
-		
-//		if (preProcessData != null) {
-//			if (preProcessData.containsData()) {
-//				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-//					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));				
-//				}
-//			}
-//		}
-		
-		this.fastRouter = new FastRouterDelegate(this, this.routingNetwork, new DijkstraNodeDataFactory());
-		this.fastRouter.prepareRoutingNetwork(preProcessData);
+				
+		this.fastRouter = new FastRouterDelegate(this, new DijkstraNodeDataFactory());
 	}
-	
+		
 	/*
 	 * Replace the references to the from and to nodes with their corresponding
 	 * nodes in the routing network.
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+		
+		this.routingNetwork.initialize();
+		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 

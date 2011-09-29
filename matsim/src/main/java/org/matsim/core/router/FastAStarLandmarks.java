@@ -45,8 +45,8 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
  */
 public class FastAStarLandmarks extends AStarLandmarks {
 
-	private RoutingNetwork routingNetwork;
-	private FastRouterDelegate fastRouter;
+	private final RoutingNetwork routingNetwork;
+	private final FastRouterDelegate fastRouter;
 
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelCost costFunction, final TravelTime timeFunction) {
@@ -62,11 +62,11 @@ public class FastAStarLandmarks extends AStarLandmarks {
 			final TravelCost costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 
-		this.routingNetwork = new RoutingNetworkFactory().createDijkstraNetwork(network);
+		this.routingNetwork = new RoutingNetworkFactory().createRoutingNetwork(network);
+		this.routingNetwork.setPreProcessDijkstra(preProcessData);
 		this.nodeData.clear();
 
-		this.fastRouter = new FastRouterDelegate(this, this.routingNetwork, new AStarNodeDataFactory());
-		this.fastRouter.prepareRoutingNetwork(preProcessData);
+		this.fastRouter = new FastRouterDelegate(this, new AStarNodeDataFactory());
 	}
 
 	/*
@@ -75,6 +75,9 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 */
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime) {
+		
+		this.routingNetwork.initialize();
+		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 
