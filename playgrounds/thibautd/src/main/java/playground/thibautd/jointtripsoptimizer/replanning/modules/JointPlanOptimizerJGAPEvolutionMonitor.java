@@ -108,7 +108,13 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	}
 
 	private boolean timeIsElapsed() {
-		return monitorTime && this.maxEndTime <= ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+		if (monitorTime) {
+			boolean timeElapsed = this.maxEndTime <= ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
+			if (timeElapsed) log.debug("stopping genetic iterations based on computation time");
+			return timeElapsed;
+		}
+
+		return false;
 	}
 }
 
