@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.busCorridor;
+package playground.ikaddoura.busCorridor.version2;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,12 +31,6 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 
-/**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
- * @see http://www.matsim.org/node/263
- * @author rashid_waraich
- */
 public class BusCorridorLegScoringFunctionTest implements LegScoring, BasicScoring {
 
 	private final static Logger log = Logger.getLogger(BusCorridorLegScoringFunctionTest.class);
@@ -45,7 +39,9 @@ public class BusCorridorLegScoringFunctionTest implements LegScoring, BasicScori
 	protected double score;
 	private double lastTime;
 	private int index; // the current position in plan.actslegs
+	private double fare;
 
+	
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 1;
 	private static final double INITIAL_SCORE = 0.0;
@@ -53,8 +49,9 @@ public class BusCorridorLegScoringFunctionTest implements LegScoring, BasicScori
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public BusCorridorLegScoringFunctionTest(final Plan plan, final CharyparNagelScoringParameters params) {
+	public BusCorridorLegScoringFunctionTest(final Plan plan, final CharyparNagelScoringParameters params, double fare) {
 		this.params = params;
+		this.fare = fare;
 		this.reset();
 
 		this.plan = plan;
@@ -91,10 +88,8 @@ public class BusCorridorLegScoringFunctionTest implements LegScoring, BasicScori
 	private static int distanceWrnCnt = 0 ;
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		double tmpScore = 0.0;
-		double monetaryCosts = 2.30;
-		double travelTime = arrivalTime - departureTime; // traveltime in
-															// seconds
-
+		double travelTime = arrivalTime - departureTime; // traveltime in seconds
+		
 		/*
 		 * we only as for the route when we have to calculate a distance cost,
 		 * because route.getDist() may calculate the distance if not yet
@@ -131,16 +126,16 @@ public class BusCorridorLegScoringFunctionTest implements LegScoring, BasicScori
 			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist + monetaryCosts * this.params.marginalUtilityOfMoney;
-			tmpScore += this.params.constantPt ;
+//			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist + fare;
+//			tmpScore += fare ;
 			
 		} else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
-			tmpScore += this.params.constantWalk ;
+//			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
+//			tmpScore += this.params.constantWalk ;
 		} else if (TransportMode.bike.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
 			tmpScore += this.params.constantBike ;

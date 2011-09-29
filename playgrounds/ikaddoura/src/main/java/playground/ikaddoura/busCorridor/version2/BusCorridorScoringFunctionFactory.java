@@ -18,51 +18,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.busCorridor;
+package playground.ikaddoura.busCorridor.version2;
 
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
-/**
- * This is a re-implementation of the original CharyparNagel function, based on a
- * modular approach.
- * @see http://www.matsim.org/node/263
- * @author rashid_waraich
- */
-public class BusCorridorMoneyScoringFunction implements MoneyScoring, BasicScoring {
+public class BusCorridorScoringFunctionFactory implements ScoringFunctionFactory {
 
-	protected double score;
+	private final CharyparNagelScoringParameters params;
+	private final double fare;
 
-	private static final double INITIAL_SCORE = 0.0;
-
-	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
-
-	public BusCorridorMoneyScoringFunction(final CharyparNagelScoringParameters params) {
-		this.params = params;
-		this.reset();
-
+	public BusCorridorScoringFunctionFactory(final PlanCalcScoreConfigGroup config, double fare) {
+		this.params = new CharyparNagelScoringParameters(config);
+		this.fare = fare;
 	}
 
 	@Override
-	public void reset() {
-		this.score = INITIAL_SCORE;
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		
+//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new BusCorridorLegScoringFunctionTest(plan, params, fare));
+//		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
+//		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
+		return scoringFunctionAccumulator;
 	}
 
-	@Override
-	public void addMoney(final double amount) {
-		this.score += amount * this.params.marginalUtilityOfMoney ; // linear mapping of money to score
+	public CharyparNagelScoringParameters getParams() {
+		return params;
 	}
-
-	@Override
-	public void finish() {
-
-	}
-
-	@Override
-	public double getScore() {
-		return this.score;
-	}
-
 }

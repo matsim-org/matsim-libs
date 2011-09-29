@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor;
+package playground.ikaddoura.busCorridor.version2;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -59,13 +60,14 @@ import playground.ikaddoura.analysis.distance.Modus;
 
 public class BusCorridorControler {
 
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input/network_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input/population.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input/config_busline.xml";
-	static String outputDirectoryPath = "../../shared-svn/studies/ihab/busCorridor/output/outputSimulation";
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version2/network_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version2/population.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version2/config_busline.xml";
+	static String outputDirectoryPath = "../../shared-svn/studies/ihab/busCorridor/output_version2/outputSimulation";
 	static int lastInternalIteration = 0;
 	static double busStopTime = 30;
 	static double travelTimeBus = 3*60;
+	static double fare = 1;
 	
 	private int numberOfBuses = 5;
 	private String directoryExtIt = null;
@@ -86,7 +88,7 @@ public class BusCorridorControler {
 	
 	private void runExternalSimulation() throws IOException {
 	
-		for (int extIt = 0; extIt <= 3 ; extIt++){
+		for (int extIt = 0; extIt <= 1 ; extIt++){
 			this.setExtItNr(extIt);
 			this.setDirectoryExtIt(outputDirectoryPath+"/extITERS/extIt."+extIt);
 			File directory = new File(this.getDirectoryExtIt());
@@ -99,14 +101,12 @@ public class BusCorridorControler {
 			analyzeUserScores();
 			providerStrategy();
 		}
-		
 		writeScoreStats();
 	}
 	
 	private void writeScoreStats() {
 		TextFileWriter stats = new TextFileWriter();
 		stats.writeFile(outputDirectoryPath, this.iteration2numberOfBuses, this.iteration2providerScore, this.iteration2userScore);
-		
 	}
 
 	private void providerStrategy() {
@@ -200,6 +200,12 @@ public class BusCorridorControler {
 //		reader.readFile(eventFile);
 		
 		// berechne aus der EventsFile einen Provider-Score
+//		double busCostsPerDay = 500;
+//		double busCostsPerKm = 1;
+//		double fixCosts = this.getNumberOfBuses() * busCostsPerDay;
+//		double varCosts = busKm * busCostsPerKm;
+//		double providerScore = - ( fixCosts + varCosts ) + earnings
+		
 		double providerScore = 333;
 		iteration2providerScore.put(this.getExtItNr(), providerScore);
 		
@@ -248,6 +254,12 @@ public class BusCorridorControler {
 		controlerConfGroup.setWritePlansInterval(1);
 		controlerConfGroup.setOutputDirectory(this.getDirectoryExtIt()+"/outputInternalSimulation");
 
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
+		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(1);
+		
+		BusCorridorScoringFunctionFactory factory = new BusCorridorScoringFunctionFactory(planCalcScoreConfigGroup, fare);
+		controler.setScoringFunctionFactory(factory);
+		
 		controler.run();
 	}
 

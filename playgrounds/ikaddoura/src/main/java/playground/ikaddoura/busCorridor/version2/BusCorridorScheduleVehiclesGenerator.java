@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitScheduleGenerator.java
+ * BusCorridorScheduleVehiclesGenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor;
+package playground.ikaddoura.busCorridor.version2;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ import org.matsim.vehicles.VehiclesImpl;
  * @author Ihab
  *
  */
-public class BusCorridorTransitScheduleGenerator {
+public class BusCorridorScheduleVehiclesGenerator {
 			
 	private double stopTime;
 	private double travelTimeBus;
