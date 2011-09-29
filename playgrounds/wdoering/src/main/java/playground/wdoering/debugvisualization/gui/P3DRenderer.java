@@ -160,165 +160,169 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		
-		if (!isPaused())
+		if (extremeValues!=null)
 		{
-	
-			if (factorX == 0.0f)
-			{
-				//get max values
-				float maxWidth = (float)(extremeValues[0]-extremeValues[3]);
-				float maxHeight = (float)(extremeValues[1]-extremeValues[4]);
-								
-				//refactor min/max values of event+network file
-				this.factorX = maxWidth / this.width;
-				this.factorY = maxHeight / this.height;
-				
-				System.out.println(((this.maxPosX-this.minPosX) /factorX));
-			}
-			
-			
-			background(0);
-			
+		
 			if (!isPaused())
 			{
-				if ((!rewind) && (i < timeSteps.length -1))
-					i+=0.1;
-				else if ((rewind) && (i > 0))
-					i-=0.1;
-			}
-			
-			iInt = (int)(Math.floor(i));
-
-			//Draw Network
-			if ((nodes!=null) && (links!=null))
-			{
-				//Stroke color
-				stroke(100,0,100,100);
-				
-				//Iterate through all nodes and the draw links
-				for (Iterator linksIterator = links.values().iterator(); linksIterator.hasNext();)
+		
+				if (factorX == 0.0f)
 				{
-					int[] fromTo = (int[]) linksIterator.next();
+					//get max values
+					float maxWidth = (float)(extremeValues[0]-extremeValues[3]);
+					float maxHeight = (float)(extremeValues[1]-extremeValues[4]);
+									
+					//refactor min/max values of event+network file
+					this.factorX = maxWidth / this.width;
+					this.factorY = maxHeight / this.height;
 					
-					DataPoint fromDataPoint = nodes.get(fromTo[0]);
-					DataPoint ToDataPoint = nodes.get(fromTo[1]);
-					
-					//draw a line (from - to - datapoint)
-					line((float)((fromDataPoint.getPosX()-minPosX)/factorX),
-						(float)((fromDataPoint.getPosY()-minPosY)/factorY),
-						(float)((ToDataPoint.getPosX()-minPosX)/factorX),
-						(float)((ToDataPoint.getPosY()-minPosY)/factorY));
-						
-					
+					System.out.println(((this.maxPosX-this.minPosX) /factorX));
 				}
-				noStroke();
-			}
-			
-			//Draw Agents and trajectories
-			int currentAgent = 0;
-			if (agents != null)
-			{
 				
-				//Iterate through all agents and display the current data point + traces
-				Iterator agentsIterator = agents.entrySet().iterator();
 				
-				while (agentsIterator.hasNext())
+				background(0);
+				
+				if (!isPaused())
 				{
-					//Get current agent
-					Map.Entry pairs = (Map.Entry) agentsIterator.next();
-					Agent agent = (Agent)pairs.getValue();
-					HashMap<Double,DataPoint> dataPoints = agent.getDataPoints();
+					if ((!rewind) && (i < timeSteps.length -1))
+						i+=0.1;
+					else if ((rewind) && (i > 0))
+						i-=0.1;
+				}
+				
+				iInt = (int)(Math.floor(i));
+	
+				//Draw Network
+				if ((nodes!=null) && (links!=null))
+				{
+					//Stroke color
+					stroke(100,0,100,100);
 					
-					//Motion tween between two datapoints (-> time steps)
-					int tweenCount = 0;
-
-					//pick preattentive agent color
-					int[] agentColor = colors.get(currentAgent);
-					
-					//first check if there is any datapoint stored to the current time step
-					if (dataPoints.get(timeSteps[iInt]) != null) 
+					//Iterate through all nodes and the draw links
+					for (Iterator linksIterator = links.values().iterator(); linksIterator.hasNext();)
 					{
-						//get the datapoint
-						DataPoint currentDataPoint = (DataPoint) dataPoints.get(timeSteps[iInt]); 
+						int[] fromTo = (int[]) linksIterator.next();
 						
-						float posX;
-						float posY;
+						DataPoint fromDataPoint = nodes.get(fromTo[0]);
+						DataPoint ToDataPoint = nodes.get(fromTo[1]);
 						
-						//calculate tweened x/y position
-						if ((tweenCount<dataPoints.size()-2))
-						{
-							DataPoint nextDataPoint = (DataPoint) dataPoints.get(timeSteps[iInt+1]);
+						//draw a line (from - to - datapoint)
+						line((float)((fromDataPoint.getPosX()-minPosX)/factorX),
+							(float)((fromDataPoint.getPosY()-minPosY)/factorY),
+							(float)((ToDataPoint.getPosX()-minPosX)/factorX),
+							(float)((ToDataPoint.getPosY()-minPosY)/factorY));
 							
-							if (nextDataPoint==null)
-								nextDataPoint = currentDataPoint;
-								
-							posX = (float)(        (  ((currentDataPoint.getPosX()-minPosX)*(1-(i-Math.floor(i))))
-												   +  ((nextDataPoint.getPosX()-minPosX)*(i-Math.floor(i)))        )
-												   / factorX);
-							
-							posY = (float)(( (  	(currentDataPoint.getPosY()-minPosY)*(1-(i-Math.floor(i))))
-												   +  ((nextDataPoint.getPosY()-minPosY)*(i-Math.floor(i)))        )
-												   / factorY);
-								
-								
-						}
-						else
-						{
-							posX = (float)((currentDataPoint.getPosX()-minPosX) / factorX);
-							posY = (float)((currentDataPoint.getPosY()-minPosY) / factorY);
-						}
 						
-						//draw trajectories
-						for (int j = 1; j <= iInt; j++)
+					}
+					noStroke();
+				}
+				
+				//Draw Agents and trajectories
+				int currentAgent = 0;
+				if (agents != null)
+				{
+					
+					//Iterate through all agents and display the current data point + traces
+					Iterator agentsIterator = agents.entrySet().iterator();
+					
+					while (agentsIterator.hasNext())
+					{
+						//Get current agent
+						Map.Entry pairs = (Map.Entry) agentsIterator.next();
+						Agent agent = (Agent)pairs.getValue();
+						HashMap<Double,DataPoint> dataPoints = agent.getDataPoints();
+						
+						//Motion tween between two datapoints (-> time steps)
+						int tweenCount = 0;
+	
+						//pick preattentive agent color
+						int[] agentColor = colors.get(currentAgent);
+						
+						//first check if there is any datapoint stored to the current time step
+						if (dataPoints.get(timeSteps[iInt]) != null) 
 						{
+							//get the datapoint
+							DataPoint currentDataPoint = (DataPoint) dataPoints.get(timeSteps[iInt]); 
 							
-							if ((dataPoints.get(timeSteps[j]) != null) && (dataPoints.get(timeSteps[j-1]) != null))
+							float posX;
+							float posY;
+							
+							//calculate tweened x/y position
+							if ((tweenCount<dataPoints.size()-2))
 							{
-								DataPoint trajectoryDataPoint1 = dataPoints.get(timeSteps[j]);
-								DataPoint trajectoryDataPoint2 = dataPoints.get(timeSteps[j-1]);
+								DataPoint nextDataPoint = (DataPoint) dataPoints.get(timeSteps[iInt+1]);
 								
-								smooth();
-								strokeWeight(4); 
+								if (nextDataPoint==null)
+									nextDataPoint = currentDataPoint;
+									
+								posX = (float)(        (  ((currentDataPoint.getPosX()-minPosX)*(1-(i-Math.floor(i))))
+													   +  ((nextDataPoint.getPosX()-minPosX)*(i-Math.floor(i)))        )
+													   / factorX);
 								
-								//make far away trajectories more transparent
-								float jFloat = (float)j;
-								float iFloat = (float)iInt;
-								stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
+								posY = (float)(( (  	(currentDataPoint.getPosY()-minPosY)*(1-(i-Math.floor(i))))
+													   +  ((nextDataPoint.getPosY()-minPosY)*(i-Math.floor(i)))        )
+													   / factorY);
+									
+									
+							}
+							else
+							{
+								posX = (float)((currentDataPoint.getPosX()-minPosX) / factorX);
+								posY = (float)((currentDataPoint.getPosY()-minPosY) / factorY);
+							}
+							
+							//draw trajectories
+							for (int j = 1; j <= iInt; j++)
+							{
 								
-								line((float)((trajectoryDataPoint1.getPosX()-minPosX)/factorX),
-									 (float)((trajectoryDataPoint1.getPosY()-minPosY)/factorY),
-									 (float)((trajectoryDataPoint2.getPosX()-minPosX)/factorX),
-									 (float)((trajectoryDataPoint2.getPosY()-minPosY)/factorY));
-								
-								
+								if ((dataPoints.get(timeSteps[j]) != null) && (dataPoints.get(timeSteps[j-1]) != null))
+								{
+									DataPoint trajectoryDataPoint1 = dataPoints.get(timeSteps[j]);
+									DataPoint trajectoryDataPoint2 = dataPoints.get(timeSteps[j-1]);
+									
+									smooth();
+									strokeWeight(4); 
+									
+									//make far away trajectories more transparent
+									float jFloat = (float)j;
+									float iFloat = (float)iInt;
+									stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
+									
+									line((float)((trajectoryDataPoint1.getPosX()-minPosX)/factorX),
+										 (float)((trajectoryDataPoint1.getPosY()-minPosY)/factorY),
+										 (float)((trajectoryDataPoint2.getPosX()-minPosX)/factorX),
+										 (float)((trajectoryDataPoint2.getPosY()-minPosY)/factorY));
+									
+									
+									
+								}
 								
 							}
 							
-						}
-						
-						//line from last position to tweened agent position
-						line((float) ((currentDataPoint.getPosX() - minPosX) / factorX),
-							 (float) ((currentDataPoint.getPosY() - minPosY) / factorY),
-							 posX, posY);
-						
-						noStroke();
+							//line from last position to tweened agent position
+							line((float) ((currentDataPoint.getPosX() - minPosX) / factorX),
+								 (float) ((currentDataPoint.getPosY() - minPosY) / factorY),
+								 posX, posY);
 							
-						//increment tween
-						tweenCount++;
+							noStroke();
+								
+							//increment tween
+							tweenCount++;
+							
+							//draw agent
+							fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+							ellipse (posX, posY, agentSize, agentSize);
 						
-						//draw agent
-						fill(color(agentColor[0], agentColor[1],agentColor[2],255));
-						ellipse (posX, posY, agentSize, agentSize);
-					
+						}
+						currentAgent++;
+						
 					}
-					currentAgent++;
-					
+		
 				}
-	
+				
+				
+				
 			}
-			
-			
-			
 		}
 	}
 
@@ -361,6 +365,18 @@ public class P3DRenderer extends PApplet
 	{
 		this.nodes = nodes;
 		this.links = links;
+		
+	}
+
+	public void updateAgentData(HashMap<Integer, Agent> agents)
+	{
+		this.agents = agents;
+		
+	}
+
+	public void updateCurrentTime(double time)
+	{
+		//this.t
 		
 	}
 

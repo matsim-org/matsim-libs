@@ -14,6 +14,8 @@ import javax.management.AttributeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 
@@ -24,7 +26,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class Importer {
+public class Importer implements XYVxVyEventsHandler {
 
 	private HashMap<Integer, Agent> agents = null; 
 	private HashMap<Integer, DataPoint> nodes = null;
@@ -37,6 +39,8 @@ public class Importer {
 	private Double minPosY;
 	private Double minPosZ;
 	
+	private Controller controller = null;
+	
 	private Double[] timeStepsAsDoubleValues;
 	
 	private ArrayList<Double> timeStepArray;
@@ -44,8 +48,9 @@ public class Importer {
 	private Double maxTimeStep;
 	private Double minTimeStep;
 
-	public void Importer()
+	public Importer(Controller controller)
 	{
+		this.controller = controller;
 	}
 
 	public void readEventFile(String fileName)
@@ -298,6 +303,21 @@ public class Importer {
 	public HashMap<Integer, DataPoint> getNodes()
 	{
 		return nodes;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(XYVxVyEvent event)
+	{
+		if (controller!=null)
+			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
+		//event.getTime()
+		
 	}
 
 

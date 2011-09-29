@@ -26,7 +26,7 @@ public class GUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	float x, y;
 	Controller controller;
-	private HashMap<Integer,Agent> agents;
+	//private HashMap<Integer,Agent> agents;
 	private Double[] extremeValues;
 	
 	GUIMainFrame guiMainFrame;
@@ -111,6 +111,18 @@ public class GUI extends JFrame {
 	public void setNetwork(HashMap<Integer, DataPoint> nodes, HashMap<Integer, int[]> links)
 	{
 		renderer.setNetwork(nodes,links);
+		
+	}
+
+	public void updateAgentData(HashMap<Integer, Agent> agents)
+	{
+		renderer.updateAgentData(agents);
+		
+	}
+
+	public void updateCurrentTime(double time)
+	{
+		renderer.updateCurrentTime(time);
 		
 	}
 
