@@ -21,10 +21,10 @@
 package org.matsim.core.router.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -61,7 +61,12 @@ public class PreProcessDijkstra {
 	private void markDeadEnds(final Network network) {
 		long now = System.currentTimeMillis();
 
-		this.nodeData = new HashMap<Node, DeadEndData>(network.getNodes().size());
+		/*
+		 * We use a concurrentHashMap because if FastRouters are used for the re-routing, 
+		 * their parallel initialization in multiple threads may result in concurrent 
+		 * calls to getNodeData(...).
+		 */
+		this.nodeData = new ConcurrentHashMap<Node, DeadEndData>(network.getNodes().size());
 		
 		DeadEndData role;
 		for (Node node : network.getNodes().values()) {
