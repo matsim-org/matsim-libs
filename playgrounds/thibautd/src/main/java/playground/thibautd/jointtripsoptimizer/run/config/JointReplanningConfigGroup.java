@@ -201,8 +201,8 @@ public class JointReplanningConfigGroup extends Module {
 	private double pNonUniform = 0.04032756452861985;
 	private boolean useOnlyHammingDistance = true;
 	// default: with or without?
-	private long maxCpuTimePerMember = (long) (10 * 1E9);
-	//private long maxCpuTimePerMember = -1;
+	//private long maxCpuTimePerMember = (long) (10 * 1E9);
+	private long maxCpuTimePerMember = -1;
 	//deprecated fields:
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
