@@ -20,9 +20,9 @@
 
 package playground.christoph.router;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -62,11 +62,11 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		this.network = network;
 		this.travelTime = travelTime;
 		
-		personInfos = new HashMap<Id, PersonInfo>();
-		followed = new HashMap<Id, Boolean>();
-		enterTimes = new HashMap<Id, Double>();
-		expectedTravelTimes = new HashMap<Id, Double>();
-		expectedAlternativeTravelTimes = new HashMap<Id, Double>();
+		personInfos = new ConcurrentHashMap<Id, PersonInfo>();
+		followed = new ConcurrentHashMap<Id, Boolean>();
+		enterTimes = new ConcurrentHashMap<Id, Double>();
+		expectedTravelTimes = new ConcurrentHashMap<Id, Double>();
+		expectedAlternativeTravelTimes = new ConcurrentHashMap<Id, Double>();
 		
 		init();
 	}
