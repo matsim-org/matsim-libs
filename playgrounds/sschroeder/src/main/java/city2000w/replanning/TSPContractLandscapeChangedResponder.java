@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
@@ -31,7 +32,6 @@ import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
 import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
 import playground.mzilske.freight.events.TransportChainAddedEvent;
 import playground.mzilske.freight.events.TransportChainRemovedEvent;
-import freight.CarrierUtils;
 
 public class TSPContractLandscapeChangedResponder implements TSPPlanStrategyModule{
 

@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.visum.VisumNetwork.TimeProfile;
 
-import trbFolder.TRBShippersContractGenerator.TimeProfile;
 import utils.XmlWriterUtils;
 
 
@@ -58,10 +58,10 @@ public class ShipperPlanWriter extends MatsimXmlWriter{
 			writer.write(XmlWriterUtils.tabs(4) + "<frequency id=" + XmlWriterUtils.inQuotation(freq) + ">" + XmlWriterUtils.newLine());
 			for(TimeProfile timeProfile : shipperKnowledge.getTimeProfileMap().get(freq)){
 				writer.write(XmlWriterUtils.tabs(5) + "<timeProfile ");
-				writer.write("startPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupStart));
-				writer.write(" endPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupEnd));
-				writer.write(" startDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryStart));
-				writer.write(" endDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryEnd) + "/>" + XmlWriterUtils.newLine());
+//				writer.write("startPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupStart));
+//				writer.write(" endPickup=" + XmlWriterUtils.inQuotation(timeProfile.pickupEnd));
+//				writer.write(" startDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryStart));
+//				writer.write(" endDelivery=" + XmlWriterUtils.inQuotation(timeProfile.deliveryEnd) + "/>" + XmlWriterUtils.newLine());
 			}
 			writer.write(XmlWriterUtils.tabs(4) + "</frequency>" + XmlWriterUtils.newLine());
 		}

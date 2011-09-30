@@ -11,10 +11,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+
 import org.xml.sax.Attributes;
 
 import playground.mzilske.freight.TSPOffer;
-import trbFolder.TRBShippersContractGenerator.TimeProfile;
 
 public class ShipperPlanReader extends MatsimXmlParser{
 
@@ -38,7 +38,7 @@ public class ShipperPlanReader extends MatsimXmlParser{
 	
 	private Integer currentFrequency;
 	
-	private List<TimeProfile> currentTimeProfile;
+//	private List<TimeProfile> currentTimeProfile;
 	
 	
 	public ShipperPlanReader(Collection<ShipperImpl> shippers) {
@@ -84,12 +84,12 @@ public class ShipperPlanReader extends MatsimXmlParser{
 			currentShipments.add(shipment);
 		}
 		if(name.equals("frequency")){
-			currentTimeProfile = new ArrayList<TimeProfile>();
+//			currentTimeProfile = new ArrayList<TimeProfile>();
 			currentFrequency = getInt(atts.getValue("id"));
 		}
 		if(name.equals("timeProfile")){
-			currentTimeProfile.add(new TimeProfile(getDouble(atts.getValue("startPickup")), getDouble(atts.getValue("endPickup")), 
-					getDouble(atts.getValue("startDelivery")), getDouble(atts.getValue("endDelivery"))));
+//			currentTimeProfile.add(new TimeProfile(getDouble(atts.getValue("startPickup")), getDouble(atts.getValue("endPickup")), 
+//					getDouble(atts.getValue("startDelivery")), getDouble(atts.getValue("endDelivery"))));
 		}
 	}
 
@@ -107,8 +107,8 @@ public class ShipperPlanReader extends MatsimXmlParser{
 			shippers.add(currentShipper);
 		}
 		if(name.equals("frequency")){
-			currentShipper.getShipperKnowledge().addTimeProfile(currentFrequency, currentTimeProfile);
-			currentTimeProfile = null;
+//			currentShipper.getShipperKnowledge().addTimeProfile(currentFrequency, currentTimeProfile);
+//			currentTimeProfile = null;
 			currentFrequency = null;
 		}
 	}

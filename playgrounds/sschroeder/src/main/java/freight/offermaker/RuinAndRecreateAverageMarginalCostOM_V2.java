@@ -13,10 +13,10 @@ import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
 import playground.mzilske.freight.CarrierPlanBuilder;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.OfferMaker;
 import city2000w.RAndRPickupAndDeliveryAndTimeClustersCarrierPlanBuilder;
-import freight.CarrierUtils;
 import freight.vrp.Locations;
 import freight.vrp.VRPTransformation;
 

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TimeWindow;
 import freight.utils.GreedyShipmentAggregator;

@@ -16,6 +16,7 @@ import org.xml.sax.Attributes;
 import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TimeWindow;

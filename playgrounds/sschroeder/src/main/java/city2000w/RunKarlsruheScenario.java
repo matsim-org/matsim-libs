@@ -35,7 +35,9 @@ import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierDriverAgentFactoryImpl;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.CarrierPlanReader;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.Carriers;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPContract;
@@ -58,8 +60,6 @@ import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
 import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
 import playground.mzilske.freight.events.TransportChainAddedEvent;
 import playground.mzilske.freight.events.TransportChainRemovedEvent;
-import freight.CarrierPlanReader;
-import freight.CarrierUtils;
 import freight.TSPPlanReader;
 
 /**

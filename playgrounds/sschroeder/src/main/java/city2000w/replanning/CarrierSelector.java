@@ -11,6 +11,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPPlan;
@@ -27,7 +28,6 @@ import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
 import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
 import playground.mzilske.freight.events.TransportChainAddedEvent;
 import playground.mzilske.freight.events.TransportChainRemovedEvent;
-import freight.CarrierUtils;
 
 public class CarrierSelector implements TSPPlanStrategyModule{
 

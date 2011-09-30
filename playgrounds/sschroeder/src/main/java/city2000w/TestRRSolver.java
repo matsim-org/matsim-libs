@@ -12,7 +12,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierPlan;
-import freight.CarrierPlanReader;
+import playground.mzilske.freight.CarrierPlanReader;
 import freight.CarrierPlanWriter;
 
 public class TestRRSolver {

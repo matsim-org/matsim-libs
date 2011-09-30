@@ -9,6 +9,7 @@ import java.util.List;
 import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPCapabilities;
 import playground.mzilske.freight.TSPContract;
@@ -22,7 +23,6 @@ import playground.mzilske.freight.events.CarrierOfferRejectEvent;
 import playground.mzilske.freight.events.OfferUtils;
 import playground.mzilske.freight.events.QueryCarrierOffersEvent;
 import playground.mzilske.freight.events.Service;
-import freight.CarrierUtils;
 
 public class KarlsruheTSPPlanBuilder {
 	

@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import trbFolder.TRBShippersContractGenerator.TimeProfile;
+import org.matsim.visum.VisumNetwork.TimeProfile;
 
 
 

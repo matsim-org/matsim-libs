@@ -16,6 +16,7 @@ import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.CarrierContract;
 import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.OfferMaker;
 import playground.mzilske.freight.ScheduledTour;
@@ -33,7 +34,6 @@ import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
-import freight.CarrierUtils;
 import freight.vrp.Locations;
 import freight.vrp.VRPTransformation;
 
