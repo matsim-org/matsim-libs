@@ -82,13 +82,13 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		LeastCostPathTree stTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
 		// SpanningTree stTravelDistance = new SpanningTree(ttc, new TravelDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
-		stTravelTime.setDepartureTime(depatureTime);
+		lcptTravelTime.setDepartureTime(depatureTime);
 		// stTravelDistance.setDepartureTime(depatureTime);
 		
 		// od-trip matrix (zonal based)
@@ -120,8 +120,8 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 				Coord coord = originZone.getCoord();
 				Node fromNode = network.getNearestNode( coord );
 				assert( fromNode != null );
-				stTravelTime.setOrigin( fromNode );
-				stTravelTime.run(network);
+				lcptTravelTime.setOrigin( fromNode );
+				lcptTravelTime.run(network);
 				//stTravelDistance.setOrigin( fromNode );
 				//stTravelDistance.run(network);
 				
@@ -146,7 +146,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 					assert( toNode != null );
 					
 					// get arrival time
-					double arrivalTime = stTravelTime.getTree().get(toNode.getId()).getTime();
+					double arrivalTime = lcptTravelTime.getTree().get(toNode.getId()).getTime();
 					// travel times in minutes (for UrbanSim)
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
