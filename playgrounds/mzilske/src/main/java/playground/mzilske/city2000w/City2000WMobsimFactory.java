@@ -45,6 +45,7 @@ import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
 import playground.mzilske.freight.CarrierAgentTracker;
+import playground.mzilske.osm.JXMapOTFVisClient;
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....
 public class City2000WMobsimFactory implements MobsimFactory {
@@ -110,7 +111,8 @@ public class City2000WMobsimFactory implements MobsimFactory {
 			OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, eventsManager);
 			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap();
 			server.addAdditionalPlans(freightAgentPlans);
-			OTFClientLive.run(scenario.getConfig(), server);
+			JXMapOTFVisClient.run(scenario.getConfig(), server);
+			// OTFClientLive.run(scenario.getConfig(), server);
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());
 			planSim.addMobsimFeature(otfvisFeature);
