@@ -21,11 +21,18 @@
 package playground.christoph.energyflows.controller;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.TravelDistanceStats;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 
@@ -46,6 +53,38 @@ public class EnergyFlowsController extends Controler {
 		StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
 		StrategyManagerConfigLoader.load(this, manager);
 		return manager;
+	}
+	
+	/**
+	 * Add ScoreStats and TravelDistancePlots for transit and non-transit Subpopulations.
+	 */
+	@Override
+	protected void loadControlerListeners() {
+		super.loadControlerListeners();
+		
+		Scenario nonTransitSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population nonTransitPopulation = nonTransitSc.getPopulation();
+
+		Scenario transitSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population transitPopulation = transitSc.getPopulation();
+		
+		for(Person person : this.scenarioData.getPopulation().getPersons().values()) {
+			int id = Integer.valueOf(person.getId().toString());
+			if (id < 1000000000) nonTransitPopulation.addPerson(person);
+			else transitPopulation.addPerson(person);
+		}
+		
+		// add subpopulation score stats
+		ScoreStats nonTransitScoreStats = new ScoreStats(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), super.getCreateGraphs());
+		this.addControlerListener(nonTransitScoreStats);
+		ScoreStats transitScoreStats = new ScoreStats(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), super.getCreateGraphs());
+		this.addControlerListener(transitScoreStats);
+
+		// add subpopulation travel distance stats
+		TravelDistanceStats nonTransitTravelDistanceStats = new TravelDistanceStats(nonTransitPopulation, this.network, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_TRAVELDISTANCESTATS), super.getCreateGraphs());
+		this.addControlerListener(nonTransitTravelDistanceStats);
+		TravelDistanceStats transitTravelDistanceStats = new TravelDistanceStats(transitPopulation, this.network, super.getControlerIO().getOutputFilename("transit" + FILENAME_TRAVELDISTANCESTATS), super.getCreateGraphs());
+		this.addControlerListener(transitTravelDistanceStats);
 	}
 	
 	/**
