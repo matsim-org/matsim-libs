@@ -10,6 +10,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.TransportChain.ChainLeg;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.Shipment;
 
 public abstract class BasicTSPAgentImpl implements TSPAgent{
 	

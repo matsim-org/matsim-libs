@@ -1,5 +1,7 @@
 package playground.mzilske.freight;
 
+import playground.mzilske.freight.carrier.Shipment;
+
 
 public interface TransportChainAgent {
 

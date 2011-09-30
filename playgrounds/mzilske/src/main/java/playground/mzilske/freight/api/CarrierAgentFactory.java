@@ -1,8 +1,8 @@
 package playground.mzilske.freight.api;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierAgent;
-import playground.mzilske.freight.CarrierAgentTracker;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierAgent;
+import playground.mzilske.freight.carrier.CarrierAgentTracker;
 
 
 public interface CarrierAgentFactory {

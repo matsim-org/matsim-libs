@@ -14,6 +14,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
 import playground.mzilske.freight.api.TSPAgentFactory;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.Shipment;
 import playground.mzilske.freight.events.QueryTSPOffersEvent;
 import playground.mzilske.freight.events.QueryTSPOffersEventHandler;
 import playground.mzilske.freight.events.ShipmentDeliveredEvent;

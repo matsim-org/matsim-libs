@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.carrier.CarrierOffer;
 import playground.mzilske.freight.events.TSPTotalCostHandler.TSPCostEvent;
 
 

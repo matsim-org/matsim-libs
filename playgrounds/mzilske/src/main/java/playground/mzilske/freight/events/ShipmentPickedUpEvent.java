@@ -5,7 +5,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.mzilske.freight.Shipment;
+import playground.mzilske.freight.carrier.Shipment;
 
 public class ShipmentPickedUpEvent extends CarrierEventImpl implements Event {
 

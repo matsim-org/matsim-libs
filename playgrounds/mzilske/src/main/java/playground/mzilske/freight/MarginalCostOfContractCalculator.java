@@ -7,6 +7,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierCostCalculator;
+import playground.mzilske.freight.carrier.Shipment;
+
 public class MarginalCostOfContractCalculator implements CarrierCostCalculator {
 	
 	private Network network;

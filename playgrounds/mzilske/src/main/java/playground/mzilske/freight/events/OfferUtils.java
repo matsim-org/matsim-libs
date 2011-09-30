@@ -4,9 +4,9 @@ import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.ContractImpl;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TimeWindow;
 import playground.mzilske.freight.api.Offer;
+import playground.mzilske.freight.carrier.Shipment;
 
 public class OfferUtils {
 

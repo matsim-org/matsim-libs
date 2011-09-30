@@ -6,6 +6,9 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+
 
 public class TransportChain {
 	

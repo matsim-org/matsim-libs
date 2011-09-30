@@ -2,7 +2,7 @@ package playground.mzilske.freight.events;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.Shipment;
+import playground.mzilske.freight.carrier.Shipment;
 
 public class Service {
 	

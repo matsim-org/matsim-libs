@@ -14,6 +14,8 @@ import playground.mzilske.freight.TransportChain.ChainElement;
 import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.TransportChain.Delivery;
 import playground.mzilske.freight.TransportChain.PickUp;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.Shipment;
 
 /**
  * @author stscr

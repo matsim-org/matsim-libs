@@ -4,6 +4,10 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.Shipment;
+
 public interface TSPAgent {
 
 	public abstract void reset();
