@@ -2,9 +2,9 @@ package freight.vrp;
 
 import java.util.Collection;
 
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Tour;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.Tour;
 
 public interface VRPSolver {
 

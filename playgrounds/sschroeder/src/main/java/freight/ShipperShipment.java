@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.TimeWindow;
 
-public class ShipperShipment implements playground.mzilske.freight.Shipment{
+public class ShipperShipment implements playground.mzilske.freight.carrier.Shipment{
 	
 	
 	private Id from;

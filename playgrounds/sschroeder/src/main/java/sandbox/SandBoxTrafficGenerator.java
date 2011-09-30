@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierVehicle;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierVehicle;
 
 
 public class SandBoxTrafficGenerator {

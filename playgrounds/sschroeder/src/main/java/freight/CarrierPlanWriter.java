@@ -12,16 +12,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.FreightConstants;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.Tour.Delivery;
-import playground.mzilske.freight.Tour.GeneralActivity;
-import playground.mzilske.freight.Tour.Pickup;
-import playground.mzilske.freight.Tour.TourElement;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.FreightConstants;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Shipment;
+import playground.mzilske.freight.carrier.Tour.Delivery;
+import playground.mzilske.freight.carrier.Tour.GeneralActivity;
+import playground.mzilske.freight.carrier.Tour.Pickup;
+import playground.mzilske.freight.carrier.Tour.TourElement;
 
 public class CarrierPlanWriter extends MatsimXmlWriter{
 

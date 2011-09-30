@@ -6,16 +6,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierCostFunction;
-import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierPlanBuilder;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierUtils;
-import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.OfferMaker;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierCostFunction;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierPlan;
+import playground.mzilske.freight.carrier.CarrierPlanBuilder;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierUtils;
+import playground.mzilske.freight.carrier.CarrierVehicle;
 import freight.vrp.Locations;
 
 public class RuinAndRecreateMarginalCostOM implements OfferMaker{

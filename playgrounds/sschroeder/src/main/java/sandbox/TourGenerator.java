@@ -11,13 +11,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierImpl;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Tour;
-import playground.mzilske.freight.TourBuilder;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierImpl;
+import playground.mzilske.freight.carrier.CarrierPlan;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Tour;
+import playground.mzilske.freight.carrier.TourBuilder;
 import sandbox.SandBoxTrafficGenerator.Company;
 import sandbox.SandBoxTrafficGenerator.Region;
 

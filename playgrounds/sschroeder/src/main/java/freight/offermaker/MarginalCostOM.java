@@ -9,17 +9,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierUtils;
-import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.OfferMaker;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Tour.Delivery;
-import playground.mzilske.freight.Tour.Pickup;
-import playground.mzilske.freight.Tour.TourElement;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierUtils;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Tour.Delivery;
+import playground.mzilske.freight.carrier.Tour.Pickup;
+import playground.mzilske.freight.carrier.Tour.TourElement;
 import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
 import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder;
 import vrp.algorithms.ruinAndRecreate.basics.TourActivityStatusUpdaterImpl;
@@ -241,7 +241,7 @@ public class MarginalCostOM implements OfferMaker{
 		return false;
 	}
 
-	private Tour makeTour(playground.mzilske.freight.Tour tour, VRPTransformation vrpTrafo) {
+	private Tour makeTour(playground.mzilske.freight.carrier.Tour tour, VRPTransformation vrpTrafo) {
 		Tour vrpTour = new Tour();
 		Customer depotCustomer = vrpTrafo.getCustomer(makeId("depot"));
 		vrpTour.getActivities().add(VrpUtils.createTourActivity(depotCustomer));

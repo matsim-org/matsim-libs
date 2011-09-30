@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import playground.mzilske.freight.Shipment;
+import playground.mzilske.freight.carrier.Shipment;
 
 public class ShipmentClustererImpl implements ShipmentClusterer{
 

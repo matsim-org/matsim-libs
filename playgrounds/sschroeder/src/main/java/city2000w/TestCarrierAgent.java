@@ -1,6 +1,6 @@
 package city2000w;
 
-import playground.mzilske.freight.CarrierAgent;
+import playground.mzilske.freight.carrier.CarrierAgent;
 
 public class TestCarrierAgent {
 	

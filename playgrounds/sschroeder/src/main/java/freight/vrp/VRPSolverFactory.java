@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierVehicle;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
 
 public interface VRPSolverFactory {
 	

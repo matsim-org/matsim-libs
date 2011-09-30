@@ -8,11 +8,6 @@ import java.util.List;
 
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierUtils;
-import playground.mzilske.freight.Shipment;
 import playground.mzilske.freight.TSPAgentTracker;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TransportChain;
@@ -20,6 +15,11 @@ import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.TransportChainBuilder;
 import playground.mzilske.freight.TransportServiceProvider;
 import playground.mzilske.freight.api.Offer;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierUtils;
+import playground.mzilske.freight.carrier.Shipment;
 import playground.mzilske.freight.events.CarrierOfferRejectEvent;
 import playground.mzilske.freight.events.OfferUtils;
 import playground.mzilske.freight.events.QueryCarrierOffersEvent;

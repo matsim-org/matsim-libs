@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.mzilske.freight.CarrierTotalCostHandler;
+import playground.mzilske.freight.events.CarrierTotalCostHandler;
 
 public class CarrierCostChartListener implements CarrierTotalCostHandler {
 

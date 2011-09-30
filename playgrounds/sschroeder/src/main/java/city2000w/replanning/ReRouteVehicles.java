@@ -2,7 +2,7 @@ package city2000w.replanning;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.carrier.Carrier;
 import city2000w.RRCarrierPlanBuilder;
 import freight.vrp.VRPSolverFactory;
 

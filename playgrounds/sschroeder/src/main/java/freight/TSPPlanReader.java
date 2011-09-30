@@ -13,16 +13,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierOffer;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierUtils;
 import playground.mzilske.freight.TSPPlan;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TimeWindow;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChainBuilder;
 import playground.mzilske.freight.TransportServiceProvider;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierUtils;
 
 public class TSPPlanReader extends MatsimXmlParser{
 

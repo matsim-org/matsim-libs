@@ -2,7 +2,7 @@ package freight.vrp;
 
 import java.util.Collection;
 
-import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.carrier.CarrierPlan;
 import vrp.api.Customer;
 import vrp.api.VRP;
 import vrp.basics.InitialSolutionFactory;

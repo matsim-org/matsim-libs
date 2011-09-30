@@ -3,7 +3,7 @@ package sandbox;
 import java.util.ArrayList;
 import java.util.List;
 
-import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.carrier.Carrier;
 import freight.CarrierPlanWriter;
 
 public class SandBoxRunner {

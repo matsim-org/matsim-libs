@@ -6,9 +6,9 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.OfferMaker;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierOffer;
 
 public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 	

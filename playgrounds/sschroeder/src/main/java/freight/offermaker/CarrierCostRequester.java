@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.TSPAgentImpl;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
@@ -17,6 +16,7 @@ import playground.mzilske.freight.TSPPlanBuilder;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChain.ChainTriple;
+import playground.mzilske.freight.carrier.CarrierOffer;
 import playground.mzilske.freight.TransportServiceProvider;
 import freight.TSPUtils;
 

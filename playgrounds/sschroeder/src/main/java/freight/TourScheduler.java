@@ -3,9 +3,9 @@ package freight;
 import java.util.Collection;
 import java.util.Map;
 
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Tour;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Tour;
 
 public interface TourScheduler {
 	

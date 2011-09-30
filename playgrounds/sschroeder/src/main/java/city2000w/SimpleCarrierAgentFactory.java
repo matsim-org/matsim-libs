@@ -8,19 +8,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.mzilske.freight.BasicCarrierAgentImpl;
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierAgent;
-import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierDriverAgentFactory;
-import playground.mzilske.freight.CarrierOffer;
 import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.api.CarrierAgentFactory;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierAgent;
+import playground.mzilske.freight.carrier.CarrierAgentImpl;
+import playground.mzilske.freight.carrier.CarrierAgentTracker;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierDriverAgentFactory;
+import playground.mzilske.freight.carrier.CarrierOffer;
 
 public class SimpleCarrierAgentFactory implements CarrierAgentFactory{
 
-	static class SimpleCarrierAgentImpl extends BasicCarrierAgentImpl{
+	static class SimpleCarrierAgentImpl extends CarrierAgentImpl{
 
 		private Logger logger = Logger.getLogger(SimpleCarrierAgentImpl.class);
 		

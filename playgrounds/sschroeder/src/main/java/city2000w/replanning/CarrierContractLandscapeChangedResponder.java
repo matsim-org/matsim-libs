@@ -3,8 +3,8 @@ package city2000w.replanning;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierPlan;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierPlan;
 import city2000w.RRCarrierPlanBuilder;
 import freight.vrp.VRPSolverFactory;
 

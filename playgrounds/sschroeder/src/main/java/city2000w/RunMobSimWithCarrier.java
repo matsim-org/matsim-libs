@@ -21,14 +21,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.freight.BasicCarrierAgentImpl;
-import playground.mzilske.freight.Carrier;
-import playground.mzilske.freight.CarrierAgent;
-import playground.mzilske.freight.CarrierAgentTracker;
-import playground.mzilske.freight.CarrierDriverAgentFactoryImpl;
-import playground.mzilske.freight.CarrierPlanReader;
 import playground.mzilske.freight.DriverEventWriter;
 import playground.mzilske.freight.api.CarrierAgentFactory;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.CarrierAgent;
+import playground.mzilske.freight.carrier.CarrierAgentImpl;
+import playground.mzilske.freight.carrier.CarrierAgentTracker;
+import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
+import playground.mzilske.freight.carrier.CarrierPlanReader;
 
 
 public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener, ShutdownListener{
@@ -43,7 +43,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		
 		@Override
 		public CarrierAgent createAgent(CarrierAgentTracker tracker,Carrier carrier) {
-			BasicCarrierAgentImpl agent = new BasicCarrierAgentImpl(tracker, carrier, router,  new CarrierDriverAgentFactoryImpl());
+			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router,  new CarrierDriverAgentFactoryImpl());
 			return agent;
 		}
 		

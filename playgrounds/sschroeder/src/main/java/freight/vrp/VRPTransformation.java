@@ -8,8 +8,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.Shipment;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.Shipment;
 import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.basics.Coordinate;

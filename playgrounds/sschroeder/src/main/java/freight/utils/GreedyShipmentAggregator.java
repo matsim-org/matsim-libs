@@ -3,7 +3,7 @@ package freight.utils;
 import java.util.Collection;
 import java.util.Map;
 
-import playground.mzilske.freight.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierShipment;
 
 public interface GreedyShipmentAggregator {
 	

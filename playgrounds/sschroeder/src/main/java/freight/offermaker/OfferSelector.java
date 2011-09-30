@@ -2,7 +2,7 @@ package freight.offermaker;
 
 import java.util.Collection;
 
-import playground.mzilske.freight.CarrierOffer;
+import playground.mzilske.freight.carrier.CarrierOffer;
 
 interface OfferSelector {
 

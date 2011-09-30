@@ -13,11 +13,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierVehicle;
-import playground.mzilske.freight.Tour;
-import playground.mzilske.freight.TourBuilder;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.Tour;
+import playground.mzilske.freight.carrier.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;

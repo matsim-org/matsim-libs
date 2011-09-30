@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierVehicle;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateFactory;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
@@ -102,7 +102,7 @@ public class RuinAndRecreateSolver implements VRPSolver {
 	}
 
 	@Override
-	public Collection<playground.mzilske.freight.Tour> solve() {
+	public Collection<playground.mzilske.freight.carrier.Tour> solve() {
 		// TODO Auto-generated method stub
 		return null;
 	}

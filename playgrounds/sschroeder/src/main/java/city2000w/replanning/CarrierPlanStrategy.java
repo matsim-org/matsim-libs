@@ -7,10 +7,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import playground.mzilske.freight.Carrier;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Shipment;
+import playground.mzilske.freight.carrier.Carrier;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Shipment;
 
 public class CarrierPlanStrategy implements PlanStrategy<Carrier>{
 	

@@ -9,7 +9,7 @@ import kid.ScheduledVehicles;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.log4j.Logger;
 
-import playground.mzilske.freight.Carrier;
+import playground.mzilske.freight.carrier.Carrier;
 import sandbox.Classifier.FrequencyClass;
 import sandbox.SandBoxTrafficGenerator.Company;
 import stats.EmpiricalWalker;

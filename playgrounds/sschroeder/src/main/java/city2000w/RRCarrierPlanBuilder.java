@@ -7,14 +7,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 
-import playground.mzilske.freight.CarrierCapabilities;
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.CarrierVehicle;
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.Tour;
+import playground.mzilske.freight.carrier.CarrierCapabilities;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierPlan;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Tour;
 import freight.vrp.VRPSolver;
 import freight.vrp.VRPSolverFactory;
 
