@@ -1,6 +1,7 @@
 package playground.wrashid.artemis.hubs;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -33,8 +34,8 @@ public class LinkHubMapping {
 		return hubIdLinkIdMapping.getKey(linkId);
 	}
 
-	public Id getLinkIdForHubId(Id hubId) {
-		return hubIdLinkIdMapping.getValue(hubId);
+	public LinkedList<Id> getLinkIdsForHubId(Id hubId) {
+		return hubIdLinkIdMapping.get(hubId);
 
 	}
 }
