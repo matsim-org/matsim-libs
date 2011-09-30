@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.Point;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.Constants;
 
 public class TestDistance {
 	

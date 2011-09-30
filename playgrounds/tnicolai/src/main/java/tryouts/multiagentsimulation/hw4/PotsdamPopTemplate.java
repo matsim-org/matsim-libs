@@ -48,7 +48,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.tnicolai.urbansim.constants.Constants;
+import playground.tnicolai.matsim4opus.constants.Constants;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
