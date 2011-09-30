@@ -48,6 +48,7 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
@@ -62,6 +63,8 @@ public class CreateUtilityHistograms {
 		LogFactory.getLog(CreateUtilityHistograms.class);
 
 	private static final double BIN_WIDTH = 5;
+	// size of the cliques to analyse (negative means all cliques)
+	private static final int N_MEMBERS = 2;
 
 	/**
 	 * true for getting data from dumps of a previously analysed population
@@ -141,8 +144,6 @@ public class CreateUtilityHistograms {
 			globalHistogram.saveAsPng(outputPath+"/globalHistogram-plain-"+i+".png", WIDTH, HEIGHT);
 			globalHistogram.getChart().getXYPlot().getRenderer().setSeriesVisible(i, false);
 		}
-
-
 	}
 
 	private static void tuneDomainAxis(final ValueAxis axis) {
@@ -204,8 +205,8 @@ public class CreateUtilityHistograms {
 
 
 	private static XYLineHistogramDataset getHistogramDataset(
-			final Scenario scenario,
-			final Scenario scenarioIndividual,
+			final ScenarioWithCliques scenario,
+			final ScenarioWithCliques scenarioIndividual,
 			final String outputPath) {
 		List<Double> globalScores = new ArrayList<Double>();
 		List<Double> jointScores = new ArrayList<Double>();
@@ -227,28 +228,31 @@ public class CreateUtilityHistograms {
 			BufferedWriter individualWriter = IOUtils.getBufferedWriter(outputPath+"/individual-popJoint.txt");
 			Map<Id, ? extends Person> individuals = scenarioIndividual.getPopulation().getPersons();
 
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				currentPlan = person.getSelectedPlan();
-				score = currentPlan.getScore();
+			for (Clique clique : scenario.getCliques().getCliques().values()) {
+				if (N_MEMBERS > 0 && clique.getMembers().size() != N_MEMBERS) continue;
+				for (Person person : clique.getMembers().values()) {
+					currentPlan = person.getSelectedPlan();
+					score = currentPlan.getScore();
 
-				globalScores.add(score);
-				globalWriter.write(""+score);
-				globalWriter.newLine();
+					globalScores.add(score);
+					globalWriter.write(""+score);
+					globalWriter.newLine();
 
-				if (isJoint(currentPlan)) {
-					jointScores.add(score);
-					jointWriter.write(""+score);
-					jointWriter.newLine();
+					if (isJoint(currentPlan)) {
+						jointScores.add(score);
+						jointWriter.write(""+score);
+						jointWriter.newLine();
 
-					indivScore = individuals.get(person.getId()).getSelectedPlan().getScore();
-					individualScores.add(indivScore);
-					individualWriter.write(""+indivScore);
-					individualWriter.newLine();
+						indivScore = individuals.get(person.getId()).getSelectedPlan().getScore();
+						individualScores.add(indivScore);
+						individualWriter.write(""+indivScore);
+						individualWriter.newLine();
 
-					if (isPassenger(currentPlan)) {
-						passengerScores.add(score);
-						passengerWriter.write(""+score);
-						passengerWriter.newLine();
+						if (isPassenger(currentPlan)) {
+							passengerScores.add(score);
+							passengerWriter.write(""+score);
+							passengerWriter.newLine();
+						}
 					}
 				}
 			}
