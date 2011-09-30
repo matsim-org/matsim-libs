@@ -4,7 +4,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-public interface Carrier {
+import playground.mzilske.freight.api.Actor;
+
+public interface Carrier extends Actor{
 
 	public abstract CarrierKnowledge getKnowledge();
 
@@ -16,7 +18,7 @@ public interface Carrier {
 
 	public abstract Collection<CarrierPlan> getPlans();
 
-	public abstract Collection<Contract> getContracts();
+	public abstract Collection<CarrierContract> getContracts();
 
 	public abstract CarrierPlan getSelectedPlan();
 
@@ -26,5 +28,9 @@ public interface Carrier {
 			CarrierCapabilities carrierCapabilities);
 
 	public abstract CarrierCapabilities getCarrierCapabilities();
+	
+	public abstract Collection<CarrierContract> getNewContracts();
+	
+	public abstract Collection<CarrierContract> getExpiredContracts();
 
 }

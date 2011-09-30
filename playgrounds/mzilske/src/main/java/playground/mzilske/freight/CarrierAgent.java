@@ -6,8 +6,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.mzilske.freight.api.Offer;
-
 public interface CarrierAgent {
 	
 	abstract Id getId();
@@ -38,9 +36,13 @@ public interface CarrierAgent {
 	
 	abstract void reset();
 
-	abstract void informOfferRejected(Offer offer);
+	abstract void informOfferRejected(CarrierOffer offer);
 
-	abstract void informOfferAccepted(Contract contract);
+	abstract void informOfferAccepted(CarrierContract contract);
+
+	abstract void informTSPContractAccepted(CarrierContract contract);
+
+	abstract void informTSPContractCanceled(CarrierContract contract);
 	
 	
 

@@ -1,12 +1,10 @@
-package playground.mzilske.freight;
+package playground.mzilske.freight.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.mzilske.freight.events.TSPEventHandler;
-import playground.mzilske.freight.events.TSPEventImpl;
 
 public interface TSPTotalCostHandler extends TSPEventHandler{
 	

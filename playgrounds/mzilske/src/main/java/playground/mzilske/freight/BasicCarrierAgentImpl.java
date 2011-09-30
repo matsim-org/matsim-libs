@@ -22,11 +22,10 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.freight.Tour.TourElement;
-import playground.mzilske.freight.api.Offer;
 
-public abstract class BasicCarrierAgentImpl implements CarrierAgent{
+public class BasicCarrierAgentImpl implements CarrierAgent{
 
-	private static Logger logger = Logger.getLogger(CarrierAgentImpl.class);
+	private static Logger logger = Logger.getLogger(DubioserCarrierAgentImpl.class);
 	
 	protected Carrier carrier;
 	
@@ -121,9 +120,6 @@ public abstract class BasicCarrierAgentImpl implements CarrierAgent{
 		carrierDriverAgents.get(personId).tellTraveltime(time);
 	}
 
-	public abstract void scoreSelectedPlan();
-	
-
 	private Person createDriverPerson(Id driverId) {
 		Person person = new PersonImpl(driverId);
 		return person;
@@ -140,15 +136,6 @@ public abstract class BasicCarrierAgentImpl implements CarrierAgent{
 		return id;
 	}
 
-	public abstract CarrierOffer requestOffer(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery);
-
-	public abstract void reset();
-
-	public abstract void calculateCosts();
-	
-	public abstract void tellLink(Id personId, Id linkId);
-		
-
 	@Override
 	public void notifyPickup(Id driverId, Shipment shipment, double time) {
 		tracker.notifyPickup(carrier.getId(), driverId, shipment, time);
@@ -159,8 +146,64 @@ public abstract class BasicCarrierAgentImpl implements CarrierAgent{
 		tracker.notifyDelivery(carrier.getId(), driverId, shipment, time);
 	}
 
-	public abstract void informOfferRejected(Offer offer);
-	
-	public abstract void informOfferAccepted(Contract contract);
+	@Override
+	public void informTSPContractAccepted(CarrierContract contract) {
+				logger.info("i am " + contract.getOffer().getId() + " and this is my new contract :)). buyer: " + contract.getBuyer() + "; seller: " + contract.getSeller());
+				carrier.getContracts().add(contract);
+				carrier.getNewContracts().add(contract);
+	//			newContracts.add(contract);
+			}
+
+	@Override
+	public void informTSPContractCanceled(CarrierContract contract) {
+				logger.info("i am " + contract.getOffer().getId() + " and my contract was canceled ;)). offer: " + contract.getOffer().getPrice());	
+	//			oldContracts.add(contract);
+				carrier.getContracts().remove(contract);
+				carrier.getExpiredContracts().add(contract);
+			}
+
+	@Override
+	public void calculateCosts() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void tellLink(Id personId, Id linkId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public CarrierOffer requestOffer(Id linkId, Id linkId2, int shipmentSize,
+			double startPickup, double endPickup, double startDelivery,
+			double endDelivery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void informOfferRejected(CarrierOffer offer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void informOfferAccepted(CarrierContract contract) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scoreSelectedPlan() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

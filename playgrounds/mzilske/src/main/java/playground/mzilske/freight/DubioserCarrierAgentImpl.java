@@ -24,13 +24,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.freight.CarrierTotalCostHandler.CarrierCostEvent;
 import playground.mzilske.freight.Tour.TourElement;
-import playground.mzilske.freight.api.Offer;
 import playground.mzilske.freight.events.CostMemoryStatusEvent;
 import playground.mzilske.freight.events.DriverPerformanceEvent;
 
-public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAgent{
+public class DubioserCarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAgent{
 	
-	private static Logger logger = Logger.getLogger(CarrierAgentImpl.class);
+	private static Logger logger = Logger.getLogger(DubioserCarrierAgentImpl.class);
 	
 	private Carrier carrier;
 	
@@ -86,15 +85,15 @@ public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAg
 		
 	};
 	
-	private CarrierCostCalculator costPerShipmentCalculator = new CarrierCostCalculator(){
-
-		@Override
-		public void run(CarrierVehicle carrierVehicle,Collection<Contract> contracts, CostMemory costMemory,
-				Double totalCosts) {
-			
-		}
-		
-	};
+//	private CarrierCostCalculator costPerShipmentCalculator = new CarrierCostCalculator(){
+//
+//		@Override
+//		public void run(CarrierVehicle carrierVehicle,Collection<CarrierContract> contracts, CostMemory costMemory,
+//				Double totalCosts) {
+//			
+//		}
+//		
+//	};
 	
 	private CarrierAgentTracker carrierAgentTracker;
 	
@@ -110,7 +109,7 @@ public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAg
 		this.offerMaker = offerMaker;
 	}
 
-	public CarrierAgentImpl(CarrierAgentTracker carrierAgentTracker, Carrier carrier, PlanAlgorithm router, CarrierDriverAgentFactory driverAgentFactory) {
+	public DubioserCarrierAgentImpl(CarrierAgentTracker carrierAgentTracker, Carrier carrier, PlanAlgorithm router, CarrierDriverAgentFactory driverAgentFactory) {
 		super(carrierAgentTracker,carrier,router,driverAgentFactory);
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
@@ -279,7 +278,7 @@ public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAg
 			carrierAgentTracker.processEvent(driverPerformanceEvent);
 		}
 		double avgCapacityUsage = weightedCapacityUsage/distance;
-		costPerShipmentCalculator.run(vehicle, carrier.getContracts(), costMemory, cost);
+//		costPerShipmentCalculator.run(vehicle, carrier.getContracts(), costMemory, cost);
 		CarrierCostEvent costEvent = new CarrierCostEvent(carrier.getId(),distance, time, cost);
 		costEvent.setCapacityUsage(avgCapacityUsage);
 		costEvent.setPerformance(performance);
@@ -294,7 +293,7 @@ public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAg
 	}
 
 	public void setCostCalculator(CarrierCostCalculator costCalculator) {
-		this.costPerShipmentCalculator = costCalculator;
+//		this.costPerShipmentCalculator = costCalculator;
 	}
 
 	public void tellLink(Id personId, Id linkId) {
@@ -320,14 +319,28 @@ public class CarrierAgentImpl extends BasicCarrierAgentImpl implements CarrierAg
 	}
 
 	@Override
-	public void informOfferRejected(Offer offer) {
+	public void informOfferRejected(CarrierOffer offer) {
 		logger.info("my offer was rejected :(");
 		
 	}
 
 	@Override
-	public void informOfferAccepted(Contract contract) {
+	public void informOfferAccepted(CarrierContract contract) {
 		logger.info("offer was accepted :))");
+		
+	}
+
+	
+
+	@Override
+	public void informTSPContractAccepted(CarrierContract contract) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void informTSPContractCanceled(CarrierContract contract) {
+		// TODO Auto-generated method stub
 		
 	}
 }

@@ -23,16 +23,22 @@ import playground.mrieser.core.mobsim.api.AgentSource;
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
 import playground.mzilske.freight.api.CarrierAgentFactory;
-import playground.mzilske.freight.events.OfferAcceptEvent;
-import playground.mzilske.freight.events.OfferAcceptEventHandler;
-import playground.mzilske.freight.events.OfferRejectEvent;
-import playground.mzilske.freight.events.OfferRejectEventHandler;
-import playground.mzilske.freight.events.QueryOffersEvent;
-import playground.mzilske.freight.events.QueryOffersEventHandler;
+import playground.mzilske.freight.events.CarrierOfferAcceptEvent;
+import playground.mzilske.freight.events.CarrierOfferAcceptEventHandler;
+import playground.mzilske.freight.events.CarrierOfferRejectEvent;
+import playground.mzilske.freight.events.CarrierOfferRejectEventHandler;
+import playground.mzilske.freight.events.QueryCarrierOffersEvent;
+import playground.mzilske.freight.events.QueryCarrierOffersEventHandler;
 import playground.mzilske.freight.events.ShipmentDeliveredEvent;
 import playground.mzilske.freight.events.ShipmentPickedUpEvent;
+import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
+import playground.mzilske.freight.events.TSPCarrierContractAcceptEventHandler;
+import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
+import playground.mzilske.freight.events.TSPCarrierContractCanceledEventHandler;
 
-public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, QueryOffersEventHandler, OfferAcceptEventHandler, OfferRejectEventHandler {
+public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, 
+	QueryCarrierOffersEventHandler, CarrierOfferAcceptEventHandler, CarrierOfferRejectEventHandler, 
+	TSPCarrierContractAcceptEventHandler, TSPCarrierContractCanceledEventHandler {
 	
 	private static Logger logger = Logger.getLogger(CarrierAgentTracker.class);
 	
@@ -143,33 +149,6 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 		processEvent(new ShipmentDeliveredEvent(carrierId, driverId, shipment, time));
 	}
 	
-	public Collection<CarrierOffer> getOffers(Id linkId, Id linkId2, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {
-		Collection<CarrierOffer> offers = new ArrayList<CarrierOffer>();
-		for (CarrierAgent carrierAgent : carrierAgents) {
-			CarrierOffer offer = carrierAgent.requestOffer(linkId, linkId2, shipmentSize, startPickup, endPickup, startDelivery, endDelivery);
-			if(offer instanceof NoOffer){
-				continue;
-			}
-			else {
-				offers.add(offer);
-			}
-		}
-		return offers;
-	}
-
-	public void removeContracts(Collection<Contract> contracts) {
-		for(Contract c : contracts){
-			Carrier carrier = findCarrier(c.getOffer().getId());
-			if(carrier != null){
-				carrier.getContracts().remove(c);
-				logger.info("remove contract: " + c.getShipment());
-			}
-			else{
-				logger.warn("contract " + c.getShipment() + " could not be removed. No carrier found.");
-			}
-		}
-	}
-
 	private Carrier findCarrier(Id carrierId) {
 		for(Carrier carrier : carriers){
 			if(carrier.getId().equals(carrierId)){
@@ -177,20 +156,6 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 			}
 		}
 		return null;
-	}
-
-	public void addContracts(Collection<Contract> contracts) {
-		for(Contract c : contracts){
-			Carrier carrier = findCarrier(c.getOffer().getId());
-			if(carrier != null){
-				carrier.getContracts().add(c);
-				logger.info("add contract: " + c.getShipment());
-			}
-			else{
-				logger.warn("contract " + c.getShipment() + " could not be added. No carrier found.");
-			}
-		}
-		
 	}
 
 	public Carrier getCarrier(Id id) {
@@ -215,7 +180,7 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	}
 
 	@Override
-	public void handleEvent(QueryOffersEvent event) {
+	public void handleEvent(QueryCarrierOffersEvent event) {
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			CarrierOffer offer = carrierAgent.requestOffer(event.getService().getFrom(), event.getService().getTo(), event.getService().getSize(), 
 					event.getService().getStartPickup(), event.getService().getEndPickup(), event.getService().getStartDelivery(), event.getService().getEndDelivery());
@@ -229,17 +194,29 @@ public class CarrierAgentTracker implements AgentSource, ActivityEndEventHandler
 	}
 
 	@Override
-	public void handleEvent(OfferRejectEvent event) {
+	public void handleEvent(CarrierOfferRejectEvent event) {
 		Id carrierId = event.getOffer().getId();
 		CarrierAgent agent = findCarrierAgent(carrierId);
-		agent.informOfferRejected(event.getOffer());
+		agent.informOfferRejected((CarrierOffer)event.getOffer());
 	}
 
 	@Override
-	public void handleEvent(OfferAcceptEvent event) {
+	public void handleEvent(CarrierOfferAcceptEvent event) {
 		Id carrierId = event.getContract().getOffer().getId();
 		CarrierAgent agent = findCarrierAgent(carrierId);
-		agent.informOfferAccepted(event.getContract());
+		agent.informOfferAccepted((CarrierContract)event.getContract());
 		
+	}
+
+	@Override
+	public void handleEvent(TSPCarrierContractAcceptEvent event) {
+		CarrierAgent agent = findCarrierAgent(event.getContract().getSeller());
+		agent.informTSPContractAccepted((CarrierContract)event.getContract());
+	}
+
+	@Override
+	public void handleEvent(TSPCarrierContractCanceledEvent event) {
+		CarrierAgent agent = findCarrierAgent(event.getContract().getSeller());
+		agent.informTSPContractCanceled((CarrierContract)event.getContract());
 	}
 }

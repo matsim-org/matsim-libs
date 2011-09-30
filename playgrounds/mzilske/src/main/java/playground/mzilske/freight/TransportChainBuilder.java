@@ -6,7 +6,6 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.TSPShipment.TimeWindow;
 import playground.mzilske.freight.TransportChain.ChainElement;
 import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.TransportChain.Delivery;
@@ -34,6 +33,18 @@ public class TransportChainBuilder {
 		if(shipment == null){
 			throw new IllegalStateException("tspShipment cannot be null.");
 		}
+	}
+	
+	public void scheduleLeg(CarrierContract contract){
+		if(!openPickUp){
+			throw new IllegalStateException("No shipment has been picked up. Thus, cannot create a leg.");
+		}
+		if(openLeg){
+			throw new IllegalStateException("Cannot create a leg, because a leg is still open");
+		}
+		ChainLeg leg = new ChainLeg(contract);
+		chainElements.add(leg);
+		openLeg = true;
 	}
 
 	public void scheduleLeg(CarrierOffer offer){

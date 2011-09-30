@@ -16,7 +16,7 @@ public class TourBuilder {
 
 	private List<TourElement> tourElements = new ArrayList<TourElement>();
 	
-	private Set<Shipment> openPickups = new HashSet<Shipment>();
+	private Set<CarrierShipment> openPickups = new HashSet<CarrierShipment>();
 
 	private Id startLinkId;
 
@@ -30,7 +30,7 @@ public class TourBuilder {
 		this.endLinkId = endLinkId;
 	}
 
-	public void schedulePickup(Shipment shipment) {
+	public void schedulePickup(CarrierShipment shipment) {
 		boolean wasNew = openPickups.add(shipment);
 		if (!wasNew) {
 			throw new RuntimeException("Trying to deliver something which was already picked up.");
@@ -38,7 +38,7 @@ public class TourBuilder {
 		tourElements.add(createPickup(shipment));
 	}
 
-	public void scheduleDelivery(Shipment shipment) {
+	public void scheduleDelivery(CarrierShipment shipment) {
 		boolean wasOpen = openPickups.remove(shipment);
 		if (!wasOpen) {
 			throw new RuntimeException("Trying to deliver something which was not picked up.");
@@ -50,11 +50,11 @@ public class TourBuilder {
 		return new Tour(startLinkId, tourElements, endLinkId);
 	}
 
-	private Pickup createPickup(Shipment shipment) {
+	private Pickup createPickup(CarrierShipment shipment) {
 		return new Pickup(shipment);
 	}
 
-	private Delivery createDelivery(Shipment shipment) {
+	private Delivery createDelivery(CarrierShipment shipment) {
 		return new Delivery(shipment);
 	}
 

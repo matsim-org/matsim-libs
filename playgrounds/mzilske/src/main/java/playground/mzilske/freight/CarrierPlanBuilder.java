@@ -7,6 +7,6 @@ public interface CarrierPlanBuilder {
 
 	public abstract CarrierPlan buildPlan(
 			CarrierCapabilities carrierCapabilities,
-			Collection<Contract> carrierContracts);
+			Collection<CarrierContract> carrierContracts);
 
 }

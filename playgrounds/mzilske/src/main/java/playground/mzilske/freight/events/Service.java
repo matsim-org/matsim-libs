@@ -2,6 +2,8 @@ package playground.mzilske.freight.events;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.Shipment;
+
 public class Service {
 	
 	private Id from;
@@ -18,6 +20,16 @@ public class Service {
 	
 	private double endDelivery;
 
+	public Service(Shipment shipment){
+		this.from = shipment.getFrom();
+		this.to = shipment.getTo();
+		this.size = shipment.getSize();
+		this.startPickup = shipment.getPickupTimeWindow().getStart();
+		this.endPickup = shipment.getPickupTimeWindow().getEnd();
+		this.startDelivery = shipment.getDeliveryTimeWindow().getStart();
+		this.endDelivery = shipment.getDeliveryTimeWindow().getEnd();
+	}
+	
 	public Service(Id from, Id to, int size, double startPickup,double endPickup, double startDelivery, double endDelivery) {
 		super();
 		this.from = from;

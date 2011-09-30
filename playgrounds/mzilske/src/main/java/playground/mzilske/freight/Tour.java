@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.Shipment.TimeWindow;
 
 public class Tour {
 
@@ -18,7 +17,7 @@ public class Tour {
 
 		public abstract double getDuration();
 		
-		public abstract Shipment getShipment();
+		public abstract CarrierShipment getShipment();
 		
 		public abstract TimeWindow getTimeWindow();
 		
@@ -26,9 +25,9 @@ public class Tour {
 	
 	public static class Pickup extends TourElement {
 
-		private Shipment shipment;
+		private CarrierShipment shipment;
 
-		public Pickup(Shipment shipment) {
+		public Pickup(CarrierShipment shipment) {
 			this.shipment = shipment;
 		}
 
@@ -53,16 +52,16 @@ public class Tour {
 		}
 
 		@Override
-		public Shipment getShipment() {
+		public CarrierShipment getShipment() {
 			return shipment;
 		}
 	};
 	
 	public static class Delivery extends TourElement {
 
-		private Shipment shipment;
+		private CarrierShipment shipment;
 
-		public Delivery(Shipment shipment) {
+		public Delivery(CarrierShipment shipment) {
 			this.shipment = shipment;
 		}
 
@@ -87,7 +86,7 @@ public class Tour {
 		}
 
 		@Override
-		public Shipment getShipment() {
+		public CarrierShipment getShipment() {
 			return shipment;
 		}
 		
@@ -129,7 +128,7 @@ public class Tour {
 		}
 
 		@Override
-		public Shipment getShipment() {
+		public CarrierShipment getShipment() {
 			return null;
 		}
 
@@ -155,8 +154,8 @@ public class Tour {
 		return Collections.unmodifiableList(tourElements);
 	}
 
-	public List<Shipment> getShipments() {
-		List<Shipment> shipments = new ArrayList<Shipment>();
+	public List<CarrierShipment> getShipments() {
+		List<CarrierShipment> shipments = new ArrayList<CarrierShipment>();
 		for (TourElement tourElement : tourElements) {
 			if (tourElement instanceof Pickup) {
 				Pickup pickup = (Pickup) tourElement;

@@ -5,13 +5,12 @@ import java.util.Map;
 import org.matsim.core.api.experimental.events.Event;
 
 import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.api.Offer;
 
-public class OfferAcceptEvent implements Event{
+public abstract class ContractCanceledEvent implements Event{
 
 	private Contract contract;
 	
-	public OfferAcceptEvent(Contract contract) {
+	public ContractCanceledEvent(Contract contract) {
 		super();
 		this.contract = contract;
 	}
@@ -31,5 +30,7 @@ public class OfferAcceptEvent implements Event{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	
 
 }

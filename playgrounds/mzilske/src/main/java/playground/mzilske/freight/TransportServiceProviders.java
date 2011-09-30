@@ -12,9 +12,9 @@ import java.util.Collection;
  */
 public class TransportServiceProviders {
 	
-	private Collection<TransportServiceProviderImpl> transportServiceProviders = new ArrayList<TransportServiceProviderImpl>();
+	private Collection<TransportServiceProvider> transportServiceProviders = new ArrayList<TransportServiceProvider>();
 
-	public Collection<TransportServiceProviderImpl> getTransportServiceProviders() {
+	public Collection<TransportServiceProvider> getTransportServiceProviders() {
 		return transportServiceProviders;
 	}
 

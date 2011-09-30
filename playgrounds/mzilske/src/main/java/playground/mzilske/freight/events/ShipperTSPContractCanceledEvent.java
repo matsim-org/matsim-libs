@@ -4,19 +4,19 @@ import java.util.Map;
 
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.mzilske.freight.api.Offer;
+import playground.mzilske.freight.Contract;
 
-public class OfferRejectEvent implements Event{
+public class ShipperTSPContractCanceledEvent implements Event{
 
-	private Offer offer;
+	private Contract contract;
 	
-	public OfferRejectEvent(Offer offer) {
+	public ShipperTSPContractCanceledEvent(Contract contract) {
 		super();
-		this.offer = offer;
+		this.contract = contract;
 	}
 
-	public Offer getOffer() {
-		return offer;
+	public Contract getContract() {
+		return contract;
 	}
 
 	@Override

@@ -6,8 +6,6 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.TSPShipment.TimeWindow;
-
 
 public class TransportChain {
 	
@@ -16,28 +14,45 @@ public class TransportChain {
 	}
 	
 	public static class ChainLeg extends ChainElement{
+		
+		private CarrierContract contract;
+		
+		@Deprecated
 		private CarrierOffer carrierId;
 		
+		@Deprecated
 		private double duration;
 		
+		@Deprecated
 		public double getDuration() {
 			return duration;
 		}
 
+		@Deprecated
 		public void setDuration(double duration) {
 			this.duration = duration;
 		}
 
+		public ChainLeg(CarrierContract contract){
+			this.contract = contract;
+		}
+		
+		@Deprecated
 		public ChainLeg(CarrierOffer offer){
 			this.carrierId = offer;
 		}
 		
+		@Deprecated
 		public CarrierOffer getAcceptedOffer(){
 			return carrierId;
 		}
 		
 		public String toString(){
 			return "Chose carrier " + carrierId;
+		}
+		
+		public CarrierContract getContract(){
+			return contract;
 		}
 
 	}
@@ -182,7 +197,7 @@ public class TransportChain {
 	public Collection<ChainLeg> getLegs(){
 		Collection<ChainLeg> legs = new ArrayList<ChainLeg>();
 		for(ChainElement e : chainElements){
-			if(e.getClass().isInstance(ChainLeg.class)){
+			if(e instanceof ChainLeg){
 				legs.add((ChainLeg)e);
 			}
 		}

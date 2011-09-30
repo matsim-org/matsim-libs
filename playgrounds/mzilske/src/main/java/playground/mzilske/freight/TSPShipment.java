@@ -2,7 +2,7 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-public class TSPShipment {
+public class TSPShipment implements Shipment{
 	
 	private Id from;
 	
@@ -36,7 +36,7 @@ public class TSPShipment {
 		return size;
 	}
 
-	public TimeWindow getPickUpTimeWindow() {
+	public TimeWindow getPickupTimeWindow() {
 		return pickUpTimeWindow;
 	}
 
@@ -48,24 +48,4 @@ public class TSPShipment {
 		return "shipment([from="+from+"][to="+to+"][size="+size+"])";
 	}
 
-	public static class TimeWindow{
-		private double start;
-		
-		private double end;
-		
-		public TimeWindow(double start, double end){
-			this.start = start;
-			this.end = end;
-		}
-
-		public double getStart() {
-			return start;
-		}
-
-		public double getEnd() {
-			return end;
-		}
-		
-		
-	}
 }

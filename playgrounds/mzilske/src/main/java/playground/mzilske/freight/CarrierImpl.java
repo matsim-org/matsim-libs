@@ -15,11 +15,15 @@ public class CarrierImpl implements Carrier {
 	
 	private Id depotLinkId;
 	
-	private Collection<Contract> contracts = new ArrayList<Contract>();
+	private Collection<CarrierContract> contracts = new ArrayList<CarrierContract>();
 
 	private CarrierCapabilities carrierCapabilities;
 	
 	private CarrierKnowledge knowledge;
+
+	private Collection<CarrierContract> expiredContracts = new ArrayList<CarrierContract>();
+
+	private Collection<CarrierContract> newContracts = new ArrayList<CarrierContract>();
 
 	/* (non-Javadoc)
 	 * @see playground.mzilske.freight.Carrier#getKnowledge()
@@ -71,7 +75,7 @@ public class CarrierImpl implements Carrier {
 	 * @see playground.mzilske.freight.Carrier#getContracts()
 	 */
 	@Override
-	public Collection<Contract> getContracts() {
+	public Collection<CarrierContract> getContracts() {
 		return contracts;
 	}
 
@@ -105,6 +109,17 @@ public class CarrierImpl implements Carrier {
 	@Override
 	public CarrierCapabilities getCarrierCapabilities() {
 		return carrierCapabilities;
+	}
+
+	@Override
+	public Collection<CarrierContract> getNewContracts() {
+		return newContracts;
+	}
+
+	@Override
+	public Collection<CarrierContract> getExpiredContracts() {
+		// TODO Auto-generated method stub
+		return expiredContracts;
 	}
 	
 }

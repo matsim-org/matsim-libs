@@ -14,21 +14,36 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
 import playground.mzilske.freight.api.TSPAgentFactory;
+import playground.mzilske.freight.events.QueryTSPOffersEvent;
+import playground.mzilske.freight.events.QueryTSPOffersEventHandler;
 import playground.mzilske.freight.events.ShipmentDeliveredEvent;
 import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
 import playground.mzilske.freight.events.ShipmentPickedUpEvent;
 import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
+import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
+import playground.mzilske.freight.events.ShipperTSPContractAcceptEventHandler;
+import playground.mzilske.freight.events.ShipperTSPContractCanceledEvent;
+import playground.mzilske.freight.events.ShipperTSPContractCanceledEventHandler;
+import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
+import playground.mzilske.freight.events.TSPCarrierContractAcceptEventHandler;
+import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
+import playground.mzilske.freight.events.TSPCarrierContractCanceledEventHandler;
+import playground.mzilske.freight.events.TransportChainAddedEvent;
+import playground.mzilske.freight.events.TransportChainAddedEventHandler;
+import playground.mzilske.freight.events.TransportChainRemovedEvent;
+import playground.mzilske.freight.events.TransportChainRemovedEventHandler;
 
 
 /**
  * @author stscr
  *
  */
-public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler {
+public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler, ShipperTSPContractAcceptEventHandler, ShipperTSPContractCanceledEventHandler,
+	TSPCarrierContractAcceptEventHandler, TSPCarrierContractCanceledEventHandler, TransportChainAddedEventHandler, TransportChainRemovedEventHandler, QueryTSPOffersEventHandler {
 	
 	private Logger logger = Logger.getLogger(TSPAgentTracker.class);	
 	
-	private Collection<TransportServiceProviderImpl> transportServiceProviders;
+	private Collection<TransportServiceProvider> transportServiceProviders;
 	
 	private Collection<TSPAgent> tspAgents = new ArrayList<TSPAgent>();
 	
@@ -36,20 +51,20 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 	
 	private TSPAgentFactory tspAgentFactory;
 	
-	public TSPAgentTracker(Collection<TransportServiceProviderImpl> transportServiceProviders, TSPAgentFactory tspAgentFactory) {
+	public TSPAgentTracker(Collection<TransportServiceProvider> transportServiceProviders, TSPAgentFactory tspAgentFactory) {
 		this.transportServiceProviders = transportServiceProviders;
 		this.tspAgentFactory = tspAgentFactory;
 		createTSPAgents();
 		eventsManager = EventsUtils.createEventsManager();
 	}
 
-	public List<Contract> createCarrierContracts(){
-		List<Contract> carrierShipments = new ArrayList<Contract>();
+	public List<CarrierContract> createCarrierContracts(){
+		List<CarrierContract> carrierContracts = new ArrayList<CarrierContract>();
 		for(TSPAgent agent : tspAgents){
-			List<Contract> agentShipments = agent.createCarrierShipments();
-			carrierShipments.addAll(agentShipments);
+			List<CarrierContract> agentShipments = agent.getCarrierContracts();
+			carrierContracts.addAll(agentShipments);
 		}
-		return carrierShipments;
+		return carrierContracts;
 	}
 	
 	private TSPAgent findTSPAgentForShipment(Shipment shipment) {
@@ -62,7 +77,7 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 	}
 
 	private void createTSPAgents() {
-		for(TransportServiceProviderImpl tsp : transportServiceProviders){
+		for(TransportServiceProvider tsp : transportServiceProviders){
 			TSPAgent tspAgent = tspAgentFactory.createTspAgent(this, tsp);
 			tspAgents.add(tspAgent);
 		}
@@ -75,42 +90,7 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 		}
 	}
 	
-	public Collection<TSPOffer> requestService(Id from, Id to, int size, double startPickup, double endPickup, double startDelivery, double endDelivery){
-		Collection<TSPOffer> offers = new ArrayList<TSPOffer>();
-		for(TSPAgent tspAgent : tspAgents){
-			TSPOffer offer = tspAgent.requestService(from,to,size,startPickup,endPickup,startDelivery,endDelivery);
-			offers.add(offer);
-		}
-		return offers;
-	}
-	
-	public void offerGranted(TSPContract contract){
-		/*
-		 * add contract to tspContracts
-		 */
-		Id tspId = contract.getOffer().getId();
-		TransportServiceProviderImpl tsp = findTsp(tspId);
-		if(tsp == null){
-			throw new IllegalStateException("tsp " + tspId + " does not exist");
-		}
-		tsp.getContracts().add(contract);
-		TSPAgent tspAgent = findAgentForTSP(tspId);
-		
-	}
-	
-	public void offerRejected(TSPOffer offer){
-		/*
-		 * remove open offers and according transportChain
-		 */
-	}
-	
-	public void contractAnnulled(TSPContract contract){
-		/*
-		 * remove offer from tspAgent
-		 */
-	}
-
-	private TSPAgent findAgentForTSP(Id tspId) {
+	private TSPAgent findAgent(Id tspId) {
 		for(TSPAgent a : tspAgents){
 			if(a.getId().equals(tspId)){
 				return a;
@@ -119,33 +99,8 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 		return null;
 	}
 
-	public Collection<Contract> registerChainAndGetAffectedCarrierContract(Id tspId, TransportChain chain) {
-		TSPAgent agent = findAgentForTSP(tspId);
-		Collection<Contract> carrierContracts = agent.registerChainAndGetCarrierContracts(chain);
-		return carrierContracts;
-	}
-
-	public Collection<Contract> removeChainAndGetAffectedCarrierContract(Id tspId, TransportChain chain) {
-		TSPAgent agent = findAgentForTSP(tspId);
-		Collection<Contract> carrierContracts = agent.removeChainAndGetAffectedCarrierContracts(chain);
-		return carrierContracts;
-	}
-
-	public void removeContracts(Collection<TSPContract> contracts) {
-		for(TSPContract c : contracts){
-			TransportServiceProviderImpl tsp = findTsp(c.getOffer().getId());
-			if(tsp != null){
-				tsp.getContracts().remove(c);
-				logger.info("remove tspContract: " + c.getShipment());
-			}
-			else{
-				logger.warn("contract " + c + " could not be removed. No tsp found.");
-			}
-		}
-	}
-
-	private TransportServiceProviderImpl findTsp(Id tspId) {
-		for(TransportServiceProviderImpl tsp : transportServiceProviders){
+	private TransportServiceProvider findTsp(Id tspId) {
+		for(TransportServiceProvider tsp : transportServiceProviders){
 			if(tsp.getId().equals(tspId)){
 				return tsp;
 			}
@@ -153,32 +108,8 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 		return null;
 	}
 
-	public void addContracts(Collection<TSPContract> contracts) {
-		for(TSPContract contract : contracts){
-			TransportServiceProviderImpl tsp = findTsp(contract.getOffer().getId());
-			if(tsp != null){
-				tsp.getContracts().add(contract);
-				logger.info("add tspContract: " + contract.getShipment());
-			}
-			else{
-				logger.warn("contract " + contract + " could not be added. No tsp found.");
-			}
-		}
-	}
-
-	public TransportServiceProviderImpl getTsp(Id tspId) {
+	public TransportServiceProvider getTsp(Id tspId) {
 		return findTsp(tspId);
-	}
-
-	public List<CarrierOffer> getCarrierOffers(TSPOffer offer) {
-		TSPAgent tspAgent = findAgentForTSP(offer.getId());
-		if(tspAgent != null){
-			return tspAgent.getCarrierOffer(offer);
-		}
-		else{
-			throw new IllegalStateException("no tspAgent found for id "+ offer.getId());
-		}
-		
 	}
 	
 	public void calculateCosts(){
@@ -217,6 +148,53 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 	public void handleEvent(ShipmentPickedUpEvent event) {
 		TSPAgent agent = findTSPAgentForShipment(event.getShipment());
 		agent.shipmentPickedUp(event.getShipment(),event.getTime());
+	}
+
+	@Override
+	public void handleEvent(ShipperTSPContractAcceptEvent event) {
+		TSPAgent agent = findAgent(event.getContract().getOffer().getId());
+		agent.informShipperContractAccepted(event.getContract());
+	}
+
+	@Override
+	public void handleEvent(ShipperTSPContractCanceledEvent event) {
+		TSPAgent agent = findAgent(event.getContract().getOffer().getId());
+		agent.informShipperContractCanceled(event.getContract());
+		
+	}
+
+	@Override
+	public void handleEvent(TSPCarrierContractAcceptEvent event) {
+		TSPAgent agent = findAgent(event.getContract().getBuyer());
+		agent.informCarrierContractAccepted(event.getContract());
+	}
+
+	@Override
+	public void handleEvent(TSPCarrierContractCanceledEvent event) {
+		TSPAgent agent = findAgent(event.getContract().getBuyer());
+		agent.informCarrierContractCanceled(event.getContract());
+	}
+
+	@Override
+	public void handleEvent(TransportChainRemovedEvent event) {
+		TSPAgent agent = findAgent(event.getTspId());
+		agent.informChainRemoved(event.getChain());
+		
+	}
+
+	@Override
+	public void handleEvent(TransportChainAddedEvent event) {
+		TSPAgent agent = findAgent(event.getTspId());
+		agent.informChainAdded(event.getChain());
+	}
+
+	@Override
+	public void handleEvent(QueryTSPOffersEvent event) {
+		for(TSPAgent a : tspAgents){
+			TSPOffer offer = a.requestService(event.getService().getFrom(), event.getService().getTo(), event.getService().getSize(), 
+					event.getService().getStartPickup(), event.getService().getEndDelivery(), event.getService().getStartDelivery(), event.getService().getEndDelivery());
+			event.getOffers().add(offer);
+		}
 	}
 	
 }

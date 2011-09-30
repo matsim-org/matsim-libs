@@ -38,7 +38,7 @@ public class CarrierTimeDistanceCostFunction implements CarrierCostFunction {
 	}
 
 	private boolean hasContractsInCity() {
-		for(Contract c : carrier.getContracts()){
+		for(CarrierContract c : carrier.getContracts()){
 			if(!c.getShipment().getTo().toString().equals("i(8,4)R")){
 				return true;
 			}

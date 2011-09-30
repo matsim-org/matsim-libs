@@ -1,6 +1,6 @@
 package playground.mzilske.freight;
 
-interface CarrierDriverAgent {
+public interface CarrierDriverAgent {
 
 	public abstract void activityEndOccurs(String activityType, double time);
 
