@@ -17,6 +17,6 @@ public class Matsim4Urbansim {
 	public  static void main(String[] args) {
 		log.info("Directing to playground tnicolai...");
 //		playground.kai.urbansim.Matsim4Urbansim.main(args);
-		playground.tnicolai.urbansim.matsim4urbansim.MATSim4Urbansim.main(args);
+		playground.tnicolai.matsim4opus.matsim4urbansim.MATSim4Urbansim.main(args);
 	}
 }
