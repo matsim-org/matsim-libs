@@ -2,9 +2,9 @@ package playground.mzilske.city2000w;
 
 import java.util.Collection;
 
-import playground.mzilske.freight.CarrierCapabilities;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierCapabilities;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierPlan;
 
 public class SelectedPlanReplicator {
 

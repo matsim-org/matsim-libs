@@ -44,7 +44,7 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
-import playground.mzilske.freight.CarrierAgentTracker;
+import playground.mzilske.freight.carrier.CarrierAgentTracker;
 import playground.mzilske.osm.JXMapOTFVisClient;
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....

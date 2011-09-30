@@ -20,7 +20,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.mzilske.freight.FreightConstants;
+import playground.mzilske.freight.carrier.FreightConstants;
 
 public class AgentObserver implements ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler{
 

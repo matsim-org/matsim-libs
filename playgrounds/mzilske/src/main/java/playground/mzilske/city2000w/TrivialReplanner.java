@@ -7,14 +7,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import playground.mzilske.freight.CarrierCapabilities;
-import playground.mzilske.freight.CarrierPlan;
-import playground.mzilske.freight.CarrierContract;
-import playground.mzilske.freight.ScheduledTour;
-import playground.mzilske.freight.CarrierShipment;
-import playground.mzilske.freight.Shipment;
-import playground.mzilske.freight.Tour.TourElement;
-import playground.mzilske.freight.TourBuilder;
+import playground.mzilske.freight.carrier.CarrierCapabilities;
+import playground.mzilske.freight.carrier.CarrierContract;
+import playground.mzilske.freight.carrier.CarrierPlan;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.ScheduledTour;
+import playground.mzilske.freight.carrier.Shipment;
+import playground.mzilske.freight.carrier.TourBuilder;
+import playground.mzilske.freight.carrier.Tour.TourElement;
 
 public class TrivialReplanner {
 
