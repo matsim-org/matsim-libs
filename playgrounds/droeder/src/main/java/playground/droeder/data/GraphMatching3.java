@@ -20,6 +20,7 @@
 package playground.droeder.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +58,7 @@ import playground.droeder.gis.DaShapeWriter;
  * @author droeder
  * based on http://www.fsutmsonline.net/images/uploads/reports/FDOT_BC353_21_rpt.pdf
  */
-public class GraphMatching2 {
+public class GraphMatching3 {
 	private static final Logger log = Logger.getLogger(GraphMatching2.class);
 	
 	private MatchingGraph reference, candidate;
@@ -68,12 +69,13 @@ public class GraphMatching2 {
 	
 	private Map<Id, Id> nodeRef2Cand;
 	private Map<Id, Id> edgePreProcessRef2Cand;
-	private Map<Id, Tuple<Id, Map<Id, List<Id>>>> segmentRef2Cand;
+	private Map<Id, Tuple<Id, Map<Id, Id>>> segmentRef2CandComplete;
+	private Map<Id, Tuple<Id, Map<Id, Id>>> segmentRef2CandPartial;
 	private Map<Id, Id> edgeRef2Cand;
 	
 	public String outDir;
 	
-	public GraphMatching2(MatchingGraph reference, MatchingGraph candidate, 
+	public GraphMatching3(MatchingGraph reference, MatchingGraph candidate, 
 			Double deltaDist, Double deltaPhi, Double relLenghtDiff){
 		this.reference = reference;
 		this.candidate = candidate;
@@ -82,8 +84,11 @@ public class GraphMatching2 {
 		this.maxRelLengthDiff = relLenghtDiff;
 		this.nodeRef2Cand = new HashMap<Id, Id>();
 		this.edgePreProcessRef2Cand = new HashMap<Id, Id>();
-		this.segmentRef2Cand = new HashMap<Id, Tuple<Id,Map<Id,List<Id>>>>();
 		this.edgeRef2Cand = new HashMap<Id, Id>();
+
+		//<refEdgeId, <CandEdgeId, <refSegmentId, candSegmentId>>>
+		this.segmentRef2CandComplete = new HashMap<Id, Tuple<Id,Map<Id, Id>>>();
+		this.segmentRef2CandPartial = new HashMap<Id, Tuple<Id,Map<Id, Id>>>();
 	}
 	
 	public void run(String outDir){
@@ -196,49 +201,42 @@ public class GraphMatching2 {
 		log.info("\tstarting segment-matching...");
 		int cnt = 0, msg = 1;
 		
-		Map<Id, List<Id>> matchedSegments;
-		Iterator<MatchingSegment> refIt, candIt;
-		MatchingSegment ref = null, cand = null;
-		SegmentCompare comp;
-		List<Id> candSegments = null;
+		//referenceSegment 2 candidateSegments
+		Map<Id, Id> matchedSegments;
+		SegmentCompare comp = null;
+		List<SegmentCompare> tempCompareList;
+		Collection<Id> ref, cand;
 		
 		//iterate over all preprocessed edges
 		for(Entry<Id, Id> pre : this.edgePreProcessRef2Cand.entrySet()){
-			comp = null;
-			matchedSegments = new HashMap<Id, List<Id>>();
-			refIt = reference.getEdges().get(pre.getKey()).getSegments().iterator();
-			candIt = candidate.getEdges().get(pre.getValue()).getSegments().iterator();
-			
-			//iterate over segments
-			while(candIt.hasNext() && refIt.hasNext()){
-				//in the first step
-				if(comp == null){
-					candSegments = new ArrayList<Id>();
-					ref = refIt.next();
-					cand = candIt.next();
+			matchedSegments = new HashMap<Id, Id>();
+			cand = new ArrayList<Id>(candidate.getEdges().get(pre.getValue()).getSegmentMap().keySet());
+			for(MatchingSegment refSeg : reference.getEdges().get(pre.getKey()).getSegments()){
+				tempCompareList = new ArrayList<SegmentCompare>();
+				for(MatchingSegment candSeg: candidate.getEdges().get(pre.getValue()).getSegments()){
+					comp = new SegmentCompare(refSeg, candSeg);
+					if(comp.isMatched(this.deltaDist, this.deltaPhi, this.maxRelLengthDiff)){
+						comp.setScore(((comp.getAvDist()/ this.deltaDist) + (comp.getDeltaAngle() / this.deltaPhi))*0.5);
+						tempCompareList.add(comp);
+					}
 				}
-				// if the reference Segment ends first, increase
-				else if(comp.refIsUndershot()){
-					ref = refIt.next();
-					candSegments = new ArrayList<Id>();
+				if(!tempCompareList.isEmpty()){
+					Collections.sort(tempCompareList);
+					comp = tempCompareList.get(0);
+					if(cand.contains(comp.getCandId())){
+						cand.remove(comp.getCandId());
+						matchedSegments.put(comp.getRefId(), comp.getCandId());
+					}else{
+						break;
+					}
 				}
-				//if the candidate segment ends first, increase
-				else{
-					cand = candIt.next();
-				}
-				//compare
-				comp = new SegmentCompare(ref, cand);
-				// if it is matched, add
-				if(comp.isMatched(this.deltaDist, this.deltaPhi, this.maxRelLengthDiff)){
-					candSegments.add(comp.getCandId());
-					matchedSegments.put(comp.getRefId(), candSegments);
-				}
+				
 			}
-			// if all parts of the candidateEdge are matched
-			if(!matchedSegments.isEmpty()){
-				this.segmentRef2Cand.put(pre.getKey(), new Tuple<Id, Map<Id,List<Id>>>(pre.getValue(), matchedSegments));
+			if(matchedSegments.size() == reference.getEdges().get(pre.getKey()).getSegments().size()){
+				this.segmentRef2CandComplete.put(pre.getKey(), new Tuple<Id, Map<Id,Id>>(pre.getKey(), matchedSegments));
+			}else if(matchedSegments.size() > 0){
+				this.segmentRef2CandPartial.put(pre.getKey(), new Tuple<Id, Map<Id,Id>>(pre.getKey(), matchedSegments));
 			}
-			
 			cnt++;
 			if(cnt%msg==0){
 				msg*=2;
@@ -247,7 +245,7 @@ public class GraphMatching2 {
 		}
 		
 		log.info("\tfinished segment-matching. " + 
-				this.segmentRef2Cand.size() + " of " + this.edgePreProcessRef2Cand.size() + 
+				this.segmentRef2CandComplete.size() + " of " + this.edgePreProcessRef2Cand.size() + 
 				" prematched edges from the referenceGraph got a match for all or some of their segments...");
 	}
 
@@ -260,30 +258,36 @@ public class GraphMatching2 {
 		
 		EdgeCompare comp;
 		int cnt = 0, msg = 1;
-		for(Entry<Id, Id> preMapped : edgePreProcessRef2Cand.entrySet()){
-			
-			comp = new EdgeCompare(reference.getEdges().get(preMapped.getKey()), candidate.getEdges().get(preMapped.getValue()));
-			/*
-			 * TODO don't know why so many prematches are deleted here!!!
-			 *		there must be a bug in the EdgeCompare, where the segments are compared
-			 */
-			if(comp.isMatched(this.deltaDist, this.deltaPhi, this.maxRelLengthDiff)){
-				edgeRef2Cand.put(preMapped.getKey(), preMapped.getValue());
-			}else{
-				//TODO just for debbuging
-//				System.out.println(comp.toString());
-			}
-			cnt++;
-			if(cnt%msg==0){
-				msg*=2;
-				log.info("\t\tprocessed " + cnt + " of " + this.edgePreProcessRef2Cand.size() + " prematched edges from the reference-Graph...");
-			}
+		
+		for(Entry<Id, Tuple<Id, Map<Id, Id>>> e: this.segmentRef2CandComplete.entrySet()){
 			
 		}
-		this.edge2Shp(this.edgeRef2Cand, this.outDir + "edgeBottomUp.shp", "edgeBottomUp");
-		log.info("\tfinished edge-matching. " + 
-				this.edgeRef2Cand.size() + " of " + this.reference.getEdges().size() + 
-				" edges from the referenceGraph got a match...");
+		
+		
+//		for(Entry<Id, Id> preMapped : edgePreProcessRef2Cand.entrySet()){
+//			
+//			comp = new EdgeCompare(reference.getEdges().get(preMapped.getKey()), candidate.getEdges().get(preMapped.getValue()));
+//			/*
+//			 * TODO don't know why so many prematches are deleted here!!!
+//			 *		there must be a bug in the EdgeCompare, where the segments are compared
+//			 */
+//			if(comp.isMatched(this.deltaDist, this.deltaPhi, this.maxRelLengthDiff)){
+//				edgeRef2Cand.put(preMapped.getKey(), preMapped.getValue());
+//			}else{
+//				//TODO just for debbuging
+////				System.out.println(comp.toString());
+//			}
+//			cnt++;
+//			if(cnt%msg==0){
+//				msg*=2;
+//				log.info("\t\tprocessed " + cnt + " of " + this.edgePreProcessRef2Cand.size() + " prematched edges from the reference-Graph...");
+//			}
+//			
+//		}
+//		this.edge2Shp(this.edgeRef2Cand, this.outDir + "edgeBottomUp.shp", "edgeBottomUp");
+//		log.info("\tfinished edge-matching. " + 
+//				this.edgeRef2Cand.size() + " of " + this.reference.getEdges().size() + 
+//				" edges from the referenceGraph got a match...");
 	}
 
 	/**
@@ -611,7 +615,7 @@ public class GraphMatching2 {
 			}
 		}
 		
-		GraphMatching2 gm = new GraphMatching2(v, h, 500.0, Math.PI/6, 0.1);
+		GraphMatching3 gm = new GraphMatching3(v, h, 500.0, Math.PI/6, 0.1);
 		gm.run(OUT);
 	}
 }
