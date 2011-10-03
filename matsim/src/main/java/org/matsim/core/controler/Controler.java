@@ -163,8 +163,8 @@ public class Controler {
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_SCORESTATS = "scorestats.txt";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats.txt";
+	public static final String FILENAME_SCORESTATS = "scorestats";
+	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
 	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
 	public static final String FILENAME_NETWORK = "output_network.xml.gz";
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";

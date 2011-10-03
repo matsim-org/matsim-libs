@@ -61,7 +61,8 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 
 	final private Population population;
 	final private BufferedWriter out;
-
+	final private String fileName;
+	
 	private final boolean createPNG;
 	private double[][] history = null;
 	private int minIteration = 0;
@@ -72,14 +73,16 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 	 * Creates a new ScoreStats instance.
 	 *
 	 * @param population
-	 * @param filename
+	 * @param filename including the path, excluding the file type extension
 	 * @param createPNG true if in every iteration, the scorestats should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
 	public ScoreStats(final Population population, final String filename, final boolean createPNG) throws UncheckedIOException {
 		this.population = population;
+		this.fileName = filename;
 		this.createPNG = createPNG;
-		this.out = IOUtils.getBufferedWriter(filename);
+		if (filename.toLowerCase().endsWith(".txt")) this.out = IOUtils.getBufferedWriter(filename);
+		else this.out = IOUtils.getBufferedWriter(filename + ".txt");
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 		} catch (IOException e) {
@@ -214,7 +217,7 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("avg. executed score", iterations, values);
 				chart.addMatsimLogo();
-				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename("scorestats.png"), 800, 600);
+				chart.saveAsPng(this.fileName + ".png", 800, 600);
 			}
 			if (index == (this.history[0].length - 1)) {
 				// we cannot store more information, so disable the graph feature.
