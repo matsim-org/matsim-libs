@@ -1,14 +1,32 @@
-package herbie.creation.ptAnalysis;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
+package herbie.creation.ptAnalysis;
 
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -21,6 +39,7 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 
 public class PtScenarioAdaption {
@@ -34,6 +53,7 @@ public class PtScenarioAdaption {
 	private String transitScheduleFile;
 	private String vehiclesFile;
 	private ScenarioImpl scenario;
+	private TransitScheduleFactory transitFactory = null;
 
 	private TreeMap<Double, Departure> newDepartures;
 	private double currentInterval;
@@ -71,7 +91,8 @@ public class PtScenarioAdaption {
 		network.setCapacityPeriod(3600.0);
 		new MatsimNetworkReader(scenario).parse(networkfilePath);
 		
-		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		this.transitFactory = schedule.getFactory();
 		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
 		
 		log.info("Initialization ... done");
@@ -83,7 +104,7 @@ public class PtScenarioAdaption {
 	private void doubleHeadway() {
 		log.info("Double headway ...");
 		
-		TransitSchedule schedule = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -156,7 +177,7 @@ public class PtScenarioAdaption {
 		
 		// Copy first departure:
 		IdImpl newId = new IdImpl(++pastId);
-		Departure newDepImpl = new DepartureImpl(newId, pastDeparture);
+		Departure newDepImpl = this.transitFactory.createDeparture(newId, pastDeparture);
 		newDepartures.put(pastDeparture, newDepImpl);
 		
 		// Add departures if headway is within the range:
@@ -167,7 +188,7 @@ public class PtScenarioAdaption {
 				
 				newId = new IdImpl(++pastId);
 				
-				newDepImpl = new DepartureImpl(newId, pastDeparture + newInterval * 60d);
+				newDepImpl = this.transitFactory.createDeparture(newId, pastDeparture + newInterval * 60d);
 				
 				newDepartures.put(pastDeparture + newInterval *60d, newDepImpl);
 				
