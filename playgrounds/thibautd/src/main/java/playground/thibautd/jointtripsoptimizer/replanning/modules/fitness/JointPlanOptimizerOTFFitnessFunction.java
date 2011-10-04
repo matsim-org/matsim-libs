@@ -28,7 +28,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationLocalSearcher;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationOnTheFlyScorer;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerPartialDecoderFactory;
@@ -52,8 +51,7 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 
 	private final JointPlanOptimizerDecoder decoder;
 	private final JointPlanOptimizerDecoder fullDecoder;
-	//private final DurationOnTheFlyScorer scorer;
-	private final DurationLocalSearcher scorer;
+	private final DurationOnTheFlyScorer scorer;
 
 	public JointPlanOptimizerOTFFitnessFunction(
 			final JointPlan plan,
@@ -80,7 +78,7 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 					numJointEpisodes,
 					numEpisodes,
 					nMembers)).createDecoder();
-		this.scorer = new DurationLocalSearcher(new DurationOnTheFlyScorer(
+		this.scorer = new DurationOnTheFlyScorer(
 					plan,
 					configGroup,
 					scoringFunctionFactory,
@@ -89,7 +87,7 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 					network,
 					numJointEpisodes,
 					numEpisodes,
-					nMembers));
+					nMembers);
 	}
 
 	@Override
