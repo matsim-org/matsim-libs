@@ -34,6 +34,7 @@ import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.InvalidConfigurationException;
+import org.jgap.NaturalSelector;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -55,6 +56,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperato
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.HammingChromosomeDistanceComparator;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.NsgaIISelector;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.selectors.RestrictedTournamentSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
@@ -170,14 +172,15 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setChromosomePool(new ChromosomePool());
 
 			// selector
-			RestrictedTournamentSelector selector = 
-				new RestrictedTournamentSelector(
-						this,
-						configGroup,
-						(configGroup.getUseOnlyHammingDistanceInRTS() ?
-							 new HammingChromosomeDistanceComparator() :
-							 new DefaultChromosomeDistanceComparator(
-								configGroup.getDiscreteDistanceScale())));
+			//RestrictedTournamentSelector selector = 
+			//	new RestrictedTournamentSelector(
+			//			this,
+			//			configGroup,
+			//			(configGroup.getUseOnlyHammingDistanceInRTS() ?
+			//				 new HammingChromosomeDistanceComparator() :
+			//				 new DefaultChromosomeDistanceComparator(
+			//					configGroup.getDiscreteDistanceScale())));
+			NaturalSelector selector = new NsgaIISelector(this);
 			this.addNaturalSelector(selector, false);
 
 			// do not try to reintroduce fittest: RTS never eliminates it
@@ -185,6 +188,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 			// genetic operators definitions
 			if (configGroup.getPlotFitness()) {
+				log.warn("plotting fitness");
 				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
 							configGroup.getMaxIterations(),

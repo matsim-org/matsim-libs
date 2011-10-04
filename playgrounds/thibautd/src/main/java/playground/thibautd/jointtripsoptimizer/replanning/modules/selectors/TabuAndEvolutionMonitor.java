@@ -30,7 +30,7 @@ import org.jgap.Population;
 import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.RandomGenerator;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JointPlanOptimizerFitnessFunction;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.AbstractJointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerPopulationFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
@@ -185,7 +185,7 @@ public class TabuAndEvolutionMonitor implements IEvolutionMonitor, TabuMonitor {
 			for (int i=0; i < this.numBool; i++) {
 				chromosome.getGene(i).setAllele(toCorrect[i]);
 			}
-			chromosome.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
+			chromosome.setFitnessValueDirectly(AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 		}
 		
 	}
