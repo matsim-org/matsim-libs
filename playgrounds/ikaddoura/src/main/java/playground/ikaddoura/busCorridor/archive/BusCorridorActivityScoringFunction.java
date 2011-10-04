@@ -84,7 +84,7 @@ public class BusCorridorActivityScoringFunction implements ActivityScoring, Basi
 	}
 
 	@Override
-	public void endActivity(final double time) {
+	public void endActivity(final double time, final Activity act) {
 		handleAct(time);
 		this.lastTime = time;
 	}
