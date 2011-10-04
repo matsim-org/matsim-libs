@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.FacilitiesUtils;
 
 public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 
@@ -60,7 +61,7 @@ public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
 	@Override
 	public final void write(final String filename) {
 		this.writeOpenAndInit(filename);
-		for (ActivityFacility f : this.facilities.getFacilities().values()) {
+		for (ActivityFacility f : FacilitiesUtils.getSortedFacilities(this.facilities).values()) {
 			this.writeFacility((ActivityFacilityImpl) f);
 			counter.incCounter();
 		}

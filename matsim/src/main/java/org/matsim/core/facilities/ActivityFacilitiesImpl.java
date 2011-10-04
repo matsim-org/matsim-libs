@@ -21,6 +21,7 @@
 package org.matsim.core.facilities;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -45,7 +46,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 
-	private Map<Id, ActivityFacility> facilities = new TreeMap<Id, ActivityFacility>();
+	private Map<Id, ActivityFacility> facilities = new LinkedHashMap<Id, ActivityFacility>();
 
 	private String name;
 
