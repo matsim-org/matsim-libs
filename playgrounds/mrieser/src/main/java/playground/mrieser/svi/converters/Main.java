@@ -24,6 +24,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.mrieser.svi.data.ShapeZonesReader;
+import playground.mrieser.svi.data.Zones;
+
 /**
  * @author mrieser / senozon
  */
@@ -31,8 +34,18 @@ public class Main {
 
 	public static void main(String[] args) {
 		convertNetwork(
-				"/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/data1/matsim/network.cleaned.xml", 
-				"/Volumes/Data/virtualbox/exchange/dynusTdata");
+				"/Volumes/Data/virtualbox/rdc_exchange/svidata/morgenspitze_matsim/network.car.xml.gz", 
+				"/Volumes/Data/virtualbox/exchange/bellevue");
+		convertZones(
+				"/Volumes/Data/virtualbox/rdc_exchange/svidata/morgenspitze/shapeexport_zone.shp", 
+				"/Volumes/Data/virtualbox/exchange/bellevue",
+				"NO");
+	}
+	
+	private static void convertZones(final String zonesShpFile, final String targetDirectory, final String zoneIdAttributeName) {
+		Zones zones = new Zones();
+		new ShapeZonesReader(zones).readShapefile(zonesShpFile);
+		new DynusTZonesWriter(zones, zoneIdAttributeName).writeToDirectory(targetDirectory);
 	}
 
 	private static void convertNetwork(final String networkFilename, final String targetDirectory) {

@@ -116,7 +116,7 @@ public class DynusTNetworkWriter {
 				writer.write('\t');
 				writer.write('0'); // MTbayR
 				writer.write('\t');
-				writer.write(Double.toString(link.getLength())); // i3, link length?
+				writer.write(Double.toString(link.getLength() * 3.2808399)); // i3, link length, convert from meter to feet
 				writer.write('\t');
 				writer.write(Integer.toString((int) link.getNumberOfLanes())); // nOfLanes
 				writer.write('\t');
@@ -124,7 +124,7 @@ public class DynusTNetworkWriter {
 				writer.write('\t');
 				writer.write('5'); // Vfadjust; speed adjustment in mph
 				writer.write('\t');
-				writer.write(Double.toString(link.getFreespeed())); // SpeedLimit, miles per hour
+				writer.write(Double.toString(link.getFreespeed() * 3.6 * 0.621371192)); // SpeedLimit, convert from meter per second to kilometer per hour to miles per hour
 				writer.write('\t');
 				writer.write(Double.toString(link.getCapacity())); // mfrtp; maximum service flow rate?
 				writer.write('\t');
