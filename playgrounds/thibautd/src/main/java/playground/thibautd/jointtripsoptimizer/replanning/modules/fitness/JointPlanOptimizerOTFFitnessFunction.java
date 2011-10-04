@@ -43,11 +43,15 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * replacement for super.m_lastComputedFitnessValue, to keep the
+	 * "getlastfitnessvalue" functionnality
+	 */
+	private double lastComputedFitnessValue;
+
 	private final JointPlanOptimizerDecoder decoder;
 	private final JointPlanOptimizerDecoder fullDecoder;
 	private final DurationOnTheFlyScorer scorer;
-	private IChromosome lastIndividuallyScored = null;;
-	private JointPlan lastResultingPlan = null;
 
 	public JointPlanOptimizerOTFFitnessFunction(
 			final JointPlan plan,
@@ -88,10 +92,6 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 
 	@Override
 	protected double evaluate(final IChromosome chromosome) {
-		if (lastIndividuallyScored == chromosome) {
-			return lastResultingPlan.getScore();
-		}
-
 		JointPlan plan = this.decoder.decode(chromosome);
 		return this.scorer.score(chromosome, plan);
 	}
@@ -100,11 +100,19 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 		return this.fullDecoder;
 	}
 
+	/**
+	 * Reimplements the jgap default by allowing a negative fitness.
+	 */
 	@Override
-	protected double[] evaluateIndividuals(IChromosome chromosome) {
-		lastIndividuallyScored = chromosome;
-		lastResultingPlan = this.decoder.decode(chromosome);
-		return this.scorer.scoreSeparately(chromosome, lastResultingPlan);
+	public double getFitnessValue(final IChromosome a_subject) {
+		double fitnessValue = evaluate(a_subject);
+		this.lastComputedFitnessValue = fitnessValue;
+		return fitnessValue;
+	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+		return this.lastComputedFitnessValue;
 	}
 }
 

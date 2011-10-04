@@ -31,7 +31,7 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.AbstractJointPlanOptimizerFitnessFunction;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JointPlanOptimizerFitnessFunction;
 
 /**
  * Extends org.jgap.Chromosome so that it can take negative fitness values.
@@ -47,13 +47,11 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	private final double dayDuration;
 	private final List<Integer> nDurationGenes;
 
-	private double[] individualScores = null;
-
 	public JointPlanOptimizerJGAPChromosome(
 			final Configuration a_configuration,
 			final Gene[] genes) throws InvalidConfigurationException {
 		super(a_configuration, genes);
-		super.m_fitnessValue = AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
+		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
 
 		try {
 			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
@@ -70,7 +68,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	public JointPlanOptimizerJGAPChromosome(
 			final Configuration a_configuration) throws InvalidConfigurationException {
 		super(a_configuration);
-		super.m_fitnessValue = AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
+		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
 
 		try {
 			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
@@ -139,7 +137,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 				// do NOT clone the fitness, as this function is mainly used to
 				// create new chromosomes to be modified, and thus re-evaluated.
 				//copy.setFitnessValue(m_fitnessValue);
-				copy.setFitnessValueDirectly(AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
+				copy.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
 			}
 			// Clone constraint checker.
 			// -------------------------
@@ -346,7 +344,7 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 
 	@Override
 	public double getFitnessValue() {
-		if ((AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != super.m_fitnessValue)) {
+		if ((JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != super.m_fitnessValue)) {
 			return super.m_fitnessValue;
 		}
 		return super.calcFitnessValue();
@@ -355,30 +353,11 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 	@Override
 	public void setFitnessValue(final double a_newFitnessValue) {
 		if (
-				(AbstractJointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != a_newFitnessValue) &&
+				(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != a_newFitnessValue) &&
 				(Math.abs(m_fitnessValue - a_newFitnessValue) > 0.0000001)) {
 
 			super.m_fitnessValue = a_newFitnessValue;
 		}
-	}
-
-	/**
-	 * @return the scores of the individual plans
-	 */
-	public double[] getIndividualScores() {
-		if (individualScores == null) {
-			super.calcFitnessValue();
-		}
-
-		return individualScores;
-	}
-
-	/** 
-	 * Sets the individual plans score, for latter use in multi-objective optimisation.
-	 */
-	public void setIndividualScores(final double[] scores) {
-		// TODO: check that not changed once set
-		this.individualScores = scores;
 	}
 
 	/**

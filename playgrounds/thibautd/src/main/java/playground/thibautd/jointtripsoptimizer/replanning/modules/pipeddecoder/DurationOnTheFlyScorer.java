@@ -104,9 +104,6 @@ public class DurationOnTheFlyScorer {
 	private	final Network network;
 	private final int nMembers;
 	private final ScoringFunctionFactory scoringFunctionFactory;
-	// to be sure individual scores are always in the same order
-	private final Id[] membersIds;
-	private final IChromosome lastScored = null;
 
 	/**
 	 * initializes a decoder, which can be used on any modification of the
@@ -129,7 +126,6 @@ public class DurationOnTheFlyScorer {
 		this.network = network;
 		this.nMembers = nMembers;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		this.membersIds = new Id[nMembers];
 
 		//construction
 		//Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
@@ -139,9 +135,7 @@ public class DurationOnTheFlyScorer {
 		Integer indexToAdd;
 
 		// initialize the geneIndices structure
-		int count = 0;
 		for (Id id : plan.getClique().getMembers().keySet()) {
-			this.membersIds[count++] = id;
 			this.genesIndices.put(id, new ArrayList<Integer>());
 		}
 
@@ -200,37 +194,6 @@ public class DurationOnTheFlyScorer {
 	public double score(
 			final IChromosome chromosome,
 			final JointPlan inputPlan) {
-		return getScore(getIndividualValuesMap(chromosome, inputPlan));
-	}
-
-	/**
-	 * returns an array containing the individuals scores, and modifies
-	 * the scores in the parameter plan so that the group score is accessible.
-	 */
-	public double[] scoreSeparately(
-			final IChromosome chromosome,
-			final JointPlan inputPlan) {
-		double[] out = new double[nMembers];
-		Map<Id, IndividualValuesWrapper> values =
-			getIndividualValuesMap(chromosome, inputPlan);
-		Map<Id, Plan> plans = this.plan.getIndividualPlans();
-
-		ScoringFunction currentScoring;
-		double score;
-		for (int i=0; i < nMembers; i++) {
-			currentScoring = values.get(membersIds[i]).scoringFunction;
-			currentScoring.finish();
-			score = currentScoring.getScore();
-			out[i] = score;
-			plans.get(membersIds[i]).setScore(score);
-		}
-
-		return out;
-	}
-
-	public Map<Id, IndividualValuesWrapper> getIndividualValuesMap(
-			final IChromosome chromosome,
-			final JointPlan inputPlan) {
 
 		Map<Id, IndividualValuesWrapper> individualValuesMap = 
 			new HashMap<Id, IndividualValuesWrapper>(nMembers);
@@ -270,7 +233,9 @@ public class DurationOnTheFlyScorer {
 			toRemove.clear();
 		} while (!individualsToPlan.isEmpty());
 
-		return individualValuesMap;
+		double score = getScore(individualValuesMap);
+		//log.debug("score: "+score);
+		return score;
 	}
 
 	private void resetInternalState() {

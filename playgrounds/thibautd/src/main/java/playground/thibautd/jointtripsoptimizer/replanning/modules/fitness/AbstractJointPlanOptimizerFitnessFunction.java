@@ -20,10 +20,8 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules.fitness;
 
 import org.jgap.FitnessFunction;
-import org.jgap.IChromosome;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPChromosome;
 
 /**
  * Extend this class to provide a fitness function for the joint replanning algorithm.
@@ -32,43 +30,9 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
  * @author thibautd
  */
 abstract public class AbstractJointPlanOptimizerFitnessFunction extends FitnessFunction {
-	public static final double NO_FITNESS_VALUE = Double.NEGATIVE_INFINITY;
-	private double lastComputedFitnessValue = NO_FITNESS_VALUE;
-
 	/**
 	 * @return a decoder which creates plans consistent with the scores
 	 */
 	abstract public JointPlanOptimizerDecoder getDecoder(); 
-
-	/**
-	 * @return the individual scores for the members of the clique
-	 */
-	abstract protected double[] evaluateIndividuals(final IChromosome chromosome);
-
-	/**
-	 * Reimplements the jgap default by allowing a negative fitness and
-	 * setting the individual scores.
-	 */
-	@Override
-	public double getFitnessValue(final IChromosome a_subject) {
-		double[] fitnessValues = evaluateIndividuals(a_subject);
-		double fitnessValue = evaluate(a_subject);
-		this.lastComputedFitnessValue = fitnessValue;
-
-		try {
-			((JointPlanOptimizerJGAPChromosome) a_subject).setIndividualScores(fitnessValues);
-		} catch (ClassCastException e) {
-			throw new IllegalArgumentException(
-					"can only run AbstractJointPlanOptimizerFitnessFunction with JointPlanOptimizerJGAPChromosome chromosomes",
-					e);
-		}
-
-		return fitnessValue;
-	}
-
-	@Override
-	public double getLastComputedFitnessValue() {
-		return this.lastComputedFitnessValue;
-	}
 }
 
