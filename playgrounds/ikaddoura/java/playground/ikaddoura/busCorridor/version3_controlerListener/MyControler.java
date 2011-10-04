@@ -33,7 +33,7 @@ public class MyControler {
 	
 	public static void main(final String[] args) {
 					
-			String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version3_controlerListener/config_busline.xml";
+			String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version3/config_busline.xml";
 			Controler controler = new Controler(configFile);
 			controler.setOverwriteFiles(true);
 			controler.addControlerListener(new MyControlerListener());
