@@ -55,8 +55,8 @@ public class JointControler extends Controler {
 	/**
 	 * replacement for the private super() fields.
 	 */
-	//private PlansScoring plansScoring = null;
-	private JointPlansScoring plansScoring = null;
+	private PlansScoring plansScoring = null;
+	//private JointPlansScoring plansScoring = null;
 	//private RoadPricing roadPricing = null;
 
 	/*
@@ -102,7 +102,8 @@ public class JointControler extends Controler {
 		this.addCoreControlerListener(new CoreControlerListener());
 
 		// the default handling of plans
-		this.plansScoring = new JointPlansScoring();
+		// this.plansScoring = new JointPlansScoring();
+		this.plansScoring = new PlansScoring();
 		//this.plansScoring = new PlansScoring();
 		this.addCoreControlerListener(this.plansScoring);
 
