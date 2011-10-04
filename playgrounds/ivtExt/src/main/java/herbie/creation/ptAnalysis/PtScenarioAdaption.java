@@ -1,23 +1,21 @@
 package herbie.creation.ptAnalysis;
 
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -36,6 +34,11 @@ public class PtScenarioAdaption {
 	private String transitScheduleFile;
 	private String vehiclesFile;
 	private ScenarioImpl scenario;
+
+	private TreeMap<Double, Departure> newDepartures;
+	private double currentInterval;
+	private long pastId;
+	private Double pastDeparture;
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -62,14 +65,14 @@ public class PtScenarioAdaption {
 		this.vehiclesFile = config.findParam("ptScenarioAdaption", "vehiclesFile");
 		
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
-		
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
+		scenario.getConfig().scenario().setUseVehicles(true);
+		scenario.getConfig().scenario().setUseTransit(true);
+		NetworkImpl network = scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		new MatsimNetworkReader(scenario).parse(networkfilePath);
 		
 		TransitSchedule schedule = ((ScenarioImpl) scenario).getTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network, scenario).parse(transitScheduleFile);
-		
-		
+		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
 		
 		log.info("Initialization ... done");
 	}
@@ -85,52 +88,101 @@ public class PtScenarioAdaption {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				
+				
 				Map<Id, Departure> departures = route.getDepartures();
 				
 				if(departures == null || departures.size() < 2) continue;
 				
-				TreeMap<Id, Departure> sortedDepartures = new TreeMap<Id, Departure>(departures);
+				newDepartures = new TreeMap<Double, Departure>();
+				TreeMap<Double, Departure> departuresTimes = new TreeMap<Double, Departure>();
 				
-				// test:
-				for(Id id : sortedDepartures.keySet()) System.out.println("Key "+ id.toString());
-				System.out.println("End test.");
-				
-				
-				for(Id depId : sortedDepartures.keySet()){
-					
-					Departure prevDepId = (Departure) sortedDepartures.lowerEntry(depId);
-					if(prevDepId == null) continue;
-					
-					double depTime1 = sortedDepartures.get(depId).getDepartureTime();
-					double depTime0 = prevDepId.getDepartureTime();
-					System.out.println("Dep. time: "+depTime1);
-					System.out.println();
-					
-					double headway = depTime1 - depTime0;
-					
-					if(headway > headwayClasses[0] && headway <= headwayClasses[headwayClasses.length - 1]){
-//  missing code
-						double addDepartureTime = 0.0;
-						addDeparture(addDepartureTime);
-						
-						if(depId.equals(sortedDepartures.lastKey())){
-//  missing code
-							double lastDepartureTime = 0.0;
-							addDeparture(lastDepartureTime);
-						}
-					}
+				for(Departure departure : departures.values()){
+					departuresTimes.put(departure.getDepartureTime(), departure);
 				}
+						
+				// test:
+//				for(Double depTime : departuresTimes.keySet()) System.out.println("depTime "+ depTime);
+//				System.out.println("End test.");
+				
+				pastId = Long.parseLong(departuresTimes.get(departuresTimes.firstKey()).getId().toString());
+				
+				for(Double depTime : departuresTimes.keySet()){
+					
+					if(departuresTimes.lastKey() == depTime) continue;
+					
+					pastDeparture = depTime;
+					currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
+					
+					if(departuresTimes.higherKey(depTime) != null &&
+							(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
+						continue;
+					}
+					
+					addNewDepartures(departuresTimes.higherKey(depTime), departuresTimes.get(depTime));
+				}
+				
+				this.removeDepartures((TransitRouteImpl) route);
+				this.addNewDepartures(route);
+				
 			}
 		}
-		
 		
 		log.info("Double headway ... done");
 	}
 	
-	private void addDeparture(double addDepartureTime) {
-
-//  missing code
+	private void removeDepartures(TransitRouteImpl route) {
 		
+//		Stack<Id>...
+		
+		for(Id id : route.getDepartures().keySet()){
+			
+		}
+//		route.removeDeparture(route.getDepartures().get(id));
+		
+		System.out.println();
+		TreeMap<Id, Departure> departures = (TreeMap<Id, Departure>) route.getDepartures();
+		departures = new TreeMap<Id, Departure>();
+		System.out.println();
+	}
+
+	private void addNewDepartures(TransitRoute route) {
+		for(Departure departure : newDepartures.values()){
+			route.addDeparture(departure);
+		}
+		
+	}
+	
+	private void addNewDepartures(Double upperThreshold, Departure departure) {
+		
+		// Copy first departure:
+		IdImpl newId = new IdImpl(++pastId);
+		Departure newDepImpl = new DepartureImpl(newId, pastDeparture);
+		newDepartures.put(pastDeparture, newDepImpl);
+		
+		// Add departures if headway is within the range:
+		if(currentInterval > headwayClasses[0] && currentInterval <= headwayClasses[headwayClasses.length - 1]) 
+		{
+			double newInterval = getNewInterval();
+			while(pastDeparture + newInterval  *60d < upperThreshold){
+				
+				newId = new IdImpl(++pastId);
+				
+				newDepImpl = new DepartureImpl(newId, pastDeparture + newInterval * 60d);
+				
+				newDepartures.put(pastDeparture + newInterval *60d, newDepImpl);
+				
+				pastDeparture = pastDeparture + newInterval * 60d;
+			}
+		}
+	}
+	
+
+	private double getNewInterval() {
+		
+		for (int i = 1; i < headwayClasses.length; i++) {
+			if(headwayClasses[i] > currentInterval) return headwayClasses[(i-1)];
+		}
+		return headwayClasses[0];
 	}
 
 	private void writeScenario() {
