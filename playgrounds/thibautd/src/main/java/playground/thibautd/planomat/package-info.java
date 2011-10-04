@@ -16,4 +16,4 @@
  * </ul>
  * 
  */
-package org.matsim.planomat;
+package playground.thibautd.planomat;
