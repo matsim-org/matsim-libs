@@ -60,7 +60,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  *
  * @author thibautd
  */
-public class DurationOnTheFlyScorer {
+public class DurationOnTheFlyScorer implements FinalScorer {
 	private static final Logger log =
 		Logger.getLogger(DurationOnTheFlyScorer.class);
 
@@ -215,7 +215,7 @@ public class DurationOnTheFlyScorer {
 					currentId,
 					new IndividualValuesWrapper(
 						this.scoringFunctionFactory.createNewScoringFunction(individualPlan),
-						individualPlan.getPlanElements()));
+						individualPlan));
 		}
 
 		do {
@@ -247,11 +247,16 @@ public class DurationOnTheFlyScorer {
 	private double getScore(final Map<Id, IndividualValuesWrapper> values) {
 		ScoringFunction currentScoring;
 
-		for (Map.Entry<Id, Plan> indivPlan :
-			this.plan.getIndividualPlans().entrySet()) {
-			currentScoring = values.get(indivPlan.getKey()).scoringFunction;
+		//for (Map.Entry<Id, Plan> indivPlan :
+		//	this.plan.getIndividualPlans().entrySet()) {
+		//	currentScoring = values.get(indivPlan.getKey()).scoringFunction;
+		//	currentScoring.finish();
+		//	indivPlan.getValue().setScore(currentScoring.getScore());
+		//}
+		for (IndividualValuesWrapper value : values.values()) {
+			currentScoring = value.scoringFunction;
 			currentScoring.finish();
-			indivPlan.getValue().setScore(currentScoring.getScore());
+			value.individualPlan.setScore(currentScoring.getScore());
 		}
 
 		return this.plan.getScore();
@@ -666,6 +671,7 @@ public class DurationOnTheFlyScorer {
 		private double now = 0d;
 		public final ScoringFunction scoringFunction;
 		public final List<PlanElement> planElements;
+		public final Plan individualPlan;
 
 		/**
 		 * For tracking travel time in complicated joint trips
@@ -674,9 +680,10 @@ public class DurationOnTheFlyScorer {
 
 		public IndividualValuesWrapper(
 				final ScoringFunction scoringFunction,
-				final List<PlanElement> planElements) {
+				final Plan indivPlan) {
 			this.scoringFunction = scoringFunction;
-			this.planElements = planElements;
+			this.individualPlan = indivPlan;
+			this.planElements = indivPlan.getPlanElements();
 		}
 
 		public void addToIndexInPlan(final int i) {
