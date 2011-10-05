@@ -45,6 +45,7 @@ public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 			
 		}
 
+		/*
 		@Override
 		public CarrierOffer requestOffer(Id from, Id to, int shipmentSize, double startPickup, double endPickup, double startDelivery, double endDelivery) {
 			CarrierOffer offer = new CarrierOffer();
@@ -69,15 +70,19 @@ public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 		@Override
 		public void reset() {
 			
+			
 		}
+		*/
 
 		@Override
 		public void calculateCosts() {
+			/*
 			double totalCostsToAllocate = 0.0;
 			for(CarrierDriverAgent driver : carrierDriverAgents.values()){
 				totalCostsToAllocate += driver.getDistance();
 			}
 			marginalCostOfContractCalculator.run(carrier.getDepotLinkId(), carrier.getContracts(), totalCostsToAllocate);
+			*/
 		}
 
 		@Override
@@ -85,6 +90,7 @@ public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 			
 		}
 
+		/*
 		@Override
 		public void informOfferAccepted(CarrierContract contract) {
 			logger.info("i am " + contract.getOffer().getId() + " and my offer was accepted :)). offer: " + contract.getOffer().getPrice());
@@ -93,7 +99,8 @@ public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 		@Override
 		public void informOfferRejected(CarrierOffer offer) {
 			logger.info("i am " + offer.getId() + " and my offer was rejected ;)). offer: " + offer.getPrice());
-		}		
+		}
+		*/		
 	}
 
 	private PlanAlgorithm router;
