@@ -31,7 +31,6 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
@@ -92,8 +91,11 @@ public class EnergyFlowsController extends Controler {
 	 * the Facilities instead of the Config File.
 	 */
 	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getFacilities());
+	protected void setUp() {
+		if (this.scoringFunctionFactory == null) {
+			this.scoringFunctionFactory = new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getFacilities());
+		}
+		super.setUp();
 	}
 	
 	public EnergyFlowsController(String[] args) {

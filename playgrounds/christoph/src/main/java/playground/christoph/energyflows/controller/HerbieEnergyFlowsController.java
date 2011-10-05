@@ -73,10 +73,10 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 		PersonalizableTravelTime timeCalculator = super.getTravelTimeCalculator();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelCostCalculator(timeCalculator, cnScoringGroup);
-		
 		this.setTravelCostCalculatorFactory(costCalculatorFactory);
-		
+				
 		super.setUp();
+		
 	}
 	
 	@Override
