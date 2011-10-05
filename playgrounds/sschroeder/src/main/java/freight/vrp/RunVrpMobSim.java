@@ -1,19 +1,19 @@
-package city2000w;
+package freight.vrp;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -21,18 +21,23 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.mzilske.city2000w.AnotherCity2000WMobsimFactory;
-import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.freight.DriverEventWriter;
 import playground.mzilske.freight.api.CarrierAgentFactory;
 import playground.mzilske.freight.carrier.Carrier;
 import playground.mzilske.freight.carrier.CarrierAgent;
 import playground.mzilske.freight.carrier.CarrierAgentImpl;
 import playground.mzilske.freight.carrier.CarrierAgentTracker;
 import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
+import playground.mzilske.freight.carrier.CarrierPlan;
 import playground.mzilske.freight.carrier.CarrierPlanReader;
+import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierVehicle;
+import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
+import vrp.basics.CrowFlyDistance;
+import vrp.basics.InitialSolutionFactoryImpl;
+import city2000w.VRPCarrierPlanBuilder;
 
 
-public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener{
+public class RunVrpMobSim implements StartupListener, BeforeMobsimListener, ScoringListener{
 	
 	static class SimpleCarrierAgentFactory implements CarrierAgentFactory {
 
@@ -47,9 +52,10 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router,  new CarrierDriverAgentFactoryImpl());
 			return agent;
 		}
-		
 	}
-	private static Logger logger = Logger.getLogger(RunMobSimWithCarrier.class);
+	
+	
+	private static Logger logger = Logger.getLogger(RunVrpMobSim.class);
 	
 	private static String NETWORK_FILENAME;
 	
@@ -60,7 +66,8 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	public static void main(String[] args) {
-		RunMobSimWithCarrier mobSim = new RunMobSimWithCarrier();
+		Logger.getRootLogger().setLevel(Level.INFO);
+		RunVrpMobSim mobSim = new RunVrpMobSim();
 		mobSim.run();
 	}
 	
@@ -86,7 +93,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
+		NETWORK_FILENAME = "../playgrounds/sschroeder/vrp/grid1000.xml";
 	}
 
 	private void readNetwork(String networkFilename) {
@@ -94,17 +101,19 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
-		new CarrierPlanReader(carrierImpls).read("../playgrounds/sschroeder/anotherInput/karlsruheCarrierPlans_after.xml");
+		Collection<Carrier> carriers = new ArrayList<Carrier>();
+		new CarrierPlanReader(carriers).read("../playgrounds/sschroeder/vrp/christophidesMingozziToth_vrpnc2_plans.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
-		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
+		carrierAgentTracker = new CarrierAgentTracker(carriers, router, scenario.getNetwork(), agentFactory);
 		AnotherCity2000WMobsimFactory mobsimFactory = new AnotherCity2000WMobsimFactory(0, carrierAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		mobsimFactory.setUseOTFVis(false);
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 	
+	
+
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(carrierAgentTracker);

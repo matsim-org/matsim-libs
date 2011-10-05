@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.mzilske.freight.carrier.CarrierShipment;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.VRP;
@@ -16,7 +17,7 @@ import vrp.basics.VRPWithMultipleDepotsAndVehiclesImpl;
 import vrp.basics.Vehicle;
 import vrp.basics.VehicleType;
 
-public class VRPWithMultipleDepotsBuilder {
+public class VRPBuilder {
 	
 	private Constraints constraints = new Constraints(){
 
@@ -42,6 +43,11 @@ public class VRPWithMultipleDepotsBuilder {
 	
 	private Map<Id,VehicleType> types = new HashMap<Id, VehicleType>();
 	
+	public VRPBuilder(VRPTransformation vrpTrafo) {
+		super();
+		this.vrpTrafo = vrpTrafo;
+	}
+
 	public void addDepot(Id depotId, Id depotLocationId){
 		depots.add(depotId);
 		depotLocations.add(depotLocationId);
@@ -51,6 +57,23 @@ public class VRPWithMultipleDepotsBuilder {
 		types.put(depotId, type);
 	}
 	
+	public void addPickupOf(CarrierShipment carrierShipment){
+		vrpTrafo.addPickupOf(carrierShipment);
+	}
+	
+	public void addDeliveryOf(CarrierShipment carrierShipment){
+		vrpTrafo.addDeliveryOf(carrierShipment);
+	}
+	
+	public void addPickupAndDeliveryOf(CarrierShipment carrierShipment){
+		vrpTrafo.addPickupAndDeliveryOf(carrierShipment);
+	}
+	
+
+	public VRPTransformation getVrpTransformation() {
+		return vrpTrafo;
+	}
+
 	public void setConstraints(Constraints constraints){
 		this.constraints = constraints;
 	}

@@ -37,7 +37,7 @@ public interface VRP {
 	
 	public Customer getDepot();
 	
-	public Map<String, Customer> getCustomers(); //inclusive depot
+	public Map<String, Customer> getCustomers(); //inclusive depots
 	
 	public Map<String, Customer> getDepots();
 

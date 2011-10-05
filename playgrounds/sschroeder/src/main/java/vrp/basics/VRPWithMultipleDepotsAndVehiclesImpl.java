@@ -98,7 +98,7 @@ public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 
 	@Override
 	public Customer getDepot() {
-		return null;
+		return getDepots().values().iterator().next();
 	}
 
 	@Override

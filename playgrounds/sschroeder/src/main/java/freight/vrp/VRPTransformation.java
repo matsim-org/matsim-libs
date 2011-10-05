@@ -25,15 +25,15 @@ import vrp.basics.VrpUtils;
 
 public class VRPTransformation {
 	
-	private HashMap<CarrierShipment,Id> fromCustomers = new HashMap<CarrierShipment, Id>();
+	private HashMap<CarrierShipment,Id> fromCustomers = new HashMap<CarrierShipment,Id>();
 	
-	private HashMap<CarrierShipment,Id> toCustomers = new HashMap<CarrierShipment, Id>();
+	private HashMap<CarrierShipment,Id> toCustomers = new HashMap<CarrierShipment,Id>();
 	
-	private HashMap<Id, CarrierShipment> shipments = new HashMap<Id, CarrierShipment>();
+	private HashMap<Id,CarrierShipment> shipments = new HashMap<Id,CarrierShipment>();
 	
 	private HashMap<Id,Customer> customers = new HashMap<Id,Customer>();
 	
-	private HashMap<Id, Node> nodes = new HashMap<Id, Node>();
+	private HashMap<Id,Node> nodes = new HashMap<Id,Node>();
 	
 	private Integer customerCounter = 0;
 
@@ -56,28 +56,26 @@ public class VRPTransformation {
 		customers.put(customerId, customer);
 	}
 
-	public void addShipments(Collection<CarrierShipment> shipments){
-		for(CarrierShipment s : shipments){
-			addShipment(s);
-		}
-	}
-
-	public void addShipment(CarrierShipment shipment){
-		addNewShipment(shipment);
-	}
-	
-	private void addNewShipment(CarrierShipment shipment) {
+	public void addPickupAndDeliveryOf(CarrierShipment shipment){
 		Customer fromCustomer = makeFromCustomer(shipment);
 		Customer toCustomer = makeToCustomer(shipment);
 		fromCustomer.setRelation(VrpUtils.createRelation(toCustomer));
 		toCustomer.setRelation(VrpUtils.createRelation(fromCustomer));
 		updateMaps(shipment, fromCustomer, toCustomer);
 	}
-
-	public void removeShipments(Collection<CarrierShipment> shipments){
-		for(Shipment s : shipments){
-			removeShipment(s);
-		}
+	
+	public void addDeliveryOf(CarrierShipment shipment){
+		Customer toCustomer = makeToCustomer(shipment);
+		customers.put(makeId(toCustomer.getId()),toCustomer);
+		toCustomers.put(shipment, makeId(toCustomer.getId()));
+		shipments.put(makeId(toCustomer.getId()), shipment);	
+	}
+	
+	public void addPickupOf(CarrierShipment shipment){
+		Customer fromCustomer = makeFromCustomer(shipment);
+		customers.put(makeId(fromCustomer.getId()),fromCustomer);
+		fromCustomers.put(shipment, makeId(fromCustomer.getId()));
+		shipments.put(makeId(fromCustomer.getId()), shipment);
 	}
 	
 	public void removeShipment(Shipment shipment){
@@ -121,8 +119,7 @@ public class VRPTransformation {
 		nodes.clear();
 	}
 
-	private void updateMaps(CarrierShipment shipment, Customer fromCustomer,
-			Customer toCustomer) {
+	private void updateMaps(CarrierShipment shipment, Customer fromCustomer, Customer toCustomer) {
 		customers.put(makeId(fromCustomer.getId()),fromCustomer);
 		customers.put(makeId(toCustomer.getId()),toCustomer);
 		toCustomers.put(shipment, makeId(toCustomer.getId()));
@@ -131,11 +128,15 @@ public class VRPTransformation {
 		shipments.put(makeId(toCustomer.getId()), shipment);
 	}
 
-	private Customer makeToCustomer(Shipment shipment) {
+	public String createCustomerId(){
 		customerCounter++;
+		return customerCounter.toString();
+	}
+	
+	private Customer makeToCustomer(Shipment shipment) {
 		Id id = shipment.getTo();
 		Node node = makeNode(id);
-		Customer customer = VrpUtils.createCustomer(customerCounter.toString(), node, shipment.getSize()*-1, 
+		Customer customer = VrpUtils.createCustomer(createCustomerId(), node, shipment.getSize()*-1, 
 				shipment.getDeliveryTimeWindow().getStart(), shipment.getDeliveryTimeWindow().getEnd(), 0.0);
 		return customer;
 	}
@@ -162,7 +163,6 @@ public class VRPTransformation {
 	}
 
 	private Customer makeFromCustomer(Shipment shipment) {
-		customerCounter++;
 		Id id = shipment.getFrom();
 		Node node = null;
 		if(nodes.containsKey(id)){
@@ -173,7 +173,7 @@ public class VRPTransformation {
 			node.setCoord(makeCoordinate(locations.getCoord(id)));
 			nodes.put(makeId(node.getId()), node);
 		}
-		Customer customer = VrpUtils.createCustomer(customerCounter.toString(), node, shipment.getSize(), 
+		Customer customer = VrpUtils.createCustomer(createCustomerId(), node, shipment.getSize(), 
 				shipment.getPickupTimeWindow().getStart(), shipment.getPickupTimeWindow().getEnd(), 0.0);	
 		return customer;
 	}

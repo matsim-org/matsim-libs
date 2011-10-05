@@ -36,7 +36,7 @@ import vrp.api.VRP;
 import vrp.basics.Coordinate;
 import vrp.basics.CustomerImpl;
 import vrp.basics.ManhattanDistance;
-import vrp.basics.MultipleDepotsInitialSolutionFactory;
+import vrp.basics.InitialSolutionFactoryImpl;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
 import vrp.basics.Relation;
@@ -120,7 +120,7 @@ public class VRPTestCase extends TestCase{
 	}
 	
 	protected Solution getInitialSolution(VRP vrp){
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		Collection<TourAgent> agents = new ArrayList<TourAgent>();
 		for(Tour t : tours){
 			VehicleType type = vrp.getVehicleType(t.getActivities().get(0).getCustomer().getId());

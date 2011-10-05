@@ -19,7 +19,7 @@ package vrp.algorithms.ruinAndRecreate.basics;
 
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.api.Costs;
-import vrp.basics.DepotDelivery;
+import vrp.basics.DeliveryFromDepot;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 
@@ -65,7 +65,7 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 	private int getLoadAtDepot(Tour tour) {
 		int loadAtDepot = 0;
 		for(TourActivity tA : tour.getActivities()){
-			if(tA instanceof DepotDelivery){
+			if(tA instanceof DeliveryFromDepot){
 				loadAtDepot += tA.getCustomer().getDemand();
 			}
 		}

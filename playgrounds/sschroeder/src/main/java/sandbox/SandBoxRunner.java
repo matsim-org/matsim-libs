@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.mzilske.freight.carrier.Carrier;
-import freight.CarrierPlanWriter;
+import playground.mzilske.freight.carrier.CarrierPlanWriter;
 
 public class SandBoxRunner {
 

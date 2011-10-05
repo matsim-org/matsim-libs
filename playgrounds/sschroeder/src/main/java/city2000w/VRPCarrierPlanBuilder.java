@@ -12,21 +12,23 @@ import playground.mzilske.freight.carrier.CarrierCapabilities;
 import playground.mzilske.freight.carrier.CarrierContract;
 import playground.mzilske.freight.carrier.CarrierPlan;
 import playground.mzilske.freight.carrier.CarrierShipment;
+import playground.mzilske.freight.carrier.CarrierUtils;
 import playground.mzilske.freight.carrier.CarrierVehicle;
 import playground.mzilske.freight.carrier.ScheduledTour;
 import playground.mzilske.freight.carrier.Tour;
 import freight.vrp.VRPSolver;
 import freight.vrp.VRPSolverFactory;
 
-public class RRCarrierPlanBuilder {
+public class VRPCarrierPlanBuilder {
 
-	private static Logger logger = Logger.getLogger(RRCarrierPlanBuilder.class);
+	private static Logger logger = Logger.getLogger(VRPCarrierPlanBuilder.class);
+	
 	private CarrierCapabilities caps;
 	private Collection<CarrierContract> contracts;
 	private Network network;
 	private VRPSolverFactory vrpSolverFactory;
 
-	public RRCarrierPlanBuilder(CarrierCapabilities caps,Collection<CarrierContract> contracts,Network network) {
+	public VRPCarrierPlanBuilder(CarrierCapabilities caps,Collection<CarrierContract> contracts,Network network) {
 		super();
 		this.caps=caps;
 		this.contracts=contracts;

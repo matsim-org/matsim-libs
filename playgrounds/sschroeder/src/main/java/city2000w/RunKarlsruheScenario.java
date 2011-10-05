@@ -180,7 +180,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void createCarrierPlans() {
 		for(Carrier carrier : carriers.getCarriers().values()){
-			RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
@@ -216,7 +216,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		for(Carrier carrier : carriers.getCarriers().values()){
 			if(!carrier.getNewContracts().isEmpty()){
 				logger.info("hohohohoh. obviously, i have to plan a new contract");
-				RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);
@@ -224,7 +224,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 			}
 			if(!carrier.getExpiredContracts().isEmpty()){
 				logger.info("outsch. a contract was canceled and i must adapt my plan");
-				RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);

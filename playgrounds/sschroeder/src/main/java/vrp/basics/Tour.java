@@ -52,6 +52,9 @@ public class Tour {
 				tour += "[" + c.getCustomer() + "]";
 			}
 		}
+		if(tour != null){
+			tour += "[time=" + costs.time + "][distance=" + costs.distance + "][generalizedCosts=" + costs.generalizedCosts + "]"; 
+		}
 		return tour;
 	}
 

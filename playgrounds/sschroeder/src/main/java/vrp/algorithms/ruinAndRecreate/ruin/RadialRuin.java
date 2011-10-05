@@ -100,7 +100,7 @@ public class RadialRuin implements RuinStrategy {
 	}
 
 	private void makeNodeDataStructure() {
-		getCustomerWithoutDepot();
+		createCustomerWithoutDepot();
 		for(Customer origin : customerWithoutDepot){
 			TreeSet<ReferencedCustomer> treeSet = new TreeSet<ReferencedCustomer>(new Comparator<ReferencedCustomer>() {
 				@Override
@@ -122,7 +122,7 @@ public class RadialRuin implements RuinStrategy {
 		}
 	}
 
-	private void getCustomerWithoutDepot() {
+	private void createCustomerWithoutDepot() {
 		for(Customer c : vrp.getCustomers().values()){
 			if(!isDepot(c)){
 				customerWithoutDepot.add(c);

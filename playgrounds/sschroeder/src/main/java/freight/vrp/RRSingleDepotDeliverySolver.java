@@ -1,5 +1,9 @@
 package freight.vrp;
 
+/**
+ * RRCCSolver - Ruin-and-Recreate Solver with Capacity Constraints
+ */
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,9 +35,9 @@ import vrp.basics.InitialSolutionFactoryImpl;
 import vrp.basics.TourActivity;
 import vrp.basics.VehicleType;
 
-public class RRPDTWSolver implements VRPSolver{
+public class RRSingleDepotDeliverySolver implements VRPSolver{
 	
-	private static Logger logger = Logger.getLogger(RRPDTWSolver.class);
+	private static Logger logger = Logger.getLogger(RRSingleDepotDeliverySolver.class);
 	
 	private int capacity;
 	
@@ -81,17 +85,39 @@ public class RRPDTWSolver implements VRPSolver{
 		this.iniSolutionFactory = iniSolutionFactory;
 	}
 
-	public RRPDTWSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
+	public RRSingleDepotDeliverySolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
 		super();
 		this.shipments = shipments;
 		this.vehicles = vehicles;
 		this.depots = makeDepots(vehicles);
 		this.network = network;
 		this.vrpTransformation = makeVRPTransformation();
-		costs = new CrowFlyDistance();
-		((CrowFlyDistance)costs).speed = 17;
-		((CrowFlyDistance)costs).detourFactor = 1.3;
-		constraints = new TimeAndCapacityPickupsDeliveriesSequenceConstraint(capacity,8*3600,costs);
+		verify();
+	}
+
+	private void verify() {
+		Id fromId = null;
+		for(CarrierShipment s : shipments){
+			if(fromId == null){
+				fromId = s.getFrom();
+			}
+			else{
+				if(!s.getFrom().equals(fromId)){
+					throw new IllegalStateException("DeliverySolver can just be used to deliveries only, thus fromId must be a depot. at least fromId must be equal for all shipments");
+				}
+			}
+		}
+		Id vehicleLocationId = null;
+		for(CarrierVehicle vehicle : vehicles){
+			if(vehicleLocationId == null){
+				vehicleLocationId = vehicle.getLocation();
+			}
+			else{
+				if(!vehicle.getLocation().equals(vehicleLocationId)){
+					throw new IllegalStateException("This can only handle one depot. However, there are vehicles with different location ids");
+				}
+			}
+		}
 	}
 
 	private Collection<Id> makeDepots(Collection<CarrierVehicle> vehicles) {
@@ -108,9 +134,14 @@ public class RRPDTWSolver implements VRPSolver{
 
 	@Override
 	public Collection<Tour> solve() {
-		logger.info("start solving");
 		RuinAndRecreate ruinAndRecreate = makeAlgorithm();
 		ruinAndRecreate.run();
+		double totDistance = 0.0;
+		for(vrp.basics.Tour t : ruinAndRecreate.getSolution()){
+			logger.info(t);
+			totDistance += t.costs.distance;
+		}
+		logger.info("total=" + totDistance);
 		Collection<Tour> tours = makeVehicleTours(ruinAndRecreate.getSolution());
 		return tours;
 	}
@@ -119,8 +150,8 @@ public class RRPDTWSolver implements VRPSolver{
 	private Collection<Tour> makeVehicleTours(Collection<vrp.basics.Tour> vrpSolution) {
 		Collection<Tour> tours = new ArrayList<Tour>();
 		for(vrp.basics.Tour tour : vrpSolution){
-			logger.info(tour);
 			TourBuilder tourBuilder = new TourBuilder();
+			Collection<CarrierShipment> shipments = getShipments(tour);
 			boolean tourStarted = false;
 			for(TourActivity act : tour.getActivities()){
 				CarrierShipment shipment = getShipment(act.getCustomer());
@@ -131,19 +162,33 @@ public class RRPDTWSolver implements VRPSolver{
 					else{
 						tourStarted = true;
 						tourBuilder.scheduleStart(makeId(act.getCustomer().getLocation().getId()));
+						for(CarrierShipment carrierShipment : shipments){
+							tourBuilder.schedulePickup(carrierShipment);
+						}
 					}
 				}
-				if(act instanceof vrp.basics.EnRouteDelivery){
+				else if(act instanceof vrp.basics.DeliveryFromDepot){
 					tourBuilder.scheduleDelivery(shipment);
 				}
-				if(act instanceof vrp.basics.EnRoutePickup){
-					tourBuilder.schedulePickup(shipment);
+				else {
+					throw new IllegalStateException("this cannot be");
 				}
 			}
 			Tour vehicleTour = tourBuilder.build();
 			tours.add(vehicleTour);
 		}
 		return tours;
+	}
+
+	private Collection<CarrierShipment> getShipments(vrp.basics.Tour tour) {
+		Collection<CarrierShipment> carrierShipments = new ArrayList<CarrierShipment>();
+		for(TourActivity act : tour.getActivities()){
+			CarrierShipment shipment = getShipment(act.getCustomer());
+			if(shipment != null){
+				carrierShipments.add(shipment);
+			}
+		}
+		return carrierShipments;
 	}
 
 	private Id makeId(String id) {
@@ -166,7 +211,6 @@ public class RRPDTWSolver implements VRPSolver{
 	}
 
 	private RuinAndRecreate makeAlgorithm() {
-		logger.info("initialise algorithm");
 		VRPBuilder vrpBuilder = new VRPBuilder(vrpTransformation);
 		for(Id depotLocation : depots){
 			Id depotId = makeDepotId();
@@ -176,19 +220,17 @@ public class RRPDTWSolver implements VRPSolver{
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(constraints);
 		for(CarrierShipment s : shipments){
-			vrpTransformation.addPickupAndDeliveryOf(s);
+			vrpBuilder.addDeliveryOf(s);
 		}
-		vrpBuilder.setVRPTransformation(vrpTransformation);
 		VRP vrp = vrpBuilder.buildVRP();
 		RuinAndRecreateFactory rrFactory = new RuinAndRecreateFactory();
 		rrFactory.setWarmUp(nOfWarmupIterations);
 		rrFactory.setIterations(nOfIterations);
 		Collection<vrp.basics.Tour> initialSolution = iniSolutionFactory.createInitialSolution(vrp);
-		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createAlgoWithPDTW(vrp, initialSolution, capacity);
+		RuinAndRecreate ruinAndRecreateAlgo = rrFactory.createStandardAlgo(vrp, initialSolution, capacity);
 		ChartListener chartListener = new ChartListener();
-		chartListener.setFilename("output/vrpChart.png");
+		chartListener.setFilename("vrp/vrpChart.png");
 		ruinAndRecreateAlgo.getListeners().add(chartListener);
-		logger.info("done");
 		return ruinAndRecreateAlgo;
 	}
 
@@ -200,7 +242,4 @@ public class RRPDTWSolver implements VRPSolver{
 		depotCounter++;
 		return new IdImpl("depot_" + depotCounter);
 	}
-
-	
-
 }

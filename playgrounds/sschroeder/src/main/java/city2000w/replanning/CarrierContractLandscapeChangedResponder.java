@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.mzilske.freight.carrier.Carrier;
 import playground.mzilske.freight.carrier.CarrierPlan;
-import city2000w.RRCarrierPlanBuilder;
+import city2000w.VRPCarrierPlanBuilder;
 import freight.vrp.VRPSolverFactory;
 
 public class CarrierContractLandscapeChangedResponder implements CarrierPlanStrategyModule{
@@ -27,7 +27,7 @@ public class CarrierContractLandscapeChangedResponder implements CarrierPlanStra
 		CarrierPlan newPlan = carrier.getSelectedPlan();
 		if(!carrier.getNewContracts().isEmpty() || !carrier.getExpiredContracts().isEmpty()){
 			logger.info("hohohohoh. obviously, i have to plan a new contract");
-			RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), network);
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), network);
 			planBuilder.setVrpSolverFactory(vrpSolverFactory);
 			newPlan = planBuilder.buildPlan();
 //				carrier.getPlans().add(plan);

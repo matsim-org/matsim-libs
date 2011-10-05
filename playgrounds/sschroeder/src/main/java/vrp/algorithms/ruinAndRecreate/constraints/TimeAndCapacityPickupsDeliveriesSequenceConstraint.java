@@ -27,8 +27,8 @@ import org.apache.log4j.Logger;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
-import vrp.basics.DepotDelivery;
-import vrp.basics.DepotPickup;
+import vrp.basics.DeliveryFromDepot;
+import vrp.basics.PickupToDepot;
 import vrp.basics.EnRouteDelivery;
 import vrp.basics.EnRoutePickup;
 import vrp.basics.Tour;
@@ -83,7 +83,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
-			if(tourAct instanceof EnRoutePickup || tourAct instanceof DepotPickup){
+			if(tourAct instanceof EnRoutePickup || tourAct instanceof PickupToDepot){
 				if(deliveryStarted){
 					if(!openCustomers.isEmpty()){
 						return false;
@@ -94,7 +94,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				}
 				openCustomers.add(tourAct.getCustomer().getId());
 			}
-			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DepotDelivery){
+			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DeliveryFromDepot){
 				if(deliveryStarted == false){
 					deliveryStarted = true;
 				}
@@ -137,7 +137,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
-			if(tourAct instanceof EnRoutePickup || tourAct instanceof DepotPickup){
+			if(tourAct instanceof EnRoutePickup || tourAct instanceof PickupToDepot){
 				if(deliveryStarted){
 					if(!openCustomers.isEmpty()){
 						return false;
@@ -148,7 +148,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				}
 				openCustomers.add(tourAct.getCustomer().getId());
 			}
-			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DepotDelivery){
+			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DeliveryFromDepot){
 				if(deliveryStarted == false){
 					deliveryStarted = true;
 				}

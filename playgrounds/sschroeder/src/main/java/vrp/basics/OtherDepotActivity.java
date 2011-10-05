@@ -29,7 +29,6 @@ public class OtherDepotActivity extends TourActivity {
 
 	public OtherDepotActivity(Customer customer) {
 		super(customer);
-		// TODO Auto-generated constructor stub
 	}
 
 }

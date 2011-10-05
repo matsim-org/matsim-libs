@@ -34,7 +34,7 @@ import vrp.algorithms.ruinAndRecreate.ruin.RadialRuin;
 import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import vrp.api.VRP;
-import vrp.basics.MultipleDepotsInitialSolutionFactory;
+import vrp.basics.InitialSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
@@ -67,6 +67,7 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreationListeners.add(l);
 	}
 	
+	
 	/**
 	 * Standard ruin and recreate without time windows. This algo is configured according to Schrimpf et. al (2000).
 	 * @param vrp
@@ -83,7 +84,7 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setInitialSolutionFactory(new MultipleDepotsInitialSolutionFactory());
+		recreationStrategy.setInitialSolutionFactory(new InitialSolutionFactoryImpl());
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
@@ -116,7 +117,14 @@ public class RuinAndRecreateFactory {
 		this.iterations = iterations;
 	}
 
-	public RuinAndRecreate createAlgoWithTimeWindows(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
+	/**
+	 * PDTW - Pickup and Delivery with TimeWindows
+	 * @param vrp
+	 * @param tours
+	 * @param vehicleCapacity
+	 * @return
+	 */
+	public RuinAndRecreate createAlgoWithPDTW(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
 		logger.info("create algo with time windows");
 		RRTourAgentWithTimeWindowFactory tourAgentFactory = new RRTourAgentWithTimeWindowFactory(vrp);
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
@@ -127,7 +135,7 @@ public class RuinAndRecreateFactory {
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
-		recreationStrategy.setInitialSolutionFactory(new MultipleDepotsInitialSolutionFactory());
+		recreationStrategy.setInitialSolutionFactory(new InitialSolutionFactoryImpl());
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
 		RadialRuin radialRuin = new RadialRuin(vrp);

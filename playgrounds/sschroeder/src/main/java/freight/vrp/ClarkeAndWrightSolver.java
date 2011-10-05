@@ -24,6 +24,7 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 		this.vrpTransformation = vrpTransformation;
 	}
 
+	/*
 	@Override
 	public void solve(Collection<CarrierContract> contracts, CarrierVehicle carrierVehicle) {
 		Id depotId = findDepotId(contracts);
@@ -31,7 +32,7 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 		vrpBuilder.setConstraints(new ClarkeWrightCapacityConstraint(carrierVehicle.getCapacity()));
 		for(CarrierContract c : contracts){
 			CarrierShipment s = c.getShipment();
-			vrpTransformation.addShipment(s);
+			vrpTransformation.addPickupAndDeliveryOf(s);
 		}
 		vrpBuilder.setVRPTransformation(vrpTransformation);
 		VRP vrp = vrpBuilder.buildVRP();
@@ -39,6 +40,7 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 		clarkAndWright.run();
 		tours.addAll(clarkAndWright.getSolution());
 	}
+	*/
 	
 	private Id findDepotId(Collection<CarrierContract> contracts) {
 		for(CarrierContract c : contracts){

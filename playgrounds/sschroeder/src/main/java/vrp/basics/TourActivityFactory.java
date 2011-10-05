@@ -41,11 +41,11 @@ public class TourActivityFactory {
 		}
 		else{
 			if(customer.getDemand() < 0){
-				tourAct = new DepotDelivery(customer);
+				tourAct = new DeliveryFromDepot(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 			else if(customer.getDemand() > 0){
-				tourAct = new DepotPickup(customer);
+				tourAct = new PickupToDepot(customer);
 				tourAct.setTimeWindow(start, end);
 			}
 			else {

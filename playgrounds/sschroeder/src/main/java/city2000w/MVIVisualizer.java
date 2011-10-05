@@ -4,9 +4,9 @@ import org.matsim.run.OTFVis;
 
 public class MVIVisualizer {
 	public static void main(String[] args) {
-		String network = "../playgrounds/sschroeder/networks/karlsruhe.xml";
+		String network = "../playgrounds/sschroeder/vrp/grid1000.xml";
 		String events = "output/ITERS/it.0/0.events.xml.gz";
-		String mvi =  "../playgrounds/sschroeder/output/karlsruhe.mvi";
+		String mvi =  "../playgrounds/sschroeder/vrp/vrp_vcn2.mvi";
 
 		
 //		OTFVis.playNetwork(network);

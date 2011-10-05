@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import vrp.api.Customer;
 import vrp.api.VRP;
 
-public class MultipleDepotsInitialSolutionFactory implements InitialSolutionFactory{
+public class InitialSolutionFactoryImpl implements InitialSolutionFactory{
 
-	private static Logger logger = Logger.getLogger(MultipleDepotsInitialSolutionFactory.class);
+	private static Logger logger = Logger.getLogger(InitialSolutionFactoryImpl.class);
 	
 	@Override
 	public Collection<Tour> createInitialSolution(VRP vrp) {

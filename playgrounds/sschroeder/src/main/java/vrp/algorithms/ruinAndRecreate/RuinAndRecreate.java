@@ -158,8 +158,6 @@ public class RuinAndRecreate {
 			printNoIteration(currentMutation);
 			currentMutation++;
 		}
-		vrpSolution = new VrpSolution(getSolution());
-		vrpSolution.setTransportCosts(currentSolution.getResult());
 		informFinish();
 	}
 	
@@ -168,10 +166,6 @@ public class RuinAndRecreate {
 			return;
 		}
 		
-	}
-
-	public VrpSolution getVrpSolution() {
-		return vrpSolution;
 	}
 
 	private void init() {
@@ -236,10 +230,6 @@ public class RuinAndRecreate {
 
 	public Collection<RuinAndRecreateListener> getListeners() {
 		return listeners;
-	}
-
-	public Solution getTourAgentSolution(){
-		return currentSolution;
 	}
 	
 	public Collection<Tour> getSolution(){

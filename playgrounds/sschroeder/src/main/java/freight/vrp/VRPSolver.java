@@ -10,5 +10,4 @@ public interface VRPSolver {
 
 	public abstract Collection<Tour> solve();
 	
-	public void solve(Collection<CarrierContract> contracts, CarrierVehicle carrierVehicle);
 }

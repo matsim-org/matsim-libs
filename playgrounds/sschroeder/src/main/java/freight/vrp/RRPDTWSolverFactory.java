@@ -8,14 +8,14 @@ import playground.mzilske.freight.carrier.CarrierShipment;
 import playground.mzilske.freight.carrier.CarrierVehicle;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
 import vrp.basics.CrowFlyDistance;
-import vrp.basics.MultipleDepotsInitialSolutionFactory;
+import vrp.basics.InitialSolutionFactoryImpl;
 
 public class RRPDTWSolverFactory implements VRPSolverFactory{
 
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network) {
 		RRPDTWSolver rrSolver = new RRPDTWSolver(shipments, carrierVehicles, network);
-		rrSolver.setIniSolutionFactory(new MultipleDepotsInitialSolutionFactory());
+		rrSolver.setIniSolutionFactory(new InitialSolutionFactoryImpl());
 		rrSolver.setnOfWarmupIterations(4);
 		rrSolver.setnOfIterations(16);
 		CrowFlyDistance crowFlyDistance = new CrowFlyDistance();

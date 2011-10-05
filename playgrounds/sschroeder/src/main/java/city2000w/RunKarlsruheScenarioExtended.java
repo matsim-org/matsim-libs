@@ -44,6 +44,7 @@ import playground.mzilske.freight.carrier.CarrierContract;
 import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
 import playground.mzilske.freight.carrier.CarrierPlan;
 import playground.mzilske.freight.carrier.CarrierPlanReader;
+import playground.mzilske.freight.carrier.CarrierPlanWriter;
 import playground.mzilske.freight.carrier.Carriers;
 import city2000w.replanning.CarrierContractLandscapeChangedResponder;
 import city2000w.replanning.CarrierPlanStrategy;
@@ -54,7 +55,6 @@ import city2000w.replanning.ReRouteVehicles;
 import city2000w.replanning.ShipperPlanStrategy;
 import city2000w.replanning.TSPContractLandscapeChangedResponder;
 import city2000w.replanning.TSPPlanStrategy;
-import freight.CarrierPlanWriter;
 import freight.ShipperAgentTracker;
 import freight.ShipperImpl;
 import freight.ShipperPlanReader;
@@ -224,7 +224,7 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 
 	private void createInitialCarrierPlans() {
 		for(Carrier carrier : carriers.getCarriers().values()){
-			RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
 			planBuilder.setVrpSolverFactory(new RRPDTWSolverFactory());
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);

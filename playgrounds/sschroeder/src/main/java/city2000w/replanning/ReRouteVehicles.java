@@ -3,7 +3,7 @@ package city2000w.replanning;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.mzilske.freight.carrier.Carrier;
-import city2000w.RRCarrierPlanBuilder;
+import city2000w.VRPCarrierPlanBuilder;
 import freight.vrp.VRPSolverFactory;
 
 public class ReRouteVehicles implements CarrierPlanStrategyModule{
@@ -20,7 +20,7 @@ public class ReRouteVehicles implements CarrierPlanStrategyModule{
 
 	@Override
 	public void handleActor(Carrier carrier) {
-		RRCarrierPlanBuilder planBuilder = new RRCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), network);
+		VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), network);
 		planBuilder.setVrpSolverFactory(vrpSolverFactory);
 		carrier.setSelectedPlan(planBuilder.buildPlan());
 	}

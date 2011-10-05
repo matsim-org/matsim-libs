@@ -50,7 +50,7 @@ public class MultipleDepotsInitialSolutionFactoryTest extends VRPTestCase {
 		vrpBuilder.assignVehicleType(depot1.getId(), new VehicleType(20));
 		vrpBuilder.assignVehicleType(depot2.getId(), new VehicleType(20));
 		VRP vrp = vrpBuilder.buildVRP();
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		assertEquals(2, tours.size());
 	}
 	
@@ -65,7 +65,7 @@ public class MultipleDepotsInitialSolutionFactoryTest extends VRPTestCase {
 		vrpBuilder.setCosts(costs);
 		VRP vrp = vrpBuilder.buildVRP();
 		
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		for(Tour tour : tours){
 			assertEquals(3, tour.getActivities().size());
 			if(tour.getActivities().get(1).getCustomer() == customerMap.get(makeId(0,10))){
@@ -96,7 +96,7 @@ public class MultipleDepotsInitialSolutionFactoryTest extends VRPTestCase {
 		vrpBuilder.setCosts(costs);
 		VRP vrp = vrpBuilder.buildVRP();
 		
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		assertEquals(1, tours.size());
 	}
 	
@@ -116,7 +116,7 @@ public class MultipleDepotsInitialSolutionFactoryTest extends VRPTestCase {
 		vrpBuilder.setCosts(costs);
 		VRP vrp = vrpBuilder.buildVRP();
 		
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getActivities().get(0).getCustomer(), depot1);
 		assertEquals(tour.getActivities().get(1).getCustomer(), customer1);
@@ -140,7 +140,7 @@ public class MultipleDepotsInitialSolutionFactoryTest extends VRPTestCase {
 		vrpBuilder.setCosts(costs);
 		VRP vrp = vrpBuilder.buildVRP();
 		
-		Collection<Tour> tours = new MultipleDepotsInitialSolutionFactory().createInitialSolution(vrp);
+		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getActivities().get(0).getCustomer(), depot2);
 		assertEquals(tour.getActivities().get(1).getCustomer(), customer1);

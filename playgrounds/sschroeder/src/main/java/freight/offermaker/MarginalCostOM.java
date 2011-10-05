@@ -124,7 +124,7 @@ public class MarginalCostOM implements OfferMaker{
 		}
 		for(CarrierContract c : carrier.getContracts()){
 			CarrierShipment s = c.getShipment();
-			vrpTransformation.addShipment(s);
+			vrpTransformation.addPickupAndDeliveryOf(s);
 		}
 		for(ScheduledTour t : carrier.getSelectedPlan().getScheduledTours()){
 			vrp.basics.Tour tour = makeTour(t.getTour(),vrpTransformation);
@@ -163,7 +163,7 @@ public class MarginalCostOM implements OfferMaker{
 			return offer;
 		}
 		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
-		vrpTransformation.addShipment(requestedShipment);
+		vrpTransformation.addPickupAndDeliveryOf(requestedShipment);
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;
 		vrp.algorithms.ruinAndRecreate.basics.Shipment shipment = VrpUtils.createShipment(vrpTransformation.getFromCustomer(requestedShipment), vrpTransformation.getToCustomer(requestedShipment));

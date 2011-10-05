@@ -27,7 +27,7 @@ import vrp.api.Customer;
 import vrp.api.VRP;
 import vrp.basics.CrowFlyDistance;
 import vrp.basics.InitialSolutionFactory;
-import vrp.basics.MultipleDepotsInitialSolutionFactory;
+import vrp.basics.InitialSolutionFactoryImpl;
 import vrp.basics.TourActivity;
 import vrp.basics.VehicleType;
 
@@ -49,7 +49,7 @@ public class RRPDSolver implements VRPSolver{
 	
 	private Map<Id,CarrierVehicle> depotCarrierVehicleMap;;
 
-	private InitialSolutionFactory iniSolutionFactory = new MultipleDepotsInitialSolutionFactory();
+	private InitialSolutionFactory iniSolutionFactory = new InitialSolutionFactoryImpl();
 	
 	private Constraints constraints;
 	
@@ -165,7 +165,7 @@ public class RRPDSolver implements VRPSolver{
 	}
 
 	private RuinAndRecreate makeAlgorithm() {
-		VRPWithMultipleDepotsBuilder vrpBuilder = new VRPWithMultipleDepotsBuilder();
+		VRPBuilder vrpBuilder = new VRPBuilder(vrpTransformation);
 		for(Id depotLocation : depots){
 			Id depotId = makeDepotId();
 			vrpBuilder.addDepot(depotId, depotLocation);
@@ -174,7 +174,7 @@ public class RRPDSolver implements VRPSolver{
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(constraints);
 		for(CarrierShipment s : shipments){
-			vrpTransformation.addShipment(s);
+			vrpTransformation.addPickupAndDeliveryOf(s);
 		}
 		vrpBuilder.setVRPTransformation(vrpTransformation);
 		VRP vrp = vrpBuilder.buildVRP();
@@ -195,11 +195,5 @@ public class RRPDSolver implements VRPSolver{
 		return new IdImpl("depot_" + depotCounter);
 	}
 
-	@Override
-	public void solve(Collection<CarrierContract> contracts,
-			CarrierVehicle carrierVehicle) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }

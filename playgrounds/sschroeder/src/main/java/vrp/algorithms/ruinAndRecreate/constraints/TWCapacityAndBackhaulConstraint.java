@@ -23,8 +23,8 @@ package vrp.algorithms.ruinAndRecreate.constraints;
 import org.apache.log4j.Logger;
 
 import vrp.api.Constraints;
-import vrp.basics.DepotDelivery;
-import vrp.basics.DepotPickup;
+import vrp.basics.DeliveryFromDepot;
+import vrp.basics.PickupToDepot;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.Vehicle;
@@ -58,10 +58,10 @@ public class TWCapacityAndBackhaulConstraint implements Constraints {
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
-			if(tourAct instanceof DepotPickup){
+			if(tourAct instanceof PickupToDepot){
 				pickupOccured = true;
 			}
-			if(tourAct instanceof DepotDelivery){
+			if(tourAct instanceof DeliveryFromDepot){
 				if(pickupOccured){
 					return false;
 				}
@@ -84,10 +84,10 @@ public class TWCapacityAndBackhaulConstraint implements Constraints {
 				logger.debug("timeWindow-conflic on tour " + tour);
 				return false;
 			}
-			if(tourAct instanceof DepotPickup){
+			if(tourAct instanceof PickupToDepot){
 				pickupOccured = true;
 			}
-			if(tourAct instanceof DepotDelivery){
+			if(tourAct instanceof DeliveryFromDepot){
 				if(pickupOccured){
 					return false;
 				}
