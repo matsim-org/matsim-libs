@@ -20,6 +20,7 @@
 package herbie.creation.ptAnalysis;
 
 import java.util.Map;
+import java.util.Stack;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -121,30 +122,32 @@ public class PtScenarioAdaption {
 					departuresTimes.put(departure.getDepartureTime(), departure);
 				}
 						
-				// test:
-//				for(Double depTime : departuresTimes.keySet()) System.out.println("depTime "+ depTime);
-//				System.out.println("End test.");
+//				 test:
+				for(Double depTime : departuresTimes.keySet()) System.out.println("depTime "+ depTime);
+				System.out.println("End test.");
 				
 				pastId = Long.parseLong(departuresTimes.get(departuresTimes.firstKey()).getId().toString());
+				pastDeparture = departuresTimes.firstKey();
 				
 				for(Double depTime : departuresTimes.keySet()){
 					
 					if(departuresTimes.lastKey() == depTime) continue;
 					
-					pastDeparture = depTime;
 					currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
 					
-					if(departuresTimes.higherKey(depTime) != null &&
+					if(departuresTimes.lastKey() != (depTime + currentInterval * 60) &&
 							(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
 						continue;
 					}
-					
+					System.out.println();
 					addNewDepartures(departuresTimes.higherKey(depTime), departuresTimes.get(depTime));
+					pastDeparture = depTime;
 				}
 				
 				this.removeDepartures((TransitRouteImpl) route);
 				this.addNewDepartures(route);
 				
+				System.out.println();
 			}
 		}
 		
@@ -153,16 +156,15 @@ public class PtScenarioAdaption {
 	
 	private void removeDepartures(TransitRouteImpl route) {
 		
-//		Stack<Id>...
+		Stack<Id> stackId = new Stack<Id>();
 		
 		for(Id id : route.getDepartures().keySet()){
-			
+			stackId.push(id);
 		}
-//		route.removeDeparture(route.getDepartures().get(id));
 		
-		System.out.println();
-		TreeMap<Id, Departure> departures = (TreeMap<Id, Departure>) route.getDepartures();
-		departures = new TreeMap<Id, Departure>();
+		while(stackId.size() > 0){
+			route.removeDeparture(route.getDepartures().get(stackId.pop()));
+		}
 		System.out.println();
 	}
 
@@ -170,7 +172,7 @@ public class PtScenarioAdaption {
 		for(Departure departure : newDepartures.values()){
 			route.addDeparture(departure);
 		}
-		
+		System.out.println();
 	}
 	
 	private void addNewDepartures(Double upperThreshold, Departure departure) {
@@ -195,8 +197,25 @@ public class PtScenarioAdaption {
 				pastDeparture = pastDeparture + newInterval * 60d;
 			}
 		}
+		else
+		{
+			copyOldDepartures(upperThreshold);
+		}
 	}
 	
+
+	private void copyOldDepartures(double upperThreshold) {
+		while ((pastDeparture + currentInterval*60) <= upperThreshold){
+			
+			IdImpl newId = new IdImpl(++pastId);
+			
+			Departure newDepImpl = new DepartureImpl(newId, pastDeparture + currentInterval * 60d);
+			
+			newDepartures.put(pastDeparture + currentInterval *60d, newDepImpl);
+			
+			pastDeparture = pastDeparture + currentInterval * 60d;
+		}
+	}
 
 	private double getNewInterval() {
 		
