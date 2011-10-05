@@ -73,8 +73,7 @@ public class TestEventHandler implements LinkLeaveEventHandler, LinkEnterEventHa
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Person "+event.getPersonId()+" - Amount: "+event.getAmount());
 	}
 
 	@Override

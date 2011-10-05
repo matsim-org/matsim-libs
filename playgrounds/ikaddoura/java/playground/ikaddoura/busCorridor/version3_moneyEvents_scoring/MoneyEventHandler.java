@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsAnalysis.java
+ * MoneyEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,30 +21,40 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.events;
+package playground.ikaddoura.busCorridor.version3_moneyEvents_scoring;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author Ihab
  *
  */
-public class TestEventFileReader {
-
-	public static void main(String[] args) {
-		
-		String eventFile = "../../shared-svn/studies/ihab/busCorridor/output_version3_test/ITERS/it.0/0.events.xml.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-
-		TestEventHandler handler = new TestEventHandler();
-		events.addHandler(handler);	
-		
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventFile);
-		
-		System.out.println("Events file "+eventFile+" read!");
+public class MoneyEventHandler implements AgentMoneyEventHandler {
+	private Controler controler;
+	
+	/**
+	 * @param controler
+	 */
+	public MoneyEventHandler(Controler controler) {
+		this.controler = controler;
 	}
 
+	@Override
+	public void reset(int iteration) {
+
+	}
+
+	@Override
+	public void handleEvent(AgentMoneyEvent event) {
+		System.out.println("AgentMoneyEvent at Time "+event.getTime()+" wird gehandelt.");
+		
+//		Id personId = event.getPersonId();
+//		double amount = event.getAmount();
+//		
+// 		Das läuft automatisch irgendwo im Hintergrund:
+//		this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(personId).addMoney(amount);
+		
+	}
 }

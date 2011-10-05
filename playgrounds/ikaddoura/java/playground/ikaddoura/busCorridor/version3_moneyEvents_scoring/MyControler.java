@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EventsAnalysis.java
+ * MyControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,30 +21,31 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.events;
+package playground.ikaddoura.busCorridor.version3_moneyEvents_scoring;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author Ihab
  *
  */
-public class TestEventFileReader {
 
-	public static void main(String[] args) {
-		
-		String eventFile = "../../shared-svn/studies/ihab/busCorridor/output_version3_test/ITERS/it.0/0.events.xml.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-
-		TestEventHandler handler = new TestEventHandler();
-		events.addHandler(handler);	
-		
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(eventFile);
-		
-		System.out.println("Events file "+eventFile+" read!");
-	}
-
+public class MyControler {
+	
+	public static void main(final String[] args) {
+					
+			String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version3/config_busline.xml";
+			Controler controler = new Controler(configFile);
+			controler.setOverwriteFiles(true);
+			controler.addControlerListener(new MyControlerListener());
+			
+			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
+			planCalcScoreConfigGroup.setTravelingPt_utils_hr(-1);
+			planCalcScoreConfigGroup.setMarginalUtilityOfMoney(1);
+			
+			MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup);
+			controler.setScoringFunctionFactory(scoringfactory);
+			controler.run();
+		}
 }
