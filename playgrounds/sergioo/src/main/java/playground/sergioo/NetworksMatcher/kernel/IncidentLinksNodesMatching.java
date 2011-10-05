@@ -18,42 +18,38 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 
 	public static double minAngle;
 
+	public static boolean rightSide = false;
+	
 
 	//Attributes
 
 	private List<Integer> linksMatchingIndices;
-
-	private boolean smallABigB = true;
 
 
 	//Methods
 
 	protected IncidentLinksNodesMatching(Set<Node> nodesA, Set<Node> nodesB) {
 		super(nodesA, nodesB);
-		composedNodeA.setIncidentLinks();
-		composedNodeB.setIncidentLinks();
 	}
 
 	public List<Integer> getLinksMatchingIndices() {
 		return linksMatchingIndices;
 	}
-
-	public boolean isSmallABigB() {
-		return smallABigB;
-	}
-
+	
 	public boolean linksAnglesMatches() {
-		List<Link> linksSmall = composedNodeA.getIncidentLinks();
-		List<Link> linksBig = composedNodeB.getIncidentLinks();
-		if(linksSmall.size()>linksBig.size()) {
-			smallABigB = false;
-			List<Link> linksTemp = linksSmall;
-			linksSmall = linksBig;
-			linksBig = linksTemp;
+		if(linksAnglesMatches(composedNodeA.getInLinksList(), composedNodeB.getInLinksList(), new ArrayList<Integer>()) && linksAnglesMatches(composedNodeA.getOutLinksList(), composedNodeB.getOutLinksList(), new ArrayList<Integer>())) {
+			for(Link linkSmall:composedNodeA.getInLinks().values()) {
+				((MatchingComposedLink)linkSmall).setToMatched(true);
+				((MatchingComposedLink)linkSmall).setIncident(true);
+			}
+			for(Link linkSmall:composedNodeA.getOutLinks().values()) {
+				((MatchingComposedLink)linkSmall).setFromMatched(true);
+				((MatchingComposedLink)linkSmall).setIncident(true);
+			}
+			return true;
 		}
-		for(Link linkBig:linksBig)
-			((MatchingComposedLink)linkBig).setIncident(true);
-		return linksAnglesMatches(linksSmall, linksBig, new ArrayList<Integer>());
+		else
+			return false;
 	}
 
 	private boolean linksAnglesMatches(List<Link> linksSmall, List<Link> linksBig, List<Integer> indicesBig) {
@@ -66,17 +62,13 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 				numChanges++;
 			if(numChanges==1) {
 				linksMatchingIndices = indicesBig;
-				for(int i:indicesBig)
-					if(smallABigB)
-						if(composedNodeB.getId().equals(linksBig.get(i).getFromNode().getId()))
-							((MatchingComposedLink)linksBig.get(i)).setFromMatched(true);
-						else
-							((MatchingComposedLink)linksBig.get(i)).setToMatched(true);
+				for(int i:indicesBig) {
+					if(composedNodeB.getId().equals(linksBig.get(i).getFromNode().getId()))
+						((MatchingComposedLink)linksBig.get(i)).setFromMatched(true);
 					else
-						if(composedNodeA.getId().equals(linksBig.get(i).getFromNode().getId()))
-							((MatchingComposedLink)linksBig.get(i)).setFromMatched(true);
-						else
-							((MatchingComposedLink)linksBig.get(i)).setToMatched(true);
+						((MatchingComposedLink)linksBig.get(i)).setToMatched(true);
+					((MatchingComposedLink)linksBig.get(i)).setIncident(true);
+				}
 				return true;
 			}
 			else
@@ -89,17 +81,6 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 					anglesDifference = 2*Math.PI - anglesDifference;
 				if(!indicesBig.contains(b) && anglesDifference<minAngle) {
 					List<Link> newLinksSmall = new ArrayList<Link>(linksSmall);
-					if(smallABigB)
-						if(composedNodeA.getId().equals(linksSmall.get(0).getFromNode().getId()))
-							((MatchingComposedLink)linksSmall.get(0)).setFromMatched(true);
-						else
-							((MatchingComposedLink)linksSmall.get(0)).setToMatched(true);
-					else
-						if(composedNodeB.getId().equals(linksSmall.get(0).getFromNode().getId()))
-							((MatchingComposedLink)linksSmall.get(0)).setFromMatched(true);
-						else
-							((MatchingComposedLink)linksSmall.get(0)).setToMatched(true);
-					((MatchingComposedLink)linksSmall.get(0)).setIncident(true);
 					newLinksSmall.remove(linksSmall.get(0));
 					List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
 					newIndicesBig.add(b);

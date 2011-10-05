@@ -52,11 +52,11 @@ public class NetworksShpXmlMatcherMain {
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		/*LayersWindow windowHR = new DoubleNetworkMatchingWindow("Networks matching", new NetworkNodesPainter(networkHighResolution, Color.BLACK, Color.CYAN), new NetworkNodesPainter(networkLowResolution, Color.BLACK, Color.CYAN));
 		windowHR.setVisible(true);*/
-		MatchingProcess matchingProcess = new MatchingProcess();
-		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/6));
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
-		matchingProcess.execute(networkLowResolution, networkHighResolution, modes);
+		MatchingProcess matchingProcess = new MatchingProcess(modes);
+		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/6));
+		matchingProcess.execute(networkLowResolution, networkHighResolution);
 		LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", matchingProcess);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())

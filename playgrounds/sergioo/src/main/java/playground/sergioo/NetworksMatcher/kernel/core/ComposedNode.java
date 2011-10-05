@@ -50,9 +50,9 @@ public class ComposedNode implements Node, Cloneable {
 
 	private final Id id;
 
-	private final Map<Id, ComposedLink> inLinks;
+	private Map<Id, Link> inLinks;
 
-	private final Map<Id, ComposedLink> outLinks;
+	private Map<Id, Link> outLinks;
 	
 	private final Set<Node> nodes;
 	
@@ -60,10 +60,15 @@ public class ComposedNode implements Node, Cloneable {
 	
 	private Types type;
 
-	private List<Link> incidentLinks;
-
-
 	//Methods
+	
+	public ComposedNode(Node node) {
+		id = new IdImpl(node.getId().toString());
+		coord = new CoordImpl(node.getCoord().getX(), node.getCoord().getY());
+		inLinks = new HashMap<Id, Link>();
+		outLinks = new HashMap<Id, Link>();
+		nodes = new HashSet<Node>();
+	}
 	
 	public ComposedNode(Set<Node> nodes) {
 		String idText = "";
@@ -76,24 +81,90 @@ public class ComposedNode implements Node, Cloneable {
 			coord.setXY(coord.getX()+node.getCoord().getX(), coord.getY()+node.getCoord().getY());
 		coord.setXY(coord.getX()/nodes.size(), coord.getY()/nodes.size());
 		this.nodes = nodes;
-		inLinks = new HashMap<Id, ComposedLink>();
-		outLinks = new HashMap<Id, ComposedLink>();
+		inLinks = new HashMap<Id, Link>();
+		outLinks = new HashMap<Id, Link>();
+		setIncidentLinks();
+		setType();
 		for(Node node:nodes) {
 			if(node.getClass().equals(ComposedNode.class))
 				((ComposedNode)node).setContainerNode(this);
 		}
 	}
+	
+	public List<Link> getInLinksList() {
+		List<Link> inLinksList = new ArrayList<Link>(inLinks.values());
+		for(int i=0; i<inLinksList.size()-1; i++)
+			for(int j=i+1; j<inLinksList.size(); j++)
+				if(((ComposedLink)inLinksList.get(i)).getAngle()>((ComposedLink)inLinksList.get(j)).getAngle()) {
+					ComposedLink temporalLink = (ComposedLink)inLinksList.get(i);
+					inLinksList.set(i, inLinksList.get(j));
+					inLinksList.set(j, temporalLink);
+				}
+		return inLinksList;
+	}
 
-	public List<Link> getIncidentLinks() {
-		return incidentLinks;
+	public List<Link> getOutLinksList() {
+		List<Link> outLinksList = new ArrayList<Link>(outLinks.values());
+		for(int i=0; i<outLinksList.size()-1; i++)
+			for(int j=i+1; j<outLinksList.size(); j++)
+				if(((ComposedLink)outLinksList.get(i)).getAngle()>((ComposedLink)outLinksList.get(j)).getAngle()) {
+					ComposedLink temporalLink = (ComposedLink)outLinksList.get(i);
+					outLinksList.set(i, outLinksList.get(j));
+					outLinksList.set(j, temporalLink);
+				}
+		return outLinksList;
 	}
 	
-	public void setIncidentLinks(List<Link> incidentLinks) {
-		this.incidentLinks = incidentLinks;
+	public void setType(Types type) {
+		this.type = type;
 	}
-
-	public void setIncidentLinks() {
-		incidentLinks = new ArrayList<Link>();
+	
+	public void setType() {
+		if(inLinks.values().size() == 0 && outLinks.values().size()==0)
+			type = Types.EMPTY;
+		else if(inLinks.values().size() == 0)
+			type = Types.SOURCE;
+		else if(outLinks.values().size() == 0)
+			type = Types.SINK;
+		else if(inLinks.values().size() == 1 && outLinks.values().size() == 1 && inLinks.values().iterator().next().getFromNode().equals(outLinks.values().iterator().next().getToNode()))
+			type = Types.DEAD_END;
+		else if(inLinks.values().size() == 1 && outLinks.values().size() == 1)
+			type = Types.ONE_WAY_PASS;
+		else if(inLinks.values().size() == 2 && outLinks.values().size() == 1) {
+			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Link firstInLink = inLinksIterator.next();
+			Link secondInLink = inLinksIterator.next();
+			if(outLinks.values().iterator().next().getToNode().equals(firstInLink.getFromNode()) || outLinks.values().iterator().next().getToNode().equals(secondInLink.getFromNode()))
+				type = Types.ONE_WAY_END;
+			else
+				type = Types.CROSSING;
+		}
+		else if(inLinks.values().size() == 1 && outLinks.values().size() == 2) {
+			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Link firstOutLink = outLinksIterator.next();
+			Link secondOutLink = outLinksIterator.next();
+			if(inLinks.values().iterator().next().getFromNode().equals(firstOutLink.getToNode()) || inLinks.values().iterator().next().getFromNode().equals(secondOutLink.getToNode()))
+				type = Types.ONE_WAY_START;
+			else
+				type = Types.CROSSING;
+		}
+		else if(inLinks.values().size() == 2 && outLinks.values().size() == 2) {
+			Iterator<Link> inLinksIterator = inLinks.values().iterator();
+			Link firstInLink = inLinksIterator.next();
+			Link secondInLink = inLinksIterator.next();
+			Iterator<Link> outLinksIterator = outLinks.values().iterator();
+			Link firstOutLink = outLinksIterator.next();
+			Link secondOutLink = outLinksIterator.next();
+			if((firstInLink.getFromNode().equals(firstOutLink.getToNode()) && secondInLink.getFromNode().equals(secondOutLink.getToNode())) || (firstInLink.getFromNode().equals(secondOutLink.getToNode()) && secondInLink.getFromNode().equals(firstOutLink.getToNode())))
+				type = Types.TWO_WAY_PASS;
+			else
+				type = Types.CROSSING;
+		}
+		else
+			type = Types.CROSSING;
+	}
+	
+	private void setIncidentLinks() {
 		for(Node node:nodes) {
 			for(Link link:node.getInLinks().values()) {
 				boolean insideLink = false;
@@ -101,7 +172,7 @@ public class ComposedNode implements Node, Cloneable {
 					if(link.getFromNode().getId().equals(node2.getId()))
 						insideLink = true;
 				if(!insideLink)
-					incidentLinks.add(link);
+					addInLink(link);
 			}
 			for(Link link:node.getOutLinks().values()) {
 				boolean insideLink = false;
@@ -109,16 +180,9 @@ public class ComposedNode implements Node, Cloneable {
 					if(link.getToNode().getId().equals(node2.getId()))
 						insideLink = true;
 				if(!insideLink)
-					incidentLinks.add(link);
+					addOutLink(link);
 			}			
 		}
-		for(int i=0; i<incidentLinks.size()-1; i++)
-			for(int j=i+1; j<incidentLinks.size(); j++)
-				if(((ComposedLink)incidentLinks.get(i)).getAngle()>((ComposedLink)incidentLinks.get(j)).getAngle()) {
-					Link temporalLink = incidentLinks.get(i);
-					incidentLinks.set(i, incidentLinks.get(j));
-					incidentLinks.set(j, temporalLink);
-				}
 	}
 	
 	public boolean isConnected() {
@@ -159,14 +223,12 @@ public class ComposedNode implements Node, Cloneable {
 
 	@Override
 	public boolean addInLink(Link link) {
-		inLinks.put(link.getId(), (ComposedLink)link);
-		return true;
+		return inLinks.put(link.getId(), link)!=null;
 	}
 
 	@Override
 	public boolean addOutLink(Link link) {
-		outLinks.put(link.getId(), (ComposedLink)link);
-		return false;
+		return outLinks.put(link.getId(), link)!=null;
 	}
 
 	@Override
@@ -185,63 +247,6 @@ public class ComposedNode implements Node, Cloneable {
 
 	public Types getType() {
 		return type;
-	}
-
-	public void setType() {
-		if(inLinks.size() == 0 && outLinks.size()==0)
-			type = Types.EMPTY;
-		else if(inLinks.size() == 0)
-			type = Types.SOURCE;
-		else if(outLinks.size() == 0)
-			type = Types.SINK;
-		else if(inLinks.size() == 1 && outLinks.size() == 1 && inLinks.values().iterator().next().getFromNode().equals(outLinks.values().iterator().next().getToNode()))
-			type = Types.DEAD_END;
-		else if(inLinks.size() == 1 && outLinks.size() == 1)
-			type = Types.ONE_WAY_PASS;
-		else if(inLinks.size() == 2 && outLinks.size() == 1) {
-			Iterator<ComposedLink> inLinksIterator = inLinks.values().iterator();
-			Link firstInLink = inLinksIterator.next();
-			Link secondInLink = inLinksIterator.next();
-			if(outLinks.values().iterator().next().getFromNode().equals(firstInLink.getToNode()) || outLinks.values().iterator().next().getFromNode().equals(secondInLink.getToNode()))
-				type = Types.ONE_WAY_END;
-			else
-				type = Types.CROSSING;
-		}
-		else if(inLinks.size() == 1 && outLinks.size() == 2) {
-			Iterator<ComposedLink> outLinksIterator = outLinks.values().iterator();
-			Link firstOutLink = outLinksIterator.next();
-			Link secondOutLink = outLinksIterator.next();
-			if(inLinks.values().iterator().next().getFromNode().equals(firstOutLink.getToNode()) || inLinks.values().iterator().next().getFromNode().equals(secondOutLink.getToNode()))
-				type = Types.ONE_WAY_START;
-			else
-				type = Types.CROSSING;
-		}
-		else if(inLinks.size() == 2 && outLinks.size() == 2) {
-			Iterator<ComposedLink> inLinksIterator = inLinks.values().iterator();
-			Link firstInLink = inLinksIterator.next();
-			Link secondInLink = inLinksIterator.next();
-			Iterator<ComposedLink> outLinksIterator = outLinks.values().iterator();
-			Link firstOutLink = outLinksIterator.next();
-			Link secondOutLink = outLinksIterator.next();
-			if((firstInLink.getFromNode().equals(firstOutLink.getToNode()) && secondInLink.getFromNode().equals(secondOutLink.getToNode())) || (firstInLink.getFromNode().equals(secondOutLink.getToNode()) && secondInLink.getFromNode().equals(firstOutLink.getToNode())))
-				type = Types.TWO_WAY_PASS;
-			else
-				type = Types.CROSSING;
-		}
-		else
-			type = Types.CROSSING;
-	}
-
-	public void setType(Types type) {
-		this.type = type;
-	}
-	
-	public ComposedNode clone() {
-		ComposedNode node = new ComposedNode(nodes);
-		node.setContainerNode(containerNode);
-		node.setIncidentLinks(incidentLinks);
-		node.setType(type);
-		return node;
 	}
 
 }

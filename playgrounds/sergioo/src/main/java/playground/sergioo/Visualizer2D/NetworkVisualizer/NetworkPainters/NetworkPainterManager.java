@@ -1,6 +1,7 @@
 package playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -11,10 +12,12 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.sergioo.Visualizer2D.Camera;
+
 public class NetworkPainterManager {
 	
 	//Attributes
-	protected final Network network;
+	protected Network network;
 	private Id selectedLinkId;
 	private Id selectedNodeId;
 	
@@ -25,6 +28,48 @@ public class NetworkPainterManager {
 	public NetworkPainterManager(Network network) {
 		super();
 		this.network = network;
+	}
+	public Network getNetwork() {
+		return network;
+	}
+	public void setNetwork(Network network) {
+		this.network = network;
+	}
+	public Collection<? extends Link> getNetworkLinks(Camera camera) throws Exception {
+		if(camera!=null) {
+			double xMin = camera.getUpLeftCorner().getX();
+			double yMin = camera.getUpLeftCorner().getY()+camera.getSize().getY();
+			double xMax = camera.getUpLeftCorner().getX()+camera.getSize().getX();
+			double yMax = camera.getUpLeftCorner().getY();
+			Collection<Link> links =  new HashSet<Link>();
+			for(Link link:network.getLinks().values()) {
+				Coord from = link.getFromNode().getCoord();
+				Coord to = link.getToNode().getCoord();
+				Coord center = link.getCoord();
+				if((xMin<from.getX() && yMin<from.getY() && xMax>from.getX() && yMax>from.getY()) || (xMin<to.getX() && yMin<to.getY() && xMax>to.getX() && yMax>to.getY())|| (xMin<center.getX() && yMin<center.getY() && xMax>center.getX() && yMax>center.getY()))
+					links.add(link);
+			}
+			return links;
+		}
+		else
+			throw new Exception("No camera defined");
+	}
+	public Collection<? extends Node> getNetworkNodes(Camera camera) throws Exception {
+		if(camera!=null) {
+			double xMin = camera.getUpLeftCorner().getX();
+			double yMin = camera.getUpLeftCorner().getY()+camera.getSize().getY();
+			double xMax = camera.getUpLeftCorner().getX()+camera.getSize().getX();
+			double yMax = camera.getUpLeftCorner().getY();
+			Collection<Node> nodes =  new HashSet<Node>();
+			for(Node node:network.getNodes().values()) {
+				Coord point = node.getCoord();
+				if(xMin<point.getX()&&yMin<point.getY()&&xMax>point.getX()&&yMax>point.getY())
+					nodes.add(node);
+			}
+			return nodes;
+		}
+		else
+			throw new Exception("No camera defined");
 	}
 	public Link getSelectedLink() {
 		if(selectedLinkId != null)

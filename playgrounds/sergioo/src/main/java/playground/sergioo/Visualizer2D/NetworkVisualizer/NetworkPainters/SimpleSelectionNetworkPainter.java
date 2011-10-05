@@ -42,10 +42,10 @@ public class SimpleSelectionNetworkPainter extends NetworkPainter {
 			paintSelected(g2, layersPanel);
 	}
 	private void paintSelected(Graphics2D g2, LayersPanel layersPanel) {
-		Link link=networkManager.getSelectedLink();
+		Link link=networkPainterManager.getSelectedLink();
 		if(link!=null)
 			paintLink(g2, layersPanel, link, selectedStroke, 3, selectedLinkColor);
-		Node node = networkManager.getSelectedNode();
+		Node node = networkPainterManager.getSelectedNode();
 		if(node!=null)
 			paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodeColor);
 	}

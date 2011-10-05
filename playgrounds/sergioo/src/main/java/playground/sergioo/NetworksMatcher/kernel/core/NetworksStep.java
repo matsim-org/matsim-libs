@@ -3,14 +3,19 @@ package playground.sergioo.NetworksMatcher.kernel.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
+
 
 public abstract class NetworksStep {
 
 	//Attributes
 
-	protected MatchingComposedNetwork networkA;
+	protected Network networkA;
 
-	protected MatchingComposedNetwork networkB;
+	protected Network networkB;
 
 	protected Region region;
 	
@@ -29,16 +34,28 @@ public abstract class NetworksStep {
 		internalStepPosition = 0;
 	}
 
-	public MatchingComposedNetwork getNetworkA() {
+	public Network getNetworkA() {
 		return networkA;
 	}
 
-	public MatchingComposedNetwork getNetworkB() {
+	public Network getNetworkB() {
 		return networkB;
 	}
+	
+	public List<NetworksStep> getNetworkSteps() {
+		return networkSteps;
+	}
+	
+	public int getInternalStepPosition() {
+		return internalStepPosition;
+	}
 
-	public MatchingComposedNetwork[] execute(MatchingComposedNetwork networkA, MatchingComposedNetwork networkB) {
-		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA, networkB};
+	public void setInternalStepPosition(int internalStepPosition) {
+		this.internalStepPosition = internalStepPosition;
+	}
+
+	public Network[] execute(Network networkA, Network networkB) {
+		Network[] networks = new Network[] {networkA, networkB};
 		int i = 0;
 		do{
 			if(i==internalStepPosition) {
@@ -54,7 +71,37 @@ public abstract class NetworksStep {
 		return networks;
 	}
 
-	protected abstract MatchingComposedNetwork[] execute();
+	protected Network[] execute() {
+		Network oldNetworkA = NetworkImpl.createNetwork();
+		Network oldNetworkB = NetworkImpl.createNetwork();
+		saveOldNetworks(oldNetworkA, oldNetworkB);
+		process(oldNetworkA, oldNetworkB);
+		Network[] reduced = new Network[] {networkA, networkB};
+		networkA = oldNetworkA;
+		networkB = oldNetworkB;
+		return reduced;
+	}
+	
+	protected abstract void process(Network oldNetworkA, Network oldNetworkB);
+	
+	protected void saveOldNetworks(Network oldNetworkA, Network oldNetworkB) {
+		for(Node node:networkA.getNodes().values()) {
+			Node newNode = new ComposedNode(node);
+			oldNetworkA.addNode(newNode);
+		}
+		for(Link link:networkA.getLinks().values()) {
+			MatchingComposedLink composedLink = new MatchingComposedLink(link.getId(), oldNetworkA.getNodes().get(link.getFromNode().getId()), oldNetworkA.getNodes().get(link.getToNode().getId()), oldNetworkA);
+			oldNetworkA.addLink(composedLink);
+		}
+		for(Node node:networkB.getNodes().values()) {
+			Node newNode = new ComposedNode(node);
+			oldNetworkB.addNode(newNode);
+		}
+		for(Link link:networkB.getLinks().values()) {
+			MatchingComposedLink composedLink = new MatchingComposedLink(link.getId(), oldNetworkB.getNodes().get(link.getFromNode().getId()), oldNetworkB.getNodes().get(link.getToNode().getId()), oldNetworkA);
+			oldNetworkB.addLink(composedLink);
+		}
+	}
 	
 	
 }

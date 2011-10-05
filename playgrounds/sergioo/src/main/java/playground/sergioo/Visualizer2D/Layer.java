@@ -8,7 +8,7 @@ public class Layer {
 	//Attributes
 	private boolean visible;
 	private final boolean active;
-	private final Painter painter;
+	private Painter painter;
 	
 	//Method
 	public Layer(Painter painter) {
@@ -26,8 +26,11 @@ public class Layer {
 	public Painter getPainter() {
 		return painter;
 	}
+	public void setPainter(Painter painter) {
+		this.painter = painter;
+	}
 	public void paint(Graphics2D g2, LayersPanel layersPanel) throws Exception {
-		if(visible)
+		if(visible && painter!=null)
 			painter.paint(g2, layersPanel);
 	}
 	public void changeVisible() {

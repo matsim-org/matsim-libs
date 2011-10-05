@@ -1,9 +1,9 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedLink;
-import playground.sergioo.NetworksMatcher.kernel.core.MatchingComposedNetwork;
 import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 
@@ -17,17 +17,15 @@ public class EdgeDeletionStep extends NetworksStep {
 	}
 
 	@Override
-	protected MatchingComposedNetwork[] execute() {
-		MatchingComposedNetwork[] networks = new MatchingComposedNetwork[] {networkA.clone(), networkB.clone()};
-		for(Link link:networkA.getLinks().values()) {
+	protected void process(Network oldNetworkA, Network oldNetworkB) {
+		for(Link link:oldNetworkA.getLinks().values()) {
 			if(((MatchingComposedLink)link).isIncident() && !((MatchingComposedLink)link).isFromMatched() && !((MatchingComposedLink)link).isToMatched())
-				networks[0].removeLink(link.getId());
+				networkA.removeLink(link.getId());
 		}
-		for(Link link:networkB.getLinks().values()) {
+		for(Link link:oldNetworkA.getLinks().values()) {
 			if(((MatchingComposedLink)link).isIncident() && !((MatchingComposedLink)link).isFromMatched() && !((MatchingComposedLink)link).isToMatched())
-				networks[1].removeLink(link.getId());
+				networkB.removeLink(link.getId());
 		}
-		return networks;
 	}
 	
 	/*@Override

@@ -17,6 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.matsim.api.core.v01.network.Network;
+
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
@@ -71,6 +73,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	private JPanel panelsPanel;
 	private MatchingProcess matchingProcess;
 	private int step;
+	private List<Color> colors;
 	
 	//Methods
 	private DoubleNetworkMatchingWindow(String title) {
@@ -124,52 +127,53 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(this, networkPainterA, networkPainterB));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
-		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
-		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
+		panelsPanel.add(layersPanels.get(PanelIds.A));
+		panelsPanel.add(layersPanels.get(PanelIds.B));
 		this.add(panelsPanel, BorderLayout.CENTER);
 	}
 	public DoubleNetworkMatchingWindow(String title, MatchingProcess matchingProcess) {
 		this(title);
 		this.matchingProcess = matchingProcess;
-		this.step = matchingProcess.getNumSteps()-1;
-		initialise(true);
-	}
-	private void initialise(boolean finalNetworks) {
-		Set<NodesMatching> nodesMatchings = matchingProcess.getMatchings(step);
-		NetworkNodesPainter networkPainterA = null;
-		NetworkNodesPainter networkPainterB = null;
-		if(finalNetworks) {
-			networkPainterA = new NetworkNodesPainter(matchingProcess.getFinalNetworkA());
-			networkPainterB = new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN);
-		}
-		else {
-			networkPainterA = new NetworkNodesPainter(matchingProcess.getNetworkA(step));
-			networkPainterB = new NetworkNodesPainter(matchingProcess.getNetworkB(step), Color.BLACK, Color.CYAN);
-		}
-		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
-		if(layersPanels.get(PanelIds.DOUBLE)!=null)
-			this.remove(layersPanels.get(PanelIds.DOUBLE));
-		if(panelsPanel!=null)
-			this.remove(panelsPanel);
-		layersPanels.clear();
-		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, networkPainterA, colors));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, networkPainterB, colors));
+		this.step = matchingProcess.getNumSteps();
+		Set<NodesMatching> nodesMatchings = matchingProcess.getFinalMatchings();
+		colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
+		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN), colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, networkPainterA, networkPainterB));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN)));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
-		panelsPanel.add(layersPanels.get(PanelIds.A), BorderLayout.WEST);
-		panelsPanel.add(layersPanels.get(PanelIds.B), BorderLayout.EAST);
+		panelsPanel.add(layersPanels.get(PanelIds.A));
+		panelsPanel.add(layersPanels.get(PanelIds.B));
 		this.add(panelsPanel, BorderLayout.CENTER);
 	}
-	public void setMatchings(Collection<NodesMatching> nodesMatchings) {
-		List<Color> colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
+	private void setStep(boolean finalStep) {
+		Collection<NodesMatching> nodesMatchings = null;
+		Network networkA = null;
+		Network networkB = null;
+		if(finalStep) {
+			nodesMatchings = matchingProcess.getFinalMatchings();
+			networkA = matchingProcess.getFinalNetworkA();
+			networkB = matchingProcess.getFinalNetworkB();
+		}
+		else {
+			nodesMatchings = matchingProcess.getMatchings(step);
+			networkA = matchingProcess.getNetworkA(step);
+			networkB = matchingProcess.getNetworkB(step);
+		}
+		if(nodesMatchings!= null && !(colors.size()==nodesMatchings.size()))
+			colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
 		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setMatchings(nodesMatchings, MatchingOptions.A, colors);
 		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).setMatchings(nodesMatchings, MatchingOptions.B, colors);
 		((DoubleNetworkMatchingPanel)layersPanels.get(PanelIds.DOUBLE)).setMatchings(nodesMatchings);
+		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setNetwork(networkA);
+		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).setNetwork(networkB);
+		((DoubleNetworkMatchingPanel)layersPanels.get(PanelIds.DOUBLE)).setNetworks(networkA, networkB);
+		setVisible(true);
+		repaint();
 	}
 	public void setNetworksSeparated() {
 		networksSeparated = !networksSeparated;
@@ -191,25 +195,19 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public void nextNetwork() {
 		step++;
-		if(step==matchingProcess.getNumSteps())
+		if(step>=matchingProcess.getNumSteps())
 			step = 0;
-		initialise(false);
-		setNetworksSeparated();
-		setNetworksSeparated();
+		setStep(false);
 	}
 	public void previousNetwork() {
 		step--;
 		if(step<0)
 			step = matchingProcess.getNumSteps()-1;
-		initialise(false);
-		setNetworksSeparated();
-		setNetworksSeparated();
+		setStep(false);
 	}
 	public void finalNetworks() {
-		step = matchingProcess.getNumSteps()-1;
-		initialise(true);
-		setNetworksSeparated();
-		setNetworksSeparated();
+		step = matchingProcess.getNumSteps();
+		setStep(true);
 	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {

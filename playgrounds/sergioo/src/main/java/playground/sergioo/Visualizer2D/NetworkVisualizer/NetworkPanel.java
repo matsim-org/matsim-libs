@@ -71,7 +71,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkManager().getNetworkLinks()) {
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
 				coords.add(link.getFromNode().getCoord());
 				coords.add(link.getToNode().getCoord());
@@ -85,19 +85,19 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectLink();
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectLink();
 				window.refreshLabel(Labels.LINK);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager().unselectNode();
+				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectNode();
 				window.refreshLabel(Labels.NODE);
 			}
 			else if(window.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
@@ -109,7 +109,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	}
 	public String getLabelText(Labels label) {
 		try {
-			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
+			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -170,7 +170,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 			((SimpleSelectionNetworkPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
 			break;
 		case 'o':
-			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkManager().selectOppositeLink();
+			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
 			window.refreshLabel(Labels.LINK);
 			break;
 		case 'v':

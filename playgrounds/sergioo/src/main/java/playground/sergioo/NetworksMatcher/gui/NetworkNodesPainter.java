@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
 public class NetworkNodesPainter extends NetworkPainter {
 	
@@ -38,17 +39,17 @@ public class NetworkNodesPainter extends NetworkPainter {
 	}
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		super.paint(g2, layersPanel);
-		for(Node node:((NetworkNodesPainterManager)networkManager).getSelectedNodes())
+		for(Node node:((NetworkNodesPainterManager)networkPainterManager).getSelectedNodes())
 			if(node!=null)
 				paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodesColor);
 		if(withSelected)
 			paintSelected(g2, layersPanel);
 	}
 	private void paintSelected(Graphics2D g2, LayersPanel layersPanel) {
-		Link link=networkManager.getSelectedLink();
+		Link link=networkPainterManager.getSelectedLink();
 		if(link!=null)
 			paintLink(g2, layersPanel, link, selectedStroke, 3, selectedLinkColor);
-		Node node = networkManager.getSelectedNode();
+		Node node = networkPainterManager.getSelectedNode();
 		if(node!=null)
 			paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodeColor);
 	}

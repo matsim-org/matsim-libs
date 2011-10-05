@@ -75,7 +75,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
-		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkManager().getNetworkLinks()) {
+		for(Link link:((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().getNetworkLinks()) {
 			if(link!=null) {
 				coords.add(link.getFromNode().getCoord());
 				coords.add(link.getToNode().getCoord());

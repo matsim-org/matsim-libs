@@ -90,7 +90,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 		}
 		else {
 			int i=0;
-			for(Link linkT:networkByCamera.getNetwork().getLinks().values()) {
+			for(Link linkT:networkPainterManager.getNetwork().getLinks().values()) {
 				Link link = linkT;
 				for(RouteTypes routeType:RouteTypes.values())
 					if(link.getAllowedModes().contains(routeType.name)) {
@@ -152,7 +152,7 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 						}
 					}
 				if(i%10000==0)
-					System.out.println(i+" of "+networkByCamera.getNetwork().getLinks().size());
+					System.out.println(i+" of "+networkPainterManager.getNetwork().getLinks().size());
 				i++;
 			}
 			try {
@@ -167,19 +167,18 @@ public class PublicTransportNetworkPainter extends NetworkPainter {
 	}
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
-		networkByCamera.setCamera(layersPanel.getCamera());
 		try {
-			for(Link link:networkByCamera.getNetworkLinks()) {
+			for(Link link:networkPainterManager.getNetworkLinks(layersPanel.getCamera())) {
 				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
 				if(linkDrawInformation==null)
 					paintLink(g2, layersPanel, link, networkStroke, 0.5, networkColor);
 			}
-			for(Link link:networkByCamera.getNetworkLinks()) {
+			for(Link link:networkPainterManager.getNetworkLinks(layersPanel.getCamera())) {
 				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
 				if(linkDrawInformation!=null && linkDrawInformation.getColor().equals(new Color(100,50,0)))
 					paintLink(g2, layersPanel, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());
 			}
-			for(Link link:networkByCamera.getNetworkLinks()) {
+			for(Link link:networkPainterManager.getNetworkLinks(layersPanel.getCamera())) {
 				LinkDrawInformation linkDrawInformation = linksDrawInformation.get(link.getId());
 				if(linkDrawInformation!=null && !linkDrawInformation.getColor().equals(new Color(100,50,0)))
 					paintLink(g2, layersPanel, link, new BasicStroke(linkDrawInformation.getThickness()*weight), 2, linkDrawInformation.getColor());

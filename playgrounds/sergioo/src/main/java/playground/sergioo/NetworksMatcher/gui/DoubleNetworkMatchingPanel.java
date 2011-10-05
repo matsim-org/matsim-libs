@@ -10,6 +10,8 @@ import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.network.Network;
+
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
@@ -58,9 +60,13 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			addLayer(new Layer(new MatchingsPainter(nodesMatchings), false));
 		}
 	}
+	public void setNetworks(Network networkA, Network networkB) {
+		((NetworkNodesPainter)getLayer(0).getPainter()).setNetwork(networkA);
+		((NetworkNodesPainter)getLayer(1).getPainter()).setNetwork(networkB);
+	}
 	public String getLabelText(Labels label) {
 		try {
-			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager(), new Object[0]);
+			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -80,11 +86,11 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkNodesPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1)
@@ -138,7 +144,7 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			((NetworkNodesPainter)getPrincipalLayer().getPainter()).changeVisibleSelectedElements();
 			break;
 		case 'o':
-			((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkManager().selectOppositeLink();
+			((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
 			doubleNetworkWindow.refreshLabel(Labels.LINK);
 			break;
 		case 'n':
@@ -146,7 +152,6 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 			break;
 		case 'v':
 			viewAll();
-			doubleNetworkWindow.cameraChange(camera);
 			break;
 		case 'm':
 			doubleNetworkWindow.setNetworksSeparated();

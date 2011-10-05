@@ -31,7 +31,7 @@ public class DoubleNetworkPanel extends LayersPanel {
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
 		for(Layer layer:getAllLayers())
-			for(Link link:((NetworkPainter)layer.getPainter()).getNetworkManager().getNetworkLinks()) {
+			for(Link link:((NetworkPainter)layer.getPainter()).getNetwork().getLinks().values()) {
 				if(link!=null) {
 					coords.add(link.getFromNode().getCoord());
 					coords.add(link.getToNode().getCoord());

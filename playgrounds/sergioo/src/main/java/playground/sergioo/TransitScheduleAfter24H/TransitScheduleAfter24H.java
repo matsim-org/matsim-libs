@@ -1,7 +1,11 @@
 package playground.sergioo.TransitScheduleAfter24H;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -20,11 +24,15 @@ public class TransitScheduleAfter24H {
 		TransitScheduleFactory transitScheduleFactory = transitSchedule.getFactory();
 		double numSeconds = numHours*3600;
 		for(TransitLine transitLine:transitSchedule.getTransitLines().values())
-			for(TransitRoute transitRoute:transitLine.getRoutes().values())
+			for(TransitRoute transitRoute:transitLine.getRoutes().values()) {
+				List<Departure> newDepartures = new ArrayList<Departure>();
 				for(Departure departure:transitRoute.getDepartures().values())
 					if(departure.getDepartureTime()<numSeconds)
-						transitRoute.addDeparture(transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime()));	
-		return null;
+						newDepartures.add(transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime()));
+				for(Departure departure:newDepartures)
+					transitRoute.addDeparture(departure);
+			}
+		return transitSchedule;
 	}
 	
 	//Main
@@ -36,7 +44,9 @@ public class TransitScheduleAfter24H {
 	 */
 	public static void main(String[] args) {
 		Integer numHours = Integer.parseInt(args[0]);
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseTransit(true);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		new TransitScheduleWriter(TransitScheduleAfter24H.addHours(((ScenarioImpl)scenario).getTransitSchedule(),numHours)).writeFile(args[2]);
 	}
