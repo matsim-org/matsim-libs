@@ -45,14 +45,13 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 
 public class PtScenarioAdaption {
 	
-	public static final double[] headwayClasses = new double[]{
+	public static final double[] relHeadwayClasses = new double[]{
 	    4, 7, 10, 15, 30, 60};  // in [minutes]!!
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private String networkfilePath;
 	private String outpath;
 	private String transitScheduleFile;
-	private String vehiclesFile;
 	private ScenarioImpl scenario;
 	private TransitScheduleFactory transitFactory = null;
 
@@ -83,7 +82,6 @@ public class PtScenarioAdaption {
 		this.networkfilePath = config.findParam("ptScenarioAdaption", "networkfilePath");
 		this.outpath = config.findParam("ptScenarioAdaption", "output");
 		this.transitScheduleFile = config.findParam("ptScenarioAdaption", "transitScheduleFile");
-		this.vehiclesFile = config.findParam("ptScenarioAdaption", "vehiclesFile");
 		
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseVehicles(true);
@@ -183,7 +181,7 @@ public class PtScenarioAdaption {
 		newDepartures.put(pastDeparture, newDepImpl);
 		
 		// Add departures if headway is within the range:
-		if(currentInterval > headwayClasses[0] && currentInterval <= headwayClasses[headwayClasses.length - 1]) 
+		if(currentInterval > relHeadwayClasses[0] && currentInterval <= relHeadwayClasses[relHeadwayClasses.length - 1]) 
 		{
 			double newInterval = getNewInterval();
 			while(pastDeparture + newInterval  *60d < upperThreshold){
@@ -199,12 +197,12 @@ public class PtScenarioAdaption {
 		}
 		else
 		{
-			copyOldDepartures(upperThreshold);
+			copyExistingDepartures(upperThreshold);
 		}
 	}
 	
 
-	private void copyOldDepartures(double upperThreshold) {
+	private void copyExistingDepartures(double upperThreshold) {
 		while ((pastDeparture + currentInterval*60) <= upperThreshold){
 			
 			IdImpl newId = new IdImpl(++pastId);
@@ -219,10 +217,10 @@ public class PtScenarioAdaption {
 
 	private double getNewInterval() {
 		
-		for (int i = 1; i < headwayClasses.length; i++) {
-			if(headwayClasses[i] > currentInterval) return headwayClasses[(i-1)];
+		for (int i = 1; i < relHeadwayClasses.length; i++) {
+			if(relHeadwayClasses[i] >= currentInterval) return relHeadwayClasses[(i-1)];
 		}
-		return headwayClasses[0];
+		return relHeadwayClasses[0];
 	}
 
 	private void writeScenario() {
