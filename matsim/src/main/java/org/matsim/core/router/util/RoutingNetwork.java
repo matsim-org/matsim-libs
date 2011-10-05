@@ -86,8 +86,6 @@ public class RoutingNetwork implements Network {
 			}
 			
 			if (dijkstraLinks.size() > 0) log.warn("Not all links have been use in the DijkstraNetwork - check connectivity of input network!");
-			dijkstraLinks.clear();
-			dijkstraLinks = null;
 			
 			if (preProcessData != null) {
 				if (preProcessData.containsData()) {

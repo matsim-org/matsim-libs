@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -81,8 +82,11 @@ public class ScoreStats implements StartupListener, IterationEndsListener, Shutd
 		this.population = population;
 		this.fileName = filename;
 		this.createPNG = createPNG;
-		if (filename.toLowerCase().endsWith(".txt")) this.out = IOUtils.getBufferedWriter(filename);
-		else this.out = IOUtils.getBufferedWriter(filename + ".txt");
+		if (filename.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+			this.out = IOUtils.getBufferedWriter(filename);
+		} else {
+			this.out = IOUtils.getBufferedWriter(filename + ".txt");
+		}
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 		} catch (IOException e) {

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
@@ -99,8 +100,11 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 		this.network = network;
 		this.fileName = filename;
 		this.createPNG = createPNG;
-		if (filename.toLowerCase().endsWith(".txt")) this.out = IOUtils.getBufferedWriter(filename);
-		else this.out = IOUtils.getBufferedWriter(filename + ".txt");
+		if (filename.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+			this.out = IOUtils.getBufferedWriter(filename);
+		} else {
+			this.out = IOUtils.getBufferedWriter(filename + ".txt");
+		}
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 		} catch (IOException e) {
