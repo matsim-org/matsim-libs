@@ -28,7 +28,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationLocalSearcher;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationOnTheFlyScorer;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationSimplexAlgo;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.FinalScorer;
