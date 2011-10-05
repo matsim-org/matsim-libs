@@ -27,6 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.MultivariateRealFunction;
+import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.MultiDirectional;
 import org.apache.commons.math.optimization.direct.NelderMead;
 import org.apache.commons.math.optimization.GoalType;
@@ -55,10 +56,13 @@ public class DurationSimplexAlgo implements FinalScorer {
 
 	private static final int N_MAX_ITERS = 30;
 	private static final double MIN_IMPROVEMENT = 1E-7;
+	// defines the size of the initial vertex (to be sure of the "locality"
+	// of the search!)
+	private static final double STEP = 60;
 	private static final double UNFEASIBLE_SCORE = Double.MIN_VALUE;
 
-	//private final MultivariateRealOptimizer optimizer = new NelderMead();
-	private final MultivariateRealOptimizer optimizer = new MultiDirectional();
+	//private final DirectSearchOptimizer optimizer = new NelderMead();
+	private final DirectSearchOptimizer optimizer = new MultiDirectional();
 	private final DurationOnTheFlyScorer scorer;
 	private final DurationFitnessFunction fitness = new DurationFitnessFunction();
 
@@ -66,7 +70,7 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private JointPlan plan = null;
 	private DoubleGene[] dimensions = null;
 
-	private boolean convergenceCheckerSet = false;
+	private boolean optimizerConfigured = false;
 
 	public DurationSimplexAlgo(
 			final DurationOnTheFlyScorer scorer) {
@@ -79,10 +83,8 @@ public class DurationSimplexAlgo implements FinalScorer {
 		this.chromosome = (JointPlanOptimizerJGAPChromosome) chromosome;
 		this.plan = inputPlan;
 
-		if (!convergenceCheckerSet) {
-			optimizer.setConvergenceChecker(
-					new SimplexConvergenceChecker(inputPlan.getClique().getMembers().size()));
-			convergenceCheckerSet = true;
+		if (!optimizerConfigured) {
+			configureOptimizer(inputPlan.getClique().getMembers().size());
 		}
 
 		Gene[] genes = chromosome.getGenes();
@@ -99,6 +101,22 @@ public class DurationSimplexAlgo implements FinalScorer {
 		updateChromosomeValue(optimum.getPoint());
 
 		return optimum.getValue();
+	}
+
+	private void configureOptimizer(final int nDim) {
+		// set the convergence monitor
+		optimizer.setConvergenceChecker(
+				new SimplexConvergenceChecker(nDim));
+
+		// define the size of the initial vertex
+		double[] steps = new double[nDim];
+
+		for (int i=0; i < nDim; i++) {
+			steps[i] = STEP;
+		}
+
+		optimizer.setStartConfiguration(steps);
+		optimizerConfigured = true;
 	}
 
 	private double[] getCurrentPoint() {
