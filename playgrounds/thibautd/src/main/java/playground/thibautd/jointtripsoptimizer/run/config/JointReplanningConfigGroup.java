@@ -160,6 +160,7 @@ public class JointReplanningConfigGroup extends Module {
 	 * seed may lead to sligthly different results.
 	 */
 	public static final String MAX_CPU_TIME = "maxCpuTimePerMemberNanoSecs";
+	public static final String MEMETIC ="isMemetic";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -203,6 +204,7 @@ public class JointReplanningConfigGroup extends Module {
 	// default: with or without?
 	//private long maxCpuTimePerMember = (long) (10 * 1E9);
 	private long maxCpuTimePerMember = -1;
+	private boolean isMemetic = false;
 	//deprecated fields:
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
@@ -330,6 +332,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_CPU_TIME)) {
 			this.setMaxCpuTimePerMemberNanoSecs(value);
 		}
+		else if (param_name.equals(MEMETIC)) {
+			this.setIsMemetic(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -444,7 +449,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_CPU_TIME)) {
 			return String.valueOf(this.getMaxCpuTimePerMemberNanoSecs());
 		}
-
+		else if (param_name.equals(MEMETIC)) {
+			return String.valueOf(this.getIsMemetic());
+		}
 		return null;
 	}
 
@@ -484,6 +491,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, POPULATION_INTERCEPT);
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		this.addParameterToMap(map, MAX_CPU_TIME);
+		this.addParameterToMap(map, MEMETIC);
 		return map;
 	}
 
@@ -883,6 +891,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public long getMaxCpuTimePerMemberNanoSecs() {
 		return this.maxCpuTimePerMember;
+	}
+
+	public void setIsMemetic(final String value) {
+		this.isMemetic = Boolean.valueOf(value);
+	}
+
+	public boolean getIsMemetic() {
+		return isMemetic;
 	}
 
 	// allow setting of GA params "directly"

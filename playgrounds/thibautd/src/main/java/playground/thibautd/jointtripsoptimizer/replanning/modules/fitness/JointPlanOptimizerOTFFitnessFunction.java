@@ -28,7 +28,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationLocalSearcher;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationOnTheFlyScorer;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationSimplexAlgo;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.FinalScorer;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerPartialDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
@@ -51,7 +54,8 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 
 	private final JointPlanOptimizerDecoder decoder;
 	private final JointPlanOptimizerDecoder fullDecoder;
-	private final DurationOnTheFlyScorer scorer;
+	//private final DurationOnTheFlyScorer scorer;
+	private final FinalScorer scorer;
 
 	public JointPlanOptimizerOTFFitnessFunction(
 			final JointPlan plan,
@@ -78,16 +82,31 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 					numJointEpisodes,
 					numEpisodes,
 					nMembers)).createDecoder();
-		this.scorer = new DurationOnTheFlyScorer(
-					plan,
-					configGroup,
-					scoringFunctionFactory,
-					legTravelTimeEstimatorFactory,
-					routingAlgorithm,
-					network,
-					numJointEpisodes,
-					numEpisodes,
-					nMembers);
+
+		if (configGroup.getIsMemetic()) {
+			this.scorer = new DurationSimplexAlgo(new DurationOnTheFlyScorer(
+						plan,
+						configGroup,
+						scoringFunctionFactory,
+						legTravelTimeEstimatorFactory,
+						routingAlgorithm,
+						network,
+						numJointEpisodes,
+						numEpisodes,
+						nMembers));
+		}
+		else {
+			this.scorer =new DurationOnTheFlyScorer(
+						plan,
+						configGroup,
+						scoringFunctionFactory,
+						legTravelTimeEstimatorFactory,
+						routingAlgorithm,
+						network,
+						numJointEpisodes,
+						numEpisodes,
+						nMembers);
+		}
 	}
 
 	@Override
