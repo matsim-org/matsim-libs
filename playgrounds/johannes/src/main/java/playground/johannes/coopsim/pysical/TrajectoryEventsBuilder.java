@@ -35,33 +35,37 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
 	private Map<Id, PersonData> personData;
-	
+
 	public TrajectoryEventsBuilder(Set<Person> persons) {
+		/*
+		 * FIXME: This actually should be a ConcurrentHashMap, however, seems to
+		 * work anyway!? Because the EventsManager is synchronized!?
+		 */
 		personData = new HashMap<Id, TrajectoryEventsBuilder.PersonData>(persons.size());
-		for(Person person : persons) {
+		for (Person person : persons) {
 			PersonData data = new PersonData();
 			data.person = person;
 			personData.put(person.getId(), data);
 		}
 	}
-	
+
 	public Set<Trajectory> trajectories() {
 		Set<Trajectory> trajectories = new HashSet<Trajectory>(personData.size());
-		for(PersonData data : personData.values()) {
-			if(data.trajectory != null)
+		for (PersonData data : personData.values()) {
+			if (data.trajectory != null)
 				trajectories.add(data.trajectory);
 		}
 		return trajectories;
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
-		for(PersonData data : personData.values()) {
+		for (PersonData data : personData.values()) {
 			data.trajectory = null;
 			data.planIndex = 0;
 		}
@@ -82,31 +86,47 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 		Trajectory t = data.trajectory;
 		int index = data.planIndex;
 		Person person = data.person;
-		
-		if(t == null) {
+
+		if (t == null) {
 			t = new Trajectory(person);
 			data.trajectory = t;
 		}
-		
+
 		Plan plan = person.getSelectedPlan();
-		
+
 		t.addElement(plan.getPlanElements().get(index), event.getTime());
-		if(index == plan.getPlanElements().size() - 2) {
+		if (index == plan.getPlanElements().size() - 2) {
 			/*
 			 * This is the last element.
 			 */
-			t.addElement(plan.getPlanElements().get(index + 1), Math.max(86400, event.getTime() + 1)); //FIXME Without +1 sec plan scores can be NaN. Probably because the last act has zero duration.
+			t.addElement(plan.getPlanElements().get(index + 1), Math.max(86400, event.getTime() + 1)); // FIXME
+																										// Without
+																										// +1
+																										// sec
+																										// plan
+																										// scores
+																										// can
+																										// be
+																										// NaN.
+																										// Probably
+																										// because
+																										// the
+																										// last
+																										// act
+																										// has
+																										// zero
+																										// duration.
 		}
-		
+
 		data.planIndex++;
 	}
-	
+
 	private class PersonData {
-		
+
 		private Trajectory trajectory;
-		
+
 		private Person person;
-		
-		private int planIndex; 
+
+		private int planIndex;
 	}
 }

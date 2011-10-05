@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvalEngine.java
+ * IntervalSimService.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
-
-import java.util.Set;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-
+package playground.johannes.coopsim.services;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class EvalEngine {
-	
-	private final Evaluator evaluator;
-	
-	public EvalEngine(Evaluator evalutor) {
-		this.evaluator = evalutor;
-	}
-	
+public class IntervalSimService<T> implements SimService<T> {
 
-	public void evaluate(Set<Trajectory> trajectories) {
-		for(Trajectory t : trajectories) {
-			double score = evaluator.evaluate(t);
-			
-			t.getPerson().getSelectedPlan().setScore(score);
-		}
+	private final SimService<T> delegate;
+	
+	private final long interval;
+	
+	private final boolean execute;
+	
+	private long iteration;
+	
+	public IntervalSimService(SimService<T> delegate, long interval, boolean execute) {
+		this.delegate = delegate;
+		this.interval = interval;
+		this.execute = execute;
 	}
+	
+	@Override
+	public void init() {
+		delegate.init();
+	}
+
+	@Override
+	public void run() {
+		if(execute) {
+			if(iteration % interval == 0) {
+				delegate.run();
+			}
+		} else {
+			if(!(iteration % interval == 0)) {
+				delegate.run();
+			}
+		}
+		iteration++;
+	}
+
+	@Override
+	public T get() {
+		return delegate.get();
+	}
+
+	@Override
+	public void terminate() {
+		delegate.terminate();
+	}
+
 }

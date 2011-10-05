@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.sna.util.Composite;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -29,12 +30,19 @@ import playground.johannes.coopsim.pysical.Trajectory;
  */
 public class EvaluatorComposite extends Composite<Evaluator> implements Evaluator {
 
+	private static final Logger logger = Logger.getLogger(EvaluatorComposite.class);
+	
 	@Override
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
 		
 		for(Evaluator e : components)
 			score += e.evaluate(trajectory);
+		
+		if(Double.isInfinite(score))
+			logger.debug("Infinite score.");
+		else if (Double.isNaN(score))
+			throw new IllegalArgumentException("NaN is not a valid score.");
 		
 		return score;
 	}

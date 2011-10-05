@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EscortsActivtyTypeTask.java
+ * InfinitScoresTask.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,58 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.mz2005.analysis;
+package playground.johannes.coopsim.analysis;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.sna.util.TXTWriter;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Plan;
 
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.mz2005.io.EscortData;
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class EscortsActivtyTypeTask extends TrajectoryAnalyzerTask {
+public class InfiniteScoresTask extends TrajectoryAnalyzerTask {
 
-	private final EscortData escortData;
-
-	public EscortsActivtyTypeTask(EscortData data) {
-		this.escortData = data;
-	}
-
+	private static final Logger logger = Logger.getLogger(InfiniteScoresTask.class);
+	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		Map<String, DescriptiveStatistics> statsMap = new HashMap<String, DescriptiveStatistics>();
-		for (Trajectory trajectory : trajectories) {
-			for (int i = 2; i < trajectory.getElements().size(); i += 2) {
-				Activity destination = (Activity) trajectory.getElements().get(i);
-				int escorts = escortData.getEscorts(trajectory.getPerson(), i - 1);
-
-//				if (escorts > 0) {
-					DescriptiveStatistics stats = statsMap.get(destination.getType());
-					if (stats == null) {
-						stats = new DescriptiveStatistics();
-						statsMap.put(destination.getType(), stats);
-					}
-
-					stats.addValue(escorts);
-//				}
-			}
+		int count = 0;
+		for(Trajectory t : trajectories) {
+			Plan p = t.getPerson().getSelectedPlan();
+			if(Double.isInfinite(p.getScore()))
+				count++;
 		}
-
-		try {
-			TXTWriter.writeStatistics(statsMap, getOutputDirectory() + "/escorts_type.txt");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+		if(count > 0)
+			logger.warn(String.format("There are %1$s plans with infinite score.", count));
 
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvalEngine.java
+ * EvaluationService.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.services;
 
-import java.util.Set;
+import java.util.Collection;
 
+import playground.johannes.coopsim.eval.Evaluator;
 import playground.johannes.coopsim.pysical.Trajectory;
-
 
 /**
  * @author illenberger
- * 
+ *
  */
-public class EvalEngine {
+public class EvaluationService implements SimService<Object> {
+
+	private final SimService<Collection<Trajectory>> mobsimService;
 	
 	private final Evaluator evaluator;
 	
-	public EvalEngine(Evaluator evalutor) {
-		this.evaluator = evalutor;
+	public EvaluationService(SimService<Collection<Trajectory>> mobsimService, Evaluator evaluator) {
+		this.mobsimService = mobsimService;
+		this.evaluator = evaluator;
 	}
 	
+	@Override
+	public void init() {
+	}
 
-	public void evaluate(Set<Trajectory> trajectories) {
+	@Override
+	public void run() {
+		Collection<Trajectory> trajectories = mobsimService.get();
 		for(Trajectory t : trajectories) {
 			double score = evaluator.evaluate(t);
-			
 			t.getPerson().getSelectedPlan().setScore(score);
 		}
 	}
+
+	@Override
+	public Object get() {
+		return null;
+	}
+
+	@Override
+	public void terminate() {
+	}
+
 }

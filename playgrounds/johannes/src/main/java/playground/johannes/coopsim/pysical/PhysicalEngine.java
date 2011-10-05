@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.sna.util.MultiThreading;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -34,7 +35,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
  */
 public class PhysicalEngine {
 
-	private final PseudoSim pseudoSim;
+	private final ParallelPseudoSim pseudoSim;
 	
 	private final Network network;
 	
@@ -44,7 +45,8 @@ public class PhysicalEngine {
 	
 	public PhysicalEngine(Network network) {
 		this.network = network;
-		this.pseudoSim = new PseudoSim();
+//		this.pseudoSim = new PseudoSim();
+		this.pseudoSim = new ParallelPseudoSim(MultiThreading.getNumAllowedThreads());
 		this.travelTime = new TravelTimeCalculator(network, 900, 86400, new TravelTimeCalculatorConfigGroup());
 		this.tracker = new VisitorTracker();
 	}
@@ -64,5 +66,10 @@ public class PhysicalEngine {
 		pseudoSim.run(plans, network, travelTime, eventsManager);
 		
 		eventsManager.removeHandler(tracker);
+	}
+	
+	public void finalize() throws Throwable {
+		super.finalize();
+		pseudoSim.finalize();
 	}
 }

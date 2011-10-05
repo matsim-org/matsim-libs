@@ -125,6 +125,13 @@ public class SimEngine {
 				drawSample(i);
 			}
 		}
+		
+		try {
+			physicalEngine.finalize();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void step() {

@@ -20,9 +20,9 @@
 package playground.johannes.socialnetworks.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author illenberger
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
-	public static <T> List<T>[] split(Set<T> set, int n) {
+	public static <T> List<T>[] split(Collection<T> set, int n) {
 		if(set.size() >= n) {
 			@SuppressWarnings("unchecked")
 			List<T>[] arrays = new List[n];

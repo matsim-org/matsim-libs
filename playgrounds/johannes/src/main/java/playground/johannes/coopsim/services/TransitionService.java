@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MentalEngine.java
+ * TransitionService.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,84 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.mental;
+package playground.johannes.coopsim.services;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 
-import playground.johannes.coopsim.mental.choice.ActivityGroupSelector;
-import playground.johannes.coopsim.mental.choice.ChoiceSelector;
-import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptor;
-import playground.johannes.coopsim.mental.planmod.PlanModEngine;
-import playground.johannes.coopsim.mental.planmod.SingleThreadedModEngine;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**
  * @author illenberger
  *
  */
-public class MentalEngine {
+public class TransitionService implements SimService<Boolean> {
 
+	private final StateService stateService;
+	
 	private final Random random;
 	
-	private final ChoiceSelector choiceSelector;
+	private Boolean accept;
 	
-	private final PlanModEngine modEngine;
-	
-	private int acceptedStates;
-	
-	private double piSum;
-	
-	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, Choice2ModAdaptor adaptor, Random random) {
-		this.choiceSelector = choiceSelector;
+	public TransitionService(StateService stateService, Random random) {
+		this.stateService = stateService;
 		this.random = random;
-		
-		modEngine = new SingleThreadedModEngine(adaptor);
 	}
 	
-	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, PlanModEngine modEngine, Random random) {
-		this.choiceSelector = choiceSelector;
-		this.random = random;		
-		this.modEngine = modEngine;
+	@Override
+	public void init() {
 	}
-	
-	public List<SocialVertex> nextState() {
-		/*
-		 * make choices
-		 */
-		Map<String, Object> choices = new HashMap<String, Object>();
-		choices = choiceSelector.select(choices);
-		/*
-		 * get plans do modify
-		 */
-		@SuppressWarnings("unchecked")
-		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
-		List<Plan> plans = new ArrayList<Plan>(egos.size());
-		for(SocialVertex v : egos) {
-			Plan plan = v.getPerson().getPerson().copySelectedPlan();
-			if(plan == null)
-				throw new NullPointerException("Outch! This person appears to have no selected plan!");
-			plans.add(plan);
-		}
-		/*
-		 * apply modifications
-		 */
-		modEngine.run(plans, choices);
 
-		return egos;
-	}
-	
-	public boolean acceptRejectState(Collection<SocialVertex> egos) {
-		boolean accept;
+	@Override
+	public void run() {
+		List<SocialVertex> egos = stateService.get();
 		/*
 		 * get new and old plans
 		 */
@@ -127,7 +85,7 @@ public class MentalEngine {
 		double delta = oldScore - newScore;
 		double pi = 1 / (1 + Math.exp(delta));
 
-		piSum += pi;
+//		piSum += pi;
 		/*
 		 * accept/reject
 		 */
@@ -137,7 +95,7 @@ public class MentalEngine {
 			 * accept state
 			 */
 			remove = oldState;
-			acceptedStates++;
+//			acceptedStates++;
 			accept = true;
 		} else {
 			/*
@@ -156,19 +114,15 @@ public class MentalEngine {
 			person.setSelectedPlan(person.getPlans().get(0));
 		}
 		
+	}
+
+	@Override
+	public Boolean get() {
 		return accept;
 	}
-	
-	public int getAcceptedStates() {
-		return acceptedStates;
+
+	@Override
+	public void terminate() {
 	}
-	
-	public double getTransitionProbaSum() {
-		return piSum;
-	}
-	
-	public void clearStatistics() {
-		acceptedStates = 0;
-		piSum = 0;
-	}
+
 }

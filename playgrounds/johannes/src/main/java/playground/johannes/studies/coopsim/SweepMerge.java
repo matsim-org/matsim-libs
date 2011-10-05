@@ -42,10 +42,10 @@ public class SweepMerge {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run20/");
-		String property = "d_trip_visit";
-		int valIdx = 5;
-		String parameterKey = "beta_join";
+		File root = new File("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run36/");
+		String property = "score";
+		int valIdx = 1;
+		String parameterKey = "alterProba";
 
 		File analysis = new File(String.format("%1$s/analysis/", root.getAbsolutePath()));
 		analysis.mkdirs();

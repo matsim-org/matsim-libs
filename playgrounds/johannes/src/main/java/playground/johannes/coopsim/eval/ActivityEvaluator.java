@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.population.Desires;
 
 import playground.johannes.coopsim.pysical.Trajectory;
 
@@ -38,13 +39,13 @@ public class ActivityEvaluator implements Evaluator {
 	
 	private final double beta;
 	
-	private final Map<String, Map<Person, Double>> desiredDurations;
+	private final Map<Person, Desires> desires;
 	
 	private final Map<String, Double> priorities;
 	
-	public ActivityEvaluator(double beta, Map<String, Map<Person, Double>> desiredDurations, Map<String, Double> priorities) {
+	public ActivityEvaluator(double beta, Map<Person, Desires> desires, Map<String, Double> priorities) {
 		this.beta = beta;
-		this.desiredDurations = desiredDurations;
+		this.desires = desires;
 		this.priorities = priorities;
 	}
 	
@@ -56,15 +57,17 @@ public class ActivityEvaluator implements Evaluator {
 			
 			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
 			
-			double t_star = t;
+			double t_star = Math.max(t, 3600);
 			if(!act.getType().equals(HOME)) {
-				t_star = desiredDurations.get(act.getType()).get(trajectory.getPerson());
+				t_star = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
 			}
 			
 			double priority = getPriority(act.getType());
 			
 			double t_zero = t_star * Math.exp(SCALE/(t_star * priority * beta));
-			t_zero = Math.max(t_zero, 1.0);
+			if(t_zero == 0)
+				throw new IllegalArgumentException("t_zero must not be 0!");
+//			t_zero = Math.max(t_zero, 1.0);
 
 			score += beta * t_star * Math.log(t/t_zero);
 		}

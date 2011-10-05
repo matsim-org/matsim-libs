@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityOvertimeEvaluator.java
+ * MobilitySimulation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.services;
 
-import java.util.Map;
+import java.util.Collection;
 
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-
-import playground.johannes.coopsim.pysical.Trajectory;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author illenberger
  *
  */
-public class ActivityOvertimeEvaluator implements Evaluator {
+public interface MobilitySimulation {
 
-	private final static String HOME = "home";
+	public void run(Collection<Plan> plans, EventsManager eventsManager);
 	
-	private final double beta;
-	
-	private final Map<String, Map<Person, Double>> desiredDurations;
-	
-	public ActivityOvertimeEvaluator(double beta, Map<String, Map<Person, Double>> desiredDurations) {
-		this.beta = beta;
-		this.desiredDurations = desiredDurations;
-	}
-	
-	@Override
-	public double evaluate(Trajectory trajectory) {
-		double score = 0;
-		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
-			Activity act = (Activity)trajectory.getElements().get(i);
-			
-			if(!act.getType().equals(HOME)) {
-				double duration = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
-				double desiredDuration = desiredDurations.get(act.getType()).get(trajectory.getPerson());
-				
-				double delta = duration / desiredDuration;
-				if(delta > 1) {
-					score -= Math.exp(beta * delta);
-				}
-			}
-		}
-		
-		return score;
-	}
-
 }
