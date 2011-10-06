@@ -69,7 +69,7 @@ public class JointPlan implements Plan {
 
 	private final Clique clique;
 
-	private final ScoresAggregator aggregator;
+	private ScoresAggregator aggregator = null;
 	// for replanning modules to be able to replicate aggregator
 	private final ScoresAggregatorFactory aggregatorFactory;
 	private final String individualPlanType;
@@ -303,43 +303,22 @@ public class JointPlan implements Plan {
 		return output;
 	}
 
+
 	/**
-	 * Adds a (joint) leg to the plan of the current individual.
-	 * Members of the clique must be set before runing this method.
-	 * @param leg a JointLeg object, with the participants belonging to the
-	 * clique
+	 * Inherited from the interface, but unimplemented.
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void addLeg(Leg leg) {
-		//log.warn("using addLeg() on JointPlan: make sure current individual"+
-		//		" is used correctly!");
-		//if (leg instanceof JointLeg) {
-		//	this.getIndividualPlan(this.getCurrentIndividual()).addLeg(
-		//			(JointLeg) leg);
-		//} else {
-		//	throw new IllegalArgumentException("trying to add a non-joint"+
-		//			"leg to joint plan: failed.");
-		//}
 		throw new UnsupportedOperationException();
 	}
 
 	/**
-	 * Adds a (joint) activity to the plan.
-	 * Members of the clique must be set before runing this method.
-	 * @param act a JointActivity object, with the participants belonging to the
-	 * clique.
+	 * Inherited from the interface, but unimplemented.
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void addActivity(Activity act) {
-		//log.warn("using addActivity() on JointPlan: make sure current individual"+
-		//		" is used correctly!");
-		//if (act instanceof JointActivity) {
-		//	this.getIndividualPlan(this.getCurrentIndividual()).addActivity(
-		//			(JointActivity) act);
-		//} else {
-		//	throw new IllegalArgumentException("trying to add a non-joint"+
-		//			"activity to joint plan: failed.");
-		//}
 		throw new UnsupportedOperationException();
 	}
 
@@ -355,26 +334,10 @@ public class JointPlan implements Plan {
 	}
 
 	/**
-	 * Returns the global score as the sum of the individual scores.
-	 *
-	 * TODO in the future, this should include the usage of weights or
-	 * the call to an external function.
+	 * Returns the global score as defined by the score aggregator
 	 */
 	@Override
 	public Double getScore() {
-		//TODO: call to an external aggregation function, to initialize in the
-		//constructor.
-		//Double score = 0.0;
-		//for (Plan plan : this.getIndividualPlans().values()) {
-		//	try {
-		//		score += plan.getScore();
-		//	} catch (NullPointerException e) {
-		//		// if at least one of the individual is null, return null
-		//		// (ie unscored).
-		//		return null;
-		//	}
-		//}
-		//return score;
 		return this.aggregator.getJointScore();
 	}
 
@@ -383,24 +346,15 @@ public class JointPlan implements Plan {
 	 */
 	@Override
 	public Person getPerson() {
-		// do not log warning (used at each iteration in the strategy manager
-		// => too verbose
-		// log.warn("using getPerson to get clique from JointPlan instance.");
 		return this.getClique();
 	}
 
 	/**
-	 * XXX unsupported: risk of breaking link individual plans/clique is too high
-	 * @param person a Clique to be passed to setClique.
+	 * Inherited from interface, but unimplemented.
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public void setPerson(Person person) {
-		//log.warn("using setPerson to set clique from JointPlan instance.");
-		//try{
-		//	this.setClique((Clique) person);
-		//} catch (java.lang.ClassCastException e) {
-		//	throw new IllegalArgumentException("unable to set "+person+" in JointPlan: is not a clique!");
-		//}
 		throw new UnsupportedOperationException("JointPlan instances can only be"
 				+" associated to a clique at construction");
 	}
@@ -479,6 +433,11 @@ public class JointPlan implements Plan {
 		}
 		this.individualPlans.clear();
 		this.individualPlans.putAll(plan.individualPlans);
+		// update the aggregator, so that it considers the scores of the new plans
+		// in fact, without doing it, the new plans should already be considered if
+		// the collection in the aggregator points towards the values collection
+		// of the map, but it would become messy (and implementation dependant)
+		this.aggregator = this.aggregatorFactory.createScoresAggregator(this.individualPlans.values());
 		this.legsMap.clear();
 		this.legsMap.putAll(plan.legsMap);
 	}
