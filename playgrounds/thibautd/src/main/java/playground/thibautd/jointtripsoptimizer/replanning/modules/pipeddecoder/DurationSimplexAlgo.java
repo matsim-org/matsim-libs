@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,9 +28,7 @@ import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.MultivariateRealFunction;
 import org.apache.commons.math.optimization.direct.DirectSearchOptimizer;
 import org.apache.commons.math.optimization.direct.MultiDirectional;
-import org.apache.commons.math.optimization.direct.NelderMead;
 import org.apache.commons.math.optimization.GoalType;
-import org.apache.commons.math.optimization.MultivariateRealOptimizer;
 import org.apache.commons.math.optimization.RealConvergenceChecker;
 import org.apache.commons.math.optimization.RealPointValuePair;
 
@@ -58,8 +55,8 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private static final double MIN_IMPROVEMENT = 1E-5;
 	// defines the size of the initial vertex (to be sure of the "locality"
 	// of the search!)
-	private static final double STEP = 60;
-	private static final double UNFEASIBLE_SCORE = Double.MIN_VALUE;
+	private static final double STEP = 10;
+	private static final double UNFEASIBLE_SCORE = Double.NEGATIVE_INFINITY;
 
 	//private final DirectSearchOptimizer optimizer = new NelderMead();
 	private final DirectSearchOptimizer optimizer = new MultiDirectional();
@@ -77,6 +74,7 @@ public class DurationSimplexAlgo implements FinalScorer {
 		this.scorer = scorer;
 	}
 
+	@Override
 	public double score(
 			final IChromosome chromosome,
 			final JointPlan inputPlan) {
