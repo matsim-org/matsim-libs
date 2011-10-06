@@ -54,8 +54,8 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private static final Log log =
 		LogFactory.getLog(DurationSimplexAlgo.class);
 
-	private static final int N_MAX_ITERS = 30;
-	private static final double MIN_IMPROVEMENT = 1E-7;
+	private static final int N_MAX_ITERS = 20;
+	private static final double MIN_IMPROVEMENT = 1E-5;
 	// defines the size of the initial vertex (to be sure of the "locality"
 	// of the search!)
 	private static final double STEP = 60;
@@ -83,12 +83,12 @@ public class DurationSimplexAlgo implements FinalScorer {
 		this.chromosome = (JointPlanOptimizerJGAPChromosome) chromosome;
 		this.plan = inputPlan;
 
+		Gene[] genes = chromosome.getGenes();
+		dimensions = getContinuousDimensions(genes);
+
 		if (!optimizerConfigured) {
 			configureOptimizer(inputPlan.getClique().getMembers().size());
 		}
-
-		Gene[] genes = chromosome.getGenes();
-		dimensions = getContinuousDimensions(genes);
 
 		RealPointValuePair optimum = null;
 		try {
@@ -103,15 +103,15 @@ public class DurationSimplexAlgo implements FinalScorer {
 		return optimum.getValue();
 	}
 
-	private void configureOptimizer(final int nDim) {
+	private void configureOptimizer(final int nMembers) {
 		// set the convergence monitor
 		optimizer.setConvergenceChecker(
-				new SimplexConvergenceChecker(nDim));
+				new SimplexConvergenceChecker(nMembers));
 
 		// define the size of the initial vertex
-		double[] steps = new double[nDim];
+		double[] steps = new double[dimensions.length];
 
-		for (int i=0; i < nDim; i++) {
+		for (int i=0; i < dimensions.length; i++) {
 			steps[i] = STEP;
 		}
 
@@ -182,13 +182,10 @@ public class DurationSimplexAlgo implements FinalScorer {
 			boolean converged = (iteration > N_MAX_ITERS) || (improvement < threshold);
 
 			//if (converged) {
-			//	log.debug("convergence: "+iteration+" iters, "
-			//			+improvement+" value diff, "
-			//			+threshold+" theshold.");
+			//	log.debug("convergence: "+iteration+" iters");
 			//}
 
 			return converged;
 		}
 	}
 }
-
