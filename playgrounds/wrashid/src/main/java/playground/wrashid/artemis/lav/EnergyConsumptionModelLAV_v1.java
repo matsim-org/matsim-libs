@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
+import playground.wrashid.lib.DebugLib;
 
 public class EnergyConsumptionModelLAV_v1 {
 
@@ -24,6 +25,8 @@ public class EnergyConsumptionModelLAV_v1 {
 		
 		double averageSpeedDrivenOnLinkInMeterPerSecond=link.getLength()/timeSpentOnLink;
 		double energyConsumptionInJoulePerMeter = vehicleEnergyConsumptionModel.getEnergyConsumptionInJoulePerMeter(averageSpeedDrivenOnLinkInMeterPerSecond);
+		
+		
 		
 		return energyConsumptionInJoulePerMeter*link.getLength();
 	}

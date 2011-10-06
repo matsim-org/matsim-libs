@@ -16,42 +16,48 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
+import playground.wrashid.artemis.output.*;
 
 public class DumbCharger_Basic2020 implements ActivityStartEventHandler,ActivityEndEventHandler {
 
 	// TODO: also consider the garage parkings with higher chargings available
 	double chargingSpeedInWatt=3500;
-	private DoubleValueHashMap<Id> actStartTime;
+	private HashMap<Id,ActivityStartEvent> actStartEvent;
 	private DoubleValueHashMap<Id> endTimeOfFirstAct;
 	
 	private final HashMap<Id, VehicleSOC> agentSocMapping;
 	private final HashMap<Id, VehicleTypeLAV> agentVehicleMapping;
 	private final EnergyConsumptionModelLAV_v1 energyConsumptionModel;
+	private ChargingLog chargingLog;
 
 	public DumbCharger_Basic2020(HashMap<Id, VehicleSOC> agentSocMapping, HashMap<Id, VehicleTypeLAV> agentVehicleMapping, EnergyConsumptionModelLAV_v1 energyConsumptionModel) {
 		this.agentSocMapping = agentSocMapping;
 		this.agentVehicleMapping = agentVehicleMapping;
 		this.energyConsumptionModel = energyConsumptionModel;
+		this.chargingLog=new ChargingLog();
 		
 		reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		actStartTime=new DoubleValueHashMap<Id>();
+		actStartEvent=new HashMap<Id, ActivityStartEvent>();
 		endTimeOfFirstAct=new DoubleValueHashMap<Id>();
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Id personId = event.getPersonId();
-		String actType = event.getActType();
+		handleActEndEvent(event.getTime(),event.getPersonId(),event.getActType(),event.getLinkId());
+	}
+	
+	private void handleActEndEvent(double actEndTime, Id personId, String actType, Id linkId){
 		if (isRelevantForCharging(personId, actType)){
-			if (!actStartTime.keySet().contains(personId)){
-				endTimeOfFirstAct.put(personId, event.getTime());
+			if (!actStartEvent.keySet().contains(personId)){
+				endTimeOfFirstAct.put(personId, actEndTime);
 				return;
 			}
-			double actDuration=GeneralLib.getIntervalDuration(actStartTime.get(personId), event.getTime());
+			double startIntervalTime = actStartEvent.get(personId).getTime();
+			double actDuration=GeneralLib.getIntervalDuration(startIntervalTime, actEndTime);
 			VehicleTypeLAV vehicle=agentVehicleMapping.get(personId);
 			VehicleSOC vehicleSOC = agentSocMapping.get(personId);
 			
@@ -68,18 +74,23 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 				}
 				
 				double batteryChargedInJoule=chargingDuration*chargingSpeedInWatt;
+				double startSOCInJoule=vehicleSOC.getSocInJoule();
 				vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);
+				chargingLog.addChargingLog(linkId.toString(), personId.toString(),startIntervalTime , startIntervalTime+chargingDuration, startSOCInJoule, vehicleSOC.getSocInJoule());
 			}
 		}
-		
 	}
 
+	public void writeChargingLog(String fileName){
+		chargingLog.writeLogToFile(fileName);
+	}
+	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 		String actType = event.getActType();
 		if (isRelevantForCharging(personId, actType)){
-			actStartTime.put(personId, event.getTime());
+			actStartEvent.put(personId, event);
 		}
 	}
 
@@ -87,7 +98,12 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 		return agentSocMapping.containsKey(personId) && actType.equalsIgnoreCase("home");
 	}
 
-	
+	public void performLastChargingOfDay(){
+		for (ActivityStartEvent startEvent:actStartEvent.values()){
+			Id personId = startEvent.getPersonId();
+			handleActEndEvent(endTimeOfFirstAct.get(personId),personId,startEvent.getActType(),startEvent.getLinkId());
+		}
+	}
 
 	
 	

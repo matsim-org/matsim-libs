@@ -136,7 +136,13 @@ public class EnergyConsumptionRegressionModel {
 
 			double effPowerTrain = vAverageSquare * a6 + a7 * averageSpeedDrivenOnLinkInMeterPerSecond + a8;
 
-			return (fRoad + fAero + fAcc) / effPowerTrain;
+			double energyConsumptionInJoulePerMeter = (fRoad + fAero + fAcc) / effPowerTrain;
+			
+			if (energyConsumptionInJoulePerMeter<0){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+			
+			return energyConsumptionInJoulePerMeter;
 		}
 	}
 

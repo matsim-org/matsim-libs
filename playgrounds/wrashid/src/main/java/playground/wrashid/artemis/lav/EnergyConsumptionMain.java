@@ -29,13 +29,13 @@ public class EnergyConsumptionMain {
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic";
+		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic1";
 
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
 				scenario, fleetCompositionFileName);
 
-		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update data 16. Aug. 2011/artemis_2.dat";
+		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update 5. okt 2011/regModel_rev4_temp.dat";
 		EnergyConsumptionModelLAV_v1 energyConsumptionModel = new EnergyConsumptionModelLAV_v1(energyConsumptionModelFile);
 
 		HashMap<Id, VehicleSOC> agentSocMapping = initializeSOCs(agentVehicleMapping, energyConsumptionModel);
@@ -53,9 +53,12 @@ public class EnergyConsumptionMain {
 
 		reader.readFile(eventsFileName);
 
-		energyConsumptionPlugin.getEnergyConsumptionOfLegs().getKeySet();
+	//	energyConsumptionPlugin.getEnergyConsumptionOfLegs().getKeySet();
 
+		dumbCharger.performLastChargingOfDay();
+		
 		energyConsumptionPlugin.writeOutputLog("c:/tmp/energyConsumptionLogPerLink.txt");
+		dumbCharger.writeChargingLog("c:/tmp/chargingLog.txt");
 
 		reportIfEVRanOutOfElectricity(agentSocMapping);
 	}
