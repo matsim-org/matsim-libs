@@ -24,8 +24,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.jgap.Gene;
 import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
+import org.jgap.impl.BooleanGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 
@@ -48,6 +50,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
+import playground.thibautd.jointtripsoptimizer.population.JointLeg;
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
@@ -61,6 +64,7 @@ import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptim
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationDecoder;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.DurationDecoderPartial;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDecoderFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder.JointPlanOptimizerDimensionDecoder;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
@@ -153,6 +157,60 @@ public class TestJPO {
 	// test methods
 	// /////////////////////////////////////////////////////////////////////////
 	/////////////////////////// fitness and decoder ////////////////////////////
+	/**
+	 * Tests synchronisation between driver and passenger.
+	 */
+	@Test
+	public void testJointTravelTimes() {
+		IChromosome sampleChrom;
+
+		try {
+			sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
+				.randomInitialJointPlanOptimizerJGAPChromosome();
+
+			//set joint trips on
+			for (Gene gene : sampleChrom.getGenes()) {
+				if (gene instanceof BooleanGene) {
+					gene.setAllele(true);
+				}
+			}
+		} catch (InvalidConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+
+		JointPlanOptimizerDecoder decoder = jgapConf.getDecoder();
+
+		JointPlan plan = decoder.decode(sampleChrom);
+
+		boolean wasJoint = false;
+
+		for (PlanElement element : plan.getPlanElements()) {
+			if (element instanceof JointLeg) {
+				JointLeg current = (JointLeg) element;
+				
+				for (JointLeg coLeg : current.getLinkedElements().values()) {
+					wasJoint = true;
+					Assert.assertEquals(
+							"joint legs have different departure times",
+							current.getDepartureTime(),
+							coLeg.getDepartureTime(),
+							MatsimTestUtils.EPSILON);
+
+					Assert.assertEquals(
+							"joint legs have different arrival times",
+							current.getArrivalTime(),
+							coLeg.getArrivalTime(),
+							MatsimTestUtils.EPSILON);
+				}
+			}
+		}
+
+		if (!wasJoint) {
+			throw new RuntimeException("test was run on data without joint trip");
+		}
+	}
+
+
 	/**
 	 * Tests whether the fitness "on the fly" and the fitness with the
 	 * "full decoder" give the same result.
