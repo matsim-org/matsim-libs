@@ -8,6 +8,13 @@
 	<version>0.4.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
+	<scm>
+		<connection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/trunk</connection>
+		<developerConnection>scm:svn:https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/trunk</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://matsim.svn.sourceforge.net/svnroot/matsim/contrib/trunk</url>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -21,11 +28,29 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
 				<configuration>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -52,9 +77,9 @@
 	</modules>
 	<repositories>
 		<repository>
-      <id>matsim</id>
-      <url>http://matsim.org/m2repo</url>
-    </repository>
+			<id>matsim</id>
+			<url>http://matsim.org/m2repo</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -62,17 +87,15 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>0.4.0-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>0.4.0-SNAPSHOT</version>
@@ -116,19 +139,19 @@
 						<version>2.0</version>
 					</plugin>
 					<plugin>
-	        			<groupId>org.codehaus.mojo</groupId>
-			        	<artifactId>findbugs-maven-plugin</artifactId>
-			        	<version>2.3.2</version>
-	    		    	<configuration>
-		          			<effort>Max</effort>
-				          	<threshold>Low</threshold>
-	    		    	</configuration>
-			      	</plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>findbugs-maven-plugin</artifactId>
+						<version>2.3.2</version>
+						<configuration>
+							<effort>Max</effort>
+							<threshold>Low</threshold>
+						</configuration>
+					</plugin>
 				</plugins>
 			</reporting>
 		</profile>
 	</profiles>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
