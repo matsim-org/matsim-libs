@@ -20,9 +20,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class GridCreator {
 
-	private static final int GRID_SIZE = 8;
+	private static final int GRID_SIZE = 100;
 
-	private static final String NETWORK_FILENAME = "output/grid.xml";
+	private static final String NETWORK_FILENAME = "output/grid1000.xml";
 
 	private Scenario scenario;
 
