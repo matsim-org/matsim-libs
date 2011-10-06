@@ -79,6 +79,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 				Id nodeId = new IdImpl(id.toString().trim());
 				int intId = Integer.parseInt(id.toString());
 				
+				// TODO [ni]: would it be more clever to use the censtoid attribute to distinguish?
 				if (intId >= MIN_NODE_ID) {
 					Coordinate c = f.getBounds().centre();
 					Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
