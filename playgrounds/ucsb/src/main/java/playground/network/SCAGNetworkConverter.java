@@ -27,7 +27,9 @@ import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.network.algorithms.SCAGShp2Links;
 import playground.network.algorithms.SCAGShp2Nodes;
 
 /**
@@ -64,8 +66,10 @@ public class SCAGNetworkConverter {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ObjectAttributes nodeObjectAttributes = new ObjectAttributes();
 		new SCAGShp2Nodes(nodeShpFile, nodeObjectAttributes).run(scenario.getNetwork());
+//		new SCAGShp2Links().run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(outputBase+"/network.xml.gz");
 		new NetworkWriteAsTable(outputBase).run(scenario.getNetwork());
+		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(outputBase+"/nodeObjectAttributes.xml.gz");
 	}
 
 }

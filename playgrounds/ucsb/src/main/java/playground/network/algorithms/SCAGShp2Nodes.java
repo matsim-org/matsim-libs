@@ -48,6 +48,9 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 	private final ObjectAttributes nodeObjectAttributes;
 	
 	private static final String ID_NAME = "ID";
+	private static final String NODE_TYPE = "NODE_TYPE";
+	
+	private static final int MIN_NODE_ID = 4193;
 
 	/**
 	 * @param nodeShpFile
@@ -74,10 +77,17 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 				Object id = f.getAttribute(ID_NAME);
 				if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
 				Id nodeId = new IdImpl(id.toString().trim());
+				int intId = Integer.parseInt(id.toString());
 				
-				Coordinate c = f.getBounds().centre();
-				Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
-				network.addNode(n);
+				if (intId >= MIN_NODE_ID) {
+					Coordinate c = f.getBounds().centre();
+					Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
+					network.addNode(n);
+					
+					Object nodeType = f.getAttribute(NODE_TYPE);
+					int intNodeType = Integer.parseInt(nodeType.toString());
+					nodeObjectAttributes.putAttribute(nodeId.toString(),NODE_TYPE,intNodeType);
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -20,8 +20,14 @@
 
 package playground.network.algorithms;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
+import org.matsim.core.network.NetworkImpl;
 
 /**
  * @author balmermi
@@ -34,7 +40,16 @@ public class SCAGShp2Links implements NetworkRunnable {
 	 */
 	@Override
 	public void run(Network network) {
-		// TODO Auto-generated method stub
+		
+//		Link l = network.getFactory().createLink(null,null, null);
+//		Set<String> modes = new HashSet<String>();
+//		modes.add(TransportMode.car);
+//		modes.add(TransportMode.pt);
+//		l.setAllowedModes(modes);
+//		l.setCapacity(capacity)
+//		l.setFreespeed(freespeed)
+//		l.setLength(length)
+//		l.setNumberOfLanes(lanes)
 
 	}
 
