@@ -201,6 +201,70 @@ public class TestJPO {
 	}
 
 	/**
+	 * tests whether the score of the optimum given by the Simplex
+	 * fitness optimizer corresponds to the fitness of the modified chromosome.
+	 */
+	@Test
+	public void testSimplexFitness() {
+		this.configGroup.setIsMemetic("false");
+		JointPlanOptimizerOTFFitnessFunction otf = new JointPlanOptimizerOTFFitnessFunction(
+					this.samplePlan,
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size(),
+					this.controler.getScoringFunctionFactory());
+
+		this.configGroup.setIsMemetic("true");
+		JointPlanOptimizerOTFFitnessFunction otfMemetic = new JointPlanOptimizerOTFFitnessFunction(
+					this.samplePlan,
+					this.configGroup,
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork(),
+					this.jgapConf.getNumJointEpisodes(),
+					this.jgapConf.getNumEpisodes(),
+					this.sampleClique.getMembers().size(),
+					this.controler.getScoringFunctionFactory());
+
+		IChromosome sampleChrom;
+		
+		try {
+			sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
+				.randomInitialJointPlanOptimizerJGAPChromosome();
+		} catch (InvalidConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+
+		IChromosome beforeOptClone = (IChromosome) sampleChrom.clone();
+		double beforeOptNormalScore = otf.getFitnessValue(sampleChrom);
+		double optimisedScore = otfMemetic.getFitnessValue(sampleChrom);
+		double afterOptNormalScore = otf.getFitnessValue(sampleChrom);
+
+		Assert.assertFalse(
+				"chromosome left unmodified after optimisation",
+				beforeOptClone.equals(sampleChrom));
+
+		Assert.assertFalse(
+				"score of modified chromosome is the same as the score of unmodified chromosome",
+				Math.abs(beforeOptNormalScore - afterOptNormalScore) < MatsimTestUtils.EPSILON);
+
+		Assert.assertTrue(
+				"optimised score is not better than unoptimised one",
+				optimisedScore > beforeOptNormalScore);
+
+		Assert.assertEquals(
+				"score returned by the optimiser not consistent with the chromosome real score",
+				optimisedScore,
+				afterOptNormalScore,
+				MatsimTestUtils.EPSILON);
+
+	}
+
+	/**
 	 * Tests the consistency of the partial decoder. More precisely,
 	 * the test fails if the partial decoder launched on a whole clique
 	 * does not produce the same output at the standard decoder.
