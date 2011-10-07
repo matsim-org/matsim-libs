@@ -29,12 +29,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * @author balmermi
@@ -43,41 +47,74 @@ import org.matsim.core.utils.io.IOUtils;
 public class UCSBStopsParser {
 
 	private final static Logger log = Logger.getLogger(UCSBStopsParser.class);
+
+	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
+
 	private static final String HID = "HID";
-	private static final Object PID = "PID";
-	private static final Object O_ZONE_ID = "OZoneID";
-	private static final Object P_ACT_TYPE = "PActType";
+	private static final String PID = "PID";
+	private static final String O_ZONE_ID = "OZoneID";
+	private static final String P_ACT_TYPE = "PActType";
+	private static final String P_DEPTIME = "StartT";
+	private static final Object ARRTIME = "ArriveT";
+	private static final int TIME_OFFSET = 3*3600;
+	private static final String MODE = "Mode";
+	private static final String ACT_TYPE = "ActType";
+	private static final String ZONE_ID = "ZoneID";
+	private static final String ACTDUR = "Duration";
+
+
+
 
 	public UCSBStopsParser() {
+	}
+	
+	private final String transformMode(int modeNo) {
+		switch (modeNo) {
+		case 0: return TransportMode.car;
+		case 1: return TransportMode.ride;
+		case 2: return TransportMode.walk;
+		case 3: return TransportMode.pt;
+		case 4: return TransportMode.ride; // driven by parent (for child)
+		case 5: return TransportMode.ride; // driven by other (for child)
+		case 6: return TransportMode.ride; // school bus (for child)
+		case 7: return TransportMode.car;  // shared ride driver (drive by car with passenger)
+		default:
+			Gbl.errorMsg(new IllegalArgumentException("modeNo="+modeNo+" not allowed."));
+			return null;
+		}
 	}
 	
 	private final String transformActType(int actTypeNo) {
 		switch (actTypeNo) {
 		case 0: return "shop";
-		case 1: return "leisure";
-		case 2: return "other_personal";
-		case 3: return "leisure_eat";
+		case 1: return "social";
+		case 2: return "other";
+		case 3: return "leisure_eat_out";
 		case 4: return "other_serve_passenger";
-		case 6: return "home";
-		case 7: return "work";
+		case 5: return "leisure_entertainment";
+		case 6: return "leisure_sports";
+		case 7: return "visit";
 		case 8: return "work_related";
-		case 10: return "drop_off_school";
-		case 11: return "pick_up_school";
-		case 12: return "other_joint_withChild";
-		case 13: return "home";
-		case 14: return "educ_school";
-		case 15: return "other_forChild";
-		case 16: return "other_joint_withAdult";
+		case 9: return "other_maintainance";
+		case 10: return "dropoff_school";
+		case 11: return "pickup_school";
+		case 12: return "home_adult";
+		case 13: return "work_adult";
+		case 14: return "home_child";
+		case 15: return "education";
+		case 16: return "leisure_child";
 		case 17: return "work";
 		case 18: return "home";
-		case 19: return "educ_school";
+		case 19: return "education";
+		case 20: return "leisure_adult_withChild";
+		case 21: return "leisure_child_withParent";
 		default:
 			Gbl.errorMsg(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
 			return null;
 		}
 	}
 	
-	public final void parse(String cemdapStopsFile, Scenario scenario) {
+	public final void parse(String cemdapStopsFile, Scenario scenario, ObjectAttributes personObjectAttributes) {
 		log.info("parsing "+cemdapStopsFile+" file...");
 		Population population = scenario.getPopulation();
 		int line_cnt = 0;
@@ -110,15 +147,40 @@ public class UCSBStopsParser {
 					population.addPerson(person);
 					person.addPlan(population.getFactory().createPlan());
 				}
+
 				Plan plan = person.getSelectedPlan();
+				int depTime = Integer.parseInt(entries[column.get(P_DEPTIME)])*60 + TIME_OFFSET;
+				int arrTime = Integer.parseInt(entries[column.get(ARRTIME)])*60 + TIME_OFFSET;
+
 				if (plan.getPlanElements().isEmpty()) {
-					// TODO balmermi: replace zone id with real coordinte
-					long zoneId = new Double(entries[column.get(O_ZONE_ID)]).longValue();
-					Coord coord = scenario.createCoord(zoneId,zoneId);
+					// TODO balmermi: replace zone id with real coordinate
+					Integer zoneId = new Double(entries[column.get(O_ZONE_ID)]).intValue();
+					personObjectAttributes.putAttribute(pid.toString(),"zone0",zoneId);
 					String actType = transformActType(new Double(entries[column.get(P_ACT_TYPE)]).intValue());
-					Activity firstActivity = population.getFactory().createActivityFromCoord(actType, coord);
+					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
+					firstActivity.setStartTime(0);
+					firstActivity.setEndTime(depTime);
+					firstActivity.setMaximumDuration(depTime);
 					plan.addActivity(firstActivity);
 				}
+				
+				String mode = transformMode(Integer.parseInt(entries[column.get(MODE)]));
+				Leg leg = population.getFactory().createLeg(mode);
+				leg.setDepartureTime(depTime);
+				leg.setTravelTime(arrTime-depTime);
+				plan.addLeg(leg);
+				
+				// TODO balmermi: replace zone id with real coordinate
+				Integer zoneId = new Double(entries[column.get(ZONE_ID)]).intValue();
+				int actIndex = plan.getPlanElements().size()/2;
+				personObjectAttributes.putAttribute(pid.toString(),"zone"+actIndex,zoneId);
+				String actType = transformActType(new Double(entries[column.get(ACT_TYPE)]).intValue());
+				Activity activity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
+				int actDur = Integer.parseInt(entries[column.get(ACTDUR)])*60;
+				activity.setStartTime(arrTime);
+				activity.setEndTime(arrTime+actDur);
+				activity.setMaximumDuration(actDur);
+				plan.addActivity(activity);
 
 			}
 		} catch (IOException e) {

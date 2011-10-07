@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
  * @author balmermi
@@ -58,9 +60,10 @@ public class UCSBStops2PlansConverter {
 		log.info("outputBase: "+outputBase);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		UCSBStopsParser cemdapParser = new UCSBStopsParser();
-		cemdapParser.parse(cemdapStopsFile, scenario);
+		ObjectAttributes personObjectAttributes = new ObjectAttributes();
+		new UCSBStopsParser().parse(cemdapStopsFile, scenario, personObjectAttributes);
 		new PopulationWriter(scenario.getPopulation(),null).write(outputBase+"/plans.xml");
+		new ObjectAttributesXmlWriter(personObjectAttributes).writeFile(outputBase+"/personObjectAttributes.xml");
 	}
 
 }
