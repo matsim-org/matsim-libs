@@ -186,6 +186,11 @@ public class Provider {
 			}
 		}
 		
+		if (newNumberOfBuses == 0){
+			log.warn("At least one Bus expected!");
+			newNumberOfBuses = 1;
+		}
+		
 		log.info("ProviderStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
 		return newNumberOfBuses;
 	}
