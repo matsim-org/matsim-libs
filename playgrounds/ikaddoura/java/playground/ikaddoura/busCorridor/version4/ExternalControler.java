@@ -37,12 +37,12 @@ public class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/network_busline.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml"; // Startwert
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4/";
-	static int numberOfExternalIterations = 3;
-	static int lastInternalIteration = 1;
+	static int numberOfExternalIterations = 10;
+	static int lastInternalIteration = 0;
 	
-	private int numberOfBuses = 5; // Startwert!
+	private int numberOfBuses = 7; // Startwert!
 	private int extItNr;
 	private String directoryExtIt;
 	
@@ -66,54 +66,25 @@ public class ExternalControler {
 			VehicleScheduleWriter transitWriter = new VehicleScheduleWriter(this.getNumberOfBuses(), networkFile, this.getDirectoryExtIt());
 			transitWriter.writeTransit();
 			
-			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath);
+			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath, this.getNumberOfBuses());
 			internalControler.run();
 
-			Provider provider = new Provider(this.extItNr);
-			provider.calculateScore(this.getDirectoryExtIt(), lastInternalIteration);
+			Provider provider = new Provider(this.getExtItNr(), this.getNumberOfBuses());
+			provider.calculateScore(this.getDirectoryExtIt(), lastInternalIteration, networkFile);
 			provider.analyzeScores();
 			
 			Users users = new Users();
-			users.analyzeScores(this.directoryExtIt);
+			users.analyzeScores(this.getDirectoryExtIt());
 
-			this.iteration2providerScore.put(this.extItNr, provider.getScore());
-			this.iteration2numberOfBuses.put(this.extItNr, this.numberOfBuses);
-			this.iteration2userScore.put(this.extItNr, users.getAvgExecScore());
+			this.iteration2providerScore.put(this.getExtItNr(), provider.getScore());
+			this.iteration2numberOfBuses.put(this.getExtItNr(), this.getNumberOfBuses());
+			this.iteration2userScore.put(this.getExtItNr(), users.getAvgExecScore());
 			
 			this.setNumberOfBuses(provider.strategy(this.iteration2numberOfBuses, this.iteration2providerScore)); // für die nächste externe Iteration!
 		}
 
 		TextFileWriter stats = new TextFileWriter();
 		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2providerScore, this.iteration2userScore);
-	}
-
-	/**
-	 * @return the outputExternalIterationDirPath
-	 */
-	public static String getOutputExternalIterationDirPath() {
-		return outputExternalIterationDirPath;
-	}
-
-	/**
-	 * @param outputExternalIterationDirPath the outputExternalIterationDirPath to set
-	 */
-	public static void setOutputExternalIterationDirPath(
-			String outputExternalIterationDirPath) {
-		ExternalControler.outputExternalIterationDirPath = outputExternalIterationDirPath;
-	}
-
-	/**
-	 * @return the numberOfExternalIterations
-	 */
-	public static int getNumberOfExternalIterations() {
-		return numberOfExternalIterations;
-	}
-
-	/**
-	 * @param numberOfExternalIterations the numberOfExternalIterations to set
-	 */
-	public static void setNumberOfExternalIterations(int numberOfExternalIterations) {
-		ExternalControler.numberOfExternalIterations = numberOfExternalIterations;
 	}
 
 	/**

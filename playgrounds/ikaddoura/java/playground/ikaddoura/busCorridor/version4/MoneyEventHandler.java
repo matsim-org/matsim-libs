@@ -25,22 +25,15 @@ package playground.ikaddoura.busCorridor.version4;
 
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.controler.Controler;
 
 /**
  * @author Ihab
  *
  */
 public class MoneyEventHandler implements AgentMoneyEventHandler {
-	private Controler controler;
-	
-	/**
-	 * @param controler
-	 */
-	public MoneyEventHandler(Controler controler) {
-		this.controler = controler;
-	}
 
+	private double earnings;
+	
 	@Override
 	public void reset(int iteration) {
 
@@ -48,13 +41,20 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		System.out.println("AgentMoneyEvent at Time "+event.getTime()+" wird gehandelt.");
+		
+		this.earnings = this.earnings + (-1 * event.getAmount());
 		
 //		Id personId = event.getPersonId();
 //		double amount = event.getAmount();
-//		
 // 		Das läuft automatisch irgendwo im Hintergrund:
 //		this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(personId).addMoney(amount);
 		
+	}
+
+	/**
+	 * @return the earnings
+	 */
+	public double getEarnings() {
+		return earnings;
 	}
 }

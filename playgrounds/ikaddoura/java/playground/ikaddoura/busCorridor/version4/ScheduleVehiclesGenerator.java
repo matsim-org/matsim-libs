@@ -209,7 +209,7 @@ public class ScheduleVehiclesGenerator {
 			for (int vehicleNr=1 ; vehicleNr<=numberOfBusses ; vehicleNr++){
 				vehicleIDs.add(new IdImpl("bus_"+vehicleNr));
 			}
-
+			
 			// Vehicles
 			for (Id vehicleId : vehicleIDs){
 				Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));

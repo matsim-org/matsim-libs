@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControlerListener.java
+ * TransitEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,66 +21,40 @@
 /**
  * 
  */
-
 package playground.ikaddoura.busCorridor.version4;
 
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.events.TransitDriverStartsEvent;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
  *
  */
-
-public class MyControlerListener implements StartupListener, IterationStartsListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, IterationEndsListener, ShutdownListener {
-
-	private MoneyThrowEventHandler moneyThrowEventHandler;
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		System.out.println("Startup-Event");
-		
-		// Wenn eine Person in ein Vehicle steigt, wirf MoneyEvent
-		this.moneyThrowEventHandler = new MoneyThrowEventHandler(event.getControler().getEvents(), event.getControler().getPopulation());
-		event.getControler().getEvents().addHandler(this.moneyThrowEventHandler);
-	
-	}
-
+public class TransitEventHandler implements TransitDriverStartsEventHandler {
+	private List<Id> vehicleIDs = new ArrayList<Id>();
 	
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		// TODO Auto-generated method stub
-		
+	public void reset(int iteration) {
+		this.vehicleIDs.clear();
 	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		// TODO Auto-generated method stub
-		
+	public void handleEvent(TransitDriverStartsEvent event) {
+		Id vehicleId = event.getVehicleId();
+		if (vehicleIDs.contains(vehicleId)){
+			// vehicleID bereits in Liste
+		}
+		else{
+			this.vehicleIDs.add(vehicleId);
+		}
 	}
 
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-		// TODO Auto-generated method stub
-		
+	public List<Id> getVehicleIDs() {
+		return vehicleIDs;
 	}
-
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 }

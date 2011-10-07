@@ -24,8 +24,16 @@
 package playground.ikaddoura.busCorridor.version4;
 
 import java.util.Map;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * @author Ihab
@@ -36,6 +44,7 @@ public class Provider {
 	private final static Logger log = Logger.getLogger(MyLegScoringFunction.class);
 
 	private int extItNr;
+	private int numberOfBuses;
 	private double score;
 	private double highestScore = 0;
 	private int iterationWithHighestScore = 0;
@@ -43,40 +52,48 @@ public class Provider {
 	/**
 	 * @param extItNr
 	 */
-	public Provider(int extItNr) {
+	public Provider(int extItNr, int numberOfBuses) {
 	this.extItNr = extItNr;
+	this.setNumberOfBuses(numberOfBuses);
 	}
 
-	public void calculateScore(String directoryExtIt, int lastInternalIteration) {
+	public void calculateScore(String directoryExtIt, int lastInternalIteration, String networkFile) {
+		
+		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		Config config = scen.getConfig();
+		config.network().setInputFile(networkFile);
+		ScenarioUtils.loadScenario(scen);		
+		Network network = scen.getNetwork();
 		
 		String lastEventFile = directoryExtIt+"/internalIterations/ITERS/it."+lastInternalIteration+"/"+lastInternalIteration+".events.xml.gz";
-
-//		Config config = ConfigUtils.loadConfig(configFile);
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		EventsManager events = new BusCorridorEventsManagerImpl();
-//		
-//		BusCorridorLinkLeaveEventHandler handler1 = new BusCorridorLinkLeaveEventHandler(scenario);
-//		BusCorridorActivityEndEventHandler handler2 = new BusCorridorActivityEndEventHandler(scenario);
-//		BusCorridorPersonEntersVehicleEventHandler handler3 = new BusCorridorPersonEntersVehicleEventHandler(scenario);
-//		BusCorridorPersonLeavesVehicleEventHandler handler4 = new BusCorridorPersonLeavesVehicleEventHandler(scenario);
-//
-//		events.addHandler(handler1);	
-//		events.addHandler(handler2);
-//		events.addHandler(handler3);
-//		events.addHandler(handler4);
-//		
-//
-//		MatsimEventsReader reader = new MatsimEventsReader(events);
-//		reader.readFile(eventFile);
 		
-		// berechne aus der EventsFile einen Provider-Score
-//		double busCostsPerDay = 500;
-//		double busCostsPerKm = 1;
-//		double fixCosts = this.getNumberOfBuses() * busCostsPerDay;
-//		double varCosts = busKm * busCostsPerKm;
-//		double providerScore = - ( fixCosts + varCosts ) + earnings
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		MoneyEventHandler moneyHandler = new MoneyEventHandler();
+		TransitEventHandler transitHandler = new TransitEventHandler();
+		LinksEventHandler linksHandler = new LinksEventHandler(network);
 		
-		this.setScore(333);
+		events.addHandler(moneyHandler);	
+		events.addHandler(transitHandler);
+		events.addHandler(linksHandler);
+		
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(lastEventFile);
+		
+		double earnings = moneyHandler.getEarnings();
+		
+		// Anzahl der Busse aus den Events!
+		int numberOfBuses = transitHandler.getVehicleIDs().size();		
+		
+		double vehicleKm = linksHandler.getVehicleKm();
+		double vehicleHours = linksHandler.getVehicleHours();
+		
+		int busCostsPerDay = 100;
+		double fixCosts = numberOfBuses * busCostsPerDay ;
+		double busCostsPerKm = 1;
+		double varCosts = vehicleKm * busCostsPerKm; // + vehicleHours * busCostsPerHour ;
+		double providerScore = (earnings) - fixCosts - varCosts;
+		
+		this.setScore(providerScore);
 		log.info("ProviderScore calculated.");
 	}
 
@@ -151,26 +168,40 @@ public class Provider {
 				// mehr Busse, score angestiegen
 				newNumberOfBuses = numberOfBuses+1;
 			}
-			if(numberOfBusesBefore < numberOfBuses & scoreBefore > score){
+			else if(numberOfBusesBefore < numberOfBuses & scoreBefore > score){
 				// mehr Busse, score gesunken
 				newNumberOfBuses = numberOfBuses-1;
 			}
-			if (numberOfBusesBefore > numberOfBuses & scoreBefore < score){
+			else if (numberOfBusesBefore > numberOfBuses & scoreBefore < score){
 				// weniger Busse, score angestiegen
 				newNumberOfBuses = numberOfBuses-1;
 			}
-			if (numberOfBusesBefore > numberOfBuses & scoreBefore > score){
+			else if (numberOfBusesBefore > numberOfBuses & scoreBefore > score){
 				// weniger Busse, score gesunken
 				newNumberOfBuses = numberOfBuses+1;
 			}
 			else {
-				System.out.println("******************** Score unverändert ******************");
+				log.warn("Provider score did not change.");
 				newNumberOfBuses = numberOfBuses;
 			}
 		}
 		
-		log.info("ProviderStrategy --> newNumberOfBuses");
+		log.info("ProviderStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
 		return newNumberOfBuses;
+	}
+
+	/**
+	 * @param numberOfBuses the numberOfBuses to set
+	 */
+	public void setNumberOfBuses(int numberOfBuses) {
+		this.numberOfBuses = numberOfBuses;
+	}
+
+	/**
+	 * @return the numberOfBuses
+	 */
+	public int getNumberOfBuses() {
+		return numberOfBuses;
 	}
 	
 	

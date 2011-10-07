@@ -37,7 +37,13 @@ public class VehicleScheduleWriter {
 	private String directoryExtIt;
 	
 	public VehicleScheduleWriter(int numberOfBuses, String networkFile, String directoryExtIt) {
-		this.numberOfBuses = numberOfBuses;
+		if (numberOfBuses==0){
+			System.out.println(" ******************* at least 1 Bus expected --> numberOfBuses set on 1");
+			this.numberOfBuses = 1;
+		}
+		else {
+			this.numberOfBuses = numberOfBuses;
+		}
 		this.networkFile = networkFile;
 		this.directoryExtIt = directoryExtIt;
 	}

@@ -23,11 +23,13 @@
  */
 package playground.ikaddoura.busCorridor.version4;
 
+import org.jfree.util.Log;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -43,14 +45,17 @@ public class InternalControler {
 	private int lastInternalIteration;
 	private int extItNr;
 	private String populationFile;
+	private int numberOfBuses;
 	
-	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath) {
+	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses) {
 		this.configFile = configFile;
 		this.directoryExtIt = directoryExtIt;
 		this.lastInternalIteration = lastInternalIteration;
 		this.extItNr = extItNr;
 		this.populationFile = populationFile;
 		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
+		this.numberOfBuses = numberOfBuses;
+		
 	}
 	
 	public void run() {
