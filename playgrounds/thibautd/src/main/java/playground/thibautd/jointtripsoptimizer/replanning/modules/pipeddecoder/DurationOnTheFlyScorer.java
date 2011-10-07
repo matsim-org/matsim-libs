@@ -104,6 +104,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 	private	final Network network;
 	private final int nMembers;
 	private final ScoringFunctionFactory scoringFunctionFactory;
+	private final JointReplanningConfigGroup configGroup;
 
 	/**
 	 * initializes a decoder, which can be used on any modification of the
@@ -126,6 +127,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 		this.network = network;
 		this.nMembers = nMembers;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.configGroup = configGroup;
 
 		//construction
 		//Map<PlanElement,Integer> alreadyDetermined = new HashMap<PlanElement,Integer>();
@@ -169,6 +171,9 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 			final SimLegInterpretation simLegInt) {
 		LegTravelTimeEstimator currentLegTTEstimator;
 
+		this.legTTEstimators.clear();
+		this.individualPlanElements.clear();
+
 		// TODO: use individual plans map instead of clique
 		for (Id id : plan.getClique().getMembers().keySet()) {
 			currentLegTTEstimator = legTravelTimeEstimatorFactory.getLegTravelTimeEstimator(
@@ -194,6 +199,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 	public double score(
 			final IChromosome chromosome,
 			final JointPlan inputPlan) {
+		//this.initializeLegEstimators(inputPlan, configGroup.getSimLegInterpretation());
 
 		Map<Id, IndividualValuesWrapper> individualValuesMap = 
 			new HashMap<Id, IndividualValuesWrapper>(nMembers);

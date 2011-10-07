@@ -55,7 +55,7 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private static final double MIN_IMPROVEMENT = 1E-5;
 	// defines the size of the initial vertex (to be sure of the "locality"
 	// of the search!)
-	private static final double STEP = 10;
+	private static final double STEP = 5;
 	private static final double UNFEASIBLE_SCORE = Double.NEGATIVE_INFINITY;
 
 	//private final DirectSearchOptimizer optimizer = new NelderMead();
@@ -81,8 +81,7 @@ public class DurationSimplexAlgo implements FinalScorer {
 		this.chromosome = (JointPlanOptimizerJGAPChromosome) chromosome;
 		this.plan = inputPlan;
 
-		Gene[] genes = chromosome.getGenes();
-		dimensions = getContinuousDimensions(genes);
+		dimensions = getContinuousDimensions( chromosome.getGenes() );
 
 		if (!optimizerConfigured) {
 			configureOptimizer(inputPlan.getClique().getMembers().size());
@@ -98,7 +97,18 @@ public class DurationSimplexAlgo implements FinalScorer {
 
 		updateChromosomeValue(optimum.getPoint());
 
+		if (Math.abs(this.scorer.score(chromosome, plan) - optimum.getValue()) > 1E-7) {
+			throw new RuntimeException();
+		}
+
+		cleanUp();
 		return optimum.getValue();
+	}
+
+	private void cleanUp() {
+		chromosome = null;
+		plan = null;
+		dimensions = null;
 	}
 
 	private void configureOptimizer(final int nMembers) {
@@ -127,22 +137,37 @@ public class DurationSimplexAlgo implements FinalScorer {
 		return point;
 	}
 
-	private void updateChromosomeValue(final double[] point) {
-		for (int i = 0; i < point.length; i++) {
-			dimensions[i].setAllele(point[i]);
+	private boolean updateChromosomeValue(final double[] point) {
+		if (point.length != dimensions.length) {
+			throw new IllegalArgumentException("dimensions incompatible");
 		}
+
+		boolean valueWasInBounds = true;
+
+		for (int i = 0; i < point.length; i++) {
+			double value = point[i];
+			if (value < dimensions[i].getLowerBound()) {
+				value = dimensions[i].getLowerBound();
+			}
+			else if (value > dimensions[i].getUpperBound()) {
+				value = dimensions[i].getLowerBound();
+			}
+			dimensions[i].setAllele( value );
+		}
+
+		return valueWasInBounds;
 	}
 
 	private DoubleGene[] getContinuousDimensions(final Gene[] genes) {
-		List<DoubleGene> dimensions = new ArrayList<DoubleGene>(genes.length);
+		List<DoubleGene> dimensionsList = new ArrayList<DoubleGene>(genes.length);
 
 		for (Gene gene : genes) {
 			if (gene instanceof DoubleGene) {
-				dimensions.add((DoubleGene) gene);
+				dimensionsList.add((DoubleGene) gene);
 			}
 		}
 		
-		return dimensions.toArray(new DoubleGene[0]);
+		return dimensionsList.toArray(new DoubleGene[0]);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -152,9 +177,11 @@ public class DurationSimplexAlgo implements FinalScorer {
 		@Override
 		public double value(final double[] point)
 				throws FunctionEvaluationException, IllegalArgumentException {
-			updateChromosomeValue(point);
+			boolean inBounds = updateChromosomeValue(point);
 
-			if (chromosome.respectsConstraints()) {
+			//System.out.print("");
+
+			if (inBounds && chromosome.respectsConstraints()) {
 				return scorer.score(chromosome, plan);
 			}
 
