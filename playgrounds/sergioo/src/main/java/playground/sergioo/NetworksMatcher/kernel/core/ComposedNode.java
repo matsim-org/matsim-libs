@@ -17,7 +17,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 
 
-public class ComposedNode implements Node, Cloneable {
+public class ComposedNode implements Node {
 
 
 	//Constants
@@ -60,6 +60,8 @@ public class ComposedNode implements Node, Cloneable {
 	
 	private Types type;
 
+	private double anglesDeviation;
+
 	//Methods
 	
 	public ComposedNode(Node node) {
@@ -68,6 +70,7 @@ public class ComposedNode implements Node, Cloneable {
 		inLinks = new HashMap<Id, Link>();
 		outLinks = new HashMap<Id, Link>();
 		nodes = new HashSet<Node>();
+		nodes.add(node);
 	}
 	
 	public ComposedNode(Set<Node> nodes) {
@@ -248,5 +251,52 @@ public class ComposedNode implements Node, Cloneable {
 	public Types getType() {
 		return type;
 	}
+
+	public double getAnglesDeviation() {
+		return anglesDeviation;
+	}
+	
+	public void setAnglesDeviation() {
+		int inOut = 0;
+		anglesDeviation = 0;
+		if(getInLinks().size()>0) {
+			inOut++;
+			double meanIn=2*Math.PI/getInLinks().size();
+			List<Link> sortedInLinks = new ArrayList<Link>(getInLinks().values());
+			for(int i=0; i<sortedInLinks.size()-1; i++) {
+				Link link = sortedInLinks.get(i);
+				for(int j=i+1; j<sortedInLinks.size(); j++)
+					if(((ComposedLink)link).getAngle()>((ComposedLink)sortedInLinks.get(j)).getAngle()) {
+						sortedInLinks.set(i, sortedInLinks.get(j));
+						sortedInLinks.set(j, link);
+						link = sortedInLinks.get(i);
+					}
+			}
+			double meanAngleInDifferences = Math.abs(meanIn-(((ComposedLink)sortedInLinks.get(0)).getAngle()+2*Math.PI-((ComposedLink)sortedInLinks.get(sortedInLinks.size()-1)).getAngle()));
+			for(int i=0; i<sortedInLinks.size()-1; i++)
+				meanAngleInDifferences += Math.abs(meanIn-(((ComposedLink)sortedInLinks.get(i+1)).getAngle()-((ComposedLink)sortedInLinks.get(i)).getAngle()));
+			anglesDeviation += meanAngleInDifferences;
+		}
+		if(getOutLinks().size()>0) {
+			inOut++;
+			double meanOut=2*Math.PI/getOutLinks().size();
+			List<Link> sortedOutLinks = new ArrayList<Link>(getOutLinks().values());
+			for(int i=0; i<sortedOutLinks.size()-1; i++) {
+				Link link = sortedOutLinks.get(i);
+				for(int j=i+1; j<sortedOutLinks.size(); j++)
+					if(((ComposedLink)link).getAngle()>((ComposedLink)sortedOutLinks.get(j)).getAngle()) {
+						sortedOutLinks.set(i, sortedOutLinks.get(j));
+						sortedOutLinks.set(j, link);
+						link = sortedOutLinks.get(i);
+					}
+			}
+			double meanAngleOutDifferences = Math.abs(meanOut-(((ComposedLink)sortedOutLinks.get(0)).getAngle()+2*Math.PI-((ComposedLink)sortedOutLinks.get(sortedOutLinks.size()-1)).getAngle()));
+			for(int i=0; i<sortedOutLinks.size()-1; i++)
+				meanAngleOutDifferences += Math.abs(meanOut-(((ComposedLink)sortedOutLinks.get(i+1)).getAngle()-((ComposedLink)sortedOutLinks.get(i)).getAngle()));
+			anglesDeviation += meanAngleOutDifferences;
+		}
+		anglesDeviation = inOut==0?Double.POSITIVE_INFINITY:anglesDeviation/inOut;
+	}
+
 
 }

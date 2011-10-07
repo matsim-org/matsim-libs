@@ -3,10 +3,14 @@ package playground.sergioo.NetworksMatcher.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +56,25 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			return caption;
 		}
 	}
+	public enum Tool {
+		MATCH("Match",0,0,2,1,"match"),
+		DELETE_MATCH("Delete match",0,1,2,1,"deleteMatch"),
+		AUTO_MATCH("Auto match",2,0,2,1,"autoMatch"),
+		SAVE_ALL("Save all",2,1,2,1,"saveAll"),
+		APPLY_PROPERTIES("Apply properties",4,0,2,2,"applyProperites");
+		String caption;
+		int gx;int gy;
+		int sx;int sy;
+		String function;
+		private Tool(String caption, int gx, int gy, int sx, int sy, String function) {
+			this.caption = caption;
+			this.gx = gx;
+			this.gy = gy;
+			this.sx = sx;
+			this.sy = sy;
+			this.function = function;
+		}
+	}
 	public enum Labels implements LayersWindow.Labels {
 		LINK("Link"),
 		NODE("Node"),
@@ -91,6 +114,21 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			buttonsPanel.add(optionButton);
 		}
 		this.add(buttonsPanel, BorderLayout.EAST);
+		JPanel toolsPanel = new JPanel();
+		toolsPanel.setLayout(new GridBagLayout());
+		for(Tool tool:Tool.values()) {
+			JButton toolButton = new JButton(tool.caption);
+			toolButton.setActionCommand(tool.name());
+			toolButton.addActionListener(this);
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridx = tool.gx;
+			gbc.gridy = tool.gy;
+			gbc.gridwidth = tool.sx;
+			gbc.gridheight = tool.sy;
+			toolsPanel.add(toolButton,gbc);
+		}
+		this.add(toolsPanel, BorderLayout.NORTH);
+		
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
 		readyButton = new JButton("Ready to exit");
@@ -231,11 +269,45 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
 		repaint();
 	}
+	public void match() {
+		//matchingProcess.match()
+	}
+	public void deleteMatch() {
+		
+	}
+	public void autoMatch() {
+		
+	}
+	public void saveAll() {
+		
+	}
+	public void applyProperties() {
+		
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for(Options option:Options.values())
 			if(e.getActionCommand().equals(option.getCaption()))
 				this.option = option;
+		for(Tool tool:Tool.values())
+			if(e.getActionCommand().equals(tool.name())) {
+				try {
+					Method m = DoubleNetworkMatchingWindow.class.getMethod(tool.function, new Class[] {});
+					m.invoke(this, new Object[]{});
+				} catch (SecurityException e1) {
+					e1.printStackTrace();
+				} catch (NoSuchMethodException e1) {
+					e1.printStackTrace();
+				} catch (IllegalArgumentException e1) {
+					e1.printStackTrace();
+				} catch (IllegalAccessException e1) {
+					e1.printStackTrace();
+				} catch (InvocationTargetException e1) {
+					e1.printStackTrace();
+				}
+				setVisible(true);
+				repaint();
+			}
 		if(e.getActionCommand().equals(READY_TO_EXIT)) {
 			setVisible(false);
 			readyToExit = true;

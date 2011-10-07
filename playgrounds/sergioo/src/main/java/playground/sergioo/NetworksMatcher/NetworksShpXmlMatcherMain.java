@@ -26,6 +26,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.InfiniteRegion;
+import playground.sergioo.NetworksMatcher.kernel.ShortPathsMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
@@ -55,7 +56,7 @@ public class NetworksShpXmlMatcherMain {
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
 		MatchingProcess matchingProcess = new MatchingProcess(modes);
-		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 30, Math.PI/6));
+		matchingProcess.addMatchingStep(new CrossingMatchingStep(new InfiniteRegion(), 70, Math.PI/12));
 		matchingProcess.execute(networkLowResolution, networkHighResolution);
 		LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", matchingProcess);
 		windowHR2.setVisible(true);

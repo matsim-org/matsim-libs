@@ -86,6 +86,12 @@ public class MatchingProcess {
 			return step.getNetworkA();
 		else if(k==0)
 			pos[0]++;
+		else if(k==step.getInternalStepPosition()) {
+			if(stepNumber==pos[0])
+				return step.getNetworkA();
+			else
+				pos[0]++;
+		}
 		return null;
 	}
 
@@ -117,6 +123,12 @@ public class MatchingProcess {
 			return step.getNetworkB();
 		else if(k==0)
 			pos[0]++;
+		else if(k==step.getInternalStepPosition()) {
+			if(stepNumber==pos[0])
+				return step.getNetworkB();
+			else
+				pos[0]++;
+		}
 		return null;
 	}
 
@@ -169,6 +181,17 @@ public class MatchingProcess {
 			}
 		else if(k==0)
 			pos[0]++;
+		else if(k==step.getInternalStepPosition()) {
+			if(stepNumber==pos[0])
+				if(MatchingStep.class.isAssignableFrom(step.getClass()))
+					return ((MatchingStep)step).getNodesMatchings();
+				else {
+					pos[0]++;
+					return null;
+				}
+			else
+				pos[0]++;
+		}
 		return null;
 	}
 	

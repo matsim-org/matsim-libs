@@ -37,7 +37,7 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 	}
 	
 	public boolean linksAnglesMatches() {
-		if(linksAnglesMatches(composedNodeA.getInLinksList(), composedNodeB.getInLinksList(), new ArrayList<Integer>()) && linksAnglesMatches(composedNodeA.getOutLinksList(), composedNodeB.getOutLinksList(), new ArrayList<Integer>())) {
+		if(linksAnglesMatches(composedNodeA.getInLinksList(), composedNodeB.getInLinksList(), new ArrayList<Integer>(), true) && linksAnglesMatches(composedNodeA.getOutLinksList(), composedNodeB.getOutLinksList(), new ArrayList<Integer>(), false)) {
 			for(Link linkSmall:composedNodeA.getInLinks().values()) {
 				((MatchingComposedLink)linkSmall).setToMatched(true);
 				((MatchingComposedLink)linkSmall).setIncident(true);
@@ -52,7 +52,7 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 			return false;
 	}
 
-	private boolean linksAnglesMatches(List<Link> linksSmall, List<Link> linksBig, List<Integer> indicesBig) {
+	private boolean linksAnglesMatches(List<Link> linksSmall, List<Link> linksBig, List<Integer> indicesBig, boolean in) {
 		if(linksSmall.size() == 0) {
 			int numChanges=0;
 			for(int i=0; i<indicesBig.size()-1; i++)
@@ -76,7 +76,7 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 		}
 		else
 			for(int b=0; b<linksBig.size(); b++) {
-				double anglesDifference = Math.abs(((ComposedLink)linksSmall.get(0)).getAngle()-((ComposedLink)linksBig.get(b)).getAngle());
+				double anglesDifference = Math.abs(((ComposedLink)linksSmall.get(0)).getAngle(in)-((ComposedLink)linksBig.get(b)).getAngle(in));
 				if(anglesDifference>Math.PI)
 					anglesDifference = 2*Math.PI - anglesDifference;
 				if(!indicesBig.contains(b) && anglesDifference<minAngle) {
@@ -84,7 +84,7 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 					newLinksSmall.remove(linksSmall.get(0));
 					List<Integer> newIndicesBig = new ArrayList<Integer>(indicesBig);
 					newIndicesBig.add(b);
-					if(linksAnglesMatches(newLinksSmall, linksBig, newIndicesBig))
+					if(linksAnglesMatches(newLinksSmall, linksBig, newIndicesBig, in))
 						return true;
 				}
 			}

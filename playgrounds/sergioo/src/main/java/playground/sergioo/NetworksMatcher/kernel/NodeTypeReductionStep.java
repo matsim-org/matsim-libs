@@ -13,7 +13,7 @@ import playground.sergioo.NetworksMatcher.kernel.core.NetworksStep;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
 
-public class CreateDirectGraphStep extends NetworksStep {
+public class NodeTypeReductionStep extends NetworksStep {
 
 	
 	
@@ -21,8 +21,8 @@ public class CreateDirectGraphStep extends NetworksStep {
 
 	//Methods
 
-	public CreateDirectGraphStep(Region region) {
-		super("Create direct graph step", region);
+	public NodeTypeReductionStep(Region region) {
+		super("Node type reduction step", region);
 		
 	}
 

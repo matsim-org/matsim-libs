@@ -2,6 +2,7 @@ package playground.sergioo.NetworksMatcher.kernel.core;
 
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
@@ -15,6 +16,10 @@ public class MatchingComposedLink extends ComposedLink {
 	private boolean isIncident = false;
 	
 	//Methods
+
+	public MatchingComposedLink(Link link, Node from, Node to, Network network) {
+		super(link, from, to, network);
+	}
 	
 	public MatchingComposedLink(Id id, Node from, Node to, Network network) {
 		super(id, from, to, network);

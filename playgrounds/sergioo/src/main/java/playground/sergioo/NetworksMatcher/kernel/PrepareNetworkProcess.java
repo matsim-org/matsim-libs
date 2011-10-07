@@ -47,12 +47,14 @@ public class PrepareNetworkProcess extends NetworksStep {
 					if(link.getAllowedModes().contains(mode))
 						withNeededMode = true;
 			if(withNeededMode) {
-				ComposedLink composedLink = new MatchingComposedLink(link.getId(), network.getNodes().get(link.getFromNode().getId()), network.getNodes().get(link.getToNode().getId()), network);
+				ComposedLink composedLink = new MatchingComposedLink(link, network.getNodes().get(link.getFromNode().getId()), network.getNodes().get(link.getToNode().getId()), network);
 				network.addLink(composedLink);
 			}
 		}
-		for(Node node:network.getNodes().values())
+		for(Node node:network.getNodes().values()) {
+			((ComposedNode)node).setAnglesDeviation();
 			((ComposedNode)node).setType();
+		}
 		return network;
 	}
 

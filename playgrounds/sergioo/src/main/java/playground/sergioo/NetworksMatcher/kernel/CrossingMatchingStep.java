@@ -1,6 +1,8 @@
 package playground.sergioo.NetworksMatcher.kernel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
@@ -19,7 +21,7 @@ public class CrossingMatchingStep extends MatchingStep {
 	//Attributes
 
 	private double radius;
-	
+
 	//Methods
 
 	public CrossingMatchingStep(Region region, double radius, double minAngle) {
@@ -28,7 +30,7 @@ public class CrossingMatchingStep extends MatchingStep {
 		this.radius = radius;
 		ComposedNode.radius = radius;
 		IncidentLinksNodesMatching.minAngle = minAngle;
-		networkSteps.add(new CreateDirectGraphStep(region));
+		networkSteps.add(new NodeTypeReductionStep(region));
 		internalStepPosition = 1;
 	}
 
@@ -67,7 +69,8 @@ public class CrossingMatchingStep extends MatchingStep {
 	public void process(Network oldNetworkA, Network oldNetworkB) {
 		Set<Node> alreadyReducedA = new HashSet<Node>();
 		Set<Node> alreadyReducedB = new HashSet<Node>();
-		for(Node node:networkA.getNodes().values())
+		List<Node> sortedNodes = sortNodesA(); 
+		for(Node node:sortedNodes)
 			SEARCH_MATCH:
 				if(region.isInside(node) && ((ComposedNode)node).getType().equals(Types.CROSSING) && !alreadyReducedA.contains(node)) {
 					Set<Node> nearestNodesToA = new HashSet<Node>();
@@ -99,6 +102,20 @@ public class CrossingMatchingStep extends MatchingStep {
 				}
 		networkSteps.add(new CrossingReductionStep(region, nodesMatchings));
 		networkSteps.add(new EdgeDeletionStep(region));
+	}
+
+	private List<Node> sortNodesA() {
+		List<Node> sortedNodes = new ArrayList<Node>(networkA.getNodes().values());
+		for(int i=0; i<sortedNodes.size()-1; i++) {
+			Node node = sortedNodes.get(i);
+			for(int j=i+1; j<sortedNodes.size(); j++)
+				if(((ComposedNode)node).getAnglesDeviation()>((ComposedNode)sortedNodes.get(j)).getAnglesDeviation()) {
+					sortedNodes.set(i, sortedNodes.get(j));
+					sortedNodes.set(j, node);
+					node = sortedNodes.get(i);
+				}
+		}
+		return sortedNodes;
 	}
 
 
