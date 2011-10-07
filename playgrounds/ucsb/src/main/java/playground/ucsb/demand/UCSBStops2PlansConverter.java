@@ -41,10 +41,10 @@ public class UCSBStops2PlansConverter {
 	 */
 	public static void main(String[] args) {
 		
-		args = new String[] {
-				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/demand/CEMDAP/stops_total_actual_small.dat",
-				"D:/balmermi/documents/eclipse/output/ucsb"
-		};
+//		args = new String[] {
+//				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/demand/CEMDAP/stops_total_actual_small.dat",
+//				"D:/balmermi/documents/eclipse/output/ucsb"
+//		};
 
 		if (args.length < 2) {
 			log.error("UCSBStops2PlansConverter cemdapStopsFile outputBase");
