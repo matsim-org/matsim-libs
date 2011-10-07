@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CEMDAP2PlansConverter.java
+ * UCSBStops2PlansConverter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -26,15 +26,13 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.ucsb.network.SCAGNetworkConverter;
-
 /**
  * @author balmermi
  *
  */
-public class CEMDAP2PlansConverter {
+public class UCSBStops2PlansConverter {
 
-	private final static Logger log = Logger.getLogger(SCAGNetworkConverter.class);
+	private final static Logger log = Logger.getLogger(UCSBStops2PlansConverter.class);
 
 	/**
 	 * @param args
@@ -47,7 +45,7 @@ public class CEMDAP2PlansConverter {
 		};
 
 		if (args.length < 2) {
-			log.error("CEMDAP2PlansConverter cemdapStopsFile outputBase");
+			log.error("UCSBStops2PlansConverter cemdapStopsFile outputBase");
 			System.exit(-1);
 		}
 		
@@ -60,7 +58,7 @@ public class CEMDAP2PlansConverter {
 		log.info("outputBase: "+outputBase);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		CEMDAPParser cemdapParser = new CEMDAPParser();
+		UCSBStopsParser cemdapParser = new UCSBStopsParser();
 		cemdapParser.parse(cemdapStopsFile, scenario);
 		new PopulationWriter(scenario.getPopulation(),null).write(outputBase+"/plans.xml");
 	}

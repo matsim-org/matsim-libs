@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CEMDAPParser.java
+ * UCSBStopsParser.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -40,15 +40,15 @@ import org.matsim.core.utils.io.IOUtils;
  * @author balmermi
  *
  */
-public class CEMDAPParser {
+public class UCSBStopsParser {
 
-	private final static Logger log = Logger.getLogger(CEMDAPParser.class);
+	private final static Logger log = Logger.getLogger(UCSBStopsParser.class);
 	private static final String HID = "HID";
 	private static final Object PID = "PID";
 	private static final Object O_ZONE_ID = "OZoneID";
 	private static final Object P_ACT_TYPE = "PActType";
 
-	public CEMDAPParser() {
+	public UCSBStopsParser() {
 	}
 	
 	private final String transformActType(int actTypeNo) {
