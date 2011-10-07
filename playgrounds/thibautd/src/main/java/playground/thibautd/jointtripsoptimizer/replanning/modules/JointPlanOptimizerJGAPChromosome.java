@@ -384,6 +384,28 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 		return true;
 	}
 
+	public double getDegreeOfConstraintsBreak() {
+		int currentDoubleGene = this.nBooleanGenes;
+		int currentUpperBound;
+		double currentDuration;
+
+		double degree = 0d;
+		for (int planLength : this.nDurationGenes) {
+			currentUpperBound = currentDoubleGene + planLength;
+			currentDuration = 0d;
+
+			for (; currentDoubleGene < currentUpperBound; currentDoubleGene++) {
+				currentDuration += ((DoubleGene) this.getGene(currentDoubleGene)).doubleValue();
+			}
+
+			if (currentDuration > this.dayDuration + EPSILON) {
+				degree += currentDuration - this.dayDuration;
+			}
+		}
+
+		return degree;
+	}
+
 	/**
 	 * Exactly the same as the Chromosome method, but with a more efficient
 	 * implementation (less getter calls). Pass from 6% of CPU time used to 3%.

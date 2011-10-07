@@ -56,7 +56,8 @@ public class DurationSimplexAlgo implements FinalScorer {
 	// defines the size of the initial vertex (to be sure of the "locality"
 	// of the search!)
 	private static final double STEP = 5;
-	private static final double UNFEASIBLE_SCORE = Double.NEGATIVE_INFINITY;
+	//private static final double UNFEASIBLE_SCORE = Double.NEGATIVE_INFINITY;
+	private static final double PENALTY = -100;
 
 	//private final DirectSearchOptimizer optimizer = new NelderMead();
 	private final DirectSearchOptimizer optimizer = new MultiDirectional();
@@ -97,10 +98,6 @@ public class DurationSimplexAlgo implements FinalScorer {
 
 		updateChromosomeValue(optimum.getPoint());
 
-		if (Math.abs(this.scorer.score(chromosome, plan) - optimum.getValue()) > 1E-7) {
-			throw new RuntimeException();
-		}
-
 		cleanUp();
 		return optimum.getValue();
 	}
@@ -137,12 +134,12 @@ public class DurationSimplexAlgo implements FinalScorer {
 		return point;
 	}
 
-	private boolean updateChromosomeValue(final double[] point) {
+	private double updateChromosomeValue(final double[] point) {
 		if (point.length != dimensions.length) {
 			throw new IllegalArgumentException("dimensions incompatible");
 		}
 
-		boolean valueWasInBounds = true;
+		double boundBreak = 0;
 
 		for (int i = 0; i < point.length; i++) {
 			double value = point[i];
@@ -152,10 +149,11 @@ public class DurationSimplexAlgo implements FinalScorer {
 			else if (value > dimensions[i].getUpperBound()) {
 				value = dimensions[i].getLowerBound();
 			}
+			boundBreak += Math.abs(point[i] - value);
 			dimensions[i].setAllele( value );
 		}
 
-		return valueWasInBounds;
+		return boundBreak;
 	}
 
 	private DoubleGene[] getContinuousDimensions(final Gene[] genes) {
@@ -177,15 +175,11 @@ public class DurationSimplexAlgo implements FinalScorer {
 		@Override
 		public double value(final double[] point)
 				throws FunctionEvaluationException, IllegalArgumentException {
-			boolean inBounds = updateChromosomeValue(point);
+			double boundBreak = updateChromosomeValue(point);
 
-			//System.out.print("");
-
-			if (inBounds && chromosome.respectsConstraints()) {
-				return scorer.score(chromosome, plan);
-			}
-
-			return UNFEASIBLE_SCORE;
+			return scorer.score(chromosome, plan) +
+				chromosome.getDegreeOfConstraintsBreak() * PENALTY +
+				boundBreak * PENALTY;
 		}
 	}
 
