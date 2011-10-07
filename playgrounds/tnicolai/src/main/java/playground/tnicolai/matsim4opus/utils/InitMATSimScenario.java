@@ -143,27 +143,28 @@ public class InitMATSimScenario {
 		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM);
 		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
 		
-		log.info("MATSim4UrbanSim Parameter -> SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE) + 
-											 " Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + 
-											 " OPUS_HOME: " + Constants.OPUS_HOME + 
-											 " OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH + 
-											 " MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS + 
-											 " MATSIM_4_OPUS_CONIG: " + Constants.MATSIM_4_OPUS_CONFIG +
-											 " MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT + 
-											 " MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP + 
-											 " MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP + 
-											 " TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN) +
-											 " Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA) +
-											 " Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_TIMES) +
-											 " Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_TIMES) +
-											 " Beta power(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_TIMES) +
-											 " Beta Travel Costs: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_COSTS) +
-											 " Beta ln(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_COSTS) +
-											 " Beta power(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_COSTS) +
-											 " Beta Travel Distance: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_DISTANCE) +
-											 " Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_DISTANCE) +
-											 " Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_DISTANCE) +
-											 " Custom Parameter: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.CUSTOM_PARAMETER) );
+		log.info("MATSim4UrbanSim Parameter:");
+		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE) );
+		log.info("Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ); 
+		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
+		log.info("OPUS_DATA_PATH: " + Constants.OPUS_DATA_PATH );
+		log.info("MATSIM_4_OPUS: " + Constants.MATSIM_4_OPUS );
+		log.info("MATSIM_4_OPUS_CONIG: " + Constants.MATSIM_4_OPUS_CONFIG );
+		log.info("MATSIM_4_OPUS_OUTPUT: " + Constants.MATSIM_4_OPUS_OUTPUT );
+		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
+		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
+		log.info("TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN) );
+		log.info("Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA) );
+		log.info("Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_TIMES) );
+		log.info("Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_TIMES) );
+		log.info("Beta power(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_TIMES) );
+		log.info("Beta Travel Costs: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_COSTS) );
+		log.info("Beta ln(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_COSTS) );
+		log.info("Beta power(Travel Costs): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_COSTS) );
+		log.info("Beta Travel Distance: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_DISTANCE) );
+		log.info("Beta ln(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_DISTANCE) );
+		log.info("Beta power(Travel Distance): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_DISTANCE) );
+		log.info("Custom Parameter: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.CUSTOM_PARAMETER) );
 		log.info("... done!");
 	}
 	
@@ -183,22 +184,51 @@ public class InitMATSimScenario {
 	}
 	
 	/**
-	 * setting input plans file (for warm start)
+	 * setting input plans file (for warm/hot start)
 	 * 
 	 * @param matsimParameter
 	 */
 	private void initInputPlansFile(ConfigType matsimParameter){
 		log.info("Setting input plans file to config...");
-		String inputPlansFile = matsimParameter.getInputPlansFile().getInputFile();
-		if(inputPlansFile!=null && !inputPlansFile.equalsIgnoreCase("")){
-			PlansConfigGroup plansCG = (PlansConfigGroup) scenario.getConfig().getModule(PlansConfigGroup.GROUP_NAME);
-			// set values
-			plansCG.setInputFile( inputPlansFile );	// input plans file
-			log.info("... done!");
-			log.info("Input plans file: " + plansCG.getInputFile());
+		// get plans file for hot start
+		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
+		// get plans file for warm start 
+		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
+		
+		// setting plans file as input
+		if( !hotStart.equals("") &&
+		  (new File(hotStart)).exists() ){
+			log.info("Hot Start detcted!");
+			setPlansFile( hotStart );
+			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.HOT_START);
+		}
+		else if( !warmStart.equals("") ){
+			log.info("Warm Start detcted!");
+			setPlansFile( warmStart );
+			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.WARM_START);
+		}
+		else{
+			log.info("Cold Start (no pop file) detected!");
+			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.COLD_START);
+		}
+		
+		// setting target location for hot start plans file
+		if(!hotStart.equals("")){
+			log.info("Storing plans file from current run. This enables hot start for next MATSim run.");
+			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, hotStart);
 		}
 		else
-			log.info("Input plans file is empty");
+			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE, "");
+	}
+
+	/**
+	 * 
+	 */
+	private void setPlansFile(String plansFile) {
+		PlansConfigGroup plansCG = (PlansConfigGroup) scenario.getConfig().getModule(PlansConfigGroup.GROUP_NAME);
+		// set values
+		plansCG.setInputFile( plansFile );	// input plans file
+		log.info("Input plans file set to: " + plansCG.getInputFile());
 	}
 	
 	/**
@@ -273,22 +303,22 @@ public class InitMATSimScenario {
 						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
 	}
 	
-	/**
-	 * setting plans file
-	 */
-	private void initPopulation(ConfigType matsimParameter){
-		// get the standard MATSim output directory
-		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
-		
-		// check if available
-		if(controlerCG.getOutputDirectory() != null){
-			String popFile = controlerCG.getOutputDirectory() + Constants.OUTPUT_PLANS_FILE_GZ;
-			if( (new File(popFile)).exists() )	
-				scenario.getConfig().plans().setInputFile( popFile );	// set plans file from previous run -> this is mandatory for "WARM START"
-		}
-		else
-			log.warn("No MATSim output directory found (=null). But it is mandatory for \"WARM START\". Threrefore \"WARM START\" can not be used!!!");		
-	}
+//	/**
+//	 * setting plans file
+//	 */
+//	private void initPopulation(ConfigType matsimParameter){
+//		// get the standard MATSim output directory
+//		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
+//		
+//		// check if available
+//		if(controlerCG.getOutputDirectory() != null){
+//			String popFile = controlerCG.getOutputDirectory() + Constants.OUTPUT_PLANS_FILE_GZ;
+//			if( (new File(popFile)).exists() )	
+//				scenario.getConfig().plans().setInputFile( popFile );	// set plans file from previous run -> this is mandatory for "WARM START"
+//		}
+//		else
+//			log.warn("No MATSim output directory found (=null). But it is mandatory for \"WARM START\". Threrefore \"WARM START\" can not be used!!!");		
+//	}
 	
 }
 

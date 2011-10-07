@@ -29,13 +29,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
+import playground.tnicolai.matsim4opus.matsimTestData.MATSimRunMode;
 import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
 import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
@@ -47,71 +48,91 @@ import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
  * @author thomas
  *
  */
-public class WarmStartTest extends MatsimTestCase{
+public class ColdWarmHotStartTest extends MatsimTestCase{
 	
-	private static final Logger log = Logger.getLogger(WarmStartTest.class);
+	private static final Logger log = Logger.getLogger(ColdWarmHotStartTest.class);
 	
 	private GenerateOPUSTestEnvironment gote = null;
-	private String warmStartPlansFile = "warm-start-input-plans-file.xml";
+	private String warmAndHotStartPlansFile;
+	private String currentMode;	// stores detects MATSim mode
 	
 	@Rule 
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
-	public void testNoInitalPlansFile(){
-		log.info("Starting testNoInitalPlansFile run: Testing if MATSim regognizes that there is no initial input plans file (with a sampling rate of 100%).");
+	public void testNoPlansFile(){
+		log.info("Starting testNoPlansFile run: Testing if MATSim regognizes that there is no initial input plans file (with a sampling rate of 100%).");
 		double samplingRate = 1.;
-		PopulationCounter result = prepareTest(false,samplingRate);
+		PopulationCounter result = prepareTest(MATSimRunMode.coldStart, samplingRate);
 		
-		evaluate(false, result, samplingRate);
+		evaluate(MATSimRunMode.coldStart, result, samplingRate);
 		
 		// clean up temp directories
 		TempDirectoryUtil.cleaningUpOPUSDirectories();
 
-		log.info("End of testMATSimConfig.");
+		log.info("End of testNoPlansFile.");
 	}
 	
 	@Test
-	public void testWithInitalPlansFile(){
-		log.info("Starting testWithInitalPlansFile run: Testing if MATSim correctly merges the old population (plans file) and new popululation (from UrbanSim output) with a sampling rate of 100%.");
+	public void testWithWarmStartPlansFile(){
+		log.info("Starting testWithWarmStartPlansFile run: Testing if MATSim correctly merges the old population (plans file) and new popululation (from UrbanSim output) with a sampling rate of 100%.");
 		double samplingRate = 1.;
-		PopulationCounter result = prepareTest(true,samplingRate);
+		PopulationCounter result = prepareTest(MATSimRunMode.warmStart, samplingRate);
 		
-		evaluate(true, result, samplingRate);
+		evaluate(MATSimRunMode.warmStart, result, samplingRate);
 		
 		// clean up temp directories
 		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		
-		log.info("End of testMATSimConfig.");
+		log.info("End of testWithWarmStartPlansFile.");
 	}
 	
 	@Test
-	public void testWithInitalPlansFileAndLowerSamplingRate(){
-		log.info("Starting testWithInitalPlansFile run: Testing if MATSim correctly merges the old population (plans file) and new popululation (from UrbanSim output) with a lower sampling rate of 50%.");
-		double samplingRate = 0.5;
-		PopulationCounter result = prepareTest(true,samplingRate);
+	public void testWithHotStartPlansFile(){
+		log.info("Starting testWithHotStartPlansFile run: Testing if MATSim correctly merges the old population (plans file) and new popululation (from UrbanSim output) with a sampling rate of 100%.");
+		double samplingRate = 1.;
+		PopulationCounter result = prepareTest(MATSimRunMode.hotStart, samplingRate);
 		
-		evaluate(true, result, samplingRate);
+		evaluate(MATSimRunMode.hotStart, result, samplingRate);
 		
 		// clean up temp directories
 		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		
-		log.info("End of testMATSimConfig.");
+		log.info("End of testWithHotStartPlansFile.");
+	}
+	
+	@Test
+	public void testWithWarmStartPlansFileAndLowerSamplingRate(){
+		log.info("Starting testWithWarmStartPlansFileAndLowerSamplingRate run: Testing if MATSim correctly merges the old population (plans file) and new popululation (from UrbanSim output) with a lower sampling rate of 50%.");
+		double samplingRate = 0.5;
+		PopulationCounter result = prepareTest(MATSimRunMode.warmStart, samplingRate);
+		
+		evaluate(MATSimRunMode.warmStart, result, samplingRate);
+		
+		// clean up temp directories
+		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		
+		log.info("End of testWithWarmStartPlansFileAndLowerSamplingRate.");
 	}
 	
 	/**
 	 * preparing MATSim test run
-	 * @param configName name of MATSim config file
+	 * @param isWarmOrHotStart
+	 * @param samplingRate
+	 * @return
 	 */
-	@SuppressWarnings("deprecation")
-	private PopulationCounter prepareTest(boolean isWarmStart, double samplingRate){
+	private PopulationCounter prepareTest(byte runMode, double samplingRate){
+		
+		this.warmAndHotStartPlansFile = "warm-start-input-plans-file.xml";
+		// reset mode flag
+		this.currentMode = null;
 		
 		// this generates an entire matsim4opus testing environment including 
 		// typical matsim input files (e. g. matsim config, urbansim outputs, network)
 		// and the matsim4opus folder structure ...
 		gote = new GenerateOPUSTestEnvironment( Boolean.TRUE );
 		// the matsim config contains all information about the matsim4opus test environment -> see next step
-		String matsimConfigPath = gote.createWarmStartOPUSTestEnvironment( this.warmStartPlansFile );
+		String matsimConfigPath = gote.createWarmStartOPUSTestEnvironment( this.warmAndHotStartPlansFile, runMode );
 		
 		// the information about the matsim4opus test environment (see previous step) will be imported into the scenario 
 		ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -122,8 +143,10 @@ public class WarmStartTest extends MatsimTestCase{
 		ims.init();
 
 		// 3 Step: init/loading scenario
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
-		loader.loadScenario();
+		ScenarioUtils.loadScenario(scenario);
+		
+		// save detected MATSim run Mode
+		this.currentMode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
 		
 		// init class ReadFromUrbansimParcelModel
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( 2001 );
@@ -134,8 +157,8 @@ public class WarmStartTest extends MatsimTestCase{
 		readFromUrbansim.readFacilities(parcels, zones);
 
 		Population oldPopulation = null;
-//		Population newPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-		if(isWarmStart){
+
+		if( scenario.getConfig().plans().getInputFile() != null ){
 			// get old population (from input plans file)
 			oldPopulation = scenario.getPopulation();
 		}
@@ -148,9 +171,9 @@ public class WarmStartTest extends MatsimTestCase{
 	 * 
 	 * @param isWarmStart
 	 */
-	private void evaluate(boolean isWarmStart, PopulationCounter result, double samplingRate){
+	private void evaluate(byte runMode, PopulationCounter result, double samplingRate){
 		
-		if(isWarmStart && samplingRate == 1.){
+		if(runMode == MATSimRunMode.warmStart && samplingRate == 1.){
 			
 			/**
 			 * 	input plans file setup (old population)
@@ -196,7 +219,7 @@ public class WarmStartTest extends MatsimTestCase{
 			 
 			 */
 			
-			// the Population counter must eqal this counts
+			// the Population counter must equal this counts
 			assertTrue(
 					result.identifiedCnt == 5 &&
 					result.newPersonCnt == 1 &&
@@ -205,16 +228,30 @@ public class WarmStartTest extends MatsimTestCase{
 					result.worklocationChangedCnt == 1 && 
 					result.employmentChangedCnt == 1 && 
 					result.jobLocationIdNullCnt == 1 &&
-					result.populationMergeTotal == 9);
+					result.populationMergeTotal == 9 &&
+					this.currentMode.equals(Constants.WARM_START));
 			
 		}
-		else if(isWarmStart && samplingRate < 1.){
+		if(runMode == MATSimRunMode.hotStart && samplingRate == 1.){
+			assertTrue(
+					result.identifiedCnt == 5 &&
+					result.newPersonCnt == 1 &&
+					result.fromBackupCnt ==1 &&
+					result.homelocationChangedCnt == 1 &&
+					result.worklocationChangedCnt == 1 && 
+					result.employmentChangedCnt == 1 && 
+					result.jobLocationIdNullCnt == 1 &&
+					result.populationMergeTotal == 9 &&
+					this.currentMode.equals(Constants.HOT_START));
+		}
+		else if(runMode == MATSimRunMode.warmStart && samplingRate < 1.){
 			assertTrue(result.populationMergeTotal == (10 * samplingRate) );
 		}
-		else if(! isWarmStart)
+		else if(runMode == MATSimRunMode.coldStart)
 			assertTrue(result.identifiedCnt == 0 &&
 					result.NUrbansimPersons == 10 &&
-					result.populationMergeTotal == 9);
+					result.populationMergeTotal == 9 &&
+					this.currentMode.equals(Constants.COLD_START));
 	}
 
 }

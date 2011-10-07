@@ -34,9 +34,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
@@ -75,11 +76,11 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 	
 	@Test
 	public void testCreateBindingClass(){
-//		String matsimConfigPath = prepareTest();
-//		boolean result = testBindingClassesViaJAXB(matsimConfigPath);
-//		
-//		// test creation of binding classes
-//		 Assert.assertTrue( result );
+		String matsimConfigPath = prepareTest();
+		boolean result = testBindingClassesViaJAXB(matsimConfigPath);
+		
+		// test creation of binding classes
+		 Assert.assertTrue( result );
 	}
 	
 	@After

@@ -137,8 +137,9 @@ public class MATSim4Urbansim {
 		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
 		
 		// saving results from current run
-		saveRunOutputs();	// tnicolai: think about hot start (e.g. by using the output_plans.xml.gz in the output folder)
-//		cleanUrbanSimOutput(); // tnicolai: Experimental, may comment out
+		saveRunOutputs();
+		cleanUrbanSimOutput(); // tnicolai: Experimental, may comment out
+		
 	}
 	
 	/**
@@ -168,8 +169,15 @@ public class MATSim4Urbansim {
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
-			log.info("Population specified in matsim config file; assuming WARM start with pre-existing pop file.");
-			log.info("Persons not found in pre-existing pop file are added; persons no longer in urbansim persons file are removed." ) ;
+			
+			String mode = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE);
+			if(mode.equals(Constants.HOT_START))
+				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
+			else if(mode.equals(Constants.WARM_START))
+				log.info("MATSim is running in WARM start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
+			
+			log.info("Persons not found in pop file are added; persons no longer in urbansim persons file are removed." ) ;
+			
 			oldPopulation = scenario.getPopulation() ;
 			// log.info("Note that the `continuation of iterations' will only work if you set this up via different config files for") ;
 			// log.info("every year and know what you are doing.") ;
@@ -220,24 +228,6 @@ public class MATSim4Urbansim {
 		
 		// run the iterations, including the post-processing:
 		controler.run() ;
-	}
-	
-	void movePlansFile(){
-		
-		Controler controler = new Controler(scenario);
-		String filename = "plans.xml.gz";
-		// get location of new generated plans file (from MATSim output directory)
-		String s = controler.getControlerIO().getIterationFilename(scenario.getConfig().controler().getLastIteration(), filename);
-		File plansFile = new File( s );
-		
-		// set destination
-		File destinationFile = new File( Constants.MATSIM_4_OPUS_TEMP + filename );
-		
-		// moving plansFile to destinationFile
-		if (plansFile.renameTo( destinationFile ) )
-			try{
-				log.info("Moved " + plansFile.getCanonicalPath() + " to " + destinationFile.getCanonicalPath() + ".");
-			} catch(Exception e){}
 	}
 	
 	/**
@@ -303,18 +293,31 @@ public class MATSim4Urbansim {
 	private void saveRunOutputs() {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
-		String saveDirectory = "RUN" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
+		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
 		String savePath = UtilityCollection.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
 		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
 		
+		String newPlansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
+		
 		// get population / plans file
 		try {
-			FileCopy.fileCopy( new File(Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME) , new File(savePath + Constants.GENERATED_PLANS_FILE_NAME) );
+			FileCopy.fileCopy( new File(newPlansFile) , new File(savePath + Constants.GENERATED_PLANS_FILE_NAME) );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		log.info("Saving UrbanSim and MATSim outputs done!");
+		
+		String targetLocationHotStartFile = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TARGET_LOCATION_HOT_START_PLANS_FILE);
+		if(!targetLocationHotStartFile.equals("")){
+			
+			log.info("Preparing hot start for next MATSim run ...");
+			boolean success = FileCopy.moveFileOrDirectory(newPlansFile, targetLocationHotStartFile);
+			if(success)
+				log.info("Hot start preparation successful!");
+			else
+				log.error("Error while moving plans file. This is not fatal but hot start will not work!");
+		}
 	}
 	
 	/**

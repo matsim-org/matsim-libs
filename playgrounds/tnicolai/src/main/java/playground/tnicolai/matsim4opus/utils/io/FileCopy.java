@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
+import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 
 /**
@@ -193,5 +194,57 @@ public class FileCopy {
 		return result; 
 	} 
 	
-}
+	/**
+	 * moving a file to another directory
+	 * @param source String
+	 * @param target String
+	 * @return true if successful
+	 */
+	public static boolean moveFileOrDirectory(String source, String target){
+		
+		// File (or directory) to be moved
+		File sourceFile = new File( source );
+		// Destination
+		File destinationDir = null;
 
+		if(sourceFile.exists()){
+			
+			log.info("Moving " + source + " to " + target);
+			
+			FileName fm = new FileName(target, '/', '.');
+			
+			if(fm.filename().length() <= 0){
+				log.error("No file name for hot start pop file given!");
+				return false;
+			}
+			
+			destinationDir = new File(fm.path());
+			// make sure that target directory exists
+			if(!destinationDir.exists()){
+				log.info("Target directory doesn't exsit and will created ...");
+				destinationDir.mkdirs();
+				log.info("... done!");
+			}
+			
+			// Move file to new directory
+			boolean success = sourceFile.renameTo(new File(target));
+			return success;
+		}
+		
+		log.error("File not found: " + source);
+		return false;
+	}
+	
+	/**
+	 * testing FileCopy
+	 * @param args
+	 */
+	public static void main(String args[]){
+		
+		String source = "/Users/thomas/Development/opus_home/matsim4opus/output/output_plans.xml.gz";
+		String target = "/Users/thomas/Development/opus_home/matsim4opus/tmp/blalbla.xml.gz";
+		
+		FileCopy.moveFileOrDirectory(source, target);
+		
+	}
+}

@@ -35,20 +35,37 @@ public class GenerateMATSimConfig {
 	private String destination;
 	private boolean isTestRun;
 	private String network;
-	private String plansFile;
+	private String warmStartPlansFile;
+	private String hotStartPlansFile;
 	
 	/**
 	 * Constructor
 	 * @param destination
 	 * @param isTestRun
 	 * @param network
-	 * @param plansFile
+	 * @param warmStartPlansFile
 	 */
-	public GenerateMATSimConfig(boolean isTestRun, String network, String plansFile){
+	public GenerateMATSimConfig(boolean isTestRun, String network, String warmStartPlansFile){
 		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
 		this.isTestRun = isTestRun;
 		this.network = network;
-		this.plansFile = plansFile;
+		this.warmStartPlansFile = warmStartPlansFile;
+		this.hotStartPlansFile = "";
+	}
+	
+	/**
+	 * Constructor
+	 * @param isTestRun
+	 * @param network
+	 * @param warmStartPlansFile
+	 * @param hotStartPlansFile
+	 */
+	public GenerateMATSimConfig(boolean isTestRun, String network, String warmStartPlansFile, String hotStartPlansFile){
+		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
+		this.isTestRun = isTestRun;
+		this.network = network;
+		this.warmStartPlansFile = warmStartPlansFile;
+		this.hotStartPlansFile = hotStartPlansFile;
 	}
 	
 	/**
@@ -61,7 +78,8 @@ public class GenerateMATSimConfig {
 		this.destination = destination;
 		this.isTestRun = isTestRun;
 		this.network = network;
-		this.plansFile = "";
+		this.warmStartPlansFile = "";
+		this.hotStartPlansFile = "";
 	}
 	
 	/**
@@ -73,7 +91,8 @@ public class GenerateMATSimConfig {
 		this.destination = Constants.MATSIM_4_OPUS_CONFIG + "matsim_config.xml";
 		this.isTestRun = isTestRun;
 		this.network = network;
-		this.plansFile = "";
+		this.warmStartPlansFile = "";
+		this.hotStartPlansFile = "";
 	}
 	
 	/**
@@ -87,11 +106,13 @@ public class GenerateMATSimConfig {
 		// create "ConfigType"
 		ControlerType controlerType = of.createControlerType();
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
+		InputPlansFileType hotStartPlansFileType = of.createInputPlansFileType();
 		NetworkType networkType = of.createNetworkType();
 		PlanCalcScoreType planCalcSoreType = of.createPlanCalcScoreType();
 		controlerType.setFirstIteration(new BigInteger("0"));
 		controlerType.setLastIteration(new BigInteger("1"));
-		inputPlansFileType.setInputFile( this.plansFile );
+		inputPlansFileType.setInputFile( this.warmStartPlansFile );
+		hotStartPlansFileType.setInputFile( this.hotStartPlansFile );
 		networkType.setInputFile( this.network );
 		planCalcSoreType.setActivityType0( "home" );
 		planCalcSoreType.setActivityType1( "work" );
@@ -99,6 +120,7 @@ public class GenerateMATSimConfig {
 		ConfigType configType = of.createConfigType();
 		configType.setControler( controlerType );
 		configType.setInputPlansFile( inputPlansFileType );
+		configType.setHotStartPlansFile( hotStartPlansFileType );
 		configType.setNetwork( networkType );
 		configType.setPlanCalcScore( planCalcSoreType );
 		

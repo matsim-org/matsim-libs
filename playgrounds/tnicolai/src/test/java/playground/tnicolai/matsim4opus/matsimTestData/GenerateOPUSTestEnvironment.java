@@ -46,39 +46,47 @@ public class GenerateOPUSTestEnvironment {
 		// copy MATSim network to temp dir
 		copyTestData(matsimNetwork, Constants.MATSIM_4_OPUS_TEMP);
 		
-		return generateMATSimConfig ( matsimNetwork, "" );
+		return generateMATSimConfig ( matsimNetwork, "", MATSimRunMode.coldStart );
 	}
 	
 	/**
 	 * creates a opus environment for warm start testing
 	 */
-	public String createWarmStartOPUSTestEnvironment(String warmStartPlansFile){
+	public String createWarmStartOPUSTestEnvironment(String warmStartPlansFile, byte runMode){
 		
 		// creates temporary opus directories
 		TempDirectoryUtil.createOPUSDirectories();
 		
 		// copying matsim input data into fresh created opus directories
-		String urbanSimOutputWarmStartDir = UtilityCollection.getWarmStartUrbanSimInputData( GenerateOPUSTestEnvironment.class );
-		String plansFileWarmStartDir = UtilityCollection.getWarmStartInputPlansFile( GenerateOPUSTestEnvironment.class );
+		String urbanSimOutputDir = UtilityCollection.getWarmStartUrbanSimInputData( GenerateOPUSTestEnvironment.class );
+		String plansFileDir = UtilityCollection.getWarmStartInputPlansFile( GenerateOPUSTestEnvironment.class );
 		String matsimNetwork = UtilityCollection.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
 
 		// copy UrbanSim data to temp dir
-		copyTestData(urbanSimOutputWarmStartDir, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(urbanSimOutputDir, Constants.MATSIM_4_OPUS_TEMP);
 		// copy plans files to temp dir
-		copyTestData(plansFileWarmStartDir, Constants.MATSIM_4_OPUS_TEMP);
+		copyTestData(plansFileDir, Constants.MATSIM_4_OPUS_TEMP);
 		// copy MATSim network to temp dir
 		copyTestData(matsimNetwork, Constants.MATSIM_4_OPUS_TEMP);
 		
-		return generateMATSimConfig ( matsimNetwork, plansFileWarmStartDir + warmStartPlansFile);
+		return generateMATSimConfig ( matsimNetwork, plansFileDir + warmStartPlansFile, runMode);
 	}
 
 	/**
 	 * @param matsimNetwork
 	 * @return path to generated MATSim config
 	 */
-	private String generateMATSimConfig(String matsimNetwork, String plansFile) {
+	private String generateMATSimConfig(String matsimNetwork, String plansFile, byte runMode) {
 		// generate MATSim config
-		GenerateMATSimConfig gmc = new GenerateMATSimConfig(this.isTestRun, matsimNetwork + "/psrc.xml.gz", plansFile);
+		GenerateMATSimConfig gmc;
+
+		if(runMode == MATSimRunMode.warmStart)
+			gmc = new GenerateMATSimConfig(this.isTestRun, matsimNetwork + "/psrc.xml.gz", plansFile);
+		else if(runMode ==MATSimRunMode.hotStart)
+			gmc = new GenerateMATSimConfig(this.isTestRun, matsimNetwork + "/psrc.xml.gz", "", plansFile);
+		else // coldStart
+			gmc = new GenerateMATSimConfig(isTestRun, matsimNetwork + "/psrc.xml.gz");
+		
 		gmc.generate();
 		
 		log.info("MATSim config file is located at: " + gmc.getMATSimConfigPath());

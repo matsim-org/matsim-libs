@@ -181,6 +181,8 @@ public class Constants {
 	public static final String BETA_POWER_TRAVEL_DISTANCE = "beta_power_travel_distance";
 	public static final String CUSTOM_PARAMETER = "custom_parameter";
 	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
+	public static final String MATSIM_MODE = "matsim_mode";
+	public static final String TARGET_LOCATION_HOT_START_PLANS_FILE = "target_location_for_hotstart_plans_file";
 	
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
@@ -198,6 +200,11 @@ public class Constants {
 	/** MATSim 4 UrbanSim parameter values as strings **/
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";
+	
+	/** MATSim Modes **/
+	public static final String COLD_START = "cold_start";
+	public static final String WARM_START = "warm_start";
+	public static final String HOT_START = "hot_start";
 	
 	/** MATSim4OPUS TEST data folder structure */
 	public static final String MATSIM_TEST_DATA_WARM_START_URBANSIM_OUTPUT = "warmstart/urbanSimOutput";
