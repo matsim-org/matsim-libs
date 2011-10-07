@@ -435,7 +435,16 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 				individualValues.getNow(),
 				destination);
 		individualValues.addToNow(currentDuration);
-		individualValues.scoringFunction.endActivity(individualValues.getNow(), destination);
+		if ( !individualValues.isLastActivity(destination) ) {
+			// do not "close" last activity, as the Charypar-Nagel
+			// scoring function does it automatically (and thus does it twice
+			// if it is done here).
+			// XXX is it supposed to be the contract? ie what if another
+			// scoring function is used?
+			individualValues.scoringFunction.endActivity(
+					individualValues.getNow(),
+					destination);
+		}
 		individualValues.addToIndexInChromosome(1);
 		individualValues.resetTravelTime();
 	}
@@ -678,6 +687,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 		public final ScoringFunction scoringFunction;
 		public final List<PlanElement> planElements;
 		public final Plan individualPlan;
+		private final Activity lastActivity;
 
 		/**
 		 * For tracking travel time in complicated joint trips
@@ -690,6 +700,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 			this.scoringFunction = scoringFunction;
 			this.individualPlan = indivPlan;
 			this.planElements = indivPlan.getPlanElements();
+			this.lastActivity = (Activity) this.planElements.get(this.planElements.size() - 1);
 		}
 
 		public void addToIndexInPlan(final int i) {
@@ -726,6 +737,10 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 
 		public void resetTravelTime() {
 			this.jointTravelTime = 0d;
+		}
+
+		public boolean isLastActivity(final Activity act) {
+			return (act == lastActivity);
 		}
 	}
 

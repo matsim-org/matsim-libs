@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules.fitness;
 
+import java.util.List;
+
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
@@ -91,12 +93,16 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 			now = 0d;
 	
 			// step through plan and score it
+			List<PlanElement> elements = indivPlan.getPlanElements();
+			Activity lastActivity = (Activity) elements.get(elements.size() - 1);
 			for (PlanElement pe : indivPlan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					currentActivity = (Activity) pe;
 					fitnessFunction.startActivity(now, currentActivity);
 					now = currentActivity.getEndTime();
-					fitnessFunction.endActivity(now, currentActivity);
+					if ( !(currentActivity == lastActivity) ) {
+						fitnessFunction.endActivity(now, currentActivity);
+					}
 				}
 				else if (pe instanceof Leg) {
 					currentLeg = (Leg) pe;
