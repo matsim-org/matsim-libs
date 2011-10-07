@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.network;
+package playground.ucsb.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -29,8 +29,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.network.algorithms.SCAGShp2Links;
-import playground.network.algorithms.SCAGShp2Nodes;
+import playground.ucsb.network.algorithms.SCAGShp2Links;
+import playground.ucsb.network.algorithms.SCAGShp2Nodes;
 
 /**
  * @author balmermi

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.network.algorithms;
+package playground.ucsb.network.algorithms;
 
 import java.io.IOException;
 

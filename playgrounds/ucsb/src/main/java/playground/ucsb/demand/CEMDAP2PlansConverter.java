@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SCAGShp2Links.java
+ * CEMDAP2PlansConverter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,39 +18,51 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.network.algorithms;
+package playground.ucsb.demand;
 
-import java.util.HashSet;
-import java.util.Set;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.ConfigUtils;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.network.NetworkImpl;
+import playground.ucsb.network.SCAGNetworkConverter;
 
 /**
  * @author balmermi
  *
  */
-public class SCAGShp2Links implements NetworkRunnable {
+public class CEMDAP2PlansConverter {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.api.internal.NetworkRunnable#run(org.matsim.api.core.v01.network.Network)
+	private final static Logger log = Logger.getLogger(SCAGNetworkConverter.class);
+
+	/**
+	 * @param args
 	 */
-	@Override
-	public void run(Network network) {
+	public static void main(String[] args) {
 		
-//		Link l = network.getFactory().createLink(null,null, null);
-//		Set<String> modes = new HashSet<String>();
-//		modes.add(TransportMode.car);
-//		modes.add(TransportMode.pt);
-//		l.setAllowedModes(modes);
-//		l.setCapacity(capacity)
-//		l.setFreespeed(freespeed)
-//		l.setLength(length)
-//		l.setNumberOfLanes(lanes)
+		args = new String[] {
+				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/demand/CEMDAP/stops_total_actual_small.dat",
+				"D:/balmermi/documents/eclipse/output/ucsb"
+		};
 
+		if (args.length < 2) {
+			log.error("CEMDAP2PlansConverter cemdapStopsFile outputBase");
+			System.exit(-1);
+		}
+		
+		// store input parameters
+		String cemdapStopsFile = args[0];
+		String outputBase = args[1];
+
+		// print input parameters
+		log.info("cemdapStopsFile: "+cemdapStopsFile);
+		log.info("outputBase: "+outputBase);
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		CEMDAPParser cemdapParser = new CEMDAPParser();
+		cemdapParser.parse(cemdapStopsFile, scenario);
+		new PopulationWriter(scenario.getPopulation(),null).write(outputBase+"/plans.xml");
 	}
 
 }
