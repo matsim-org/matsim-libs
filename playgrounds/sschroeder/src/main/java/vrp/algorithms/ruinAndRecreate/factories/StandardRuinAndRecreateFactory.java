@@ -15,13 +15,15 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package vrp.algorithms.ruinAndRecreate;
+package vrp.algorithms.ruinAndRecreate.factories;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
+import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
+import vrp.algorithms.ruinAndRecreate.RuinStrategyManager;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
@@ -33,8 +35,9 @@ import vrp.algorithms.ruinAndRecreate.recreation.RecreationListener;
 import vrp.algorithms.ruinAndRecreate.ruin.RadialRuin;
 import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
+import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
-import vrp.basics.InitialSolutionFactoryImpl;
+import vrp.basics.SingleDepotSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
@@ -47,9 +50,9 @@ import vrp.basics.VrpUtils;
  */
 
 
-public class RuinAndRecreateFactory {
+public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 	
-	private static Logger logger = Logger.getLogger(RuinAndRecreateFactory.class);
+	private static Logger logger = Logger.getLogger(StandardRuinAndRecreateFactory.class);
 	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
@@ -57,25 +60,13 @@ public class RuinAndRecreateFactory {
 
 	private int warmUp = 10;
 	
-	private int iterations = 50;
+	private int iterations = 100;
 	
-	public void addRecreationListener(RecreationListener l){
-		recreationListeners.add(l);
-	}
-	
-	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
-		ruinAndRecreationListeners.add(l);
-	}
-	
-	
-	/**
-	 * Standard ruin and recreate without time windows. This algo is configured according to Schrimpf et. al (2000).
-	 * @param vrp
-	 * @param tours
-	 * @param vehicleCapacity
-	 * @return
+	/* (non-Javadoc)
+	 * @see vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateFactory#createAlgorithm(vrp.api.SingleDepotVRP, java.util.Collection, int)
 	 */
-	public RuinAndRecreate createStandardAlgo(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
+	@Override
+	public RuinAndRecreate createAlgorithm(SingleDepotVRP vrp, Collection<Tour> tours, int vehicleCapacity){
 		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(vrp);
 		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
@@ -84,7 +75,7 @@ public class RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setInitialSolutionFactory(new InitialSolutionFactoryImpl());
+		recreationStrategy.setInitialSolutionFactory(new SingleDepotSolutionFactoryImpl());
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
@@ -102,71 +93,31 @@ public class RuinAndRecreateFactory {
 			ruinAndRecreateAlgo.getListeners().add(l);
 		}
 		
-		for(RecreationListener l : recreationListeners){
-			recreationStrategy.addListener(l);
-		}
-		
 		return ruinAndRecreateAlgo;
 	}
 	
-	public int getWarmUp() {
-		return warmUp;
-	}
 
 	public void setIterations(int iterations) {
 		this.iterations = iterations;
 	}
 
-	/**
-	 * PDTW - Pickup and Delivery with TimeWindows
-	 * @param vrp
-	 * @param tours
-	 * @param vehicleCapacity
-	 * @return
-	 */
-	public RuinAndRecreate createAlgoWithPDTW(VRP vrp, Collection<Tour> tours, int vehicleCapacity){
-		logger.info("create algo with time windows");
-		RRTourAgentWithTimeWindowFactory tourAgentFactory = new RRTourAgentWithTimeWindowFactory(vrp);
-		Solution initialSolution = getInitialSolution(vrp,tours,tourAgentFactory,vehicleCapacity);
-		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
-		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
-		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);
-		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
-		
-		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setTourAgentFactory(tourAgentFactory);
-		recreationStrategy.setInitialSolutionFactory(new InitialSolutionFactoryImpl());
-		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
-		
-		RadialRuin radialRuin = new RadialRuin(vrp);
-		radialRuin.setFractionOfAllNodes(0.3);
-		
-		RandomRuin randomRuin = new RandomRuin(vrp);
-		randomRuin.setFractionOfAllNodes2beRuined(0.5);
-		
-		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(radialRuin, 0.5);
-		ruinAndRecreateAlgo.getRuinStrategyManager().addStrategy(randomRuin, 0.5);
-		ruinAndRecreateAlgo.setThresholdFunction(new SchrimpfsRRThresholdFunction(0.1));
-		logger.info("done");
-		return ruinAndRecreateAlgo;
-	}
-	
-	
-
 	private Solution getInitialSolution(VRP vrp, Collection<Tour> tours, TourAgentFactory tourAgentFactory, int vehicleCapacity) {
-		logger.info("make initial solution");
 		Collection<TourAgent> tourAgents = new ArrayList<TourAgent>();
 		for(Tour tour : tours){
 			Vehicle vehicle = VrpUtils.createVehicle(vehicleCapacity);
 			tourAgents.add(tourAgentFactory.createTourAgent(tour, vehicle));
 		}
-		logger.info("done");
 		return new Solution(tourAgents);
 	}
 
 	public void setWarmUp(int nOfWarmUpIterations) {
 		this.warmUp = nOfWarmUpIterations;
 		
+	}
+
+
+	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
+		ruinAndRecreationListeners.add(l);
 	}
 
 }

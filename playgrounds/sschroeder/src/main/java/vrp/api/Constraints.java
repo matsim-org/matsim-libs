@@ -28,8 +28,6 @@ import vrp.basics.Vehicle;
 
 public interface Constraints {
 	
-	public boolean judge(Tour tour);
-	
 	public boolean judge(Tour tour, Vehicle vehicle);
 
 }

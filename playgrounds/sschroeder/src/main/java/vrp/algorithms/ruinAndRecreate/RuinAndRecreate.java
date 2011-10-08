@@ -31,9 +31,9 @@ import vrp.algorithms.ruinAndRecreate.api.ThresholdFunction;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
+import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
 import vrp.basics.Tour;
-import vrp.basics.VrpSolution;
 import vrp.basics.VrpUtils;
 
 
@@ -101,11 +101,9 @@ public class RuinAndRecreate {
 
 	private Collection<RuinAndRecreateListener> listeners = new ArrayList<RuinAndRecreateListener>();
 	
-	private VrpSolution vrpSolution;
-	
 	private int lastPrint = 1;
 	
-	public RuinAndRecreate(VRP vrp, Solution iniSolution, int nOfMutations) {
+	public RuinAndRecreate(SingleDepotVRP vrp, Solution iniSolution, int nOfMutations) {
 		this.vrp = vrp;
 		this.currentSolution = iniSolution;
 		this.nOfMutations = nOfMutations;
@@ -223,6 +221,7 @@ public class RuinAndRecreate {
 
 	private void informListener(int currentMutation, double tentativeResult,double currentResult, double currentThreshold, boolean isAccepted) {
 		RuinAndRecreateEvent event = new RuinAndRecreateEvent(currentMutation, tentativeResult,currentResult, currentThreshold, isAccepted);
+		event.setCurrentSolution(getSolution());
 		for(RuinAndRecreateListener l : listeners){
 			l.inform(event);
 		}

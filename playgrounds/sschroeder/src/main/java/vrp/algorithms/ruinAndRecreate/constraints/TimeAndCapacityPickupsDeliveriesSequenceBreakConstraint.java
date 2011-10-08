@@ -28,9 +28,9 @@ import org.apache.log4j.Logger;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.basics.DeliveryFromDepot;
-import vrp.basics.PickupToDepot;
 import vrp.basics.EnRouteDelivery;
 import vrp.basics.EnRoutePickup;
+import vrp.basics.PickupToDepot;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.Vehicle;
@@ -74,65 +74,6 @@ public class TimeAndCapacityPickupsDeliveriesSequenceBreakConstraint implements 
 		this.maxCap = maxCap;
 		this.costs = costs;
 		this.maxTime = maxTime;
-	}
-
-	
-	@Override
-	public boolean judge(Tour tour) {
-		int currentCap = 0;
-		boolean deliveryStarted = false;
-		Set<String> openCustomers = new HashSet<String>();
-		double time = 0.0;
-		
-		TourActivity lastAct = null;
-		TourActivity firstAct = null;
-		for(TourActivity tourAct : tour.getActivities()){
-			if(lastAct == null){
-				firstAct = tourAct;
-				lastAct = tourAct;
-			}
-			else{
-				time += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
-			}
-			if(time > maxTime){
-				return false;
-			}
-			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
-				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);
-				return false;
-			}
-			if(tourAct.hasTimeWindowConflict()){
-				logger.debug("timeWindow-conflic on tour " + tour);
-				return false;
-			}
-			if(tourAct instanceof EnRoutePickup || tourAct instanceof PickupToDepot){
-				if(deliveryStarted){
-					if(!openCustomers.isEmpty()){
-						return false;
-					}
-					else{
-						deliveryStarted = false;
-					}
-				}
-				openCustomers.add(tourAct.getCustomer().getId());
-			}
-			if(tourAct instanceof EnRouteDelivery || tourAct instanceof DeliveryFromDepot){
-				if(deliveryStarted == false){
-					deliveryStarted = true;
-				}
-				String relatedCustomer = tourAct.getCustomer().getRelation().getCustomer().getId();
-				if(openCustomers.contains(relatedCustomer)){
-					openCustomers.remove(relatedCustomer);
-				}
-				else{
-					return false;
-				}
-			}
-			if(isWithinBreak(tourAct.getEarliestArrTime()) || isWithinBreak(tourAct.getLatestArrTime())){
-				return false;
-			}
-		}
-		return true;
 	}
 
 

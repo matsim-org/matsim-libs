@@ -26,11 +26,11 @@ import org.apache.log4j.Logger;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.MultipleDepotsVRP;
 
-public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
+public class VRPWithMultipleDepotsImpl implements MultipleDepotsVRP{
 
-	private static Logger logger = Logger.getLogger(VRPWithMultipleDepotsAndVehiclesImpl.class);
+	private static Logger logger = Logger.getLogger(VRPWithMultipleDepotsImpl.class);
 	
 	private Costs costs;
 	
@@ -42,7 +42,7 @@ public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 	
 	private Map<String,VehicleType> vehicleTypes;
 	
-	public VRPWithMultipleDepotsAndVehiclesImpl(Collection<String> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
+	public VRPWithMultipleDepotsImpl(Collection<String> depots, Collection<Customer> customers, Costs costs, Constraints constraints) {
 		super();
 		this.costs = costs;
 		this.constraints = constraints;
@@ -51,7 +51,12 @@ public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 		vehicleTypes = new HashMap<String,VehicleType>();
 	}
 	
-
+	/**
+	 * use assignVehicleTypeToDepot instead
+	 * @param depotId
+	 * @param vehicleType
+	 */
+	@Deprecated
 	public void assignVehicleType(String depotId, VehicleType vehicleType){
 		if(depots.containsKey(depotId)){
 			vehicleTypes.put(depotId, vehicleType);
@@ -97,11 +102,6 @@ public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 	}
 
 	@Override
-	public Customer getDepot() {
-		return getDepots().values().iterator().next();
-	}
-
-	@Override
 	public Map<String, Customer> getCustomers() {
 		return customers;
 	}
@@ -112,4 +112,13 @@ public class VRPWithMultipleDepotsAndVehiclesImpl implements VRP{
 	}
 
 
+	@Override
+	public void assignVehicleTypeToDepot(String depotId, VehicleType vehicleType) {
+		if(depots.containsKey(depotId)){
+			vehicleTypes.put(depotId, vehicleType);
+		}
+		else{
+			logger.warn("cannot assign vehicleType, since depot " + depotId + " does not exist");
+		}
+	}
 }

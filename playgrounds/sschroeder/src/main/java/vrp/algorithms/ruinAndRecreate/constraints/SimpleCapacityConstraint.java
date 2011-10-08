@@ -42,19 +42,7 @@ public class SimpleCapacityConstraint implements Constraints {
 		super();
 		this.maxCap = maxCap;
 	}
-
-	@Override
-	public boolean judge(Tour tour) {
-		int currentCap = 0;
-		for(TourActivity tourAct : tour.getActivities()){
-			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
-				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);
-				return false;
-			}
-		}
-		return true;
-	}
-
+	
 	@Override
 	public boolean judge(Tour tour, Vehicle vehicle) {
 		int currentCap = 0;

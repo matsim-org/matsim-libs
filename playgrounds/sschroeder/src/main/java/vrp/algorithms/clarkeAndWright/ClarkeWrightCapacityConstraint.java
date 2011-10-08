@@ -38,7 +38,7 @@ public class ClarkeWrightCapacityConstraint implements Constraints{
 	}
 
 	@Override
-	public boolean judge(Tour tour) {
+	public boolean judge(Tour tour, Vehicle vehicle) {
 		int currentCap = 0;
 		for(TourActivity acts : tour.getActivities()){
 			currentCap += acts.getCustomer().getDemand();
@@ -49,12 +49,6 @@ public class ClarkeWrightCapacityConstraint implements Constraints{
 		else{
 			return false;
 		}
-	}
-
-	@Override
-	public boolean judge(Tour tour, Vehicle vehicle) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

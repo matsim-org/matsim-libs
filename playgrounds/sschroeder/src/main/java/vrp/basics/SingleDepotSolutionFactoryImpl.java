@@ -25,14 +25,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 
-public class InitialSolutionFactoryImpl implements InitialSolutionFactory{
+public class SingleDepotSolutionFactoryImpl implements SingleDepotInitialSolutionFactory{
 
-	private static Logger logger = Logger.getLogger(InitialSolutionFactoryImpl.class);
+	private static Logger logger = Logger.getLogger(SingleDepotSolutionFactoryImpl.class);
 	
 	@Override
-	public Collection<Tour> createInitialSolution(VRP vrp) {
+	public Collection<Tour> createInitialSolution(SingleDepotVRP vrp) {
 		logger.info("create initial solution");
 		Collection<Tour> tours = new ArrayList<Tour>();
 		Set<String> customersWithService = new HashSet<String>();
@@ -40,19 +40,17 @@ public class InitialSolutionFactoryImpl implements InitialSolutionFactory{
 			if(customersWithService.contains(customer.getId())){
 				continue;
 			}
-			if(vrp.getDepots().containsKey(customer.getId())){
+			if(vrp.getDepot().getId().equals(customer.getId())){
 				continue;
 			}
-			Customer depot = null;
+			Customer depot = vrp.getDepot();
 			if(customer.hasRelation()){
 				Customer relatedCustomer = customer.getRelation().getCustomer();
 				Tour tour = null;
 				if(relatedCustomer.getDemand() < 0){
-					depot = getClosestDepot(vrp, customer, relatedCustomer);
 					tour = VrpUtils.createRoundTour(depot, customer, relatedCustomer);
 				}
 				else{
-					depot = getClosestDepot(vrp, relatedCustomer, customer);
 					tour = VrpUtils.createRoundTour(depot, relatedCustomer, customer);
 				}
 				customersWithService.add(customer.getId());
@@ -60,7 +58,6 @@ public class InitialSolutionFactoryImpl implements InitialSolutionFactory{
 				tours.add(tour);
 			}
 			else{
-				depot = getClosestDepot(vrp, customer);
 				Tour tour = VrpUtils.createRoundTour(depot, customer);
 				customersWithService.add(customer.getId());
 				tours.add(tour);
@@ -71,59 +68,29 @@ public class InitialSolutionFactoryImpl implements InitialSolutionFactory{
 	}
 	
 	@Override
-	public Tour createRoundTour(VRP vrp, Customer from, Customer to){
+	public Tour createRoundTour(SingleDepotVRP vrp, Customer from, Customer to){
 		Tour tour = null;
-		if(vrp.getDepots().containsKey(from.getId())){
-			Customer depot = vrp.getDepots().get(from.getId());
+		Customer depot = vrp.getDepot();
+		if(vrp.getDepot().getId().equals(from.getId())){
 			tour = VrpUtils.createRoundTour(depot, to);
 		}
-		else if(vrp.getDepots().containsKey(to.getId())){
-			Customer depot = vrp.getDepots().get(to.getId());
+		else if(vrp.getDepot().getId().equals(to.getId())){
 			tour = VrpUtils.createRoundTour(depot, from);
 		}
 		else {
-			Customer depot = getClosestDepot(vrp, from, to);
 			tour = VrpUtils.createRoundTour(depot, from, to);
 		}
 		return tour;
 	}
 	
-	private Customer getClosestDepot(VRP vrp, Customer from, Customer to){
-		Customer bestDepot = null;
-		Double minCost2Depot = Double.MAX_VALUE; 
-		for(Customer depot : vrp.getDepots().values()){
-			double cost = vrp.getCosts().getCost(depot.getLocation(), from.getLocation());
-			cost += vrp.getCosts().getCost(from.getLocation(), to.getLocation());
-			cost += vrp.getCosts().getCost(to.getLocation(), depot.getLocation());
-			if(cost < minCost2Depot){
-				bestDepot = depot;
-				minCost2Depot = cost;
-			}
-		}
-		return bestDepot;
-	}
-	
-	private Customer getClosestDepot(VRP vrp, Customer customer) {
-		Customer bestDepot = null;
-		Double minCost2Depot = Double.MAX_VALUE; 
-		for(Customer depot : vrp.getDepots().values()){
-			double costs = vrp.getCosts().getCost(depot.getLocation(), customer.getLocation());
-			if(costs < minCost2Depot){
-				minCost2Depot = costs;
-				bestDepot = depot;
-			}
-		}
-		return bestDepot;
-	}
-
 	@Override
-	public Vehicle createVehicle(VRP vrp, Tour tour) {
+	public Vehicle createVehicle(SingleDepotVRP vrp, Tour tour) {
 		if(tour.getActivities().size()<1){
 			throw new IllegalStateException("number of tourActivities smaller than 1");
 		}
 		String depotId = tour.getActivities().get(0).getCustomer().getId();
 		assertNotNull(depotId);
-		Vehicle vehicle = VrpUtils.createVehicle(vrp.getVehicleType(depotId));
+		Vehicle vehicle = VrpUtils.createVehicle(vrp.getVehicleType());
 		assertNotNull(vehicle);
 		return vehicle;
 	}

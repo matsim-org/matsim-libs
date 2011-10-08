@@ -51,11 +51,6 @@ public class BestTourBuilder implements TourBuilder {
 	private Constraints constraints = new Constraints(){
 
 		@Override
-		public boolean judge(Tour tour) {
-			return true;
-		}
-
-		@Override
 		public boolean judge(Tour tour, Vehicle vehicle) {
 			return true;
 		}

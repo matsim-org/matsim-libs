@@ -18,10 +18,7 @@
 package vrp.basics;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
@@ -176,38 +173,6 @@ public class VrpUtils {
 	
 	public static Relation createRelation(Customer customer){
 		return new Relation(customer);
-	}
-	
-	public static Collection<Tour> createTrivialSolution(VRP vrp){
-		Collection<Tour> tours = new ArrayList<Tour>();
-		Customer depot = vrp.getDepot();
-		Set<String> customersWithService = new HashSet<String>();
-		for(Customer customer : vrp.getCustomers().values()){
-			if(customersWithService.contains(customer.getId())){
-				continue;
-			}
-			if(depot != customer){
-				if(customer.hasRelation()){
-					Customer relatedCustomer = customer.getRelation().getCustomer();
-					Tour tour = null;
-					if(relatedCustomer.getDemand() < 0){
-						tour = VrpUtils.createRoundTour(depot, customer, relatedCustomer);
-					}
-					else{
-						tour = VrpUtils.createRoundTour(depot, relatedCustomer, customer);
-					}
-					customersWithService.add(customer.getId());
-					customersWithService.add(relatedCustomer.getId());
-					tours.add(tour);
-				}
-				else{
-					Tour tour = VrpUtils.createRoundTour(depot, customer);
-					customersWithService.add(customer.getId());
-					tours.add(tour);
-				}
-			}
-		}
-		return tours;
 	}
 	
 }

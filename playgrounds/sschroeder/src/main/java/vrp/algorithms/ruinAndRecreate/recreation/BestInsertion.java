@@ -31,9 +31,9 @@ import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
-import vrp.api.VRP;
-import vrp.basics.InitialSolutionFactory;
+import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
+import vrp.basics.SingleDepotInitialSolutionFactory;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 
@@ -50,11 +50,11 @@ public class BestInsertion implements RecreationStrategy{
 
 	private Logger logger = Logger.getLogger(BestInsertion.class);
 	
-	private VRP vrp;
+	private SingleDepotVRP vrp;
 	
 	private TourAgentFactory tourAgentFactory;
 	
-	private InitialSolutionFactory initialSolutionFactory;
+	private SingleDepotInitialSolutionFactory initialSolutionFactory;
 	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
@@ -68,12 +68,12 @@ public class BestInsertion implements RecreationStrategy{
 		return recreationListeners;
 	}
 
-	public BestInsertion(VRP vrp) {
+	public BestInsertion(SingleDepotVRP vrp) {
 		super();
 		this.vrp = vrp;
 	}
 	
-	public void setInitialSolutionFactory(InitialSolutionFactory initialSolutionFactory) {
+	public void setInitialSolutionFactory(SingleDepotInitialSolutionFactory initialSolutionFactory) {
 		this.initialSolutionFactory = initialSolutionFactory;
 	}
 

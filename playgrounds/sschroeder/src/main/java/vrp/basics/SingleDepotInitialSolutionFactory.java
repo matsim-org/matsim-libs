@@ -20,15 +20,15 @@ package vrp.basics;
 import java.util.Collection;
 
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 
 
-public interface InitialSolutionFactory {
+public interface SingleDepotInitialSolutionFactory {
 	
-	public Collection<Tour> createInitialSolution(VRP vrp);
+	public Collection<Tour> createInitialSolution(SingleDepotVRP vrp);
 	
-	public Tour createRoundTour(VRP vrp, Customer from, Customer to);
+	public Tour createRoundTour(SingleDepotVRP vrp, Customer from, Customer to);
 
-	public Vehicle createVehicle(VRP vrp, Tour tour);
+	public Vehicle createVehicle(SingleDepotVRP vrp, Tour tour);
 
 }

@@ -18,24 +18,20 @@
 package vrp.basics;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 
+public class SingleDepotVRPImpl implements SingleDepotVRP{
 
-/**
- * 
- * @author stefan schroeder
- *
- */
-
-public class VrpImpl implements VRP{
-	
-	private String depotId;
+	private static Logger logger = Logger.getLogger(SingleDepotVRPImpl.class);
 	
 	private Costs costs;
 	
@@ -43,15 +39,22 @@ public class VrpImpl implements VRP{
 	
 	private Map<String,Customer> customers;
 	
-	private Map<String,Customer> depots;
+	private String depot;
 	
-	public VrpImpl(String depotId, Collection<Customer> customers, Costs costs, Constraints constraints){
-		this.depotId = depotId;
+	private VehicleType vehicleType;
+	
+	public SingleDepotVRPImpl(String depot, VehicleType vehicleType, Collection<Customer> customers, Costs costs, Constraints constraints) {
+		super();
 		this.costs = costs;
 		this.constraints = constraints;
 		mapCustomers(customers);
-		depots = new HashMap<String, Customer>();
-		depots.put(depotId, getDepot());
+		this.vehicleType = vehicleType;
+		this.depot = depot;
+	}
+	
+	@Override
+	public VehicleType getVehicleType(){
+		return vehicleType;
 	}
 	
 	private void mapCustomers(Collection<Customer> customers) {
@@ -73,23 +76,11 @@ public class VrpImpl implements VRP{
 
 	@Override
 	public Customer getDepot() {
-		return customers.get(depotId);
+		return customers.get(depot);
 	}
 
 	@Override
 	public Map<String, Customer> getCustomers() {
-		return customers;
+		return Collections.unmodifiableMap(customers);
 	}
-
-	@Override
-	public Map<String, Customer> getDepots() {
-		return depots;
-	}
-
-	@Override
-	public VehicleType getVehicleType(String depotId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

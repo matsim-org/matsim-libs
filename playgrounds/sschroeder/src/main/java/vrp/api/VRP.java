@@ -23,8 +23,6 @@ package vrp.api;
 
 import java.util.Map;
 
-import vrp.basics.VehicleType;
-
 /**
  * @author stefan schroeder
  *
@@ -35,11 +33,11 @@ public interface VRP {
 	
 	public Costs getCosts();
 	
-	public Customer getDepot();
+//	public Customer getDepot();
 	
 	public Map<String, Customer> getCustomers(); //inclusive depots
 	
-	public Map<String, Customer> getDepots();
+//	public Map<String, Customer> getDepots();
 
-	public VehicleType getVehicleType(String depotId);
+//	public VehicleType getVehicleType(String depotId);
 }

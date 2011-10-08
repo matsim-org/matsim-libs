@@ -45,32 +45,7 @@ public class TWCapacityAndBackhaulConstraint implements Constraints {
 		this.maxCap = maxCap;
 	}
 
-	@Override
-	public boolean judge(Tour tour) {
-		int currentCap = 0;
-		boolean pickupOccured = false;
-		for(TourActivity tourAct : tour.getActivities()){
-			if(tourAct.getCurrentLoad() > maxCap || tourAct.getCurrentLoad() < 0){
-				logger.debug("capacity-conflict (maxCap=" + maxCap + ";currentCap=" + currentCap + " on tour " + tour);
-				return false;
-			}
-			if(tourAct.hasTimeWindowConflict()){
-				logger.debug("timeWindow-conflic on tour " + tour);
-				return false;
-			}
-			if(tourAct instanceof PickupToDepot){
-				pickupOccured = true;
-			}
-			if(tourAct instanceof DeliveryFromDepot){
-				if(pickupOccured){
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	@Override
+		@Override
 	public boolean judge(Tour tour, Vehicle vehicle) {
 		int currentCap = 0;
 		maxCap = vehicle.getCapacity();

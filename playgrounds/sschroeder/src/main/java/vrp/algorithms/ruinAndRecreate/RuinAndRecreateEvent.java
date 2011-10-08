@@ -17,6 +17,10 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate;
 
+import java.util.Collection;
+
+import vrp.basics.Tour;
+
 /**
  * Collector of algo-information. Can be listened to.
  * 
@@ -35,6 +39,8 @@ public class RuinAndRecreateEvent {
 	private double threshold;
 	
 	private boolean solutionAccepted;
+	
+	private Collection<Tour> currentSolution;
 
 	public RuinAndRecreateEvent(int currentMutation, double tentativeSolution,
 			double currentResult, double currentThreshold, boolean solutionAccepted) {
@@ -44,6 +50,14 @@ public class RuinAndRecreateEvent {
 		this.threshold = currentThreshold;
 		this.solutionAccepted = solutionAccepted;
 		this.currentResult = currentResult;
+	}
+
+	public Collection<Tour> getCurrentSolution() {
+		return currentSolution;
+	}
+
+	public void setCurrentSolution(Collection<Tour> currentSolution) {
+		this.currentSolution = currentSolution;
 	}
 
 	public double getCurrentResult() {

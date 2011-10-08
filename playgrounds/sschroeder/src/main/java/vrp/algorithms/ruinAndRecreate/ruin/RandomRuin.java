@@ -29,7 +29,7 @@ import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.VrpUtils;
 
@@ -46,7 +46,7 @@ public class RandomRuin implements RuinStrategy {
 	
 	private Logger logger = Logger.getLogger(RadialRuin.class);
 
-	private VRP vrp;
+	private SingleDepotVRP vrp;
 
 	private double fractionOfAllNodes2beRuined;
 	
@@ -60,7 +60,7 @@ public class RandomRuin implements RuinStrategy {
 		this.random = random;
 	}
 
-	public RandomRuin(VRP vrp) {
+	public RandomRuin(SingleDepotVRP vrp) {
 		super();
 		this.vrp = vrp;
 		logger.info("initialise random ruin");
@@ -78,7 +78,7 @@ public class RandomRuin implements RuinStrategy {
 	}
 
 	private boolean isDepot(Customer c) {
-		if(vrp.getDepots().containsKey(c.getId())){
+		if(vrp.getDepot().getId().equals(c.getId())){
 			return true;
 		}
 		return false;

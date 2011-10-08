@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 import vrp.basics.OtherDepotActivity;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
@@ -97,13 +97,13 @@ public class ClarkeAndWright {
 
 	private final static Logger logger = Logger.getLogger(vrp.algorithms.clarkeAndWright.ClarkeAndWright.class);
 	private final static String TYPE = "Clarke&Wright"; 
-	private final VRP vrp;
+	private final SingleDepotVRP vrp;
 	private PriorityQueue<Saving> savings;
 	private List<Tour> tours = new ArrayList<Tour>();
 	private HashMap<String,Tour> tourAssignment = new HashMap<String, Tour>();
 	
 	
-	public ClarkeAndWright(final VRP vrp){
+	public ClarkeAndWright(final SingleDepotVRP vrp){
 		this.vrp = vrp;
 		int iniDimension = vrp.getCustomers().values().size();
 		int initialCapacity = iniDimension*iniDimension;			
@@ -168,7 +168,7 @@ public class ClarkeAndWright {
 				Customer customer_i = vrp.getCustomers().get(from);
 				Customer customer_j = vrp.getCustomers().get(to);
 				Tour tour = VrpUtils.createRoundTour(depot, customer_i, customer_j);
-				if(vrp.getConstraints().judge(tour)){
+				if(vrp.getConstraints().judge(tour,null)){
 					tours.add(tour);
 					updateTourAssignment(tour);
 				}
@@ -189,7 +189,7 @@ public class ClarkeAndWright {
 						continue;
 					}
 					else{
-						if(vrp.getConstraints().judge(tour)){
+						if(vrp.getConstraints().judge(tour,null)){
 							tours.remove(tour1);
 							tours.remove(tour2);
 							tours.add(tour);
@@ -207,7 +207,7 @@ public class ClarkeAndWright {
 						newTour.getActivities().addAll(tour.getActivities());
 						TourActivity newActivity = VrpUtils.createTourActivity(vrp.getCustomers().get(to));
 						newTour.getActivities().add(newTour.getActivities().size()-1,newActivity);
-						if(vrp.getConstraints().judge(newTour)){
+						if(vrp.getConstraints().judge(newTour,null)){
 							tours.remove(tour);
 							tours.add(newTour);
 							updateTourAssignment(newTour);
@@ -221,7 +221,7 @@ public class ClarkeAndWright {
 						newTour.getActivities().addAll(tour.getActivities());
 						TourActivity newActivity = VrpUtils.createTourActivity(vrp.getCustomers().get(from));
 						newTour.getActivities().add(1,newActivity);
-						if(vrp.getConstraints().judge(newTour)){
+						if(vrp.getConstraints().judge(newTour,null)){
 							tours.remove(tour);
 							tours.add(newTour);
 							updateTourAssignment(newTour);
@@ -309,7 +309,7 @@ public class ClarkeAndWright {
 
 	private void createAndAddShuttleTour(Customer customer) {
 		Tour tour = VrpUtils.createRoundTour(vrp.getDepot(), customer);
-		if(vrp.getConstraints().judge(tour)){
+		if(vrp.getConstraints().judge(tour,null)){
 			tours.add(tour);
 			updateTourAssignment(tour);
 		}

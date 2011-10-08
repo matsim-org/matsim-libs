@@ -33,4 +33,14 @@ public class NodeFactory {
 		node.setMatrixId(matrixId);
 		return node;
 	}
+	
+	public Node createNode(String id, Coordinate coord){
+		Node node = new NodeImpl(id);
+		node.setCoord(coord);
+		return node;
+	}
+	
+	public Node createNode(String id){
+		return new NodeImpl(id);
+	}
 }
