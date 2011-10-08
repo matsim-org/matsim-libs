@@ -5,20 +5,15 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 
 import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import vrp.algorithms.clarkeAndWright.ClarkeAndWright;
-import vrp.algorithms.clarkeAndWright.ClarkeWrightCapacityConstraint;
-import vrp.api.VRP;
 import vrp.basics.Tour;
 
 public class ClarkeAndWrightSolver implements VRPSolver {
 
 	private Collection<Tour> tours;
-	private VRPTransformation vrpTransformation;
+	private MatSim2VRPTransformation vrpTransformation;
 		
 	public ClarkeAndWrightSolver(Collection<Tour> tours,
-			VRPTransformation vrpTransformation) {
+			MatSim2VRPTransformation vrpTransformation) {
 		super();
 		this.tours = tours;
 		this.vrpTransformation = vrpTransformation;

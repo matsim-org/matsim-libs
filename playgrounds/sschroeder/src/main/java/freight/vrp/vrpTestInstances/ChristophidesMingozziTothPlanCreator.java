@@ -18,10 +18,15 @@ import playground.mzilske.freight.carrier.CarrierPlanWriter;
 import playground.mzilske.freight.carrier.CarrierShipment;
 import playground.mzilske.freight.carrier.CarrierVehicle;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
+import vrp.algorithms.ruinAndRecreate.factories.StandardRuinAndRecreateFactory;
+import vrp.api.Constraints;
 import vrp.basics.CrowFlyDistance;
-import vrp.basics.InitialSolutionFactoryImpl;
+import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.Tour;
+import vrp.basics.Vehicle;
 import city2000w.VRPCarrierPlanBuilder;
-import freight.vrp.RRSingleDepotDeliverySolver;
+import freight.vrp.ChartListener;
+import freight.vrp.RRSingleDepotVRPSolver;
 import freight.vrp.VRPSolver;
 import freight.vrp.VRPSolverFactory;
 
@@ -31,12 +36,17 @@ public class ChristophidesMingozziTothPlanCreator {
 
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network) {
-			RRSingleDepotDeliverySolver solver = new RRSingleDepotDeliverySolver(shipments, carrierVehicles, network);
+			RRSingleDepotVRPSolver solver = new RRSingleDepotVRPSolver(shipments, carrierVehicles, network);
 			CrowFlyDistance costs = new CrowFlyDistance();
 			costs.speed = 1;
+			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
+			ChartListener chartListener = new ChartListener();
+			chartListener.setFilename("vrp/vrp.png");
+			ruinAndRecreateFactory.addRuinAndRecreateListener(chartListener);
+			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
-			solver.setConstraints(new CapacityConstraint(carrierVehicles.iterator().next().getCapacity()));
-			solver.setIniSolutionFactory(new InitialSolutionFactoryImpl());
+			solver.setConstraints(new CapacityConstraint());
+			solver.setIniSolutionFactory(new SingleDepotSolutionFactoryImpl());
 			solver.setnOfWarmupIterations(20);
 			solver.setnOfIterations(500);
 			return solver;

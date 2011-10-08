@@ -13,10 +13,10 @@ import playground.mzilske.freight.carrier.CarrierVehicle;
 import playground.mzilske.freight.carrier.ScheduledTour;
 import playground.mzilske.freight.carrier.Shipment;
 import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.TourBuilder;
 import playground.mzilske.freight.carrier.Tour.Delivery;
 import playground.mzilske.freight.carrier.Tour.Pickup;
 import playground.mzilske.freight.carrier.Tour.TourElement;
+import playground.mzilske.freight.carrier.TourBuilder;
 
 public class TourSchedulerImpl implements TourScheduler{
 	

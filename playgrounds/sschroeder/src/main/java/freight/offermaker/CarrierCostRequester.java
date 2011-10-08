@@ -16,8 +16,8 @@ import playground.mzilske.freight.TSPPlanBuilder;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportChain.ChainTriple;
-import playground.mzilske.freight.carrier.CarrierOffer;
 import playground.mzilske.freight.TransportServiceProvider;
+import playground.mzilske.freight.carrier.CarrierOffer;
 import freight.TSPUtils;
 
 public class CarrierCostRequester implements TSPOfferMaker{

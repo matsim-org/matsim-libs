@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-
 import org.xml.sax.Attributes;
 
 import playground.mzilske.freight.TSPOffer;

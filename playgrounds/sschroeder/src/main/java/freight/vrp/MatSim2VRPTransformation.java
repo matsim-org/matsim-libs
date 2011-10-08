@@ -23,7 +23,7 @@ import vrp.basics.VrpUtils;
  *
  */
 
-public class VRPTransformation {
+public class MatSim2VRPTransformation {
 	
 	private HashMap<CarrierShipment,Id> fromCustomers = new HashMap<CarrierShipment,Id>();
 	
@@ -39,16 +39,22 @@ public class VRPTransformation {
 
 	private Locations locations;
 	
-	public VRPTransformation(Locations locations) {
+	/**
+	 * Locations contains all required customer locations, which basically are the coordinates of customer locations.
+	 * It was determined that customers live
+	 * @param locations
+	 */
+	
+	public MatSim2VRPTransformation(Locations locations) {
 		super();
 		this.locations = locations;
 	}
 	
-	public void addAndCreateCustomer(String customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
+	void addAndCreateCustomer(String customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
 		addAndCreateCustomer(makeId(customerId), linkId, demand, startTime, endTime, serviceTime);
 	}
 	
-	public void addAndCreateCustomer(Id customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
+	void addAndCreateCustomer(Id customerId, Id linkId, int demand, double startTime, double endTime, double serviceTime){
 		Id nodeId = linkId;
 		Node node = makeNode(nodeId);
 		Customer customer = VrpUtils.createCustomer(customerId.toString(), node, demand, startTime, endTime, serviceTime);
@@ -56,7 +62,7 @@ public class VRPTransformation {
 		customers.put(customerId, customer);
 	}
 
-	public void addPickupAndDeliveryOf(CarrierShipment shipment){
+	void addEnRoutePickupAndDeliveryShipment(CarrierShipment shipment){
 		Customer fromCustomer = makeFromCustomer(shipment);
 		Customer toCustomer = makeToCustomer(shipment);
 		fromCustomer.setRelation(VrpUtils.createRelation(toCustomer));
@@ -64,21 +70,21 @@ public class VRPTransformation {
 		updateMaps(shipment, fromCustomer, toCustomer);
 	}
 	
-	public void addDeliveryOf(CarrierShipment shipment){
+	void addDeliveryFromDepotShipment(CarrierShipment shipment){
 		Customer toCustomer = makeToCustomer(shipment);
 		customers.put(makeId(toCustomer.getId()),toCustomer);
 		toCustomers.put(shipment, makeId(toCustomer.getId()));
 		shipments.put(makeId(toCustomer.getId()), shipment);	
 	}
 	
-	public void addPickupOf(CarrierShipment shipment){
+	void addPickupForDepotShipment(CarrierShipment shipment){
 		Customer fromCustomer = makeFromCustomer(shipment);
 		customers.put(makeId(fromCustomer.getId()),fromCustomer);
 		fromCustomers.put(shipment, makeId(fromCustomer.getId()));
 		shipments.put(makeId(fromCustomer.getId()), shipment);
 	}
 	
-	public void removeShipment(Shipment shipment){
+	void removeShipment(Shipment shipment){
 		Id fromCustomerId = fromCustomers.get(shipment);
 		Id toCustomerId = toCustomers.get(shipment);
 		shipments.remove(toCustomerId);
@@ -111,7 +117,7 @@ public class VRPTransformation {
 		return customers.get(customerId);
 	}
 
-	public void clear(){
+	void clear(){
 		fromCustomers.clear();
 		toCustomers.clear();
 		shipments.clear();
@@ -128,7 +134,7 @@ public class VRPTransformation {
 		shipments.put(makeId(toCustomer.getId()), shipment);
 	}
 
-	public String createCustomerId(){
+	String createCustomerId(){
 		customerCounter++;
 		return customerCounter.toString();
 	}
@@ -148,7 +154,9 @@ public class VRPTransformation {
 		}
 		else{
 			node = VrpUtils.createNode(id.toString());
-			node.setCoord(makeCoordinate(locations.getCoord(id)));
+			if(locations.getCoord(id) != null){
+				node.setCoord(makeCoordinate(locations.getCoord(id)));
+			}
 			nodes.put(makeId(node.getId()), node);
 		}
 		return node;
@@ -164,15 +172,7 @@ public class VRPTransformation {
 
 	private Customer makeFromCustomer(Shipment shipment) {
 		Id id = shipment.getFrom();
-		Node node = null;
-		if(nodes.containsKey(id)){
-			node = nodes.get(id);
-		}
-		else{
-			node = VrpUtils.createNode(id.toString());
-			node.setCoord(makeCoordinate(locations.getCoord(id)));
-			nodes.put(makeId(node.getId()), node);
-		}
+		Node node = makeNode(id);
 		Customer customer = VrpUtils.createCustomer(createCustomerId(), node, shipment.getSize(), 
 				shipment.getPickupTimeWindow().getStart(), shipment.getPickupTimeWindow().getEnd(), 0.0);	
 		return customer;

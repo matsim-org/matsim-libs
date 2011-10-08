@@ -31,7 +31,7 @@ import vrp.basics.CrowFlyDistance;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
 import freight.vrp.Locations;
-import freight.vrp.VRPTransformation;
+import freight.vrp.MatSim2VRPTransformation;
 
 public class MarginalCostOM implements OfferMaker{
 	
@@ -49,7 +49,7 @@ public class MarginalCostOM implements OfferMaker{
 			Costs costs = new CrowFlyDistance();
 			updater = new TourActivityStatusUpdaterImpl(costs);
 			tourBuilder = new BestTourBuilder();
-			tourBuilder.setConstraints(new TWAndCapacityConstraint(vehicleCapacity));
+			tourBuilder.setConstraints(new TWAndCapacityConstraint());
 			tourBuilder.setCosts(costs);
 			tourBuilder.setTourActivityStatusUpdater(updater);
 		}
@@ -101,7 +101,7 @@ public class MarginalCostOM implements OfferMaker{
 	
 	private Collection<ServiceProviderImpl> afternoonService;
 	
-	private VRPTransformation vrpTransformation;
+	private MatSim2VRPTransformation vrpTransformation;
 	
 	private VRP vrp = null;
 	
@@ -124,7 +124,7 @@ public class MarginalCostOM implements OfferMaker{
 		}
 		for(CarrierContract c : carrier.getContracts()){
 			CarrierShipment s = c.getShipment();
-			vrpTransformation.addPickupAndDeliveryOf(s);
+//			vrpTransformation.addEnRoutePickupAndDeliveryShipment(s);
 		}
 		for(ScheduledTour t : carrier.getSelectedPlan().getScheduledTours()){
 			vrp.basics.Tour tour = makeTour(t.getTour(),vrpTransformation);
@@ -163,7 +163,7 @@ public class MarginalCostOM implements OfferMaker{
 			return offer;
 		}
 		CarrierShipment requestedShipment = CarrierUtils.createShipment(from, to, size, startPickup, endPickup, startDelivery, endDelivery);
-		vrpTransformation.addPickupAndDeliveryOf(requestedShipment);
+//		vrpTransformation.addEnRoutePickupAndDeliveryShipment(requestedShipment);
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;
 		vrp.algorithms.ruinAndRecreate.basics.Shipment shipment = VrpUtils.createShipment(vrpTransformation.getFromCustomer(requestedShipment), vrpTransformation.getToCustomer(requestedShipment));
@@ -241,7 +241,7 @@ public class MarginalCostOM implements OfferMaker{
 		return false;
 	}
 
-	private Tour makeTour(playground.mzilske.freight.carrier.Tour tour, VRPTransformation vrpTrafo) {
+	private Tour makeTour(playground.mzilske.freight.carrier.Tour tour, MatSim2VRPTransformation vrpTrafo) {
 		Tour vrpTour = new Tour();
 		Customer depotCustomer = vrpTrafo.getCustomer(makeId("depot"));
 		vrpTour.getActivities().add(VrpUtils.createTourActivity(depotCustomer));
@@ -265,14 +265,14 @@ public class MarginalCostOM implements OfferMaker{
 
 	@Override
 	public void init() {
-		vrpTransformation = new VRPTransformation(this.locations);
-		vrpTransformation.addAndCreateCustomer("depot", carrierVehicle.getLocation(), 0, 0.0, 24*3600, 0.0);
+		vrpTransformation = new MatSim2VRPTransformation(this.locations);
+//		vrpTransformation.addAndCreateCustomer("depot", carrierVehicle.getLocation(), 0, 0.0, 24*3600, 0.0);
 		createServiceProvidersFromExistingPlan();
 	}
 
 	@Override
 	public void reset() {
-		vrpTransformation.clear();
+//		vrpTransformation.clear();
 		serviceProviders.clear();
 	}
 

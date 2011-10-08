@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -27,14 +26,7 @@ import playground.mzilske.freight.carrier.CarrierAgent;
 import playground.mzilske.freight.carrier.CarrierAgentImpl;
 import playground.mzilske.freight.carrier.CarrierAgentTracker;
 import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
-import playground.mzilske.freight.carrier.CarrierPlan;
 import playground.mzilske.freight.carrier.CarrierPlanReader;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
-import vrp.basics.CrowFlyDistance;
-import vrp.basics.InitialSolutionFactoryImpl;
-import city2000w.VRPCarrierPlanBuilder;
 
 
 public class RunVrpMobSim implements StartupListener, BeforeMobsimListener, ScoringListener{

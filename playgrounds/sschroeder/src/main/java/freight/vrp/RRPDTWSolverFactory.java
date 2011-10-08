@@ -7,15 +7,17 @@ import org.matsim.api.core.v01.network.Network;
 import playground.mzilske.freight.carrier.CarrierShipment;
 import playground.mzilske.freight.carrier.CarrierVehicle;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
+import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateWithTimeWindowsFactory;
 import vrp.basics.CrowFlyDistance;
-import vrp.basics.InitialSolutionFactoryImpl;
+import vrp.basics.SingleDepotSolutionFactoryImpl;
 
 public class RRPDTWSolverFactory implements VRPSolverFactory{
 
 	@Override
 	public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network) {
-		RRPDTWSolver rrSolver = new RRPDTWSolver(shipments, carrierVehicles, network);
-		rrSolver.setIniSolutionFactory(new InitialSolutionFactoryImpl());
+		RRSingleDepotVRPSolver rrSolver = new RRSingleDepotVRPSolver(shipments, carrierVehicles, network);
+		rrSolver.setRuinAndRecreateFactory(new RuinAndRecreateWithTimeWindowsFactory());
+		rrSolver.setIniSolutionFactory(new SingleDepotSolutionFactoryImpl());
 		rrSolver.setnOfWarmupIterations(4);
 		rrSolver.setnOfIterations(16);
 		CrowFlyDistance crowFlyDistance = new CrowFlyDistance();
