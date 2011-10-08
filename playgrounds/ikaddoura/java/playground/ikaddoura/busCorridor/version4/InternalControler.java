@@ -77,12 +77,16 @@ public class InternalControler {
 		controler.setOverwriteFiles(true);
 		controler.addControlerListener(new MyControlerListener());
 		
-		PlansConfigGroup plans = controler.getConfig().plans();
-		plans.setInputFile(population);
-		
 		TransitConfigGroup transit = controler.getConfig().transit();
 		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
+		
+		PlansConfigGroup plans = controler.getConfig().plans();
+		plans.setInputFile(population);
+		
+//		TransitConfigGroup transit = controler.getConfig().transit();
+//		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
+//		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);

@@ -39,10 +39,10 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population_1agent.xml"; // Startwert
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4/";
-	static int numberOfExternalIterations = 4;
+	static int numberOfExternalIterations = 3;
 	static int lastInternalIteration = 0;
 	
-	private int numberOfBuses = 7; // Startwert!
+	private int numberOfBuses = 1; // Startwert! 
 	private int extItNr;
 	private String directoryExtIt;
 	
@@ -52,7 +52,6 @@ public class ExternalControler {
 	private Map<Integer, Integer> iteration2numberOfCarLegs = new HashMap<Integer, Integer>();
 	private Map<Integer, Integer> iteration2numberOfPtLegs = new HashMap<Integer, Integer>();
 	private Map<Integer, Integer> iteration2numberOfWalkLegs = new HashMap<Integer, Integer>();
-
 
 	public static void main(final String[] args) throws IOException {
 		ExternalControler simulation = new ExternalControler();
