@@ -13,10 +13,7 @@ import playground.mzilske.freight.carrier.Carrier;
 import playground.mzilske.freight.carrier.CarrierAgent;
 import playground.mzilske.freight.carrier.CarrierAgentImpl;
 import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierDriverAgent;
 import playground.mzilske.freight.carrier.CarrierDriverAgentFactory;
-import playground.mzilske.freight.carrier.CarrierOffer;
 
 public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 

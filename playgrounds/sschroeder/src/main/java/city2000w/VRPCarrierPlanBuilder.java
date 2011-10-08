@@ -12,7 +12,6 @@ import playground.mzilske.freight.carrier.CarrierCapabilities;
 import playground.mzilske.freight.carrier.CarrierContract;
 import playground.mzilske.freight.carrier.CarrierPlan;
 import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
 import playground.mzilske.freight.carrier.CarrierVehicle;
 import playground.mzilske.freight.carrier.ScheduledTour;
 import playground.mzilske.freight.carrier.Tour;

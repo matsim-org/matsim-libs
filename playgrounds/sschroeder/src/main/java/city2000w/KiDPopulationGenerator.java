@@ -9,13 +9,11 @@ import java.util.List;
 
 import kid.KiDDataReader;
 import kid.KiDPlanAgentCreator;
-import kid.KiDStatWriter;
 import kid.KiDUtils;
 import kid.ScheduledVehicles;
-import kid.filter.And;
 import kid.filter.AllActivitiesInSelectedRegionsFilter;
+import kid.filter.And;
 import kid.filter.LogicVehicleFilter;
-import kid.filter.StuttgartRegionFilter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

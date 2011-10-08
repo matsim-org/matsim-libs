@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kid.GeotoolsTransformation;
-import kid.KiDUtils;
 import kid.filter.RegionFilter;
 import kid.filter.SimpleFeatureFilter;
 

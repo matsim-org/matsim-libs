@@ -11,8 +11,8 @@ public class MVIVisualizer {
 		
 //		OTFVis.playNetwork(network);
 
-//		String[] arguments = { "-convert",events, network, mvi, "60" };
-//		OTFVis.convert(arguments);
+		String[] arguments = { "-convert",events, network, mvi, "60" };
+		OTFVis.convert(arguments);
 
 		
 		OTFVis.playMVI(mvi);
