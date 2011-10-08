@@ -37,9 +37,9 @@ public class ExternalControler {
 	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/network_busline.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml"; // Startwert
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population_1agent.xml"; // Startwert
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4/";
-	static int numberOfExternalIterations = 10;
+	static int numberOfExternalIterations = 4;
 	static int lastInternalIteration = 0;
 	
 	private int numberOfBuses = 7; // Startwert!
@@ -49,6 +49,10 @@ public class ExternalControler {
 	private Map<Integer, Double> iteration2providerScore = new HashMap<Integer, Double>();
 	private Map<Integer, Integer> iteration2numberOfBuses = new HashMap<Integer, Integer>();
 	private Map<Integer, Double> iteration2userScore = new HashMap<Integer,Double>();
+	private Map<Integer, Integer> iteration2numberOfCarLegs = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> iteration2numberOfPtLegs = new HashMap<Integer, Integer>();
+	private Map<Integer, Integer> iteration2numberOfWalkLegs = new HashMap<Integer, Integer>();
+
 
 	public static void main(final String[] args) throws IOException {
 		ExternalControler simulation = new ExternalControler();
@@ -75,16 +79,20 @@ public class ExternalControler {
 			
 			Users users = new Users();
 			users.analyzeScores(this.getDirectoryExtIt());
+			users.analyzeLegModes(this.getDirectoryExtIt(), lastInternalIteration);
 
 			this.iteration2providerScore.put(this.getExtItNr(), provider.getScore());
 			this.iteration2numberOfBuses.put(this.getExtItNr(), this.getNumberOfBuses());
 			this.iteration2userScore.put(this.getExtItNr(), users.getAvgExecScore());
+			this.iteration2numberOfCarLegs.put(this.getExtItNr(), users.getNumberOfCarLegs());
+			this.iteration2numberOfPtLegs.put(this.getExtItNr(), users.getNumberOfPtLegs());
+			this.iteration2numberOfWalkLegs.put(this.getExtItNr(), users.getNumberOfWalkLegs());
 			
 			this.setNumberOfBuses(provider.strategy(this.iteration2numberOfBuses, this.iteration2providerScore)); // für die nächste externe Iteration!
 		}
 
 		TextFileWriter stats = new TextFileWriter();
-		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2providerScore, this.iteration2userScore);
+		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2providerScore, this.iteration2userScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 	}
 
 	/**

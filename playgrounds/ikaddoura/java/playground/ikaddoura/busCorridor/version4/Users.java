@@ -29,7 +29,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -39,6 +42,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
  */
 public class Users {
 	private double avgExecScore;
+	private int numberOfPtLegs;
+	private int numberOfCarLegs;
+	private int numberOfWalkLegs;
 	
 	public void analyzeScores(String directoryExtIt) {
 		List<Double> scores = new ArrayList<Double>();
@@ -61,19 +67,41 @@ public class Users {
 		
 		this.setAvgExecScore(scoreSum/scores.size());
 	}
-
-	/**
-	 * @param avgExecScore the avgExecScore to set
-	 */
+	 
 	public void setAvgExecScore(double avgExecScore) {
 		this.avgExecScore = avgExecScore;
 	}
 
-	/**
-	 * @return the avgExecScore
-	 */
 	public double getAvgExecScore() {
 		return avgExecScore;
 	}
 
+	public int getNumberOfPtLegs() {
+		return numberOfPtLegs;
+	}
+
+	public int getNumberOfCarLegs() {
+		return numberOfCarLegs;
+	}
+	
+	public int getNumberOfWalkLegs() {
+		return numberOfWalkLegs;
+	}
+
+	public void analyzeLegModes(String directoryExtIt, int lastInternalIteration) {
+		String lastEventFile = directoryExtIt+"/internalIterations/ITERS/it."+lastInternalIteration+"/"+lastInternalIteration+".events.xml.gz";
+		
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		DepartureEventHandler departureHandler = new DepartureEventHandler();
+		
+		events.addHandler(departureHandler);	
+		
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(lastEventFile);
+		
+		this.numberOfPtLegs = departureHandler.getNumberOfPtLegs();
+		this.numberOfCarLegs = departureHandler.getNumberOfCarLegs();
+		this.numberOfWalkLegs = departureHandler.getNumberOfWalkLegs();
+		
+	}
 }

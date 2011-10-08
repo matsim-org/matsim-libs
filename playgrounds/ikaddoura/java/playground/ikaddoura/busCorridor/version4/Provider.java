@@ -87,11 +87,11 @@ public class Provider {
 		double vehicleKm = linksHandler.getVehicleKm();
 		double vehicleHours = linksHandler.getVehicleHours();
 		
-		int busCostsPerDay = 100;
+		int busCostsPerDay = 10;
 		double fixCosts = numberOfBuses * busCostsPerDay ;
 		double busCostsPerKm = 1;
 		double varCosts = vehicleKm * busCostsPerKm; // + vehicleHours * busCostsPerHour ;
-		double providerScore = (earnings) - fixCosts - varCosts;
+		double providerScore = (earnings*100) - fixCosts - varCosts;
 		
 		this.setScore(providerScore);
 		log.info("ProviderScore calculated.");
