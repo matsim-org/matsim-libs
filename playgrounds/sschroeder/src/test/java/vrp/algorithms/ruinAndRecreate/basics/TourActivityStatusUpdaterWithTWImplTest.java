@@ -35,7 +35,7 @@ public class TourActivityStatusUpdaterWithTWImplTest extends VRPTestCase{
 	
 	@Override
 	public void setUp(){
-		init();
+		initCustomersInPlainCoordinateSystem();
 		Customer depot = getDepot();
 		Customer cust1 = customerMap.get(makeId(0,10));
 		Customer cust2 = customerMap.get(makeId(10,0));

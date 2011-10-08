@@ -18,19 +18,21 @@
 package vrp.algorithms.ruinAndRecreate.ruin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import vrp.VRPTestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
+import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.TourActivity;
 
 public class RandomRuinTest extends VRPTestCase{
 
-	VRP vrp;
+	SingleDepotVRP vrp;
 	
 	Solution solution;
 	
@@ -38,8 +40,8 @@ public class RandomRuinTest extends VRPTestCase{
 	
 	@Override
 	public void setUp(){
-		init();
-		vrp = getVRP();
+		initCustomersInPlainCoordinateSystem();
+		vrp = getVRP(2);
 		solution = getInitialSolution(vrp);
 		randomRuin = new RandomRuin(vrp);
 		randomRuin.setFractionOfAllNodes2beRuined(0.5);
@@ -67,6 +69,22 @@ public class RandomRuinTest extends VRPTestCase{
 		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent.getTourActivities());
 		assertEquals(3, tourAgent.getTourActivities().size());
 		assertEquals(customerMap.get(makeId(10,10)),acts.get(1).getCustomer());
+	}
+	
+	public void testCustomerWithoutService(){
+		randomRuin.run(solution);
+		assertEquals(2,randomRuin.getShipmentsWithoutService().size());
+	}
+	
+	public void testShipmentsWithoutService(){
+		randomRuin.run(solution);
+		Shipment s1 = randomRuin.getShipmentsWithoutService().get(0);
+		Shipment s2 = randomRuin.getShipmentsWithoutService().get(1);
+		assertEquals(vrp.getDepot(),s1.getTo());
+		assertEquals(customerMap.get(makeId(0, 10)),s1.getFrom());
+		
+		assertEquals(customerMap.get(makeId(1, 4)),s2.getTo());
+		assertEquals(customerMap.get(makeId(1, 5)),s2.getFrom());
 	}
 	
 	public void testRuinedSolutionWithoutRelation(){
@@ -103,5 +121,13 @@ public class RandomRuinTest extends VRPTestCase{
 		assertEquals(customerMap.get(makeId(1,4)),acts.get(1).getCustomer());
 	}
 	
-	
+	public void testRandomRuinWithNoCustomer(){
+		try{
+			randomRuin.run(new Solution(Collections.EMPTY_LIST));
+			assertTrue(true);
+		}
+		catch(Exception e){
+			assertTrue(false);
+		}
+	}
 }

@@ -27,18 +27,17 @@ import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
-import vrp.api.VRP;
-import vrp.basics.InitialSolutionFactoryImpl;
+import vrp.api.SingleDepotVRP;
+import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
-import vrp.basics.VRPBuilder;
-import vrp.basics.VRPWithMultipleDepotsAndVehiclesImpl;
 import vrp.basics.VehicleType;
 
 public class BestInsertionTest extends VRPTestCase{
 	BestInsertion bestInsertion;
 	
-	VRP vrp;
+	SingleDepotVRP vrp;
 	
 	Customer depot1;
 	
@@ -58,58 +57,124 @@ public class BestInsertionTest extends VRPTestCase{
 	
 	@Override
 	public void setUp(){
-		init();
-		iniAlgo();
+//		vrp = getVRP(2);
+		
+		initCustomersInPlainCoordinateSystem();
+
+		buildVRP(2);
+		
+		makeSolutionWithoutC1andC2();
+		
+		bestInsertion = new BestInsertion(vrp);
+		bestInsertion.setInitialSolutionFactory(new SingleDepotSolutionFactoryImpl());
+		bestInsertion.setTourAgentFactory(new RRTourAgentFactory(vrp));
+		
+		shipmentWithoutService = new ArrayList<Shipment>();
+		shipmentWithoutService.add(makeShipmentFromC2ToC1());
+	}
+
+
+
+	private void buildVRP(int capacity) {
 		depot1 = customerMap.get(makeId(0,0));
 		depot1.setDemand(0);
-		depot2 = customerMap.get(makeId(10,0));
-		depot2.setDemand(0);
-		VRPBuilder vrpBuilder = new VRPBuilder();
-		vrpBuilder.addCustomer(depot1, true);
-		vrpBuilder.addCustomer(depot2, true);
+		SingleDepotVRPBuilder vrpBuilder = new SingleDepotVRPBuilder();
+		vrpBuilder.addCustomer(depot1);
+		vrpBuilder.setDepot(depot1);
 		
-		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)), false);
-		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)), false);
+		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)));
+		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)));
 		c1 = customerMap.get(makeId(1,4));
-		vrpBuilder.addCustomer(c1, false);
+		vrpBuilder.addCustomer(c1);
 		c2 = customerMap.get(makeId(1,5));
-		vrpBuilder.addCustomer(c2, false);
+		vrpBuilder.addCustomer(c2);
 		setRelation(c1,c2);
+		
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(constraints);
-		vrpBuilder.assignVehicleType(depot1.getId(), new VehicleType(2));
-		vrpBuilder.assignVehicleType(depot2.getId(), new VehicleType(2));
+		vrpBuilder.setVehicleType(new VehicleType(capacity));
 		vrp = vrpBuilder.buildVRP();
-		
-		makeIniSolution();
-		
-		shipmentWithoutService = makeShipment();
 	}
 	
 	
 
-	private List<Shipment> makeShipment() {
-		List<Shipment> shipments = new ArrayList<Shipment>();
-		shipments.add(new Shipment(c2,c1));
-		return shipments;
+	public void testSizeOfNewSolution(){
+		bestInsertion.run(solution, shipmentWithoutService);
+		assertEquals(2, solution.getTourAgents().size());
 	}
+	
+	public void testActivitiesOfFirstTourInSolution(){
+		bestInsertion.run(solution, shipmentWithoutService);
+		assertEquals(3, tourAgent1.getTourSize());
+	}
+	
+	public void testActivitiesOfSecondTourInSolution(){
+		bestInsertion.run(solution, shipmentWithoutService);
+		assertEquals(5, tourAgent2.getTourSize());
+	}
+	
+	public void testCustomerSequenceOfInsertion(){
+		bestInsertion.run(solution, shipmentWithoutService);
+		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent2.getTourActivities());
+		assertEquals(c2,acts.get(1).getCustomer());
+		assertEquals(c1,acts.get(3).getCustomer());
+	}
+	
+	public void testSolutionSizesWhenChangingVehicleType(){
+		vrp = getVRP(1);
+		bestInsertion.run(solution, shipmentWithoutService);
+		assertEquals(2, solution.getTourAgents().size());
+	}
+	
+	public void testCustomerSequenceOfInsertionAfterChangingVehicleType(){
+		buildVRP(1);
+		makeSolutionWithoutC1andC2();
+		shipmentWithoutService = new ArrayList<Shipment>();
+		shipmentWithoutService.add(makeShipmentFromC2ToC1());
+		bestInsertion.run(solution, shipmentWithoutService);
+		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent2.getTourActivities());
+		assertEquals(c2,acts.get(1).getCustomer());
+		assertEquals(c1,acts.get(2).getCustomer());
+	}
+	
+//	public void testSmth(){
+//		c1.setDemand(-2);
+//		c2.setDemand(2);
+//		makeSolutionWithoutC1andC2();
+//		bestInsertion.run(solution, shipmentWithoutService);
+//		assertEquals(2, solution.getTourAgents().size());
+//		assertEquals(3, tourAgent1.getTourSize());
+//		assertEquals(5, tourAgent2.getTourSize());
+//	}
+//	
+//	public void testSequenceOfSolutionWhenChangingVehicleType(){
+//		((VRPWithMultipleDepotsImpl)vrp).assignVehicleType(depot1.getId(), new VehicleType(1));
+//		c1.setDemand(-2);
+//		c2.setDemand(2);
+//		makeSolutionWithoutC1andC2();
+//		bestInsertion.run(solution, shipmentWithoutService);
+//		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent2.getTourActivities());
+//		assertEquals(c2,acts.get(1).getCustomer());
+//		assertEquals(c1,acts.get(2).getCustomer());
+//	}
 
-	private void makeIniSolution() {
+
+
+	private void makeSolutionWithoutC1andC2() {
 		Collection<Customer> tourSequence = new ArrayList<Customer>();
 		tourSequence.add(depot1);
 		tourSequence.add(customerMap.get(makeId(0,10)));
 		tourSequence.add(depot1);
 		Tour tour1 = makeTour(tourSequence);
-		VehicleType type1 = vrp.getVehicleType(depot1.getId());
+		VehicleType type1 = vrp.getVehicleType();
 		tourAgent1 = getTourAgent(vrp, tour1, type1);
 		
 		Collection<Customer> anotherTourSequence = new ArrayList<Customer>();
-		anotherTourSequence.add(depot2);
+		anotherTourSequence.add(depot1);
 		anotherTourSequence.add(customerMap.get(makeId(10,10)));
-		anotherTourSequence.add(depot2);
+		anotherTourSequence.add(depot1);
 		Tour tour2 = makeTour(anotherTourSequence);
-		VehicleType type2 = vrp.getVehicleType(depot2.getId());
-		tourAgent2 = getTourAgent(vrp, tour2,type2);
+		tourAgent2 = getTourAgent(vrp, tour2, type1);
 		
 		Collection<TourAgent> agents = new ArrayList<TourAgent>();
 		agents.add(tourAgent1);
@@ -118,47 +183,9 @@ public class BestInsertionTest extends VRPTestCase{
 	}
 
 
-	private void iniAlgo() {
-		bestInsertion = new BestInsertion(vrp);
-		bestInsertion.setInitialSolutionFactory(new InitialSolutionFactoryImpl());
-		bestInsertion.setTourAgentFactory(new RRTourAgentFactory(vrp));
-		
-	}
 
-	public void testSizeOfNewSolution(){
-		bestInsertion.run(solution, shipmentWithoutService);
-		assertEquals(2, solution.getTourAgents().size());
-		assertEquals(5, tourAgent1.getTourSize());
-		assertEquals(3, tourAgent2.getTourSize());
-	}
-	
-	public void testCustomerSequenceOfInsertion(){
-		bestInsertion.run(solution, shipmentWithoutService);
-		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent1.getTourActivities());
-		assertEquals(c2,acts.get(2).getCustomer());
-		assertEquals(c1,acts.get(3).getCustomer());
-	}
-	
-	public void testSolutionSizesWhenChangingVehicleType(){
-		((VRPWithMultipleDepotsAndVehiclesImpl)vrp).assignVehicleType(depot1.getId(), new VehicleType(1));
-		c1.setDemand(-2);
-		c2.setDemand(2);
-		makeIniSolution();
-		bestInsertion.run(solution, shipmentWithoutService);
-		assertEquals(2, solution.getTourAgents().size());
-		assertEquals(3, tourAgent1.getTourSize());
-		assertEquals(5, tourAgent2.getTourSize());
-	}
-	
-	public void testSequenceOfSolutionWhenChangingVehicleType(){
-		((VRPWithMultipleDepotsAndVehiclesImpl)vrp).assignVehicleType(depot1.getId(), new VehicleType(1));
-		c1.setDemand(-2);
-		c2.setDemand(2);
-		makeIniSolution();
-		bestInsertion.run(solution, shipmentWithoutService);
-		List<TourActivity> acts = new ArrayList<TourActivity>(tourAgent2.getTourActivities());
-		assertEquals(c2,acts.get(1).getCustomer());
-		assertEquals(c1,acts.get(2).getCustomer());
+	private Shipment makeShipmentFromC2ToC1() {
+		return new Shipment(c2,c1);
 	}
 	
 }

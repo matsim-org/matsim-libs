@@ -34,7 +34,7 @@ public class BestTourBuilderTest extends VRPTestCase{
 	
 	@Override
 	public void setUp(){
-		init();
+		initCustomersInPlainCoordinateSystem();
 		tourBuilder = new BestTourBuilder();
 		tourBuilder.setCosts(costs);
 		tourBuilder.setTourActivityStatusUpdater(new TourActivityStatusUpdaterImpl(costs));

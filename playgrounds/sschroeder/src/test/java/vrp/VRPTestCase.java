@@ -32,17 +32,18 @@ import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
+import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
 import vrp.basics.Coordinate;
 import vrp.basics.CustomerImpl;
 import vrp.basics.ManhattanDistance;
-import vrp.basics.InitialSolutionFactoryImpl;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
 import vrp.basics.Relation;
+import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
 import vrp.basics.TourActivityFactory;
-import vrp.basics.VRPBuilder;
 import vrp.basics.VehicleType;
 import vrp.basics.VrpUtils;
 
@@ -82,7 +83,7 @@ public class VRPTestCase extends TestCase{
 	 *   
 	 */
 	
-	protected void init(){
+	protected void initCustomersInPlainCoordinateSystem(){
 		costs = new ManhattanDistance();
 		nodes = new Nodes();
 		customers = new ArrayList<Customer>();
@@ -93,37 +94,34 @@ public class VRPTestCase extends TestCase{
 		
 	}
 	
-	protected VRP getVRP(){
+	protected SingleDepotVRP getVRP(int capacity){
 		if(!init){
-			init();
+			initCustomersInPlainCoordinateSystem();
 			init = true;
 		}
 		Customer depot1 = customerMap.get(makeId(0,0));
 		depot1.setDemand(0);
-		Customer depot2 = customerMap.get(makeId(10,0));
-		depot2.setDemand(0);
-		VRPBuilder vrpBuilder = new VRPBuilder();
-		vrpBuilder.addCustomer(depot1, true);
-		vrpBuilder.addCustomer(depot2, true);
-		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)), false);
-		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)), false);
+		SingleDepotVRPBuilder vrpBuilder = new SingleDepotVRPBuilder();
+		vrpBuilder.addCustomer(depot1);
+		vrpBuilder.setDepot(depot1);
+		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)));
+		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)));
 		Customer c1 = customerMap.get(makeId(1,4));
-		vrpBuilder.addCustomer(c1, false);
+		vrpBuilder.addCustomer(c1);
 		Customer c2 = customerMap.get(makeId(1,5));
-		vrpBuilder.addCustomer(c2, false);
+		vrpBuilder.addCustomer(c2);
 		setRelation(c1,c2);
 		vrpBuilder.setCosts(costs);
 		vrpBuilder.setConstraints(constraints);
-		vrpBuilder.assignVehicleType(depot1.getId(), new VehicleType(2));
-		vrpBuilder.assignVehicleType(depot2.getId(), new VehicleType(2));
+		vrpBuilder.setVehicleType(new VehicleType(capacity));
 		return vrpBuilder.buildVRP();
 	}
 	
-	protected Solution getInitialSolution(VRP vrp){
-		Collection<Tour> tours = new InitialSolutionFactoryImpl().createInitialSolution(vrp);
+	protected Solution getInitialSolution(SingleDepotVRP vrp){
+		Collection<Tour> tours = new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp);
 		Collection<TourAgent> agents = new ArrayList<TourAgent>();
 		for(Tour t : tours){
-			VehicleType type = vrp.getVehicleType(t.getActivities().get(0).getCustomer().getId());
+			VehicleType type = vrp.getVehicleType();
 			TourAgent a = new RRTourAgentFactory(vrp).createTourAgent(t, VrpUtils.createVehicle(type));
 			agents.add(a);
 		}

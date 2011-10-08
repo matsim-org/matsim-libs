@@ -18,19 +18,21 @@
 package vrp.algorithms.ruinAndRecreate.ruin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import vrp.VRPTestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
+import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
-import vrp.api.VRP;
+import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.TourActivity;
 
 public class RadialRuinTest extends VRPTestCase {
 
-	VRP vrp;
+	SingleDepotVRP vrp;
 
 	Solution solution;
 
@@ -38,8 +40,8 @@ public class RadialRuinTest extends VRPTestCase {
 
 	@Override
 	public void setUp() {
-		init();
-		vrp = getVRP();
+		initCustomersInPlainCoordinateSystem();
+		vrp = getVRP(2);
 		solution = getInitialSolution(vrp);
 		radialRuin = new RadialRuin(vrp);
 		radialRuin.setFractionOfAllNodes(0.5);
@@ -65,6 +67,22 @@ public class RadialRuinTest extends VRPTestCase {
 				tourAgent.getTourActivities());
 		assertEquals(3, tourAgent.getTourActivities().size());
 		assertEquals(customerMap.get(makeId(10, 10)), acts.get(1).getCustomer());
+	}
+	
+	public void testCustomerWithoutService(){
+		radialRuin.run(solution);
+		assertEquals(2,radialRuin.getShipmentsWithoutService().size());
+	}
+	
+	public void testShipmentsWithoutService(){
+		radialRuin.run(solution);
+		Shipment s1 = radialRuin.getShipmentsWithoutService().get(0);
+		Shipment s2 = radialRuin.getShipmentsWithoutService().get(1);
+		assertEquals(vrp.getDepot(),s1.getTo());
+		assertEquals(customerMap.get(makeId(0, 10)),s1.getFrom());
+		
+		assertEquals(customerMap.get(makeId(1, 4)),s2.getTo());
+		assertEquals(customerMap.get(makeId(1, 5)),s2.getFrom());
 	}
 
 	public void testRuinedSolutionWithoutRelation() {
@@ -102,6 +120,16 @@ public class RadialRuinTest extends VRPTestCase {
 				tourAgent.getTourActivities());
 		assertEquals(3, tourAgent.getTourActivities().size());
 		assertEquals(customerMap.get(makeId(10, 10)), acts.get(1).getCustomer());
+	}
+	
+	public void testRandomRuinWithNoCustomer(){
+		try{
+			radialRuin.run(new Solution(Collections.EMPTY_LIST));
+			assertTrue(true);
+		}
+		catch(Exception e){
+			assertTrue(false);
+		}
 	}
 
 }
