@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
  */
 public class Provider {
 	
-	private final static Logger log = Logger.getLogger(MyLegScoringFunction.class);
+	private final static Logger log = Logger.getLogger(Provider.class);
 
 	private int extItNr;
 	private int numberOfBuses;
@@ -181,7 +181,7 @@ public class Provider {
 				newNumberOfBuses = numberOfBuses+1;
 			}
 			else {
-				log.warn("Provider score did not change.");
+				log.info("Provider score did not change.");
 				newNumberOfBuses = numberOfBuses;
 			}
 		}
@@ -192,6 +192,12 @@ public class Provider {
 		}
 		
 		log.info("ProviderStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
+		return newNumberOfBuses;
+	}
+	
+	public int increaseNumberOfBuses() {
+		int newNumberOfBuses = numberOfBuses + 1;
+		log.info("NumberOfBuses increased for next external Iteration to "+newNumberOfBuses+".");
 		return newNumberOfBuses;
 	}
 

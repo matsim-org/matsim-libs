@@ -40,7 +40,6 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	private EventsManager events;
 	private double fare;
 	private Population population;
-	public static final Logger logger = Logger.getLogger(MoneyThrowEventHandler.class);
 
 	public MoneyThrowEventHandler(EventsManager events, Population population) {
 		this.events = events;
@@ -56,7 +55,6 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		this.fare = calculateFare(event, population);
 		AgentMoneyEvent moneyEvent = new AgentMoneyEventImpl(event.getTime(), event.getPersonId(), fare);
-		logger.info("Person enters Vehicle --> AgentMoneyEvent thrown.");
 		this.events.processEvent(moneyEvent); //schickt das MoneyEvent an den EventManager
 	}
 

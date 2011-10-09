@@ -23,13 +23,13 @@
  */
 package playground.ikaddoura.busCorridor.version4;
 
-import org.jfree.util.Log;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.config.TransitConfigGroup;
 
@@ -45,7 +45,6 @@ public class InternalControler {
 	private int lastInternalIteration;
 	private int extItNr;
 	private String populationFile;
-	private int numberOfBuses;
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses) {
 		this.configFile = configFile;
@@ -53,9 +52,7 @@ public class InternalControler {
 		this.lastInternalIteration = lastInternalIteration;
 		this.extItNr = extItNr;
 		this.populationFile = populationFile;
-		this.outputExternalIterationDirPath = outputExternalIterationDirPath;
-		this.numberOfBuses = numberOfBuses;
-		
+		this.outputExternalIterationDirPath = outputExternalIterationDirPath;		
 	}
 	
 	public void run() {
@@ -84,20 +81,19 @@ public class InternalControler {
 		PlansConfigGroup plans = controler.getConfig().plans();
 		plans.setInputFile(population);
 		
-//		TransitConfigGroup transit = controler.getConfig().transit();
-//		transit.setTransitScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
-//		transit.setVehiclesFile(this.directoryExtIt+"/vehiclesFile.xml");
-		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);
 		controlerConfGroup.setLastIteration(this.lastInternalIteration);
-		controlerConfGroup.setWriteEventsInterval(1);
-		controlerConfGroup.setWritePlansInterval(1);
+		controlerConfGroup.setWriteEventsInterval(this.lastInternalIteration);
+		controlerConfGroup.setWritePlansInterval(this.lastInternalIteration);
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
-		planCalcScoreConfigGroup.setTravelingPt_utils_hr(-1);
+		planCalcScoreConfigGroup.setTravelingPt_utils_hr(-6);
 		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(1);
+		planCalcScoreConfigGroup.setTraveling_utils_hr(-6);
+		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(-2);
+		planCalcScoreConfigGroup.setConstantCar(-4.115);
 		
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup);
 		controler.setScoringFunctionFactory(scoringfactory);

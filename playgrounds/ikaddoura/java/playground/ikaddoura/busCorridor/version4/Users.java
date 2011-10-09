@@ -26,6 +26,7 @@ package playground.ikaddoura.busCorridor.version4;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -41,18 +42,24 @@ import org.matsim.core.utils.misc.ConfigUtils;
  *
  */
 public class Users {
+	
+	private final static Logger log = Logger.getLogger(Users.class);
+
 	private double avgExecScore;
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs;
 	
-	public void analyzeScores(String directoryExtIt) {
+	public void analyzeScores(String directoryExtIt, String networkFile) {
+		
 		List<Double> scores = new ArrayList<Double>();
 		double scoreSum = 0.0;
 		
-		String outputPlanFile = directoryExtIt+"/internalIterations/output_plans.xml.gz";
+		String outputPlanFile = directoryExtIt+"/internalIterations/output_plans.xml.gz";		
+		
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(outputPlanFile);
+		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 
@@ -66,6 +73,8 @@ public class Users {
 		}
 		
 		this.setAvgExecScore(scoreSum/scores.size());
+		
+		log.info("Users Scores analyzed.");
 	}
 	 
 	public void setAvgExecScore(double avgExecScore) {
@@ -103,5 +112,7 @@ public class Users {
 		this.numberOfCarLegs = departureHandler.getNumberOfCarLegs();
 		this.numberOfWalkLegs = departureHandler.getNumberOfWalkLegs();
 		
+		log.info("Leg Modes analyzed.");
+
 	}
 }

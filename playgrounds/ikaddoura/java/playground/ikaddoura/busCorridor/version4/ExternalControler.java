@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Ihab
  *
@@ -35,14 +37,16 @@ import java.util.Map;
 
 public class ExternalControler {
 	
+	private final static Logger log = Logger.getLogger(ExternalControler.class);
+	
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/network_busline.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population_1agent.xml"; // Startwert
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4/";
-	static int numberOfExternalIterations = 3;
-	static int lastInternalIteration = 0;
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population_2.xml"; // Startwert
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4";
+	static int numberOfExternalIterations = 10;
+	static int lastInternalIteration = 50 ;
 	
-	private int numberOfBuses = 1; // Startwert! 
+	private int numberOfBuses = 1; // for first iteration!
 	private int extItNr;
 	private String directoryExtIt;
 	
@@ -61,6 +65,7 @@ public class ExternalControler {
 	private void externalIteration() throws IOException {
 		
 		for (int extIt = 0; extIt <= numberOfExternalIterations ; extIt++){
+			log.info("************* EXTERNAL ITERATION "+extIt+" BEGINS *************");
 			this.setExtItNr(extIt);
 			this.setDirectoryExtIt(outputExternalIterationDirPath +"/extITERS/extIt."+extIt);
 			File directory = new File(this.getDirectoryExtIt());
@@ -77,7 +82,7 @@ public class ExternalControler {
 			provider.analyzeScores();
 			
 			Users users = new Users();
-			users.analyzeScores(this.getDirectoryExtIt());
+			users.analyzeScores(this.getDirectoryExtIt(), networkFile);
 			users.analyzeLegModes(this.getDirectoryExtIt(), lastInternalIteration);
 
 			this.iteration2providerScore.put(this.getExtItNr(), provider.getScore());
@@ -87,7 +92,10 @@ public class ExternalControler {
 			this.iteration2numberOfPtLegs.put(this.getExtItNr(), users.getNumberOfPtLegs());
 			this.iteration2numberOfWalkLegs.put(this.getExtItNr(), users.getNumberOfWalkLegs());
 			
-			this.setNumberOfBuses(provider.strategy(this.iteration2numberOfBuses, this.iteration2providerScore)); // für die nächste externe Iteration!
+//			this.setNumberOfBuses(provider.strategy(this.iteration2numberOfBuses, this.iteration2providerScore)); // für die nächste externe Iteration!
+			this.setNumberOfBuses(provider.increaseNumberOfBuses()); // für die nächste externe Iteration!
+
+			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
 		}
 
 		TextFileWriter stats = new TextFileWriter();
