@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -75,11 +76,11 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 				fCnt++;
 				
 				Object id = f.getAttribute(ID_NAME);
-				if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
+				if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
 				Id nodeId = new IdImpl(id.toString().trim());
 				int intId = Integer.parseInt(id.toString());
 				
-				// TODO [ni]: would it be more clever to use the censtoid attribute to distinguish?
+				// TODO [ni]: would it be more clever to use the centroid attribute to distinguish?
 				if (intId >= MIN_NODE_ID) {
 					Coordinate c = f.getBounds().centre();
 					Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
@@ -91,8 +92,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("fCnt "+fCnt+": IOException while parsing "+nodeShpFile+".");
+			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+nodeShpFile+".");
 		}
 		log.info("done. (creating nodes)");
 	}

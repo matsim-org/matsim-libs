@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SCAGShp2Links.java
+ * UCSBTAZ2Coord.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,33 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ucsb.network.algorithms;
+package playground.ucsb.demand;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.NetworkRunnable;
+import java.util.Map;
+
+import org.geotools.feature.Feature;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import playground.ucsb.UCSBUtils;
 
 /**
  * @author balmermi
  *
  */
-public class SCAGShp2Links implements NetworkRunnable {
+public class UCSBTAZ2Coord {
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.api.internal.NetworkRunnable#run(org.matsim.api.core.v01.network.Network)
-	 */
-	@Override
-	public void run(Network network) {
-		
-//		Link l = network.getFactory().createLink(null,null, null);
-//		Set<String> modes = new HashSet<String>();
-//		modes.add(TransportMode.car);
-//		modes.add(TransportMode.pt);
-//		l.setAllowedModes(modes);
-//		l.setCapacity(capacity)
-//		l.setFreespeed(freespeed)
-//		l.setLength(length)
-//		l.setNumberOfLanes(lanes)
-
+	public final void assignCoords(Scenario scenario, ObjectAttributes personObjectAttributes, Map<String,Feature> features) {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			int actIndex = 0;
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity activity = (Activity)pe;
+					String zoneId = (String)personObjectAttributes.getAttribute(person.getId().toString(),UCSBStopsParser.ZONE+actIndex);
+					if (zoneId == null) { Gbl.errorMsg("pid="+person.getId()+": object attribute '"+UCSBStopsParser.ZONE+actIndex+"' not found."); }
+					Feature zone = features.get(zoneId);
+					if (zone == null) { Gbl.errorMsg("zone with id="+zoneId+" not found."); }
+					Coord coord = UCSBUtils.getRandomCoordinate(zone);
+					activity.getCoord().setXY(coord.getX(),coord.getY());
+				}
+			}
+		}
 	}
-
 }

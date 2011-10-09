@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -36,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -48,6 +50,7 @@ public class UCSBStopsParser {
 
 	private final static Logger log = Logger.getLogger(UCSBStopsParser.class);
 
+	private final Random r = MatsimRandom.getRandom();
 	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
 
 	private static final String HID = "HID";
@@ -62,7 +65,7 @@ public class UCSBStopsParser {
 	private static final String ZONE_ID = "ZoneID";
 	private static final String ACTDUR = "Duration";
 
-
+	public static final String ZONE = "zone";
 
 
 	public UCSBStopsParser() {
@@ -114,8 +117,7 @@ public class UCSBStopsParser {
 		}
 	}
 	
-	public final void parse(String cemdapStopsFile, Scenario scenario, ObjectAttributes personObjectAttributes) {
-		log.info("parsing "+cemdapStopsFile+" file...");
+	public final void parse(String cemdapStopsFile, Scenario scenario, ObjectAttributes personObjectAttributes, double fraction) {
 		Population population = scenario.getPopulation();
 		int line_cnt = 0;
 
@@ -127,19 +129,30 @@ public class UCSBStopsParser {
 			String[] heads = curr_line.split("\t", -1);
 			Map<String,Integer> column = new LinkedHashMap<String,Integer>(heads.length);
 			for (int i=0; i<heads.length; i++) { column.put(heads[i],i); }
-			log.info("columns of input file: "+cemdapStopsFile+" ...");
-			for (String head : column.keySet()) { log.info(column.get(head)+":"+head); }
-			log.info("done.");
+			
+			Id currPid = null;
+			boolean storePerson = false;
 
 			// data
 			while ((curr_line = br.readLine()) != null) {
 				String[] entries = curr_line.split("\t", -1);
 				line_cnt++;
 				
+				if (line_cnt % 1000000 == 0) {
+					log.info("line "+line_cnt+": "+population.getPersons().size()+" persons stored so far.");
+					Gbl.printMemoryUsage();
+				}
+				
 				// household id / person id
 				Integer hid = new Double(entries[column.get(HID)]).intValue();
 				Integer id = new Double(entries[column.get(PID)]).intValue();
 				Id pid = scenario.createId(hid+"_"+id);
+				
+				if (!pid.equals(currPid)) {
+					currPid = pid;
+					if (r.nextDouble() < fraction) { storePerson = true; } else { storePerson = false; }
+				}
+				if (!storePerson) { continue; }
 				
 				Person person = population.getPersons().get(pid);
 				if (person == null) {
@@ -153,9 +166,8 @@ public class UCSBStopsParser {
 				int arrTime = Integer.parseInt(entries[column.get(ARRTIME)])*60 + TIME_OFFSET;
 
 				if (plan.getPlanElements().isEmpty()) {
-					// TODO balmermi: replace zone id with real coordinate
-					Integer zoneId = new Double(entries[column.get(O_ZONE_ID)]).intValue();
-					personObjectAttributes.putAttribute(pid.toString(),"zone0",zoneId);
+					String zoneId = entries[column.get(O_ZONE_ID)].trim();
+					personObjectAttributes.putAttribute(pid.toString(),ZONE+"0",zoneId);
 					String actType = transformActType(new Double(entries[column.get(P_ACT_TYPE)]).intValue());
 					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
 					firstActivity.setStartTime(0);
@@ -170,10 +182,9 @@ public class UCSBStopsParser {
 				leg.setTravelTime(arrTime-depTime);
 				plan.addLeg(leg);
 				
-				// TODO balmermi: replace zone id with real coordinate
-				Integer zoneId = new Double(entries[column.get(ZONE_ID)]).intValue();
+				String zoneId = entries[column.get(ZONE_ID)].trim();
 				int actIndex = plan.getPlanElements().size()/2;
-				personObjectAttributes.putAttribute(pid.toString(),"zone"+actIndex,zoneId);
+				personObjectAttributes.putAttribute(pid.toString(),ZONE+actIndex,zoneId);
 				String actType = transformActType(new Double(entries[column.get(ACT_TYPE)]).intValue());
 				Activity activity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
 				int actDur = Integer.parseInt(entries[column.get(ACTDUR)])*60;
@@ -186,7 +197,7 @@ public class UCSBStopsParser {
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
 		}
-		log.info(line_cnt+" lines parsed");
-		log.info("done.");
+		log.info(line_cnt+" lines parsed.");
+		log.info(population.getPersons().size()+" persons stored.");
 	}
 }
