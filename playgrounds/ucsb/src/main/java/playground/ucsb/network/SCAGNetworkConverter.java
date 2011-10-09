@@ -50,7 +50,7 @@ public class SCAGNetworkConverter {
 				"D:/balmermi/documents/eclipse/output/ucsb"
 		};
 
-		if (args.length < 2) {
+		if (args.length != 2) {
 			log.error("SCAGNetworkConverter nodeShpFile outputBase");
 			System.exit(-1);
 		}

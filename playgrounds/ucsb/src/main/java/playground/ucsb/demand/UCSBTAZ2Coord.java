@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ucsb.UCSBUtils;
@@ -50,7 +51,8 @@ public class UCSBTAZ2Coord {
 					Feature zone = features.get(zoneId);
 					if (zone == null) { Gbl.errorMsg("zone with id="+zoneId+" not found."); }
 					Coord coord = UCSBUtils.getRandomCoordinate(zone);
-					activity.getCoord().setXY(coord.getX(),coord.getY());
+					((ActivityImpl)activity).setCoord(coord);
+					actIndex++;
 				}
 			}
 		}

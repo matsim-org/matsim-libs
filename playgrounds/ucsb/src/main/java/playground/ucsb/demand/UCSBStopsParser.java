@@ -87,30 +87,60 @@ public class UCSBStopsParser {
 		}
 	}
 	
+//	private final String transformActType(int actTypeNo) {
+//		switch (actTypeNo) {
+//		case 0: return "shop";
+//		case 1: return "social";
+//		case 2: return "other";
+//		case 3: return "leisure_eat_out";
+//		case 4: return "other_serve_passenger";
+//		case 5: return "leisure_entertainment";
+//		case 6: return "leisure_sports";
+//		case 7: return "visit";
+//		case 8: return "work_related";
+//		case 9: return "other_maintainance";
+//		case 10: return "dropoff_school";
+//		case 11: return "pickup_school";
+//		case 12: return "home_adult";
+//		case 13: return "work_adult";
+//		case 14: return "home_child";
+//		case 15: return "education";
+//		case 16: return "leisure_child";
+//		case 17: return "work";
+//		case 18: return "home";
+//		case 19: return "education";
+//		case 20: return "leisure_adult_withChild";
+//		case 21: return "leisure_child_withParent";
+//		default:
+//			Gbl.errorMsg(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
+//			return null;
+//		}
+//	}
+	
 	private final String transformActType(int actTypeNo) {
 		switch (actTypeNo) {
 		case 0: return "shop";
-		case 1: return "social";
+		case 1: return "other";
 		case 2: return "other";
-		case 3: return "leisure_eat_out";
-		case 4: return "other_serve_passenger";
-		case 5: return "leisure_entertainment";
-		case 6: return "leisure_sports";
-		case 7: return "visit";
-		case 8: return "work_related";
-		case 9: return "other_maintainance";
-		case 10: return "dropoff_school";
-		case 11: return "pickup_school";
-		case 12: return "home_adult";
-		case 13: return "work_adult";
-		case 14: return "home_child";
-		case 15: return "education";
-		case 16: return "leisure_child";
+		case 3: return "leis";
+		case 4: return "other";
+		case 5: return "leis";
+		case 6: return "leis";
+		case 7: return "other";
+		case 8: return "work";
+		case 9: return "other";
+		case 10: return "other";
+		case 11: return "other";
+		case 12: return "home";
+		case 13: return "work";
+		case 14: return "home";
+		case 15: return "educ";
+		case 16: return "leis";
 		case 17: return "work";
 		case 18: return "home";
-		case 19: return "education";
-		case 20: return "leisure_adult_withChild";
-		case 21: return "leisure_child_withParent";
+		case 19: return "educ";
+		case 20: return "leis";
+		case 21: return "leis";
 		default:
 			Gbl.errorMsg(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
 			return null;

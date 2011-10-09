@@ -26,9 +26,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -50,14 +56,15 @@ public class UCSBStops2PlansConverter {
 		
 //		args = new String[] {
 //				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/demand/CEMDAP/stops_total_actual.dat.gz",
-//				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/geographics/TAZ/taz.shp",
+//				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/geographics/TAZ/taz_Project_UTM_Zone_11N.shp",
 //				"TAZ2K",
+//				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/_old/networkSCAGOld.xml",
 //				"0.001",
 //				"D:/balmermi/documents/eclipse/output/ucsb"
 //		};
 
-		if (args.length < 4) {
-			log.error("UCSBStops2PlansConverter cemdapStopsFile tazShapeFile tazIdName popFraction outputBase");
+		if (args.length != 6) {
+			log.error("UCSBStops2PlansConverter cemdapStopsFile tazShapeFile tazIdName networkFile popFraction outputBase");
 			System.exit(-1);
 		}
 		
@@ -65,13 +72,15 @@ public class UCSBStops2PlansConverter {
 		String cemdapStopsFile = args[0];
 		String tazShapeFile = args[1];
 		String tazIdName = args[2];
-		Double popFraction = Double.parseDouble(args[3]);
-		String outputBase = args[4];
+		String networkFile = args[3];
+		Double popFraction = Double.parseDouble(args[4]);
+		String outputBase = args[5];
 
 		// print input parameters
 		log.info("cemdapStopsFile: "+cemdapStopsFile);
 		log.info("tazShapeFile: "+tazShapeFile);
 		log.info("tazIdName: "+tazIdName);
+		log.info("networkFile: "+networkFile);
 		log.info("popFraction: "+popFraction);
 		log.info("outputBase: "+outputBase);
 		
@@ -89,8 +98,16 @@ public class UCSBStops2PlansConverter {
 		log.info("assigning coordinates to activities...");
 		new UCSBTAZ2Coord().assignCoords(scenario, personObjectAttributes, features);
 		log.info("done. (assigning)");
+		
+		log.info("parsing network file "+networkFile+"...");
+		new NetworkReaderMatsimV1(scenario).parse(networkFile);
+		new NetworkCleaner().run(scenario.getNetwork());
+		new XY2Links((NetworkImpl)scenario.getNetwork()).run(scenario.getPopulation());
+		log.info("done. (running)");
 
 		log.info("writing data to "+outputBase+"...");
+		new NetworkWriter(scenario.getNetwork()).write(outputBase+"/network.xml.gz");
+		new NetworkWriteAsTable(outputBase).run(scenario.getNetwork());
 		new PopulationWriter(scenario.getPopulation(), null).write(outputBase+"/plans.xml.gz");
 		new ObjectAttributesXmlWriter(personObjectAttributes).writeFile(outputBase+"/personObjectAttributes.xml.gz");
 		log.info("done. (writing)");
