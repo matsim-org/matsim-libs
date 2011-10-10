@@ -23,6 +23,7 @@ package playground.ikaddoura.busCorridor.prepare;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,13 +39,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-public class CreatePopulation implements Runnable {
+public class CreatePopulationRnd implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
 		
 	public static void main(String[] args) {
-		CreatePopulation potsdamPopulation = new CreatePopulation();
+		CreatePopulationRnd potsdamPopulation = new CreatePopulationRnd();
 		potsdamPopulation.run();
 		
 	}
@@ -58,7 +59,7 @@ public class CreatePopulation implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input/population_rnd.xml");
 	}
 
 	private void fillZoneData() {
@@ -77,25 +78,27 @@ public class CreatePopulation implements Runnable {
 	}
 	
 	private void generatePopulation() {
-		generateHomeWorkHomeTripsPt("node2", "node10", 120); // home, work, anzahl
-		generateHomeWorkHomeTripsPt("node10", "node2", 120); // home, work, anzahl
+		generateHomeWorkHomeTripsPt("node2", "node10", 30); // home, work, anzahl
+		generateHomeWorkHomeTripsPt("node10", "node2", 30); // home, work, anzahl
+		generateHomeWorkHomeTripsPt("node3", "node5", 20); // home, work, anzahl
+		generateHomeWorkHomeTripsPt("node5", "node3", 20); // home, work, anzahl
+		generateHomeWorkShoppingHomeTripsPt("node3", "node9", "node5", 20); // home, work, shopping, anzahl
+		generateHomeWorkShoppingHomeTripsPt("node9", "node3", "node6", 20); // home, work, shopping, anzahl
+
 	}
 
 	private void generateHomeWorkHomeTripsPt(String zone1, String zone2, int quantity) {
 		for (int i=0; i<quantity; ++i) {
 			
-//			Coord homeLocation = blur(zone1);
-//			Coord workLocation = blur(zone2);
-			
-			Coord homeLocation = zoneGeometries.get(zone1);
-			Coord workLocation = zoneGeometries.get(zone2);
+			Coord homeLocation = blur(zone1);
+			Coord workLocation = blur(zone2);
 			
 			Person person = population.getFactory().createPerson(createId(zone1, zone2, i, TransportMode.pt));
 			Plan plan = population.getFactory().createPlan();
 			
-			plan.addActivity(createHome(homeLocation, i));
+			plan.addActivity(createHome(homeLocation));
 			plan.addLeg(createDriveLegPt());
-			plan.addActivity(createWork(workLocation, i));
+			plan.addActivity(createWork(workLocation));
 			plan.addLeg(createDriveLegPt());
 			Activity homeActivity1 = (Activity) plan.getPlanElements().get(0);
 			double homeEndTime = homeActivity1.getEndTime();
@@ -106,29 +109,69 @@ public class CreatePopulation implements Runnable {
 			population.addPerson(person);
 		}
 	}
+	
+	private void generateHomeWorkShoppingHomeTripsPt(String zone1, String zone2, String zone3, int quantity) {
+		for (int i=0; i<quantity; ++i) {
+			
+			Coord homeLocation = blur(zone1);
+			Coord workLocation = blur(zone2);
+			Coord shoppingLocation = blur(zone3);
+
+			Person person = population.getFactory().createPerson(createId(zone1, zone2, zone3, i, TransportMode.pt));
+			Plan plan = population.getFactory().createPlan();
+			
+			plan.addActivity(createHome(homeLocation));
+			plan.addLeg(createDriveLegPt());
+			plan.addActivity(createWork(workLocation));
+			plan.addLeg(createDriveLegPt());
+			plan.addActivity(createShopping(plan, shoppingLocation));
+			plan.addLeg(createDriveLegPt());
+			
+			Activity homeActivity1 = (Activity) plan.getPlanElements().get(0);
+			double homeEndTime = homeActivity1.getEndTime();
+			Activity homeActivity2 = homeActivity1;
+			homeActivity2.setEndTime(homeEndTime);
+			plan.addActivity(homeActivity2);
+			
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
+	}
 		
-//	private Coord blur(String zone) {
-//		Random rnd = new Random();
-//		double xCoord = zoneGeometries.get(zone).getX()+rnd.nextDouble()*50-rnd.nextDouble()*50;
-//		double yCoord = zoneGeometries.get(zone).getY()+rnd.nextDouble()*50-rnd.nextDouble()*50;
-//		Coord zoneCoord = scenario.createCoord(xCoord, yCoord);
-//		return zoneCoord;
-//	}
+	private Coord blur(String zone) {
+		Random rnd = new Random();
+		double xCoord = zoneGeometries.get(zone).getX()+rnd.nextDouble()*50-rnd.nextDouble()*50;
+		double yCoord = zoneGeometries.get(zone).getY()+rnd.nextDouble()*50-rnd.nextDouble()*50;
+		Coord zoneCoord = scenario.createCoord(xCoord, yCoord);
+		return zoneCoord;
+	}
 	
 	private Leg createDriveLegPt() {
 		Leg leg = population.getFactory().createLeg(TransportMode.pt);
 		return leg;
 	}
 
-	private Activity createWork(Coord workLocation, int nr) {
+	private Activity createWork(Coord workLocation) {
+		Random rnd = new Random();
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
-		activity.setEndTime((16*60*60)+(nr*60));
+		activity.setEndTime((16*60*60)+(rnd.nextDouble()*60*60)-(rnd.nextDouble()*60*60));
+		return activity;
+	}
+	
+	private Activity createShopping(Plan plan, Coord shoppingLocation) {
+		Random rnd = new Random();
+		Activity activity = population.getFactory().createActivityFromCoord("shopping", shoppingLocation);
+		Activity work = (Activity) plan.getPlanElements().get(2);
+		double endWorkTime = work.getEndTime();
+		double minimalShoppingTime = 30;
+		activity.setEndTime(endWorkTime+minimalShoppingTime+(rnd.nextDouble()*60*60));
 		return activity;
 	}
 
-	private Activity createHome(Coord homeLocation, int nr) {
+	private Activity createHome(Coord homeLocation) {
+		Random rnd = new Random();
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
-		activity.setEndTime(8*60*60+(nr*60));
+		activity.setEndTime(8*60*60+(rnd.nextDouble()*60*60)-(rnd.nextDouble()*60*60));
 		return activity;
 	}
 
@@ -136,5 +179,8 @@ public class CreatePopulation implements Runnable {
 		return new IdImpl(transportMode + "_" + zone1 + "_" + zone2 + "_" + i);
 	}
 	
+	private Id createId(String zone1, String zone2, String zone3, int i, String transportMode) {
+		return new IdImpl(transportMode + "_" + zone1 + "_" + zone2 + "_" + zone3 + "_" + i);
+	}
 }
 
