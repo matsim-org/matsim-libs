@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
+
 import junit.framework.TestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
@@ -36,17 +38,18 @@ import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
 import vrp.basics.Coordinate;
 import vrp.basics.CustomerImpl;
-import vrp.basics.ManhattanDistance;
+import vrp.basics.ManhattanCosts;
 import vrp.basics.NodeImpl;
 import vrp.basics.Nodes;
 import vrp.basics.Relation;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
 import vrp.basics.TourActivityFactory;
 import vrp.basics.VehicleType;
 import vrp.basics.VrpUtils;
 
+@Ignore
 public class VRPTestCase extends TestCase{
 	
 	public Tour tour;
@@ -84,7 +87,7 @@ public class VRPTestCase extends TestCase{
 	 */
 	
 	protected void initCustomersInPlainCoordinateSystem(){
-		costs = new ManhattanDistance();
+		costs = new ManhattanCosts();
 		nodes = new Nodes();
 		customers = new ArrayList<Customer>();
 		customerMap = new HashMap<String, Customer>();
@@ -118,7 +121,7 @@ public class VRPTestCase extends TestCase{
 	}
 	
 	protected Solution getInitialSolution(SingleDepotVRP vrp){
-		Collection<Tour> tours = new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp);
+		Collection<Tour> tours = new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp);
 		Collection<TourAgent> agents = new ArrayList<TourAgent>();
 		for(Tour t : tours){
 			VehicleType type = vrp.getVehicleType();

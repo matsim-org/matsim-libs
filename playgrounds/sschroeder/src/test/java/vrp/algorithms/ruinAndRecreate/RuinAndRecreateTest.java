@@ -31,7 +31,7 @@ import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
 
@@ -120,7 +120,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		assertEquals(solution.size(),2);
@@ -132,7 +132,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		int solVal = 0;
@@ -148,7 +148,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		List<Tour> solList = new ArrayList<Tour>(solution);
@@ -175,7 +175,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		assertEquals(solution.size(),3);
@@ -187,7 +187,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		int solVal = 0;
@@ -203,7 +203,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.setConstraints(constraints);
 		SingleDepotVRP vrp = vrpBuilder.buildVRP();
 		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
 		algo.run();
 		Collection<Tour> solution = algo.getSolution();
 		List<Tour> solList = new ArrayList<Tour>(solution);

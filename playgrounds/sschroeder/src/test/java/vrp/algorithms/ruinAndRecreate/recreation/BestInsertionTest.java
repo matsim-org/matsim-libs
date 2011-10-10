@@ -28,7 +28,7 @@ import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
@@ -66,7 +66,7 @@ public class BestInsertionTest extends VRPTestCase{
 		makeSolutionWithoutC1andC2();
 		
 		bestInsertion = new BestInsertion(vrp);
-		bestInsertion.setInitialSolutionFactory(new SingleDepotSolutionFactoryImpl());
+		bestInsertion.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		bestInsertion.setTourAgentFactory(new RRTourAgentFactory(vrp));
 		
 		shipmentWithoutService = new ArrayList<Shipment>();

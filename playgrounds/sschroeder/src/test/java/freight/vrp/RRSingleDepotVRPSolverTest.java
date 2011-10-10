@@ -25,9 +25,9 @@ import playground.mzilske.freight.carrier.Tour.Delivery;
 import playground.mzilske.freight.carrier.Tour.Pickup;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
 import vrp.algorithms.ruinAndRecreate.factories.StandardRuinAndRecreateFactory;
-import vrp.basics.CrowFlyDistance;
+import vrp.basics.CrowFlyCosts;
 import vrp.basics.RandomNumberGeneration;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 
 public class RRSingleDepotVRPSolverTest extends TestCase{
 	
@@ -35,14 +35,14 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network) {
-			RRSingleDepotVRPSolver solver = new RRSingleDepotVRPSolver(shipments, carrierVehicles, network);
-			CrowFlyDistance costs = new CrowFlyDistance();
+			ShipmentBasedSingleDepotVRPSolver solver = new ShipmentBasedSingleDepotVRPSolver(shipments, carrierVehicles, network);
+			CrowFlyCosts costs = new CrowFlyCosts();
 			costs.speed = 1;
 			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
 			solver.setConstraints(new CapacityConstraint());
-			solver.setIniSolutionFactory(new SingleDepotSolutionFactoryImpl());
+			solver.setIniSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 			solver.setnOfWarmupIterations(20);
 			solver.setnOfIterations(50);
 			return solver;
