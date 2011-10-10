@@ -31,7 +31,7 @@ import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.VRP;
-import vrp.basics.CrowFlyDistance;
+import vrp.basics.CrowFlyCosts;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
 import freight.vrp.Locations;
@@ -119,7 +119,7 @@ public class AverageMarginalCostOM implements OfferMaker{
 		public ServiceProviderImpl(Tour tour, int vehicleCapacity) {
 			super();
 			this.tour = tour;
-			Costs costs = new CrowFlyDistance();
+			Costs costs = new CrowFlyCosts();
 			updater = new TourActivityStatusUpdaterImpl(costs);
 			tourBuilder = new BestTourBuilder();
 			tourBuilder.setConstraints(new TWAndCapacityConstraint());
