@@ -39,9 +39,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
  * @author Ihab
  *
  */
-public class Provider {
+public class Operator {
 	
-	private final static Logger log = Logger.getLogger(Provider.class);
+	private final static Logger log = Logger.getLogger(Operator.class);
 
 	private int extItNr;
 	private int numberOfBuses;
@@ -52,7 +52,7 @@ public class Provider {
 	/**
 	 * @param extItNr
 	 */
-	public Provider(int extItNr, int numberOfBuses) {
+	public Operator(int extItNr, int numberOfBuses) {
 	this.extItNr = extItNr;
 	this.setNumberOfBuses(numberOfBuses);
 	}
@@ -85,16 +85,16 @@ public class Provider {
 		int numberOfBuses = transitHandler.getVehicleIDs().size();		
 		
 		double vehicleKm = linksHandler.getVehicleKm();
-		double vehicleHours = linksHandler.getVehicleHours();
+//		double vehicleHours = linksHandler.getVehicleHours();
 		
 		int busCostsPerDay = 10;
 		double fixCosts = numberOfBuses * busCostsPerDay ;
 		double busCostsPerKm = 1;
 		double varCosts = vehicleKm * busCostsPerKm; // + vehicleHours * busCostsPerHour ;
-		double providerScore = (earnings*100) - fixCosts - varCosts;
+		double operatorScore = (earnings*100) - fixCosts - varCosts;
 		
-		this.setScore(providerScore);
-		log.info("ProviderScore calculated.");
+		this.setScore(operatorScore);
+		log.info("OperatorScore calculated.");
 	}
 
 	public void analyzeScores() {
@@ -104,7 +104,7 @@ public class Provider {
 		}
 		else {}
 		
-		log.info("ProviderScore analyzed.");	
+		log.info("OperatorScore analyzed.");	
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class Provider {
 		return score;
 	}
 
-	public int strategy(Map<Integer, Integer> iteration2numberOfBuses, Map<Integer, Double> iteration2providerScore) {
+	public int strategy(Map<Integer, Integer> iteration2numberOfBuses, Map<Integer, Double> iteration2operatorScore) {
 		
 		int numberOfBuses = iteration2numberOfBuses.get(this.extItNr);
 		int newNumberOfBuses = 0;
@@ -162,7 +162,7 @@ public class Provider {
 			
 			int numberOfBusesBefore = iteration2numberOfBuses.get(this.extItNr-1);
 			double score = this.getScore(); // iteration2providerScore.get(this.extItNr);
-			double scoreBefore = iteration2providerScore.get(this.extItNr-1);
+			double scoreBefore = iteration2operatorScore.get(this.extItNr-1);
 			
 			if(numberOfBusesBefore < numberOfBuses & scoreBefore < score){
 				// mehr Busse, score angestiegen
@@ -181,7 +181,7 @@ public class Provider {
 				newNumberOfBuses = numberOfBuses+1;
 			}
 			else {
-				log.info("Provider score did not change.");
+				log.info("Operator score did not change.");
 				newNumberOfBuses = numberOfBuses;
 			}
 		}
@@ -191,7 +191,7 @@ public class Provider {
 			newNumberOfBuses = 1;
 		}
 		
-		log.info("ProviderStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
+		log.info("OperatorStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
 		return newNumberOfBuses;
 	}
 	
