@@ -94,7 +94,7 @@ public class TourGenerator {
 		Id lastDestination = company.getCarrier().getDepotLinkId();
 		for(int i=0;i<nOfActivities;i++){
 			Id destinationLink = getRandomRegionLink(lastDestination);
-			builder.scheduleGeneralActivity("pause", destinationLink , 300.0);
+			builder.scheduleGeneralActivity("pause", destinationLink , null, null, 300.0);
 			lastDestination = destinationLink;
 		}
 		builder.scheduleEnd(company.getCarrier().getDepotLinkId());
