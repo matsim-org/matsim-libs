@@ -149,6 +149,11 @@ public class JointReplanningConfigGroup extends Module {
 	public static final String HAMMING_DISTANCE = "useHammingDistanceOnlyInRTS";
 	public static final String POPULATION_COEF = "populationSizeSlope";
 	public static final String POPULATION_INTERCEPT = "populationSizeIntercept";
+	/**
+	 * the maximum number of chromosomes in the population.
+	 * Values inferior to 2 correspond to no limitation.
+	 */
+	public static final String MAX_POP_SIZE = "maxPopulationSize";
 	public static final String WINDOW_SIZE_COEF = "windowSizeSlope";
 	public static final String WINDOW_SIZE_INTERCEPT = "windowSizeIntercept";
 	/**
@@ -173,9 +178,9 @@ public class JointReplanningConfigGroup extends Module {
 
 	//parameter values, initialized to defaults.
 
-	private int populationSize = 28;
 	private double populationCoef = 1;
 	private double populationIntercept = 20;
+	private int maxPopulationSize = -1;
 	private double windowSizeCoef = 0.5;
 	private double windowSizeIntercept = 3;
 	private double mutationProb = 0.05929328513354826;
@@ -206,6 +211,7 @@ public class JointReplanningConfigGroup extends Module {
 	private long maxCpuTimePerMember = -1;
 	private boolean isMemetic = false;
 	//deprecated fields:
+	private int populationSize = 28;
 	private int numTimeIntervals;
 	private double dropOffDuration = 0;
 	private double selectionThreshold = 0.1d;
@@ -335,6 +341,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MEMETIC)) {
 			this.setIsMemetic(value);
 		}
+		else if (param_name.equals(MAX_POP_SIZE)) {
+			this.setMaxPopulationSize(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -452,6 +461,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MEMETIC)) {
 			return String.valueOf(this.getIsMemetic());
 		}
+		else if(param_name.equals(MAX_POP_SIZE)) {
+			return String.valueOf(this.getMaxPopulationSize());
+		}
 		return null;
 	}
 
@@ -492,6 +504,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		this.addParameterToMap(map, MAX_CPU_TIME);
 		this.addParameterToMap(map, MEMETIC);
+		this.addParameterToMap(map, MAX_POP_SIZE);
 		return map;
 	}
 
@@ -899,6 +912,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public boolean getIsMemetic() {
 		return isMemetic;
+	}
+
+	public void setMaxPopulationSize(final String value) {
+		this.maxPopulationSize = Integer.valueOf(value);
+	}
+
+	public int getMaxPopulationSize() {
+		return (this.maxPopulationSize < 2 ? Integer.MAX_VALUE : this.maxPopulationSize);
 	}
 
 	// allow setting of GA params "directly"

@@ -146,9 +146,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			// per double dimension.
 			//int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
 			//int popSize = configGroup.getPopulationSize();
-			int popSize = (int) Math.ceil(
-					configGroup.getPopulationIntercept() +
-					configGroup.getPopulationCoef() * sampleGenes.length);
+			int popSize = Math.min(
+					(int) Math.ceil(
+						configGroup.getPopulationIntercept() +
+						configGroup.getPopulationCoef() * sampleGenes.length),
+					configGroup.getMaxPopulationSize());
 			//log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 
