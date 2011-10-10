@@ -39,12 +39,13 @@ public class RunMating {
 		Logger.getLogger(RunMating.class);
 
 	private static final Mater.TripChaining chainingMode =
-		//Mater.TripChaining.ALL_TOGETHER;
-		Mater.TripChaining.ONE_BY_ONE;
-	private static final String popFile = "../../../trunk/examples/equil/plans2000.xml.gz";
-	private static final String netFile = "../../../trunk/examples/equil/network.xml";
-	private static final String outputPrefix = "testcases/matings/3-shuttle";
-	private static final int cliqueSize = 3;
+		Mater.TripChaining.ALL_TOGETHER;
+		//Mater.TripChaining.ONE_BY_ONE;
+	private static final String popFile = "../../trunk/examples/equil/plans2000.xml.gz";
+	private static final String netFile = "../../trunk/examples/equil/network.xml";
+	private static final String outputPrefix = "testcases/matings/3-50-together";
+	private static final int minCliqueSize = 3;
+	private static final int maxCliqueSize = 50;
 	private static final double pNoCar = 0.7d;
 
 	public static void main(String[] args) {
@@ -62,7 +63,7 @@ public class RunMating {
 		(new MatsimPopulationReader(scenario)).readFile(popFile);
 
 		log.info("mating");
-		Mater matingAlgo = new Mater(scenario, chainingMode, cliqueSize, pNoCar);
+		Mater matingAlgo = new Mater(scenario, chainingMode, minCliqueSize, maxCliqueSize, pNoCar);
 		matingAlgo.run();
 
 		log.info("writing output");

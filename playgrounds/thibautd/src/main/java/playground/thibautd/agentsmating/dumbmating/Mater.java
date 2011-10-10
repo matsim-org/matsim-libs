@@ -61,7 +61,8 @@ public class Mater {
 	private final Scenario scenario;
 	private final Map<Id, List<Id>> cliques = new HashMap<Id, List<Id>>();
 	private final TripChaining chainingMode;
-	private final int cliquesSize;
+	private final int minCliqueSize;
+	private final int maxCliqueSize;
 	private final IdFactory idFactory = new IdFactory();
 	private final PuNameFactory puFactory = new PuNameFactory();
 	// probability that car availability is set to "never" for passenger
@@ -82,12 +83,14 @@ public class Mater {
 	public Mater(
 			final Scenario scenario,
 			final TripChaining chainingMode,
-			final int cliquesSize,
+			final int minCliqueSize,
+			final int maxCliqueSize,
 			final double pNoCar) {
 		this.population = scenario.getPopulation();
 		this.scenario = scenario;
 		this.chainingMode = chainingMode;
-		this.cliquesSize = cliquesSize;
+		this.minCliqueSize = minCliqueSize;
+		this.maxCliqueSize = maxCliqueSize;
 		this.pNoCar = pNoCar;
 	}
 
@@ -95,18 +98,20 @@ public class Mater {
 	 * Returns the mating, and modifies plans in the population.
 	 */
 	public Map<Id, List<Id>> run() {
-		List<Person> clique = new ArrayList<Person>(cliquesSize);
+		int cliqueSize = minCliqueSize + randomGen.nextInt(maxCliqueSize - minCliqueSize);
+		List<Person> clique = new ArrayList<Person>(maxCliqueSize);
 		int count = 0;
 
 		this.cliques.clear();
 
 		for (Person person : this.population.getPersons().values()) {
-			if (count < this.cliquesSize) {
+			if (count < cliqueSize) {
 				count++;
 				clique.add(person);
 			}
 			else {
 				processClique(clique);
+				cliqueSize = minCliqueSize + randomGen.nextInt(maxCliqueSize - minCliqueSize);
 				clique.clear();
 				clique.add(person);
 				count = 1;
@@ -130,7 +135,7 @@ public class Mater {
 	}
 
 	private void addClique(final List<Person> clique) {
-		List<Id> newClique = new ArrayList<Id>(this.cliquesSize);
+		List<Id> newClique = new ArrayList<Id>();
 
 		for (Person person : clique) {
 			newClique.add(person.getId());
