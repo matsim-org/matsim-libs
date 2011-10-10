@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
-import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
-import vrp.algorithms.ruinAndRecreate.factories.StandardRuinAndRecreateFactory;
+import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
+import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateWithTimeWindowsFactory;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.Coordinate;
@@ -20,32 +20,33 @@ import freight.vrp.ChartListener;
 import freight.vrp.RuinAndRecreateReport;
 
 /**
- * test instances for the capacitated vrp. instances are from christophides, mingozzi and toth
- * and can be found at:
- * http://neo.lcc.uma.es/radi-aeb/WebVRP/
+ * test instances for the capacitated vrp with pickup and deliveries and time windows. 
+ * instances are from li and lim and can be found at:
+ * http://www.top.sintef.no/vrp/benchmarks.html
  * @author stefan schroeder
  *
  */
 
-public class Christophides {
+
+public class LiLim {
 	
-	private SingleDepotVRPBuilder vrpBuilder;
+private SingleDepotVRPBuilder vrpBuilder;
 	
 	private String fileNameOfInstance;
 	
 	private String instanceName;
 	
-	public Christophides(String fileNameOfInstance, String instanceName) {
+	public LiLim(String fileNameOfInstance, String instanceName) {
 		this.fileNameOfInstance = fileNameOfInstance;
 		this.instanceName = instanceName;
 	}
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Christophides christophides = new Christophides("/Users/stefan/Documents/workspace/VehicleRouting/instances/vrp_christofides_mingozzi_toth/vrpnc14.txt", "vrpnc14");
-		christophides.run();
+		LiLim liLim = new LiLim("/Users/stefan/Documents/workspace/VehicleRouting/instances/cvrppdtw_lilim/pdp100/lc103.txt", "lc103");
+		liLim.run();
 	}
-
+	
 	public void run(){
 		vrpBuilder = new SingleDepotVRPBuilder();
 		readProblem(fileNameOfInstance);
@@ -55,11 +56,11 @@ public class Christophides {
 	}
 	
 	private RuinAndRecreate createAlgo(SingleDepotVRP vrp) {
-		StandardRuinAndRecreateFactory factory = new StandardRuinAndRecreateFactory();
-		factory.setIterations(1000);
+		RuinAndRecreateWithTimeWindowsFactory factory = new RuinAndRecreateWithTimeWindowsFactory();
+		factory.setIterations(10000);
 		factory.setWarmUp(100);
 		ChartListener chartListener = new ChartListener();
-		chartListener.setFilename("vrp/christophides/"+instanceName+".png");
+		chartListener.setFilename("vrp/liLim/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
 		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);
@@ -67,45 +68,52 @@ public class Christophides {
 	}
 
 	private SingleDepotVRP createVRP() {
-		vrpBuilder.setConstraints(new CapacityConstraint());
+		vrpBuilder.setConstraints(new TWAndCapacityConstraint());
 		vrpBuilder.setCosts(new CrowFlyCosts());
 		return vrpBuilder.buildVRP();
 	}
 
 	private void readProblem(String filename) {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
-		int counter = 0;
 		String line = null;
-		Integer vehicleCapacity = null; 
+		boolean firstLine = true;
 		try {
 			while((line = reader.readLine()) != null){
 				line = line.replace("\r", "");
 				line = line.trim();
-				String[] tokens = line.split(" ");
-				if(counter == 0){
-					vehicleCapacity = Integer.parseInt(tokens[1].trim());
+				String[] tokens = line.split("\t");
+				if(firstLine){
+					int vehicleCapacity = getInt(tokens[1]);
 					vrpBuilder.setVehicleType(vehicleCapacity);
-				}
-				else if(counter == 1){
-					Coordinate depotCoord = makeCoord(tokens[0].trim(),tokens[1].trim());
-					Customer depot = vrpBuilder.createAndAddCustomer(""+counter, vrpBuilder.getNodeFactory().createNode(""+counter,depotCoord), 0, 0.0, 0.0, 0.0);
-					vrpBuilder.setDepot(depot);
+					firstLine = false;
+					continue;
 				}
 				else{
-					Coordinate customerCoord = makeCoord(tokens[0].trim(),tokens[1].trim());
-					int demand = Integer.parseInt(tokens[2].trim());
-					vrpBuilder.createAndAddCustomer(""+counter, vrpBuilder.getNodeFactory().createNode(""+counter,customerCoord), demand, 0.0, 0.0, 0.0);
+					String customerId = tokens[0];
+					Coordinate coord = makeCoord(tokens[1], tokens[2]);
+					int demand = getInt(tokens[3]);
+					double startTimeWindow = getDouble(tokens[4]);
+					double endTimeWindow = getDouble(tokens[5]);
+					double serviceTime = getDouble(tokens[6]);
+					Customer customer = vrpBuilder.createAndAddCustomer(customerId, vrpBuilder.getNodeFactory().createNode(customerId, coord), 
+							demand, startTimeWindow, endTimeWindow, serviceTime); 
+					if(customerId.equals("0")){
+						vrpBuilder.setDepot(customer);
+					}
+					if(!tokens[7].equals("0")){
+						vrpBuilder.addRelation(customerId,tokens[7]);
+					}
+					else if(!tokens[8].equals("0")){
+						vrpBuilder.addRelation(customerId,tokens[8]);
+					}
 				}
-				counter++;
 			}
 			reader.close();
-		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
 	private Coordinate makeCoord(String xString, String yString) {
@@ -114,5 +122,13 @@ public class Christophides {
 		return new Coordinate(x,y);
 	}
 	
+	private double getDouble(String string) {
+		return Double.parseDouble(string);
+	}
+
+	private int getInt(String string) {
+		return Integer.parseInt(string);
+	}
+
 
 }

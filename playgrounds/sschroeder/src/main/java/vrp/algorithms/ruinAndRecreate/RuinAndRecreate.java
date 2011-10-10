@@ -161,7 +161,7 @@ public class RuinAndRecreate {
 	
 	private void verify() {
 		if(currentSolution.getTourAgents().isEmpty() || currentSolution.getTourAgents().size() < 1){
-			return;
+			throw new IllegalStateException("initial solution is empty. this cannot be. check vehicle-routing-problem setup (VRP)");
 		}
 		
 	}

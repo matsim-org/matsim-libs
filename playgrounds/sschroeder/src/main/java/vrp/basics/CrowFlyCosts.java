@@ -28,7 +28,7 @@ import vrp.api.Node;
  * @author stefan schroeder
  *
  */
-public class CrowFlyDistance implements Costs{
+public class CrowFlyCosts implements Costs{
 	
 	public int speed = 1;
 	

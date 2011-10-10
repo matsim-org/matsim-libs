@@ -18,7 +18,7 @@ import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
@@ -33,6 +33,15 @@ public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFac
 	
 	private int iterations = 50;
 	
+	public RuinAndRecreateWithTimeWindowsFactory(int warmup, int iterations) {
+		this.warmUp = warmup;
+		this.iterations = iterations;
+	}
+
+	public RuinAndRecreateWithTimeWindowsFactory() {
+		super();
+	}
+
 	public void addRuinAndRecreateListener(RuinAndRecreateListener l){
 		ruinAndRecreationListeners.add(l);
 	}
@@ -53,7 +62,7 @@ public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFac
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
-		recreationStrategy.setInitialSolutionFactory(new SingleDepotSolutionFactoryImpl());
+		recreationStrategy.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
 		RadialRuin radialRuin = new RadialRuin(vrp);

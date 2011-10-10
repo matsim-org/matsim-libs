@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
 
-public class SingleDepotSolutionFactoryImpl implements SingleDepotInitialSolutionFactory{
+public class SingleDepotInitialSolutionFactoryImpl implements SingleDepotInitialSolutionFactory{
 
-	private static Logger logger = Logger.getLogger(SingleDepotSolutionFactoryImpl.class);
+	private static Logger logger = Logger.getLogger(SingleDepotInitialSolutionFactoryImpl.class);
 	
 	@Override
 	public Collection<Tour> createInitialSolution(SingleDepotVRP vrp) {

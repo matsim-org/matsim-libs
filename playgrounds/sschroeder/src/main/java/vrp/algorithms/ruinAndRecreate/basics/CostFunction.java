@@ -44,6 +44,9 @@ public class CostFunction {
 	}
 
 	public double getTotalCost() {
+		if(cost == null){
+			throw new IllegalStateException("cost value is null. make sure, the vrp is setup correctly");
+		}
 		return cost;
 	}
 }

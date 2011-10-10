@@ -37,7 +37,7 @@ import vrp.algorithms.ruinAndRecreate.ruin.RandomRuin;
 import vrp.algorithms.ruinAndRecreate.thresholdFunctions.SchrimpfsRRThresholdFunction;
 import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
@@ -62,6 +62,16 @@ public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 	
 	private int iterations = 100;
 	
+	public StandardRuinAndRecreateFactory(int warmUp, int iterations) {
+		super();
+		this.warmUp = warmUp;
+		this.iterations = iterations;
+	}
+
+	public StandardRuinAndRecreateFactory() {
+		super();
+	}
+
 	/* (non-Javadoc)
 	 * @see vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateFactory#createAlgorithm(vrp.api.SingleDepotVRP, java.util.Collection, int)
 	 */
@@ -75,7 +85,7 @@ public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setInitialSolutionFactory(new SingleDepotSolutionFactoryImpl());
+		recreationStrategy.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		

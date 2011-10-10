@@ -13,8 +13,8 @@ import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateWithTimeWindowsFa
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.Coordinate;
-import vrp.basics.CrowFlyDistance;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.CrowFlyCosts;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
 import freight.vrp.ChartListener;
 import freight.vrp.RuinAndRecreateReport;
@@ -59,7 +59,7 @@ private SingleDepotVRPBuilder vrpBuilder;
 	
 	private SingleDepotVRP createVRP() {
 		vrpBuilder.setConstraints(new TWAndCapacityConstraint());
-		CrowFlyDistance costs = new CrowFlyDistance();
+		CrowFlyCosts costs = new CrowFlyCosts();
 		costs.speed = 1;
 		vrpBuilder.setCosts(costs);
 		return vrpBuilder.buildVRP();
@@ -74,7 +74,7 @@ private SingleDepotVRPBuilder vrpBuilder;
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
 		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);
-		return factory.createAlgorithm(vrp, new SingleDepotSolutionFactoryImpl().createInitialSolution(vrp),vrp.getVehicleType().capacity);
+		return factory.createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp),vrp.getVehicleType().capacity);
 	}
 	
 	private void readProblem(String fileNameOfInstance){

@@ -19,6 +19,8 @@ package vrp.basics;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import vrp.api.Constraints;
 import vrp.api.Costs;
@@ -28,6 +30,16 @@ import vrp.api.SingleDepotVRP;
 
 public class SingleDepotVRPBuilder {
 	
+	class Relation {
+		String id1;
+		String id2;
+		public Relation(String id1, String id2) {
+			super();
+			this.id1 = id1;
+			this.id2 = id2;
+		}
+	}
+	
 	private Constraints constraints;
 	
 	private Costs costs;
@@ -36,7 +48,9 @@ public class SingleDepotVRPBuilder {
 	
 	private VehicleType vehicleType;
 	
-	private Collection<Customer> customers = new ArrayList<Customer>();
+	private Collection<Relation> relations = new ArrayList<SingleDepotVRPBuilder.Relation>();
+	
+	private Map<String,Customer> customerMap = new HashMap<String, Customer>();
 	
 	private NodeFactory nodeFactory = new NodeFactory();
 	
@@ -51,16 +65,20 @@ public class SingleDepotVRPBuilder {
 	}
 	
 	public void setDepot(Customer customer){
-		if(!customers.contains(customer)){
+		if(!customerMap.containsKey(customer.getId())){
 			throw new IllegalStateException(customer.getId() + " is not in customer list. add customer with addCustomer() first and then set it as depot");
 		}
 		depot = customer;
 	}
 	
 	public void addCustomer(Customer customer){
-		customers.add(customer);
+		customerMap.put(customer.getId(), customer);
 	}
 	
+	public void addRelation(String customerId1, String customerId2) {
+		relations.add(new Relation(customerId1,customerId2));
+	}
+
 	public void setVehicleType(VehicleType vehicleType){
 		this.vehicleType = vehicleType;
 	}
@@ -87,8 +105,19 @@ public class SingleDepotVRPBuilder {
 	
 	public SingleDepotVRP buildVRP(){
 		verify();
-		SingleDepotVRP vrp = new SingleDepotVRPImpl(depot.getId(),vehicleType, customers, costs, constraints);
+		setRelations();
+		SingleDepotVRP vrp = new SingleDepotVRPImpl(depot.getId(),vehicleType, customerMap.values(), costs, constraints);
 		return vrp;
+	}
+
+	private void setRelations() {
+		for(Relation relation : relations){
+			Customer c1 = customerMap.get(relation.id1);
+			Customer c2 = customerMap.get(relation.id2);
+			c1.setRelation(new vrp.basics.Relation(c2));
+			c2.setRelation(new vrp.basics.Relation(c1));
+		}
+		
 	}
 
 	private void verify() {

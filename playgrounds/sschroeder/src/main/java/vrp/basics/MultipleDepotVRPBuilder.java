@@ -41,7 +41,7 @@ public class MultipleDepotVRPBuilder {
 		
 	};
 	
-	private Costs costs = new CrowFlyDistance();
+	private Costs costs = new CrowFlyCosts();
 	
 	private List<String> depots = new ArrayList<String>();
 	

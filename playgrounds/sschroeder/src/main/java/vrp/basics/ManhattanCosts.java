@@ -26,7 +26,7 @@ import vrp.api.Node;
  *
  */
 
-public class ManhattanDistance implements Costs {
+public class ManhattanCosts implements Costs {
 
 	public double speed = 1;
 	
