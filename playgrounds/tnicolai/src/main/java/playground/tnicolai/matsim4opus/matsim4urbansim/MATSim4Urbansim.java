@@ -137,8 +137,8 @@ public class MATSim4Urbansim {
 		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
 		
 		// saving results from current run
-		saveRunOutputs();
-		cleanUrbanSimOutput(); // tnicolai: Experimental, may comment out
+		//saveRunOutputs();			// tnicolai: Experimental, comment out for matsim4urbansim release
+		//cleanUrbanSimOutput();	// tnicolai: Experimental, comment out for matsim4urbansim release
 		
 	}
 	
@@ -219,7 +219,8 @@ public class MATSim4Urbansim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV2( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
+//		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV2( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
+		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3WithoutWorkplaceAccessibility( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
 		
 		// tnicolai todo?: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
