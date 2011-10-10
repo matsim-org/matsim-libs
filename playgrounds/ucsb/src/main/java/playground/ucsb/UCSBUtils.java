@@ -20,21 +20,28 @@
 
 package playground.ucsb;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -80,5 +87,16 @@ public abstract class UCSBUtils {
 		}
 		log.info(features.size()+" features stored.");
 		return features;
+	}
+	
+	public static final Set<Id> parseObjectIds(String idFile) throws FileNotFoundException, IOException {
+		Set<Id> idSet = new HashSet<Id>();
+		BufferedReader br = IOUtils.getBufferedReader(idFile);
+		String curr_line;
+		while ((curr_line = br.readLine()) != null) {
+			Id id = new IdImpl(curr_line.trim());
+			idSet.add(id);
+		}
+		return idSet;
 	}
 }

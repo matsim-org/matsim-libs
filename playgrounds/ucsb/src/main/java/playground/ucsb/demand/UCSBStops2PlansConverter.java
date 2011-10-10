@@ -107,7 +107,7 @@ public class UCSBStops2PlansConverter {
 
 		log.info("writing data to "+outputBase+"...");
 		new NetworkWriter(scenario.getNetwork()).write(outputBase+"/network.xml.gz");
-		new NetworkWriteAsTable(outputBase).run(scenario.getNetwork());
+		new NetworkWriteAsTable(outputBase,5.0).run(scenario.getNetwork());
 		new PopulationWriter(scenario.getPopulation(), null).write(outputBase+"/plans.xml.gz");
 		new ObjectAttributesXmlWriter(personObjectAttributes).writeFile(outputBase+"/personObjectAttributes.xml.gz");
 		log.info("done. (writing)");

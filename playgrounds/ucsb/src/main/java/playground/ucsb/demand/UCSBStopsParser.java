@@ -22,9 +22,11 @@ package playground.ucsb.demand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +37,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -147,6 +150,21 @@ public class UCSBStopsParser {
 		}
 	}
 	
+	private final void cleanUp(Population population) {
+		Set<Id> pidsToRemove = new HashSet<Id>();
+		for (Person person : population.getPersons().values()) {
+			Activity firstActivity = (Activity)person.getSelectedPlan().getPlanElements().get(0);
+			if (firstActivity.getEndTime() < 0.0) {
+				pidsToRemove.add(person.getId());
+				log.info("pid="+person.getId()+": first departure before 00:00:00. Will be removed from the population");
+			}
+		}
+		for (Id pid : pidsToRemove) {
+			population.getPersons().remove(pid);
+		}
+		log.info("in totoal "+pidsToRemove.size()+" removed from the population.");
+	}
+	
 	public final void parse(String cemdapStopsFile, Scenario scenario, ObjectAttributes personObjectAttributes, double fraction) {
 		Population population = scenario.getPopulation();
 		int line_cnt = 0;
@@ -229,5 +247,7 @@ public class UCSBStopsParser {
 		}
 		log.info(line_cnt+" lines parsed.");
 		log.info(population.getPersons().size()+" persons stored.");
+		cleanUp(population);
+		log.info(population.getPersons().size()+" persons remaining.");
 	}
 }
