@@ -474,10 +474,13 @@ public class JointPlan implements Plan {
 	 * for used in JointLeg only.
 	 */
 	JointLeg getLegById(IdLeg legId) {
-		if (!this.legsMap.containsKey(legId)) {
+		JointLeg leg = this.legsMap.get(legId);
+
+		if (leg == null) {
 			throw new RuntimeException("legs links could not be resolved");
 		}
-		return this.legsMap.get(legId);
+
+		return leg;
 	}
 
 	/**

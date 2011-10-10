@@ -78,6 +78,8 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	private final PlansCalcRoute plansCalcRoute;
 	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final Network network;
+	// reference to the internal network link map
+	private final Map<Id, ? extends Link> networkLinks;
 	private final Map<Tuple<Id, Id>, Map<String, LegImpl>> fixedRoutes = 
 		new HashMap<Tuple<Id, Id>, Map<String, LegImpl>>();
 
@@ -100,6 +102,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		this.plansCalcRoute = plansCalcRoute;
 		this.simLegInterpretation = simLegInterpretation;
 		this.network = network;
+		this.networkLinks = network.getLinks();
 
 		this.initPlanSpecificInformation();
 	}
@@ -150,13 +153,13 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 							route.getLinkIds()),
 						now);
 				now = this.processLink(
-						this.network.getLinks().get(actDestination.getLinkId()),
+						this.networkLinks.get(actDestination.getLinkId()),
 						now);
 			}
 			else if (simLegInterpretation.equals(
 						PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(
-						this.network.getLinks().get(actOrigin.getLinkId()),
+						this.networkLinks.get(actOrigin.getLinkId()),
 						now);
 				now = this.processRouteTravelTime(
 						NetworkUtils.getLinks(this.network, route.getLinkIds()),
@@ -194,12 +197,12 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 						NetworkUtils.getLinks(this.network, route.getLinkIds()),
 						now);
 				now = this.processLink(
-						this.network.getLinks().get(actDestination.getLinkId()),
+						this.networkLinks.get(actDestination.getLinkId()),
 						now);
 			}
 			else if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
 				now = this.processLink(
-						this.network.getLinks().get(actOrigin.getLinkId()),
+						this.networkLinks.get(actOrigin.getLinkId()),
 						now);
 				now = this.processRouteTravelTime(
 						NetworkUtils.getLinks(this.network, route.getLinkIds()),
@@ -271,9 +274,9 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 			final Activity actDestination) {
 		if (mode.equals(TransportMode.car)) {
 			Link startLink =
-				this.network.getLinks().get(actOrigin.getLinkId());
+				this.networkLinks.get(actOrigin.getLinkId());
 			Link endLink =
-				this.network.getLinks().get(actDestination.getLinkId());
+				this.networkLinks.get(actDestination.getLinkId());
 			NetworkRoute route = (NetworkRoute) 
 				this.plansCalcRoute.getRouteFactory().createRoute(
 						TransportMode.car,
