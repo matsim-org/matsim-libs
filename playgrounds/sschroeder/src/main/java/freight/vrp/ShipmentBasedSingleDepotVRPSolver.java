@@ -31,13 +31,13 @@ import vrp.api.SingleDepotVRP;
 import vrp.basics.DeliveryFromDepot;
 import vrp.basics.PickupToDepot;
 import vrp.basics.SingleDepotInitialSolutionFactory;
-import vrp.basics.SingleDepotSolutionFactoryImpl;
+import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.TourActivity;
 import vrp.basics.VehicleType;
 
-public class RRSingleDepotVRPSolver implements VRPSolver{
+public class ShipmentBasedSingleDepotVRPSolver implements VRPSolver{
 	
-	private static Logger logger = Logger.getLogger(RRSingleDepotVRPSolver.class);
+	private static Logger logger = Logger.getLogger(ShipmentBasedSingleDepotVRPSolver.class);
 	
 	private MatSim2VRPTransformation matsim2vrp;
 	
@@ -49,7 +49,7 @@ public class RRSingleDepotVRPSolver implements VRPSolver{
 	
 	private VehicleType vehicleType;
 	
-	private SingleDepotInitialSolutionFactory iniSolutionFactory = new SingleDepotSolutionFactoryImpl();
+	private SingleDepotInitialSolutionFactory iniSolutionFactory = new SingleDepotInitialSolutionFactoryImpl();
 	
 	private Constraints constraints;
 	
@@ -61,7 +61,7 @@ public class RRSingleDepotVRPSolver implements VRPSolver{
 	
 	private RuinAndRecreateFactory rrFactory;
 
-	public RRSingleDepotVRPSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
+	public ShipmentBasedSingleDepotVRPSolver(Collection<CarrierShipment> shipments, Collection<CarrierVehicle> vehicles, Network network) {
 		super();
 		this.shipments = shipments;
 		makeDepot(vehicles);

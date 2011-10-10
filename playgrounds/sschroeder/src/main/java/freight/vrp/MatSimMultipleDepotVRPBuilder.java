@@ -12,7 +12,7 @@ import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.MultipleDepotsVRP;
 import vrp.api.VRP;
-import vrp.basics.CrowFlyDistance;
+import vrp.basics.CrowFlyCosts;
 import vrp.basics.Tour;
 import vrp.basics.VRPWithMultipleDepotsImpl;
 import vrp.basics.Vehicle;
@@ -31,7 +31,7 @@ public class MatSimMultipleDepotVRPBuilder {
 	
 	private MatSim2VRPTransformation vrpTrafo;
 	
-	private Costs costs = new CrowFlyDistance();
+	private Costs costs = new CrowFlyCosts();
 	
 	private List<Id> depots = new ArrayList<Id>();
 	
