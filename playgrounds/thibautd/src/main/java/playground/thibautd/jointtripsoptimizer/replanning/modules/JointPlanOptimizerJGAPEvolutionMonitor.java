@@ -50,6 +50,9 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	private final boolean monitorTime;
 	private long maxEndTime = Long.MAX_VALUE;
 
+	// for log only
+	private final int nMembers;
+
 	private int iterationsToEval = 0;
 	private double oldBest = Double.NEGATIVE_INFINITY;
 
@@ -64,6 +67,7 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 		this.jgapConfig = jgapConfig;
 		this.maxCpuTime = (long) nMembers * configGroup.getMaxCpuTimePerMemberNanoSecs();
 		this.monitorTime = (this.maxCpuTime >= 0); 
+		this.nMembers = nMembers;
 	}
 
 	@Override
@@ -110,7 +114,7 @@ public class JointPlanOptimizerJGAPEvolutionMonitor implements IEvolutionMonitor
 	private boolean timeIsElapsed() {
 		if (monitorTime) {
 			boolean timeElapsed = this.maxEndTime <= ManagementFactory.getThreadMXBean().getCurrentThreadCpuTime();
-			if (timeElapsed) log.debug("stopping genetic iterations based on computation time");
+			if (timeElapsed) log.debug("stopping genetic iterations based on computation time after "+this.jgapConfig.getGenerationNr()+" iterations for clique with "+nMembers+" members");
 			return timeElapsed;
 		}
 
