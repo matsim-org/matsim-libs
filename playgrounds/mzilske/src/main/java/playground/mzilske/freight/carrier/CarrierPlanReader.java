@@ -163,7 +163,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 				if(durationString != null){
 					duration = Double.parseDouble(durationString);
 				}
-				currentTourBuilder.scheduleGeneralActivity(atts.getValue(TYPE), makeId(atts.getValue(LINKID)), duration);
+				currentTourBuilder.scheduleGeneralActivity(atts.getValue(TYPE), makeId(atts.getValue(LINKID)), null, null, duration);
 			}
 		}
 	}

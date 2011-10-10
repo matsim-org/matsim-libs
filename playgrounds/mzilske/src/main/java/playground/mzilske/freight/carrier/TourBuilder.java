@@ -69,12 +69,12 @@ public class TourBuilder {
 		}
 	}
 	
-	public void scheduleGeneralActivity(String type, Id locationLink, Double duration){
-		tourElements.add(createGeneralActivity(type,locationLink,duration));
+	public void scheduleGeneralActivity(String type, Id locationLink, Double earliestStart, Double latestStart, Double duration){
+		tourElements.add(createGeneralActivity(type,locationLink,earliestStart,latestStart,duration));
 	}
 
-	private TourElement createGeneralActivity(String type, Id locationLink,Double duration) {
-		GeneralActivity act = new GeneralActivity(type, locationLink, duration);
+	private TourElement createGeneralActivity(String type, Id locationLink,Double earliestStart, Double latestStart, Double duration) {
+		GeneralActivity act = new GeneralActivity(type, locationLink, earliestStart, latestStart, duration);
 		return act;
 	}
 

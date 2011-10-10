@@ -19,13 +19,18 @@ public class Tour {
 
 		public abstract double getDuration();
 		
+		@Deprecated
 		public abstract CarrierShipment getShipment();
 		
 		public abstract TimeWindow getTimeWindow();
 		
 	};
 	
-	public static class Pickup extends TourElement {
+	public static abstract class ShipmentBasedActivity extends TourElement {
+		public abstract CarrierShipment getShipment();
+	}
+	
+	public static class Pickup extends ShipmentBasedActivity {
 
 		private CarrierShipment shipment;
 
@@ -59,7 +64,7 @@ public class Tour {
 		}
 	};
 	
-	public static class Delivery extends TourElement {
+	public static class Delivery extends ShipmentBasedActivity {
 
 		private CarrierShipment shipment;
 
@@ -102,16 +107,17 @@ public class Tour {
 		
 		private Double duration;
 		
-		public GeneralActivity(String type, Id location, Double duration) {
+		private Double earliestStart;
+		
+		private Double latestStart;
+		
+		public GeneralActivity(String type, Id location, Double earliestStart, Double latestStart, Double duration) {
 			super();
 			this.type = type;
 			this.location = location;
-			if(duration != null){
-				this.duration = duration;
-			}
-			else{
-				this.duration = 0.0;
-			}
+			this.duration = duration;
+			this.earliestStart = earliestStart;
+			this.latestStart = latestStart;
 		}
 
 		@Override
@@ -136,7 +142,7 @@ public class Tour {
 
 		@Override
 		public TimeWindow getTimeWindow() {
-			return new TimeWindow(0.0, 3600*24);
+			return new TimeWindow(earliestStart, latestStart);
 		}
 		
 	}
