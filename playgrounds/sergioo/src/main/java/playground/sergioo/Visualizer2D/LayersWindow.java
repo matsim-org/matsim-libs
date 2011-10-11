@@ -24,6 +24,7 @@ public abstract class LayersWindow extends JFrame {
 	}
 	public interface Labels {
 		public String getText();
+		public int ordinal();
 	}
 	
 	//Constants
@@ -50,6 +51,7 @@ public abstract class LayersWindow extends JFrame {
 		lblCoords[0].setText(nF.format(x)+" ");
 		lblCoords[1].setText(" "+nF.format(y));
 	}
+	public abstract void refreshLabel(Labels label);
 	
 }
 

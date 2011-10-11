@@ -262,13 +262,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	public void setActivePanel(NetworkNodesPanel panel) {
 		layersPanels.put(PanelIds.ACTIVE, panel);
 	}
-	public void refreshLabel(Labels label) {
-		if(label.equals(Labels.ACTIVE))
-			labels[label.ordinal()].setText(layersPanels.get(PanelIds.ACTIVE)==layersPanels.get(PanelIds.A)?"A":"B");
-		else
-			labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
-		repaint();
-	}
+	
 	public void match() {
 		//matchingProcess.match()
 	}
@@ -312,6 +306,14 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			setVisible(false);
 			readyToExit = true;
 		}
+	}
+	@Override
+	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
+		if(label.equals(Labels.ACTIVE))
+			labels[label.ordinal()].setText(layersPanels.get(PanelIds.ACTIVE)==layersPanels.get(PanelIds.A)?"A":"B");
+		else
+			labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
+		repaint();
 	}
 	
 }

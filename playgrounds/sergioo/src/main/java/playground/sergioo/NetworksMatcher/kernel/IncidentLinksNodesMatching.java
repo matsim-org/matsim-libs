@@ -76,7 +76,7 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 		}
 		else
 			for(int b=0; b<linksBig.size(); b++) {
-				double anglesDifference = Math.abs(((ComposedLink)linksSmall.get(0)).getAngle(in)-((ComposedLink)linksBig.get(b)).getAngle(in));
+				double anglesDifference = Math.abs(((ComposedLink)linksSmall.get(0)).getAngle()-((ComposedLink)linksBig.get(b)).getAngle());
 				if(anglesDifference>Math.PI)
 					anglesDifference = 2*Math.PI - anglesDifference;
 				if(!indicesBig.contains(b) && anglesDifference<minAngle) {

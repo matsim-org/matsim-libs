@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
-import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
 public class NetworkNodesPainter extends NetworkPainter {
 	

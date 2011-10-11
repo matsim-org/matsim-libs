@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import org.matsim.api.core.v01.network.Network;
+
 import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
@@ -76,6 +78,10 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 	private JButton readyButton;
 	
 	//Methods
+	public SimpleNetworkWindow(String title, Network network) {
+		this(title, new NetworkPainter(network));
+	}
+	
 	public SimpleNetworkWindow(String title, NetworkPainter networkPainter) {
 		setTitle(title);
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -120,7 +126,7 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 		this.add(infoPanel, BorderLayout.SOUTH);
 		pack();
 	}
-	public void refreshLabel(Labels label) {
+	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		labels[label.ordinal()].setText(((NetworkPanel)layersPanels.get(PanelIds.ONE)).getLabelText(label));
 	}
 	@Override
@@ -133,5 +139,6 @@ public class SimpleNetworkWindow extends LayersWindow implements ActionListener 
 			readyToExit = true;
 		}
 	}
+	
 	
 }

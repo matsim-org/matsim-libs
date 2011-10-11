@@ -165,4 +165,5 @@ public abstract class LayersPanel extends JPanel {
 		return (y-(this.getHeight()-height)/2)*camera.getSize().getY()/height+camera.getUpLeftCorner().getY();
 	}
 	
+	
 }

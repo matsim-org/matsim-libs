@@ -103,7 +103,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		}
 		super.calculateBoundaries(coords);
 	}
-	public String getLabelText(Labels label) {
+	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
 			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkNodesPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
+import playground.sergioo.Visualizer2D.LayersWindow;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.SimpleSelectionNetworkPainter;
@@ -51,12 +52,12 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 	private static final long serialVersionUID = 1L;
 	
 	//Attributes
-	private final SimpleNetworkWindow window;
+	protected final LayersWindow window;
 	private int iniX;
 	private int iniY;
 	
 	//Methods
-	public NetworkPanel(SimpleNetworkWindow window, NetworkPainter networkPainter) {
+	public NetworkPanel(LayersWindow window, NetworkPainter networkPainter) {
 		super();
 		this.window = window;
 		addLayer(new Layer(networkPainter));
@@ -107,7 +108,7 @@ public class NetworkPanel extends LayersPanel implements MouseListener, MouseMot
 		}
 		repaint();
 	}
-	public String getLabelText(Labels label) {
+	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
 			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {

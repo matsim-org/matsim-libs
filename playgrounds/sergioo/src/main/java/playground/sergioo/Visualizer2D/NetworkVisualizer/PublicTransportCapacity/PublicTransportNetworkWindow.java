@@ -127,5 +127,9 @@ public class PublicTransportNetworkWindow extends LayersWindow implements Action
 			readyToExit = true;
 		}
 	}
+	@Override
+	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
+		
+	}
 	
 }
