@@ -213,7 +213,7 @@ public class DaShapeWriter {
 			attribs = new AttributeType[attributes.size() + 2];
 		}
 		attribs[0] = DefaultAttributeTypeFactory.newAttributeType("Point", Point.class, true, null, null, MGC.getCRS(TransformationFactory.WGS84_UTM35S));
-		attribs[1] = AttributeTypeFactory.newAttributeType("id", String.class);
+		attribs[1] = AttributeTypeFactory.newAttributeType("name", String.class);
 		Integer count = 2;
 		
 		if(!(attributes == null)){
