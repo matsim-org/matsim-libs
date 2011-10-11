@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.spanningTreeTest;
+package playground.tnicolai.matsim4opus.leastcostpathtree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,12 +19,12 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.tnicolai.matsim4opus.testCostCalculators.TravelDistanceCostCalculatorTest;
-import playground.tnicolai.matsim4opus.testCostCalculators.TravelTimeCostCalculatorTest;
+import playground.tnicolai.matsim4opus.costcalculators.TravelDistanceCostCalculatorTest;
+import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.toronto.ttimematrix.LeastCostPathTree;
 import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
-public class SpanningTreeTest extends MatsimTestCase{
+public class LeastCostPathTreeTest extends MatsimTestCase{
 	
 	ScenarioImpl scenario;
 	double dummyCostFactor;

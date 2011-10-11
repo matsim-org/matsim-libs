@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.testCostCalculators;
+package playground.tnicolai.matsim4opus.costcalculators;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;

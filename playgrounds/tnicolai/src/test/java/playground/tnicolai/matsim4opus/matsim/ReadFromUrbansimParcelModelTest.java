@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.matsimTest;
+package playground.tnicolai.matsim4opus.matsim;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.matsimTest;
+package playground.tnicolai.matsim4opus.matsim;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.warmStart;
+package playground.tnicolai.matsim4opus.startmode;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;

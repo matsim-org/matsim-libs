@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.accessibilityTest;
+package playground.tnicolai.matsim4opus.accessibility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,8 +23,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.testCostCalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;

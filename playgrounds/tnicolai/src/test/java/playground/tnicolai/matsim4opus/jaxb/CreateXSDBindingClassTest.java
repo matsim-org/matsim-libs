@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.jaxbTest;
+package playground.tnicolai.matsim4opus.jaxb;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +43,8 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.jaxbTest.test.MatsimConfigType;
-import playground.tnicolai.matsim4opus.jaxbTest.test.ObjectFactory;
+import playground.tnicolai.matsim4opus.jaxb.test.MatsimConfigType;
+import playground.tnicolai.matsim4opus.jaxb.test.ObjectFactory;
 import playground.tnicolai.matsim4opus.matsimTestData.GenerateOPUSTestEnvironment;
 import playground.tnicolai.matsim4opus.utils.UpdateXMLBindingClasses;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
