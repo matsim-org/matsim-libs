@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -35,6 +38,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -80,8 +84,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	private final Network network;
 	// reference to the internal network link map
 	private final Map<Id, ? extends Link> networkLinks;
-	private final Map<Tuple<Id, Id>, Map<String, LegImpl>> fixedRoutes = 
-		new HashMap<Tuple<Id, Id>, Map<String, LegImpl>>();
+	private final FixedRoutes fixedRoutes = new FixedRoutes();
 
 	/**
 	 * Constructs an instance.
@@ -120,37 +123,19 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 			final Activity actDestination,
 			final int legPlanElementIndex,
 			final double departureTime) {
-		LegImpl newLeg = null;
-		Tuple<Id, Id> odTuple = getOdTuple(actOrigin, actDestination);
-		Map<String, LegImpl> legInformation = this.fixedRoutes.get(odTuple);
+		RouteWrapper routeInformation = fixedRoutes.getRoute(mode, actOrigin, actDestination);
+		Route route = routeInformation.getWrappedRoute();
 
-		if (legInformation == null) {
-			legInformation = new HashMap<String, LegImpl>();
-			this.fixedRoutes.put(odTuple, legInformation);
-		}
-
-		if (legInformation.containsKey(mode)) {
-			newLeg = legInformation.get(mode);
-		}
-		else {
-			newLeg = new LegImpl(mode);
-
-			createRoute(mode, actOrigin, newLeg, actDestination);
-
-			legInformation.put(mode, newLeg);
-		}
+		LegImpl newLeg = new LegImpl(mode);
 
 		if (mode.equals(TransportMode.car)) {
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLinkId(), now);
 
-			NetworkRoute route = ((NetworkRoute) newLeg.getRoute());
 			if (simLegInterpretation.equals(
 						PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				now = this.processRouteTravelTime(
-						NetworkUtils.getLinks(
-							this.network,
-							route.getLinkIds()),
+						routeInformation.getLinks(),
 						now);
 				now = this.processLink(
 						this.networkLinks.get(actDestination.getLinkId()),
@@ -162,14 +147,19 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 						this.networkLinks.get(actOrigin.getLinkId()),
 						now);
 				now = this.processRouteTravelTime(
-						NetworkUtils.getLinks(this.network, route.getLinkIds()),
+						routeInformation.getLinks(),
 						now);
 			}
 
 			newLeg.setTravelTime(now - departureTime);
 		}
+		else {
+			newLeg.setTravelTime(route.getTravelTime());
+		}
 
-		return new LegImpl(newLeg);
+		newLeg.setRoute(route);
+
+		return newLeg;
 	}
 
 	@Override
@@ -182,19 +172,18 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 			final Leg legIntermediate,
 			final boolean doModifyLeg) {
 		double legTravelTimeEstimation = 0.0;
-		Tuple<Id, Id> odTuple = getOdTuple(actOrigin, actDestination);
 		String mode = legIntermediate.getMode();
 
 		if (mode.equals(TransportMode.car)) {
 			double now = departureTime;
 			now = this.processDeparture(actOrigin.getLinkId(), now);
-			Map<String, LegImpl> odInformation = this.fixedRoutes.get(odTuple);
-			NetworkRoute route = (NetworkRoute) getFixedRoute(odTuple, actOrigin, actDestination, mode);
+			RouteWrapper routeInformation = fixedRoutes.getRoute(mode, actOrigin, actDestination);
+			NetworkRoute route = (NetworkRoute) routeInformation.getWrappedRoute();
 			NetworkRoute networkRoute;
 
 			if (simLegInterpretation.equals(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
 				now = this.processRouteTravelTime(
-						NetworkUtils.getLinks(this.network, route.getLinkIds()),
+						routeInformation.getLinks(),
 						now);
 				now = this.processLink(
 						this.networkLinks.get(actDestination.getLinkId()),
@@ -205,7 +194,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 						this.networkLinks.get(actOrigin.getLinkId()),
 						now);
 				now = this.processRouteTravelTime(
-						NetworkUtils.getLinks(this.network, route.getLinkIds()),
+						routeInformation.getLinks(),
 						now);
 			}
 
@@ -227,7 +216,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 			legTravelTimeEstimation = now - departureTime;
 		}
 		else {
-			Route route = getFixedRoute(odTuple, actOrigin, actDestination, mode);
+			Route route = fixedRoutes.getRoute(mode, actOrigin, actDestination).getWrappedRoute();
 			legTravelTimeEstimation = route.getTravelTime();
 
 			if (doModifyLeg) {
@@ -238,91 +227,6 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 
 		return legTravelTimeEstimation;
 	}
-
-	private Route getFixedRoute(
-			final Tuple<Id, Id> odTuple,
-			final Activity actOrigin,
-			final Activity actDestination,
-			final String mode) {
-		Map<String, LegImpl> odInformation = this.fixedRoutes.get(odTuple);
-		LegImpl infoLeg;
-
-		if (odInformation == null) {
-			odInformation = new HashMap<String, LegImpl>();
-			infoLeg = new LegImpl(mode);
-			createRoute(mode, actOrigin, infoLeg, actDestination);
-			odInformation.put(mode, infoLeg);
-			this.fixedRoutes.put(odTuple, odInformation);
-		}
-		else {
-			infoLeg = odInformation.get(mode);
-			
-			if (infoLeg == null) {
-				infoLeg = new LegImpl(mode);
-				createRoute(mode, actOrigin, infoLeg, actDestination);
-				odInformation.put(mode, infoLeg);
-			}
-		}
-
-		return infoLeg.getRoute();
-	}
-
-	private void createRoute(
-			final String mode,
-			final Activity actOrigin,
-			final LegImpl infoLeg,
-			final Activity actDestination) {
-		if (mode.equals(TransportMode.car)) {
-			Link startLink =
-				this.networkLinks.get(actOrigin.getLinkId());
-			Link endLink =
-				this.networkLinks.get(actDestination.getLinkId());
-			NetworkRoute route = (NetworkRoute) 
-				this.plansCalcRoute.getRouteFactory().createRoute(
-						TransportMode.car,
-						startLink.getId(),
-						endLink.getId());
-
-			// calculate free speed route and cache it
-			Path path =
-				this.plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
-						startLink.getToNode(),
-						endLink.getFromNode(),
-						0.0);
-
-			route.setLinkIds(
-					startLink.getId(),
-					NetworkUtils.getLinkIds(path.links),
-					endLink.getId());
-
-			// set route distance
-			double distance = RouteUtils.calcDistance(route, this.network);
-
-			//if (simLegInterpretation.equals(
-			//			PlanomatConfigGroup.SimLegInterpretation.CetinCompatible)) {
-			//	distance += endLink.getLength();
-			//}
-			//else if (simLegInterpretation.equals(
-			//			PlanomatConfigGroup.SimLegInterpretation.CharyparEtAlCompatible)) {
-			//	distance += startLink.getLength();
-			//}
-
-			route.setDistance(distance);
-
-			infoLeg.setRoute(route);
-		}
-		else {
-			double travelTimeEst = this.plansCalcRoute.handleLeg(
-					this.plan.getPerson(),
-					infoLeg,
-					actOrigin,
-					actDestination,
-					FALSE_NOW);
-			// just to be sure...
-			infoLeg.getRoute().setTravelTime(travelTimeEst);
-		}
-	}
-
 	/*
 	 * =========================================================================
 	 * helper methods
@@ -367,34 +271,144 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	 * That is, the router will only be used for newly created ODs.
 	 */
 	private void initPlanSpecificInformation() {
-		if (this.plan != null) {
-			Map<String, LegImpl> odInformation;
-			Tuple<Id, Id> odTuple;
-			Route route;
-			for (PlanElement planElement : this.plan.getPlanElements()) {
-				if (planElement instanceof LegImpl) {
-					LegImpl leg = (LegImpl) planElement;
-					// TODO this should be possible for all types of routes.
-					// Then we could cache e.g. the original pt routes, too.
-					// however, LegImpl cloning constructor does not yet handle
-					// generic routes correctly
-					route = leg.getRoute();
-					if (route instanceof NetworkRoute) {
-						//FIXME: OD impossible to extract from route!
-						odTuple = getOdTuple(route);
-						odInformation = this.fixedRoutes.get(odTuple);
 
-						if (odInformation == null) {
-							// create information map for this od
-							odInformation = new HashMap<String, LegImpl>();
-							odInformation.put(leg.getMode(), new LegImpl(leg));
-							this.fixedRoutes.put(
-									odTuple,
-									odInformation);
-						}
-						else if (!odInformation.containsKey(leg.getMode())) {
-							// update information map for this OD
-							odInformation.put(leg.getMode(), new LegImpl(leg));
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+
+	// /////////////////////////////////////////////////////////////////////
+	// classes
+	// /////////////////////////////////////////////////////////////////////
+
+	/**
+	 * map-like class, storing route information related to triplets
+	 * origin-destination-mode.
+	 */
+	private class FixedRoutes {
+		private final Map<Tuple<Id, Id>, Map<String, RouteWrapper>> fixedRoutes = 
+			new HashMap<Tuple<Id, Id>, Map<String, RouteWrapper>>();
+
+		public RouteWrapper getRoute(
+				final String mode,
+				final Activity origin,
+				final Activity destination) {
+			RouteWrapper route = null;
+			Tuple<Id, Id> od = getOdTuple(origin, destination);
+
+			Map<String, RouteWrapper> routesByMode = fixedRoutes.get(od);
+
+			if (routesByMode == null) {
+				routesByMode = new HashMap<String, RouteWrapper>();
+				route = createRoute(mode, origin, destination);
+				routesByMode.put(mode, route);
+				fixedRoutes.put(od, routesByMode);
+			}
+			else {
+				route = routesByMode.get(mode);
+
+				if (route == null) {
+					route = createRoute(mode, origin, destination);
+					routesByMode.put(mode, route);
+				}
+			}
+
+			return route;
+		}
+
+		private RouteWrapper createRoute(
+				final String mode,
+				final Activity actOrigin,
+				final Activity actDestination) {
+			if (mode.equals(TransportMode.car)) {
+				Link startLink =
+					networkLinks.get(actOrigin.getLinkId());
+				Link endLink =
+					networkLinks.get(actDestination.getLinkId());
+				NetworkRoute route = (NetworkRoute) 
+					plansCalcRoute.getRouteFactory().createRoute(
+							TransportMode.car,
+							startLink.getId(),
+							endLink.getId());
+
+				// calculate free speed route and cache it
+				Path path =
+					plansCalcRoute.getPtFreeflowLeastCostPathCalculator().calcLeastCostPath(
+							startLink.getToNode(),
+							endLink.getFromNode(),
+							0.0);
+
+				route.setLinkIds(
+						startLink.getId(),
+						NetworkUtils.getLinkIds(path.links),
+						endLink.getId());
+
+				// set route distance
+				double distance = RouteUtils.calcDistance(route, network);
+
+				route.setDistance(distance);
+
+				return new RouteWrapper(route);
+			}
+			else {
+				Leg leg = new LegImpl(mode);
+				double travelTimeEst = plansCalcRoute.handleLeg(
+						plan.getPerson(),
+						leg,
+						actOrigin,
+						actDestination,
+						FALSE_NOW);
+				// just to be sure...
+				leg.getRoute().setTravelTime(travelTimeEst);
+				return new RouteWrapper(leg.getRoute());
+			}
+		}
+
+		private Tuple<Id, Id> getOdTuple(
+				final Activity actOrigin,
+				final Activity actDestination) {
+			return new Tuple<Id, Id>(
+					actOrigin.getLinkId(),
+					actDestination.getLinkId());
+		}
+
+		private Tuple<Id, Id> getOdTuple(final Route route) {
+			return new Tuple<Id, Id>(
+					route.getStartLinkId(),
+					route.getEndLinkId());
+		}
+
+		public void initPlanSpecificInformation() {
+			if (plan != null) {
+				Map<String, RouteWrapper> odInformation;
+				Tuple<Id, Id> odTuple;
+				Route route;
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof LegImpl) {
+						LegImpl leg = (LegImpl) planElement;
+						// TODO this should be possible for all types of routes.
+						// Then we could cache e.g. the original pt routes, too.
+						// however, LegImpl cloning constructor does not yet handle
+						// generic routes correctly
+						route = leg.getRoute();
+						if (route instanceof NetworkRoute) {
+							odTuple = getOdTuple(route);
+							odInformation = this.fixedRoutes.get(odTuple);
+
+							if (odInformation == null) {
+								// create information map for this od
+								odInformation = new HashMap<String, RouteWrapper>();
+								odInformation.put(leg.getMode(), new RouteWrapper(leg.getRoute()));
+								this.fixedRoutes.put(
+										odTuple,
+										odInformation);
+							}
+							else if (!odInformation.containsKey(leg.getMode())) {
+								// update information map for this OD
+								odInformation.put(leg.getMode(), new RouteWrapper(leg.getRoute()));
+							}
 						}
 					}
 				}
@@ -402,24 +416,72 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 		}
 	}
 
-	private Tuple<Id, Id> getOdTuple(
-			final Activity actOrigin,
-			final Activity actDestination) {
-		return new Tuple<Id, Id>(
-				actOrigin.getLinkId(),
-				actDestination.getLinkId());
-	}
+	/**
+	 * wraps a route and provides access to a list of its links,
+	 * without having to research them in the network every time
+	 * it is needed.
+	 */
+	private class RouteWrapper {
+		private final Route route;
+		private List<Link> links = null;
 
+		// /////////////////////////////////////////////////////////////////////
+		// constructor
+		// /////////////////////////////////////////////////////////////////////
+		public RouteWrapper(
+				final Route route) {
+			this.route = route;
+		}
 
-	private Tuple<Id, Id> getOdTuple(final Route route) {
-		return new Tuple<Id, Id>(
-				route.getStartLinkId(),
-				route.getEndLinkId());
-	}
+		// /////////////////////////////////////////////////////////////////////
+		// new methods
+		// /////////////////////////////////////////////////////////////////////
+		public List<Link> getLinks() {
+			if (links == null) {
+				links = NetworkUtils.getLinks(
+						network,
+						((NetworkRoute) route).getLinkIds());
+			}
 
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName();
+			return links;
+		}
+
+		public Route getWrappedRoute() {
+			return route;
+		}
+
+		// /////////////////////////////////////////////////////////////////////
+		// route methods
+		// /////////////////////////////////////////////////////////////////////
+		//@Override
+		//public double getDistance() {
+		//	return route.getDistance();
+		//}
+
+		//@Override
+		//public Id getEndLinkId() {
+		//	return route.getEndLinkId();
+		//}
+
+		//@Override
+		//public Id getStartLinkId() {
+		//	return route.getStartLinkId();
+		//}
+
+		//@Override
+		//public double getTravelTime() {
+		//	return route.getTravelTime();
+		//}
+
+		//@Override
+		//public void setDistance(double arg0) {
+		//	route.setDistance(arg0);
+		//}
+
+		//@Override
+		//public void setTravelTime(double arg0) {
+		//	route.setTravelTime(arg0);
+		//}
 	}
 }
 
