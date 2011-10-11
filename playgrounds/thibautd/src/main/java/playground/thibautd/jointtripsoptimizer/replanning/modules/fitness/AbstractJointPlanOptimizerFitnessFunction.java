@@ -20,6 +20,7 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules.fitness;
 
 import org.jgap.FitnessFunction;
+import org.jgap.IChromosome;
 
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerDecoder;
 
@@ -34,5 +35,22 @@ abstract public class AbstractJointPlanOptimizerFitnessFunction extends FitnessF
 	 * @return a decoder which creates plans consistent with the scores
 	 */
 	abstract public JointPlanOptimizerDecoder getDecoder(); 
+	private double lastComputedFitnessValue = Double.NEGATIVE_INFINITY;
+
+	/**
+	 * Reimplements the jgap default by allowing a negative fitness.
+	 */
+	@Override
+	public double getFitnessValue(final IChromosome a_subject) {
+		double fitnessValue = evaluate(a_subject);
+		this.lastComputedFitnessValue = fitnessValue;
+		return fitnessValue;
+	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+		return this.lastComputedFitnessValue;
+	}
+
 }
 

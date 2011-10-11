@@ -65,24 +65,52 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 			final int numJointEpisodes,
 			final int numEpisodes,
 			final int nMembers,
+			final boolean isMemetic,
 			final ScoringFunctionFactory scoringFunctionFactory) {
-		super();
-		this.decoder = (new JointPlanOptimizerPartialDecoderFactory(
-					plan,
-					configGroup,
-					numJointEpisodes,
-					numEpisodes)).createDecoder();
-		this.fullDecoder = (new JointPlanOptimizerDecoderFactory(
-					plan,
-					configGroup,
-					legTravelTimeEstimatorFactory,
-					routingAlgorithm,
-					network,
-					numJointEpisodes,
-					numEpisodes,
-					nMembers)).createDecoder();
+		this(plan,
+			configGroup,
+			legTravelTimeEstimatorFactory,
+			routingAlgorithm,
+			network,
+			numJointEpisodes,
+			numEpisodes,
+			nMembers,
+			isMemetic,
+			scoringFunctionFactory,
+			(new JointPlanOptimizerPartialDecoderFactory(
+				plan,
+				configGroup,
+				numJointEpisodes,
+				numEpisodes)).createDecoder(),
+			(new JointPlanOptimizerDecoderFactory(
+				plan,
+				configGroup,
+				legTravelTimeEstimatorFactory,
+				routingAlgorithm,
+				network,
+				numJointEpisodes,
+				numEpisodes,
+				nMembers)).createDecoder());
+	}
 
-		if (configGroup.getIsMemetic()) {
+	public JointPlanOptimizerOTFFitnessFunction(
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network,
+			final int numJointEpisodes,
+			final int numEpisodes,
+			final int nMembers,
+			final boolean isMemetic,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final JointPlanOptimizerDecoder partialDecoder,
+			final JointPlanOptimizerDecoder fullDecoder) {
+		super();
+		this.decoder = partialDecoder;
+		this.fullDecoder = fullDecoder;
+
+		if (isMemetic) {
 			this.scorer = new DurationSimplexAlgo(new DurationOnTheFlyScorer(
 						plan,
 						configGroup,
@@ -107,6 +135,7 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 						nMembers);
 		}
 	}
+
 
 	@Override
 	protected double evaluate(final IChromosome chromosome) {

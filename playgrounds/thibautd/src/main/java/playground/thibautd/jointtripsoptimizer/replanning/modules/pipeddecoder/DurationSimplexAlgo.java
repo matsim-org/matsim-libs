@@ -21,6 +21,7 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.pipeddecoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

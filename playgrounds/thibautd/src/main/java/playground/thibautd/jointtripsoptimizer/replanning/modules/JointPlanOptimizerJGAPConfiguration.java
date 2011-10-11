@@ -50,6 +50,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.AbstractJointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JointPlanOptimizerOTFFitnessFunction;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.fitness.JPOFitnessFunctionFactory;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
@@ -154,8 +155,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			//log.debug("population size set to "+popSize);
 			this.setPopulationSize(popSize);
 
-			this.fitnessFunction = new JointPlanOptimizerOTFFitnessFunction(
+			this.fitnessFunction = new JPOFitnessFunctionFactory(
 			//this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
+						this,
 						plan,
 						configGroup,
 						legTravelTimeEstimatorFactory,
@@ -164,7 +166,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						this.numToggleGenes,
 						this.numEpisodes,
 						this.nMembers,
-						scoringFunctionFactory);
+						scoringFunctionFactory).createFitnessFunction();
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			this.setFitnessFunction(this.fitnessFunction);
 
