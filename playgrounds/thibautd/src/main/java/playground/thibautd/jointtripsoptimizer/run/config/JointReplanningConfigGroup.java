@@ -166,6 +166,9 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	public static final String MAX_CPU_TIME = "maxCpuTimePerMemberNanoSecs";
 	public static final String MEMETIC ="isMemetic";
+	public static final String NON_MEM_FITNESS_WEIGHT = "directFitnessWeight";
+	public static final String DUR_OPT_FITNESS_WEIGHT = "durationOptimizingFitnessWeight";
+	public static final String TOGGLE_OPT_FITNESS_WEIGHT = "toggleOptimizingFitnessWeight";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -210,6 +213,9 @@ public class JointReplanningConfigGroup extends Module {
 	//private long maxCpuTimePerMember = (long) (10 * 1E9);
 	private long maxCpuTimePerMember = -1;
 	private boolean isMemetic = false;
+	private double directFitnessWeight = 5;
+	private double durationMemeticFitnessWeight = 1;
+	private double toggleMemeticFitnessWeight = 4;
 	//deprecated fields:
 	private int populationSize = 28;
 	private int numTimeIntervals;
@@ -341,8 +347,14 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MEMETIC)) {
 			this.setIsMemetic(value);
 		}
-		else if (param_name.equals(MAX_POP_SIZE)) {
-			this.setMaxPopulationSize(value);
+		else if (param_name.equals(NON_MEM_FITNESS_WEIGHT)) {
+			this.setDirectFitnessWeight(value);
+		}
+		else if (param_name.equals(DUR_OPT_FITNESS_WEIGHT)) {
+			this.setDurationMemeticFitnessWeight(value);
+		}
+		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
+			this.setToggleMemeticFitnessWeight(value);
 		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
@@ -464,6 +476,15 @@ public class JointReplanningConfigGroup extends Module {
 		else if(param_name.equals(MAX_POP_SIZE)) {
 			return String.valueOf(this.getMaxPopulationSize());
 		}
+		else if (param_name.equals(NON_MEM_FITNESS_WEIGHT)) {
+			return String.valueOf(this.getDirectFitnessWeight());
+		}
+		else if (param_name.equals(DUR_OPT_FITNESS_WEIGHT)) {
+			return String.valueOf(this.getDurationMemeticFitnessWeight());
+		}
+		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
+			return String.valueOf(this.getToggleMemeticFitnessWeight());
+		}
 		return null;
 	}
 
@@ -505,6 +526,9 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, MAX_CPU_TIME);
 		this.addParameterToMap(map, MEMETIC);
 		this.addParameterToMap(map, MAX_POP_SIZE);
+		this.addParameterToMap(map, NON_MEM_FITNESS_WEIGHT);
+		this.addParameterToMap(map, DUR_OPT_FITNESS_WEIGHT);
+		this.addParameterToMap(map, TOGGLE_OPT_FITNESS_WEIGHT);
 		return map;
 	}
 
@@ -920,6 +944,30 @@ public class JointReplanningConfigGroup extends Module {
 
 	public int getMaxPopulationSize() {
 		return (this.maxPopulationSize < 2 ? Integer.MAX_VALUE : this.maxPopulationSize);
+	}
+
+	public void setDirectFitnessWeight(final String value) {
+		this.directFitnessWeight = Double.parseDouble(value);
+	}
+
+	public double getDirectFitnessWeight() {
+		return this.directFitnessWeight;
+	}
+
+	public void setDurationMemeticFitnessWeight(final String value) {
+		this.durationMemeticFitnessWeight = Double.parseDouble(value);
+	}
+
+	public double getDurationMemeticFitnessWeight() {
+		return this.durationMemeticFitnessWeight;
+	}
+
+	public void setToggleMemeticFitnessWeight(final String value) {
+		this.toggleMemeticFitnessWeight = Double.parseDouble(value);
+	}
+
+	public double getToggleMemeticFitnessWeight() {
+		return this.toggleMemeticFitnessWeight;
 	}
 
 	// allow setting of GA params "directly"

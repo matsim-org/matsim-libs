@@ -124,9 +124,9 @@ public class JPOFitnessFunctionFactory implements MatsimFactory {
 					full,
 					otfFitness);
 
-			fitness.addFitness(otfFitness, 0.7);
-			fitness.addFitness(durationMemeticFitness, 1.0);
-			fitness.addFitness(toggleMemetic, 3.0);
+			fitness.addFitness(otfFitness, configGroup.getDirectFitnessWeight());
+			fitness.addFitness(durationMemeticFitness, configGroup.getDurationMemeticFitnessWeight());
+			fitness.addFitness(toggleMemetic, configGroup.getToggleMemeticFitnessWeight());
 
 			return fitness;
 		} else {
