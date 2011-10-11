@@ -62,7 +62,7 @@ public class VehicleScheduleWriter {
 		
 		generator.setNumberOfBusses(this.numberOfBuses); // Anzahl der Busse
 		generator.setStartTime(7*3600);
-		generator.setEndTime(17*3600);
+		generator.setEndTime(19*3600);
 		
 		generator.createVehicles();
 		generator.createSchedule();
