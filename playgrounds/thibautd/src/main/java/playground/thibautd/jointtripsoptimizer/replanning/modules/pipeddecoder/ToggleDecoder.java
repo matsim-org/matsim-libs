@@ -403,6 +403,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	 * The legs reimplacing shared rides are pt legs. Other modes are possible
 	 * only if the mode is optimized: this part is left to the ModeDecoder.
 	 *
+	 * /!\ acts are not copied!
+	 *
 	 * @return the number of plan elements to ignore
 	 */
 	private int planActivity(
@@ -416,7 +418,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 			if (isUsefulPU(
 						leg,
 						plannedSharedLegs)) {
-				correctPlan.add(new JointActivity(act));
+				//correctPlan.add(new JointActivity(act));
+				correctPlan.add(act);
 				correctPlan.add(new JointLeg(leg));
 				return 1;
 			}
@@ -429,7 +432,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 			if (isUsefulDO(
 						(JointLeg) incorrectPlan.get(i-1),
 						plannedSharedLegs)) {
-				correctPlan.add(new JointActivity(act));
+				//correctPlan.add(new JointActivity(act));
+				correctPlan.add(act);
 				correctPlan.add(new JointLeg((JointLeg) incorrectPlan.get(i+1)));
 				return 1;
 			}
@@ -441,12 +445,14 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		else if ((i < incorrectPlan.size() - 1) &&
 				(incorrectPlan.get(i+1) instanceof JointActivity)) {
 			// case of an unaffected shared leg
-			correctPlan.add(new JointActivity(act));
+			// correctPlan.add(new JointActivity(act));
+			correctPlan.add(act);
 			correctPlan.add(new JointLeg(DEFAULT_REMP_MODE, act.getPerson()));
 			return 0;
 		}
 		else {
-			correctPlan.add(new JointActivity(act));
+			// correctPlan.add(new JointActivity(act));
+			correctPlan.add(act);
 			return 0;
 		}
 	}

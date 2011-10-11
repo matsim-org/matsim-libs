@@ -114,6 +114,9 @@ public class JointPlan implements Plan {
 	 * Creates a joint plan from individual plans.
 	 * Two individual trips to be shared must have their Pick-Up activity type set
 	 * to 'pu_i', where i is an integer which identifies the joint trip.
+	 * @param clique the clique this plan pertains to
+	 * @param plans the individual plans. If they consist of Joint activities, 
+	 * those activities are referenced, otherwise, they are copied in a joint activity.
 	 * @param addAtIndividualLevel if true, the plans are added to the Person's plans.
 	 * set to false for a temporary plan (in a replanning for example).
 	 * @param toSynchronize if true, the activity durations will be modified so
@@ -149,8 +152,13 @@ public class JointPlan implements Plan {
 
 			for (PlanElement pe : currentImportedPlan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					currentActivity = new JointActivity((Activity) pe, 
-							this.clique.getMembers().get(id));
+					if (pe instanceof JointActivity) {
+						currentActivity = (JointActivity) pe;
+					}
+					else {
+						currentActivity = new JointActivity((Activity) pe, 
+								this.clique.getMembers().get(id));
+					}
 					actType = currentActivity.getType();
 
 					if (actType.matches(JointActingTypes.PICK_UP_REGEXP)) {
@@ -163,8 +171,12 @@ public class JointPlan implements Plan {
 					currentPlan.addActivity(currentActivity);
 				}
 				else {
-					currentLeg = new JointLeg((Leg) pe,
-							(Person) this.clique.getMembers().get(id));
+					if (pe instanceof JointLeg) {
+						currentLeg = (JointLeg) pe;
+					} else  {
+						currentLeg = new JointLeg((Leg) pe,
+								(Person) this.clique.getMembers().get(id));
+					}
 
 					if (currentJointEpisodeId != null) {
 						// this leg is a shared leg, remember this.
