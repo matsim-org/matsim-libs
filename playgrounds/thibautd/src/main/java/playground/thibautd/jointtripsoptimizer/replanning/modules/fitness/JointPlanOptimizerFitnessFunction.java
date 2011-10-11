@@ -21,7 +21,6 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.fitness;
 
 import java.util.List;
 
-import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
 import org.matsim.api.core.v01.network.Network;
@@ -48,12 +47,6 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
 public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimizerFitnessFunction {
 
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * replacement for super.m_lastComputedFitnessValue, to keep the
-	 * "getlastfitnessvalue" functionnality
-	 */
-	private double lastComputedFitnessValue;
 
 	private final JointPlanOptimizerDecoder decoder;
 	private final ScoringFunctionFactory scoringFunctionFactory;
@@ -123,23 +116,9 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 		return plan.getScore();
 	}
 
+	@Override
 	public JointPlanOptimizerDecoder getDecoder() {
 		return this.decoder;
-	}
-
-	/**
-	 * Reimplements the jgap default by allowing a negative fitness.
-	 */
-	@Override
-	public double getFitnessValue(final IChromosome a_subject) {
-		double fitnessValue = evaluate(a_subject);
-		this.lastComputedFitnessValue = fitnessValue;
-		return fitnessValue;
-	}
-
-	@Override
-	public double getLastComputedFitnessValue() {
-		return this.lastComputedFitnessValue;
 	}
 }
 

@@ -45,12 +45,6 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * replacement for super.m_lastComputedFitnessValue, to keep the
-	 * "getlastfitnessvalue" functionnality
-	 */
-	private double lastComputedFitnessValue;
-
 	private final JointPlanOptimizerDecoder decoder;
 	private final JointPlanOptimizerDecoder fullDecoder;
 	//private final DurationOnTheFlyScorer scorer;
@@ -143,23 +137,9 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 		return this.scorer.score(chromosome, plan);
 	}
 
+	@Override
 	public JointPlanOptimizerDecoder getDecoder() {
 		return this.fullDecoder;
-	}
-
-	/**
-	 * Reimplements the jgap default by allowing a negative fitness.
-	 */
-	@Override
-	public double getFitnessValue(final IChromosome a_subject) {
-		double fitnessValue = evaluate(a_subject);
-		this.lastComputedFitnessValue = fitnessValue;
-		return fitnessValue;
-	}
-
-	@Override
-	public double getLastComputedFitnessValue() {
-		return this.lastComputedFitnessValue;
 	}
 }
 
