@@ -34,19 +34,21 @@ import org.matsim.matrices.Matrix;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityHelperObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneInfoObject;
 import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
- *
+ * This controller version is designed for the sustaincity mile stone (Month 18).
+ * This versrion dosn't contain experimental code such as workplace accessibility 
+ * computation (which is available in version V2)!
+ * 
  * @author nagel
  * @author thomas
  *
  */
-public class MATSim4UrbanSimControlerListenerV3WithoutWorkplaceAccessibility implements ShutdownListener {
-	private static final Logger log = Logger.getLogger(MATSim4UrbanSimControlerListenerV3WithoutWorkplaceAccessibility.class);
+public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
+	private static final Logger log = Logger.getLogger(MATSim4UrbanSimControlerListenerV3.class);
 
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl facilities;
@@ -59,7 +61,7 @@ public class MATSim4UrbanSimControlerListenerV3WithoutWorkplaceAccessibility imp
 	 * constructor
 	 * @param zones 
 	 */
-	MATSim4UrbanSimControlerListenerV3WithoutWorkplaceAccessibility( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
+	MATSim4UrbanSimControlerListenerV3( final ActivityFacilitiesImpl zones, final Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
 		this.zones = zones;
 		this.facilities = facilities;
 		this.numberOfWorkplacesPerZone = numberOfWorkplacesPerZone;
