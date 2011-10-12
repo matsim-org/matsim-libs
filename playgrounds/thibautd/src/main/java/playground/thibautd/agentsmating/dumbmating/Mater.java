@@ -77,7 +77,8 @@ public class Mater {
 	 */
 	public enum TripChaining {
 		ALL_TOGETHER,
-		ONE_BY_ONE
+		ONE_BY_ONE,
+		BOTH
 	}
 
 	public Mater(
@@ -151,6 +152,14 @@ public class Mater {
 				break;
 			case ONE_BY_ONE :
 				setShuttlePlan(clique);
+				break;
+			case BOTH :
+				if (randomGen.nextDouble() < 0.5) {
+					setAllTogetherPlan(clique);
+				}
+				else {
+					setShuttlePlan(clique);
+				}
 				break;
 		}
 	}
