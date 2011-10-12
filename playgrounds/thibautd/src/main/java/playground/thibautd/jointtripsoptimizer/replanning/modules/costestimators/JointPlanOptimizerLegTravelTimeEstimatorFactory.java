@@ -56,23 +56,23 @@ public class JointPlanOptimizerLegTravelTimeEstimatorFactory {
 			final PlanomatConfigGroup.RoutingCapability routingCapability,
 			final PlansCalcRoute routingAlgorithm,
 			final Network network) {
-		TravelTime effectiveTravelTime;
+		//TravelTime effectiveTravelTime;
 
-		try {
-			effectiveTravelTime = new TravelTimeEstimatorWrapper((TravelTimeCalculator) travelTime);
-		} catch (ClassCastException e) {
-			if (logWrappingWarning) {
-				logWrappingWarning = false;
-				log.warn("Not wrapping travel time estimator for Joint Plan Optimisation. On big networks, this can be quite unefficient!");
-			}
-			effectiveTravelTime = travelTime;
-		}
-
+		//try {
+		//	effectiveTravelTime = new TravelTimeEstimatorWrapper((TravelTimeCalculator) travelTime);
+		//} catch (ClassCastException e) {
+		//	if (logWrappingWarning) {
+		//		logWrappingWarning = false;
+		//		log.warn("Not wrapping travel time estimator for Joint Plan Optimisation. On big networks, this can be quite unefficient!");
+		//	}
+		//	effectiveTravelTime = travelTime;
+		//}
 
 		return new ODBasedFixedRouteLegTravelTimeEstimator(
 				plan,
-				effectiveTravelTime,
-				this.depDelay,
+				//effectiveTravelTime,
+				travelTime,
+				depDelay,
 				routingAlgorithm,
 				simLegInterpretation,
 				network);
