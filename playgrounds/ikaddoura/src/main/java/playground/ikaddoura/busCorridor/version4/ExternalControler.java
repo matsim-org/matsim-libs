@@ -42,9 +42,9 @@ public class ExternalControler {
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/network_busline.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml"; // for first iteration
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4_constantDemand";
-	static int numberOfExternalIterations = 3;
-	static int lastInternalIteration = 0 ; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 17
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version4_variableDemand";
+	static int numberOfExternalIterations = 15;
+	static int lastInternalIteration = 20 ; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 17
 	
 	private int numberOfBuses = 1; // for first iteration!
 	private int extItNr;

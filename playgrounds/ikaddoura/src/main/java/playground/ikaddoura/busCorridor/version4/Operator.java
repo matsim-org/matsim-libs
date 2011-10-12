@@ -87,11 +87,12 @@ public class Operator {
 		double vehicleKm = linksHandler.getVehicleKm();
 //		double vehicleHours = linksHandler.getVehicleHours();
 		
-		int busCostsPerDay = 50;
+		double busCostsPerDay = 50;
+		double constant = 5000; // Zulage
 		double fixCosts = numberOfBuses * busCostsPerDay ;
 		double busCostsPerKm = 1;
 		double varCosts = vehicleKm * busCostsPerKm; // + vehicleHours * busCostsPerHour ;
-		double operatorScore = (earnings*10) - fixCosts - varCosts;
+		double operatorScore = constant + earnings - fixCosts - varCosts;
 		
 		this.setScore(operatorScore);
 		log.info("OperatorScore calculated.");
