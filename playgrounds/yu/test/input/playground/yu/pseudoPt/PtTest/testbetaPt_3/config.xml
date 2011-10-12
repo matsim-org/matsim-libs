@@ -19,6 +19,8 @@
 		<param name="outputDirectory" value="test/output/playground/yu/pseudoPt/PtTest/testbetaPt_3" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="50" />
+		
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- otfvis, googleearth, transims -->
 	</module>
 
 	<module name="simulation">
@@ -27,7 +29,6 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "netvis"/> <!-- netvis, googleearth, transims -->
 		
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />

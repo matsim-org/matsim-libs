@@ -29,6 +29,7 @@
 		<param name="outputDirectory" value="test/output/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes2" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+		<param name="snapshotFormat" value="otfvis" /><!-- netvis, googleearth, transims -->
 	</module>
 
 	<module name="simulation">
@@ -36,10 +37,7 @@
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 
-		<param name="snapshotperiod" value="00:00:00" />
-		<!-- 00:00:00 means NO snapshot writing -->
-		<param name="snapshotFormat" value="otfvis" />
-		<!-- netvis, googleearth, transims -->
+		<param name="snapshotperiod" value="00:00:00" /><!-- 00:00:00 means NO snapshot writing -->
 
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />

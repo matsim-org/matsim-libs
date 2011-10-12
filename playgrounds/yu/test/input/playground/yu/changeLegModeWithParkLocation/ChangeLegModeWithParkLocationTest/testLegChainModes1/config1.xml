@@ -1,45 +1,42 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
-	<!--
-	<module name="bse">
-		<param name="countsStandardDeviation" value="25" />
-		<param name="lambda" value="0.95" />
-		<param name="startTime" value="7" />
-		<param name="endTime" value="20" />
-		<param name="rejectProbFactor" value="1.0" />
-		<param name="maxDraws" value="20" />
-		<param name="freezeIteration" value="20" />
-	</module>
--->
+	<!-- <module name="bse"> <param name="countsStandardDeviation" value="25" 
+		/> <param name="lambda" value="0.95" /> <param name="startTime" value="7" 
+		/> <param name="endTime" value="20" /> <param name="rejectProbFactor" value="1.0" 
+		/> <param name="maxDraws" value="20" /> <param name="freezeIteration" value="20" 
+		/> </module> -->
 	<module name="global">
 		<param name="randomSeed" value="4711" />
 		<param name="coordinateSystem" value="CH1903_LV03" />
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/network.xml.gz" />
+		<param name="inputNetworkFile"
+			value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/network.xml.gz" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1/plans1.xml" />
+		<param name="inputPlansFile"
+			value="test/input/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1/plans1.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1" />
+		<param name="outputDirectory"
+			value="test/output/playground/yu/changeLegModeWithParkLocation/ChangeLegModeWithParkLocationTest/testLegChainModes1" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
+
+		<param name="snapshotFormat" value="otfvis" /><!-- netvis, googleearth,	transims -->
 	</module>
 
 	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
+		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ 
+			run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 
-		<param name="snapshotperiod" value="00:00:00" />
-		<!-- 00:00:00 means NO snapshot writing -->
-		<param name="snapshotFormat" value="otfvis" />
-		<!-- netvis, googleearth, transims -->
+		<param name="snapshotperiod" value="00:00:00" /><!-- 00:00:00 means NO snapshot writing -->
 
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />
@@ -48,9 +45,9 @@
 		<param name="removeStuckVehicles" value="no" />
 	</module>
 
-<module name="planCalcScore">
+	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
-	
+
 		<param name="BrainExpBeta" value="4.0" />
 		<param name="lateArrival" value="0" />
 		<param name="earlyDeparture" value="0" />
@@ -59,735 +56,720 @@
 		<param name="travelingPt" value="-3" />
 		<param name="travelingWalk" value="-18" />
 		<param name="waiting" value="-0" />
-		
-		
-		<param name="activityType_0"            value="h0.5" />
-		<param name="activityPriority_0"        value="1" />
+
+
+		<param name="activityType_0" value="h0.5" />
+		<param name="activityPriority_0" value="1" />
 		<param name="activityTypicalDuration_0" value="00:30:00" />
 
-		<param name="activityType_1"            value="h1" />
-		<param name="activityPriority_1"        value="1" />
+		<param name="activityType_1" value="h1" />
+		<param name="activityPriority_1" value="1" />
 		<param name="activityTypicalDuration_1" value="01:00:00" />
 
-		<param name="activityType_2"            value="h2" />
-		<param name="activityPriority_2"        value="1" />
+		<param name="activityType_2" value="h2" />
+		<param name="activityPriority_2" value="1" />
 		<param name="activityTypicalDuration_2" value="02:00:00" />
 
-		<param name="activityType_3"            value="h3" />
-		<param name="activityPriority_3"        value="1" />
+		<param name="activityType_3" value="h3" />
+		<param name="activityPriority_3" value="1" />
 		<param name="activityTypicalDuration_3" value="03:00:00" />
 
-		<param name="activityType_4"            value="h4" />
-		<param name="activityPriority_4"        value="1" />
+		<param name="activityType_4" value="h4" />
+		<param name="activityPriority_4" value="1" />
 		<param name="activityTypicalDuration_4" value="04:00:00" />
 
-		<param name="activityType_5"            value="h5" />
-		<param name="activityPriority_5"        value="1" />
+		<param name="activityType_5" value="h5" />
+		<param name="activityPriority_5" value="1" />
 		<param name="activityTypicalDuration_5" value="05:00:00" />
 
-		<param name="activityType_6"            value="h6" />
-		<param name="activityPriority_6"        value="1" />
+		<param name="activityType_6" value="h6" />
+		<param name="activityPriority_6" value="1" />
 		<param name="activityTypicalDuration_6" value="06:00:00" />
 
-		<param name="activityType_7"            value="h7" />
-		<param name="activityPriority_7"        value="1" />
+		<param name="activityType_7" value="h7" />
+		<param name="activityPriority_7" value="1" />
 		<param name="activityTypicalDuration_7" value="07:00:00" />
 
-		<param name="activityType_8"            value="h8" />
-		<param name="activityPriority_8"        value="1" />
+		<param name="activityType_8" value="h8" />
+		<param name="activityPriority_8" value="1" />
 		<param name="activityTypicalDuration_8" value="08:00:00" />
 
-		<param name="activityType_9"            value="h9" />
-		<param name="activityPriority_9"        value="1" />
+		<param name="activityType_9" value="h9" />
+		<param name="activityPriority_9" value="1" />
 		<param name="activityTypicalDuration_9" value="09:00:00" />
 
-		<param name="activityType_10"            value="h10" />
-		<param name="activityPriority_10"        value="1" />
+		<param name="activityType_10" value="h10" />
+		<param name="activityPriority_10" value="1" />
 		<param name="activityTypicalDuration_10" value="10:00:00" />
 
-		<param name="activityType_11"            value="h11" />
-		<param name="activityPriority_11"        value="1" />
+		<param name="activityType_11" value="h11" />
+		<param name="activityPriority_11" value="1" />
 		<param name="activityTypicalDuration_11" value="11:00:00" />
 
-		<param name="activityType_12"            value="h12" />
-		<param name="activityPriority_12"        value="1" />
+		<param name="activityType_12" value="h12" />
+		<param name="activityPriority_12" value="1" />
 		<param name="activityTypicalDuration_12" value="12:00:00" />
 
-		<param name="activityType_13"            value="h13" />
-		<param name="activityPriority_13"        value="1" />
+		<param name="activityType_13" value="h13" />
+		<param name="activityPriority_13" value="1" />
 		<param name="activityTypicalDuration_13" value="13:00:00" />
 
-		<param name="activityType_14"            value="h14" />
-		<param name="activityPriority_14"        value="1" />
+		<param name="activityType_14" value="h14" />
+		<param name="activityPriority_14" value="1" />
 		<param name="activityTypicalDuration_14" value="14:00:00" />
 
-		<param name="activityType_15"            value="h15" />
-		<param name="activityPriority_15"        value="1" />
+		<param name="activityType_15" value="h15" />
+		<param name="activityPriority_15" value="1" />
 		<param name="activityTypicalDuration_15" value="15:00:00" />
 
-		<param name="activityType_16"            value="h16" />
-		<param name="activityPriority_16"        value="1" />
+		<param name="activityType_16" value="h16" />
+		<param name="activityPriority_16" value="1" />
 		<param name="activityTypicalDuration_16" value="16:00:00" />
 
-		<param name="activityType_17"            value="h17" />
-		<param name="activityPriority_17"        value="1" />
+		<param name="activityType_17" value="h17" />
+		<param name="activityPriority_17" value="1" />
 		<param name="activityTypicalDuration_17" value="17:00:00" />
 
-		<param name="activityType_18"            value="h18" />
-		<param name="activityPriority_18"        value="1" />
+		<param name="activityType_18" value="h18" />
+		<param name="activityPriority_18" value="1" />
 		<param name="activityTypicalDuration_18" value="18:00:00" />
 
-		<param name="activityType_19"            value="h19" />
-		<param name="activityPriority_19"        value="1" />
+		<param name="activityType_19" value="h19" />
+		<param name="activityPriority_19" value="1" />
 		<param name="activityTypicalDuration_19" value="19:00:00" />
 
-		<param name="activityType_20"            value="h20" />
-		<param name="activityPriority_20"        value="1" />
+		<param name="activityType_20" value="h20" />
+		<param name="activityPriority_20" value="1" />
 		<param name="activityTypicalDuration_20" value="20:00:00" />
 
-		<param name="activityType_21"            value="h21" />
-		<param name="activityPriority_21"        value="1" />
+		<param name="activityType_21" value="h21" />
+		<param name="activityPriority_21" value="1" />
 		<param name="activityTypicalDuration_21" value="21:00:00" />
 
-		<param name="activityType_22"            value="h22" />
-		<param name="activityPriority_22"        value="1" />
+		<param name="activityType_22" value="h22" />
+		<param name="activityPriority_22" value="1" />
 		<param name="activityTypicalDuration_22" value="22:00:00" />
 
-		<param name="activityType_23"            value="h23" />
-		<param name="activityPriority_23"        value="1" />
+		<param name="activityType_23" value="h23" />
+		<param name="activityPriority_23" value="1" />
 		<param name="activityTypicalDuration_23" value="23:00:00" />
 
-		<param name="activityType_24"           value="h24" />
-		<param name="activityPriority_24"        value="1" />
+		<param name="activityType_24" value="h24" />
+		<param name="activityPriority_24" value="1" />
 		<param name="activityTypicalDuration_24" value="24:00:00" />
 
-		<param name="activityType_25"           value="w0.5" />
-		<param name="activityPriority_25"        value="1" />
+		<param name="activityType_25" value="w0.5" />
+		<param name="activityPriority_25" value="1" />
 		<param name="activityTypicalDuration_25" value="00:30:00" />
 		<param name="activityMinimalDuration_25" value="00:30:00" />
 
-		<param name="activityType_26"           value="w1" />
-		<param name="activityPriority_26"        value="1" />
+		<param name="activityType_26" value="w1" />
+		<param name="activityPriority_26" value="1" />
 		<param name="activityTypicalDuration_26" value="01:00:00" />
 		<param name="activityMinimalDuration_26" value="01:00:00" />
 
-		<param name="activityType_27"           value="w2" />
-		<param name="activityPriority_27"        value="1" />
+		<param name="activityType_27" value="w2" />
+		<param name="activityPriority_27" value="1" />
 		<param name="activityTypicalDuration_27" value="02:00:00" />
 		<param name="activityMinimalDuration_27" value="02:00:00" />
 
-		<param name="activityType_28"           value="w3" />
-		<param name="activityPriority_28"        value="1" />
+		<param name="activityType_28" value="w3" />
+		<param name="activityPriority_28" value="1" />
 		<param name="activityTypicalDuration_28" value="03:00:00" />
 		<param name="activityMinimalDuration_28" value="03:00:00" />
 
-		<param name="activityType_29"            value="w4" />
-		<param name="activityPriority_29"        value="1" />
+		<param name="activityType_29" value="w4" />
+		<param name="activityPriority_29" value="1" />
 		<param name="activityTypicalDuration_29" value="04:00:00" />
 		<param name="activityMinimalDuration_29" value="04:00:00" />
 
-		<param name="activityType_30"            value="w5" />
-		<param name="activityPriority_30"        value="1" />
+		<param name="activityType_30" value="w5" />
+		<param name="activityPriority_30" value="1" />
 		<param name="activityTypicalDuration_30" value="05:00:00" />
 		<param name="activityMinimalDuration_30" value="05:00:00" />
 
-		<param name="activityType_31"            value="w6" />
-		<param name="activityPriority_31"        value="1" />
+		<param name="activityType_31" value="w6" />
+		<param name="activityPriority_31" value="1" />
 		<param name="activityTypicalDuration_31" value="06:00:00" />
 		<param name="activityMinimalDuration_31" value="06:00:00" />
 
-		<param name="activityType_32"            value="w7" />
-		<param name="activityPriority_32"        value="1" />
+		<param name="activityType_32" value="w7" />
+		<param name="activityPriority_32" value="1" />
 		<param name="activityTypicalDuration_32" value="07:00:00" />
 		<param name="activityMinimalDuration_32" value="07:00:00" />
 
-		<param name="activityType_33"            value="w8" />
-		<param name="activityPriority_33"        value="1" />
+		<param name="activityType_33" value="w8" />
+		<param name="activityPriority_33" value="1" />
 		<param name="activityTypicalDuration_33" value="08:00:00" />
 		<param name="activityMinimalDuration_33" value="08:00:00" />
 
-		<param name="activityType_34"            value="w9" />
-		<param name="activityPriority_34"        value="1" />
+		<param name="activityType_34" value="w9" />
+		<param name="activityPriority_34" value="1" />
 		<param name="activityTypicalDuration_34" value="09:00:00" />
 		<param name="activityMinimalDuration_34" value="09:00:00" />
 
-		<param name="activityType_35"            value="w10" />
-		<param name="activityPriority_35"        value="1" />
+		<param name="activityType_35" value="w10" />
+		<param name="activityPriority_35" value="1" />
 		<param name="activityTypicalDuration_35" value="10:00:00" />
 		<param name="activityMinimalDuration_35" value="10:00:00" />
 
-		<param name="activityType_36"            value="w11" />
-		<param name="activityPriority_36"        value="1" />
+		<param name="activityType_36" value="w11" />
+		<param name="activityPriority_36" value="1" />
 		<param name="activityTypicalDuration_36" value="11:00:00" />
 		<param name="activityMinimalDuration_36" value="11:00:00" />
 
-		<param name="activityType_37"            value="w12" />
-		<param name="activityPriority_37"        value="1" />
+		<param name="activityType_37" value="w12" />
+		<param name="activityPriority_37" value="1" />
 		<param name="activityTypicalDuration_37" value="12:00:00" />
 		<param name="activityMinimalDuration_37" value="12:00:00" />
 
-		<param name="activityType_38"           value="w13" />
-		<param name="activityPriority_38"        value="1" />
+		<param name="activityType_38" value="w13" />
+		<param name="activityPriority_38" value="1" />
 		<param name="activityTypicalDuration_38" value="13:00:00" />
 		<param name="activityMinimalDuration_38" value="13:00:00" />
 
-		<param name="activityType_39"           value="w14" />
-		<param name="activityPriority_39"        value="1" />
+		<param name="activityType_39" value="w14" />
+		<param name="activityPriority_39" value="1" />
 		<param name="activityTypicalDuration_39" value="14:00:00" />
 		<param name="activityMinimalDuration_39" value="14:00:00" />
 
-		<param name="activityType_40"           value="w15" />
-		<param name="activityPriority_40"        value="1" />
+		<param name="activityType_40" value="w15" />
+		<param name="activityPriority_40" value="1" />
 		<param name="activityTypicalDuration_40" value="15:00:00" />
 		<param name="activityMinimalDuration_40" value="15:00:00" />
 
-		<param name="activityType_41"            value="w16" />
-		<param name="activityPriority_41"        value="1" />
+		<param name="activityType_41" value="w16" />
+		<param name="activityPriority_41" value="1" />
 		<param name="activityTypicalDuration_41" value="16:00:00" />
 		<param name="activityMinimalDuration_41" value="16:00:00" />
 
-		<param name="activityType_42"            value="w17" />
-		<param name="activityPriority_42"        value="1" />
+		<param name="activityType_42" value="w17" />
+		<param name="activityPriority_42" value="1" />
 		<param name="activityTypicalDuration_42" value="17:00:00" />
 		<param name="activityMinimalDuration_42" value="17:00:00" />
 
-		<param name="activityType_43"            value="w18" />
-		<param name="activityPriority_43"        value="1" />
+		<param name="activityType_43" value="w18" />
+		<param name="activityPriority_43" value="1" />
 		<param name="activityTypicalDuration_43" value="18:00:00" />
 		<param name="activityMinimalDuration_43" value="18:00:00" />
 
-		<param name="activityType_44"            value="w19" />
-		<param name="activityPriority_44"        value="1" />
+		<param name="activityType_44" value="w19" />
+		<param name="activityPriority_44" value="1" />
 		<param name="activityTypicalDuration_44" value="19:00:00" />
 		<param name="activityMinimalDuration_44" value="19:00:00" />
 
-		<param name="activityType_45"            value="w20" />
-		<param name="activityPriority_45"        value="1" />
+		<param name="activityType_45" value="w20" />
+		<param name="activityPriority_45" value="1" />
 		<param name="activityTypicalDuration_45" value="20:00:00" />
 		<param name="activityMinimalDuration_45" value="20:00:00" />
 
-		<param name="activityType_46"            value="e0.5" />
-		<param name="activityPriority_46"        value="1" />
+		<param name="activityType_46" value="e0.5" />
+		<param name="activityPriority_46" value="1" />
 		<param name="activityTypicalDuration_46" value="00:30:00" />
 		<param name="activityMinimalDuration_46" value="00:30:00" />
 
-		<param name="activityType_47"            value="e1" />
-		<param name="activityPriority_47"        value="1" />
+		<param name="activityType_47" value="e1" />
+		<param name="activityPriority_47" value="1" />
 		<param name="activityTypicalDuration_47" value="01:00:00" />
 		<param name="activityMinimalDuration_47" value="01:00:00" />
 
-		<param name="activityType_48"           value="e2" />
-		<param name="activityPriority_48"        value="1" />
+		<param name="activityType_48" value="e2" />
+		<param name="activityPriority_48" value="1" />
 		<param name="activityTypicalDuration_48" value="02:00:00" />
 		<param name="activityMinimalDuration_48" value="02:00:00" />
 
-		<param name="activityType_49"           value="e3" />
-		<param name="activityPriority_49"        value="1" />
+		<param name="activityType_49" value="e3" />
+		<param name="activityPriority_49" value="1" />
 		<param name="activityTypicalDuration_49" value="03:00:00" />
 		<param name="activityMinimalDuration_49" value="03:00:00" />
 
-		<param name="activityType_50"           value="e4" />
-		<param name="activityPriority_50"        value="1" />
+		<param name="activityType_50" value="e4" />
+		<param name="activityPriority_50" value="1" />
 		<param name="activityTypicalDuration_50" value="04:00:00" />
 		<param name="activityMinimalDuration_50" value="04:00:00" />
 
-		<param name="activityType_51"            value="e5" />
-		<param name="activityPriority_51"        value="1" />
+		<param name="activityType_51" value="e5" />
+		<param name="activityPriority_51" value="1" />
 		<param name="activityTypicalDuration_51" value="05:00:00" />
 		<param name="activityMinimalDuration_51" value="05:00:00" />
 
-		<param name="activityType_52"            value="e6" />
-		<param name="activityPriority_52"        value="1" />
+		<param name="activityType_52" value="e6" />
+		<param name="activityPriority_52" value="1" />
 		<param name="activityTypicalDuration_52" value="06:00:00" />
 		<param name="activityMinimalDuration_52" value="06:00:00" />
 
-		<param name="activityType_53"            value="e7" />
-		<param name="activityPriority_53"        value="1" />
+		<param name="activityType_53" value="e7" />
+		<param name="activityPriority_53" value="1" />
 		<param name="activityTypicalDuration_53" value="07:00:00" />
 		<param name="activityMinimalDuration_53" value="07:00:00" />
 
-		<param name="activityType_54"            value="e8" />
-		<param name="activityPriority_54"        value="1" />
+		<param name="activityType_54" value="e8" />
+		<param name="activityPriority_54" value="1" />
 		<param name="activityTypicalDuration_54" value="08:00:00" />
 		<param name="activityMinimalDuration_54" value="08:00:00" />
 
-		<param name="activityType_55"            value="e9" />
-		<param name="activityPriority_55"        value="1" />
+		<param name="activityType_55" value="e9" />
+		<param name="activityPriority_55" value="1" />
 		<param name="activityTypicalDuration_55" value="09:00:00" />
 		<param name="activityMinimalDuration_55" value="09:00:00" />
 
-		<param name="activityType_56"            value="e10" />
-		<param name="activityPriority_56"        value="1" />
+		<param name="activityType_56" value="e10" />
+		<param name="activityPriority_56" value="1" />
 		<param name="activityTypicalDuration_56" value="10:00:00" />
 		<param name="activityMinimalDuration_56" value="10:00:00" />
 
-		<param name="activityType_57"            value="e11" />
-		<param name="activityPriority_57"        value="1" />
+		<param name="activityType_57" value="e11" />
+		<param name="activityPriority_57" value="1" />
 		<param name="activityTypicalDuration_57" value="11:00:00" />
 		<param name="activityMinimalDuration_57" value="11:00:00" />
 
-		<param name="activityType_58"           value="e12" />
-		<param name="activityPriority_58"        value="1" />
+		<param name="activityType_58" value="e12" />
+		<param name="activityPriority_58" value="1" />
 		<param name="activityTypicalDuration_58" value="12:00:00" />
 		<param name="activityMinimalDuration_58" value="12:00:00" />
 
-		<param name="activityType_59"           value="e13" />
-		<param name="activityPriority_59"        value="1" />
+		<param name="activityType_59" value="e13" />
+		<param name="activityPriority_59" value="1" />
 		<param name="activityTypicalDuration_59" value="13:00:00" />
 		<param name="activityMinimalDuration_59" value="13:00:00" />
 
-		<param name="activityType_60"           value="e14" />
-		<param name="activityPriority_60"        value="1" />
+		<param name="activityType_60" value="e14" />
+		<param name="activityPriority_60" value="1" />
 		<param name="activityTypicalDuration_60" value="14:00:00" />
 		<param name="activityMinimalDuration_60" value="14:00:00" />
 
-		<param name="activityType_61"            value="e15" />
-		<param name="activityPriority_61"        value="1" />
+		<param name="activityType_61" value="e15" />
+		<param name="activityPriority_61" value="1" />
 		<param name="activityTypicalDuration_61" value="15:00:00" />
 		<param name="activityMinimalDuration_61" value="15:00:00" />
 
-		<param name="activityType_62"            value="e16" />
-		<param name="activityPriority_62"        value="1" />
+		<param name="activityType_62" value="e16" />
+		<param name="activityPriority_62" value="1" />
 		<param name="activityTypicalDuration_62" value="16:00:00" />
 		<param name="activityMinimalDuration_62" value="16:00:00" />
 
-		<param name="activityType_63"            value="e17" />
-		<param name="activityPriority_63"        value="1" />
+		<param name="activityType_63" value="e17" />
+		<param name="activityPriority_63" value="1" />
 		<param name="activityTypicalDuration_63" value="17:00:00" />
 		<param name="activityMinimalDuration_63" value="17:00:00" />
 
-		<param name="activityType_64"            value="e18" />
-		<param name="activityPriority_64"        value="1" />
+		<param name="activityType_64" value="e18" />
+		<param name="activityPriority_64" value="1" />
 		<param name="activityTypicalDuration_64" value="18:00:00" />
 		<param name="activityMinimalDuration_64" value="18:00:00" />
 
-		<param name="activityType_65"            value="e19" />
-		<param name="activityPriority_65"        value="1" />
+		<param name="activityType_65" value="e19" />
+		<param name="activityPriority_65" value="1" />
 		<param name="activityTypicalDuration_65" value="19:00:00" />
 		<param name="activityMinimalDuration_65" value="19:00:00" />
 
-		<param name="activityType_66"            value="e20" />
-		<param name="activityPriority_66"        value="1" />
+		<param name="activityType_66" value="e20" />
+		<param name="activityPriority_66" value="1" />
 		<param name="activityTypicalDuration_66" value="20:00:00" />
 		<param name="activityMinimalDuration_66" value="20:00:00" />
 
-		<param name="activityType_67"            value="l0.5" />
-		<param name="activityPriority_67"        value="1" />
+		<param name="activityType_67" value="l0.5" />
+		<param name="activityPriority_67" value="1" />
 		<param name="activityTypicalDuration_67" value="00:30:00" />
 		<param name="activityMinimalDuration_67" value="00:30:00" />
 
-		<param name="activityType_68"           value="l1" />
-		<param name="activityPriority_68"        value="1" />
+		<param name="activityType_68" value="l1" />
+		<param name="activityPriority_68" value="1" />
 		<param name="activityTypicalDuration_68" value="01:00:00" />
 		<param name="activityMinimalDuration_68" value="01:00:00" />
 
-		<param name="activityType_69"           value="l2" />
-		<param name="activityPriority_69"        value="1" />
+		<param name="activityType_69" value="l2" />
+		<param name="activityPriority_69" value="1" />
 		<param name="activityTypicalDuration_69" value="02:00:00" />
 		<param name="activityMinimalDuration_69" value="02:00:00" />
 
-		<param name="activityType_70"           value="l3" />
-		<param name="activityPriority_70"        value="1" />
+		<param name="activityType_70" value="l3" />
+		<param name="activityPriority_70" value="1" />
 		<param name="activityTypicalDuration_70" value="03:00:00" />
 		<param name="activityMinimalDuration_70" value="03:00:00" />
 
-		<param name="activityType_71"            value="l4" />
-		<param name="activityPriority_71"        value="1" />
+		<param name="activityType_71" value="l4" />
+		<param name="activityPriority_71" value="1" />
 		<param name="activityTypicalDuration_71" value="04:00:00" />
 		<param name="activityMinimalDuration_71" value="04:00:00" />
 
-		<param name="activityType_72"            value="l5" />
-		<param name="activityPriority_72"        value="1" />
+		<param name="activityType_72" value="l5" />
+		<param name="activityPriority_72" value="1" />
 		<param name="activityTypicalDuration_72" value="05:00:00" />
 		<param name="activityMinimalDuration_72" value="05:00:00" />
 
-		<param name="activityType_73"            value="l6" />
-		<param name="activityPriority_73"        value="1" />
+		<param name="activityType_73" value="l6" />
+		<param name="activityPriority_73" value="1" />
 		<param name="activityTypicalDuration_73" value="06:00:00" />
 		<param name="activityMinimalDuration_73" value="06:00:00" />
 
-		<param name="activityType_74"            value="l7" />
-		<param name="activityPriority_74"        value="1" />
+		<param name="activityType_74" value="l7" />
+		<param name="activityPriority_74" value="1" />
 		<param name="activityTypicalDuration_74" value="07:00:00" />
 		<param name="activityMinimalDuration_74" value="07:00:00" />
 
-		<param name="activityType_75"            value="l8" />
-		<param name="activityPriority_75"        value="1" />
+		<param name="activityType_75" value="l8" />
+		<param name="activityPriority_75" value="1" />
 		<param name="activityTypicalDuration_75" value="08:00:00" />
 		<param name="activityMinimalDuration_75" value="08:00:00" />
 
-		<param name="activityType_76"            value="l9" />
-		<param name="activityPriority_76"        value="1" />
+		<param name="activityType_76" value="l9" />
+		<param name="activityPriority_76" value="1" />
 		<param name="activityTypicalDuration_76" value="09:00:00" />
 		<param name="activityMinimalDuration_76" value="09:00:00" />
 
-		<param name="activityType_77"            value="l10" />
-		<param name="activityPriority_77"        value="1" />
+		<param name="activityType_77" value="l10" />
+		<param name="activityPriority_77" value="1" />
 		<param name="activityTypicalDuration_77" value="10:00:00" />
 		<param name="activityMinimalDuration_77" value="10:00:00" />
 
-		<param name="activityType_78"           value="l11" />
-		<param name="activityPriority_78"        value="1" />
+		<param name="activityType_78" value="l11" />
+		<param name="activityPriority_78" value="1" />
 		<param name="activityTypicalDuration_78" value="11:00:00" />
 		<param name="activityMinimalDuration_78" value="11:00:00" />
 
-		<param name="activityType_79"           value="l12" />
-		<param name="activityPriority_79"        value="1" />
+		<param name="activityType_79" value="l12" />
+		<param name="activityPriority_79" value="1" />
 		<param name="activityTypicalDuration_79" value="12:00:00" />
 		<param name="activityMinimalDuration_79" value="12:00:00" />
 
-		<param name="activityType_80"           value="l13" />
-		<param name="activityPriority_80"        value="1" />
+		<param name="activityType_80" value="l13" />
+		<param name="activityPriority_80" value="1" />
 		<param name="activityTypicalDuration_80" value="13:00:00" />
 		<param name="activityMinimalDuration_80" value="13:00:00" />
 
-		<param name="activityType_81"            value="l14" />
-		<param name="activityPriority_81"        value="1" />
+		<param name="activityType_81" value="l14" />
+		<param name="activityPriority_81" value="1" />
 		<param name="activityTypicalDuration_81" value="14:00:00" />
 		<param name="activityMinimalDuration_81" value="14:00:00" />
 
-		<param name="activityType_82"            value="l15" />
-		<param name="activityPriority_82"        value="1" />
+		<param name="activityType_82" value="l15" />
+		<param name="activityPriority_82" value="1" />
 		<param name="activityTypicalDuration_82" value="15:00:00" />
 		<param name="activityMinimalDuration_82" value="15:00:00" />
 
-		<param name="activityType_83"            value="l16" />
-		<param name="activityPriority_83"        value="1" />
+		<param name="activityType_83" value="l16" />
+		<param name="activityPriority_83" value="1" />
 		<param name="activityTypicalDuration_83" value="16:00:00" />
 		<param name="activityMinimalDuration_83" value="16:00:00" />
 
-		<param name="activityType_84"            value="l17" />
-		<param name="activityPriority_84"        value="1" />
+		<param name="activityType_84" value="l17" />
+		<param name="activityPriority_84" value="1" />
 		<param name="activityTypicalDuration_84" value="17:00:00" />
 		<param name="activityMinimalDuration_84" value="17:00:00" />
 
-		<param name="activityType_85"            value="l18" />
-		<param name="activityPriority_85"        value="1" />
+		<param name="activityType_85" value="l18" />
+		<param name="activityPriority_85" value="1" />
 		<param name="activityTypicalDuration_85" value="18:00:00" />
 		<param name="activityMinimalDuration_85" value="18:00:00" />
 
-		<param name="activityType_86"            value="l19" />
-		<param name="activityPriority_86"        value="1" />
+		<param name="activityType_86" value="l19" />
+		<param name="activityPriority_86" value="1" />
 		<param name="activityTypicalDuration_86" value="19:00:00" />
 		<param name="activityMinimalDuration_86" value="19:00:00" />
 
-		<param name="activityType_87"            value="l20" />
-		<param name="activityPriority_87"        value="1" />
+		<param name="activityType_87" value="l20" />
+		<param name="activityPriority_87" value="1" />
 		<param name="activityTypicalDuration_87" value="20:00:00" />
 		<param name="activityMinimalDuration_87" value="20:00:00" />
 
-		<param name="activityType_88"           value="s0.5" />
-		<param name="activityPriority_88"        value="1" />
+		<param name="activityType_88" value="s0.5" />
+		<param name="activityPriority_88" value="1" />
 		<param name="activityTypicalDuration_88" value="00:30:00" />
 		<param name="activityMinimalDuration_88" value="00:30:00" />
 
-		<param name="activityType_89"           value="s1" />
-		<param name="activityPriority_89"        value="1" />
+		<param name="activityType_89" value="s1" />
+		<param name="activityPriority_89" value="1" />
 		<param name="activityTypicalDuration_89" value="01:00:00" />
 		<param name="activityMinimalDuration_89" value="01:00:00" />
 
-		<param name="activityType_90"           value="s2" />
-		<param name="activityPriority_90"        value="1" />
+		<param name="activityType_90" value="s2" />
+		<param name="activityPriority_90" value="1" />
 		<param name="activityTypicalDuration_90" value="02:00:00" />
 		<param name="activityMinimalDuration_90" value="02:00:00" />
 
-		<param name="activityType_91"            value="s3" />
-		<param name="activityPriority_91"        value="1" />
+		<param name="activityType_91" value="s3" />
+		<param name="activityPriority_91" value="1" />
 		<param name="activityTypicalDuration_91" value="03:00:00" />
 		<param name="activityMinimalDuration_91" value="03:00:00" />
 
-		<param name="activityType_92"            value="s4" />
-		<param name="activityPriority_92"        value="1" />
+		<param name="activityType_92" value="s4" />
+		<param name="activityPriority_92" value="1" />
 		<param name="activityTypicalDuration_92" value="04:00:00" />
 		<param name="activityMinimalDuration_92" value="04:00:00" />
 
-		<param name="activityType_93"            value="s5" />
-		<param name="activityPriority_93"        value="1" />
+		<param name="activityType_93" value="s5" />
+		<param name="activityPriority_93" value="1" />
 		<param name="activityTypicalDuration_93" value="05:00:00" />
 		<param name="activityMinimalDuration_93" value="05:00:00" />
 
-		<param name="activityType_94"            value="s6" />
-		<param name="activityPriority_94"        value="1" />
+		<param name="activityType_94" value="s6" />
+		<param name="activityPriority_94" value="1" />
 		<param name="activityTypicalDuration_94" value="06:00:00" />
 		<param name="activityMinimalDuration_94" value="06:00:00" />
 
-		<param name="activityType_95"            value="s7" />
-		<param name="activityPriority_95"        value="1" />
+		<param name="activityType_95" value="s7" />
+		<param name="activityPriority_95" value="1" />
 		<param name="activityTypicalDuration_95" value="07:00:00" />
 		<param name="activityMinimalDuration_95" value="07:00:00" />
 
-		<param name="activityType_96"            value="s8" />
-		<param name="activityPriority_96"        value="1" />
+		<param name="activityType_96" value="s8" />
+		<param name="activityPriority_96" value="1" />
 		<param name="activityTypicalDuration_96" value="08:00:00" />
 		<param name="activityMinimalDuration_96" value="08:00:00" />
 
-		<param name="activityType_97"            value="s9" />
-		<param name="activityPriority_97"        value="1" />
+		<param name="activityType_97" value="s9" />
+		<param name="activityPriority_97" value="1" />
 		<param name="activityTypicalDuration_97" value="09:00:00" />
 		<param name="activityMinimalDuration_97" value="09:00:00" />
 
-		<param name="activityType_98"           value="s10" />
-		<param name="activityPriority_98"        value="1" />
+		<param name="activityType_98" value="s10" />
+		<param name="activityPriority_98" value="1" />
 		<param name="activityTypicalDuration_98" value="10:00:00" />
 		<param name="activityMinimalDuration_98" value="10:00:00" />
 
-		<param name="activityType_99"           value="s11" />
-		<param name="activityPriority_99"        value="1" />
+		<param name="activityType_99" value="s11" />
+		<param name="activityPriority_99" value="1" />
 		<param name="activityTypicalDuration_99" value="11:00:00" />
 		<param name="activityMinimalDuration_99" value="11:00:00" />
 
-		<param name="activityType_100"           value="s12" />
-		<param name="activityPriority_100"        value="1" />
+		<param name="activityType_100" value="s12" />
+		<param name="activityPriority_100" value="1" />
 		<param name="activityTypicalDuration_100" value="12:00:00" />
 		<param name="activityMinimalDuration_100" value="12:00:00" />
 
 		<!-- home _0 to _24 -->
-<!--		<param name="activityOpeningTime_0"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_1"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_2"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_3"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_4"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_5"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_6"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_7"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_8"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_9"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_10"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_11"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_12"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_13"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_14"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_15"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_16"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_17"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_18"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_19"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_20"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_21"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_22"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_23"     value="00:00:00" />-->
-<!--		<param name="activityOpeningTime_24"     value="00:00:00" />-->
+		<!-- <param name="activityOpeningTime_0" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_1" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_2" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_3" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_4" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_5" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_6" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_7" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_8" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_9" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_10" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_11" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_12" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_13" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_14" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_15" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_16" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_17" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_18" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_19" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_20" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_21" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_22" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_23" value="00:00:00" /> -->
+		<!-- <param name="activityOpeningTime_24" value="00:00:00" /> -->
 		<!-- work _25 to _45 -->
-		<param name="activityOpeningTime_25"     value="07:00:00" />
-		<param name="activityOpeningTime_26"     value="07:00:00" />
-		<param name="activityOpeningTime_27"     value="07:00:00" />
-		<param name="activityOpeningTime_28"     value="07:00:00" />
-		<param name="activityOpeningTime_29"     value="07:00:00" />
-		<param name="activityOpeningTime_30"     value="07:00:00" />
-		<param name="activityOpeningTime_31"     value="07:00:00" />
-		<param name="activityOpeningTime_32"     value="07:00:00" />
-		<param name="activityOpeningTime_33"     value="07:00:00" />
-		<param name="activityOpeningTime_34"     value="07:00:00" />
-		<param name="activityOpeningTime_35"     value="07:00:00" />
-		<param name="activityOpeningTime_36"     value="07:00:00" />
-		<param name="activityOpeningTime_37"     value="07:00:00" />
-		<param name="activityOpeningTime_38"     value="07:00:00" />
-		<param name="activityOpeningTime_39"     value="07:00:00" />
-		<param name="activityOpeningTime_40"     value="07:00:00" />
-		<param name="activityOpeningTime_41"     value="07:00:00" />
-		<param name="activityOpeningTime_42"     value="07:00:00" />
-		<param name="activityOpeningTime_43"     value="07:00:00" />
-		<param name="activityOpeningTime_44"     value="07:00:00" />
-		<param name="activityOpeningTime_45"     value="07:00:00" />
+		<param name="activityOpeningTime_25" value="07:00:00" />
+		<param name="activityOpeningTime_26" value="07:00:00" />
+		<param name="activityOpeningTime_27" value="07:00:00" />
+		<param name="activityOpeningTime_28" value="07:00:00" />
+		<param name="activityOpeningTime_29" value="07:00:00" />
+		<param name="activityOpeningTime_30" value="07:00:00" />
+		<param name="activityOpeningTime_31" value="07:00:00" />
+		<param name="activityOpeningTime_32" value="07:00:00" />
+		<param name="activityOpeningTime_33" value="07:00:00" />
+		<param name="activityOpeningTime_34" value="07:00:00" />
+		<param name="activityOpeningTime_35" value="07:00:00" />
+		<param name="activityOpeningTime_36" value="07:00:00" />
+		<param name="activityOpeningTime_37" value="07:00:00" />
+		<param name="activityOpeningTime_38" value="07:00:00" />
+		<param name="activityOpeningTime_39" value="07:00:00" />
+		<param name="activityOpeningTime_40" value="07:00:00" />
+		<param name="activityOpeningTime_41" value="07:00:00" />
+		<param name="activityOpeningTime_42" value="07:00:00" />
+		<param name="activityOpeningTime_43" value="07:00:00" />
+		<param name="activityOpeningTime_44" value="07:00:00" />
+		<param name="activityOpeningTime_45" value="07:00:00" />
 		<!-- educ _46 to _66 -->
-		<param name="activityOpeningTime_46"     value="07:00:00" />
-		<param name="activityOpeningTime_47"     value="07:00:00" />
-		<param name="activityOpeningTime_48"     value="07:00:00" />
-		<param name="activityOpeningTime_49"     value="07:00:00" />
-		<param name="activityOpeningTime_50"     value="07:00:00" />
-		<param name="activityOpeningTime_51"     value="07:00:00" />
-		<param name="activityOpeningTime_52"     value="07:00:00" />
-		<param name="activityOpeningTime_53"     value="07:00:00" />
-		<param name="activityOpeningTime_54"     value="07:00:00" />
-		<param name="activityOpeningTime_55"     value="07:00:00" />
-		<param name="activityOpeningTime_56"     value="07:00:00" />
-		<param name="activityOpeningTime_57"     value="07:00:00" />
-		<param name="activityOpeningTime_58"     value="07:00:00" />
-		<param name="activityOpeningTime_59"     value="07:00:00" />
-		<param name="activityOpeningTime_60"     value="07:00:00" />
-		<param name="activityOpeningTime_61"     value="07:00:00" />
-		<param name="activityOpeningTime_62"     value="07:00:00" />
-		<param name="activityOpeningTime_63"     value="07:00:00" />
-		<param name="activityOpeningTime_64"     value="07:00:00" />
-		<param name="activityOpeningTime_65"     value="07:00:00" />
-		<param name="activityOpeningTime_66"     value="07:00:00" />
+		<param name="activityOpeningTime_46" value="07:00:00" />
+		<param name="activityOpeningTime_47" value="07:00:00" />
+		<param name="activityOpeningTime_48" value="07:00:00" />
+		<param name="activityOpeningTime_49" value="07:00:00" />
+		<param name="activityOpeningTime_50" value="07:00:00" />
+		<param name="activityOpeningTime_51" value="07:00:00" />
+		<param name="activityOpeningTime_52" value="07:00:00" />
+		<param name="activityOpeningTime_53" value="07:00:00" />
+		<param name="activityOpeningTime_54" value="07:00:00" />
+		<param name="activityOpeningTime_55" value="07:00:00" />
+		<param name="activityOpeningTime_56" value="07:00:00" />
+		<param name="activityOpeningTime_57" value="07:00:00" />
+		<param name="activityOpeningTime_58" value="07:00:00" />
+		<param name="activityOpeningTime_59" value="07:00:00" />
+		<param name="activityOpeningTime_60" value="07:00:00" />
+		<param name="activityOpeningTime_61" value="07:00:00" />
+		<param name="activityOpeningTime_62" value="07:00:00" />
+		<param name="activityOpeningTime_63" value="07:00:00" />
+		<param name="activityOpeningTime_64" value="07:00:00" />
+		<param name="activityOpeningTime_65" value="07:00:00" />
+		<param name="activityOpeningTime_66" value="07:00:00" />
 		<!-- leis _67 to _87 -->
-		<param name="activityOpeningTime_67"     value="00:00:00" />
-		<param name="activityOpeningTime_68"     value="00:00:00" />
-		<param name="activityOpeningTime_69"     value="00:00:00" />
-		<param name="activityOpeningTime_70"     value="00:00:00" />
-		<param name="activityOpeningTime_71"     value="00:00:00" />
-		<param name="activityOpeningTime_72"     value="00:00:00" />
-		<param name="activityOpeningTime_73"     value="00:00:00" />
-		<param name="activityOpeningTime_74"     value="00:00:00" />
-		<param name="activityOpeningTime_75"     value="00:00:00" />
-		<param name="activityOpeningTime_76"     value="00:00:00" />
-		<param name="activityOpeningTime_77"     value="00:00:00" />
-		<param name="activityOpeningTime_78"     value="00:00:00" />
-		<param name="activityOpeningTime_79"     value="00:00:00" />
-		<param name="activityOpeningTime_80"     value="00:00:00" />
-		<param name="activityOpeningTime_81"     value="00:00:00" />
-		<param name="activityOpeningTime_82"     value="00:00:00" />
-		<param name="activityOpeningTime_83"     value="00:00:00" />
-		<param name="activityOpeningTime_84"     value="00:00:00" />
-		<param name="activityOpeningTime_85"     value="00:00:00" />
-		<param name="activityOpeningTime_86"     value="00:00:00" />
-		<param name="activityOpeningTime_87"     value="00:00:00" />
+		<param name="activityOpeningTime_67" value="00:00:00" />
+		<param name="activityOpeningTime_68" value="00:00:00" />
+		<param name="activityOpeningTime_69" value="00:00:00" />
+		<param name="activityOpeningTime_70" value="00:00:00" />
+		<param name="activityOpeningTime_71" value="00:00:00" />
+		<param name="activityOpeningTime_72" value="00:00:00" />
+		<param name="activityOpeningTime_73" value="00:00:00" />
+		<param name="activityOpeningTime_74" value="00:00:00" />
+		<param name="activityOpeningTime_75" value="00:00:00" />
+		<param name="activityOpeningTime_76" value="00:00:00" />
+		<param name="activityOpeningTime_77" value="00:00:00" />
+		<param name="activityOpeningTime_78" value="00:00:00" />
+		<param name="activityOpeningTime_79" value="00:00:00" />
+		<param name="activityOpeningTime_80" value="00:00:00" />
+		<param name="activityOpeningTime_81" value="00:00:00" />
+		<param name="activityOpeningTime_82" value="00:00:00" />
+		<param name="activityOpeningTime_83" value="00:00:00" />
+		<param name="activityOpeningTime_84" value="00:00:00" />
+		<param name="activityOpeningTime_85" value="00:00:00" />
+		<param name="activityOpeningTime_86" value="00:00:00" />
+		<param name="activityOpeningTime_87" value="00:00:00" />
 		<!-- shop _88 to _100 -->
-		<param name="activityOpeningTime_88"     value="08:00:00" />
-		<param name="activityOpeningTime_89"     value="08:00:00" />
-		<param name="activityOpeningTime_90"     value="08:00:00" />
-		<param name="activityOpeningTime_91"     value="08:00:00" />
-		<param name="activityOpeningTime_92"     value="08:00:00" />
-		<param name="activityOpeningTime_93"     value="08:00:00" />
-		<param name="activityOpeningTime_94"     value="08:00:00" />
-		<param name="activityOpeningTime_95"     value="08:00:00" />
-		<param name="activityOpeningTime_96"     value="08:00:00" />
-		<param name="activityOpeningTime_97"     value="08:00:00" />
-		<param name="activityOpeningTime_98"     value="08:00:00" />
-		<param name="activityOpeningTime_99"     value="08:00:00" />
-		<param name="activityOpeningTime_100"     value="08:00:00" />
+		<param name="activityOpeningTime_88" value="08:00:00" />
+		<param name="activityOpeningTime_89" value="08:00:00" />
+		<param name="activityOpeningTime_90" value="08:00:00" />
+		<param name="activityOpeningTime_91" value="08:00:00" />
+		<param name="activityOpeningTime_92" value="08:00:00" />
+		<param name="activityOpeningTime_93" value="08:00:00" />
+		<param name="activityOpeningTime_94" value="08:00:00" />
+		<param name="activityOpeningTime_95" value="08:00:00" />
+		<param name="activityOpeningTime_96" value="08:00:00" />
+		<param name="activityOpeningTime_97" value="08:00:00" />
+		<param name="activityOpeningTime_98" value="08:00:00" />
+		<param name="activityOpeningTime_99" value="08:00:00" />
+		<param name="activityOpeningTime_100" value="08:00:00" />
 
 		<!-- home _0 to _24 -->
-<!--		<param name="activityClosingTime_0"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_1"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_2"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_3"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_4"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_5"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_6"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_7"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_8"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_9"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_10"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_11"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_12"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_13"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_14"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_15"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_16"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_17"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_18"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_19"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_20"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_21"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_22"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_23"     value="24:00:00" />-->
-<!--		<param name="activityClosingTime_24"     value="24:00:00" />-->
+		<!-- <param name="activityClosingTime_0" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_1" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_2" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_3" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_4" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_5" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_6" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_7" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_8" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_9" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_10" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_11" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_12" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_13" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_14" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_15" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_16" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_17" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_18" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_19" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_20" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_21" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_22" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_23" value="24:00:00" /> -->
+		<!-- <param name="activityClosingTime_24" value="24:00:00" /> -->
 		<!-- work _25 to _45 -->
-		<param name="activityClosingTime_25"     value="18:00:00" />
-		<param name="activityClosingTime_26"     value="18:00:00" />
-		<param name="activityClosingTime_27"     value="18:00:00" />
-		<param name="activityClosingTime_28"     value="18:00:00" />
-		<param name="activityClosingTime_29"     value="18:00:00" />
-		<param name="activityClosingTime_30"     value="18:00:00" />
-		<param name="activityClosingTime_31"     value="18:00:00" />
-		<param name="activityClosingTime_32"     value="18:00:00" />
-		<param name="activityClosingTime_33"     value="18:00:00" />
-		<param name="activityClosingTime_34"     value="18:00:00" />
-		<param name="activityClosingTime_35"     value="18:00:00" />
-		<param name="activityClosingTime_36"     value="18:00:00" />
-		<param name="activityClosingTime_37"     value="18:00:00" />
-		<param name="activityClosingTime_38"     value="18:00:00" />
-		<param name="activityClosingTime_39"     value="18:00:00" />
-		<param name="activityClosingTime_40"     value="18:00:00" />
-		<param name="activityClosingTime_41"     value="18:00:00" />
-		<param name="activityClosingTime_42"     value="18:00:00" />
-		<param name="activityClosingTime_43"     value="18:00:00" />
-		<param name="activityClosingTime_44"     value="18:00:00" />
-		<param name="activityClosingTime_45"     value="18:00:00" />
+		<param name="activityClosingTime_25" value="18:00:00" />
+		<param name="activityClosingTime_26" value="18:00:00" />
+		<param name="activityClosingTime_27" value="18:00:00" />
+		<param name="activityClosingTime_28" value="18:00:00" />
+		<param name="activityClosingTime_29" value="18:00:00" />
+		<param name="activityClosingTime_30" value="18:00:00" />
+		<param name="activityClosingTime_31" value="18:00:00" />
+		<param name="activityClosingTime_32" value="18:00:00" />
+		<param name="activityClosingTime_33" value="18:00:00" />
+		<param name="activityClosingTime_34" value="18:00:00" />
+		<param name="activityClosingTime_35" value="18:00:00" />
+		<param name="activityClosingTime_36" value="18:00:00" />
+		<param name="activityClosingTime_37" value="18:00:00" />
+		<param name="activityClosingTime_38" value="18:00:00" />
+		<param name="activityClosingTime_39" value="18:00:00" />
+		<param name="activityClosingTime_40" value="18:00:00" />
+		<param name="activityClosingTime_41" value="18:00:00" />
+		<param name="activityClosingTime_42" value="18:00:00" />
+		<param name="activityClosingTime_43" value="18:00:00" />
+		<param name="activityClosingTime_44" value="18:00:00" />
+		<param name="activityClosingTime_45" value="18:00:00" />
 		<!-- educ _46 to _66 -->
-		<param name="activityClosingTime_46"     value="18:00:00" />
-		<param name="activityClosingTime_47"     value="18:00:00" />
-		<param name="activityClosingTime_48"     value="18:00:00" />
-		<param name="activityClosingTime_49"     value="18:00:00" />
-		<param name="activityClosingTime_50"     value="18:00:00" />
-		<param name="activityClosingTime_51"     value="18:00:00" />
-		<param name="activityClosingTime_52"     value="18:00:00" />
-		<param name="activityClosingTime_53"     value="18:00:00" />
-		<param name="activityClosingTime_54"     value="18:00:00" />
-		<param name="activityClosingTime_55"     value="18:00:00" />
-		<param name="activityClosingTime_56"     value="18:00:00" />
-		<param name="activityClosingTime_57"     value="18:00:00" />
-		<param name="activityClosingTime_58"     value="18:00:00" />
-		<param name="activityClosingTime_59"     value="18:00:00" />
-		<param name="activityClosingTime_60"     value="18:00:00" />
-		<param name="activityClosingTime_61"     value="18:00:00" />
-		<param name="activityClosingTime_62"     value="18:00:00" />
-		<param name="activityClosingTime_63"     value="18:00:00" />
-		<param name="activityClosingTime_64"     value="18:00:00" />
-		<param name="activityClosingTime_65"     value="18:00:00" />
-		<param name="activityClosingTime_66"     value="18:00:00" />
+		<param name="activityClosingTime_46" value="18:00:00" />
+		<param name="activityClosingTime_47" value="18:00:00" />
+		<param name="activityClosingTime_48" value="18:00:00" />
+		<param name="activityClosingTime_49" value="18:00:00" />
+		<param name="activityClosingTime_50" value="18:00:00" />
+		<param name="activityClosingTime_51" value="18:00:00" />
+		<param name="activityClosingTime_52" value="18:00:00" />
+		<param name="activityClosingTime_53" value="18:00:00" />
+		<param name="activityClosingTime_54" value="18:00:00" />
+		<param name="activityClosingTime_55" value="18:00:00" />
+		<param name="activityClosingTime_56" value="18:00:00" />
+		<param name="activityClosingTime_57" value="18:00:00" />
+		<param name="activityClosingTime_58" value="18:00:00" />
+		<param name="activityClosingTime_59" value="18:00:00" />
+		<param name="activityClosingTime_60" value="18:00:00" />
+		<param name="activityClosingTime_61" value="18:00:00" />
+		<param name="activityClosingTime_62" value="18:00:00" />
+		<param name="activityClosingTime_63" value="18:00:00" />
+		<param name="activityClosingTime_64" value="18:00:00" />
+		<param name="activityClosingTime_65" value="18:00:00" />
+		<param name="activityClosingTime_66" value="18:00:00" />
 		<!-- leis _67 to _87 -->
-		<param name="activityClosingTime_67"     value="24:00:00" />
-		<param name="activityClosingTime_68"     value="24:00:00" />
-		<param name="activityClosingTime_69"     value="24:00:00" />
-		<param name="activityClosingTime_70"     value="24:00:00" />
-		<param name="activityClosingTime_71"     value="24:00:00" />
-		<param name="activityClosingTime_72"     value="24:00:00" />
-		<param name="activityClosingTime_73"     value="24:00:00" />
-		<param name="activityClosingTime_74"     value="24:00:00" />
-		<param name="activityClosingTime_75"     value="24:00:00" />
-		<param name="activityClosingTime_76"     value="24:00:00" />
-		<param name="activityClosingTime_77"     value="24:00:00" />
-		<param name="activityClosingTime_78"     value="24:00:00" />
-		<param name="activityClosingTime_79"     value="24:00:00" />
-		<param name="activityClosingTime_80"     value="24:00:00" />
-		<param name="activityClosingTime_81"     value="24:00:00" />
-		<param name="activityClosingTime_82"     value="24:00:00" />
-		<param name="activityClosingTime_83"     value="24:00:00" />
-		<param name="activityClosingTime_84"     value="24:00:00" />
-		<param name="activityClosingTime_85"     value="24:00:00" />
-		<param name="activityClosingTime_86"     value="24:00:00" />
-		<param name="activityClosingTime_87"     value="24:00:00" />
+		<param name="activityClosingTime_67" value="24:00:00" />
+		<param name="activityClosingTime_68" value="24:00:00" />
+		<param name="activityClosingTime_69" value="24:00:00" />
+		<param name="activityClosingTime_70" value="24:00:00" />
+		<param name="activityClosingTime_71" value="24:00:00" />
+		<param name="activityClosingTime_72" value="24:00:00" />
+		<param name="activityClosingTime_73" value="24:00:00" />
+		<param name="activityClosingTime_74" value="24:00:00" />
+		<param name="activityClosingTime_75" value="24:00:00" />
+		<param name="activityClosingTime_76" value="24:00:00" />
+		<param name="activityClosingTime_77" value="24:00:00" />
+		<param name="activityClosingTime_78" value="24:00:00" />
+		<param name="activityClosingTime_79" value="24:00:00" />
+		<param name="activityClosingTime_80" value="24:00:00" />
+		<param name="activityClosingTime_81" value="24:00:00" />
+		<param name="activityClosingTime_82" value="24:00:00" />
+		<param name="activityClosingTime_83" value="24:00:00" />
+		<param name="activityClosingTime_84" value="24:00:00" />
+		<param name="activityClosingTime_85" value="24:00:00" />
+		<param name="activityClosingTime_86" value="24:00:00" />
+		<param name="activityClosingTime_87" value="24:00:00" />
 		<!-- shop _88 to _100 -->
-		<param name="activityClosingTime_88"     value="20:00:00" />
-		<param name="activityClosingTime_89"     value="20:00:00" />
-		<param name="activityClosingTime_90"     value="20:00:00" />
-		<param name="activityClosingTime_91"     value="20:00:00" />
-		<param name="activityClosingTime_92"     value="20:00:00" />
-		<param name="activityClosingTime_93"     value="20:00:00" />
-		<param name="activityClosingTime_94"     value="20:00:00" />
-		<param name="activityClosingTime_95"     value="20:00:00" />
-		<param name="activityClosingTime_96"     value="20:00:00" />
-		<param name="activityClosingTime_97"     value="20:00:00" />
-		<param name="activityClosingTime_98"     value="20:00:00" />
-		<param name="activityClosingTime_99"     value="20:00:00" />
-		<param name="activityClosingTime_100"    value="20:00:00" />
+		<param name="activityClosingTime_88" value="20:00:00" />
+		<param name="activityClosingTime_89" value="20:00:00" />
+		<param name="activityClosingTime_90" value="20:00:00" />
+		<param name="activityClosingTime_91" value="20:00:00" />
+		<param name="activityClosingTime_92" value="20:00:00" />
+		<param name="activityClosingTime_93" value="20:00:00" />
+		<param name="activityClosingTime_94" value="20:00:00" />
+		<param name="activityClosingTime_95" value="20:00:00" />
+		<param name="activityClosingTime_96" value="20:00:00" />
+		<param name="activityClosingTime_97" value="20:00:00" />
+		<param name="activityClosingTime_98" value="20:00:00" />
+		<param name="activityClosingTime_99" value="20:00:00" />
+		<param name="activityClosingTime_100" value="20:00:00" />
 
-		<param name="activityType_101"            value="tta" /> 
-		<param name="activityPriority_101"        value="1" />
+		<param name="activityType_101" value="tta" />
+		<param name="activityPriority_101" value="1" />
 		<param name="activityTypicalDuration_101" value="24:00:00" />
-		<param name="activityOpeningTime_101"     value="06:00:00" />
-		<param name="activityClosingTime_101"     value="22:00:00" />
+		<param name="activityOpeningTime_101" value="06:00:00" />
+		<param name="activityClosingTime_101" value="22:00:00" />
 	</module>
 
-	<!--
-	<module name="strategy">
-		<param name="maxAgentPlanMemorySize" value="4" /><!- 0 means unlimited ->
-		
-
-		<param name="ModuleProbability_1" value="0.1" />
-		<param name="Module_1" value="ChangeExpBeta" />
-
-		<param name="ModuleProbability_2" value="0" />
-		<param name="Module_2" value="playground.yu.test.PlanStrategy4ChangeLegModeWithParkLocation" />
-
-		<param name="ModuleProbability_3" value="0.4" />
-		<param name="Module_3" value="ReRoute" />
-
-	</module>
-		<module name="counts">
-		<param name="inputCountsFile" value="../matsim/examples/equil/counts100.xml" />
-		<param name="outputformat" value="kml" />
-		<param name="distanceFilter" value="30000" />
-		<param name="countsScaleFactor" value="1" />
-		<param name="distanceFilterCenterNode" value="7" />
-	</module>
-		<module name="TimeAllocationMutator">
-		<param name="mutationRange" value="7200" />
-	</module>
--->
+	<!-- <module name="strategy"> <param name="maxAgentPlanMemorySize" value="4" 
+		/><!- 0 means unlimited -> <param name="ModuleProbability_1" value="0.1" 
+		/> <param name="Module_1" value="ChangeExpBeta" /> <param name="ModuleProbability_2" 
+		value="0" /> <param name="Module_2" value="playground.yu.test.PlanStrategy4ChangeLegModeWithParkLocation" 
+		/> <param name="ModuleProbability_3" value="0.4" /> <param name="Module_3" 
+		value="ReRoute" /> </module> <module name="counts"> <param name="inputCountsFile" 
+		value="../matsim/examples/equil/counts100.xml" /> <param name="outputformat" 
+		value="kml" /> <param name="distanceFilter" value="30000" /> <param name="countsScaleFactor" 
+		value="1" /> <param name="distanceFilterCenterNode" value="7" /> </module> 
+		<module name="TimeAllocationMutator"> <param name="mutationRange" value="7200" 
+		/> </module> -->
 	<module name="changeLegModeWithParkLocation">
 		<param name="modes" value="car,pt,walk" />
 		<param name="offsetWalk" value="6" />

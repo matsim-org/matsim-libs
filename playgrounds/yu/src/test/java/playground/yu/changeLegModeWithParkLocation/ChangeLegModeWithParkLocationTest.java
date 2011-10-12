@@ -37,7 +37,7 @@ import playground.yu.tests.ChangeLegModeWithParkLocation;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 	private static class LegChainModesListener1 implements
@@ -137,7 +137,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				criterion = "|car|pt|walk|walk|car|car|car|car|";
 				break;
 			case 10:
-				criterion = "|walk|pt|pt|pt|pt|walk|walk|walk|";
+				criterion = "|car|pt|walk|walk|walk|pt|car|car|";
 				break;
 			}
 			System.out.println("----->currentIteration=" + itr);
@@ -195,7 +195,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				criterion = "|pt|pt|walk|pt|pt|pt|pt|pt|";
 				break;
 			case 10:
-				criterion = "|walk|pt|pt|pt|pt|walk|walk|walk|";
+				criterion = "|car|pt|walk|pt|pt|pt|car|car|";
 				break;
 			}
 			System.out.println("----->currentIteration=" + itr);
