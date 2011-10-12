@@ -8,7 +8,7 @@
 		<stopFacility id="TEST_STOP_2" x="-116.751677" y="36.915682" linkRefId="dL1_TEST_STOP_2" name="GTFS TEST STOP 2"
  isBlocking="false"/>
 	</transitStops>
-	<transitLine id="TEST_ROUTE">
+	<transitLine id="TEST-ROUTE_Test Route">
 		<transitRoute id="TEST_TRIP_WD">
 			<transportMode>pt</transportMode>
 			<routeProfile>

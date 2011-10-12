@@ -27,6 +27,7 @@ public class GtfsTests extends MatsimTestCase {
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
+		gtfs.writeScenario();
 		ScenarioImpl scenario = (ScenarioImpl) gtfs.getScenario(); 
 		
 		// The Conversion is done, now read the checked scenario

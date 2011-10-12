@@ -57,6 +57,7 @@ public class GtfsConverter {
 	private ScenarioImpl scenario;
 	private Map<String,Integer> vehicleIdsAndTypes = new HashMap<String,Integer>();
 	private Map<Id,Integer> vehicleTypesToRoutesAssignments = new HashMap<Id,Integer>();
+	private Map<Id,Id> matsimRouteIdToGtfsTripIdAssignments = new HashMap<Id,Id>();
 	private boolean createShapedNetwork = false;
 
 	private long date = 0;
@@ -175,11 +176,11 @@ public class GtfsConverter {
 		this.convertStops(stopsSource);
 	
 		// Get the Routenames and the assigned Trips
-		Map<Id,String> routeNames = getRouteNames(routesSource);
-		Map<Id,Id> routeToTripAssignments = getRouteToTripAssignments(tripSource);
+		Map<Id, Id> gtfsToMatsimRouteIdAssingments = getMatsimRouteIds(routesSource);
+		Map<Id,Id> routeToTripAssignments = getRouteToTripAssignments(tripSource,gtfsToMatsimRouteIdAssingments);
 	
 		// Create Transitlines
-		this.createTransitLines(routeNames);
+		this.createTransitLines(gtfsToMatsimRouteIdAssingments);
 	
 		// Get the used service Id for the choosen weekday and date
 		List<String> usedServiceIds = new ArrayList<String>();
@@ -224,7 +225,7 @@ public class GtfsConverter {
 		
 		// Convert the schedules for the trips
 		System.out.println("Convert the schedules");
-		this.convertSchedules(stopTimesSource, routeNames, routeToTripAssignments, usedTripIds, tripRoute);
+		this.convertSchedules(stopTimesSource, routeToTripAssignments, usedTripIds, tripRoute);
 	
 		// If you use the optional frequencies.txt, it will be transformed here
 		if((new File(frequenciesFilename)).exists()){
@@ -264,6 +265,7 @@ public class GtfsConverter {
 		int serviceIdIndex = tripsSource.getContentIndex("service_id");
 		int tripIdIndex = tripsSource.getContentIndex("trip_id");
 		int shapeIdIndex = tripsSource.getContentIndex("shape_id");
+		int headsignIndex = tripsSource.getContentIndex("trip_headsign");
 		for (String[] entries : tripsSource.getContent()) {
 			if (usedServiceIds.contains(entries[serviceIdIndex])) {
 				usedTripIds.add(new IdImpl(entries[tripIdIndex]));
@@ -279,28 +281,46 @@ public class GtfsConverter {
 					this.createShapedNetwork = false;
 				}
 			}
+			if(headsignIndex>0){
+				String headsign = entries[headsignIndex];
+				String oldId = entries[tripIdIndex];
+				oldId = oldId.replace("_", "-");
+				headsign = headsign.replace("_", "-");
+				this.matsimRouteIdToGtfsTripIdAssignments.put(new IdImpl(entries[tripIdIndex]), new IdImpl(oldId + "_" + headsign));
+			}else{
+				this.matsimRouteIdToGtfsTripIdAssignments.put(new IdImpl(entries[tripIdIndex]), new IdImpl(entries[tripIdIndex]));
+			} 							
 		}
 		return usedTripIds;
 	}
 
-	private Map<Id,String> getRouteNames(GtfsSource routesSource) {
-		Map<Id, String> routeNames = new HashMap<Id, String>();
+	private Map<Id, Id> getMatsimRouteIds(GtfsSource routesSource) {
+		Map<Id, Id> routeNames = new HashMap<Id, Id>();
 		int routeIdIndex = routesSource.getContentIndex("route_id");
-		int routeLongNameIndex = routesSource.getContentIndex("route_long_name");
+		int routeShortNameIndex = routesSource.getContentIndex("route_short_name");
 		int vehicleTypeIndex = routesSource.getContentIndex("route_type");
 		for(String[] entries: routesSource.getContent()){
-			routeNames.put(new IdImpl(entries[routeIdIndex]),entries[routeLongNameIndex]);
-			this.vehicleTypesToRoutesAssignments.put(new IdImpl(entries[routeIdIndex]), Integer.parseInt(entries[vehicleTypeIndex].trim()));
+			String shortName = entries[routeShortNameIndex];
+			String oldId = entries[routeIdIndex];
+			oldId = oldId.replace("_", "-");
+			shortName = shortName.replace("_", "-");
+			if(shortName.equals("")){
+				System.out.println("Route " + oldId + " has no short route name");
+				shortName = "NoShortRouteName";
+			}
+			Id newId = new IdImpl(oldId + "_" + shortName);
+			routeNames.put(new IdImpl(entries[routeIdIndex]),newId);
+			this.vehicleTypesToRoutesAssignments.put(newId, Integer.parseInt(entries[vehicleTypeIndex].trim()));
 		}
 		return routeNames;
 	}
 
-	private Map<Id,Id> getRouteToTripAssignments(GtfsSource tripsSource){
+	private Map<Id,Id> getRouteToTripAssignments(GtfsSource tripsSource, Map<Id, Id> gtfsToMatsimRouteIdAssingments){
 		Map<Id,Id> routeTripAssignment = new HashMap<Id,Id>();
 		int routeIdIndex = tripsSource.getContentIndex("route_id");
 		int tripIdIndex = tripsSource.getContentIndex("trip_id");
 		for(String[] entries: tripsSource.getContent()) {
-			routeTripAssignment.put(new IdImpl(entries[tripIdIndex]), new IdImpl(entries[routeIdIndex]));				
+			routeTripAssignment.put(new IdImpl(entries[tripIdIndex]), gtfsToMatsimRouteIdAssingments.get(new IdImpl(entries[routeIdIndex])));				
 		}
 		return routeTripAssignment;		
 	}
@@ -373,10 +393,10 @@ public class GtfsConverter {
 			double endTime = Time.parseTime(entries[endTimeIndex].trim());
 			double step = Double.parseDouble(entries[stepIndex]);
 			if((!(entries[tripIdIndex].equals(oldTripId))) && (usedTripIds.contains(tripId))){
-				departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).getDepartures().size();
+				departureCounter = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures().size();
 			}
 			if(usedTripIds.contains(tripId)){
-				Map<Id,Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).getDepartures();
+				Map<Id,Departure> depatures = ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).getDepartures();
 				double latestDeparture = 0;
 				for(Departure d: depatures.values()){
 					if(latestDeparture < d.getDepartureTime()){
@@ -389,7 +409,7 @@ public class GtfsConverter {
 						Departure d = ts.getFactory().createDeparture(new IdImpl(tripId.toString() + "." + departureCounter), time);
 						d.setVehicleId(new IdImpl(tripId.toString() + "." + departureCounter));
 						this.vehicleIdsAndTypes.put(tripId.toString() + "." + departureCounter,this.vehicleTypesToRoutesAssignments.get(routeToTripAssignments.get(tripId)));
-						ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(tripId).addDeparture(d);
+						ts.getTransitLines().get(routeToTripAssignments.get(tripId)).getRoutes().get(this.matsimRouteIdToGtfsTripIdAssignments.get(tripId)).addDeparture(d);
 						departureCounter++;
 					}						
 					time = time + step;
@@ -400,7 +420,7 @@ public class GtfsConverter {
 	}
 
 
-	private void convertSchedules(GtfsSource stopTimesSource, Map<Id, String> routeNames, Map<Id, Id> routeToTripAssignments, List<Id> tripIds, Map<Id, NetworkRoute> tripRoute){
+	private void convertSchedules(GtfsSource stopTimesSource, Map<Id, Id> routeToTripAssignments, List<Id> tripIds, Map<Id, NetworkRoute> tripRoute){
 		List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
 		int idCounter = 0;	
 		int tripIdIndex = stopTimesSource.getContentIndex("trip_id");
@@ -429,7 +449,7 @@ public class GtfsConverter {
 					//finish old route
 					stops = this.interpolateMissingDepartures(stops);
 					TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
-					TransitRoute tr = ts.getFactory().createTransitRoute(currentTripId, tripRoute.get(currentTripId), stops, "pt");
+					TransitRoute tr = ts.getFactory().createTransitRoute(this.matsimRouteIdToGtfsTripIdAssignments.get(currentTripId), tripRoute.get(currentTripId), stops, "pt");
 					tr.addDeparture(departure);
 					tl.addRoute(tr);
 					stops = new LinkedList<TransitRouteStop>();
@@ -454,7 +474,7 @@ public class GtfsConverter {
 			//finish old route
 			stops = this.interpolateMissingDepartures(stops);
 			TransitLine tl = ts.getTransitLines().get(routeToTripAssignments.get(currentTripId));
-			TransitRoute tr = ts.getFactory().createTransitRoute(currentTripId, tripRoute.get(currentTripId), stops, "pt");
+			TransitRoute tr = ts.getFactory().createTransitRoute(this.matsimRouteIdToGtfsTripIdAssignments.get(currentTripId), tripRoute.get(currentTripId), stops, "pt");
 			tr.addDeparture(departure);
 			tl.addRoute(tr);
 		}	
@@ -574,9 +594,9 @@ public class GtfsConverter {
 		return linkId;
 	}
 
-	private void createTransitLines(Map<Id, String> routeNames) {
-		for(Id id: routeNames.keySet()){
-			TransitLine tl = ts.getFactory().createTransitLine(id);
+	private void createTransitLines(Map<Id, Id> gtfsToMatsimRouteId) {
+		for(Id id: gtfsToMatsimRouteId.keySet()){
+			TransitLine tl = ts.getFactory().createTransitLine(gtfsToMatsimRouteId.get(id));
 			ts.addTransitLine(tl);
 		}		
 	}

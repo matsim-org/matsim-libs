@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 class OsmMatcher {
 
 	static String gtfsTransitSchedule = "./transitSchedule_new.xml";
-	static String osmTransitSchedule = "./transitSchedule_subway.xml";
+	static String osmTransitSchedule = "./transitSchedule_all.xml";
 	
 	
 	public static void main(String[] args) {
@@ -65,68 +65,90 @@ class OsmMatcher {
 	public void matchSchedules(){
 		Map<Id, Id> osmStopToGtfsStopAssignments = this.matchStops();
 		this.writeStationResult(osmStopToGtfsStopAssignments);
-		Map<Id,Id> osmLineToGtfsLineAssignments = this.matchTrips(osmStopToGtfsStopAssignments);
+		Map<Id,Id> osmRouteToGtfsRouteAssignments = this.matchRoutes();
+		this.writeRouteResult(osmRouteToGtfsRouteAssignments);
+		Map<Id,Id> osmLineToGtfsLineAssignments = this.matchTrips(osmRouteToGtfsRouteAssignments);
 		this.writeLineResult(osmLineToGtfsLineAssignments);
 	}
-
-	private Map<Id, Id> matchStops() {
+	
+	private Map<Id,Id> matchStops(){
 		Map<Id,Id> result = new HashMap<Id,Id>();
 		List<TransitStopFacility> osmStops = new ArrayList<TransitStopFacility>();
 		osmStops.addAll(osmTs.getFacilities().values());
-		int count = 0;
 		for(TransitStopFacility stop: gtfsTs.getFacilities().values()){
-			double dist = Double.MAX_VALUE;
-			Coord gtfsCoord = stop.getCoord();
 			Id gtfsId = stop.getId();
-			Id osmId = new IdImpl("NONE FOUND");
+			Id osmId = null;
 			for(TransitStopFacility osmStop: osmStops){
-				Coord osmCoord = osmTrafo.transform(osmStop.getCoord());
-				double d = CoordUtils.calcDistance(gtfsCoord, osmCoord);
-				if((d < dist) && (d < 0.002)){
-					osmId = osmStop.getId();
-					dist = d;
+				osmId = osmStop.getId();
+				String[] idInfos = osmId.toString().split("_");
+				String gtfsInfo = idInfos[idInfos.length-2].trim();
+				String gtfsIdString = gtfsId.toString().trim();
+				if(gtfsInfo.equalsIgnoreCase(gtfsIdString)){
+					break;
+				}else{
+					osmId = new IdImpl("NONE FOUND");
 				}
 			}
 			result.put(gtfsId, osmId);
-			if(++count % 1000 == 0){
-				System.out.println(count + " stations processed");
+		}
+		return result;
+	}
+
+	private Map<Id,Id> matchRoutes(){
+		Map<Id,Id> result = new HashMap<Id,Id>();
+		for(TransitLine tl: gtfsTs.getTransitLines().values()){
+			String gtfsRouteShortName = (tl.getId().toString().split("_"))[1].trim();
+			Id fittingOsmId = new IdImpl("NONE FOUND");
+			for(Id osmId: osmTs.getTransitLines().keySet()){
+				String refInfo = (osmId.toString().split("_"))[2].trim();
+				if(refInfo.equalsIgnoreCase(gtfsRouteShortName)){
+					fittingOsmId = osmId;
+					break;
+				}
 			}
+			result.put(tl.getId(), fittingOsmId);
 		}
 		return result;
 	}
 	
-	private Map<Id,Id> matchTrips(Map<Id,Id> osmStopToGtfsStopAssingments){
+	private Map<Id, Id> matchTrips(Map<Id, Id> osmRouteToGtfsRouteAssignments) {
 		Map<Id,Id> result = new HashMap<Id,Id>();
 		for(TransitLine tl: gtfsTs.getTransitLines().values()){
-			for(TransitRoute tr: tl.getRoutes().values()){
-				List<TransitRouteStop> routeStops = tr.getStops();
-				TransitRouteStop firstStop = routeStops.get(0);
-				result.put(tr.getId(),new IdImpl("NONE FOUND"));
-				this.gtfsTransitLineToRouteAssignments.put(tr.getId(), tl.getId());
-				for(TransitLine otl: osmTs.getTransitLines().values()){
-					for(TransitRoute otr: otl.getRoutes().values()){
-						this.osmTransitLineToRouteAssignments.put(otr.getId(), otl.getId());
-						for(TransitRouteStop otrs: otr.getStops()){
-							if(otrs.getStopFacility().getId().equals(osmStopToGtfsStopAssingments.get(firstStop.getStopFacility().getId()))){
-								List<TransitRouteStop> osmStops = new ArrayList<TransitRouteStop>();
-								osmStops.addAll(otr.getStops());
-								if(this.isInLine(routeStops,osmStops, osmStopToGtfsStopAssingments, otrs)){
-									result.put(tr.getId(), otr.getId());
-								}else{
-									Collections.reverse(osmStops);
-									if(this.isInLine(routeStops, osmStops, osmStopToGtfsStopAssingments, otrs)){
-										result.put(tr.getId(), otr.getId());
-									}
-								}									
+			TransitLine osmTl = osmTs.getTransitLines().get(osmRouteToGtfsRouteAssignments.get(tl.getId()));
+			if(osmTl!= null){
+				for(TransitRoute tr: tl.getRoutes().values()){
+					Id osmId = new IdImpl("NONE FOUND");
+					String headsignInfo = (tr.getId().toString().split("_"))[1].trim();
+					for(TransitRoute osmTr: osmTl.getRoutes().values()){
+						String directionInfo = (osmTr.getId().toString().split("_"))[1].trim();
+						if(headsignInfo.equalsIgnoreCase(directionInfo)){
+							osmId = osmTr.getId();
+							break;
+						}
+					}
+					if(osmId.toString().equals("NONE FOUND")){
+						String[] parts = headsignInfo.split(" ");
+						for(String word: parts){
+							for(TransitRoute osmTr: osmTl.getRoutes().values()){
+								String directionInfo = (osmTr.getId().toString().split("_"))[1].trim();
+								if(directionInfo.toLowerCase().contains(word.toLowerCase())){
+									osmId = osmTr.getId();
+									break;
+								}
+							}
+							if(!(osmId.toString().equals("NONE FOUND"))){
+								break;
 							}
 						}
 					}
+					result.put(tr.getId(), osmId);
 				}
 			}
 		}
 		return result;
 	}
-	
+
+
 	private boolean isInLine(List<TransitRouteStop> routeStops, List<TransitRouteStop> stops, Map<Id, Id> osmStopToGtfsStopAssingments, TransitRouteStop firstRouteStop) {
 		int startIndex = stops.indexOf(firstRouteStop);
 		boolean result = true;
@@ -149,10 +171,10 @@ class OsmMatcher {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./osmStopToGtfsStopAssignments.txt")));
 			for(Id gtfsId: osmStopToGtfsStopAssignments.keySet()){
-				if(osmStopToGtfsStopAssignments.get(gtfsId).toString().equals("NONE FOUND")){
-					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsTs.getFacilities().get(gtfsId).getCoord() + ") " + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
+				if(osmStopToGtfsStopAssignments.get(gtfsId).toString().equalsIgnoreCase("NONE FOUND")){
+					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
 				}else{
-					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsTs.getFacilities().get(gtfsId).getCoord() + ") " + " --> " + osmStopToGtfsStopAssignments.get(gtfsId) + " (" + osmTs.getFacilities().get(osmStopToGtfsStopAssignments.get(gtfsId)).getCoord() + ") --> distance = " + CoordUtils.calcDistance(gtfsTs.getFacilities().get(gtfsId).getCoord(), osmTrafo.transform(osmTs.getFacilities().get(osmStopToGtfsStopAssignments.get(gtfsId)).getCoord())) + "\n");
+					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + " --> " + osmTs.getFacilities().get(osmStopToGtfsStopAssignments.get(gtfsId)).getName() + " (" + osmStopToGtfsStopAssignments.get(gtfsId) + ")\n");
 				}
 			}
 			bw.flush();
@@ -160,18 +182,35 @@ class OsmMatcher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 	
+	private void writeRouteResult(Map<Id, Id> osmRouteToGtfsRouteAssignments) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./osmRouteToGtfsRouteAssignments.txt")));
+			for(Id gtfsId: osmRouteToGtfsRouteAssignments.keySet()){
+				if(osmRouteToGtfsRouteAssignments.get(gtfsId).toString().equalsIgnoreCase("NONE FOUND")){
+					bw.write(gtfsId + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
+				}else{
+					bw.write(gtfsId + " --> " + osmRouteToGtfsRouteAssignments.get(gtfsId) + "\n");
+				}
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	private void writeLineResult(Map<Id,Id>osmLinetoGtfsLineAssingments){
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./osmLineToGtfsLineAssignments.txt")));
 			for(Id gtfsId: osmLinetoGtfsLineAssingments.keySet()){
 				Id osmId = osmLinetoGtfsLineAssingments.get(gtfsId);
-				if(osmLinetoGtfsLineAssingments.get(gtfsId).toString().equals("NONE FOUND")){
-					bw.write(gtfsTs.getTransitLines().get(gtfsTransitLineToRouteAssignments.get(gtfsId)).getRoutes().get(gtfsId).getId() + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
+				if(osmLinetoGtfsLineAssingments.get(gtfsId).toString().equalsIgnoreCase("NONE FOUND")){
+					bw.write(gtfsId + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
 				}else{
-					bw.write(gtfsTs.getTransitLines().get(gtfsTransitLineToRouteAssignments.get(gtfsId)).getRoutes().get(gtfsId).getId() + "\t\t\t --> \t\t\t" + osmTs.getTransitLines().get(osmTransitLineToRouteAssignments.get(osmId)).getRoutes().get(osmId).getId() + "\n");
+					bw.write(gtfsId + " --> " + osmId + "\n");
 				}
 			}
 			bw.flush();
@@ -179,8 +218,6 @@ class OsmMatcher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	
+	}	
 	
 }
