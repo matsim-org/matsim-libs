@@ -146,6 +146,8 @@ public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
 					if(e != null)
 						trips = e.getValue();
 					
+					// IMPORTANT: Do adapt the travel_data header in "initZone2ZoneImpedaceWriter"
+					// 			  when changing anything at this call.
 					travelDataWriter.write ( originZoneID.toString()	//origin zone id
 							+ "," + destinationZoneID.toString()		//destination zone id
 							+ "," + travelTime_min 						//tcost
