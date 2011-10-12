@@ -45,6 +45,17 @@ public class JointPlanOptimizerLegTravelTimeEstimatorFactory {
 	public JointPlanOptimizerLegTravelTimeEstimatorFactory(
 			final TravelTime travelTime,
 			final  DepartureDelayAverageCalculator depDelay) {
+		this.travelTime = travelTime;
+		this.depDelay = depDelay;
+	}
+
+	//TODO: pass everything except the plan by the constructor?
+	public LegTravelTimeEstimator getLegTravelTimeEstimator(
+			final Plan plan,
+			final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
+			final PlanomatConfigGroup.RoutingCapability routingCapability,
+			final PlansCalcRoute routingAlgorithm,
+			final Network network) {
 		TravelTime effectiveTravelTime;
 
 		try {
@@ -57,20 +68,10 @@ public class JointPlanOptimizerLegTravelTimeEstimatorFactory {
 			effectiveTravelTime = travelTime;
 		}
 
-		this.travelTime = effectiveTravelTime;
-		this.depDelay = depDelay;
-	}
 
-	//TODO: pass everything except the plan by the constructor?
-	public LegTravelTimeEstimator getLegTravelTimeEstimator(
-			final Plan plan,
-			final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation,
-			final PlanomatConfigGroup.RoutingCapability routingCapability,
-			final PlansCalcRoute routingAlgorithm,
-			final Network network) {
 		return new ODBasedFixedRouteLegTravelTimeEstimator(
 				plan,
-				this.travelTime,
+				effectiveTravelTime,
 				this.depDelay,
 				routingAlgorithm,
 				simLegInterpretation,
