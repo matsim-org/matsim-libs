@@ -145,16 +145,16 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 		double timeSpendOnLink= GeneralLib.getIntervalDuration(linkEnteranceTime, linkLeaveTime);
 		resetLinkEnteranceTime(personId);
 		Link link = network.getLinks().get(linkId);
-		double averageSpeedDriven=link.getLength()/timeSpendOnLink;
-		if (timeSpendOnLink==GeneralLib.numberOfSecondsInDay || averageSpeedDriven>link.getFreespeed()){
+		double averageSpeedDrivenInMetersPerSecond=link.getLength()/timeSpendOnLink;
+		if (timeSpendOnLink==GeneralLib.numberOfSecondsInDay || averageSpeedDrivenInMetersPerSecond>link.getFreespeed()){
 			// do not consider events with "zero" travel time and such, which produce higher travel times than
 			// allowed due to artifacts from different simulations, e.g. wait2link, etc.
 			return;
 		}
-		if (averageSpeedDriven<0.1){
-			// avoid too small speeds, which lead to negative number in energy consumption regression model
-			return;
-		}
+//		if (averageSpeedDrivenInMetersPerSecond<3){
+//			// avoid too small speeds, which lead to negative number in energy consumption regression model
+//			return;
+//		}
 				
 		
 		double energyConsumptionOnLink=getEnergyConsumptionAndHandleSoc(personId,timeSpendOnLink,link,linkEnteranceTime);

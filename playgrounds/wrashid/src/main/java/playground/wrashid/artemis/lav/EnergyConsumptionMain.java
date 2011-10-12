@@ -29,13 +29,13 @@ public class EnergyConsumptionMain {
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic1";
+		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic";
 
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
 				scenario, fleetCompositionFileName);
 
-		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update 5. okt 2011/regModel_rev4_temp.dat";
+		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/12. okt 2011/regModel_rev4.1.dat";
 		EnergyConsumptionModelLAV_v1 energyConsumptionModel = new EnergyConsumptionModelLAV_v1(energyConsumptionModelFile);
 
 		HashMap<Id, VehicleSOC> agentSocMapping = initializeSOCs(agentVehicleMapping, energyConsumptionModel);

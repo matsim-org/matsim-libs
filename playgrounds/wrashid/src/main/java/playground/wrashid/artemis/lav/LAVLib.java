@@ -2,6 +2,7 @@ package playground.wrashid.artemis.lav;
 
 import java.util.LinkedList;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.StringMatrix;
 
@@ -36,7 +37,13 @@ public class LAVLib {
 					LinkedList<String> rowList = GeneralLib.convertStringArrayToList(columns);
 					stringMatrix.addRow(rowList);
 				}
+			} else {
+				DebugLib.emptyFunctionForSettingBreakPoint();
 			}
+		}
+		
+		if (stringMatrix.getNumberOfRows() ==0){
+			DebugLib.stopSystemAndReportInconsistency("maxNumberOfTabs:"+ maxNumberOfTabs);
 		}
 		
 		return stringMatrix;

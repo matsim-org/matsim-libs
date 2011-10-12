@@ -59,7 +59,7 @@ public class EnergyConsumptionRegressionModel {
 		return null;
 	}
 	
-	private double getBestMatchForMaxSpeed(double maxSpeedInKmPerHour) {
+	public double getBestMatchForMaxSpeed(double maxSpeedInKmPerHour) {
 		double difference=Double.MAX_VALUE;
 		int indexOfLeastDifferenceSpeed=-1;
 		
@@ -68,11 +68,19 @@ public class EnergyConsumptionRegressionModel {
 			double currentDifference=Math.abs(maxSpeedInKmPerHour-curSpeed);
 			if (currentDifference<difference){
 				indexOfLeastDifferenceSpeed=i;
+				difference=currentDifference;
 			}
 			i++;
 		}
 		
-		return availableMaxSpeeds.get(indexOfLeastDifferenceSpeed);
+		// the speed must be rounded up, because if the we round a max speed of 80 down to 60 and the average driven speed is 70,
+		// this may cause problems in the model of LAV.
+		
+		if (maxSpeedInKmPerHour>availableMaxSpeeds.get(indexOfLeastDifferenceSpeed)){
+			return availableMaxSpeeds.get(indexOfLeastDifferenceSpeed+1);
+		} else {
+			return availableMaxSpeeds.get(indexOfLeastDifferenceSpeed);
+		}
 	}
 
 	public static LinkedList<EnergyConsumptionModelRow> getEnergyConsumptionRegressionModel(String fileName) {
@@ -102,6 +110,8 @@ public class EnergyConsumptionRegressionModel {
 			
 			list.add(energyConsumptionModelRow);
 		}
+		
+		
 
 		return list;
 	}
@@ -132,7 +142,7 @@ public class EnergyConsumptionRegressionModel {
 
 			double fRoad = a1;
 			double fAero = a2 + a3 * vAverageSquare;
-			double fAcc = (vAverageSquare - vMaxSquare) * a4 + vAverageSquare * a5;
+			double fAcc = (vAverageSquare - vMaxSquare) * a4 + averageSpeedDrivenOnLinkInMeterPerSecond * a5;
 
 			double effPowerTrain = vAverageSquare * a6 + a7 * averageSpeedDrivenOnLinkInMeterPerSecond + a8;
 

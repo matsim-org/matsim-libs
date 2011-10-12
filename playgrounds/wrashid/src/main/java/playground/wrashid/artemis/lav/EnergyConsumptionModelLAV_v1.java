@@ -24,9 +24,18 @@ public class EnergyConsumptionModelLAV_v1 {
 		EnergyConsumptionModelRow vehicleEnergyConsumptionModel = energyConsumptionRegressionModel.getVehicleEnergyConsumptionModel(vehicle, freespeedInKmPerHour);
 		
 		double averageSpeedDrivenOnLinkInMeterPerSecond=link.getLength()/timeSpentOnLink;
+		
+		
+		// speeds less than 3m/s may cause problems with the model of Gil
+		if (averageSpeedDrivenOnLinkInMeterPerSecond<3){
+			averageSpeedDrivenOnLinkInMeterPerSecond=3;
+		}
+		
 		double energyConsumptionInJoulePerMeter = vehicleEnergyConsumptionModel.getEnergyConsumptionInJoulePerMeter(averageSpeedDrivenOnLinkInMeterPerSecond);
 		
-		
+		if (energyConsumptionInJoulePerMeter<0){
+			DebugLib.emptyFunctionForSettingBreakPoint();
+		}
 		
 		return energyConsumptionInJoulePerMeter*link.getLength();
 	}
