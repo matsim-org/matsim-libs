@@ -271,7 +271,7 @@ public class ODBasedFixedRouteLegTravelTimeEstimator implements LegTravelTimeEst
 	 * That is, the router will only be used for newly created ODs.
 	 */
 	private void initPlanSpecificInformation() {
-
+		this.fixedRoutes.initPlanSpecificInformation();
 	}
 
 	@Override
