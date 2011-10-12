@@ -8,8 +8,8 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class EnergyConsumptionPerHub {
 
 	public static void main(String[] args) {
-		
-		String chargingLogFileNamePath = "H:/data/experiments/ArtemisAug2011/runs/run1/output/ITERS/it.0/0.chargingLog.txt";
+		String chargingLogFileNamePath = "c:/tmp/chargingLog.txt";
+		//String chargingLogFileNamePath = "H:/data/experiments/ArtemisAug2011/runs/run1/output/ITERS/it.0/0.chargingLog.txt";
 		String linkHubMappingTable = "H:/data/experiments/ARTEMIS/zh/dumb charging/input/run1/linkHub_orig.mappingTable.txt";
 		
 		DoubleValueHashMap<String> energyConsumptionPerHub = getEnergyConsumptionPerHub(chargingLogFileNamePath, linkHubMappingTable);

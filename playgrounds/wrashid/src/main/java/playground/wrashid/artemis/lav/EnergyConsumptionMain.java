@@ -1,17 +1,22 @@
 package playground.wrashid.artemis.lav;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelLAV;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
+import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.DebugLib;
@@ -21,13 +26,23 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
 public class EnergyConsumptionMain {
 
 	public static void main(String[] args) {
-		String baseFolder = "H:/data/experiments/ARTEMIS/output/run2/";
+		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+
+		// the main scenario
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+		String baseFolder="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
+		final String eventsFileName = baseFolder + "ITERS/it.50/50.events.xml.gz";
+		
+		// small scenario for debugging:
+//		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+//		String baseFolder = "H:/data/experiments/ARTEMIS/output/run2/";
+//		final String eventsFileName = baseFolder + "ITERS/it.50/50.events.txt.gz";
+		
+		
 		final String networkFileName = baseFolder + "output_network.xml.gz";
-		final String eventsFileName = baseFolder + "ITERS/it.50/50.events.txt.gz";
 		final String plansFileName = baseFolder + "output_plans.xml.gz";
 		final String facilitiesFileName = baseFolder + "output_facilities.xml.gz";
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2020_Basic";
 
@@ -48,19 +63,57 @@ public class EnergyConsumptionMain {
 		DumbCharger_Basic2020 dumbCharger = new DumbCharger_Basic2020(agentSocMapping, agentVehicleMapping,
 				energyConsumptionModel);
 		events.addHandler(dumbCharger);
+		
+		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
+		
+		events.addHandler(parkingTimesPlugin);
 
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-
-		reader.readFile(eventsFileName);
-
-	//	energyConsumptionPlugin.getEnergyConsumptionOfLegs().getKeySet();
-
+		
+		reader.parse(eventsFileName);
+		// reader.readFile(eventsFile);
+		
+		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		dumbCharger.performLastChargingOfDay();
 		
 		energyConsumptionPlugin.writeOutputLog("c:/tmp/energyConsumptionLogPerLink.txt");
 		dumbCharger.writeChargingLog("c:/tmp/chargingLog.txt");
 
 		reportIfEVRanOutOfElectricity(agentSocMapping);
+		
+		String outputFileForParkingTimesAndLegEnergyConsumption="c:/tmp/parkingTimesAndLegEnergyConsumption.txt";
+		writeParkingTimesAndEnergyConsumptionToFile(parkingTimesPlugin, energyConsumptionPlugin, outputFileForParkingTimesAndLegEnergyConsumption);
+	}
+
+	private static void writeParkingTimesAndEnergyConsumptionToFile(ParkingTimesPlugin parkingTimesPlugin,
+			EnergyConsumptionPlugin energyConsumptionPlugin, String outputFileName) {
+
+		ArrayList<String> parkingTimesAndEnergyConsumption= new ArrayList<String>();
+		
+		parkingTimesAndEnergyConsumption.add("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules");
+		for (Id personId: parkingTimesPlugin.getParkingTimeIntervals().getKeySet()){
+			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimesPlugin.getParkingTimeIntervals().get(personId);
+			LinkedList<Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfEachLeg().get(personId);
+			
+			for (int i=0;i<parkingIntervals.size();i++){
+				StringBuffer stringBuffer = new StringBuffer();
+			
+				stringBuffer.append(personId);
+				stringBuffer.append("\t");
+				stringBuffer.append(GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getArrivalTime()));
+				stringBuffer.append("\t");
+				stringBuffer.append(GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getDepartureTime()));
+				stringBuffer.append("\t");
+				stringBuffer.append(parkingIntervals.get(i).getLinkId());
+				stringBuffer.append("\t");
+				stringBuffer.append(parkingIntervals.get(i).getActTypeOfFirstActDuringParking());
+				stringBuffer.append("\t");
+				stringBuffer.append(energyConsumptionOfLegs.get(i));
+				
+				parkingTimesAndEnergyConsumption.add(stringBuffer.toString());
+			}
+		}
+		
+		GeneralLib.writeList(parkingTimesAndEnergyConsumption, outputFileName);
 	}
 
 	private static void reportIfEVRanOutOfElectricity(HashMap<Id, VehicleSOC> agentSocMapping) {

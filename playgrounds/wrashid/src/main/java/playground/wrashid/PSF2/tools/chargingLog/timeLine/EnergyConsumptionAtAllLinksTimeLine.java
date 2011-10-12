@@ -14,7 +14,8 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 	static int timeBinSizeInSeconds=900;
 	
 	public static void main(String[] args) {
-		String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run6/ITERS/it.0/0.chargingLog.txt";
+		String chargingLogFileNamePath = "c:/tmp/chargingLog.txt";
+		//String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run6/ITERS/it.0/0.chargingLog.txt";
 		HashMap<Id, double[]> energyConsumptionPerLink = readChargingLog(chargingLogFileNamePath);
 		
 		printEnergyConsumptionAtAllLinksDuringTheDay(energyConsumptionPerLink);

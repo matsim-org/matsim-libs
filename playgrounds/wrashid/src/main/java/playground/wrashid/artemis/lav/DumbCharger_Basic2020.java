@@ -105,6 +105,4 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 		}
 	}
 
-	
-	
 }

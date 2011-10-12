@@ -10,7 +10,6 @@ public class FleetCompositionReader {
 	
 		HashMap<VehicleTypeLAV, Integer> vehicleFleet = getVehicleFleetForTesting();
 		
-		
 		System.out.println(getTotalNumberOfVehicles(vehicleFleet));
 	}
 
