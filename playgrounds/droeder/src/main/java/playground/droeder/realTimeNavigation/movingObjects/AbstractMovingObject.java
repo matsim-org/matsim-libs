@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.movingObjects;
 
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 
+import playground.droeder.Vector2D;
 import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -30,40 +33,55 @@ import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
  */
 public abstract class AbstractMovingObject implements MovingObject{
 	
-	private Coord currentPosition;
-	private double vX;
-	private double vY;
+	private Vector2D currentPosition;
+	private Vector2D newPosition;
+	private Vector2D speed;
+	private Id id;
+	private Geometry geometry;
 
-	public AbstractMovingObject(Coord position, double vX, double vY){
+	public AbstractMovingObject(Vector2D position, Id id, Geometry g){
+		this.id = id;
 		this.currentPosition = position;
-		this.vX = vX;
-		this.vY = vY;
+		this.geometry = g;
+	}
+	
+	public Geometry getGeometry(){
+		return this.geometry;
+	}
+	
+	public Id getId(){
+		return this.id;
 	}
 
-	public double getVx(){
-		return this.vX;
+	public Vector2D getSpeed(){
+		return this.speed;
 	}
-	
-	public double getVy(){
-		return this.vY;
-	}
-	
-	public Coord getCurrentPosition(){
+
+	public Vector2D getCurrentPosition(){
 		return this.currentPosition;
 	}
 	
-	protected void setCurrentPosition(Coord c){
+	protected void setCurrentPosition(Vector2D c){
 		this.currentPosition = c;
 	}
 	
-	protected void setVx(double vX){
-		this.vX = vX;
+	protected void setNewPosition(Vector2D c){
+		this.newPosition = c;
 	}
 	
-	protected void setVy(double vY){
-		this.vY = vY;
+	public boolean processNextStep(){
+		if(currentPosition.equals(newPosition)){
+			return false;
+		}else{
+			currentPosition = newPosition;
+			return true;
+		}
 	}
 	
-	public abstract boolean processTimeStep(double stepSize, VelocityObstacle obstacle);
+	protected void setSpeed(Vector2D v){
+		this.speed = v;
+	}
+
+	public abstract void calculateNextStep(double stepSize, VelocityObstacle obstacle);
 	
 }

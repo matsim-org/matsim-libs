@@ -19,26 +19,29 @@
  * *********************************************************************** */
 package playground.droeder;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+
 /**
  * @author droeder
  *
  */
 public class Vector2D {
 	
-	private Double x;
-	private Double y;
+	private double x;
+	private double y;
 
-	public Vector2D(Double x, Double y){
+	public Vector2D(double x, double y){
 		this.x = x;
 		this.y = y;
 	}
 	
-	public Vector2D(Double factor, Vector2D v){
+	public Vector2D(double factor, Vector2D v){
 		this.x = v.getX() * factor;
 		this.y = v.getY() * factor;
 	}
 	
-	public Vector2D(Double factor, Double x, Double y){
+	public Vector2D(double factor, double x, double y){
 		this.x = factor * x;
 		this.y = factor * y;
 	}
@@ -63,29 +66,32 @@ public class Vector2D {
 		return new Vector2D(this.x - v.getX(), this.y - v.getY());
 	}
 	
-	public Double absolut(){
+	public double absolut(){
 		return Math.sqrt(Math.pow(x,2) + Math.pow(y, 2));
 	}
-
+	
+	public Vector2D getUnitVector(){
+		return new Vector2D(1/this.absolut(), this);
+	}
 	/**
 	 * @return
 	 */
-	public Double getY() {
+	public double getY() {
 		return this.y;
 	}
 
 	/**
 	 * @return
 	 */
-	public Double getX() {
+	public double getX() {
 		return this.x;
 	}
 	
-	public Double scalarProduct(Vector2D v){
+	public double scalarProduct(Vector2D v){
 		return ((this.x * v.getX()) + (this.y * v.getY()));
 	}
 	
-	public Vector2D addFactor(Double f){
+	public Vector2D addFactor(double f){
 		this.x = this.x * f;
 		this.y = this.y * f;
 		return this;
@@ -108,5 +114,9 @@ public class Vector2D {
 		}else{
 			return false;
 		}
+	}
+	
+	public Coord getCoord(){
+		return new CoordImpl(this.x, this.y);
 	}
 }

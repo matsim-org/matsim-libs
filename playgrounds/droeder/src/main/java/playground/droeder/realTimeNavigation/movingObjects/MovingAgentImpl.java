@@ -19,12 +19,14 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.movingObjects;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
+import javax.vecmath.Vector2d;
+
+import org.matsim.api.core.v01.Id;
 
 import playground.droeder.Vector2D;
 import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
@@ -32,37 +34,28 @@ import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
  */
 public class MovingAgentImpl extends AbstractMovingObject {
 	
-	private Coord goal;
+	private Vector2D goal;
 	private double maxSpeed;
 	private boolean arrived = false;
 
-	/**
-	 * @param position 
-	 * @param goal
-	 * @param vX
-	 * @param vY
-	 * @param maxSpeed
-	 * @param maxAcc
-	 * @param maxDec 
-	 * 
-	 */
-	public MovingAgentImpl(Coord position, Coord goal, double vX, double vY, double maxSpeed) {
-		super(position, vX, vY);
+	public MovingAgentImpl(Vector2D position, Vector2D goal, double maxSpeed, Id id, Geometry g) {
+		super(position, id, g);
 		this.goal = goal;
 		this.maxSpeed = maxSpeed;
+		this.setSpeed(this.goal.subtract(super.getCurrentPosition()).getUnitVector().addFactor(this.maxSpeed));
 	}
 
 	/* (non-Javadoc)
 	 * @see playground.droeder.realTimeNavigation.movingObjects.AbstractMovingObject#processTimeStep(double, playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle)
 	 */
 	@Override
-	public boolean processTimeStep(double stepSize, VelocityObstacle obstacle) {
+	public void calculateNextStep(double stepSize, VelocityObstacle obstacle) {
+		//TODO better calc obstacle here
 		if(this.arrived){
-			return false;
+			return;
 		}else{
 			this.calcNewSpeed(obstacle);
 			this.calcNewPosition(stepSize);
-			return true;
 		}
 	}
 
@@ -70,7 +63,9 @@ public class MovingAgentImpl extends AbstractMovingObject {
 	 * @param obstacle
 	 */
 	private void calcNewSpeed(VelocityObstacle obstacle) {
-		// TODO Auto-generated method stub
+		//TODO calculate the best possible speed to the goal outside of the velocityObstalce
+		obstacle.getGeometry().getCoordinates();
+		this.setSpeed(this.goal.subtract(super.getCurrentPosition()).getUnitVector().addFactor(this.maxSpeed));
 		
 	}
 
@@ -79,17 +74,13 @@ public class MovingAgentImpl extends AbstractMovingObject {
 	 * @return boolean false if agent arrived at goal
 	 */
 	private void calcNewPosition(double stepSize) {
-		if(CoordUtils.calcDistance(this.getCurrentPosition(), this.goal) < 0.01){
+		if((this.goal.subtract(super.getCurrentPosition()).absolut()) < 0.01){
 			this.arrived = true;
 		}else{
 			Vector2D r0 = new Vector2D(this.getCurrentPosition().getX(), this.getCurrentPosition().getY());
-			Vector2D v0 = new Vector2D(this.getVx(), this.getVy());
-			if(v0.absolut() > this.maxSpeed){
-				v0 = new Vector2D(maxSpeed, v0.addFactor(1/v0.absolut()));
-			}
-			Vector2D newPosition = new Vector2D(stepSize, v0);
+			Vector2D newPosition = new Vector2D(stepSize, super.getSpeed());
 			newPosition = newPosition.add(r0);
-			this.setCurrentPosition(new CoordImpl(newPosition.getX(), newPosition.getY()));
+			super.setNewPosition(newPosition);
 		}
 	}
 }

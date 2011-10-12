@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.velocityObstacles;
 
+import java.util.List;
+
+import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -28,5 +32,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public interface VelocityObstacle {
 	
 	public Geometry getGeometry();
+	
 
 }

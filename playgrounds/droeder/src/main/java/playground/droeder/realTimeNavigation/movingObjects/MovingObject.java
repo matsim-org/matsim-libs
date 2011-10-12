@@ -19,7 +19,12 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.movingObjects;
 
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+
+import playground.droeder.Vector2D;
+import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
@@ -27,9 +32,15 @@ import org.matsim.api.core.v01.Coord;
  */
 public interface MovingObject {
 	
-	public Coord getCurrentPosition();
+	public Id getId();
 	
-	public double getVx();
+	public Vector2D getCurrentPosition();
 	
-	public double getVy();
+	public boolean processNextStep();
+	
+	public void calculateNextStep(double stepSize, VelocityObstacle obstacle);
+	
+	public Geometry getGeometry();
+	
+	public Vector2D getSpeed();
 }

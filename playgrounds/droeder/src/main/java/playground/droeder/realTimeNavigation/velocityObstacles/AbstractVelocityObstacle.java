@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.velocityObstacles;
 
-import java.util.List;
+import java.util.Set;
 
 import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
 
@@ -33,10 +33,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AbstractVelocityObstacle implements VelocityObstacle {
 	
 	protected MovingObject theOne;
-	protected List<MovingObject> opponents;
+	protected Set<MovingObject> opponents;
 	private Geometry geometry;
 
-	public AbstractVelocityObstacle(MovingObject theOne, List<MovingObject> opponents){
+	public AbstractVelocityObstacle(MovingObject theOne, Set<MovingObject> opponents){
 		this.theOne = theOne;
 		this.opponents = opponents;
 	}
