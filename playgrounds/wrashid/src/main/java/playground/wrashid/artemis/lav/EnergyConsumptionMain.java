@@ -82,6 +82,35 @@ public class EnergyConsumptionMain {
 		
 		String outputFileForParkingTimesAndLegEnergyConsumption="c:/tmp/parkingTimesAndLegEnergyConsumption.txt";
 		writeParkingTimesAndEnergyConsumptionToFile(parkingTimesPlugin, energyConsumptionPlugin, outputFileForParkingTimesAndLegEnergyConsumption);
+	
+		String outputFileAgentVehicleMapping="c:/tmp/agentVehicleMapping.txt";
+		writeAgentVehicleMappingToFile(agentVehicleMapping,outputFileAgentVehicleMapping );
+	}
+
+	private static void writeAgentVehicleMappingToFile(HashMap<Id, VehicleTypeLAV> agentVehicleMapping,
+			String outputFileAgentVehicleMapping) {
+		
+		ArrayList<String> agentVehicleMappingArray= new ArrayList<String>();
+		
+		agentVehicleMappingArray.add("agentId\tpt\tfl\tpw\twt");
+		for (Id personId:agentVehicleMapping.keySet()){
+			VehicleTypeLAV vehicleTypeLAV = agentVehicleMapping.get(personId);
+			StringBuffer stringBuffer = new StringBuffer();
+			
+			stringBuffer.append(personId);
+			stringBuffer.append("\t");
+			stringBuffer.append(vehicleTypeLAV.powerTrainClass);
+			stringBuffer.append("\t");
+			stringBuffer.append(vehicleTypeLAV.fuelClass);
+			stringBuffer.append("\t");
+			stringBuffer.append(vehicleTypeLAV.powerClass);
+			stringBuffer.append("\t");
+			stringBuffer.append(vehicleTypeLAV.massClass);
+			
+			agentVehicleMappingArray.add(stringBuffer.toString());
+		}
+		
+		GeneralLib.writeList(agentVehicleMappingArray, outputFileAgentVehicleMapping);
 	}
 
 	private static void writeParkingTimesAndEnergyConsumptionToFile(ParkingTimesPlugin parkingTimesPlugin,
