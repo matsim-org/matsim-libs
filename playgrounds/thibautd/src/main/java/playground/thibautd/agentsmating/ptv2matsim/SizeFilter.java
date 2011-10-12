@@ -51,7 +51,7 @@ public class SizeFilter {
 	private static final Log log =
 		LogFactory.getLog(SizeFilter.class);
 
-	private final static int MAX_SIZE = 5;
+	private final static int MAX_SIZE = 10;
 	public static void main(final String[] args) {
 		String configFile = args[0];
 		
