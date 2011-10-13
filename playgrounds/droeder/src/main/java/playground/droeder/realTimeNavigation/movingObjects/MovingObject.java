@@ -43,4 +43,7 @@ public interface MovingObject {
 	public Geometry getGeometry();
 	
 	public Vector2D getSpeed();
+	
+	public boolean arrived();
+	
 }

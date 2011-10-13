@@ -38,6 +38,7 @@ public abstract class AbstractMovingObject implements MovingObject{
 	private Vector2D speed;
 	private Id id;
 	private Geometry geometry;
+	private boolean positionUpdate = false;
 
 	public AbstractMovingObject(Vector2D position, Id id, Geometry g){
 		this.id = id;
@@ -66,17 +67,20 @@ public abstract class AbstractMovingObject implements MovingObject{
 	}
 	
 	protected void setNewPosition(Vector2D c){
+		this.positionUpdate = true;
 		this.newPosition = c;
 	}
 	
 	public boolean processNextStep(){
-		if(currentPosition.equals(newPosition)){
-			return false;
-		}else{
-			currentPosition = newPosition;
+		if(positionUpdate){
+			this.currentPosition = newPosition;
+			this.positionUpdate = false;
 			return true;
+		}else{
+			return false;
 		}
 	}
+	
 	
 	protected void setSpeed(Vector2D v){
 		this.speed = v;

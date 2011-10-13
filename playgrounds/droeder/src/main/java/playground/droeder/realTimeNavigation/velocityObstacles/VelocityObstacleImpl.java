@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.velocityObstacles;
 
-import java.util.List;
 import java.util.Set;
 
 import playground.droeder.Vector2D;
@@ -27,7 +26,6 @@ import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 
@@ -37,7 +35,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class VelocityObstacleImpl extends AbstractVelocityObstacle {
 	
-	private GeometryCollection geometries;
+	private Geometry geometry;
 	private GeometryFactory fac = new GeometryFactory();
 
 	public VelocityObstacleImpl(MovingObject theOne, Set<MovingObject> opponents) {
@@ -55,26 +53,33 @@ public class VelocityObstacleImpl extends AbstractVelocityObstacle {
 		for(MovingObject o: this.opponents){
 			if(o.equals(super.theOne)) continue;
 			coords = new Coordinate[(o.getGeometry().getCoordinates().length * super.theOne.getGeometry().getCoordinates().length) + 1];
+			// find the apex of the cone 
 			coords[0] = vector2Coordinate(super.theOne.getCurrentPosition().add(o.getSpeed()));
 			translation = o.getCurrentPosition().add(o.getSpeed());
 			
 			ii = 1;
+			//addition of the coordinates of both agentGeometries -> MinkowskiSum
 			for(Coordinate c : o.getGeometry().getCoordinates()){
+				//TODO reflection of the origin Geometry in its referencePoint -> not necessary for a circle 
 				for(Coordinate cc : super.theOne.getGeometry().getCoordinates()){
 					coords[ii] = new Coordinate(c.x + cc.x + translation.getX(), c.y + cc.y + translation.getY());
 					ii++;
 				}
 			}
-			//TODO throws sometimes emptystack
 			objects[i] = fac.createMultiPoint(coords).convexHull();
 			i++;
 		}
 		
-		
-		this.geometries = fac.createGeometryCollection(objects);
-		return this.geometries;
+		// we want only one geometry
+		this.geometry = fac.createGeometryCollection(objects).buffer(0);
+		return this.geometry;
 	}
 	
+	/**
+	 * just for intern use
+	 * @param v
+	 * @return
+	 */
 	private Coordinate vector2Coordinate(Vector2D v){
 		return new Coordinate(v.getX(), v.getY());
 	}

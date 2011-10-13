@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.velocityObstacles;
 
-import java.util.List;
-
-import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 /**

@@ -92,9 +92,7 @@ public class Vector2D {
 	}
 	
 	public Vector2D addFactor(double f){
-		this.x = this.x * f;
-		this.y = this.y * f;
-		return this;
+		return new Vector2D(this.x * f, this.y * f);
 	}
 	
 	@Override
