@@ -53,19 +53,19 @@ public class MatSimSingleDepotVRPBuilderTest extends TestCase{
 		costs = new Costs(){
 
 			@Override
-			public Double getCost(Node from, Node to) {
+			public Double getGeneralizedCost(Node from, Node to, double time) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public Double getDistance(Node from, Node to) {
+			public Double getDistance(Node from, Node to, double time) {
 				// TODO Auto-generated method stub
 				return null;
 			}
 
 			@Override
-			public Double getTime(Node from, Node to) {
+			public Double getTransportTime(Node from, Node to, double time) {
 				// TODO Auto-generated method stub
 				return null;
 			}

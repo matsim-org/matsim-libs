@@ -79,7 +79,7 @@ public class RuinAndRecreateTest extends TestCase{
 		costs = new Costs() {
 			
 			@Override
-			public Double getTime(Node from, Node to) {
+			public Double getTransportTime(Node from, Node to, double time) {
 				int fromInt = Integer.parseInt(from.getId());
 				int toInt = Integer.parseInt(to.getId());
 				if(fromInt >= toInt){
@@ -91,13 +91,13 @@ public class RuinAndRecreateTest extends TestCase{
 			}
 			
 			@Override
-			public Double getDistance(Node from, Node to) {
-				return getTime(from,to);
+			public Double getDistance(Node from, Node to, double time) {
+				return getTransportTime(from,to, 0.0);
 			}
 			
 			@Override
-			public Double getCost(Node from, Node to) {
-				return getTime(from,to);
+			public Double getGeneralizedCost(Node from, Node to, double time) {
+				return getTransportTime(from,to, 0.0);
 			}
 		};
 		vrpBuilder = new SingleDepotVRPBuilder();
