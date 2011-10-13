@@ -72,7 +72,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				lastAct = tourAct;
 			}
 			else{
-				time += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
+				time += costs.getTransportTime(lastAct.getLocation(), tourAct.getLocation(), 0.0);
 			}
 			if(time > maxTime){
 				return false;

@@ -197,7 +197,7 @@ public class BestTourBuilder implements TourBuilder {
 	}
 
 	private double getCosts(Node from, Node to) {
-		return costs.getCost(from, to);
+		return costs.getGeneralizedCost(from, to, 0.0);
 	}
 
 	private Node getActLocation(Tour tour, int i) {

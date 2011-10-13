@@ -25,10 +25,10 @@ package vrp.api;
 
 public interface Costs {
 
-	public Double getCost(Node from, Node to);
+	public Double getGeneralizedCost(Node from, Node to, double time);
 	
-	public Double getDistance(Node from, Node to);
+	public Double getDistance(Node from, Node to, double time);
 	
-	public Double getTime(Node from, Node to);
+	public Double getTransportTime(Node from, Node to, double time);
 
 }

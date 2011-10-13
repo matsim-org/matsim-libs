@@ -71,10 +71,10 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 				currentAct.setEarliestArrTime(early);
 				int currentLoad = lastCustomer.getCurrentLoad() + currentAct.getCustomer().getDemand();
 				currentAct.setCurrentLoad(currentLoad);
-				costs += this.costs.getCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
-				tour.costs.generalizedCosts += this.costs.getCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
-				tour.costs.distance += this.costs.getDistance(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
-				tour.costs.time  += this.costs.getTime(lastCustomer.getLocation(), currentAct.getCustomer().getLocation());
+				costs += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
+				tour.costs.generalizedCosts += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
+				tour.costs.distance += this.costs.getDistance(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
+				tour.costs.time  += this.costs.getTransportTime(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
 				lastCustomer = currentAct;
 			}
 			j--;
@@ -89,7 +89,7 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 	}
 
 	private double getTime(TourActivity act1, TourActivity act2) {
-		return costs.getTime(act1.getLocation(), act2.getLocation());
+		return costs.getTransportTime(act1.getLocation(), act2.getLocation(), 0.0);
 	}
 
 	private int getLoadAtDepot(Tour tour) {

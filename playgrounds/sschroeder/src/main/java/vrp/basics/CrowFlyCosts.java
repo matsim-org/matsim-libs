@@ -35,19 +35,19 @@ public class CrowFlyCosts implements Costs{
 	public double detourFactor = 1.0;
 	
 	@Override
-	public Double getCost(Node from, Node to) {
-		return getDistance(from, to);
+	public Double getGeneralizedCost(Node from, Node to, double time) {
+		return getDistance(from, to, 0.0);
 	}
 
 	@Override
-	public Double getDistance(Node from, Node to) {
+	public Double getDistance(Node from, Node to, double time) {
 		return EuclideanDistanceCalculator.calculateDistance(from.getCoord(), to.getCoord())*detourFactor;
 	}
 
 
 	@Override
-	public synchronized Double getTime(Node from, Node to) {
-		return getDistance(from, to)/speed;
+	public synchronized Double getTransportTime(Node from, Node to, double time) {
+		return getDistance(from, to, 0.0)/speed;
 	}
 
 }

@@ -82,7 +82,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceV2Constraint implements Con
 				lastAct = tourAct;
 			}
 			else{
-				timeOnTheRoad += costs.getTime(lastAct.getLocation(), tourAct.getLocation());
+				timeOnTheRoad += costs.getTransportTime(lastAct.getLocation(), tourAct.getLocation(), 0.0);
 			}
 			differentLocations.add(tourAct.getCustomer().getLocation().getId());
 			if(differentLocations.size() > maxNuOfDifferentLocations){

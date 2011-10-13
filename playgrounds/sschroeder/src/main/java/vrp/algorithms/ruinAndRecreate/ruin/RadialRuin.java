@@ -115,7 +115,7 @@ public class RadialRuin implements RuinStrategy {
 			});
 			distanceNodeTree.put(origin.getId(), treeSet);
 			for(Customer destination : customerWithoutDepot){
-				double distance = vrp.getCosts().getCost(origin.getLocation(), destination.getLocation());
+				double distance = vrp.getCosts().getGeneralizedCost(origin.getLocation(), destination.getLocation(), 0.0);
 				ReferencedCustomer refNode = new ReferencedCustomer(destination, distance);
 				treeSet.add(refNode);
 			}

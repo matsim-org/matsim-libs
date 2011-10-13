@@ -88,7 +88,7 @@ public class CostsImpl implements Costs{
 	private Map<CostMatrixKey,CostValues> costMatrix = new HashMap<CostMatrixKey, CostValues>();
 	
 	@Override
-	public Double getCost(Node from, Node to) {
+	public Double getGeneralizedCost(Node from, Node to, double time) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
 			return costMatrix.get(costMatrixKey).getCost();
@@ -105,7 +105,7 @@ public class CostsImpl implements Costs{
 	}
 
 	@Override
-	public Double getDistance(Node from, Node to) {
+	public Double getDistance(Node from, Node to, double time) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
 			return costMatrix.get(costMatrixKey).getDistance();
@@ -121,7 +121,7 @@ public class CostsImpl implements Costs{
 	}
 
 	@Override
-	public Double getTime(Node from, Node to) {
+	public Double getTransportTime(Node from, Node to, double time) {
 		CostMatrixKey costMatrixKey = new CostMatrixKey(from.getId(), to.getId());
 		if(costMatrix.containsKey(costMatrixKey)){
 			return costMatrix.get(costMatrixKey).getTime();

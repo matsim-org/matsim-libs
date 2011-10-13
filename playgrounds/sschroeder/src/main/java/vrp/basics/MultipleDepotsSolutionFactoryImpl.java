@@ -90,9 +90,9 @@ public class MultipleDepotsSolutionFactoryImpl {
 		Customer bestDepot = null;
 		Double minCost2Depot = Double.MAX_VALUE; 
 		for(Customer depot : vrp.getDepots().values()){
-			double cost = vrp.getCosts().getCost(depot.getLocation(), from.getLocation());
-			cost += vrp.getCosts().getCost(from.getLocation(), to.getLocation());
-			cost += vrp.getCosts().getCost(to.getLocation(), depot.getLocation());
+			double cost = vrp.getCosts().getGeneralizedCost(depot.getLocation(), from.getLocation(), 0.0);
+			cost += vrp.getCosts().getGeneralizedCost(from.getLocation(), to.getLocation(), 0.0);
+			cost += vrp.getCosts().getGeneralizedCost(to.getLocation(), depot.getLocation(), 0.0);
 			if(cost < minCost2Depot){
 				bestDepot = depot;
 				minCost2Depot = cost;
@@ -105,7 +105,7 @@ public class MultipleDepotsSolutionFactoryImpl {
 		Customer bestDepot = null;
 		Double minCost2Depot = Double.MAX_VALUE; 
 		for(Customer depot : vrp.getDepots().values()){
-			double costs = vrp.getCosts().getCost(depot.getLocation(), customer.getLocation());
+			double costs = vrp.getCosts().getGeneralizedCost(depot.getLocation(), customer.getLocation(), 0.0);
 			if(costs < minCost2Depot){
 				minCost2Depot = costs;
 				bestDepot = depot;

@@ -47,10 +47,10 @@ public class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
 		for(int i=1;i<tour.getActivities().size();i++){
 			TourActivity fromAct = tour.getActivities().get(i-1);
 			TourActivity toAct = tour.getActivities().get(i);
-			cost += costs.getCost(fromAct.getLocation(),toAct.getLocation());
-			tour.costs.generalizedCosts += costs.getCost(fromAct.getLocation(),toAct.getLocation());
-			tour.costs.distance += costs.getDistance(fromAct.getLocation(),toAct.getLocation());
-			tour.costs.time  += costs.getTime(fromAct.getLocation(),toAct.getLocation());
+			cost += costs.getGeneralizedCost(fromAct.getLocation(),toAct.getLocation(), 0.0);
+			tour.costs.generalizedCosts += costs.getGeneralizedCost(fromAct.getLocation(),toAct.getLocation(), 0.0);
+			tour.costs.distance += costs.getDistance(fromAct.getLocation(),toAct.getLocation(), 0.0);
+			tour.costs.time  += costs.getTransportTime(fromAct.getLocation(),toAct.getLocation(), 0.0);
 			int loadAtCustomer = fromAct.getCurrentLoad() + toAct.getCustomer().getDemand();
 			toAct.setCurrentLoad(loadAtCustomer);
 		}

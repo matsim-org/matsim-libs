@@ -31,19 +31,19 @@ public class ManhattanCosts implements Costs {
 	public double speed = 1;
 	
 	@Override
-	public Double getCost(Node from, Node to) {
-		return getDistance(from, to);
+	public Double getGeneralizedCost(Node from, Node to, double time) {
+		return getDistance(from, to, 0.0);
 	}
 
 	@Override
-	public Double getDistance(Node from, Node to) {
+	public Double getDistance(Node from, Node to, double time) {
 		return calculateDistance(from, to);
 	}
 
 	@Override
-	public Double getTime(Node from, Node to) {
-		double time = calculateDistance(from, to)/speed;
-		return time;
+	public Double getTransportTime(Node from, Node to, double time) {
+		double transportTime = calculateDistance(from, to)/speed;
+		return transportTime;
 	}
 	
 	private double calculateDistance(Node from, Node to){

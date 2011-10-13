@@ -143,10 +143,10 @@ public class ClarkeAndWright {
 				if(customer_i.getId().equals(customer_j.getId())){
 					continue;
 				}
-				if(costMatrix.getCost(from,to) != null){
+				if(costMatrix.getGeneralizedCost(from,to, 0.0) != null){
 					Node depot = vrp.getDepot().getLocation();
-					double costSaving = costMatrix.getCost(depot,from) + 
-						costMatrix.getCost(to,depot) - costMatrix.getCost(from,to);
+					double costSaving = costMatrix.getGeneralizedCost(depot,from, 0.0) + 
+						costMatrix.getGeneralizedCost(to,depot, 0.0) - costMatrix.getGeneralizedCost(from,to, 0.0);
 					if(costSaving>0){
 						Saving saving = new Saving(customer_i.getId(),customer_j.getId(),costSaving);	
 						savings.add(saving);
