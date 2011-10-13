@@ -23,8 +23,18 @@ public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
 	@Override
 	public void finish() {
-		System.out.println("totDistance="+bestResult);
+		System.out.println("totalCosts="+Math.round(bestResult));
 		System.out.println("#tours="+bestSolution.size());
+		for(Tour t : bestSolution){
+			System.out.println(t);
+			System.out.println("tpCosts=" + round(t.costs.generalizedCosts));
+			System.out.println("tpDistance=" + round(t.costs.distance));
+			System.out.println("tpTime=" + round(t.costs.time));
+		}
+	}
+
+	private Long round(double time) {
+		return Math.round(time);
 	}
 	
 	
