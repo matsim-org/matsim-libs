@@ -56,7 +56,7 @@ import cadyts.calibrators.Calibrator;
 import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import cadyts.supply.SimResults;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 public class BseUCControlerListener implements StartupListener,
 		AfterMobsimListener, BeforeMobsimListener, BseControlerListener {

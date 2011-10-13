@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts;
 
@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.xml.sax.Attributes;
 
-import cadyts.utilities.misc.DynamicData;
-import cadyts.utilities.misc.DynamicDataXMLFileIO;
+import utilities.misc.DynamicData;
+import utilities.misc.DynamicDataXMLFileIO;
 
 /** @author yu */
 public class BseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {

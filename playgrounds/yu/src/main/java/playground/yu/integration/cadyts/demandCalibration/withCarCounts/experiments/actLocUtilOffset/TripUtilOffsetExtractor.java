@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset;
 
@@ -47,11 +47,11 @@ import org.matsim.counts.Counts;
 
 import playground.yu.utils.ArrayTools;
 import playground.yu.utils.math.SimpleStatistics;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 // AgentDepartureEventHandler,
@@ -109,9 +109,9 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 
 	/**
 	 * GripTrip exists only for one timeBin
-	 * 
+	 *
 	 * @author yu
-	 * 
+	 *
 	 */
 	public static class TripsWithUtilOffset {
 		private final Tuple<Coord, Coord> odRelationship/* orig,dest [2] */;
@@ -199,6 +199,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 	// this.tripEvents.put(agentId, tripEvents);
 	// tripEvents.setTripBegins(event);
 	// }
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		Id agentId = event.getPersonId();
 		if (tripEvents.containsKey(agentId)) {
@@ -210,10 +211,12 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 		tripEvents.setTripBegins(event);
 	}
 
+	@Override
 	public void reset(int iteration) {
 
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id agentId = event.getPersonId();
 		TripEvents tripEvents = this.tripEvents.get(agentId);
@@ -225,6 +228,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 		tripEvents.addLinkEnterEvent(event);
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id agentId = event.getPersonId();
 		TripEvents tripEvents = this.tripEvents.get(agentId);

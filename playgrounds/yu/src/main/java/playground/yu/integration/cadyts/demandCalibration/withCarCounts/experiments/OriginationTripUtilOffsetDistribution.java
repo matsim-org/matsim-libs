@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments;
 
@@ -51,11 +51,11 @@ import org.matsim.counts.MatsimCountsReader;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.ActivityLocationUtilOffsetExtractor;
 import playground.yu.utils.io.DistributionCreator;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class OriginationTripUtilOffsetDistribution extends
 		ActivityLocationUtilOffsetExtractor implements ActivityEndEventHandler,
@@ -94,13 +94,13 @@ public class OriginationTripUtilOffsetDistribution extends
 	/**
 	 * one trip ends
 	 */
+	@Override
 	public void handleEvent(ActivityStartEvent event) {// means a Leg is
 		// finished
 		Id agentId = event.getPersonId();
 		// internalHandleEvent(this.endedActs.remove(agentId));
 		if (event != null) {
-			Double legUtilOffset = tmpAgentLegUtilOffsets
-					./**/remove(agentId)/**/;
+			Double legUtilOffset = tmpAgentLegUtilOffsets./**/remove(agentId)/**/;
 			ActivityEndEvent actEndEvent = endedActs.remove(agentId);
 			if (legUtilOffset != null && actEndEvent != null/*
 															 * an
@@ -125,6 +125,7 @@ public class OriginationTripUtilOffsetDistribution extends
 		}
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		endedActs.put(event.getPersonId(), event);
 		/* beginning of new Leg */
@@ -149,13 +150,12 @@ public class OriginationTripUtilOffsetDistribution extends
 
 		DistributionCreator creator2 = new DistributionCreator(
 				origTripUtilOffsetList2, interval);
-		creator2
-				.createChart(
-						filenameBase + "totalUn0.png",
-						"total \"unzero\" origination trip Utility offset distribution",
-						"\"non-zero\" value of origination trip utility offset",
-						"number of trips with value (!=0) in (interval = "
-								+ interval + ") range of x");
+		creator2.createChart(
+				filenameBase + "totalUn0.png",
+				"total \"unzero\" origination trip Utility offset distribution",
+				"\"non-zero\" value of origination trip utility offset",
+				"number of trips with value (!=0) in (interval = " + interval
+						+ ") range of x");
 
 		// all actType
 		Map<String, List<Double>> localActType_origTripUtilOffsets = new HashMap<String, List<Double>>();
@@ -192,7 +192,8 @@ public class OriginationTripUtilOffsetDistribution extends
 
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -208,7 +209,8 @@ public class OriginationTripUtilOffsetDistribution extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils
+				.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

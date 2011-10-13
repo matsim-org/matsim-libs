@@ -20,7 +20,7 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation;
 
-import cadyts.utilities.math.MultinomialLogit;
+import utilities.math.MultinomialLogit;
 
 public interface MultinomialLogitChoice extends CadytsChoice {
 

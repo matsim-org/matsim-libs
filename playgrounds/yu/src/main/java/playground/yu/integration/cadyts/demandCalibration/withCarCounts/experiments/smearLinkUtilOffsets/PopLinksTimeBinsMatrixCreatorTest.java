@@ -56,7 +56,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -66,7 +65,7 @@ import org.matsim.counts.MatsimCountsReader;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.utils.io.ScoreModificationReader;
 import playground.yu.utils.io.SimpleWriter;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
@@ -447,7 +446,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		// linkUtilityOffsetFilename =
 		// "../matsim-bse/old_runs/um1/ITERS/it.1000/linkIdTimeBinX.log";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
@@ -458,7 +457,7 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		PopLinksTimeBinsMatrixCreatorTest pltbmc = new PopLinksTimeBinsMatrixCreatorTest(
 				network, population, 7, 20);
 		pltbmc.init();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(pltbmc);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 

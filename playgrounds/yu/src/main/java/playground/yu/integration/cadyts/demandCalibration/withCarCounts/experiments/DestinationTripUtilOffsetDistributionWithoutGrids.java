@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments;
 
@@ -44,7 +44,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Counts;
@@ -52,11 +51,11 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.utils.io.DistributionCreator;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		ActivityStartEventHandler, LinkEnterEventHandler {// TODO
@@ -119,7 +118,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		int arStartTime = 7, arEndTime = 24;// lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -136,7 +135,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		// ,lowerLimit,1000d
 		);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////
@@ -211,6 +210,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		return 0d;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id linkId = event.getLinkId();
 		Id agentId = event.getPersonId();
@@ -228,6 +228,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		// }
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent/* trip ending */event) {
 		// if (event != null) {
 		int timeStep = getTimeStep(event.getTime());

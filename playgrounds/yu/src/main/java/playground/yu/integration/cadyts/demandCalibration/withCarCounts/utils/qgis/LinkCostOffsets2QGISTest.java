@@ -39,7 +39,7 @@ import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 public class LinkCostOffsets2QGISTest {
 	private static boolean isInRange(final Id linkId, final Network net) {

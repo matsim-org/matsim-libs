@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.distribution;
 
@@ -41,11 +41,11 @@ import org.matsim.counts.Counts;
 
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.AreaUtilityOffsets;
 import playground.yu.utils.io.SimpleWriter;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class ActivityLocationUtilOffsetExtractor implements
 		LinkEnterEventHandler {
@@ -155,6 +155,7 @@ public class ActivityLocationUtilOffsetExtractor implements
 		return ((LinkImpl) l).calcDistance(distanceFilterCenterNodeCoord) < distanceFilter;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id linkId = event.getLinkId();
 		Id agentId = event.getPersonId();
@@ -182,13 +183,14 @@ public class ActivityLocationUtilOffsetExtractor implements
 		return gridUtilOffsets;
 	}
 
+	@Override
 	public void reset(int iteration) {
 
 	}
 
 	/**
 	 * save information from event into gridCenterUtilOffsets container
-	 * 
+	 *
 	 * @param event
 	 */
 	protected void internalHandleEvent(ActivityEvent event) {

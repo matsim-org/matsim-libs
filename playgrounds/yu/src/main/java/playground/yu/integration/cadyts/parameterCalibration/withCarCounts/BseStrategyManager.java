@@ -26,7 +26,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelTime;
 
-import cadyts.calibrators.Calibrator;
+import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
 /**
  * @author yu
@@ -51,7 +51,7 @@ public interface BseStrategyManager {
 	 * @param calibrator
 	 * @param travelTimes
 	 */
-	public void init(final Calibrator<Link> calibrator,
+	public void init(final MATSimChoiceParameterCalibrator<Link> calibrator,
 			final TravelTime travelTimes);
 
 }

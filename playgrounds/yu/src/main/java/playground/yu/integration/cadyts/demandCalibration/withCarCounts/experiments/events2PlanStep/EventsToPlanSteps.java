@@ -79,27 +79,25 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 
 	private PlanBuilder<Link> getPlanStepFactoryOfPlan(PlanImpl plan,
 			boolean throwException) {
-		PlanBuilder<Link> planStepFactory = this.planStepFactories.get(plan);
+		PlanBuilder<Link> planStepFactory = planStepFactories.get(plan);
 		if (planStepFactory == null) {
-			if (throwException)/*
-								 * Exception should be thrown for
-								 * "addTurn/Entering" and "addExit/arrival"
-								 * without "Entry/Departure"
-								 */
+			if (throwException) {
 				throw new RuntimeException(
 						"EventsToPlanSteps:\tEntering or arrival without Entry??");
+			}
 
 			planStepFactory = new PlanBuilder<Link>();
-			this.planStepFactories.put(plan, planStepFactory);
+			planStepFactories.put(plan, planStepFactory);
 		}
 		return planStepFactory;
 	}
 
 	private Link getEventLink(Id linkId) {
-		Link link = this.net.getLinks().get(linkId);
-		if (link == null)
+		Link link = net.getLinks().get(linkId);
+		if (link == null) {
 			throw new RuntimeException(
 					"EventsToPlanSteps:\tan event happens on a link that does NOT exist in network!!!");
+		}
 		return link;
 	}
 
@@ -108,40 +106,41 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 	}
 
 	private PlanImpl getPlanFromEvent(PersonEvent event) {
-		Person person = this.pop.getPersons().get(event.getPersonId());
-		if (person == null)
+		Person person = pop.getPersons().get(event.getPersonId());
+		if (person == null) {
 			throw new RuntimeException(
 					"EventsToPlanSteps:\tPerson of an event [" + event
 							+ "] does NOT exist in Population!!!");
+		}
 		PlanImpl plan = (PlanImpl) person.getSelectedPlan();
 		return plan;
 	}
 
 	public Plan<Link> getPlanSteps(PlanImpl plan) {
-		return this.planStepsMap.get(plan);
+		return planStepsMap.get(plan);
 	}
 
 	/*
 	 * public final void convert(final PlanImpl plan) {
-	 * 
+	 *
 	 * if (PlanModeJudger.usePt(plan)) { if (!foundPT) {
 	 * System.out.println("BSE: found a PT plan"); foundPT = true; }
 	 * planStepFactory.reset(); return; }
-	 * 
+	 *
 	 * double time = plan.getFirstActivity().getEndTime(); if (time > MAX_TIME)
 	 * return; for (int i = 1; i < plan.getPlanElements().size() - 1; i += 2) {
 	 * // that's the leg we're gonna handle now LegImpl leg = (LegImpl)
 	 * plan.getPlanElements().get(i); ActivityImpl fromAct = (ActivityImpl)
 	 * plan.getPreviousActivity(leg); ActivityImpl toAct = (ActivityImpl)
 	 * plan.getNextActivity(leg);
-	 * 
+	 *
 	 * // entry
-	 * planStepFactory.addEntry(network.getLinks().get(fromAct.getLinkId()), (int)
-	 * time); // turns for all links for (Id linkId : ((NetworkRoute)
-	 * leg.getRoute()).getLinkIds()) { Link link = network.getLinks().get(linkId);
-	 * planStepFactory.addTurn(link, (int) time); time +=
-	 * ttime.getLinkTravelTime(link, time); if (time > MAX_TIME) {
-	 * planStepFactory.addExit(MAX_TIME); return; } } // last turn to
+	 * planStepFactory.addEntry(network.getLinks().get(fromAct.getLinkId()),
+	 * (int) time); // turns for all links for (Id linkId : ((NetworkRoute)
+	 * leg.getRoute()).getLinkIds()) { Link link =
+	 * network.getLinks().get(linkId); planStepFactory.addTurn(link, (int)
+	 * time); time += ttime.getLinkTravelTime(link, time); if (time > MAX_TIME)
+	 * { planStepFactory.addExit(MAX_TIME); return; } } // last turn to
 	 * destination link
 	 * planStepFactory.addTurn(network.getLinks().get(toAct.getLinkId()), (int)
 	 * time); time += ttime.getLinkTravelTime(network.getLinks().get(
@@ -155,65 +154,74 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 	 * Math.max(time, toAct.getEndTime()); } // for-loop: handle next leg }
 	 */
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		PlanImpl plan = this.getPlanFromEvent(event);
-		if (this.finishedPlans.contains(plan))
+		PlanImpl plan = getPlanFromEvent(event);
+		if (finishedPlans.contains(plan)) {
 			return;
-		PlanBuilder<Link> planStepFactory = this.getPlanStepFactoryOfPlan(plan,
+		}
+		PlanBuilder<Link> planStepFactory = getPlanStepFactoryOfPlan(plan,
 				false);
 		int time = (int) event.getTime();
 		if (time > MAX_TIME) {// DON'T add entry in time>MAX_TIME, it has had an
 			// exit
-			this.endPlanStepFactory(planStepFactory, plan);
+			endPlanStepFactory(planStepFactory, plan);
 			return;
 		}
-		planStepFactory.addEntry(this.getEventLink(event.getLinkId()), time);
+		planStepFactory.addEntry(getEventLink(event.getLinkId()), time);
 	}
 
+	@Override
 	public void reset(int iteration) {
-		this.finishedPlans.clear();
+		finishedPlans.clear();
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		PlanImpl plan = this.getPlanFromEvent(event);
-		if (this.finishedPlans.contains(plan))
+		PlanImpl plan = getPlanFromEvent(event);
+		if (finishedPlans.contains(plan)) {
 			return;
-		PlanBuilder<Link> planStepFactory = this.getPlanStepFactoryOfPlan(plan,
+		}
+		PlanBuilder<Link> planStepFactory = getPlanStepFactoryOfPlan(plan,
 				true);
 		int time = (int) event.getTime();
 		if (time > MAX_TIME) {
 			planStepFactory.addExit(MAX_TIME);
-			this.endPlanStepFactory(planStepFactory, plan);
+			endPlanStepFactory(planStepFactory, plan);
 			return;
 		}
-		planStepFactory.addTurn(this.getEventLink(event.getLinkId()), time);
+		planStepFactory.addTurn(getEventLink(event.getLinkId()), time);
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		// removePlanFactory, if the arrivalEvent ist the last one?? --> clearUp
 		// will be done afterMobsim
-		PlanImpl plan = this.getPlanFromEvent(event);
-		if (this.finishedPlans.contains(plan))
+		PlanImpl plan = getPlanFromEvent(event);
+		if (finishedPlans.contains(plan)) {
 			return;
-		PlanBuilder<Link> planStepFactory = this.getPlanStepFactoryOfPlan(plan,
+		}
+		PlanBuilder<Link> planStepFactory = getPlanStepFactoryOfPlan(plan,
 				true);
 		int time = (int) event.getTime();
 		if (time > MAX_TIME) {
 			planStepFactory.addExit(MAX_TIME);
-			this.endPlanStepFactory(planStepFactory, plan);
+			endPlanStepFactory(planStepFactory, plan);
 			return;
 		}
 		planStepFactory.addExit(time);
 	}
 
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		PlanImpl plan = this.getPlanFromEvent(event);
-		if (this.finishedPlans.contains(plan))
+		PlanImpl plan = getPlanFromEvent(event);
+		if (finishedPlans.contains(plan)) {
 			return;
-		PlanBuilder<Link> planStepFactory = this.getPlanStepFactoryOfPlan(plan,
+		}
+		PlanBuilder<Link> planStepFactory = getPlanStepFactoryOfPlan(plan,
 				true);
 		planStepFactory.addExit(getExitTime((int) event.getTime()));
-		this.endPlanStepFactory(planStepFactory, plan);
+		endPlanStepFactory(planStepFactory, plan);
 		// if planStepFactory==null, this planSteps could have been already
 		// completed because of oversteping of MAX_TiME
 	}
@@ -224,33 +232,33 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 	 */
 	private void endPlanStepFactory(PlanBuilder<Link> planStepFactory,
 			PlanImpl plan) {
-		this.planStepsMap.put(plan, planStepFactory.getResult());
+		planStepsMap.put(plan, planStepFactory.getResult());
 		removePlanStepFactory(plan);//
-		this.finishedPlans.add(plan);
+		finishedPlans.add(plan);
 	}
 
 	private void removePlanStepFactory(PlanImpl plan) {
-		this.planStepFactories.remove(plan);
+		planStepFactories.remove(plan);
 	}
 
 	/**
 	 * this should be done by removeWorstPlan in StrategyManager
-	 * 
+	 *
 	 * @param plan
 	 */
 	public void removePlanSteps(PlanImpl plan) {
-		this.planStepsMap.remove(plan);
+		planStepsMap.remove(plan);
 	}
 
 	public void clearUpAfterMobsim() {
 		System.out
 				.println("MATSim_Integration.DemandCalibration:\tsize of planStepFactories:\t"
 						+ planStepFactories.size());
-		for (PlanImpl plan : this.planStepFactories.keySet()) {
+		for (PlanImpl plan : planStepFactories.keySet()) {
 			planStepsMap
-					.put(plan, this.planStepFactories.get(plan).getResult());
+					.put(plan, planStepFactories.get(plan).getResult());
 		}
-		this.planStepFactories.clear();
+		planStepFactories.clear();
 		System.out
 				.println("MATSim_Integration.DemandCalibration:\tsize of planStepsMap:\t"
 						+ planStepsMap.size());
@@ -274,7 +282,8 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 			pop.addPerson(person);
 			person.addPlan(new PlanImpl());
 		}
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils
+				.createEventsManager();
 		EventsToPlanSteps e2p = new EventsToPlanSteps(net, pop);
 		events.addHandler(e2p);
 		loop: for (int i = 0; i < 10; i++) {

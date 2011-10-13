@@ -19,11 +19,10 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +39,6 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.utils.charts.XYScatterChart;
@@ -52,14 +50,14 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkC
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.ActivityTimeDistribution.RealActivityTimes;
 import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.io.SimpleWriter;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * creates scatter plots about: TripUtilityOffsets <-> performing time /
  * typicalDuration
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DestTripUtilOffset_perfRatio extends
 		DestinationTripUtilOffsetDistribution implements
@@ -81,6 +79,7 @@ public class DestTripUtilOffset_perfRatio extends
 		perfRatios = new HashMap<String, List<Double>>();
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event != null) {
 			Id agentId = event.getPersonId();
@@ -92,6 +91,7 @@ public class DestTripUtilOffset_perfRatio extends
 		}
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (event != null) {
 			Id agentId = event.getPersonId();
@@ -138,9 +138,8 @@ public class DestTripUtilOffset_perfRatio extends
 		// */);
 
 		for (String shortType : tripUtilOffsets.keySet()) {
-			writer
-					.writeln(shortType
-							+ "\ntripUtilityOffset\tperformingRatio (performing time / activity typical duration)");
+			writer.writeln(shortType
+					+ "\ntripUtilityOffset\tperformingRatio (performing time / activity typical duration)");
 
 			double[] tripUtilOffsetArray /* x-axis */= Collection2Array
 					.toArrayFromDouble(tripUtilOffsets.get(shortType));
@@ -191,7 +190,8 @@ public class DestTripUtilOffset_perfRatio extends
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		// double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -207,7 +207,7 @@ public class DestTripUtilOffset_perfRatio extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d, params);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(dtuoPr);
 		// /////////////////////////////////

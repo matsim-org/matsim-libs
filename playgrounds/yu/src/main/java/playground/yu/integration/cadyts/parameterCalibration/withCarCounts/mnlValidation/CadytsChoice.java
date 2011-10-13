@@ -29,7 +29,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
-import cadyts.utilities.math.BasicStatistics;
+import utilities.math.BasicStatistics;
 
 public interface CadytsChoice extends EventHandler {
 

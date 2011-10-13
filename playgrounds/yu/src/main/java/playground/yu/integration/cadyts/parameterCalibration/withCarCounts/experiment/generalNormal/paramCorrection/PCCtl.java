@@ -92,8 +92,7 @@ public class PCCtl extends BseParamCalibrationControler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new PCStrMn(network, getFirstIteration(),
-				config.planCalcScore().getBrainExpBeta(),
-				Integer.parseInt(config.findParam(
+				config, Integer.parseInt(config.findParam(
 						PCCtlListener.BSE_CONFIG_MODULE_NAME,
 						"parameterDimension"/*
 											 * 2, traveling , performing

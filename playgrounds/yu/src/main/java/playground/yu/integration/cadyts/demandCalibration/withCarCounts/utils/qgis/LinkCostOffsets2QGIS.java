@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis;
 
@@ -49,7 +49,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.yu.utils.qgis.MATSimNet2QGIS;
 import playground.yu.utils.qgis.Network2PolygonGraph;
 import playground.yu.utils.qgis.X2GraphImpl;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
@@ -58,7 +58,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkCostOffsets2QGIS extends MATSimNet2QGIS {
 	public static class LinkCostOffsets2PolygonGraph extends X2GraphImpl {
@@ -81,10 +81,12 @@ public class LinkCostOffsets2QGIS extends MATSimNet2QGIS {
 					.addTypes(new AttributeType[] { geom, id });
 		}
 
+		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
 				NumberFormatException, IllegalAttributeException {
-			for (int i = 0; i < attrTypes.size(); i++)
+			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
+			}
 			FeatureType ftRoad = defaultFeatureTypeFactory.getFeatureType();
 			for (Id linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
@@ -95,8 +97,9 @@ public class LinkCostOffsets2QGIS extends MATSimNet2QGIS {
 				Object[] o = new Object[size];
 				o[0] = mp;
 				o[1] = link.getId().toString();
-				for (int i = 0; i < parameters.size(); i++)
+				for (int i = 0; i < parameters.size(); i++) {
 					o[i + 2] = parameters.get(i).get(link.getId());
+				}
 				Feature ft = ftRoad.create(o, "network");
 				features.add(ft);
 			}
@@ -126,8 +129,8 @@ public class LinkCostOffsets2QGIS extends MATSimNet2QGIS {
 
 	public LinkCostOffsets2QGIS(Network network, String coordinateSystem,
 			int countsStartTime, int countsEndTime) {
-		((ScenarioImpl) this.scenario).setNetwork((NetworkImpl) network);
-		this.crs = MGC.getCRS(coordinateSystem);
+		((ScenarioImpl) scenario).setNetwork((NetworkImpl) network);
+		crs = MGC.getCRS(coordinateSystem);
 		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
 		this.countsStartTime = countsStartTime;
 		this.countsEndTime = countsEndTime;

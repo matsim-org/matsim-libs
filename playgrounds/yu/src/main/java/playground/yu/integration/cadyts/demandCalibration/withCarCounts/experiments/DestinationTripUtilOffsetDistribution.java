@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments;
 
@@ -54,11 +54,11 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkC
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.GridUtils;
 import playground.yu.utils.io.DistributionCreator;
 import playground.yu.utils.io.GridCenterReader;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class DestinationTripUtilOffsetDistribution implements
 		ActivityStartEventHandler, LinkEnterEventHandler {
@@ -81,7 +81,7 @@ public class DestinationTripUtilOffsetDistribution implements
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -97,7 +97,7 @@ public class DestinationTripUtilOffsetDistribution implements
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////
@@ -120,7 +120,7 @@ public class DestinationTripUtilOffsetDistribution implements
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -146,7 +146,7 @@ public class DestinationTripUtilOffsetDistribution implements
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, 1000d, timeCenterCoords);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////
@@ -240,6 +240,7 @@ public class DestinationTripUtilOffsetDistribution implements
 		return 0d;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id linkId = event.getLinkId();
 		Id agentId = event.getPersonId();
@@ -257,6 +258,7 @@ public class DestinationTripUtilOffsetDistribution implements
 		// }
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event != null) {
 			int timeStep = getTimeStep(event.getTime());

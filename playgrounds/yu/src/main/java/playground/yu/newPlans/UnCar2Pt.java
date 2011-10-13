@@ -51,6 +51,7 @@ public class UnCar2Pt extends NewPopulation {
 					Leg leg = (Leg) pe;
 					if (!leg.getMode().equals("car")) {
 						leg.setMode("pt");
+						//TODO leg.setTravelTime(distance/beeline speed)
 					}
 				}
 			}

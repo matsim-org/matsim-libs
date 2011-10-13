@@ -37,13 +37,12 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
-import cadyts.calibrators.Calibrator;
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 
 public abstract class BseParamCalibrationStrategyManager extends
 		StrategyManager implements BseStrategyManager {
 
-	protected AnalyticalCalibrator<Link> calibrator = null;
+	protected MATSimChoiceParameterCalibrator<Link> calibrator = null;
 
 	protected PlanToPlanStep planConverter = null;
 	protected CadytsChoice chooser;
@@ -62,9 +61,9 @@ public abstract class BseParamCalibrationStrategyManager extends
 	}
 
 	@Override
-	public void init(final Calibrator<Link> calibrator,
+	public void init(final MATSimChoiceParameterCalibrator<Link> calibrator,
 			final TravelTime travelTimes) {
-		this.calibrator = (AnalyticalCalibrator<Link>) calibrator;
+		this.calibrator = calibrator;
 		planConverter = new PlanToPlanStep(travelTimes, net);
 		tt = travelTimes;
 		// this.worstPlanSelector = new RemoveWorstPlanSelector();
@@ -99,7 +98,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	}
 
 	protected void resetChooser() {
-//		chooser.reset(iter);
+		// chooser.reset(iter);
 		chooser.reset(removeds);
 		removeds.clear();
 	}

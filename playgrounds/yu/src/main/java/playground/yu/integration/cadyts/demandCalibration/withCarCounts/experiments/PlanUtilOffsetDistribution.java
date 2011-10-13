@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments;
 
@@ -47,11 +47,11 @@ import org.matsim.counts.MatsimCountsReader;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.ActivityLocationUtilOffsetExtractor;
 import playground.yu.utils.io.DistributionCreator;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * @author yu
- * 
+ *
  */
 public class PlanUtilOffsetDistribution extends
 		ActivityLocationUtilOffsetExtractor {
@@ -74,7 +74,8 @@ public class PlanUtilOffsetDistribution extends
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -90,7 +91,8 @@ public class PlanUtilOffsetDistribution extends
 				counts, linkUtilOffsets, arStartTime, arEndTime, lowerLimit,
 				1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils
+				.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////
@@ -168,6 +170,7 @@ public class PlanUtilOffsetDistribution extends
 
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id linkId = event.getLinkId();
 		Id agentId = event.getPersonId();
@@ -201,7 +204,8 @@ public class PlanUtilOffsetDistribution extends
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double interval = 0.25;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -217,7 +221,8 @@ public class PlanUtilOffsetDistribution extends
 				counts, linkUtilOffsets, arStartTime, arEndTime, lowerLimit,
 				1000d);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils
+				.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.commuting;
 
@@ -48,13 +48,13 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkC
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.TripUtilOffsetExtractor;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.Trips2QGISNormal;
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * extract trips to one activity
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class TripToActivityUtilOffsetExtractor extends TripUtilOffsetExtractor {
 
@@ -132,7 +132,7 @@ public class TripToActivityUtilOffsetExtractor extends TripUtilOffsetExtractor {
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 50;
 		double gridLength = 1000d;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -150,7 +150,7 @@ public class TripToActivityUtilOffsetExtractor extends TripUtilOffsetExtractor {
 												 * false by using rigorous
 												 * version
 												 */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(tuoExtractor);
 		// /////////////////////////////////

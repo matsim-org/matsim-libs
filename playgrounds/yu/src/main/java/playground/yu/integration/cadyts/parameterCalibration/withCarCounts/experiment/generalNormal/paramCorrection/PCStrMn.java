@@ -20,15 +20,14 @@
 
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -39,36 +38,35 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
-import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
+import utilities.math.BasicStatistics;
+import utilities.math.MultinomialLogit;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
-import cadyts.utilities.math.BasicStatistics;
-import cadyts.utilities.math.Matrix;
-import cadyts.utilities.math.MultinomialLogit;
-import cadyts.utilities.math.Vector;
 
 public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		BseStrategyManager {
 	private final static Logger log = Logger.getLogger(PCStrMn.class);
 	private double delta;
-	private final double brainExpBeta;
+	private Config config;
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private final int paramDimension;
 	private Plan oldSelected = null;
+	private MultinomialLogit singleMnl = null;
+
 	private BasicStatistics betaTravelingPtStats = null;
 
-	public PCStrMn(NetworkImpl net, int firstIteration, double brainExpBeta,
+	public PCStrMn(NetworkImpl net, int firstIteration, Config config,
 			int paramDimension) {
 		super(firstIteration);
 		this.net = net;
-		this.brainExpBeta = brainExpBeta;
+		this.config = config;
 		this.paramDimension = paramDimension;
 	}
 
-	public void init(ChoiceParameterCalibrator<Link> calibrator,
+	public void init(MATSimChoiceParameterCalibrator<Link> calibrator,
 			TravelTime travelTimeCalculator, MultinomialLogitChoice chooser,
 			double delta) {
 		// init(calibrator, travelTimeCalculator);
@@ -140,6 +138,11 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * not to be done with MNL, but "ChangeExpBeta" as well as
 					 * "SelectExpBeta" can still be written in configfile
 					 */
+				} else {// with planInnovation
+					singleMnl = new MultinomialLogitCreator()
+							.createSingle(config);
+					((Events2Score4PC_mnl) chooser).setSinglePlanAttrs(
+							oldSelected, singleMnl);
 				}
 			} else {// ***********iter-firstIter<=maxPlanPerAgent************
 				if (iter - firstIter == 1) {
@@ -184,22 +187,27 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					selectedPlan.setScore(oldSelected.getScore());
 					oldSelected = null;
 
-					Vector p = new Vector(1/* (single-)choiceSetSize */);
-					p.set(0, 1d/* 100% */);
-
-					Matrix d = new Matrix(1/* n-choiceSetSize */,
-							paramDimension
-					// m-size of parameters that has to be calibrated
-					);
-					for (int i = 0; i < paramDimension; i++) {
-						d.setColumn(i, new Vector(0d));
-					}
-
+					/*
+					 * Vector p = new Vector(1/* (single-)choiceSetSize /);
+					 * p.set(0, 1d/* 100% /);
+					 *
+					 * Matrix d = new Matrix(1/* n-choiceSetSize /,
+					 * paramDimension // m-size of parameters that has to be
+					 * calibrated ); for (int i = 0; i < paramDimension; i++) {
+					 * d.setColumn(i, new Vector(0d)); }
+					 */
 					// ******************************************************
-					((ChoiceParameterCalibrator<Link>) calibrator)
-							.selectPlan(0,
-									getSinglePlanChoiceSet(selectedPlan), p, d,
-									null);
+
+					calibrator.selectPlan(0,
+							getSinglePlanChoiceSet(selectedPlan), singleMnl
+
+					/*
+					 * FUNCTIONS FOR CALIBRATOR 1,2 p, d, null FUNCTIONS FOR
+					 * CALIBRATOR 1,2
+					 */
+					);
+					singleMnl = null;
+
 					// **********************************************************
 				} else {// Change-/SelectExpBeta has been done.
 					int selectIdx = person.getPlans().indexOf(
@@ -207,48 +215,44 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					// ********************************************************
 					MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
 							.getMultinomialLogit();
-					Vector probs = mnl.getProbs();
 
-					if (Double.isNaN(probs.sum())) {
-						log.fatal("mnl/probs/NaN");
-						System.out
-								.println("selecteIdx from ChangeExpBeta (MATSim)\t"
-										+ selectIdx
-										+ "\nprobs\n"
-										+ probs
-										+ "\nperson\t"
-										+ person.getId()
-										+ "\nplans:");
-						List<? extends Plan> plans = person.getPlans();
-						for (int i = 0; i < plans.size(); i++) {
-							System.out.print(i + ". plan with score\t"
-									+ plans.get(i).getScore());
-							if (plans.get(i).isSelected()) {
-								System.out.println("\tselected");
-							} else {
-								System.out.println();
-							}
-						}
-					}
+					/*
+					 * FUNCTIONS FOR CALIBRATOR 1,2 Vector probs =
+					 * mnl.getProbs();
+					 *
+					 * if (Double.isNaN(probs.sum())) {
+					 * log.fatal("mnl/probs/NaN"); System.out
+					 * .println("selecteIdx from ChangeExpBeta (MATSim)\t" +
+					 * selectIdx + "\nprobs\n" + probs + "\nperson\t" +
+					 * person.getId() + "\nplans:"); List<? extends Plan> plans
+					 * = person.getPlans(); for (int i = 0; i < plans.size();
+					 * i++) { System.out.print(i + ". plan with score\t" +
+					 * plans.get(i).getScore()); if (plans.get(i).isSelected())
+					 * { System.out.println("\tselected"); } else {
+					 * System.out.println(); } } }
+					 *
+					 * List<Integer> attrIndices = new ArrayList<Integer>(); for
+					 * (String paramName : PCCtlListener.paramNames) {
+					 * attrIndices.add(Events2Score4PC.attrNameList
+					 * .indexOf(paramName)); }
+					 *
+					 * Matrix dProb_dParameters = mnl.get_dProb_dParameters(
+					 * attrIndices, false// with/out ASC /);
+					 *
+					 * List<? extends Matrix> d2ChoiceProb_dParam2 = mnl
+					 * .get_d2P_dbdb(delta, attrIndices, false); FUNCTIONS FOR
+					 * CALIBRATOR 1,2
+					 */
 
-					List<Integer> attrIndices = new ArrayList<Integer>();
-					for (String paramName : PCCtlListener.paramNames) {
-						attrIndices.add(Events2Score4PC.attrNameList
-								.indexOf(paramName));
-					}
-
-					Matrix dProb_dParameters = mnl.get_dProb_dParameters(
-							attrIndices, false/* with/out ASC */);
-
-					List<? extends Matrix> d2ChoiceProb_dParam2 = mnl
-							.get_d2P_dbdb(delta, attrIndices, false);
 					/* UPDATE PARAMETERS (OBSERVE THE PLAN CHOOSING IN MATSIM) */
 
-					/* int selectedIdx= */((ChoiceParameterCalibrator<Link>) calibrator)
-							.selectPlan(selectIdx,
-									getPlanChoiceSet((PersonImpl) person),
-									probs, dProb_dParameters,
-									d2ChoiceProb_dParam2);
+					/* int selectedIdx= */calibrator.selectPlan(selectIdx,
+							getPlanChoiceSet((PersonImpl) person), mnl
+					/*
+					 * FUNCTIONS FOR CALIBRATOR 1,2 probs, dProb_dParameters,
+					 * d2ChoiceProb_dParam2 FUNCTIONS FOR CALIBRATOR 1,2
+					 */
+					);
 					// ***************************************************
 				}
 			}
@@ -457,8 +461,8 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 	private void generateScoreCorrection(Plan plan) {
 		planConverter.convert((PlanImpl) plan);
 		cadyts.demand.Plan<Link> planSteps = planConverter.getPlanSteps();
-		double scoreCorrection = ((MATSimChoiceParameterCalibrator<Link>) calibrator)
-				.getUtilityCorrection(planSteps) / brainExpBeta;
+		double scoreCorrection = calibrator.getUtilityCorrection(planSteps)
+				/ config.planCalcScore().getBrainExpBeta();
 		// #######SAVE "utilityCorrection" 4 MNL.ASC#########
 		plan.getCustomAttributes().put(UTILITY_CORRECTION, scoreCorrection);
 		// ##################################################

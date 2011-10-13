@@ -51,7 +51,7 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experime
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.TripUtilOffsetExtractor.TripsWithUtilOffset;
 import playground.yu.utils.qgis.X2QGIS;
 import playground.yu.utils.qgis.MATSimNet2QGIS.ShapeFileWriter2;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 public class Trips2QGISRigorous implements X2QGIS {
 	private CoordinateReferenceSystem crs;
@@ -110,7 +110,7 @@ public class Trips2QGISRigorous implements X2QGIS {
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		double gridLength = 1000d;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -125,7 +125,7 @@ public class Trips2QGISRigorous implements X2QGIS {
 				counts, net, linkUtilOffsets, gridLength, arStartTime,
 				arEndTime);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(tuoExtractor);
 		// /////////////////////////////////

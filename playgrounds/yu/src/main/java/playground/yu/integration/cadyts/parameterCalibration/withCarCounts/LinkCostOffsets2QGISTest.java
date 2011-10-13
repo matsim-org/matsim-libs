@@ -39,12 +39,12 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 public class LinkCostOffsets2QGISTest {
 	private static boolean isInRange(final Id linkId, final Network net) {
-		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl("2531")).getCoord();
+		Coord distanceFilterCenterNodeCoord = net.getNodes()
+				.get(new IdImpl("2531")).getCoord();
 		double distanceFilter = 30000;
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {
@@ -75,7 +75,8 @@ public class LinkCostOffsets2QGISTest {
 		int arStartTime = 7;
 		int arEndTime = 20;
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
 
 		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);

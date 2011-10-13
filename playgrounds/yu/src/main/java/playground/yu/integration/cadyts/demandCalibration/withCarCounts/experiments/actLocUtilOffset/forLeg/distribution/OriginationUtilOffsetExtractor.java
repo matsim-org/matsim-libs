@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.distribution;
 
@@ -51,13 +51,13 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkC
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.AreaUtilityOffsets;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.ActivityLocationUtilOffset2QGIS4Distribution;
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * shows the Utility Offset of activity location for originating traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class OriginationUtilOffsetExtractor extends
 		ActivityLocationUtilOffsetExtractor implements ActivityEndEventHandler,
@@ -75,6 +75,7 @@ public class OriginationUtilOffsetExtractor extends
 				lowerLimit, gridLength);
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id agentId = event.getPersonId();
 		if (endedActs.containsKey(agentId))/* Is it a legal Leg? */{
@@ -85,11 +86,13 @@ public class OriginationUtilOffsetExtractor extends
 	/**
 	 * one trip ends
 	 */
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		Id agentId = event.getPersonId();
 		internalHandleEvent(endedActs.remove(agentId));
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		endedActs.put(event.getPersonId(), event);
 		/* beginning of new Leg */
@@ -98,6 +101,7 @@ public class OriginationUtilOffsetExtractor extends
 	/**
 	 * addition of
 	 */
+	@Override
 	public void output(String outputFilenameBase) {
 		// for (Id agentId : this.tmpAgentLegUtilOffsets.keySet()) {
 		// ActivityEndEvent aee = this.endedActs.remove(agentId);
@@ -124,7 +128,7 @@ public class OriginationUtilOffsetExtractor extends
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 20;
 		double gridLength = 1000d;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -140,7 +144,7 @@ public class OriginationUtilOffsetExtractor extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, gridLength);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

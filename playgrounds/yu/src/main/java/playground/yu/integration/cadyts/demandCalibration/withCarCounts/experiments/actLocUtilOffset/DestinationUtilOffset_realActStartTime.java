@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset;
 
@@ -60,13 +60,13 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qg
 import playground.yu.utils.container.Collection2Array;
 import playground.yu.utils.io.DistributionCreator;
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * shows the Utility Offset of activity location for terminating traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DestinationUtilOffset_realActStartTime extends
 		ActivityLocationUtilOffsetExtractor implements
@@ -87,6 +87,7 @@ public class DestinationUtilOffset_realActStartTime extends
 		this.params = params;
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event != null) {
 			Id agentId = event.getPersonId();
@@ -98,6 +99,7 @@ public class DestinationUtilOffset_realActStartTime extends
 		}
 	}
 
+	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (event != null) {
 			Id agentId = event.getPersonId();
@@ -157,6 +159,7 @@ public class DestinationUtilOffset_realActStartTime extends
 		}
 	}
 
+	@Override
 	public void output(String outputFilenameBase) {
 		XYScatterChart chart = new XYScatterChart(
 				"tripUtilOffset <-> real activity start time",
@@ -214,7 +217,7 @@ public class DestinationUtilOffset_realActStartTime extends
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 
 		Config config = ConfigUtils.loadConfig(configFilename);
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -231,7 +234,7 @@ public class DestinationUtilOffset_realActStartTime extends
 				lowerLimit, 1000d, new CharyparNagelScoringParameters(config
 						.planCalcScore()));
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

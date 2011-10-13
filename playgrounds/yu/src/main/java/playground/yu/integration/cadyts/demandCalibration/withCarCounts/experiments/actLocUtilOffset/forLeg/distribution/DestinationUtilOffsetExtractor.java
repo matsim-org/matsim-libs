@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.forLeg.distribution;
 
@@ -46,13 +46,13 @@ import playground.yu.integration.cadyts.demandCalibration.withCarCounts.BseLinkC
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.actLocUtilOffset.AreaUtilityOffsets;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.ActivityLocationUtilOffset2QGIS4Distribution;
 import playground.yu.utils.qgis.X2QGIS;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 /**
  * shows the Utility Offset of activity location for terminating traffic
- * 
+ *
  * @author yu
- * 
+ *
  */
 public class DestinationUtilOffsetExtractor extends
 		ActivityLocationUtilOffsetExtractor implements
@@ -65,6 +65,7 @@ public class DestinationUtilOffsetExtractor extends
 				lowerLimit, gridLength);
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		internalHandleEvent(event);
 	}
@@ -83,7 +84,7 @@ public class DestinationUtilOffsetExtractor extends
 		int arStartTime = 9, arEndTime = 9, lowerLimit = 20;
 		double gridLength = 1000d;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
@@ -99,7 +100,7 @@ public class DestinationUtilOffsetExtractor extends
 				net, counts, linkUtilOffsets, arStartTime, arEndTime,
 				lowerLimit, gridLength);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		// /////////////////////////////////
 		events.addHandler(aluoe);
 		// /////////////////////////////////

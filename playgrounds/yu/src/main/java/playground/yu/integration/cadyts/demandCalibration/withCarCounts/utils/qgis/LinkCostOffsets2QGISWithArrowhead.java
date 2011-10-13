@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis;
 
@@ -49,7 +49,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.yu.utils.qgis.MATSimNet2QGIS;
 import playground.yu.utils.qgis.Network2PolygonGraph;
 import playground.yu.utils.qgis.X2GraphImpl;
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * @author yu
- * 
+ *
  */
 public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 	public static class LinkCostOffsets2PolygonGraphWithArrowhead extends
@@ -84,6 +84,7 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 					.addTypes(new AttributeType[] { geom, id });
 		}
 
+		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
 				NumberFormatException, IllegalAttributeException {
 			for (int i = 0; i < attrTypes.size(); i++) {
@@ -108,6 +109,7 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 			return features;
 		}
 
+		@Override
 		protected LinearRing getLinearRing(Link link) {
 			// //////////////////////////////////////////////////////////////
 			double width = getLinkWidth(link);

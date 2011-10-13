@@ -46,13 +46,13 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.exper
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.io.SimpleWriter;
-import cadyts.utilities.math.BasicStatistics;
-import cadyts.utilities.math.MultinomialLogit;
-import cadyts.utilities.math.Vector;
+import utilities.math.BasicStatistics;
+import utilities.math.MultinomialLogit;
+import utilities.math.Vector;
 
 /**
  * @author yu
- * 
+ *
  */
 public class Events2Score4PC_mnl extends Events2Score4PC implements
 		MultinomialLogitChoice {
@@ -92,23 +92,157 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 		this.mnl = mnl;
 	}
 
+	public void setSinglePlanAttrs(Plan plan, MultinomialLogit mnl) {
+		Id personId = plan.getPerson().getId();
+		Double legDurCar = legDursCar.get(personId).get(plan), legDurPt = legDursPt
+				.get(personId).get(plan), legDurWalk = legDursWalk
+				.get(personId).get(plan),
+
+		perfAttr = actAttrs.get(personId).get(plan), stuckAttr = stuckAttrs
+				.get(personId).get(plan),
+
+		distanceCar = distancesCar.get(personId).get(plan), distancePt = distancesPt
+				.get(personId).get(plan), distanceWalk = distancesWalk.get(
+				personId).get(plan);
+
+		Integer carLegNo = carLegNos.get(personId).get(plan), ptLegNo = ptLegNos
+				.get(personId).get(plan), walkLegNo = walkLegNos.get(personId)
+				.get(plan);
+
+		// nullpoint check
+		if (legDurCar == null || legDurPt == null || legDurWalk == null
+
+		|| perfAttr == null || stuckAttr == null
+
+		|| distanceCar == null || distancePt == null || distanceWalk == null
+
+		|| carLegNo == null || ptLegNo == null || walkLegNo == null) {
+			throw new NullPointerException("BSE:\t\tfergot to save some attr?");
+		}
+
+		// NaN check
+		if (Double.isNaN(legDurCar) || Double.isNaN(legDurPt)
+				|| Double.isNaN(legDurWalk)
+
+				|| Double.isNaN(perfAttr) || Double.isNaN(stuckAttr)
+
+				|| Double.isNaN(distanceCar) || Double.isNaN(distancePt)
+				|| Double.isNaN(distanceWalk)
+
+				|| Double.isNaN(carLegNo) || Double.isNaN(ptLegNo)
+				|| Double.isNaN(walkLegNo)) {
+			log.warn("\tNaN Exception:\nattr of traveling\t" + legDurCar
+					+ "\nattr of travelingPt\t" + legDurPt
+					+ "\nattr of travelingWalk\t" + legDurWalk
+
+					+ "\nattr of stuck\t" + stuckAttr
+					+ "\nattr of performing\t" + perfAttr
+
+					+ "\ncar distance\t" + distanceCar + "\npt distance\t"
+					+ distancePt + "\nwalk distance\t" + distanceWalk
+
+					+ "\ncar leg No.\t" + carLegNo + "\npt leg No.\t" + ptLegNo
+					+ "\nwalk leg No.\t" + walkLegNo
+
+			);
+			throw new RuntimeException();
+			// ///////////////////////////////////////////////////////////////
+		}
+		int choiceIdx = 0
+		// plans.indexOf(plan)
+		;
+
+		// if (plans.size() <= maxPlansPerAgent)/* with mnl */{
+		// choice set index & size check
+		if (choiceIdx < 0 || choiceIdx >= mnl.getChoiceSetSize()) {
+			log.warn("IndexOutofBound, choiceIdx<0 or >=choiceSetSize!\nperson "
+					+ personId + " the " + choiceIdx + ". Plan");
+			throw new RuntimeException();
+		}
+
+		// set attributes to MultinomialLogit
+		// travelTime
+		int attrNameIndex = attrNameList.indexOf("traveling");
+		mnl.setAttribute(choiceIdx, attrNameIndex, legDurCar
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("travelingPt");
+		mnl.setAttribute(choiceIdx, attrNameIndex, legDurPt
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("travelingWalk");
+		mnl.setAttribute(choiceIdx, attrNameIndex, legDurWalk
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		//
+		attrNameIndex = attrNameList.indexOf("performing");
+		mnl.setAttribute(choiceIdx, attrNameIndex, perfAttr
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("stuck");
+		mnl.setAttribute(choiceIdx, attrNameIndex, stuckAttr
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		// distances
+		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRateCar");
+		mnl.setAttribute(choiceIdx, attrNameIndex, distanceCar
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
+		mnl.setAttribute(choiceIdx, attrNameIndex, distancePt
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
+		mnl.setAttribute(choiceIdx, attrNameIndex, distanceWalk
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		// offsets
+		attrNameIndex = attrNameList.indexOf("constantCar");
+		mnl.setAttribute(choiceIdx, attrNameIndex, carLegNo
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("constantPt");
+		mnl.setAttribute(choiceIdx, attrNameIndex, ptLegNo
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		attrNameIndex = attrNameList.indexOf("constantWalk");
+		mnl.setAttribute(choiceIdx, attrNameIndex, walkLegNo
+				/ paramScaleFactorList.get(attrNameIndex));
+
+		// ##########################################################
+		/*
+		 * ASC (utilityCorrection, ASC for "stay home" Plan in the future...)
+		 */
+		// #############################################
+
+		Object uc = plan.getCustomAttributes().get(
+				BseStrategyManager.UTILITY_CORRECTION);
+
+		// add UC as ASC into MNL
+
+		if (setUCinMNL) {
+			mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
+		}
+
+	}
+
 	/**
 	 * set Attr. plans of a person. This method should be called after
 	 * removedPlans, i.e. there should be only choiceSetSize plans in the memory
 	 * of an agent.
-	 * 
+	 *
 	 * @param person
 	 */
 	@Override
 	public void setPersonAttrs(Person person, BasicStatistics[] statistics) {
-		Id agentId = person.getId();
-		Map<Plan, Double> legDurMapCar = legDursCar.get(agentId), legDurMapPt = legDursPt
-				.get(agentId), legDurMapWalk = legDursWalk.get(agentId), perfAttrMap = actAttrs
-				.get(agentId), stuckAttrMap = stuckAttrs.get(agentId), distanceMapCar = distancesCar
-				.get(agentId), distanceMapPt = distancesPt.get(agentId), distanceMapWalk = distancesWalk
-				.get(agentId);
-		Map<Plan, Integer> carLegNoMap = carLegNos.get(agentId), ptLegNoMap = ptLegNos
-				.get(agentId), walkLegNoMap = walkLegNos.get(agentId);
+		Id personId = person.getId();
+		Map<Plan, Double> legDurMapCar = legDursCar.get(personId), legDurMapPt = legDursPt
+				.get(personId), legDurMapWalk = legDursWalk.get(personId), perfAttrMap = actAttrs
+				.get(personId), stuckAttrMap = stuckAttrs.get(personId), distanceMapCar = distancesCar
+				.get(personId), distanceMapPt = distancesPt.get(personId), distanceMapWalk = distancesWalk
+				.get(personId);
+		Map<Plan, Integer> carLegNoMap = carLegNos.get(personId), ptLegNoMap = ptLegNos
+				.get(personId), walkLegNoMap = walkLegNos.get(personId);
 		// nullpoint check
 		if (legDurMapCar == null || legDurMapPt == null
 				|| legDurMapWalk == null
@@ -120,7 +254,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				|| carLegNoMap == null || ptLegNoMap == null
 				|| walkLegNoMap == null) {
-			throw new NullPointerException("BSE:\t\twasn't person\t" + agentId
+			throw new NullPointerException("BSE:\t\twasn't person\t" + personId
 					+ "\tsimulated?????");
 		}
 
@@ -135,6 +269,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 			distanceCar = distanceMapCar.get(plan), distancePt = distanceMapPt
 					.get(plan), distanceWalk = distanceMapWalk.get(plan);
+
 			Integer carLegNo = carLegNoMap.get(plan), ptLegNo = ptLegNoMap
 					.get(plan), walkLegNo = walkLegNoMap.get(plan);
 
@@ -184,7 +319,7 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 				// choice set index & size check
 				if (choiceIdx < 0 || choiceIdx >= mnl.getChoiceSetSize()) {
 					log.warn("IndexOutofBound, choiceIdx<0 or >=choiceSetSize!\nperson "
-							+ agentId + " the " + choiceIdx + ". Plan");
+							+ personId + " the " + choiceIdx + ". Plan");
 					throw new RuntimeException();
 				}
 
@@ -258,8 +393,9 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 
 				// add UC as ASC into MNL
 
-				if (setUCinMNL)
+				if (setUCinMNL) {
 					mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
+				}
 			}
 		}
 	}

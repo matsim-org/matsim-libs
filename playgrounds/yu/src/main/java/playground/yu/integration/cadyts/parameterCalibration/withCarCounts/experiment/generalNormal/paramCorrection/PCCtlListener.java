@@ -56,13 +56,11 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlVa
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
 import playground.yu.utils.io.SimpleWriter;
-import cadyts.calibrators.Calibrator;
-import cadyts.calibrators.analytical.ChoiceParameterCalibrator;
+import utilities.math.MultinomialLogit;
+import utilities.math.Vector;
+import utilities.misc.DynamicData;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.utilities.math.MultinomialLogit;
-import cadyts.utilities.math.Vector;
-import cadyts.utilities.misc.DynamicData;
 
 public class PCCtlListener extends BseParamCalibrationControlerListener
 		implements StartupListener, ShutdownListener, IterationEndsListener {
@@ -87,7 +85,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private double llhSum = 0d;
 	private boolean writeQGISFile = true;
 
-	// private ChoiceParameterCalibrator2<Link> calibrator = null;
+	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private void setMatsimParameters(Controler ctl) {
 		final Network network = ctl.getNetwork();
 		Config config = ctl.getConfig();
@@ -139,19 +137,28 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				BSE_CONFIG_MODULE_NAME, "regressionInertia");
 		double regressionInertia = 0;
 		if (regressionInertiaValue == null) {
-			System.out.println("BSE:\tregressionInertia\t= default value\t"
-					+ Calibrator.DEFAULT_REGRESSION_INERTIA);
-			regressionInertia = Calibrator.DEFAULT_REGRESSION_INERTIA;
+			System.out
+					.println("BSE:\tregressionInertia\t= default value\t"
+							+ MATSimChoiceParameterCalibrator.DEFAULT_REGRESSION_INERTIA);
+			regressionInertia = MATSimChoiceParameterCalibrator.DEFAULT_REGRESSION_INERTIA;
 		} else {
 			regressionInertia = Double.parseDouble(regressionInertiaValue);
 			System.out.println("BSE:\tregressionInertia\t=\t"
 					+ regressionInertia);
 		}
 
+		List<Integer> calibratedParameterIndices = new ArrayList<Integer>();
+		for (String paramName : paramNames) {
+			calibratedParameterIndices.add(Events2Score4PC.attrNameList
+					.indexOf(paramName));
+		}
+
 		// INITIALIZING "Calibrator"
+		MatsimRandom.reset(config.global().getRandomSeed());
 		calibrator = new MATSimChoiceParameterCalibrator<Link>(
 				ctlIO.getOutputFilename("calibration.log"),
-				MatsimRandom.getLocalInstance(), regressionInertia, paramDim);
+				MatsimRandom.getLocalInstance(), regressionInertia,
+				calibratedParameterIndices);
 
 		// SETTING staticsFile
 		calibrator.setStatisticsFile(ctlIO
@@ -183,11 +190,10 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			}
 		}
 
-		((ChoiceParameterCalibrator<Link>) calibrator)
-				.setInitialParameters(initialParams);// without ASC
+		calibrator.setInitialParameters(initialParams);// without ASC
 	}
 
-	private void setInitialParameterVariancesInCalbrator(Config config) {
+	private void setInitialParameterVariancesInCalibrator(Config config) {
 		String setInitialParamVarStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 				"setInitialParameterVariances");
 		if (setInitialParamVarStr != null) {
@@ -200,8 +206,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 									PARAM_STDDEV_INDEX + i)));// [traveling,performing]
 				}
 
-				((ChoiceParameterCalibrator<Link>) calibrator)
-						.setInitialParameterVariances(initialParamVars);
+				calibrator.setInitialParameterVariances(initialParamVars);
 			}
 		} else {
 			Logger.getLogger("BSE:\tNo setting of setInitialParameterVariances, so it is accepted as FALSE");
@@ -254,14 +259,13 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (useApproximateNewtonStr != null) {
 				boolean useApproximateNewton = Boolean
 						.parseBoolean(useApproximateNewtonStr);
-				((ChoiceParameterCalibrator<Link>) calibrator)
-						.setUseApproximateNetwton(useApproximateNewton);
+				calibrator.setUseApproximateNetwton(useApproximateNewton);
 				System.out.println("BSE:\tuseApproximateNetwton\t=\t"
 						+ useApproximateNewton);
 			} else {
 				System.out
 						.println("BSE:\tuseApproximateNetwton\t= default value\t"
-								+ ChoiceParameterCalibrator.DEFAULT_USE_APPROXIMATE_NEWTON);
+								+ MATSimChoiceParameterCalibrator.DEFAULT_USE_APPROXIMATE_NEWTON);
 			}
 		}
 
@@ -278,25 +282,26 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			} else {
 				System.out
 						.println("BSE:\tproportionalAssignment\t= default value\t"
-								+ Calibrator.DEFAULT_PROPORTIONAL_ASSIGNMENT);
+								+ MATSimChoiceParameterCalibrator.DEFAULT_PROPORTIONAL_ASSIGNMENT);
 			}
 		}
 
 		// SETTING FREEZE ITERATION
-		// {
-		// final String freezeIterationStr =
-		// config.findParam(BSE_CONFIG_MODULE_NAME,
-		// "freezeIteration");
-		// if (freezeIterationStr != null) {
-		// final int freezeIteration = Integer
-		// .parseInt(freezeIterationStr);
-		// System.out.println("BSE:\tfreezeIteration\t= "
-		// + freezeIteration);
-		// calibrator.setFreezeIteration(freezeIteration);
-		// } else
-		// System.out.println("BSE:\tfreezeIteration\t= default value\t"
-		// + Calibrator.DEFAULT_FREEZE_ITERATION);
-		// }
+		{
+			final String freezeIterationStr = config.findParam(
+					BSE_CONFIG_MODULE_NAME, "freezeIteration");
+			if (freezeIterationStr != null) {
+				final int freezeIteration = Integer
+						.parseInt(freezeIterationStr);
+				System.out.println("BSE:\tfreezeIteration\t= "
+						+ freezeIteration);
+				calibrator.setFreezeIteration(freezeIteration);
+			} else {
+				System.out
+						.println("BSE:\tfreezeIteration\t= default value\t"
+								+ MATSimChoiceParameterCalibrator.DEFAULT_FREEZE_ITERATION);
+			}
+		}
 
 		// SETTING MINSTDDEV
 		{
@@ -307,8 +312,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				calibrator.setMinStddev(minStdDev, TYPE.FLOW_VEH_H);
 				System.out.println("BSE:\tminStdDev\t= " + minStdDev);
 			} else {
-				System.out.println("BSE:\tminStdDev\t= default value\t"
-						+ Calibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H);
+				System.out
+						.println("BSE:\tminStdDev\t= default value\t"
+								+ MATSimChoiceParameterCalibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H);
 			}
 		}
 		// SETTING Preparatory Iterations
@@ -324,7 +330,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			} else {
 				System.out
 						.println("BSE:\tpreparatoryIterations\t= default value\t"
-								+ Calibrator.DEFAULT_PREPARATORY_ITERATIONS);
+								+ MATSimChoiceParameterCalibrator.DEFAULT_PREPARATORY_ITERATIONS);
 			}
 		}
 		// SETTING varianceScale
@@ -337,10 +343,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				System.out.println("BSE:\tvarianceScale\t= " + varianceScale);
 				calibrator.setVarianceScale(varianceScale);
 			} else {
-				System.out.println("BSE:\tvarianceScale\t= default value\t"
-						+ Calibrator.DEFAULT_VARIANCE_SCALE);
+				System.out
+						.println("BSE:\tvarianceScale\t= default value\t"
+								+ MATSimChoiceParameterCalibrator.DEFAULT_VARIANCE_SCALE);
 			}
 		}
+
 		// SETTING parameterStepSize
 		{
 			String initialStepSizeStr = config.findParam(
@@ -349,11 +357,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			if (initialStepSizeStr != null) {
 				double initialStepSize = Double.parseDouble(initialStepSizeStr);
 				System.out.println(initialStepSize);
-				((ChoiceParameterCalibrator<Link>) calibrator)
-						.setInitialStepSize(initialStepSize);
+				calibrator.setInitialStepSize(initialStepSize);
 			} else {
-				System.out.println("default value\t"
-						+ ChoiceParameterCalibrator.DEFAULT_INITIAL_STEP_SIZE);
+				System.out
+						.println("default value\t"
+								+ MATSimChoiceParameterCalibrator.DEFAULT_INITIAL_STEP_SIZE);
 			}
 		}
 		// SETTING msaExponent
@@ -366,12 +374,11 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 					"msaExponent");
 			if (msaExponentStr != null) {
 				double msaExponent = Double.parseDouble(msaExponentStr);
-				((ChoiceParameterCalibrator<Link>) calibrator)
-						.setMsaExponent(msaExponent);
+				calibrator.setMsaExponent(msaExponent);
 				System.out.println("BSE:\tmsaExponent\t=" + msaExponent);
 			} else {
 				System.out.println("BSE:\tmsaExponent\t= default value\t"
-						+ ChoiceParameterCalibrator.DEFAULT_MSA_EXPONENT);
+						+ MATSimChoiceParameterCalibrator.DEFAULT_MSA_EXPONENT);
 			}
 		}
 	}
@@ -387,8 +394,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager()).init(
-				(ChoiceParameterCalibrator<Link>) calibrator,
+		((PCStrMn) ctl.getStrategyManager()).init(calibrator,
 				ctl.getTravelTimeCalculator(),
 				(MultinomialLogitChoice) chooser, delta);
 	}
@@ -408,13 +414,14 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		{
 			writerCV = new SimpleWriter(
 					ctlIO.getOutputFilename("parameterCovariance.log"));
-			StringBuffer sb = new StringBuffer("iter\tmatrix/Covariance ["
+			StringBuffer sb = new StringBuffer("iter\tcovariance ["
 					+ paramNames[0]);
 			for (int i = 1; i < paramNames.length; i++) {
 				sb.append(", ");
 				sb.append(paramNames[i]);
 			}
-			sb.append("]");
+			sb.append("]\texpectation of variance\tvariance of expectation");
+
 			writerCV.writeln(sb);
 		}
 		{
@@ -464,7 +471,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		// *********SETTING PARAMETERS FOR "PARAMETER CALIBRATION"****
 		setInitialParametersInCalibrator(config);
-		setInitialParameterVariancesInCalbrator(config);
+		setInitialParameterVariancesInCalibrator(config);
 
 		// *******************SETTING CALIBRATOR********************
 		setCalibratorParameters(config);
@@ -525,7 +532,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	}
 
 	public void setWriteQGISFile(boolean writeQGISFile) {
-		this.writeQGISFile = writeQGISFile;
+		writeQGISFile = writeQGISFile;
 	}
 
 	private void outputHalfway(Controler ctl, int outputIterInterval) {
@@ -596,15 +603,22 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				}
 			}
 			// ************************************************
-			writerCV.writeln(iter
-					+ ":\n"
-					+ ((ChoiceParameterCalibrator<Link>) calibrator)
-							.getParameterCovariance());
+			if (calibrator.getParameterCovariance() != null) {
+				writerCV.writeln(iter
+						+ "\t"
+						+ calibrator.getParameterCovariance()
+								.toSingleLineString()
+						+ "\t"
+						+ calibrator.getParameterCovarianceExpOfVarComponent()
+								.toSingleLineString()
+						+ "\t"
+						+ calibrator.getParameterCovarianceVarOfExpComponent()
+								.toSingleLineString());
+			}
 			writerCV.flush();
 
 			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
-			Vector params = ((ChoiceParameterCalibrator<Link>) calibrator)
-					.getParameters();
+			Vector params = calibrator.getParameters();
 			PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 			// VERY IMPORTANT #########################################
@@ -615,8 +629,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 				// *******should after Scoring Listener!!!*******
 
-				if (((ChoiceParameterCalibrator<Link>) calibrator)
-						.getInitialStepSize() != 0d) {
+				if (calibrator.getInitialStepSize() != 0d) {
 
 					StringBuffer sb = new StringBuffer(Integer.toString(iter));
 

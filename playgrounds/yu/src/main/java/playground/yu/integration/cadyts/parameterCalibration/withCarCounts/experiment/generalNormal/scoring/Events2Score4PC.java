@@ -47,11 +47,11 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
-import cadyts.utilities.math.BasicStatistics;
+import utilities.math.BasicStatistics;
 
 /**
  * @author yu
- * 
+ *
  */
 public abstract class Events2Score4PC extends EventsToScore implements
 		CadytsChoice {
@@ -173,7 +173,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 * 
+	 *
 	 * @param person
 	 * @param monetaryDistanceCostRateCarStats
 	 */
@@ -362,6 +362,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		}
 	}
 
+	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event
 				.getPersonId());
@@ -375,9 +376,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	}
 
 	private int getAgentPlanElementIndex(Id personId) {
-		Integer index = this.agentPlanElementIndex.get(personId);
+		Integer index = agentPlanElementIndex.get(personId);
 		if (index == null) {
-			this.agentPlanElementIndex.put(personId, Integer.valueOf(0));
+			agentPlanElementIndex.put(personId, Integer.valueOf(0));
 			return 0;
 		}
 		return index.intValue();
