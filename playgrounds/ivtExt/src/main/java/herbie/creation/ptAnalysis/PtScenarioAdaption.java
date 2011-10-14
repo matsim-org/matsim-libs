@@ -58,7 +58,7 @@ public class PtScenarioAdaption {
 	private TreeMap<Double, Departure> newDepartures;
 	private double currentInterval;
 	private long pastId;
-	private Double pastDeparture;
+	private Double implDeparture;
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -114,32 +114,39 @@ public class PtScenarioAdaption {
 				if(departures == null || departures.size() < 2) continue;
 				
 				newDepartures = new TreeMap<Double, Departure>();
-				TreeMap<Double, Departure> departuresTimes = new TreeMap<Double, Departure>();
 				
+				TreeMap<Double, Departure> departuresTimes = new TreeMap<Double, Departure>();
 				for(Departure departure : departures.values()){
 					departuresTimes.put(departure.getDepartureTime(), departure);
 				}
 						
 //				 test:
-				for(Double depTime : departuresTimes.keySet()) System.out.println("depTime "+ depTime);
+				for(Double depTime : departuresTimes.keySet()) System.out.println(" depTime " + depTime);
 				System.out.println("End test.");
 				
 				pastId = Long.parseLong(departuresTimes.get(departuresTimes.firstKey()).getId().toString());
-				pastDeparture = departuresTimes.firstKey();
+				
+				implDeparture = departuresTimes.firstKey();
+				copyFirstDeparture();
+				
+				currentInterval = (departuresTimes.higherKey(implDeparture) - implDeparture) / 60d;
 				
 				for(Double depTime : departuresTimes.keySet()){
 					
-					if(departuresTimes.lastKey() == depTime) continue;
-					
-					currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
-					
-					if(departuresTimes.lastKey() != (depTime + currentInterval * 60) &&
+					if(departuresTimes.lastKey() != depTime &&
 							(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
 						continue;
 					}
-					System.out.println();
-					addNewDepartures(departuresTimes.higherKey(depTime), departuresTimes.get(depTime));
-					pastDeparture = depTime;
+					
+					if(departuresTimes.lastKey() == depTime) {
+						addNewDepartures(depTime + getNewInterval() * 60d);
+					}
+					else {
+						
+						addNewDepartures((depTime));
+						currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
+						System.out.println();
+					}
 				}
 				
 				this.removeDepartures((TransitRouteImpl) route);
@@ -152,6 +159,13 @@ public class PtScenarioAdaption {
 		log.info("Double headway ... done");
 	}
 	
+	private void copyFirstDeparture() {
+		
+		IdImpl newId = new IdImpl(pastId);
+		Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
+		newDepartures.put(implDeparture, newDepImpl);
+	}
+
 	private void removeDepartures(TransitRouteImpl route) {
 		
 		Stack<Id> stackId = new Stack<Id>();
@@ -168,31 +182,32 @@ public class PtScenarioAdaption {
 
 	private void addNewDepartures(TransitRoute route) {
 		for(Departure departure : newDepartures.values()){
+			
+			Id vehicleId = new IdImpl("tr_"+departure.getId().toString());
+			departure.setVehicleId(vehicleId);
+			
 			route.addDeparture(departure);
+			System.out.println("depTime: " + departure.getDepartureTime());
 		}
 		System.out.println();
 	}
 	
-	private void addNewDepartures(Double upperThreshold, Departure departure) {
-		
-		// Copy first departure:
-		IdImpl newId = new IdImpl(++pastId);
-		Departure newDepImpl = this.transitFactory.createDeparture(newId, pastDeparture);
-		newDepartures.put(pastDeparture, newDepImpl);
+	private void addNewDepartures(Double upperThreshold) {
 		
 		// Add departures if headway is within the range:
 		if(currentInterval > relHeadwayClasses[0] && currentInterval <= relHeadwayClasses[relHeadwayClasses.length - 1]) 
 		{
 			double newInterval = getNewInterval();
-			while(pastDeparture + newInterval  *60d < upperThreshold){
+
+			while(implDeparture  < upperThreshold){
 				
-				newId = new IdImpl(++pastId);
+				IdImpl newId = new IdImpl(++pastId);
 				
-				newDepImpl = this.transitFactory.createDeparture(newId, pastDeparture + newInterval * 60d);
+				Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture + newInterval * 60d);
 				
-				newDepartures.put(pastDeparture + newInterval *60d, newDepImpl);
+				newDepartures.put(implDeparture + newInterval *60d, newDepImpl);
 				
-				pastDeparture = pastDeparture + newInterval * 60d;
+				implDeparture = implDeparture + newInterval * 60d;
 			}
 		}
 		else
@@ -203,16 +218,14 @@ public class PtScenarioAdaption {
 	
 
 	private void copyExistingDepartures(double upperThreshold) {
-		while ((pastDeparture + currentInterval*60) <= upperThreshold){
-			
-			IdImpl newId = new IdImpl(++pastId);
-			
-			Departure newDepImpl = new DepartureImpl(newId, pastDeparture + currentInterval * 60d);
-			
-			newDepartures.put(pastDeparture + currentInterval *60d, newDepImpl);
-			
-			pastDeparture = pastDeparture + currentInterval * 60d;
-		}
+		
+		IdImpl newId = new IdImpl(++pastId);
+		
+		Departure newDepImpl = new DepartureImpl(newId, implDeparture + currentInterval *60d);
+		
+		newDepartures.put(implDeparture + currentInterval *60d, newDepImpl);
+		
+		implDeparture = implDeparture + currentInterval * 60d;
 	}
 
 	private double getNewInterval() {
@@ -226,7 +239,6 @@ public class PtScenarioAdaption {
 	private void writeScenario() {
 		log.info("Writing new network file ...");
 		
-		new NetworkWriter(this.scenario.getNetwork()).write(this.outpath + "network.xml.gz");
 		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(this.outpath + "transitSchedule.xml.gz");
 		
 		log.info("Writing new network file ... done");
