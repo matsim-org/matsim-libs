@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.facilities.algorithms.FacilitiesDefineCapAndOpentime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.knowledges.KnowledgesImpl;
@@ -98,7 +99,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("running testInitDemand()...");
 
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
+		
 		log.info("  reading facilites xml file as a layer of the world...");
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
@@ -134,6 +135,13 @@ public class TriangleTest extends MatsimTestCase {
 
 		log.info("  running plans modules... ");
 		new PlansCreateFromNetwork(ns_algo,2.0).run(plans);
+		/*
+		 * After switching from TreeMap to LinkedHashMap it is necessary to sort a
+		 * population manually, of the persons are not added according to their
+		 * natural order.  
+		 * cdobler, oct'11
+		 */
+		PopulationUtils.sortPersons(plans);
 		log.info("  done.");
 
 		log.info("\n");

@@ -27,6 +27,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -52,7 +53,9 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
@@ -111,8 +114,15 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	public void testBetaTravel_6() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
-		config.controler().setWritePlansInterval(0);
-		TestControler controler = new TestControler(config);
+		config.controler().setWritePlansInterval(0);	
+		/*
+		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
+		 * to store the persons in the population, we have to sort the population manually.  
+		 * cdobler, oct'11
+		 */
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		PopulationUtils.sortPersons(scenario.getPopulation());
+		TestControler controler = new TestControler(scenario);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -128,7 +138,14 @@ public class BetaTravelTest extends MatsimTestCase {
 	public void testBetaTravel_66() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		config.controler().setWritePlansInterval(0);
-		TestControler controler = new TestControler(config);
+		/*
+		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
+		 * to store the persons in the population, we have to sort the population manually.  
+		 * cdobler, oct'11
+		 */
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		PopulationUtils.sortPersons(scenario.getPopulation());
+		TestControler controler = new TestControler(scenario);
 		controler.addControlerListener(new TestControlerListener());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -252,8 +269,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	private static class TestControler extends Controler {
 
-		protected TestControler(final Config config) {
-			super(config);
+		protected TestControler(final Scenario scenario) {
+			super(scenario);
 		}
 
 		@Override

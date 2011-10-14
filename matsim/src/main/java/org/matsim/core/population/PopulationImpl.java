@@ -21,8 +21,8 @@
 package org.matsim.core.population;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +46,7 @@ public class PopulationImpl implements Population {
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
 	
-	private Map<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
+	private Map<Id, PersonImpl> persons = new LinkedHashMap<Id, PersonImpl>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();

@@ -54,6 +54,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -131,7 +132,7 @@ public class SelectedPlans2ESRIShape {
 
 	private void drawOutputSample() {
 		this.outputSamplePlans = new ArrayList<Plan>();
-		for (Person pers : this.population.getPersons().values()) {
+		for (Person pers : PopulationUtils.getSortedPersons(this.population).values()) {
 			if (MatsimRandom.getRandom().nextDouble() <= this.outputSample) {
 				this.outputSamplePlans.add(pers.getSelectedPlan());
 			}

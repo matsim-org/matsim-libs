@@ -20,9 +20,12 @@
 
 package org.matsim.integration.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -49,7 +52,14 @@ public class ResumableRunsTest extends MatsimTestCase {
 
 		// run1
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
-		Controler controler1 = new Controler(config);
+		/*
+		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
+		 * to store the persons in the population, we have to sort the population manually.  
+		 * cdobler, oct'11
+		 */
+		Scenario scenario1 = ScenarioUtils.loadScenario(config);
+		PopulationUtils.sortPersons(scenario1.getPopulation());
+		Controler controler1 = new Controler(scenario1);
 		controler1.setCreateGraphs(false);
 		controler1.setDumpDataAtEnd(false);
 		controler1.run();

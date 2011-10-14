@@ -32,6 +32,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -139,7 +140,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	}
 
 	public final void writePersons() {
-		for (Person p : this.population.getPersons().values()) {
+		for (Person p : PopulationUtils.getSortedPersons(this.population).values()) {
 			writePerson(p);
 		}
 	}

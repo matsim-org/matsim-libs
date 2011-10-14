@@ -18,17 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.population;
+package org.matsim.core.utils.misc;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 
 /**
  * @author nagel
@@ -103,4 +107,26 @@ public class PopulationUtils {
 
 	}
 
+	/**
+	 * @param population
+	 * @return sorted map containing containing the persons as values and their ids as keys.
+	 */
+	public static SortedMap<Id, Person> getSortedPersons(final Population population) {
+		return new TreeMap<Id, Person>(population.getPersons());
+	}
+	
+	/**
+	 * Sorts the person in the given population. 
+	 * @param population 
+	 */
+	@SuppressWarnings("unchecked")
+	public static void sortPersons(final Population population) {
+		Map<Id, Person> map = (Map<Id, Person>) population.getPersons();
+		
+		if (map instanceof SortedMap) return;
+		
+		Map<Id, Person> treeMap = new TreeMap<Id, Person>(map);
+		map.clear();
+		map.putAll(treeMap);
+	}
 }

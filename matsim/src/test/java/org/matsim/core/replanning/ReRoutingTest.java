@@ -23,10 +23,13 @@ package org.matsim.core.replanning;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ReRoutingTest extends MatsimTestCase {
@@ -38,7 +41,14 @@ public class ReRoutingTest extends MatsimTestCase {
 		config.simulation().setTimeStepSize(10.0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
-		TestControler controler = new TestControler(config);
+		/*
+		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
+		 * to store the persons in the population, we have to sort the population manually.  
+		 * cdobler, oct'11
+		 */
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		PopulationUtils.sortPersons(scenario.getPopulation());
+		TestControler controler = new TestControler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
@@ -54,8 +64,8 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	static public class TestControler extends Controler {
 
-		public TestControler(final Config config) {
-			super(config);
+		public TestControler(final Scenario scenario) {
+			super(scenario);
 		}
 
 		@Override
