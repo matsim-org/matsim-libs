@@ -46,7 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 public class PtScenarioAdaption {
 	
 	public static final double[] relHeadwayClasses = new double[]{
-	    4, 7, 10, 15, 30, 60};  // in [minutes]!!
+	    4, 7, 10, 15, 30, 60};  // in [minutes] and ascending order!!
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private String networkfilePath;
@@ -59,6 +59,8 @@ public class PtScenarioAdaption {
 	private double currentInterval;
 	private long pastId;
 	private Double implDeparture;
+
+	private int originNumberOfDep;
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -108,7 +110,6 @@ public class PtScenarioAdaption {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				
-				
 				Map<Id, Departure> departures = route.getDepartures();
 				
 				if(departures == null || departures.size() < 2) continue;
@@ -120,9 +121,14 @@ public class PtScenarioAdaption {
 					departuresTimes.put(departure.getDepartureTime(), departure);
 				}
 						
-//				 test:
-				for(Double depTime : departuresTimes.keySet()) System.out.println(" depTime " + depTime);
+//				test:
+				originNumberOfDep = 0;
+				for(Double depTime : departuresTimes.keySet()) {
+					originNumberOfDep++;
+					System.out.println(" depTime " + depTime);
+				}
 				System.out.println("End test.");
+//				System.out.print("Old departures: "+ originNumberOfDep);
 				
 				pastId = Long.parseLong(departuresTimes.get(departuresTimes.firstKey()).getId().toString());
 				
@@ -133,26 +139,26 @@ public class PtScenarioAdaption {
 				
 				for(Double depTime : departuresTimes.keySet()){
 					
+					if(route.getId().toString().contains("Y24.1_R.1.")){
+						System.out.println();
+					}
 					if(departuresTimes.lastKey() != depTime &&
 							(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
 						continue;
 					}
 					
 					if(departuresTimes.lastKey() == depTime) {
-						addNewDepartures(depTime + getNewInterval() * 60d);
+						addNewDepartures(depTime + currentInterval * 60 - getNewInterval() * 60);
 					}
 					else {
 						
 						addNewDepartures((depTime));
 						currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
-						System.out.println();
 					}
 				}
 				
 				this.removeDepartures((TransitRouteImpl) route);
 				this.addNewDepartures(route);
-				
-				System.out.println();
 			}
 		}
 		
@@ -177,19 +183,23 @@ public class PtScenarioAdaption {
 		while(stackId.size() > 0){
 			route.removeDeparture(route.getDepartures().get(stackId.pop()));
 		}
-		System.out.println();
 	}
 
 	private void addNewDepartures(TransitRoute route) {
+		int counter = 0;
 		for(Departure departure : newDepartures.values()){
 			
 			Id vehicleId = new IdImpl("tr_"+departure.getId().toString());
 			departure.setVehicleId(vehicleId);
 			
 			route.addDeparture(departure);
+			counter++;
 			System.out.println("depTime: " + departure.getDepartureTime());
 		}
-		System.out.println();
+//		System.out.println(" New Departures: " + counter);
+		if(counter < originNumberOfDep){
+			System.out.println();
+		}
 	}
 	
 	private void addNewDepartures(Double upperThreshold) {
@@ -201,13 +211,13 @@ public class PtScenarioAdaption {
 
 			while(implDeparture  < upperThreshold){
 				
+				implDeparture = implDeparture + newInterval * 60d;
+				
 				IdImpl newId = new IdImpl(++pastId);
 				
-				Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture + newInterval * 60d);
+				Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
 				
-				newDepartures.put(implDeparture + newInterval *60d, newDepImpl);
-				
-				implDeparture = implDeparture + newInterval * 60d;
+				newDepartures.put(implDeparture, newDepImpl);
 			}
 		}
 		else
@@ -219,21 +229,35 @@ public class PtScenarioAdaption {
 
 	private void copyExistingDepartures(double upperThreshold) {
 		
-		IdImpl newId = new IdImpl(++pastId);
+		while(implDeparture  < upperThreshold){
+			
+			implDeparture = implDeparture + currentInterval * 60d;
+			
+			IdImpl newId = new IdImpl(++pastId);
+			
+			Departure newDepImpl = new DepartureImpl(newId, implDeparture);
+			
+			newDepartures.put(implDeparture, newDepImpl);
+		}
 		
-		Departure newDepImpl = new DepartureImpl(newId, implDeparture + currentInterval *60d);
 		
-		newDepartures.put(implDeparture + currentInterval *60d, newDepImpl);
-		
-		implDeparture = implDeparture + currentInterval * 60d;
+//		implDeparture = implDeparture + currentInterval * 60d;
+//		
+//		IdImpl newId = new IdImpl(++pastId);
+//		
+//		Departure newDepImpl = new DepartureImpl(newId, implDeparture);
+//		
+//		newDepartures.put(implDeparture, newDepImpl);
 	}
 
 	private double getNewInterval() {
 		
+		if(relHeadwayClasses[0] > currentInterval) return currentInterval;
+		
 		for (int i = 1; i < relHeadwayClasses.length; i++) {
 			if(relHeadwayClasses[i] >= currentInterval) return relHeadwayClasses[(i-1)];
 		}
-		return relHeadwayClasses[0];
+		return currentInterval;
 	}
 
 	private void writeScenario() {
