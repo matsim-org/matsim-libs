@@ -115,7 +115,7 @@ public class PublicTransportNetworkPanel extends LayersPanel implements MouseLis
 	}
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		camera.move(getWorldX(e.getX()),getWorldX(iniX),getWorldY(e.getY()),getWorldY(iniY));
+		camera.move(getWorldX(iniX)-getWorldX(e.getX()),getWorldY(iniY)-getWorldY(e.getY()));
 		iniX = e.getX();
 		iniY = e.getY();
 		repaint();

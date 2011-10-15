@@ -10,12 +10,17 @@ import playground.sergioo.CountsFileGenerator.CountsWindow.Labels;
 import playground.sergioo.CountsFileGenerator.CountsWindow.Options;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersWindow;
+import playground.sergioo.Visualizer2D.PointsPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPanel;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
 public class CountsNetworkPanel extends NetworkPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	//Attributes
 

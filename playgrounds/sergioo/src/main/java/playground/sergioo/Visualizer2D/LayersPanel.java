@@ -62,6 +62,9 @@ public abstract class LayersPanel extends JPanel {
 	protected void addLayer(int position, Layer layer) {
 		layers.add(position, layer);
 	}
+	protected void setLayer(int position, Layer layer) {
+		layers.set(position, layer);
+	}
 	public Layer getLayer(int position) {
 		return layers.get(position);
 	}

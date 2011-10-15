@@ -71,7 +71,7 @@ public abstract class NetworksStep {
 		return networks;
 	}
 
-	protected Network[] execute() {
+	private Network[] execute() {
 		Network oldNetworkA = NetworkImpl.createNetwork();
 		Network oldNetworkB = NetworkImpl.createNetwork();
 		saveOldNetworks(oldNetworkA, oldNetworkB);

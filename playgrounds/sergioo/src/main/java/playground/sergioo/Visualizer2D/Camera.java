@@ -29,11 +29,14 @@ public class Camera {
 	public double getAspectRatio() {
 		return size.getX()/-size.getY();
 	}
-	public void setCamera(Point2D upLeftCorner, Vector2D size) {
-		this.upLeftCorner.setX(upLeftCorner.getX());
-		this.upLeftCorner.setY(upLeftCorner.getY());
-		this.size.setX(size.getX());
-		this.size.setY(size.getY());
+	public void copyCamera(Camera camera) {
+		upLeftCorner.setX(camera.getUpLeftCorner().getX());
+		upLeftCorner.setY(camera.getUpLeftCorner().getY());
+		size.setX(camera.getSize().getX());
+		size.setY(camera.getSize().getY());
+	}
+	public void copyCenter(Camera camera) {
+		centerCamera(camera.getCenter().getX(), camera.getCenter().getY());
 	}
 	public void zoomIn() {
 		Vector2D difCorners = new Vector2D(size.getX()*(1-1/ZOOM_RATE)/2,size.getY()*(1-1/ZOOM_RATE)/2);
@@ -65,8 +68,8 @@ public class Camera {
 		this.size.setX(xMax-xMin);
 		this.size.setY(yMin-yMax);
 	}
-	public void move(double x, double ix, double y, double iy) {
-		Vector2D difCorners = new Vector2D(ix-x,iy-y);
+	public void move(double dx, double dy) {
+		Vector2D difCorners = new Vector2D(dx, dy);
 		upLeftCorner.translate(difCorners);
 	}
 	public void centerCamera(double x, double y) {

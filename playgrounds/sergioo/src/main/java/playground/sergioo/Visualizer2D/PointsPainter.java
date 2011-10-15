@@ -1,4 +1,4 @@
-package playground.sergioo.CountsFileGenerator;
+package playground.sergioo.Visualizer2D;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -20,16 +20,20 @@ public class PointsPainter extends Painter {
 	//Methods
 	public void addPoint(Coord point) {
 		points.add(point);
-		selectedPoint = point;
+	}
+	public void clearPoints() {
+		points.clear();
 	}
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(Coord point:points)
 			paintCircle(g2, layersPanel, point, 2, Color.BLACK);
-		paintCircle(g2, layersPanel, selectedPoint, 4, Color.RED);
+		if(selectedPoint!=null)
+			paintCircle(g2, layersPanel, selectedPoint, 4, Color.RED);
 	}
 	public void selectPoint(Coord point) {
-		selectedPoint = point;
+		if(points.contains(point))
+			selectedPoint = point;
 	}
 
 }

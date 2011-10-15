@@ -2,9 +2,11 @@ package playground.sergioo.NetworksMatcher.gui;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -16,18 +18,31 @@ public class NetworkNodesPainterManager extends NetworkPainterManager {
 
 	private static final String SEPARATOR = " & ";
 	//Attributes
-	private Collection<Id> selectedNodesId;
+	private Set<Id> selectedNodesId;
 	
 	//Methods
 	public NetworkNodesPainterManager(Network network) {
 		super(network);
 		selectedNodesId = new HashSet<Id>();
 	}
-	public Collection<Node> getSelectedNodes() {
-		Collection<Node> selectedNodes = new HashSet<Node>();
+	public Set<Node> getSelectedNodes() {
+		Set<Node> selectedNodes = new HashSet<Node>();
 		for(Id selectedNodeId:selectedNodesId)
 			selectedNodes.add(network.getNodes().get(selectedNodeId));
 		return selectedNodes;
+	}
+	public Set<Node> getSelectedNodesAndClear() {
+		Set<Node> selectedNodes = getSelectedNodes();
+		selectedNodesId.clear();
+		return selectedNodes;
+	}
+	public void selectNodes(Set<Node> nodes) {
+		selectedNodesId = new HashSet<Id>();
+		for(Node node:nodes)
+			selectedNodesId.add(node.getId());
+	}
+	public Collection<? extends Link> getLinks(){
+		return network.getLinks().values();
 	}
 	public void selectNodeFromCollection(double x, double y) {
 		selectedNodesId.add(getIdNearestNode(x, y));

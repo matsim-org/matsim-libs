@@ -69,14 +69,14 @@ public class MatchingsPainter extends Painter {
 						paintCircle(g2, layersPanel, node.getCoord(), 4, color);
 					paintCircle(g2, layersPanel, nodesMatching.getComposedNodeA().getCoord(), layersPanel.getScreenX(5*ComposedNode.radius), new Color(color.getRed(), color.getGreen(), color.getBlue()));
 					nodesMatching.getComposedNodeA().setAnglesDeviation();
-					g2.drawString((int)(nodesMatching.getComposedNodeA().getAnglesDeviation()*180/Math.PI)+"", layersPanel.getScreenX(nodesMatching.getComposedNodeA().getCoord().getX()), layersPanel.getScreenY(nodesMatching.getComposedNodeA().getCoord().getY()));
+					//g2.drawString((int)(nodesMatching.getComposedNodeA().getAnglesDeviation()*180/Math.PI)+"", layersPanel.getScreenX(nodesMatching.getComposedNodeA().getCoord().getX()), layersPanel.getScreenY(nodesMatching.getComposedNodeA().getCoord().getY()));
 				}
 				if(option.equals(MatchingOptions.BOTH) || option.equals(MatchingOptions.B)) {
 					for(Node node:nodesMatching.getComposedNodeB().getNodes())
 						paintCircle(g2, layersPanel, node.getCoord(), 4, new Color(color.getRed()*7/8, color.getGreen()*7/8, color.getBlue()*7/8));
 					paintCircle(g2, layersPanel, nodesMatching.getComposedNodeB().getCoord(), layersPanel.getScreenX(ComposedNode.radius), new Color(color.getRed(), color.getGreen(), color.getBlue(), 128));
 					nodesMatching.getComposedNodeB().setAnglesDeviation();
-					g2.drawString((int)(nodesMatching.getComposedNodeB().getAnglesDeviation()*180/Math.PI)+"", layersPanel.getScreenX(nodesMatching.getComposedNodeB().getCoord().getX()), layersPanel.getScreenY(nodesMatching.getComposedNodeB().getCoord().getY()));
+					//g2.drawString((int)(nodesMatching.getComposedNodeB().getAnglesDeviation()*180/Math.PI)+"", layersPanel.getScreenX(nodesMatching.getComposedNodeB().getCoord().getX()), layersPanel.getScreenY(nodesMatching.getComposedNodeB().getCoord().getY()));
 				}
 			}
 		}

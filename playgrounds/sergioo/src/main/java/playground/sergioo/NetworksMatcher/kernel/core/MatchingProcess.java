@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.bcel.generic.CASTORE;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
+import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.PrepareNetworkProcess;
 
 
@@ -18,6 +20,10 @@ public class MatchingProcess {
 	//Attributes
 
 	private final List<NetworksStep> steps;
+	
+	private Network initialNetworkA;
+
+	private Network initialNetworkB;
 
 	private Network finalNetworkA;
 
@@ -41,6 +47,8 @@ public class MatchingProcess {
 	}
 
 	public void execute(Network networkA, Network networkB) {
+		initialNetworkA = networkA;
+		initialNetworkB = networkB;
 		for(NetworksStep step:steps) {
 			Network[] networks = step.execute(networkA, networkB);
 			networkA = networks[0];
@@ -58,78 +66,49 @@ public class MatchingProcess {
 		return finalNetworkB;
 	}
 	
-	public Network getNetworkA(int stepNumber) {
+	public NetworksStep getStep(int stepNumber) {
 		int[] pos = new int[]{0};
 		for(NetworksStep step:steps) {
-			Network networkA = getNetworkA(step, pos, stepNumber);
-			if(networkA!=null)
-				return networkA;
+			NetworksStep nStep = getStep(step, pos, stepNumber);
+			if(nStep!=null)
+				return nStep;
 		}
 		return null;
 	}
 
-	private Network getNetworkA(NetworksStep step, int[] pos, int stepNumber) {
+	private NetworksStep getStep(NetworksStep step, int[] pos, int stepNumber) {
 		int k=0;
 		for(NetworksStep subStep:step.getNetworkSteps()) {
 			if(k==step.getInternalStepPosition()) {
 				if(stepNumber==pos[0])
-					return step.getNetworkA();
+					return step;
 				else
 					pos[0]++;
 			}
-			Network networkA = getNetworkA(subStep, pos, stepNumber);
-			if(networkA!=null)
-				return networkA;
+			NetworksStep nStep = getStep(subStep, pos, stepNumber);
+			if(nStep!=null)
+				return nStep;
 			k++;
 		}
 		if(k==0 && stepNumber==pos[0])
-			return step.getNetworkA();
+			return step;
 		else if(k==0)
 			pos[0]++;
 		else if(k==step.getInternalStepPosition()) {
 			if(stepNumber==pos[0])
-				return step.getNetworkA();
+				return step;
 			else
 				pos[0]++;
 		}
 		return null;
+	}
+	
+	public Network getNetworkA(int stepNumber) {
+		return getStep(stepNumber).getNetworkA();
 	}
 
 	public Network getNetworkB(int stepNumber) {
-		int[] pos = new int[]{0};
-		for(NetworksStep step:steps) {
-			Network networkB = getNetworkB(step, pos, stepNumber);
-			if(networkB!=null)
-				return networkB;
-		}
-		return null;
-	}
-
-	private Network getNetworkB(NetworksStep step, int[] pos, int stepNumber) {
-		int k=0;
-		for(NetworksStep subStep:step.getNetworkSteps()) {
-			if(k==step.getInternalStepPosition()) {
-				if(stepNumber==pos[0])
-					return step.getNetworkB();
-				else
-					pos[0]++;
-			}
-			Network networkB = getNetworkB(subStep, pos, stepNumber);
-			if(networkB!=null)
-				return networkB;
-			k++;
-		}
-		if(k==0 && stepNumber==pos[0])
-			return step.getNetworkB();
-		else if(k==0)
-			pos[0]++;
-		else if(k==step.getInternalStepPosition()) {
-			if(stepNumber==pos[0])
-				return step.getNetworkB();
-			else
-				pos[0]++;
-		}
-		return null;
+		return getStep(stepNumber).getNetworkB();
 	}
 
 	public void applyProperties(boolean fromAtoB) {
@@ -143,56 +122,12 @@ public class MatchingProcess {
 					((MatchingComposedLink)emptyLink).applyProperties((MatchingComposedLink)fullLink);
 	}
 	
-	public Set<NodesMatching> getMatchings(int stepNumber) {
-		int[] pos = new int[]{0};
-		for(NetworksStep step:steps) {
-			Set<NodesMatching> matchings = getMatchings(step, pos, stepNumber);
-			if(matchings!=null)
-				return matchings;
+	public Set<NodesMatching> getNodesMatchings(int stepNumber) {
+		try {
+			return ((MatchingStep)getStep(stepNumber)).getNodesMatchings();
+		} catch (Exception e) {
+			return null;
 		}
-		return null;
-	}
-
-	private Set<NodesMatching> getMatchings(NetworksStep step, int[] pos, int stepNumber) {
-		int k=0;
-		for(NetworksStep subStep:step.getNetworkSteps()) {
-			if(k==step.getInternalStepPosition()) {
-				if(stepNumber==pos[0])
-					if(MatchingStep.class.isAssignableFrom(step.getClass()))
-						return ((MatchingStep)step).getNodesMatchings();
-					else {
-						pos[0]++;
-						return null;
-					}
-				else
-					pos[0]++;
-			}
-			Set<NodesMatching> matchings = getMatchings(subStep, pos, stepNumber);
-			if(matchings!=null)
-				return matchings;
-			k++;
-		}
-		if(k==0 && stepNumber==pos[0])
-			if(MatchingStep.class.isAssignableFrom(step.getClass()))
-				return ((MatchingStep)step).getNodesMatchings();
-			else {
-				pos[0]++;
-				return null;
-			}
-		else if(k==0)
-			pos[0]++;
-		else if(k==step.getInternalStepPosition()) {
-			if(stepNumber==pos[0])
-				if(MatchingStep.class.isAssignableFrom(step.getClass()))
-					return ((MatchingStep)step).getNodesMatchings();
-				else {
-					pos[0]++;
-					return null;
-				}
-			else
-				pos[0]++;
-		}
-		return null;
 	}
 	
 	public Set<NodesMatching> getFinalMatchings() {

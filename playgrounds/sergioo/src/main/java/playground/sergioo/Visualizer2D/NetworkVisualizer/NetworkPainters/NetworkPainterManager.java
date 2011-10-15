@@ -120,6 +120,9 @@ public class NetworkPainterManager {
 	public void selectLink(double x, double y) {
 		selectedLinkId = getIdNearestLink(x, y);
 	}
+	public void selectLink(Link link) {
+		selectedLinkId = link.getId();
+	}
 	public void selectOppositeLink() {
 		if(selectedLinkId!=null)
 			selectedLinkId = getIdOppositeLink(network.getLinks().get(selectedLinkId));
