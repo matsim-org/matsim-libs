@@ -47,7 +47,6 @@ public class VehicleScheduleWriter {
 		
 		ScheduleVehiclesGenerator generator = new ScheduleVehiclesGenerator();
 		generator.setStopTime(30);
-		generator.setTravelTimeBus(3*60);
 		generator.setNetworkFile(networkFile);
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");
