@@ -40,13 +40,13 @@ public class Network2ShapeFile {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String netFile = "/Users/thomas/Development/opus_home/data/psrc/network/psrc.xml.gz";
+		String netFile = "/Users/thomas/Desktop/ivtch-changed.xml";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 		// WGS84 isn't correct and may affects the transformation, but this isn't important to see the link id's
-		new Links2ESRIShape(net, "/Users/thomas/Development/opus_home/data/psrc/network/psrc.shp", TransformationFactory.WGS84).write();
+		new Links2ESRIShape(net, "/Users/thomas/Desktop/ivtch-changed.shp", TransformationFactory.WGS84).write();
 		
 		
 	}
