@@ -42,7 +42,7 @@ import cadyts.supply.SimResults;
  */
 public abstract class BseParamCalibrationControlerListener implements
 		ControlerListener {
-	protected boolean watching = false;
+//	protected boolean watching = false;
 	protected VolumesAnalyzer volumes = null;
 	protected double countsScaleFactor = 1d, distanceFilter = 0d;
 	protected Coord distanceFilterCenterNodeCoord = null;

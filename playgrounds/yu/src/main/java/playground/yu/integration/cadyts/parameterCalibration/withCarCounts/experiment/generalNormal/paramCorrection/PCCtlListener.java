@@ -67,7 +67,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	private int caliStartTime, caliEndTime;
 	private int avgLlhOverIters = 0, writeLlhInterval = 0;
 	// private Config config;
-	private int cycleIdx = 0, cycle;
+	// private int cycleIdx = 0, cycle;
 
 	private SimpleWriter writer = null, writerCV = null;
 	private static List<Link> links = new ArrayList<Link>();
@@ -111,8 +111,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		ControlerIO ctlIO = ctl.getControlerIO();
 
 		// SETTING "parameter calibration" parameters
-		watching = Boolean.parseBoolean(config.findParam(
-				BSE_CONFIG_MODULE_NAME, "watching"));
+		// watching = Boolean.parseBoolean(config.findParam(
+		// BSE_CONFIG_MODULE_NAME, "watching"));
+
 		String parameterDimensionStr = config.findParam(BSE_CONFIG_MODULE_NAME,
 				"parameterDimension");
 		if (parameterDimensionStr != null) {
@@ -171,22 +172,21 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
-			double paramScaleFactor = Events2Score4PC.paramScaleFactorList
-					.get(Events2Score4PC.attrNameList.indexOf(paramNames[i]));
+			// double paramScaleFactor = Events2Score4PC.paramScaleFactorList
+			// .get(Events2Score4PC.attrNameList.indexOf(paramNames[i]));
 
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
 
-				initialParams.set(
-						i,
-						Double.parseDouble(ScoringConfigGetValue
-								.getValue(paramNames[i])) * paramScaleFactor);
+				initialParams.set(i, Double.parseDouble(ScoringConfigGetValue
+						.getValue(paramNames[i]))
+				// * paramScaleFactor
+						);
 
 			} else/* bse */{
-				initialParams.set(
-						i,
-						Double.parseDouble(config.findParam(
-								BSE_CONFIG_MODULE_NAME, paramNames[i]))
-								* paramScaleFactor);
+				initialParams.set(i, Double.parseDouble(config.findParam(
+						BSE_CONFIG_MODULE_NAME, paramNames[i]))
+				// * paramScaleFactor
+						);
 			}
 		}
 
@@ -483,8 +483,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			System.out.println("BSE:\tusing the countsScaleFactor of "
 					+ countsScaleFactor + " as packetSize from config.");
 		}
-		cycle = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
-				"cycle"));
+		// cycle = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
+		// "cycle"));
 
 		// READING countsdata
 		readCounts(ctl);
@@ -623,63 +623,63 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			// VERY IMPORTANT #########################################
 
-			if (!watching && cycleIdx == 0) {
-				MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-						.getMultinomialLogit();
+			// if (
+			// // !watching &&
+			// cycleIdx == 0) {
+			MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+					.getMultinomialLogit();
 
-				// *******should after Scoring Listener!!!*******
+			// *******should after Scoring Listener!!!*******
 
-				if (calibrator.getInitialStepSize() != 0d) {
+			if (calibrator.getInitialStepSize() != 0d) {
 
-					StringBuffer sb = new StringBuffer(Integer.toString(iter));
+				StringBuffer sb = new StringBuffer(Integer.toString(iter));
 
-					for (int i = 0; i < paramNames.length; i++) {
-						int paramNameIndex = Events2Score4PC.attrNameList
-								.indexOf(paramNames[i]/*
-													 * pos. of param in
-													 * Parameters in Cadyts
-													 */);
-						double paramScaleFactor = Events2Score4PC.paramScaleFactorList
-								.get(paramNameIndex);
+				for (int i = 0; i < paramNames.length; i++) {
+					int paramNameIndex = Events2Score4PC.attrNameList
+							.indexOf(paramNames[i]/*
+												 * pos. of param in Parameters
+												 * in Cadyts
+												 */);
+					double paramScaleFactor = Events2Score4PC.paramScaleFactorList
+							.get(paramNameIndex);
 
-						double value = params.get(i);
-						if (scoringCfg.getParams().containsKey(paramNames[i])) {
-							scoringCfg.addParam(paramNames[i],
-									Double.toString(value / paramScaleFactor));
-						} else/* bse */{
-							config.setParam(BSE_CONFIG_MODULE_NAME,
-									paramNames[i],
-									Double.toString(value / paramScaleFactor));
-						}
-
-						mnl.setParameter(paramNameIndex, value);
-
-						// text output
-						paramArrays[i][iter - firstIter] = value
-								/ paramScaleFactor;
-						sb.append("\t");
-						sb.append(value / paramScaleFactor);
+					double value = params.get(i);
+					if (scoringCfg.getParams().containsKey(paramNames[i])) {
+						scoringCfg.addParam(paramNames[i],
+								Double.toString(value / paramScaleFactor));
+					} else/* bse */{
+						config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+								Double.toString(value / paramScaleFactor));
 					}
 
-					writer.writeln(sb);
-					writer.flush();
+					mnl.setParameter(paramNameIndex, value);
+
+					// text output
+					paramArrays[i][iter - firstIter] = value / paramScaleFactor;
+					sb.append("\t");
+					sb.append(value / paramScaleFactor);
 				}
-				/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-				((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
-
-				CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
-						config.planCalcScore(), ctl.getNetwork());
-				ctl.setScoringFunctionFactory(sfFactory);
-				((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
-
-				strategyManager.setChooser(chooser);
-
+				writer.writeln(sb);
+				writer.flush();
 			}
-			cycleIdx++;
-			if (cycleIdx == cycle) {
-				cycleIdx = 0;
-			}
+			/*-----------------initialStepSize==0, no parameters are changed----------------------*/
+
+			((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
+
+			CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
+					config.planCalcScore(), ctl.getNetwork());
+			ctl.setScoringFunctionFactory(sfFactory);
+			((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
+
+			strategyManager.setChooser(chooser);
+
+			// }
+			// cycleIdx++;
+			// if (cycleIdx == cycle) {
+			// cycleIdx = 0;
+			// }
 		}
 
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
