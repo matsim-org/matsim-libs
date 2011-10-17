@@ -322,7 +322,10 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 				+"; mutationNonUniformity = "+genes[NON_UNIFORM_GENE]
 				+"; isMutationInPlace = "+genes[IN_PLACE_GENE]
 				+"; nonUniformMutationProb = "+genes[P_NON_UNIFORM_GENE]
-				+"; hammingOnly = "+genes[HAMMING_GENE];
+				+"; hammingOnly = "+genes[HAMMING_GENE]
+				+"; toggleOptWeight = "+genes[TOGGLE_OPT_GENE]
+				+"; durationOptWeight = "+genes[DUR_OPT_GENE]
+				+"; maxNSimplexIters = "+genes[SIMPLEX_ITERS_GENE];
 	}
 
 	/**
