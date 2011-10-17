@@ -128,7 +128,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		//	}
 		//}
 
-		int[] sizes = {1,3,4,6,20,57};
+		//int[] sizes = {1,3,4,6,20,57};
+		int[] sizes = {1,3,4,6,7,10};
 
 		for (int size : sizes) {
 			for (int i=0; i < cliques.size(); i++) {
