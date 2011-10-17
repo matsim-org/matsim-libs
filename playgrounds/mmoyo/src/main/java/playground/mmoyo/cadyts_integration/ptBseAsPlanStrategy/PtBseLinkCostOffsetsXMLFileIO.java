@@ -21,7 +21,7 @@ package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 
 //LINK import org.matsim.api.core.v01.network.Link;
@@ -30,13 +30,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.utilities.misc.DynamicDataXMLFileIO;
+import utilities.misc.DynamicDataXMLFileIO;
 
 public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
 
 	private static final long serialVersionUID = 1L;
-	private final TransitSchedule schedule; 
-	
+	private final TransitSchedule schedule;
+
 	public PtBseLinkCostOffsetsXMLFileIO(final TransitSchedule schedule) {
 		super();
 		this.schedule = schedule;
@@ -47,11 +47,11 @@ public class PtBseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitS
 	@Override
 	protected TransitStopFacility attrValue2key(final String stopId) {
 		System.out.println(strAttrValue2key + stopId);
-		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
+		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl(stopId));
 		System.out.println(strStop + stop);
 		return stop;
 	}
-	
+
 	@Override
 	protected String key2attrValue(final TransitStopFacility key) {
 		return key.getId().toString();

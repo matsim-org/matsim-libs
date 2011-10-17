@@ -42,7 +42,7 @@ import playground.mmoyo.utils.TransitRouteUtil;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGISWithArrowhead;
 import playground.yu.utils.qgis.X2QGIS;
 
-import cadyts.utilities.misc.DynamicData;
+import utilities.misc.DynamicData;
 
  /**produces gis polygons from cost offset values*/
 public class LinkCostOffsets2QGIS {

@@ -22,10 +22,11 @@ package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 
-import cadyts.utilities.io.tabularFileParser.TabularFileHandler;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import utilities.io.tabularfileparser.TabularFileHandler;
+import utilities.io.tabularfileparser.TabularFileParser;
 
 /**Reader for the calibration-stat files produced after calibration.**/
 public class CalibrationStatReader implements TabularFileHandler {
@@ -39,16 +40,16 @@ public class CalibrationStatReader implements TabularFileHandler {
 	final String CRL = "\n";
 	private Map <Integer, StatisticsData> statDataMap = new TreeMap <Integer, StatisticsData>();
 	private StringBuffer sBuff;
-	
+
 	protected CalibrationStatReader(){
 	}
-	
+
 	@Override
 	public void startDocument() {
 		log.info("reading calibration-stats file...");
-		this.sBuff = new StringBuffer();
+		sBuff = new StringBuffer();
 	}
-	
+
 	@Override
 	public void startRow(final String[] row)  {
 		String colArray[] = row[0].split(TAB);
@@ -101,7 +102,7 @@ public class CalibrationStatReader implements TabularFileHandler {
 		System.out.println (sBuff.toString());
 		log.info("done.");
 	}
-	
+
 	protected class StatisticsData{
 		private String count_ll;
 		private String count_ll_pred_err;
@@ -116,121 +117,127 @@ public class CalibrationStatReader implements TabularFileHandler {
 		private String plan_lambda_min;
 		private String plan_lambda_max;
 		private String replan_count;
-		
+
 		protected void setCount_ll(final String countLl) {
-			this.count_ll = countLl;
+			count_ll = countLl;
 		}
 
 		protected void setCount_ll_pred_err(final String countLlPredErr) {
-			this.count_ll_pred_err = countLlPredErr;
+			count_ll_pred_err = countLlPredErr;
 		}
 
 		protected void setP2p_ll(final String p2pLl) {
-			this.p2p_ll = p2pLl;
+			p2p_ll = p2pLl;
 		}
 
 		protected void setTotal_ll(final String totalLl) {
-			this.total_ll = totalLl;
+			total_ll = totalLl;
 		}
 
 		protected void setLink_lambda_avg(final String linkLambdaAvg) {
-			this.link_lambda_avg = linkLambdaAvg;
+			link_lambda_avg = linkLambdaAvg;
 		}
 
 		protected void setLink_lambda_stddev(final String linkLambdaStddev) {
-			this.link_lambda_stddev = linkLambdaStddev;
+			link_lambda_stddev = linkLambdaStddev;
 		}
 
 		protected void setLink_lambda_min(final String linkLambdaMin) {
-			this.link_lambda_min = linkLambdaMin;
+			link_lambda_min = linkLambdaMin;
 		}
 
 		protected void setLink_lambda_max(final String linkLambdaMax) {
-			this.link_lambda_max = linkLambdaMax;
+			link_lambda_max = linkLambdaMax;
 		}
 
 		protected void setPlan_lambda_avg(final String planLambdaAvg) {
-			this.plan_lambda_avg = planLambdaAvg;
+			plan_lambda_avg = planLambdaAvg;
 		}
 
 		protected void setPlan_lambda_stddev(final String planLambdaStddev) {
-			this.plan_lambda_stddev = planLambdaStddev;
+			plan_lambda_stddev = planLambdaStddev;
 		}
 
 		protected void setPlan_lambda_min(final String planLambdaMin) {
-			this.plan_lambda_min = planLambdaMin;
+			plan_lambda_min = planLambdaMin;
 		}
 
 		protected void setPlan_lambda_max(final String planLambdaMax) {
-			this.plan_lambda_max = planLambdaMax;
+			plan_lambda_max = planLambdaMax;
 		}
 
 		protected void setReplan_count(final String replanCount) {
-			this.replan_count = replanCount;
+			replan_count = replanCount;
 		}
 
 		protected String getCount_ll() {
-			return this.count_ll;
+			return count_ll;
 		}
 
 		protected String getCount_ll_pred_err() {
-			return this.count_ll_pred_err;
+			return count_ll_pred_err;
 		}
 
 		protected String getP2p_ll() {
-			return this.p2p_ll;
+			return p2p_ll;
 		}
 
 		protected String getTotal_ll() {
-			return this.total_ll;
+			return total_ll;
 		}
 
 		protected String getLink_lambda_avg() {
-			return this.link_lambda_avg;
+			return link_lambda_avg;
 		}
 
 		protected String getLink_lambda_stddev() {
-			return this.link_lambda_stddev;
+			return link_lambda_stddev;
 		}
 
 		protected String getLink_lambda_min() {
-			return this.link_lambda_min;
+			return link_lambda_min;
 		}
 
 		protected String getLink_lambda_max() {
-			return this.link_lambda_max;
+			return link_lambda_max;
 		}
 
 		protected String getPlan_lambda_avg() {
-			return this.plan_lambda_avg;
+			return plan_lambda_avg;
 		}
 
 		protected String getPlan_lambda_stddev() {
-			return this.plan_lambda_stddev;
+			return plan_lambda_stddev;
 		}
 
 		protected String getPlan_lambda_min() {
-			return this.plan_lambda_min;
+			return plan_lambda_min;
 		}
 
 		protected String getPlan_lambda_max() {
-			return this.plan_lambda_max;
+			return plan_lambda_max;
 		}
 
 		protected String getReplan_count() {
-			return this.replan_count;
+			return replan_count;
 		}
 	}
 
 	protected Map <Integer, StatisticsData> getCalStatMap (){
-		return this.statDataMap;
+		return statDataMap;
 	}
-	
+
 	public static void main(String[] args) throws IOException {
-		String calibStatFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/input_calibration-stats.txt";  
+		String calibStatFile = "../playgrounds/mmoyo/test/input/playground/mmoyo/EquilCalibration/input_calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		new TabularFileParser().parse(calibStatFile, calibrationStatReader);
 		System.out.println(calibrationStatReader.getCalStatMap().get(Integer.valueOf(2)).count_ll);
+	}
+
+	@Override
+	public String preprocess(String line) {
+		// just dummy
+		return null;
 	}
 
 }

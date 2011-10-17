@@ -38,8 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.mmoyo.analysis.counts.reader.CountsReader;
-import playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy.NewPtBsePlanStrategy;
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import utilities.io.tabularfileparser.TabularFileParser;
 
 public class CadytsIntegrationTest extends MatsimTestCase {
 
@@ -47,11 +46,11 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 	@Test
 	public final void testCalibration() {
 
-		String inputDir = this.getInputDirectory();
-		String outputDir = this.getOutputDirectory();
+		String inputDir = getInputDirectory();
+		String outputDir = getOutputDirectory();
 
-		System.out.println(" Input Dir " + this.getInputDirectory() );
-		System.out.println(" Output Dir " + this.getOutputDirectory() );
+		System.out.println(" Input Dir " + getInputDirectory() );
+		System.out.println(" Output Dir " + getOutputDirectory() );
 
 		String configFile = inputDir + "equil_config.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
@@ -70,7 +69,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("Diferent number of nodes in network.", controler.getNetwork().getNodes().size() , 15 );
 		Assert.assertNotNull("Transit schedule is null.", controler.getScenario().getTransitSchedule());
 		Assert.assertEquals("Num. of trLines is wrong.", controler.getScenario().getTransitSchedule().getTransitLines().size() , 1);
-		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);		
+		Assert.assertEquals("Num of facilities in schedule is wrong.", controler.getScenario().getTransitSchedule().getFacilities().size() , 5);
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
@@ -87,12 +86,12 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
 		//test that NewPtBsePlanStrategy is present as replanning strategy
-		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies(); 
+		List <PlanStrategy> strategyList = controler.getStrategyManager().getStrategies();
 		NewPtBsePlanStrategy ptBsestrategy = null;
 		int i=0;
 		do{
 			if (strategyList.get(i).getClass().equals(NewPtBsePlanStrategy.class)){
-				ptBsestrategy = (NewPtBsePlanStrategy)strategyList.get(i); 	
+				ptBsestrategy = (NewPtBsePlanStrategy)strategyList.get(i);
 			}
 			i++;
 		}while (ptBsestrategy==null && i< strategyList.size());
@@ -102,8 +101,8 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		String expectedCalibSettings ="[BruteForce=true][CenterRegression=false][FreezeIteration=2147483647][MinStddev=8.0][PreparatoryIterations=1][RegressionInertia=0.95][VarianceScale=1.0]";
 		Assert.assertEquals("calibrator settings do not match" , ptBsestrategy.getCalibratorSettings(), expectedCalibSettings );
 
-		//  results  
-		// Test first that the calibrationStatReader works properly 
+		//  results
+		// Test first that the calibrationStatReader works properly
 		TabularFileParser tabularFileParser = new TabularFileParser();
 		String calibStatFile = inputDir + "input_calibration-stats.txt";
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
@@ -134,7 +133,7 @@ public class CadytsIntegrationTest extends MatsimTestCase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(Integer.valueOf(6));
 		Assert.assertEquals("diferrent Count_ll", "-1.546875", outStatData.getCount_ll() );
 		Assert.assertEquals("diferrent Count_ll_pred_err",  "9.917082938182276E-8" , outStatData.getCount_ll_pred_err() );
