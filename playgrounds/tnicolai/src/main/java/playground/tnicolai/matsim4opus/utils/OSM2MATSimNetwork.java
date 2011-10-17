@@ -19,7 +19,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 public class OSM2MATSimNetwork {
 
 	public static void main(String[] args) {
-		String osm = "path-to-merged-network.osm";
+		String osm = "/Users/thomas/Downloads/merged-network.osm";
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network net = sc.getNetwork();
@@ -29,7 +29,7 @@ public class OSM2MATSimNetwork {
 		OsmNetworkReader onr = new OsmNetworkReader(net, ct);
 		onr.parse(osm);
 		new NetworkCleaner().run(net);
-		new NetworkWriter(net).write("output-path-for-network.xml");
+		new NetworkWriter(net).write("/Users/thomas/Downloads/merged-network.xml");
 	}
 
 }
