@@ -169,6 +169,7 @@ public class JointReplanningConfigGroup extends Module {
 	public static final String NON_MEM_FITNESS_WEIGHT = "directFitnessWeight";
 	public static final String DUR_OPT_FITNESS_WEIGHT = "durationOptimizingFitnessWeight";
 	public static final String TOGGLE_OPT_FITNESS_WEIGHT = "toggleOptimizingFitnessWeight";
+	public static final String N_MAX_SIMPLEX_ITERS = "nMaxMultidirectionnalSearchIterations";
 	// deprecated parameters
 	private static final String NUM_TIME_INTERVALS = "numTimeIntervals";
 	private static final String DO_DUR = "dropOffDuration";
@@ -216,6 +217,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double directFitnessWeight = 5;
 	private double durationMemeticFitnessWeight = 1;
 	private double toggleMemeticFitnessWeight = 4;
+	private int nMaxSimplexIters = 30;
 	//deprecated fields:
 	private int populationSize = 28;
 	private int numTimeIntervals;
@@ -356,6 +358,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
 			this.setToggleMemeticFitnessWeight(value);
 		}
+		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
+			this.setMaxSimplexIterations(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -485,6 +490,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
 			return String.valueOf(this.getToggleMemeticFitnessWeight());
 		}
+		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
+			return ""+this.getMaxSimplexIterations();
+		}
 		return null;
 	}
 
@@ -529,6 +537,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, NON_MEM_FITNESS_WEIGHT);
 		this.addParameterToMap(map, DUR_OPT_FITNESS_WEIGHT);
 		this.addParameterToMap(map, TOGGLE_OPT_FITNESS_WEIGHT);
+		this.addParameterToMap(map, N_MAX_SIMPLEX_ITERS);
 		return map;
 	}
 
@@ -970,6 +979,14 @@ public class JointReplanningConfigGroup extends Module {
 		return this.toggleMemeticFitnessWeight;
 	}
 
+	public void setMaxSimplexIterations( final String value ) {
+		this.nMaxSimplexIters = Integer.valueOf(value);
+	}
+
+	public int getMaxSimplexIterations() {
+		return this.nMaxSimplexIters;
+	}
+
 	// allow setting of GA params "directly"
 	public void setPopulationSize(final int populationSize) {
 		this.populationSize = (populationSize);
@@ -1071,5 +1088,26 @@ public class JointReplanningConfigGroup extends Module {
 	public void setWindowSizeIntercept(final double value) {
 		windowSizeIntercept = value;
 	}
+
+	public void setMaxPopulationSize(final int value) {
+		this.maxPopulationSize = value;
+	}
+
+	public void setDirectFitnessWeight(final double value) {
+		this.directFitnessWeight = value;
+	}
+
+	public void setDurationMemeticFitnessWeight(final double value) {
+		this.durationMemeticFitnessWeight = value;
+	}
+
+	public void setToggleMemeticFitnessWeight(final double value) {
+		this.toggleMemeticFitnessWeight = value;
+	}
+
+	public void setMaxSimplexIterations( final int value ) {
+		this.nMaxSimplexIters = value;
+	}
+
 }
 

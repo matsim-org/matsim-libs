@@ -105,7 +105,9 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 		this.fullDecoder = fullDecoder;
 
 		if (isMemetic) {
-			this.scorer = new DurationSimplexAlgo(new DurationOnTheFlyScorer(
+			this.scorer = new DurationSimplexAlgo(
+					configGroup,
+					new DurationOnTheFlyScorer(
 						plan,
 						configGroup,
 						scoringFunctionFactory,
@@ -117,7 +119,7 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 						nMembers));
 		}
 		else {
-			this.scorer =new DurationOnTheFlyScorer(
+			this.scorer = new DurationOnTheFlyScorer(
 						plan,
 						configGroup,
 						scoringFunctionFactory,

@@ -39,6 +39,7 @@ import org.jgap.impl.DoubleGene;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPChromosome;
+import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
  * "on the fly" duration scorer, which performs an local optimisation algorithm
@@ -52,8 +53,9 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private static final Log log =
 		LogFactory.getLog(DurationSimplexAlgo.class);
 
-	private static final int N_MAX_ITERS = 20;
-	private static final double MIN_IMPROVEMENT = 1E-5;
+	//private static final int N_MAX_ITERS = 30;
+	private final int nMaxIters;
+	private static final double MIN_IMPROVEMENT = 1E-4;
 	// defines the size of the initial vertex (to be sure of the "locality"
 	// of the search!)
 	private static final double STEP = 5;
@@ -72,7 +74,9 @@ public class DurationSimplexAlgo implements FinalScorer {
 	private boolean optimizerConfigured = false;
 
 	public DurationSimplexAlgo(
+			final JointReplanningConfigGroup configGroup,
 			final DurationOnTheFlyScorer scorer) {
+		this.nMaxIters = configGroup.getMaxSimplexIterations();
 		this.scorer = scorer;
 	}
 
@@ -184,7 +188,7 @@ public class DurationSimplexAlgo implements FinalScorer {
 		}
 	}
 
-	private static class SimplexConvergenceChecker implements RealConvergenceChecker {
+	private class SimplexConvergenceChecker implements RealConvergenceChecker {
 		private final double threshold;
 
 		public SimplexConvergenceChecker(final int nMembers) {
@@ -199,7 +203,8 @@ public class DurationSimplexAlgo implements FinalScorer {
 			double previousValue = previousWorstPoint.getValue();
 			double currentValue = currentWorstPoint.getValue();
 			double improvement = Math.abs(currentValue - previousValue);
-			boolean converged = (iteration > N_MAX_ITERS) || (improvement < threshold);
+			//boolean converged = (iteration > N_MAX_ITERS) || (improvement < threshold);
+			boolean converged = (iteration > nMaxIters) || (improvement < threshold);
 
 			//if (converged) {
 			//	log.debug("convergence: "+iteration+" iters");
