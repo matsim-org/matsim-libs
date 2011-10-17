@@ -75,9 +75,12 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 		int paramWindowSize = (int) Math.ceil(
 				configGroup.getWindowSizeIntercept() +
 				configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
-		this.windowSize = Math.min(
+		paramWindowSize = Math.min(
 				paramWindowSize,
 				jgapConfig.getPopulationSize());
+
+		this.windowSize = Math.max(1, paramWindowSize);
+
 		this.jgapConfig = jgapConfig;
 		this.distanceComparator = distanceComparator;
 	}

@@ -153,7 +153,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 						configGroup.getPopulationCoef() * sampleGenes.length),
 					configGroup.getMaxPopulationSize());
 			//log.debug("population size set to "+popSize);
-			this.setPopulationSize(popSize);
+			this.setPopulationSize( Math.max(2, popSize) );
 
 			this.fitnessFunction = new JPOFitnessFunctionFactory(
 			//this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
