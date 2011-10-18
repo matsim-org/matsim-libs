@@ -63,7 +63,7 @@ public class MatchedLines2newSchedule {
 	
 	private ScenarioImpl osm;
 	private TransitSchedule hafas;
-	private static String PATH;
+//	private static String PATH;
 	
 	/**
 	 * @param osm
@@ -82,7 +82,6 @@ public class MatchedLines2newSchedule {
 		final String OSMSCHED = DIR + "osm_berlin_subway_sched.xml";
 		final String HAFASSCHED = DaPaths.OUTPUT + "bvg09/transitSchedule-HAFAS-Coord.xml";
 		final String OUTSCHED = DIR + "manuallyMatchedSched.xml";
-		PATH = DIR;
 		
 		final Set<String[]> matchedLines = DaFileReader.readFileContent(MATCHEDLINES, ";", true);
 		

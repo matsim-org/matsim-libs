@@ -66,18 +66,20 @@ public class MovingAgentImpl extends AbstractMovingObject {
 		Vector2D bestNewSpeed = this.goal.subtract(super.getCurrentPosition()).getUnitVector().addFactor(this.maxSpeed);
 		
 		//TODO reduce speed if agent is next to its goal
-		if(covers(obstacle.getGeometry(), super.getCurrentPosition().add(bestNewSpeed))){
-			int numOfArcs = 10;
-			int speedRate = 5;
+		if(obstacle == null){
+			super.setSpeed(bestNewSpeed);
+		}else if(covers(obstacle.getGeometry(), super.getCurrentPosition().add(bestNewSpeed))){
+			double numOfArcs = 10.0;
+			double speedRate = 5.0;
 			double angle = 2* Math.PI /numOfArcs;
 			Vector2D newLocation, newSpeed;
 			double dist = Double.POSITIVE_INFINITY;
 			double temp;
 			bestNewSpeed = new Vector2D(0, 0);
-			//TODO very inefficient, need a better algorithm to exteriorPoints
+			//TODO very inefficient, need a better algorithm to get exteriorPoints. should be a point at the border of the VO ...
 			for(int i = 0 ; i < numOfArcs; i++){
 				for(int j = 1; j < speedRate + 1; j++){
-					newSpeed = new Vector2D(maxSpeed * j / speedRate * Math.cos(angle * i), maxSpeed * j / speedRate * Math.sin(angle * i));
+					newSpeed = new Vector2D((maxSpeed * j * Math.cos(angle * i))/ speedRate, (maxSpeed * j * Math.sin(angle * i)) / speedRate);
 					newLocation = super.getCurrentPosition().add(newSpeed);
 					if(!covers(obstacle.getGeometry(), newLocation)){
 						temp  = CoordUtils.calcDistance(newLocation.getCoord(), this.goal.getCoord());
@@ -89,13 +91,14 @@ public class MovingAgentImpl extends AbstractMovingObject {
 				}
 			}
 			
-			this.setSpeed(bestNewSpeed);
+			super.setSpeed(bestNewSpeed);
 		}else{
-			this.setSpeed(bestNewSpeed);
+			super.setSpeed(bestNewSpeed);
 		}
 	}
 	
 	private boolean covers(Geometry g, Vector2D v){
+		if(g == null) return false;
 		for(int i = 0; i < g.getNumGeometries(); i++){
 			if(g.getGeometryN(i).covers(
 					new GeometryFactory().createPoint(new Coordinate(v.getX(), v.getY())))){
@@ -115,13 +118,27 @@ public class MovingAgentImpl extends AbstractMovingObject {
 			this.arrived = true;
 		}else{
 			Vector2D r0 = new Vector2D(this.getCurrentPosition().getX(), this.getCurrentPosition().getY());
-			Vector2D newPosition = new Vector2D(stepSize, super.getSpeed());
-			newPosition = newPosition.add(r0);
-			super.setNewPosition(newPosition);
+			Vector2D translation = new Vector2D(stepSize, super.getSpeed());
+			double alpha1 = (this.getGoal().getX() - r0.getX())/(translation.getX());
+			double alpha2 = (this.getGoal().getY() - r0.getY())/(translation.getY());
+			if((alpha1 < 1) && (alpha2 < 1) && (alpha1 == alpha2) ){
+				//TODO debug here, Agents jump!
+				super.setNewPosition(this.goal);
+			}else{
+				super.setNewPosition(translation.add(r0));
+			}
 		}
 	}
 	
 	public boolean arrived(){
 		return this.arrived;
+	}
+	
+	public Vector2D getGoal(){
+		return goal;
+	}
+	
+	public double getMaxSpeed(){
+		return maxSpeed;
 	}
 }

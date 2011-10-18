@@ -45,8 +45,9 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author droeder
- *
+ * use <code> {@link VelocityObstacleTestRunner} </Code>
  */
+@Deprecated
 public class TestRunner2d {
 
 	/**
@@ -72,17 +73,17 @@ public class TestRunner2d {
 
 		// create Agents
 		Map<MovingObject, Map<String, Coord>> pos = new HashMap<MovingObject, Map<String, Coord>>();
-		numOfAgents = 5;
-		agentRadius = 20;
+		numOfAgents = 20;
+		double agentDistributionRadius = 20;
 		angle = Math.PI /numOfAgents;
 		
 		MovingObject agent;
 		Vector2D position, goal;
-		double maxSpeed = 0.5;
+		double maxSpeed = 2.0;
 		Id id;
 		for(int i = 0 ; i < numOfAgents; i++){
 			id = new IdImpl(i);
-			position = new Vector2D(agentRadius * Math.cos(angle * i), agentRadius * Math.sin(angle * i));
+			position = new Vector2D(agentDistributionRadius * Math.cos(angle * i), agentDistributionRadius * Math.sin(angle * i));
 			goal = new Vector2D(-1, position);
 			agent = new MovingAgentImpl(position, goal, maxSpeed, id, g);
 			pos.put(agent, new HashMap<String, Coord>());
@@ -104,10 +105,8 @@ public class TestRunner2d {
 					e.getValue().put(String.valueOf(0), e.getKey().getCurrentPosition().getCoord());
 					vos.put(e.getKey().getId(), new HashMap<String, Geometry>());
 				}else {
-					VelocityObstacle vo = new VelocityObstacleImpl(e.getKey(), pos.keySet());
+					VelocityObstacle vo = new VelocityObstacleImpl(e.getKey(),pos.keySet());
 					vos.get(e.getKey().getId()).put(String.valueOf(i), vo.getGeometry());
-					for(int j = 0 ; j < vo.getGeometry().getNumGeometries(); j++) {
-					}
 					e.getKey().calculateNextStep(1, vo);
 				}
 			}
@@ -172,7 +171,7 @@ public class TestRunner2d {
 		}
 		return coords;
 	}
-
+	
 	
 //	public static void main(String[] args){
 //		final String DIR = DaPaths.VSP + "2D_Sim/";

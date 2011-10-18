@@ -38,6 +38,12 @@ public class VelocityObstacleImpl extends AbstractVelocityObstacle {
 	private Geometry geometry;
 	private GeometryFactory fac = new GeometryFactory();
 
+	/**
+	 *  use <code>{@link ReciprocalVelocityObstacleImpl}</code>
+	 * @param theOne
+	 * @param opponents
+	 */
+	@Deprecated
 	public VelocityObstacleImpl(MovingObject theOne, Set<MovingObject> opponents) {
 		super(theOne, opponents);
 	}
@@ -60,7 +66,7 @@ public class VelocityObstacleImpl extends AbstractVelocityObstacle {
 			ii = 1;
 			//addition of the coordinates of both agentGeometries -> MinkowskiSum
 			for(Coordinate c : o.getGeometry().getCoordinates()){
-				//TODO reflection of the origin Geometry in its referencePoint -> not necessary for a circle 
+				//TODO reflection of the origin Geometry in its referencePoint -> not implemented yet, because its not necessary for a circle...
 				for(Coordinate cc : super.theOne.getGeometry().getCoordinates()){
 					coords[ii] = new Coordinate(c.x + cc.x + translation.getX(), c.y + cc.y + translation.getY());
 					ii++;
@@ -83,6 +89,7 @@ public class VelocityObstacleImpl extends AbstractVelocityObstacle {
 	private Coordinate vector2Coordinate(Vector2D v){
 		return new Coordinate(v.getX(), v.getY());
 	}
+	
 
 
 }

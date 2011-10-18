@@ -61,7 +61,7 @@ public class OSMTransitCheck {
 		
 		String OUTNETSHP = DIR + "osm_berlin_subway_net.shp";
 		String OUTSCHEDSTOPSSHP = DIR + "osm_berlin_subway_stops_by_sched.shp";
-		String OSMSUBWAYLINKSEQUENCESHP = DIR + "osm_subway_link_sequence.shp";
+//		String OSMSUBWAYLINKSEQUENCESHP = DIR + "osm_subway_link_sequence.shp";
 		String OSMCOMPLETESEQUENCE = DIR + "osm_subway_link_complSequ.shp";
 		
 		String[] modes = new String[1];
