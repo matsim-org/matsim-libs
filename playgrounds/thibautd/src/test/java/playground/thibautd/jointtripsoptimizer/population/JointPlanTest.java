@@ -162,6 +162,33 @@ public class JointPlanTest {
 				clique.getMembers().get(pers1).getPlans().contains(plan1));
 	}
 
+	@Test
+	public void testCopyConstructor() {
+		JointPlan testPlan =
+			new JointPlan(
+					clique,
+					individualUnsynchronizedPlans,
+					false,
+					true);
+		JointPlan copy = new JointPlan(testPlan);
+
+		List<PlanElement> elements = testPlan.getPlanElements();
+		List<PlanElement> copyElements = copy.getPlanElements();
+
+		for (int i=0; i < elements.size(); i++) {
+			// not that simple: equals not defined
+			//Assert.assertTrue(
+			//		"copied plan different from copy",
+			//		elements.get(i).equals(copyElements.get(i)));
+			Assert.assertTrue(
+					"references in copy plan identical to the ones in copied plan",
+					elements.get(i) != copyElements.get(i));
+
+		}
+
+		// TODO: modify copy and chack no modification in copied
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
