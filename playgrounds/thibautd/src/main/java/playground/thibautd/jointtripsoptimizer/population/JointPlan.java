@@ -152,13 +152,13 @@ public class JointPlan implements Plan {
 
 			for (PlanElement pe : currentImportedPlan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					if (pe instanceof JointActivity) {
-						currentActivity = (JointActivity) pe;
-					}
-					else {
+					//if (pe instanceof JointActivity) {
+					//	currentActivity = (JointActivity) pe;
+					//}
+					//else {
 						currentActivity = new JointActivity((Activity) pe, 
 								this.clique.getMembers().get(id));
-					}
+					//}
 					actType = currentActivity.getType();
 
 					if (actType.matches(JointActingTypes.PICK_UP_REGEXP)) {
@@ -171,12 +171,12 @@ public class JointPlan implements Plan {
 					currentPlan.addActivity(currentActivity);
 				}
 				else {
-					if (pe instanceof JointLeg) {
-						currentLeg = (JointLeg) pe;
-					} else  {
+					//if (pe instanceof JointLeg) {
+					//	currentLeg = (JointLeg) pe;
+					//} else  {
 						currentLeg = new JointLeg((Leg) pe,
 								(Person) this.clique.getMembers().get(id));
-					}
+					//}
 
 					if (currentJointEpisodeId != null) {
 						// this leg is a shared leg, remember this.
