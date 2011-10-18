@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,16 @@ public class MyTollPotentialCalculator {
 	private final RoadPricingScheme scheme;
 
 	/**
-	 * @param args
+	 * Implementing the class to calculate the potential toll. 
+	 * @param args the following arguments are required, and in the following order:
+	 * <ol>
+	 * 	<li> events file from which agent plans are analyzed;
+	 * 	<li> file road pricing file (should be in the format according to
+	 * 		 {@link http://www.matsim.org/files/dtd/roadpricing_v1.dtd}
+	 * 	<li> the output folder to which the maps are written;
+	 * 	<li> list of agent Ids that indicate the upper limit of a subgroup. A separate
+	 * 		 map will be written for each subgroup of agents.
+	 * </ol>
 	 */
 	public static void main(String[] args) {
 		log.info("===============================================================================");
@@ -61,8 +71,8 @@ public class MyTollPotentialCalculator {
 			breakList.add(new IdImpl(args[i]));
 		}
 
-		MyTollPotentialCalculator mtpc = new MyTollPotentialCalculator(linksFilename);
-		List<Id> linkList = mtpc.readLinkIdsFromRoadPricingScheme();
+		MyTollPotentialCalculator mtpc = new MyTollPotentialCalculator();
+		List<Id> linkList = mtpc.readLinkIdsFromRoadPricingScheme(linksFilename);
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
@@ -107,14 +117,15 @@ public class MyTollPotentialCalculator {
 	}
 
 	
-	public MyTollPotentialCalculator(String roadpricingFilename) {
-		log.info("Reading tolled links from " + roadpricingFilename);		
+	public MyTollPotentialCalculator() {
 		scheme = new RoadPricingScheme();
-		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
-		rpr.parse(roadpricingFilename);		
 	}
 	
-	private List<Id> readLinkIdsFromRoadPricingScheme(){
+	
+	private List<Id> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
+		log.info("Reading tolled links from " + roadpricingFilename);		
+		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
+		rpr.parse(roadpricingFilename);		
 		List<Id> list = new ArrayList<Id>();
 		for(Id i : this.scheme.getLinkIdSet()){
 			list.add(i);
@@ -135,7 +146,7 @@ public class MyTollPotentialCalculator {
 	 * 		guess we assume the list is sorted in ascending order).  
 	 * @param scheme the {@link RoadPricingScheme} 
 	 * @return a {@link List} of {@link Map}s (one for each agent category) of 
-	 * 		people that entered (on or more times) an observed link, as well as 
+	 * 		people that entered (one or more times) an observed link, as well as 
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyTollPotentialEventHandler
 	 */
