@@ -283,10 +283,11 @@ public class LocationChoiceConfigGroup extends Module {
 		return map;
 	}
 
-
+	@Deprecated
 	public String getMode() {
 		return this.constrained;
 	}
+	@Deprecated
 	public void setMode(final String constrained) {
 		this.constrained = constrained;
 	}
@@ -326,9 +327,11 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setRecursionTravelSpeed(final String recursionTravelSpeed) {
 		this.recursionTravelSpeed = recursionTravelSpeed;
 	}
+	@Deprecated
 	public void setSimpleTG(final String simple_tg) {
 		this.simple_tg = simple_tg;
 	}
+	@Deprecated
 	public String getSimpleTG() {
 		return this.simple_tg;
 	}
