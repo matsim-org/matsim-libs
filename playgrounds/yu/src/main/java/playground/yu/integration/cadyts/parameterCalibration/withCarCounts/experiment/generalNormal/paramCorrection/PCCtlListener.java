@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
@@ -87,16 +88,15 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	// private ChoiceParameterCalibrator3<Link> calibrator = null;
 	private void setMatsimParameters(Controler ctl) {
-		final Network network = ctl.getNetwork();
 		Config config = ctl.getConfig();
 
-		String distFilterCenterNodeStr = config.counts()
-				.getDistanceFilterCenterNode();
+		CountsConfigGroup ccg = config.counts();
+		String distFilterCenterNodeStr = ccg.getDistanceFilterCenterNode();
 		if (distFilterCenterNodeStr != null) {
 			// set up center and radius of counts stations locations
-			distanceFilterCenterNodeCoord = network.getNodes()
+			distanceFilterCenterNodeCoord = ctl.getNetwork().getNodes()
 					.get(new IdImpl(distFilterCenterNodeStr)).getCoord();
-			distanceFilter = config.counts().getDistanceFilter();
+			distanceFilter = ccg.getDistanceFilter();
 		}
 		// set up volumes analyzer
 		volumes = ctl.getVolumes();
@@ -227,17 +227,18 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
-		for (Map.Entry<Id, Count> entry : counts.getCounts().entrySet()) {
-			Link link = network.getLinks().get(entry.getKey());
+		Map<Id, Count> countsMap = counts.getCounts();
+		for (Id countId : countsMap.keySet()) {
+			Link link = network.getLinks().get(countId);
 			if (link == null) {
-				System.err.println("could not find link "
-						+ entry.getKey().toString());
-			} else if (isInRange(entry.getKey(), network)) {
+				System.err.println("could not find link " + countId.toString());
+			} else if (isInRange(countId, network)) {
 				// for ...2QGIS
-				links.add(network.getLinks().get(entry.getKey()));
-				linkIds.add(entry.getKey());
+				links.add(network.getLinks().get(countId));
+				linkIds.add(countId);
 				// ---------GUNNAR'S CODES---------------------
-				for (Volume volume : entry.getValue().getVolumes().values()) {
+				for (Volume volume : countsMap.get(countId).getVolumes()
+						.values()) {
 					int hour = volume.getHour();
 					if (hour >= caliStartTime && hour <= caliEndTime) {
 						int start_s = (hour - 1) * 3600;
