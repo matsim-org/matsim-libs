@@ -19,6 +19,7 @@
 		<param name="outputDirectory" value="/home/jjoubert/Commercial/Output/Run_06/" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="100" />
+		<param name = "snapshotFormat"	value = "googleearth"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
     <module name="counts">
@@ -43,7 +44,6 @@
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.275" />
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "googleearth"/> <!-- netvis, googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">

@@ -20,6 +20,7 @@
 		<param name="outputDirectory" value="./output/holes" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
+		<param name="snapshotFormat" value="otfvis" />
 	</module>
 
 	<module name="qsim">
@@ -28,7 +29,6 @@
 
 		<param name="trafficDynamics" value="withHolesExperimental"/>
 
-		<param name="snapshotFormat" value="otfvis" />
 		<param name="snapshotStyle" value="withHolesExperimental" />
 		<param name="snapshotperiod" value="00:00:10" />
 		

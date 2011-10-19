@@ -24,6 +24,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="outputDirectory" value="2myoutput" />
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="simulation">
@@ -40,7 +41,6 @@
                 <!-- (leave as is) -->
 	
  		<param name = "snapshotperiod"	value = "00:15:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">

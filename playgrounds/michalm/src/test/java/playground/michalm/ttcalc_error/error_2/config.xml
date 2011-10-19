@@ -13,11 +13,11 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="0" />
 		<param name="eventsFileFormat" value="xml" />
+    <param name="snapshotFormat" value="otfvis" />
 	</module>
 
 
 	<module name="qsim">
-	        <param name="snapshotFormat" value="otfvis" />
 		<param name="snapshotperiod" value="00:01:00" />
 		<param name="flowCapacityFactor" value="1" />
 		<param name="storageCapacityFactor" value="1" />

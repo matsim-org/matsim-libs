@@ -27,7 +27,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 
-		<param name="snapshotFormat" value="otfvis" /><!-- netvis, googleearth,	transims -->
+		<param name="snapshotFormat" value="otfvis" /><!-- otfvis, googleearth,	transims -->
 	</module>
 
 	<module name="simulation">

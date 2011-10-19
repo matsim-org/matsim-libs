@@ -19,6 +19,7 @@
 		<param name="outputDirectory" value="./Output/OTFVisTests/QSim" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="1" />
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="qsim">
@@ -27,7 +28,6 @@
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 	
 	<module name="otfvis" >

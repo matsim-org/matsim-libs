@@ -15,7 +15,7 @@
 		<param name="outputDirectory" value="test/output/Equil_Szenario2" />
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
-		<param name = "snapshotFormat"	value = ""/> <!-- netvis, googleearth, transims -->
+		<param name = "snapshotFormat"	value = ""/> <!-- otfvis, googleearth, transims -->
 	</module>
 
 	<module name="simulation">

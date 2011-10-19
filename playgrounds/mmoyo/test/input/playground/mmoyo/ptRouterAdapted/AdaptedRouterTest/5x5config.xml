@@ -30,13 +30,13 @@
 		<param name="firstIteration" value="-1" />
 		<param name="lastIteration" value="0" />
 		<param name="writeEventsInterval" value="1" />
+		<param name="snapshotFormat"	value = "otfvis"/> 
 	</module>
 	
 	<module name="qsim" >
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="30:00:00" />
 		<param name="snapshotperiod" value="00:00:00" />
-		<param name="snapshotFormat"	value = "otfvis"/> 
  		<param name="snapshotStyle"	value = "queue"/> 
 		<param name="flowCapacityFactor" value="0.02" />
 		<param name="storageCapacityFactor" value="0.06" />
