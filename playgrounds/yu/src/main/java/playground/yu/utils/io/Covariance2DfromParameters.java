@@ -36,6 +36,7 @@ import utilities.math.Matrix;
 import utilities.math.Vector;
 
 /**
+ * calculates var{E{...}}
  * @author yu
  *
  */
