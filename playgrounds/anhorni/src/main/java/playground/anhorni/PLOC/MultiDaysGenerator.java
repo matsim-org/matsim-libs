@@ -118,7 +118,7 @@ public class MultiDaysGenerator {
 		hhandler.assign(); 
 			
 		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", config,
-				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
+				Long.parseLong(config.locationchoice().getRandomSeed()));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -126,7 +126,7 @@ public class MultiDaysGenerator {
 		maxEpsilonComputer.finishReplanning();
 		
 		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", config,
-				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
+				Long.parseLong(config.locationchoice().getRandomSeed()));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
