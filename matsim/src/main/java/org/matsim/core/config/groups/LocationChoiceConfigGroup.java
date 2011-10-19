@@ -40,7 +40,6 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RECURSIONTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
 	private static final String RECURSIONTRAVELSPEED = "recursionTravelSpeed";
 	private static final String MAX_RECURSIONS = "maxRecursions";
-	private static final String FIX_BY_ACTTYPE = "fixByActType";
 	private static final String SIMPLE_TG = "simple_tg";
 	private static final String CENTER_NODE = "centerNode";
 	private static final String RADIUS = "radius";
@@ -61,7 +60,6 @@ public class LocationChoiceConfigGroup extends Module {
 	private String recursionTravelSpeedChange = "0.1";
 	private String recursionTravelSpeed = "8.5";
 	private String maxRecursions = "1";
-	private String fixByActType = "false";
 	private String simple_tg = "false";
 	private String centerNode = "null";
 	private String radius = "null";
@@ -103,9 +101,6 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (MAX_RECURSIONS.equals(key)) {
 			return getMaxRecursions();
-		}
-		if (FIX_BY_ACTTYPE.equals(key)) {
-			return getFixByActType();
 		}
 		if (SIMPLE_TG.equals(key)) {
 			return getSimpleTG();
@@ -201,14 +196,6 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setMaxRecursions(value);
 			}
-		} else if (FIX_BY_ACTTYPE.equals(key)) {
-			if (!(value.equals("true") || value.equals("false"))) {
-				log.warn("set 'fixByActType' to either 'true' or 'false'. Set to default value 'false'");
-				setFixByActType("false");
-			}
-			else {
-				setFixByActType(value);
-			}
 		} else if (SIMPLE_TG.equals(key)) {
 			if (!(value.equals("true") || value.equals("false"))) {
 				log.warn("set 'simple_tg' to either 'true' or 'false'. Set to default value 'false'");
@@ -283,7 +270,6 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RECURSIONTRAVELSPEEDCHANGE);
 		this.addParameterToMap(map, RECURSIONTRAVELSPEED);
 		this.addParameterToMap(map, MAX_RECURSIONS);
-		this.addParameterToMap(map, FIX_BY_ACTTYPE);
 		this.addParameterToMap(map, SIMPLE_TG);
 		this.addParameterToMap(map, CENTER_NODE);
 		this.addParameterToMap(map, RADIUS);
@@ -339,12 +325,6 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setRecursionTravelSpeed(final String recursionTravelSpeed) {
 		this.recursionTravelSpeed = recursionTravelSpeed;
-	}
-	public String getFixByActType() {
-		return this.fixByActType;
-	}
-	public void setFixByActType(final String fixByActType) {
-		this.fixByActType = fixByActType;
 	}
 	public void setSimpleTG(final String simple_tg) {
 		this.simple_tg = simple_tg;

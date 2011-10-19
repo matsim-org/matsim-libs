@@ -28,12 +28,12 @@
  *  </li>
  *  <li><strong><font color="black">planSelector</font></strong><br>
  * 		Type and range: String (BestScore, SelectExpBeta, ChangeExpBeta, SelectRandom)<br>
- * 		Default: null <br>
+ * 		Default: SelectExpBeta <br>
  * 		Description: Specifies which plan should be replanned.
  *  </li>
  *  <li><strong><font color="black">algorithm</font></strong><br>
  * 		Type and range: String (random, bestResponse, localSearchRecursive, localSearchSingleAct)<br>
- * 		Default: null <br>
+ * 		Default: random <br>
  * 		Description: Specifies which version of destination choice module should be applied. <br>
  * 		localSearchRecursive = time geography <br>
  * 		localSearchSingleAct = the same as simple_tg <br>
@@ -44,11 +44,6 @@
  * 		Type and range: long <br>
  * 		Default: null <br>
  * 		Description: Initial seed for generation of random error terms
- *  </li>
- *  <li><strong><font color="black">fixByActType</font></strong><br>
- * 		Type and range: boolean (true / false) <br>
- * 		Default: false <br>
- * 		Description: deprecated, do not use this anymore
  *  </li>
  * </ul>
  * 
