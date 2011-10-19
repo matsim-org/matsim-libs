@@ -51,6 +51,13 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String SEARCHSPACEBETA = "searchSpaceBeta";
 	private static final String MAXDISTANCEEPSILON = "maxDistanceEpsilon";
 	private static final String PLANSELECTOR = "planSelector";
+	
+	private static final String RANDOMSEED = "randomSeed";
+	private static final String EPSDISTR = "epsilonDistribution";
+	private static final String SCALE_EPS_SHOPPING = "scaleEpsShopping";
+	private static final String SCALE_EPS_LEISURE = "scaleEpsLeisure";
+	private static final String PROBCHOICESETSIZE = "probChoiceSetSize";
+	private static final String PROBCHOICEEXP = "probChoiceExponent";
 
 	//default values
 	private String constrained = "false";
@@ -71,6 +78,13 @@ public class LocationChoiceConfigGroup extends Module {
 	private String searchSpaceBeta = "-0.0001";
 	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
+	
+	private String randomSeed = "221177";
+	private String epsilonDistribution = "gumbel";
+	private String scaleEpsShopping = "1.0";
+	private String scaleEpsLeisure = "1.0";
+	private String probChoiceSetSize = "10";
+	private String probChoiceExponent ="3";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -131,6 +145,24 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (PLANSELECTOR.equals(key)) {
 			return getPlanSelector();
+		}
+		if (RANDOMSEED.equals(key)) {
+			return getRandomSeed();
+		}
+		if (EPSDISTR.equals(key)) {
+			return getEpsilonDistribution();
+		}
+		if (SCALE_EPS_SHOPPING.equals(key)) {
+			return getScaleEpsShopping();
+		}
+		if (SCALE_EPS_LEISURE.equals(key)) {
+			return getScaleEpsLeisure();
+		}
+		if (PROBCHOICESETSIZE.equals(key)) {
+			return getProbChoiceSetSize();
+		}
+		if (PROBCHOICEEXP.equals(key)) {
+			return getProbChoiceExponent();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -253,13 +285,55 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setPlanSelector(value);
 			}
+		} else if (RANDOMSEED.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("set a random seed. Set to default value '221177' now");
+			}
+			else {
+				setRandomSeed(value);
+			}
+		} else if (EPSDISTR.equals(key)) {
+			if (!(value.equals("gumbel") || value.equals("gaussian"))) {
+				log.warn("set a distribution for the random error terms. Set to default value 'gumbel' now");
+			}
+			else {
+				setEpsilonDistribution(value);
+			}
+		} else if (SCALE_EPS_SHOPPING.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("set a scaling factor for shopping random error terms. Set to default value '1.0' now");
+			}
+			else {
+				setScaleEpsShopping(value);
+			}
+		} else if (SCALE_EPS_LEISURE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("set a scaling factor for leisure random error terms. Set to default value '1.0' now");
+			}
+			else {
+				setScaleEpsLeisure(value);
+			}
+		} else if (PROBCHOICESETSIZE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define size of canditate set for probabilistic choice. Set to default value '10' now");
+			}
+			else {
+				setProbChoiceSetSize(value);
+			}
+		} else if (PROBCHOICEEXP.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define weight (exponent) for weighting scores in candiate set. Set to default value '3' now");
+			}
+			else {
+				setProbChoiceExponent(value);
+			}
 		}
 		else
 		{
 			throw new IllegalArgumentException(key);
 		}
 	}
-
+	
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
@@ -280,6 +354,12 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, SEARCHSPACEBETA);
 		this.addParameterToMap(map, MAXDISTANCEEPSILON);
 		this.addParameterToMap(map, PLANSELECTOR);
+		this.addParameterToMap(map, RANDOMSEED);
+		this.addParameterToMap(map, EPSDISTR);
+		this.addParameterToMap(map, SCALE_EPS_SHOPPING);
+		this.addParameterToMap(map, SCALE_EPS_LEISURE);
+		this.addParameterToMap(map, PROBCHOICESETSIZE);
+		this.addParameterToMap(map, PROBCHOICEEXP);
 		return map;
 	}
 
@@ -388,5 +468,41 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setPlanSelector(String planSelector) {
 		this.planSelector = planSelector;
+	}
+	public String getRandomSeed() {
+		return randomSeed;
+	}
+	public void setRandomSeed(String randomSeed) {
+		this.randomSeed = randomSeed;
+	}
+	public String getEpsilonDistribution() {
+		return epsilonDistribution;
+	}
+	public void setEpsilonDistribution(String epsilonDistribution) {
+		this.epsilonDistribution = epsilonDistribution;
+	}
+	public String getScaleEpsShopping() {
+		return scaleEpsShopping;
+	}
+	public void setScaleEpsShopping(String scaleEpsShopping) {
+		this.scaleEpsShopping = scaleEpsShopping;
+	}
+	public String getScaleEpsLeisure() {
+		return scaleEpsLeisure;
+	}
+	public void setScaleEpsLeisure(String scaleEpsLeisure) {
+		this.scaleEpsLeisure = scaleEpsLeisure;
+	}
+	public String getProbChoiceSetSize() {
+		return probChoiceSetSize;
+	}
+	public void setProbChoiceSetSize(String probChoiceSetSize) {
+		this.probChoiceSetSize = probChoiceSetSize;
+	}
+	public String getProbChoiceExponent() {
+		return probChoiceExponent;
+	}
+	public void setProbChoiceExponent(String probChoiceExponent) {
+		this.probChoiceExponent = probChoiceExponent;
 	}
 }

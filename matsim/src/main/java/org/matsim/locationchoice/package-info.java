@@ -42,7 +42,7 @@
  *  </li>
  *  <li><strong><font color="black">randomSeed</font></strong><br>
  * 		Type and range: long <br>
- * 		Default: null <br>
+ * 		Default: 221177 <br>
  * 		Description: Initial seed for generation of random error terms
  *  </li>
  * </ul>
@@ -101,19 +101,19 @@
  * 
  * <h3>Utility Function Specification</h3>
  * <ul>
- * 	<li><strong><font color="red">gumbel</font></strong><br>
- * 		Type and range: boolean (true/false) <br> 
- * 		Default: false <br>
+ * 	<li><strong><font color="red">epsilonDistribution</font></strong><br>
+ * 		Type and range: String (gumbel/gaussian) <br> 
+ * 		Default: gumbel <br>
  * 		Description: Either use Normal or Gumbel distribution for error terms
  * 	</li>
- * <li><strong><font color="red">fShop</font></strong><br>
+ * <li><strong><font color="red">scaleEpsShopping</font></strong><br>
  * 		Type and range: float > 0.0 <br> 
- * 		Default: null <br>
+ * 		Default: 1.0 <br>
  * 		Description: Scale the shopping activities epsilons
  * 	</li>
- * <li><strong><font color="red">fLeisure</font></strong><br>
+ * <li><strong><font color="red">scaleEpsLeisure</font></strong><br>
  * 		Type and range: float > 0.0 <br> 
- * 		Default: null <br>
+ * 		Default: 1.0 <br>
  * 		Description: Scale the leisure activities epsilons
  * 	</li>
  * </ul>
@@ -138,14 +138,14 @@
  * 		Default: -1 <br>
  * 		Description: Maximum search space radius [m]. "-1" means no explicit fixed search space limitation. 
  * 	</li>
- * <li><strong><font color="red">numberOfAlternatives</font></strong><br>
+ * <li><strong><font color="red">probChoiceSetSize</font></strong><br>
  * 		Type and range: int > 0 <br> 
- * 		Default: ... <br>
+ * 		Default: 10 <br>
  * 		Description: Number of alternatives taken into account for the probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
  * 	</li>
- *  <li><strong><font color="red">csexponent</font></strong><br>
+ *  <li><strong><font color="red">probChoiceExponent</font></strong><br>
  * 		Type and range: float <br> 
- * 		Default: ... <br>
+ * 		Default: 3.0 <br>
  * 		Description: Weighting of scores in the reduced choice set subject to probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
  * 	</li>
  * </ul>
