@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
 import java.util.ArrayList;
 
@@ -36,7 +36,7 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.LegScoringFunction4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.LegScoringFunction4PC;
 
 /**
  * @author yu

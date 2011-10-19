@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Run.java
+ * DummyPlansScoring4PC.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,40 +19,41 @@
  * *********************************************************************** */
 
 /**
- *
+ * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.yu.tests.parameterCalibration.naiveWithoutUC.SimCntLogLikelihoodCtlListener;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.StartupListener;
 
 /**
+ * a changed copy of {@code PlansScoring} for the parameter calibration,
+ * especially in order to put new parameters to CharyparNagelScoringConfigGroup
+ * 
  * @author yu
- *
+ * 
  */
-public class PC_Run_withOwnLlh {
-	/** @param args */
-	/**
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0]);
-		Controler ctl = new PCCtl(config);
-		// if (args.length > 1 && Boolean.parseBoolean(args[1])) {
-		// ctl.addControlerListener(new CntSimCap4Chart());
-		// ctl.addControlerListener(new RouteTravelTimeSummary());
-		// }
-		// TODO set in config
-		// ctl.addControlerListener(new QVProfilControlerListener());
+public abstract class PlansScoring4PC implements StartupListener,
+		ScoringListener, IterationStartsListener {
 
-		ctl.addControlerListener(new SimCntLogLikelihoodCtlListener());
+	protected Events2Score4PC planScorer;
 
-		ctl.setCreateGraphs(false);
-		ctl.setOverwriteFiles(true);
-		ctl.run();
+	public abstract void notifyStartup(final StartupEvent event);
+
+	public Events2Score4PC getPlanScorer() {
+		return planScorer;
+	}
+
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		planScorer.reset(event.getIteration());
+	}
+
+	public void notifyScoring(final ScoringEvent event) {
+		planScorer.finish();
 	}
 
 }

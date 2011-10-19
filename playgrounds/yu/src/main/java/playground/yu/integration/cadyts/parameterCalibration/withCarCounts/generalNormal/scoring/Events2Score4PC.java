@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;

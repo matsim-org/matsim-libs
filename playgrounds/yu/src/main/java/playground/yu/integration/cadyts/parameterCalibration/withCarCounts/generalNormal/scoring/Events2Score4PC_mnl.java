@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +42,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.utils.io.SimpleWriter;

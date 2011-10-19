@@ -36,7 +36,10 @@ import utilities.math.Matrix;
 import utilities.math.Vector;
 
 /**
- * calculates var{E{...}}
+ * calculates var{E{...}} (variance of expectation, the 2nd part of total
+ * variance), see also: {@link http
+ * ://en.wikipedia.org/wiki/Law_of_total_covariance}
+ *
  * @author yu
  *
  */

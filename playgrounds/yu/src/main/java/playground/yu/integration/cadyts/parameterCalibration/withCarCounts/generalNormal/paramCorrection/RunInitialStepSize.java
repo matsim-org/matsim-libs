@@ -21,27 +21,31 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+
 /**
- * starts tests with different initial betaTravelingPt values.
+ * starts tests with different initialStepSize in cadyts values.
  *
  * @author yu
  *
  */
-public class RunTravPt {
+public class RunInitialStepSize {
 	private static void run(Config config, String outputPath, double val) {
 		// /////////////////////////////////////////////////////
-		config.planCalcScore().setTravelingPt_utils_hr(val);
+		config.setParam(
+				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
+				"initialStepSize", Double.toString(val));
 		// ///////////////////////////////////////////////////////
 		config.controler().setOutputDirectory(outputPath + val);
 		// //////////////////////////////////////////////////////
 		System.out
-				.println("################################################\n Tests mit\t\"travelingPt\"\t=\t"
+				.println("################################################\n P.C. travPt Tests mit\t\"initialStepSize\"\t=\t"
 						+ val + "\tBEGAN!");
 
 		Controler ctl = new PCCtl(config);
@@ -49,7 +53,8 @@ public class RunTravPt {
 		ctl.setOverwriteFiles(true);
 		ctl.run();
 
-		System.out.println("Tests mit\t\"travelingPt\"\t=\t" + val
+		System.out.println(" P.C. travPt Tests mit\t\"initialStepSize\"\t=\t"
+				+ val
 				+ "\tENDED!\n################################################");
 	}
 
@@ -57,22 +62,16 @@ public class RunTravPt {
 	 * @param args0
 	 *            configfile (required)
 	 * @param args1
-	 *            travelPt<=0 ? travelPt*(-10d) : travelPt*10d (required)
-	 * @param args2
-	 *            travelPt>0 ? "positive" : (nothing)
+	 *            initialStepSize (positive real number)
 	 */
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 		String outputPath = config.controler().getOutputDirectory();
 		/* please without "/" at the end */
 
-		double travPtVal = -Double.parseDouble(args[1]/*
-													 * to be used value * -10d
-													 */) / 10d;
-		if (args.length == 3 && args[2].equals("positive")) {
-			travPtVal = -travPtVal;
-		}
-		run(config, outputPath, travPtVal);
+		double initialStepSize = Double.parseDouble(args[1]
+		/* to be used value * 10d */) / 10d;
+		run(config, outputPath, initialStepSize);
 	}
 
 }

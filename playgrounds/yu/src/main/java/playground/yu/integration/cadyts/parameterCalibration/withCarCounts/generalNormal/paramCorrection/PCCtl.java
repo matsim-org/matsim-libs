@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.EventsHandling;
@@ -36,7 +36,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.PlansScoring4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC_mnl;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",

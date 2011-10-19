@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection.PCCtlListener;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.PCCtlListener;
 import utilities.math.MultinomialLogit;
 
 public class MultinomialLogitCreator {

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;

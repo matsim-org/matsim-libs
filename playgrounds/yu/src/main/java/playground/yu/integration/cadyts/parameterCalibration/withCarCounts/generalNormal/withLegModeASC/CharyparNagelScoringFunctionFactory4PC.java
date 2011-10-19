@@ -1,4 +1,4 @@
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -30,7 +30,7 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.ScoringFunctionAccumulator4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.ScoringFunctionAccumulator4PC;
 
 public class CharyparNagelScoringFunctionFactory4PC extends
 		CharyparNagelScoringFunctionFactory {

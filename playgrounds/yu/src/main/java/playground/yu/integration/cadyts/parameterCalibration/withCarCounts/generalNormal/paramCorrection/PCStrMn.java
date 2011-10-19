@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
 import java.util.Collections;
 
@@ -38,8 +38,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.MultinomialLogitCreator;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
 import utilities.math.BasicStatistics;

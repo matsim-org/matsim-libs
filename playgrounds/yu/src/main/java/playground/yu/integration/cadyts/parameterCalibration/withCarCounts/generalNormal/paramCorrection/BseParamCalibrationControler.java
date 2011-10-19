@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyPlansScoring4PC.java
+ * DummyBseParamCalibrationControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,39 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
-import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 
 /**
- * a changed copy of {@code PlansScoring} for the parameter calibration,
- * especially in order to put new parameters to CharyparNagelScoringConfigGroup
- *
  * @author yu
  *
  */
-public class PlansScoring4PC_mnl extends PlansScoring4PC implements
-		StartupListener, ScoringListener, IterationStartsListener {
-	private final static Logger log = Logger.getLogger(PlansScoring4PC_mnl.class);
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-		Controler ctl = event.getControler();
+public abstract class BseParamCalibrationControler extends Controler {
 
-		planScorer = new Events2Score4PC_mnl(ctl.getConfig(), ctl
-				.getScoringFunctionFactory(), ctl.getPopulation());
+	protected BseParamCalibrationControlerListener extension;
+	protected PlansScoring4PC plansScoring4PC;
 
-		log.debug(
-				"PlansScoring4PC_mnl loaded ScoringFunctionFactory");
-
-		ctl.getEvents().addHandler(planScorer);
+	public BseParamCalibrationControler(String[] args) {
+		super(args);
 	}
+
+	public BseParamCalibrationControler(Config config) {
+		super(config);
+	}
+
+	public PlansScoring4PC getPlansScoring4PC() {
+		return plansScoring4PC;
+	}
+
+	@Override
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new CharyparNagelScoringFunctionFactory4PC(
+				config.planCalcScore(), network);
+	}
+
+	@Override
+	protected abstract void loadCoreListeners();
 
 }

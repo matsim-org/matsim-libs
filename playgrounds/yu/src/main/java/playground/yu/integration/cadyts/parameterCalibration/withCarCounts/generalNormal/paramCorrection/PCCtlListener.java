@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,9 +50,9 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.Events2Score4PC_mnl;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;

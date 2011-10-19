@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyBseParamCalibrationControler.java
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,44 +18,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.paramCorrection;
+/**
+ *
+ */
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.scoring.PlansScoring4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.experiment.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+import playground.yu.tests.parameterCalibration.naiveWithoutUC.SimCntLogLikelihoodCtlListener;
 
 /**
  * @author yu
  *
  */
-public abstract class BseParamCalibrationControler extends Controler {
+public class PC_Run_withOwnLlh {
+	/** @param args */
+	/**
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new PCCtl(config);
+		// if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+		// ctl.addControlerListener(new CntSimCap4Chart());
+		// ctl.addControlerListener(new RouteTravelTimeSummary());
+		// }
+		// TODO set in config
+		// ctl.addControlerListener(new QVProfilControlerListener());
 
-	protected BseParamCalibrationControlerListener extension;
-	protected PlansScoring4PC plansScoring4PC;
+		ctl.addControlerListener(new SimCntLogLikelihoodCtlListener());
 
-	public BseParamCalibrationControler(String[] args) {
-		super(args);
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 	}
-
-	public BseParamCalibrationControler(Config config) {
-		super(config);
-	}
-
-	public PlansScoring4PC getPlansScoring4PC() {
-		return plansScoring4PC;
-	}
-
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory4PC(
-				config.planCalcScore(), network);
-	}
-
-	@Override
-	protected abstract void loadCoreListeners();
 
 }
