@@ -22,7 +22,6 @@ package herbie.creation.ptAnalysis;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -30,7 +29,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
@@ -42,6 +40,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 public class PtScenarioAdaption {
 	
@@ -52,15 +55,19 @@ public class PtScenarioAdaption {
 	private String networkfilePath;
 	private String outpath;
 	private String transitScheduleFile;
+	private String transitVehicleFile;
 	private ScenarioImpl scenario;
 	private TransitScheduleFactory transitFactory = null;
 
+	private TreeMap<Double, Departure> departuresTimes;
 	private TreeMap<Double, Departure> newDepartures;
 	private double currentInterval;
-	private long pastId;
 	private Double implDeparture;
-
-	private int originNumberOfDep;
+	
+	TreeMap<Id, Vehicle> newVehiclesMap;
+	int vehicleNumber;
+	private Vehicle currentVehicle;
+	
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -69,13 +76,14 @@ public class PtScenarioAdaption {
 		}
 		
 		PtScenarioAdaption ptScenarioAdaption = new PtScenarioAdaption();
-		ptScenarioAdaption.init(args[0]);
+		ptScenarioAdaption.initConfig(args[0]);
+		ptScenarioAdaption.initScenario();
 		ptScenarioAdaption.doubleHeadway();
 		ptScenarioAdaption.writeScenario();
 	}
 
-	private void init(String file) {
-		log.info("Initialization ...");
+	private void initConfig(String file) {
+		log.info("InitConfig ...");
 		
 		Config config = new Config();
     	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
@@ -84,6 +92,13 @@ public class PtScenarioAdaption {
 		this.networkfilePath = config.findParam("ptScenarioAdaption", "networkfilePath");
 		this.outpath = config.findParam("ptScenarioAdaption", "output");
 		this.transitScheduleFile = config.findParam("ptScenarioAdaption", "transitScheduleFile");
+		this.transitVehicleFile = config.findParam("ptScenarioAdaption", "transitVehicleFile");
+		
+		log.info("InitConfig ... done");
+	}
+
+	private void initScenario() {
+		log.info("Initialization ...");
 		
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseVehicles(true);
@@ -96,6 +111,9 @@ public class PtScenarioAdaption {
 		this.transitFactory = schedule.getFactory();
 		new TransitScheduleReaderV1(schedule, network, scenario).readFile(transitScheduleFile);
 		
+		Vehicles vehicles = scenario.getVehicles();
+		new VehicleReaderV1(vehicles).readFile(transitVehicleFile);
+		
 		log.info("Initialization ... done");
 	}
 	
@@ -103,73 +121,89 @@ public class PtScenarioAdaption {
 	 * increase headway according to the values in headwayClasses!
 	 */
 	private void doubleHeadway() {
-		log.info("Double headway ...");
+		log.info("DoubleHeadway ...");
 		
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
+		
+		newVehiclesMap = new TreeMap<Id, Vehicle>();
+		vehicleNumber = 0;
 		
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				
 				Map<Id, Departure> departures = route.getDepartures();
 				
-				if(departures == null || departures.size() < 2) continue;
+				if(departures == null) continue;
 				
 				newDepartures = new TreeMap<Double, Departure>();
 				
-				TreeMap<Double, Departure> departuresTimes = new TreeMap<Double, Departure>();
+				departuresTimes = new TreeMap<Double, Departure>();
 				for(Departure departure : departures.values()){
 					departuresTimes.put(departure.getDepartureTime(), departure);
 				}
-						
-//				test:
-				originNumberOfDep = 0;
-				for(Double depTime : departuresTimes.keySet()) {
-					originNumberOfDep++;
-					System.out.println(" depTime " + depTime);
-				}
-				System.out.println("End test.");
-//				System.out.print("Old departures: "+ originNumberOfDep);
-				
-				pastId = Long.parseLong(departuresTimes.get(departuresTimes.firstKey()).getId().toString());
 				
 				implDeparture = departuresTimes.firstKey();
+				Id vehicleId = departuresTimes.get(implDeparture).getVehicleId();
+				currentVehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+				
 				copyFirstDeparture();
 				
-				currentInterval = (departuresTimes.higherKey(implDeparture) - implDeparture) / 60d;
-				
-				for(Double depTime : departuresTimes.keySet()){
+				if(departures.size() >= 2) {
 					
-					if(route.getId().toString().contains("Y24.1_R.1.")){
-						System.out.println();
-					}
-					if(departuresTimes.lastKey() != depTime &&
-							(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
-						continue;
-					}
-					
-					if(departuresTimes.lastKey() == depTime) {
-						addNewDepartures(depTime + currentInterval * 60 - getNewInterval() * 60);
-					}
-					else {
-						
-						addNewDepartures((depTime));
-						currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
-					}
+					considerHeadwayAdaption();
 				}
 				
 				this.removeDepartures((TransitRouteImpl) route);
-				this.addNewDepartures(route);
+				this.copyNewDepartures(route);				
 			}
 		}
+		this.removeVehicles();
+		this.copyNewVehicles();
 		
-		log.info("Double headway ... done");
+		log.info("DoubleHeadway ... done");
 	}
 	
+	private void considerHeadwayAdaption() {
+		
+		currentInterval = (departuresTimes.higherKey(implDeparture) - implDeparture) / 60d;
+		
+		for(Double depTime : departuresTimes.keySet()){
+			
+			Id vehicleId = departuresTimes.get(depTime).getVehicleId();
+			currentVehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+			
+			if(departuresTimes.lastKey() != depTime &&
+					(departuresTimes.higherKey(depTime) - depTime) / 60d == currentInterval){
+				continue;
+			}
+			
+			if(departuresTimes.lastKey() == depTime) {
+				addNewDepartures(depTime + currentInterval * 60 - getNewInterval() * 60);
+			}
+			else {
+				
+				addNewDepartures((depTime));
+				currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
+			}
+		}
+	}
+
 	private void copyFirstDeparture() {
 		
-		IdImpl newId = new IdImpl(pastId);
-		Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
-		newDepartures.put(implDeparture, newDepImpl);
+		setNewDeparture();
+	}
+
+	private void removeVehicles() {
+		
+		scenario.getVehicles().getVehicles().clear();
+	}
+	
+	private void copyNewVehicles() {
+		
+		for(Id id : newVehiclesMap.keySet()){
+			
+			scenario.getVehicles().getVehicles().put(id, newVehiclesMap.get(id));
+		}
 	}
 
 	private void removeDepartures(TransitRouteImpl route) {
@@ -185,26 +219,15 @@ public class PtScenarioAdaption {
 		}
 	}
 
-	private void addNewDepartures(TransitRoute route) {
-		int counter = 0;
+	private void copyNewDepartures(TransitRoute route) {
 		for(Departure departure : newDepartures.values()){
 			
-			Id vehicleId = new IdImpl("tr_"+departure.getId().toString());
-			departure.setVehicleId(vehicleId);
-			
 			route.addDeparture(departure);
-			counter++;
-			System.out.println("depTime: " + departure.getDepartureTime());
-		}
-//		System.out.println(" New Departures: " + counter);
-		if(counter < originNumberOfDep){
-			System.out.println();
 		}
 	}
 	
 	private void addNewDepartures(Double upperThreshold) {
 		
-		// Add departures if headway is within the range:
 		if(currentInterval > relHeadwayClasses[0] && currentInterval <= relHeadwayClasses[relHeadwayClasses.length - 1]) 
 		{
 			double newInterval = getNewInterval();
@@ -213,19 +236,14 @@ public class PtScenarioAdaption {
 				
 				implDeparture = implDeparture + newInterval * 60d;
 				
-				IdImpl newId = new IdImpl(++pastId);
-				
-				Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
-				
-				newDepartures.put(implDeparture, newDepImpl);
+				setNewDeparture();
 			}
 		}
 		else
-		{
+		{	
 			copyExistingDepartures(upperThreshold);
 		}
 	}
-	
 
 	private void copyExistingDepartures(double upperThreshold) {
 		
@@ -233,21 +251,27 @@ public class PtScenarioAdaption {
 			
 			implDeparture = implDeparture + currentInterval * 60d;
 			
-			IdImpl newId = new IdImpl(++pastId);
-			
-			Departure newDepImpl = new DepartureImpl(newId, implDeparture);
-			
-			newDepartures.put(implDeparture, newDepImpl);
+			setNewDeparture();
 		}
+	}
+
+	private void setNewDeparture() {
+		
+		IdImpl newId = new IdImpl(vehicleNumber);
+		
+		Departure newDepImpl = this.transitFactory.createDeparture(newId, implDeparture);
+		
+		Id newVehicleId = new IdImpl("tr_" + vehicleNumber);
+		
+		newDepImpl.setVehicleId(newVehicleId);
+		newDepartures.put(implDeparture, newDepImpl);
+		
+		currentVehicle = new VehicleImpl(newVehicleId, currentVehicle.getType());
 		
 		
-//		implDeparture = implDeparture + currentInterval * 60d;
-//		
-//		IdImpl newId = new IdImpl(++pastId);
-//		
-//		Departure newDepImpl = new DepartureImpl(newId, implDeparture);
-//		
-//		newDepartures.put(implDeparture, newDepImpl);
+		newVehiclesMap.put(newVehicleId, currentVehicle);
+		
+		vehicleNumber++;
 	}
 
 	private double getNewInterval() {
@@ -263,7 +287,9 @@ public class PtScenarioAdaption {
 	private void writeScenario() {
 		log.info("Writing new network file ...");
 		
-		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(this.outpath + "transitSchedule.xml.gz");
+		new TransitScheduleWriter(this.scenario.getTransitSchedule()).writeFile(this.outpath + "newTransitSchedule.xml.gz");
+		
+		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(this.outpath + "newTransitVehicles.xml.gz");
 		
 		log.info("Writing new network file ... done");
 	}
