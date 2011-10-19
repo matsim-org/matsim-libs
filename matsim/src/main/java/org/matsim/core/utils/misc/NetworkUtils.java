@@ -113,6 +113,33 @@ public class NetworkUtils {
 	}
 	
 	/**
+	 * Sorts the links and nodes in the given network.
+	 * @param network 
+	 */
+	@SuppressWarnings("unchecked")
+	public static void sortNetwork(final Network network) {
+		Map<Id, Link> linksMap = (Map<Id, Link>) network.getLinks();
+		Map<Id, Node> nodesMap = (Map<Id, Node>) network.getNodes(); 
+				
+		Map<Id, Node> sortedNodesMap = getSortedNodes(network);
+		Map<Id, Link> sortedLinksMap = getSortedLinks(network);
+		
+		// if the nodes are already stored in a sorted map
+		if (nodesMap instanceof SortedMap) {
+			// if the links are already stored in a sorted map
+			if (linksMap instanceof SortedMap) return;
+			else {
+				for (Link link : sortedLinksMap.values()) network.removeLink(link.getId());
+				for (Link link : sortedLinksMap.values()) network.addLink(link);
+			}
+		} else {
+			for (Node node : sortedNodesMap.values()) network.removeNode(node.getId());
+			for (Node node : sortedNodesMap.values()) network.addNode(node);
+			for (Link link : sortedLinksMap.values()) network.addLink(link);			
+		}
+	}
+	
+	/**
 	 * @param network
 	 * @param links list of link ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified links.
