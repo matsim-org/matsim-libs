@@ -71,5 +71,8 @@ public class NetworkNodesPainterManager extends NetworkPainterManager {
 			text += selectedNodeId.toString()+SEPARATOR;
 		return text;
 	}
+	public void clearNodesSelection() {
+		selectedNodesId.clear();
+	}
 
 }

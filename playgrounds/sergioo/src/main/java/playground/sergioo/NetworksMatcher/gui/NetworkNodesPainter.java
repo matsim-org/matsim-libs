@@ -15,9 +15,9 @@ import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.Network
 public class NetworkNodesPainter extends NetworkPainter {
 	
 	//Attributes
-	private Color selectedNodesColor = Color.CYAN;
+	private Color selectedNodesColor = Color.MAGENTA;
+	private Color selectedNodeColor = Color.CYAN;
 	private Color selectedLinkColor = Color.GREEN;
-	private Color selectedNodeColor = Color.MAGENTA;
 	private Stroke selectedStroke = new BasicStroke(2);
 	private boolean withSelected = true;
 	
@@ -28,9 +28,8 @@ public class NetworkNodesPainter extends NetworkPainter {
 	public NetworkNodesPainter(Network network, Color networkColor, Stroke networkStroke) {
 		super(network, new NetworkNodesPainterManager(network), networkColor, networkStroke);
 	}
-	public NetworkNodesPainter(Network network, Color networkColor, Color selectedNodesColor) {
+	public NetworkNodesPainter(Network network, Color networkColor) {
 		super(network, new NetworkNodesPainterManager(network), networkColor);
-		this.selectedNodesColor = selectedNodesColor;
 	}
 	public NetworkNodesPainter(Network network, Color networkColor, Stroke networkStroke, Color selectedNodesColor) {
 		super(network, new NetworkNodesPainterManager(network), networkColor, networkStroke);
@@ -40,7 +39,7 @@ public class NetworkNodesPainter extends NetworkPainter {
 		super.paint(g2, layersPanel);
 		for(Node node:((NetworkNodesPainterManager)networkPainterManager).getSelectedNodes())
 			if(node!=null)
-				paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodesColor);
+				paintCircle(g2, layersPanel, node.getCoord(), 6, selectedNodesColor);
 		if(withSelected)
 			paintSelected(g2, layersPanel);
 	}
@@ -48,9 +47,9 @@ public class NetworkNodesPainter extends NetworkPainter {
 		Link link=networkPainterManager.getSelectedLink();
 		if(link!=null)
 			paintLink(g2, layersPanel, link, selectedStroke, 3, selectedLinkColor);
-		Node node = networkPainterManager.getSelectedNode();
+		Node node=networkPainterManager.getSelectedNode();
 		if(node!=null)
-			paintCircle(g2, layersPanel, node.getCoord(), 5, selectedNodeColor);
+			paintX(g2, layersPanel, node.getCoord(), 4, selectedNodeColor);
 	}
 	public void changeVisibleSelectedElements() {
 		withSelected = !withSelected;

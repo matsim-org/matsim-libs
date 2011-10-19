@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -141,6 +142,22 @@ public class NetworkPainterManager {
 	}
 	public String refreshNode() {
 		return selectedNodeId==null?"":selectedNodeId.toString();
+	}
+	public Link selectLink(String id) {
+		Link link = network.getLinks().get(new IdImpl(id));
+		if(link!=null)
+			selectedLinkId = link.getId();
+		else
+			selectedLinkId = null;
+		return link;
+	}
+	public Node selectNode(String id) {
+		Node node = network.getNodes().get(new IdImpl(id));
+		if(node!=null)
+			selectedNodeId = node.getId();
+		else
+			selectedNodeId = null;
+		return node;
 	}
 	
 }

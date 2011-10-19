@@ -9,7 +9,6 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +26,7 @@ import javax.swing.JTextField;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -53,7 +53,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public enum Options implements LayersWindow.Options {
 		SELECT_LINK("<html>L<br/>I<br/>N<br/>K</html>"),
-		SELECT_NODE("<html>N<br/>O<br/>D<br/>E</html>"),
 		SELECT_NODES("<html>N<br/>O<br/>D<br/>E<br/>S</html>"),
 		ZOOM("<html>Z<br/>O<br/>O<br/>M</html>");
 		private String caption;
@@ -67,11 +66,14 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public enum Tool {
 		MATCH("Match",0,0,2,1,"match"),
-		DELETE_MATCH("Delete match",0,1,2,1,"deleteMatch"),
-		SELECT_MATCH("Select match",2,0,2,1,"selectMatch"),
-		MODIFY_MATCH("Modify match",2,1,2,1,"modifyMatch"),
-		VERIFY_MATCHINGS("Verify matchings",4,0,2,1,"verifyMatchings"),
-		SAVE("Save",4,1,2,1,"save");
+		DELETE_MATCH("Delete match",2,0,2,1,"deleteMatch"),
+		SELECT_MATCH("Select match",4,0,2,1,"selectMatch"),
+		CLEAR_SELECTION("Clear selection",6,0,2,1,"clearSelection"),
+		MODIFY_MATCH("Modify match",8,0,2,1,"modifyMatch"),
+		FIND_LINK("Find link",10,0,2,1,"findLink"),
+		FIND_NODE("Find node",12,0,2,1,"findNode"),
+		VERIFY_MATCHINGS("Verify matchings",14,0,2,1,"verifyMatchings"),
+		SAVE("Save",16,0,2,1,"save");
 		String caption;
 		int gx;int gy;
 		int sx;int sy;
@@ -101,7 +103,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	
 	//Attributes
-	private JButton readyButton;
 	private boolean networksSeparated = true;
 	private JPanel panelsPanel;
 	private MatchingProcess matchingProcess;
@@ -113,7 +114,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	//Methods
 	private DoubleNetworkMatchingWindow(String title) {
 		setTitle(title);
-		setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setLocation(0,0);
 		this.setLayout(new BorderLayout());
 		option = Options.ZOOM;
@@ -128,10 +128,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this.add(buttonsPanel, BorderLayout.EAST);
 		JPanel infoPanel = new JPanel();
 		infoPanel.setLayout(new BorderLayout());
-		readyButton = new JButton("Ready to exit");
-		readyButton.addActionListener(this);
-		readyButton.setActionCommand(READY_TO_EXIT);
-		infoPanel.add(readyButton, BorderLayout.WEST);
 		JPanel labelsPanel = new JPanel();
 		labelsPanel.setLayout(new FlowLayout());
 		labelsPanel.setBorder(new TitledBorder("Information"));
@@ -175,12 +171,12 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		nodesMatchings = matchingProcess.getFinalMatchings();
 		colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
 		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), colors));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN), colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK, Color.CYAN)));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A));
@@ -189,6 +185,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public DoubleNetworkMatchingWindow(String title, Network networkA, Network networkB, Set<NodesMatching> nodesMatchings) {
 		this(title);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		option = Options.SELECT_NODES;
 		JPanel toolsPanel = new JPanel();
 		toolsPanel.setLayout(new GridBagLayout());
@@ -207,12 +204,12 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this.nodesMatchings = nodesMatchings;
 		colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
 		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkNodesPainter(networkA), colors));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(networkB, Color.BLACK, Color.CYAN), colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(networkB, Color.DARK_GRAY), colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(networkA), new NetworkNodesPainter(networkB, Color.BLACK, Color.CYAN)));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(networkA), new NetworkNodesPainter(networkB, Color.BLACK), colors));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A));
@@ -312,7 +309,11 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public void match() {
 		if(matchingProcess == null) {
-			nodesMatchings.add(new NodesMatching(((NetworkNodesPanel)layersPanels.get(PanelIds.A)).getSelectedNodes(),((NetworkNodesPanel)layersPanels.get(PanelIds.B)).getSelectedNodes()));
+			try {
+				nodesMatchings.add(new NodesMatching(((NetworkNodesPanel)layersPanels.get(PanelIds.A)).getSelectedNodes(),((NetworkNodesPanel)layersPanels.get(PanelIds.B)).getSelectedNodes(), false));
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(this, "Select at least one node in each side.");
+			}
 			selectedNodesMatching = null;
 			float r = 0,g = 0,b = 0;
 			while(r+b+g<1) {
@@ -347,12 +348,46 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			}
 		}
 	}
+	public void clearSelection() {
+		if(matchingProcess == null) {
+			((NetworkNodesPanel)layersPanels.get(PanelIds.A)).clearNodesSelection();
+			((NetworkNodesPanel)layersPanels.get(PanelIds.B)).clearNodesSelection();
+		}
+	}
 	public void modifyMatch() {
 		if(matchingProcess == null) {
 			if(selectedNodesMatching!=null) {
 				nodesMatchings.remove(selectedNodesMatching);
 				match();
 			}
+		}
+	}
+	public void findLink() {
+		String res = JOptionPane.showInputDialog("Please write \"A\" for the left network and \"B\" for the right one");
+		if(res!=null && (res.equals("A") || res.equals("B"))) {
+			boolean isA = true;
+			if(res.equals("B"))
+				isA = false;
+			res = JOptionPane.showInputDialog("Please write the link Id");
+			if(res!=null && !res.equals(""))
+				if(isA)
+					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).selectLink(res);
+				else
+					((NetworkNodesPanel)layersPanels.get(PanelIds.B)).selectLink(res);
+		}
+	}
+	public void findNode() {
+		String res = JOptionPane.showInputDialog("Please write \"A\" for the left network and \"B\" for the right one");
+		if(res!=null && (res.equals("A") || res.equals("B"))) {
+			boolean isA = true;
+			if(res.equals("B"))
+				isA = false;
+			res = JOptionPane.showInputDialog("Please write the node Id");
+			if(res!=null && !res.equals(""))
+				if(isA)
+					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).selectNode(res);
+				else
+					((NetworkNodesPanel)layersPanels.get(PanelIds.B)).selectNode(res);
 		}
 	}
 	public void verifyMatchings() {
@@ -362,16 +397,24 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 				if(!(isInNetworkAMatchings(link.getFromNode()) && isInNetworkAMatchings(link.getToNode()))) {
 					wrongLinks.add(link);
 				}
-			if(wrongLinks.size()==0)
-				JOptionPane.showMessageDialog(this, "Yes!!!");
+			if(wrongLinks.size()==0) {
+				Node node = getRepeatedNode();
+				if(node == null)
+					JOptionPane.showMessageDialog(this, "Yes!!!");
+				else
+					JOptionPane.showMessageDialog(this, "No, the node "+node.getId()+" is repeated");
+			}
 			else {
 				JOptionPane.showMessageDialog(this, "No, "+wrongLinks.size()+" links");
 				((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setLinksLayer(wrongLinks);
-				double x = wrongLinks.iterator().next().getCoord().getX(), y = wrongLinks.iterator().next().getCoord().getY();
-				((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(x, y);
-				((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(x, y);
+				/*centerCamera(wrongLinks.iterator().next().getCoord());
+				*/
 			}
 		}
+	}
+	public void centerCamera(Coord coord) {
+		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(coord);
+		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(coord);
 	}
 	public void save() {
 		try {
@@ -391,6 +434,24 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 					return true;
 		return false;
 	}
+	private Node getRepeatedNode() {
+		Set<Node> matchingNodesA = new HashSet<Node>();
+		Set<Node> matchingNodesB = new HashSet<Node>();
+		for(NodesMatching nodesMatching:nodesMatchings) {
+			for(Node node:nodesMatching.getComposedNodeA().getNodes())
+				if(matchingNodesA.contains(node))
+					return node;
+				else
+					matchingNodesA.add(node);
+			for(Node node:nodesMatching.getComposedNodeB().getNodes())
+				if(matchingNodesB.contains(node))
+					return node;
+				else
+					matchingNodesB.add(node);
+		}
+		return null;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for(Options option:Options.values())
@@ -415,10 +476,6 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 				setVisible(true);
 				repaint();
 			}
-		if(e.getActionCommand().equals(READY_TO_EXIT)) {
-			setVisible(false);
-			readyToExit = true;
-		}
 	}
 	@Override
 	public void refreshLabel(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
@@ -427,6 +484,16 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		else
 			labels[label.ordinal()].setText(((NetworkNodesPanel)layersPanels.get(PanelIds.ACTIVE)).getLabelText(label));
 		repaint();
+	}
+	@Override
+	public void dispose() {
+		int res = JOptionPane.showConfirmDialog(this, "Do you want you want to save the matchings?");
+		if(res == JOptionPane.YES_OPTION)
+			save();
+		if(!(res == JOptionPane.CANCEL_OPTION)) {
+			this.setVisible(false);
+			readyToExit = true;
+		}
 	}
 	
 }

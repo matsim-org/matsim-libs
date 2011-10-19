@@ -9,11 +9,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.Painter;
 
 public class NetworkPainter extends Painter {
+	
+	//Constants
+	private static final double ANGLE_ARROW = Math.PI/6;
+	private static final double LONG_ARROW = 10;
 	
 	//Attributes
 	protected final NetworkPainterManager networkPainterManager;
@@ -63,7 +68,12 @@ public class NetworkPainter extends Painter {
 		}
 	}
 	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
-		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(link.getFromNode().getCoord(), link.getToNode().getCoord()), stroke, color);
+		Coord from = link.getFromNode().getCoord();
+		Coord to = link.getToNode().getCoord();
+		double angle = Math.atan2(to.getY()-from.getY(), to.getX()-from.getX());;
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(from, to), stroke, color);
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(to, new CoordImpl(to.getX()-LONG_ARROW*pointSize*Math.sin(Math.PI/2-angle-ANGLE_ARROW), to.getY()-LONG_ARROW*pointSize*Math.cos(Math.PI/2-angle-ANGLE_ARROW))), stroke, color);
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(to, new CoordImpl(to.getX()-LONG_ARROW*pointSize*Math.sin(Math.PI/2-angle+ANGLE_ARROW), to.getY()-LONG_ARROW*pointSize*Math.cos(Math.PI/2-angle+ANGLE_ARROW))), stroke, color);
 		paintCircle(g2, layersPanel, link.getToNode().getCoord(), pointSize, color);
 	}
 	

@@ -23,14 +23,17 @@ public class NodesMatching {
 	protected final ComposedNode composedNodeA;
 	
 	protected final ComposedNode composedNodeB;
-
+	
+	private boolean automatic;
+	
 
 	//Methods
 
-	public NodesMatching(Set<Node> nodesA, Set<Node> nodesB) {
+	public NodesMatching(Set<Node> nodesA, Set<Node> nodesB, boolean automatic) throws Exception {
 		super();
 		composedNodeA = new ComposedNode(nodesA);
 		composedNodeB = new ComposedNode(nodesB);
+		this.automatic = automatic;
 	}	
 	
 	public ComposedNode getComposedNodeA() {
@@ -42,7 +45,7 @@ public class NodesMatching {
 	}
 	
 	public String toString() {
-		String line = "";
+		String line = Boolean.toString(automatic)+SEPARATOR_AB;
 		for(Node node:composedNodeA.getNodes())
 			line+=node.getId().toString()+SEPARATOR_NODES;
 		line+=SEPARATOR_AB;
@@ -51,17 +54,17 @@ public class NodesMatching {
 		return line;
 	}
 	
-	public static NodesMatching parseNodesMatching(String line, Network networkA, Network networkB) {
+	public static NodesMatching parseNodesMatching(String line, Network networkA, Network networkB) throws Exception {
 		Set<Node> nodesA = new HashSet<Node>();
 		Set<Node> nodesB = new HashSet<Node>();
 		String[] ab = line.split(SEPARATOR_AB);
-		for(String nodeId:ab[0].split(SEPARATOR_NODES))
-			if(!nodeId.equals(""))
-				nodesA.add(networkA.getNodes().get(new IdImpl(nodeId)));
 		for(String nodeId:ab[1].split(SEPARATOR_NODES))
 			if(!nodeId.equals(""))
+				nodesA.add(networkA.getNodes().get(new IdImpl(nodeId)));
+		for(String nodeId:ab[2].split(SEPARATOR_NODES))
+			if(!nodeId.equals(""))
 				nodesB.add(networkB.getNodes().get(new IdImpl(nodeId)));
-		return new NodesMatching(nodesA, nodesB);
+		return new NodesMatching(nodesA, nodesB, Boolean.parseBoolean(ab[0]));
 	}
 
 }

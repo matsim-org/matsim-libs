@@ -27,7 +27,7 @@ public class PointsPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(Coord point:points)
-			paintCircle(g2, layersPanel, point, 2, Color.BLACK);
+			paintX(g2, layersPanel, point, 5, Color.BLACK);
 		if(selectedPoint!=null)
 			paintCircle(g2, layersPanel, selectedPoint, 4, Color.RED);
 	}

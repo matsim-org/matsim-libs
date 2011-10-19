@@ -1,5 +1,6 @@
 package playground.sergioo.NetworksMatcher.gui;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -9,11 +10,13 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
+import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.DoubleNetwork.DoubleNetworkPanel;
@@ -40,10 +43,10 @@ public class DoubleNetworkMatchingPanel extends DoubleNetworkPanel implements Mo
 		addMouseWheelListener(this);
 		addKeyListener(this);
 	}
-	public DoubleNetworkMatchingPanel(Collection<NodesMatching> nodesMatchings, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
+	public DoubleNetworkMatchingPanel(Collection<NodesMatching> nodesMatchings, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB, List<Color> colors) {
 		super(networkPainterA, networkPainterB);
 		this.doubleNetworkWindow = doubleNetworkWindow;
-		addLayer(new Layer(new MatchingsPainter(nodesMatchings), false));
+		addLayer(new Layer(new MatchingsPainter(nodesMatchings, MatchingOptions.BOTH, colors), false));
 		matchingsAdded = true;
 		addMouseListener(this);
 		addMouseMotionListener(this);

@@ -1,5 +1,6 @@
 package playground.sergioo.Visualizer2D;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Shape;
@@ -26,6 +27,18 @@ public abstract class Painter {
 		g2.setColor(color);
 		Shape circle = new Ellipse2D.Double(layersPanel.getScreenX(coord.getX())-pointSize,layersPanel.getScreenY(coord.getY())-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
+	}
+	protected void paintCross(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
+		g2.setColor(color);
+		g2.setStroke(new BasicStroke((float) (pointSize)));
+		g2.drawLine(layersPanel.getScreenX(coord.getX())-(int)pointSize, layersPanel.getScreenY(coord.getY()), layersPanel.getScreenX(coord.getX())+(int)pointSize, layersPanel.getScreenY(coord.getY()));
+		g2.drawLine(layersPanel.getScreenX(coord.getX()), layersPanel.getScreenY(coord.getY())-(int)pointSize, layersPanel.getScreenX(coord.getX()), layersPanel.getScreenY(coord.getY())+(int)pointSize);
+	}
+	protected void paintX(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
+		g2.setColor(color);
+		g2.setStroke(new BasicStroke((float) (pointSize)));
+		g2.drawLine(layersPanel.getScreenX(coord.getX())-(int)pointSize, layersPanel.getScreenY(coord.getY())+(int)pointSize, layersPanel.getScreenX(coord.getX())+(int)pointSize, layersPanel.getScreenY(coord.getY())-(int)pointSize);
+		g2.drawLine(layersPanel.getScreenX(coord.getX())-(int)pointSize, layersPanel.getScreenY(coord.getY())-(int)pointSize, layersPanel.getScreenX(coord.getX())+(int)pointSize, layersPanel.getScreenY(coord.getY())+(int)pointSize);
 	}
 	
 }

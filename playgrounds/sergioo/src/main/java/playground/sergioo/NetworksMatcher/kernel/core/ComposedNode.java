@@ -73,7 +73,9 @@ public class ComposedNode implements Node {
 		nodes.add(node);
 	}
 	
-	public ComposedNode(Set<Node> nodes) {
+	public ComposedNode(Set<Node> nodes) throws Exception {
+		if(nodes==null || nodes.size() == 0)
+			throw new Exception("A composed node can not be empty");
 		String idText = "";
 		for(Node node:nodes)
 			idText+=node.getId()+SEPARATOR;

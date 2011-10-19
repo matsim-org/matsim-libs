@@ -17,19 +17,17 @@ public class IncidentLinksNodesMatching extends NodesMatching {
 	//Static attributes
 
 	public static double minAngle;
-
-	public static boolean rightSide = false;
 	
 
 	//Attributes
 
 	private List<Integer> linksMatchingIndices;
-
+	
 
 	//Methods
 
-	protected IncidentLinksNodesMatching(Set<Node> nodesA, Set<Node> nodesB) {
-		super(nodesA, nodesB);
+	protected IncidentLinksNodesMatching(Set<Node> nodesA, Set<Node> nodesB) throws Exception {
+		super(nodesA, nodesB, true);
 	}
 
 	public List<Integer> getLinksMatchingIndices() {
