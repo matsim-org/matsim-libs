@@ -42,16 +42,4 @@
 <!-- 		<param name="activityEarliestEndTime_1" value="" /> -->
 	</module>
 	
-	
-       <module name="locationchoice">
-<!--                 <param name="constrained" value="False"/> -->
-<!--                 <param name="restraintFcnFactor" value="1."/> -->
-<!--                 <param name="restraintFcnExp" value="1."/> -->
-<!--                 <param name="scaleFactor" value="1" /> -->
-<!--                 <param name="recursionTravelSpeedChange" value="1."/> -->
-<!--                 <param name="recursionTravelSpeed" value="1."/> -->
-<!--                 <param name="maxRecursions" value="1"/> -->
-<!--                 <param name="fixByActType" value="True"/> -->
-        </module>
-
 </config>

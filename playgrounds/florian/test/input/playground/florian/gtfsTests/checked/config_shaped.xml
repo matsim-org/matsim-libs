@@ -91,29 +91,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="locationchoice" >
-		<param name="algorithm" value="null" />
-		<param name="centerNode" value="null" />
-		<param name="constrained" value="false" />
-		<param name="fixByActType" value="false" />
-		<param name="flexible_types" value="null" />
-		<param name="maxDistanceEpsilon" value="-1.0" />
-		<param name="maxRecursions" value="1" />
-		<param name="planSelector" value="SelectExpBeta" />
-		<param name="radius" value="null" />
-		<param name="recursionTravelSpeed" value="8.5" />
-		<param name="recursionTravelSpeedChange" value="0.1" />
-		<param name="restraintFcnExp" value="0.0" />
-		<param name="restraintFcnFactor" value="0.0" />
-		<param name="scaleFactor" value="1" />
-		<param name="searchSpaceBeta" value="0.0001" />
-		<param name="simple_tg" value="false" />
-		<param name="travelTimes" value="true" />
-		<param name="tt_approximationLevel" value="0" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="multimodal" >
 
 		<!-- Use this, if your network is not multi modal. Links with free speeds that are lower than the specified cutoff value will be usable for walk and bike trips. -->
