@@ -20,9 +20,9 @@
 package org.matsim.contrib.matsim4urbansim.leastcostpathtree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -41,7 +41,6 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.LeastCostPathTree;
 import org.matsim.utils.LeastCostPathTree.NodeData;
-
 
 public class LeastCostPathTreeTest extends MatsimTestCase{
 	
@@ -74,16 +73,16 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		lcptTime.calculate(this.scenario.getNetwork(), origin, 8*3600);
 		double spTravelTime = lcptTime.getTree().get( destination.getId() ).getTime();
 		double spTravelTimeCost = lcptTime.getTree().get( destination.getId() ).getCost(); // here cost = travel time
-		List<Node> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
+		List<Id> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
 		printResults(spTravelTime, spTravelTimeCost); // travel time = 100s, cost = (50s+50s) * 0,003 = 0,3s
-		Assert.assertTrue( containsNode(spTimeVisitedNodes, 2));
+		Assert.assertTrue( containsNode(spTimeVisitedNodes, this.scenario.createId("2")));
 		
 		lcptDistance.calculate(this.scenario.getNetwork(), origin, 8*3600);
 		double spDistanceTime = lcptDistance.getTree().get( destination.getId() ).getTime();
 		double spDistanceCost = lcptDistance.getTree().get( destination.getId() ).getCost(); // here cost = travel distance
-		List<Node> spDistenceVisitedNodes = getVisitedNodes(lcptDistance, destination, "Travel Distance");
+		List<Id> spDistenceVisitedNodes = getVisitedNodes(lcptDistance, destination, "Travel Distance");
 		printResults(spDistanceTime, spDistanceCost); // travel time = 1000s, cost = (50m+50m) * 0,003 = 0,3m
-		Assert.assertTrue( containsNode(spDistenceVisitedNodes, 3));
+		Assert.assertTrue( containsNode(spDistenceVisitedNodes, this.scenario.createId("3")));
 
 	}
 	
@@ -91,37 +90,37 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		System.out.println("Travel Times:" + tt + ", Travel Costs: " + tc);
 	}
 	
-	private List<Node> getVisitedNodes(LeastCostPathTree lcpt, Node destination, String costType) {
+	private List<Id> getVisitedNodes(LeastCostPathTree lcpt, Node destination, String costType) {
 		
-		HashMap<Id, NodeData> tree = lcpt.getTree();
-		List<Node> nodeList = new ArrayList<Node>();
+		Map<Id, NodeData> tree = lcpt.getTree();
+		List<Id> nodeList = new ArrayList<Id>();
 		
 		// set destination node ...
 		// ... from there we get the route to the origin node by the following iteration
-		Node tmpNode = destination;
+		Id tmpNodeId = destination.getId();
 		System.out.println("Choosen route based on " + costType + " :");
 		while(true){
-			System.out.println("Node " + tmpNode.getId());
-			nodeList.add( tmpNode );
+			System.out.println("Node " + tmpNodeId);
+			nodeList.add(tmpNodeId);
 			
-			NodeData nodeData = tree.get(tmpNode.getId());
+			NodeData nodeData = tree.get(tmpNodeId);
 			assert(nodeData != null);
-			tmpNode = nodeData.getPrevNode();
+			tmpNodeId = nodeData.getPrevNodeId();
 			
-			if(tmpNode == null)
+			if(tmpNodeId == null)
 				break;
 		}
 		return nodeList;
 	}
 	
-	private boolean containsNode(List<Node> list, int nodeId){
+	private boolean containsNode(List<Id> list, Id nodeId){
 		
-		Iterator<Node> nodes = list.iterator();
+		Iterator<Id> nodes = list.iterator();
 		
 		while(nodes.hasNext()){
 			
-			Node node = nodes.next();
-			if(node.getId().compareTo( new IdImpl(nodeId)) == 0)
+			Id node = nodes.next();
+			if(node.compareTo(nodeId) == 0)
 				return true;
 			
 		}

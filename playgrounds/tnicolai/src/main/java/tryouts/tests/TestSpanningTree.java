@@ -20,8 +20,8 @@
 package tryouts.tests;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -56,32 +56,32 @@ public class TestSpanningTree {
 		Node origin = network.getNodes().get(new IdImpl(4224));
 		lcpt.calculate(network, origin, 8*3600);
 
-		HashMap<Id, NodeData> tree = lcpt.getTree();
+		Map<Id, NodeData> tree = lcpt.getTree();
 		
 		// now set the destination node
 		Node destination = network.getNodes().get(new IdImpl(2176));
 		
-		List<Node> nodeList = new ArrayList<Node>();
+		List<Id> nodeList = new ArrayList<Id>();
 								// set destination node ...
 								// ... from there we get the route to the origin node by the following iteration
-		Node tmpNode = destination;
+		Id tmpNode = destination.getId();
 		while(true){
 			
-			nodeList.add( tmpNode );
+			nodeList.add(tmpNode);
 			
-			NodeData nodeData = tree.get(tmpNode.getId());
+			NodeData nodeData = tree.get(tmpNode);
 			assert(nodeData != null);
-			tmpNode = nodeData.getPrevNode();
+			tmpNode = nodeData.getPrevNodeId();
 			
 			if(tmpNode == null)
 				break;
 		}
 		System.out.println();
-		for(Node node: nodeList)
-			System.out.println(node.getId());
+		for(Id node: nodeList)
+			System.out.println(node);
 		
 		// create a link list out of that ...
-		List<Link> linkList = RouteUtils.getLinksFromNodes(nodeList);
+		List<Link> linkList = RouteUtils.getLinksFromNodeIds(network, nodeList);
 		List<Id> linkIdList = new ArrayList<Id>();
 		
 		System.out.println();

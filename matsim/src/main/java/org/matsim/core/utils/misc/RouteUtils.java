@@ -75,6 +75,23 @@ public class RouteUtils {
 		return links;
 	}
 
+	public static List<Link> getLinksFromNodeIds(final Network network, final List<Id> nodeIds) {
+		ArrayList<Link> links = new ArrayList<Link>(nodeIds.size());
+		Node prevNode = null;
+		for (Id nodeId : nodeIds) {
+			Node node = network.getNodes().get(nodeId);
+			if (prevNode != null) {
+				Link foundLink = findLink(prevNode, node);
+				if (foundLink != null) {
+					links.add(foundLink);
+				}
+			}
+			prevNode = node;
+		}
+		links.trimToSize();
+		return links;
+	}
+
 	private static Link findLink(Node prevNode, Node node) {
 		for (Link link : prevNode.getOutLinks().values()) {
 			if (link.getToNode().equals(node)) {

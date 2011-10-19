@@ -73,13 +73,13 @@ public class LeastCostPathTree {
 		this.origin = origin;
 		this.dTime = time;
 		
-		nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
 		NodeData d = new NodeData();
 		d.time = time;
 		d.cost = 0;
-		nodeData.put(origin.getId(), d);
+		this.nodeData.put(origin.getId(), d);
 
-		ComparatorCost comparator = new ComparatorCost(nodeData);
+		ComparatorCost comparator = new ComparatorCost(this.nodeData);
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, comparator);
 		relaxNode(origin, pendingNodes);
 		while (!pendingNodes.isEmpty()) {
@@ -93,18 +93,18 @@ public class LeastCostPathTree {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static class NodeData {
-		private Node prev = null;
+		private Id prevId = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 
 		/*package*/ void reset() {
-			this.prev = null;
+			this.prevId = null;
 			this.cost = Double.MAX_VALUE;
 			this.time = 0;
 		}
 
-		/*package*/ void visit(final Node comingFrom, final double cost, final double time) {
-			this.prev = comingFrom;
+		/*package*/ void visit(final Id comingFromNodeId, final double cost, final double time) {
+			this.prevId = comingFromNodeId;
 			this.cost = cost;
 			this.time = time;
 		}
@@ -117,12 +117,12 @@ public class LeastCostPathTree {
 			return this.time;
 		}
 
-		public Node getPrevNode() {
-			return this.prev;
+		public Id getPrevNodeId() {
+			return this.prevId;
 		}
 	}
 
-	static class ComparatorCost implements Comparator<Node> {
+	/*package*/ static class ComparatorCost implements Comparator<Node> {
 		protected Map<Id, ? extends NodeData> nodeData;
 
 		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) {
@@ -149,7 +149,7 @@ public class LeastCostPathTree {
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 
-	public final HashMap<Id, NodeData> getTree() {
+	public final Map<Id, NodeData> getTree() {
 		return this.nodeData;
 	}
 
@@ -191,7 +191,7 @@ public class LeastCostPathTree {
 			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
-				nnData.visit(n, visitCost, visitTime);
+				nnData.visit(n.getId(), visitCost, visitTime);
 				pendingNodes.add(nn);
 			}
 		}
@@ -211,11 +211,11 @@ public class LeastCostPathTree {
 				.planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.calculate(network, origin, 8*3600);
-		HashMap<Id, NodeData> tree = st.getTree();
+		Map<Id, NodeData> tree = st.getTree();
 		for (Id id : tree.keySet()) {
 			NodeData d = tree.get(id);
-			if (d.getPrevNode() != null) {
-				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNode().getId());
+			if (d.getPrevNodeId() != null) {
+				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNodeId());
 			} else {
 				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + "0");
 			}

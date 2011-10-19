@@ -19,9 +19,7 @@
 
 package playground.toronto.ttimematrix;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -94,19 +92,17 @@ public class RouteChoiceCostcalculatorTest {
 		System.out.println(costType);
 		System.out.println("Travel Times:" + tt + ", Travel Costs: " + tc);
 		
-		HashMap<Id, NodeData> tree = st.getTree();
-		List<Node> nodeList = new ArrayList<Node>();
+		Map<Id, NodeData> tree = st.getTree();
 		
 		// print route choice
-		Node tmpNode = destination;
+		Id tmpNode = destination.getId();
 		System.out.println("Choosen route :");
 		while(true){
-			System.out.println("Node " + tmpNode.getId());
-			nodeList.add( tmpNode );
+			System.out.println("Node " + tmpNode);
 			
-			NodeData nodeData = tree.get(tmpNode.getId());
+			NodeData nodeData = tree.get(tmpNode);
 			assert(nodeData != null);
-			tmpNode = nodeData.getPrevNode();
+			tmpNode = nodeData.getPrevNodeId();
 			
 			if(tmpNode == null)
 				break;
@@ -168,7 +164,6 @@ public class RouteChoiceCostcalculatorTest {
 	}
 	
 	public static class TravelTimeCostCalculator implements TravelCost{
-		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
 		
 		protected final TravelTime timeCalculator;
 		
