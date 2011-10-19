@@ -21,7 +21,6 @@
 package org.matsim.core.events.handler;
 
 import org.matsim.core.api.experimental.events.LinkChangeEvent;
-import org.matsim.core.events.handler.EventHandler;
 
 public interface LinkChangeEventHandler extends EventHandler {
 	
