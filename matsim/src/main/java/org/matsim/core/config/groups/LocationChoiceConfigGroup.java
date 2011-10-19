@@ -67,10 +67,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private String radius = "null";
 	private String flexible_types = "null";
 		
-	private String algorithm = "null";
+	private String algorithm = "random";
 	private String tt_approximationLevel = "0";
 	private String travelTimes = "true";
-	private String searchSpaceBeta = "0.0001";
+	private String searchSpaceBeta = "-0.0001";
 	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
 
@@ -229,7 +229,13 @@ public class LocationChoiceConfigGroup extends Module {
 				setFlexibleTypes(value);
 			}
 		} else if (ALGO.equals(key)) {
-			setAlgorithm(value);
+			if (!(value.equals("localSearchRecursive") || value.equals("localSearchSingleAct") 
+					|| value.equals("random") || value.equals("bestResponse"))) {
+				log.warn("define algorithm: 'localSearchRecursive', 'localSearchSingleAct', 'random', 'bestResponse'. Set to default value 'random' now");
+			}
+			else {
+				setAlgorithm(value);
+			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
 			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
 				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '0' now (no approximation)");
