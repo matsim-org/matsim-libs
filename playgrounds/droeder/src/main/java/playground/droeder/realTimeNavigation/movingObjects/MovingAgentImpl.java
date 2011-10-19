@@ -121,8 +121,7 @@ public class MovingAgentImpl extends AbstractMovingObject {
 			Vector2D translation = new Vector2D(stepSize, super.getSpeed());
 			double alpha1 = (this.getGoal().getX() - r0.getX())/(translation.getX());
 			double alpha2 = (this.getGoal().getY() - r0.getY())/(translation.getY());
-			if((alpha1 < 1) && (alpha2 < 1) && (alpha1 == alpha2) ){
-				//TODO debug here, Agents jump!
+			if((alpha1 < 1) && (alpha1 > 0) && (alpha2 < 1) && (alpha2 > 0) && (alpha1 == alpha2)){
 				super.setNewPosition(this.goal);
 			}else{
 				super.setNewPosition(translation.add(r0));

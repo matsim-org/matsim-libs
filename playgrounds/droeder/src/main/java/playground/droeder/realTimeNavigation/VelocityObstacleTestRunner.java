@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,16 +54,25 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  *
  */
 public class VelocityObstacleTestRunner {
+	//Directory
+	final static String DIR = DaPaths.VSP + "2D_Sim/";
+	//parameters for run
+	// (FACTORFORQUADTREE * MAXSPEED [m/s] * stepSize [s]) is distance in which the quadTree is looking for objects to build the VO 
+	private static final double FACTORFORQUADTREE = 10.0;
+	private static final int NUMOFOAGENTS = 10;
+	private static final double MAXSPEED = 1.0;
+	private static final double AGENTDIAMETER = 0.7;
+		//TODO agents in which distance should be considered, factor * maxSpeed
+	// ###############
+	final static String OUTDIR = DIR + "output/" + "agents" + String.valueOf(NUMOFOAGENTS) + "_quadTreeR" + String.valueOf(FACTORFORQUADTREE) + "/";
+	
 	
 	Map<Id, MovingObject> objects;
 	private QuadTree<MovingObject> quadTree = null;
-	private double minX = Double.MAX_VALUE;
-	private double maxY = Double.MIN_VALUE;
-	private double minY = Double.MAX_VALUE;
-	private double maxX = Double.MIN_VALUE;
-	
-	//TODO agents in which distance should be considered, factor * maxSpeed
-	private final double FACTORFORQUADTREE = 5.0;
+	private double minX;
+	private double maxY;
+	private double minY;
+	private double maxX;
 	private Collection<Id> finished;
 	private boolean first = true;
 	private int cnt = 0;
@@ -77,14 +87,11 @@ public class VelocityObstacleTestRunner {
 			.getLogger(VelocityObstacleTestRunner.class);
 	
 	public static void main(String[] args){
-		final String DIR = DaPaths.VSP + "2D_Sim/";
-		final String OUTDIR = DIR + "output/";
-		
 		VelocityObstacleTestRunner runner = new VelocityObstacleTestRunner();
 		
 		//create agentGeometry
 		int numOfParts = 18;
-		double agentRadius = 1;
+		double agentRadius = AGENTDIAMETER / 2;
 		
 		Coordinate[] c = new Coordinate[numOfParts + 1];
 		double angle = Math.PI * 2 / numOfParts;
@@ -95,12 +102,12 @@ public class VelocityObstacleTestRunner {
 		Geometry g = new GeometryFactory().createLinearRing(c);
 
 		// create Agents
-		int numOfAgents = 7;
+		int numOfAgents = NUMOFOAGENTS;
 		double agentDistributionRadius = 20;
 		angle = Math.PI /numOfAgents;
 		
 		Vector2D position, goal;
-		double maxSpeed = 1.0;
+		double maxSpeed = MAXSPEED;
 		Id id;
 		for(int i = 0 ; i < numOfAgents; i++){
 			id = new IdImpl(i);
@@ -111,7 +118,10 @@ public class VelocityObstacleTestRunner {
 		
 		while(!runner.finished()){
 			runner.doStep(1);
-			
+			if(runner.getStepCnt() > Math.pow(2, 12)){
+				log.info("stopped run after " + runner.getStepCnt() + "...");
+				break;
+			}
 		}
 		runner.dump(OUTDIR);
 	}
@@ -136,6 +146,15 @@ public class VelocityObstacleTestRunner {
 	public VelocityObstacleTestRunner(){
 		this.objects = new HashMap<Id, MovingObject>();
 		this.finished = new HashSet<Id>();
+		this.initQuad();
+	}
+	
+	private void initQuad(){
+		this.quadTree = null;
+		minX = Double.MAX_VALUE;
+		maxY = Double.MIN_VALUE;
+		minY = Double.MAX_VALUE;
+		maxX = Double.MIN_VALUE;
 	}
 	
 	public boolean createAndAddMovingAgent(Id id, Vector2D start, Vector2D goal, double maxSpeed, Geometry g){
@@ -221,7 +240,7 @@ public class VelocityObstacleTestRunner {
 		
 		for(MovingObject o: this.objects.values()){
 			VelocityObstacle vo = new ReciprocalVelocityObstacleImpl(o, this.quadTree.get(o.getCurrentPosition().getX(), 
-					o.getCurrentPosition().getY(), this.FACTORFORQUADTREE * desiredVelocity.get(o.getId()).absolut()*stepSize));
+					o.getCurrentPosition().getY(), VelocityObstacleTestRunner.FACTORFORQUADTREE * desiredVelocity.get(o.getId()).absolut()*stepSize));
 			vos.put(o.getId(), vo);
 			
 		}
@@ -234,13 +253,14 @@ public class VelocityObstacleTestRunner {
 	 * 
 	 */
 	private void walk(double stepSize, Map<Id, VelocityObstacle> vo) {
+		this.initQuad();
 		prepareForDump(vo);
 		for(MovingObject o: this.objects.values()){
 			o.calculateNextStep(stepSize, vo.get(o.getId()));
 		}
 		for(MovingObject o: this.objects.values()){
-			this.quadTree.remove(o.getCurrentPosition().getX(), o.getCurrentPosition().getY(), o);
 			o.processNextStep();
+			this.findValuesForQuad(o.getCurrentPosition());
 			if(o.arrived()){
 				this.finished.add(o.getId());
 				String id = o.getId().toString() + "_" + String.valueOf(cnt + 1);
@@ -250,8 +270,6 @@ public class VelocityObstacleTestRunner {
 				this.agentPositionAttrib.put(id, new TreeMap<String, String>());
 				this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
 				this.agentPositionAttrib.get(id).put("step", String.valueOf(cnt));
-			}else{
-				this.quadTree.put(o.getCurrentPosition().getX(), o.getCurrentPosition().getY(), o);
 			}
 		}
 		for(Id id : this.finished){
@@ -262,7 +280,7 @@ public class VelocityObstacleTestRunner {
 		
 		cnt++;
 		if(cnt%nxtmsg == 0){
-			log.info("processed " + cnt + " steps... " + this.getNumOfActiveAgents() + " agents are on the road...");
+			log.info("processed " + cnt + " steps... " + this.getNumOfActiveAgents() + " agents still walk...");
 			nxtmsg *= 2;
 		}
 	}
@@ -314,8 +332,16 @@ public class VelocityObstacleTestRunner {
 	}
 	
 	public void dump(String dir){
-		DaShapeWriter.writeDefaultLineString2Shape(dir + "vo.shp", "vo", this.vo, this.voAttrib);
-		DaShapeWriter.writeDefaultPoints2Shape(dir + "agentPosition.shp", "agentPosition", this.agentPosition, this.agentPositionAttrib);
-		DaShapeWriter.writeDefaultLineStrings2Shape(dir + "agentWay.shp", "agentWay", this.agentWay);
+		if(!new File(dir).exists()){
+			new File(dir).mkdirs();
+			log.info(dir + " not found! Created: " + dir +" ...");
+		}
+		DaShapeWriter.writeDefaultLineString2Shape(dir + "vo-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "vo", this.vo, this.voAttrib);
+		DaShapeWriter.writeDefaultPoints2Shape(dir + "agentPosition-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "agentPosition", this.agentPosition, this.agentPositionAttrib);
+		DaShapeWriter.writeDefaultLineStrings2Shape(dir + "agentWay-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "agentWay", this.agentWay);
+	}
+	
+	public int getStepCnt(){
+		return this.cnt;
 	}
 }
