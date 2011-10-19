@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -41,7 +40,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.pt.qsim.TransitAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -90,9 +88,8 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QSim sim = new QSim(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = new TransitAgent(person, sim);
-		agent.initialize();
 		agent.endActivityAndAssumeControl(10);
 
 		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
@@ -129,9 +126,8 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QSim sim = new QSim(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = new TransitAgent(person, sim);
-		agent.initialize();
 		agent.endActivityAndAssumeControl(10);
 
 		assertFalse(agent.getExitAtStop(stop1));

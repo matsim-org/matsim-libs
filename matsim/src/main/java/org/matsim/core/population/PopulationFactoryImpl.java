@@ -36,12 +36,12 @@ import org.matsim.core.population.routes.RouteFactory;
  */
 public class PopulationFactoryImpl implements PopulationFactory {
 
-	private final Scenario scenario;
+//	private final Scenario scenario;
 	
 	private final ModeRouteFactory routeFactory = new ModeRouteFactory();
 
 	public PopulationFactoryImpl(final Scenario scenario) {
-		this.scenario = scenario;
+//		this.scenario = scenario;
 	}
 
 	@Override

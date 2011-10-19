@@ -35,8 +35,8 @@ import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEventImpl;
 import org.matsim.core.events.VehicleDepartsAtFacilityEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -89,11 +89,6 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 
 	protected void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
-	}
-
-	@Override
-	public void initialize() {
-		throw new UnsupportedOperationException("not sure what this means here because I don't know if a AbstractTransitDriver can be `beyond' life") ;
 	}
 
 	@Override

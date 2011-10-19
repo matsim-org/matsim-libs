@@ -42,7 +42,6 @@ import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
-import org.matsim.core.mobsim.framework.Initializable;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
@@ -336,8 +335,8 @@ public class QSim implements VisMobsim, Netsim {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
 			if ( agent instanceof MobsimDriverAgent ) {
-				createAndAddDefaultVehicle((MobsimAgent) agent, defaultVehicleType);
-				parkVehicleOnInitialLink((MobsimAgent) agent);
+				createAndAddDefaultVehicle(agent, defaultVehicleType);
+				parkVehicleOnInitialLink(agent);
 			}
 		}
 	}
@@ -351,12 +350,6 @@ public class QSim implements VisMobsim, Netsim {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			agents.add(agent);
-			
-			// I would prefer to get rid of the following or understand why it is needed.  But tests fail if I move the material
-			// into the ctor.  kai, jun'11
-			if ( agent instanceof Initializable ) {
-				((Initializable)agent).initialize();
-			}
 		}
 	}
 

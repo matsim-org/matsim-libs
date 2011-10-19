@@ -37,10 +37,8 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
@@ -87,23 +85,19 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 		this.person = p;
 		this.simulation = simulation;
-	}
 
-	// ============================================================================================================================
-	// other
-
-	@Override
-	public final void initialize() {
-		List<? extends PlanElement> planElements = this.getPlanElements();
-		this.currentPlanElementIndex = 0;
-		Activity firstAct = (Activity) planElements.get(0);
-		double actEndTime = firstAct.getEndTime();
-
-		this.currentLinkId = firstAct.getLinkId();
-		if ((actEndTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
-			this.activityEndTime = actEndTime ;
-			this.simulation.scheduleActivityEnd(this);
-			this.simulation.getAgentCounter().incLiving();
+		List<? extends PlanElement> planElements = p.getSelectedPlan().getPlanElements();
+		if (planElements.size() > 0) {
+			this.currentPlanElementIndex = 0;
+			Activity firstAct = (Activity) planElements.get(0);
+			double actEndTime = firstAct.getEndTime();
+			
+			this.currentLinkId = firstAct.getLinkId();
+			if ((actEndTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
+				this.activityEndTime = actEndTime ;
+				this.simulation.scheduleActivityEnd(this);
+				this.simulation.getAgentCounter().incLiving();
+			}
 		}
 	}
 
@@ -401,7 +395,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	/**
 	 * Convenience method delegating to person's selected plan
-	 * @return list of {@link ActivityImpl}s and {@link LegImpl}s of this agent's plan
+	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
 		return Collections.unmodifiableList( this.getSelectedPlan().getPlanElements() ) ;

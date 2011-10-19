@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -1031,7 +1030,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			Departure dep = builder.createDeparture(id1, 100);
 
 			// setup: simulation
-			qsim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+			qsim = new QSim(scenario, EventsUtils.createEventsManager());
 			NetsimNetwork qnet = qsim.getNetsimNetwork();
 			this.qlink1 = (QLinkImpl) qnet.getNetsimLink(id1);
 			this.qlink2 = (QLinkImpl) qnet.getNetsimLink(id2);
@@ -1068,7 +1067,6 @@ public class TransitQueueNetworkTest extends TestCase {
 			PersonDriverAgentImpl nDriver = new PersonDriverAgentImpl(person, qsim);
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
-			nDriver.initialize();
 			nDriver.endActivityAndAssumeControl(100);
 
 			if (stop2 != null) {
@@ -1094,7 +1092,6 @@ public class TransitQueueNetworkTest extends TestCase {
 				PersonDriverAgentImpl nDriver2 = new PersonDriverAgentImpl(person2, qsim);
 				this.normalVehicle2.setDriver(nDriver2);
 				nDriver2.setVehicle(this.normalVehicle);
-				nDriver2.initialize();
 			} else {
 				this.normalVehicle2 = null;
 			}

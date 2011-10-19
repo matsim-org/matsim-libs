@@ -153,11 +153,6 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void initialize() {
-		
-	}
-
-	@Override
 	public void setVehicle(final QVehicle veh) {
 	}
 

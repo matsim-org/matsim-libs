@@ -115,7 +115,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -158,7 +158,7 @@ public class ParallelQSimTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -200,7 +200,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -249,7 +249,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -305,7 +305,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -337,7 +337,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -373,7 +373,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -436,7 +436,7 @@ public class ParallelQSimTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		synchronizedEvents.addHandler(vAnalyzer);
@@ -498,7 +498,7 @@ public class ParallelQSimTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		synchronizedEvents.addHandler(vAnalyzer);
@@ -572,7 +572,7 @@ public class ParallelQSimTest extends TestCase {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		synchronizedEvents.addHandler(vAnalyzer);
@@ -620,7 +620,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -675,7 +675,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -730,7 +730,7 @@ public class ParallelQSimTest extends TestCase {
 		plan.createAndAddActivity("w", f.link3.getId());
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 
 		/* use two parallel Threads */
@@ -752,7 +752,6 @@ public class ParallelQSimTest extends TestCase {
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
-		agent.initialize();
 		agent.endActivityAndAssumeControl(100.0);
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
@@ -793,7 +792,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -851,7 +850,7 @@ public class ParallelQSimTest extends TestCase {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EventsCollector collector = new EventsCollector();
 		synchronizedEvents.addHandler(collector);
@@ -893,7 +892,7 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -909,7 +908,7 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongStartLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -925,7 +924,7 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_WrongEndLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -942,7 +941,7 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_ImpossibleRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -958,7 +957,7 @@ public class ParallelQSimTest extends TestCase {
 	 * @author mrieser
 	 */
 	public void testConsistentRoutes_MissingRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
@@ -1059,7 +1058,7 @@ public class ParallelQSimTest extends TestCase {
 		person.addPlan(plan);
 		population.addPerson(person);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -1164,7 +1163,7 @@ public class ParallelQSimTest extends TestCase {
 		person3.addPlan(plan3);
 		population.addPerson(person3);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		SynchronizedEventsManagerImpl synchronizedEvents = new SynchronizedEventsManagerImpl(events);
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		synchronizedEvents.addHandler(collector);
@@ -1251,7 +1250,7 @@ public class ParallelQSimTest extends TestCase {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.addQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);

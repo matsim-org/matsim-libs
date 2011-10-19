@@ -116,7 +116,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -155,7 +155,7 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -193,7 +193,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -238,7 +238,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -290,7 +290,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -318,7 +318,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -350,7 +350,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
 
@@ -409,7 +409,7 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -467,7 +467,7 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -537,7 +537,7 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
 
@@ -581,7 +581,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -651,7 +651,7 @@ public class QSimTest {
 		
 		
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -714,7 +714,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -762,7 +762,7 @@ public class QSimTest {
 		plan.createAndAddActivity("w", f.link3.getId());
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		/* prepare sim */
 		QSim sim = new QSim(f.scenario, events);
@@ -779,7 +779,6 @@ public class QSimTest {
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
-		agent.initialize();
 		agent.endActivityAndAssumeControl(100.0);
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
@@ -821,7 +820,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -875,7 +874,7 @@ public class QSimTest {
 		f.plans.addPerson(person);
 
 		/* build events */
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 
@@ -913,7 +912,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testConsistentRoutes_WrongRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
@@ -929,7 +928,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testConsistentRoutes_WrongStartLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
@@ -945,7 +944,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testConsistentRoutes_WrongEndLink() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
@@ -962,7 +961,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testConsistentRoutes_ImpossibleRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
@@ -978,7 +977,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testConsistentRoutes_MissingRoute() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
 		events.addHandler(counter);
 		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
@@ -1073,7 +1072,7 @@ public class QSimTest {
 		person.addPlan(plan);
 		population.addPerson(person);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 
@@ -1172,7 +1171,7 @@ public class QSimTest {
 		person3.addPlan(plan3);
 		population.addPerson(person3);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		FirstLastEventCollector collector = new FirstLastEventCollector();
 		events.addHandler(collector);
 
@@ -1253,7 +1252,7 @@ public class QSimTest {
 		final ArrayList<Id> linkIds2;
 
 		public Fixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.addQSimConfigGroup(new QSimConfigGroup());
 			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);

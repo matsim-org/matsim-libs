@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -41,7 +40,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -80,6 +78,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		QVehicle v = StaticFactoriesContainer.createQueueVehicle(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
+		p.addPlan(new PlanImpl());
 		v.setDriver(StaticFactoriesContainer.createQueuePersonAgent(p, null));
 		Exception e = null;
 		//as QueueLink has static access to the rest of the simulation
@@ -126,7 +125,6 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, f.qSim);
-		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -171,7 +169,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, EventsUtils.createEventsManager());
 
 		QVehicle veh = StaticFactoriesContainer.createQueueVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
@@ -183,7 +181,6 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
-		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -217,7 +214,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(f.scenario, EventsUtils.createEventsManager());
 
 		QVehicle veh = StaticFactoriesContainer.createQueueVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(80));
@@ -229,7 +226,6 @@ public class QueueLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		MobsimDriverAgent driver = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
-		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		driver.endActivityAndAssumeControl(0);
@@ -275,7 +271,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2, 0));
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 1.0, 1.0);
 		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1.0, 1.0, 1.0, 1.0);
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, EventsUtils.createEventsManager());
 		QueueNetwork queueNetwork = new QueueNetwork(network, qsim);
 		QueueSimEngine simEngine = new QueueSimEngine(queueNetwork, MatsimRandom.getRandom(), scenario.getConfig());
 		QueueLink qlink = queueNetwork.getQueueLink(new IdImpl("1"));
@@ -299,13 +295,11 @@ public class QueueLinkTest extends MatsimTestCase {
 		MobsimDriverAgent pa1 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
-		pa1.initialize();
 
 		QVehicle v2 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		MobsimDriverAgent pa2 = StaticFactoriesContainer.createQueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.initialize();
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());
@@ -347,7 +341,8 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())), ((EventsManager) EventsUtils.createEventsManager()));
+		p.addPlan(new PlanImpl());
+		QueueSimulation qsim = QueueSimulationFactory.createMobsimStatic(ScenarioUtils.createScenario(ConfigUtils.createConfig()), EventsUtils.createEventsManager());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle veh1 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(new IdImpl(1), vehType));
@@ -410,7 +405,7 @@ public class QueueLinkTest extends MatsimTestCase {
 			Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1001, 0));
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
-			this.qSim = QueueSimulationFactory.createMobsimStatic(this.scenario, ((EventsManager) EventsUtils.createEventsManager())) ;
+			this.qSim = QueueSimulationFactory.createMobsimStatic(this.scenario, EventsUtils.createEventsManager()) ;
 			this.queueNetwork = new QueueNetwork(network, this.qSim );
 			QueueSimEngine engine = new QueueSimEngine(this.queueNetwork, MatsimRandom.getRandom(), this.scenario.getConfig());
 			this.qlink1 = this.queueNetwork.getQueueLink(new IdImpl("1"));

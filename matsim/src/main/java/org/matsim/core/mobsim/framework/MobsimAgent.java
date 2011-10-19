@@ -75,7 +75,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author nagel
  *
  */
-public interface MobsimAgent extends NetworkAgent, Identifiable, Initializable {
+public interface MobsimAgent extends NetworkAgent, Identifiable {
 
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,

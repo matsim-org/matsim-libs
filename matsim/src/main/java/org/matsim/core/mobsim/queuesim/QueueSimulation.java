@@ -229,7 +229,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			//not needed in new agent class
 			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
-			agent.initialize();
 			QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 			qlink.addParkedVehicle(veh);
 		}

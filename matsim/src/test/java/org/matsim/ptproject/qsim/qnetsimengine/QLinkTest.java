@@ -77,6 +77,7 @@ public class QLinkTest extends MatsimTestCase {
 		QVehicleImpl v = new QVehicleImpl(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
+		p.addPlan(new PlanImpl());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(new PersonDriverAgentImpl(p, new QSim(scenario, (EventsUtils.createEventsManager()))));
@@ -99,6 +100,7 @@ public class QLinkTest extends MatsimTestCase {
 
 		QVehicleImpl veh = new QVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
+		p.addPlan(new PlanImpl());
 		veh.setDriver(new PersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
@@ -143,6 +145,7 @@ public class QLinkTest extends MatsimTestCase {
 
 		QVehicleImpl veh = new QVehicleImpl(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
+		p.addPlan(new PlanImpl());
 		veh.setDriver(new PersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
@@ -187,7 +190,6 @@ public class QLinkTest extends MatsimTestCase {
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonDriverAgentImpl driver = new PersonDriverAgentImpl(pers, f.sim);
-		driver.initialize();
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		f.qlink1.addParkedVehicle(veh);
@@ -257,13 +259,11 @@ public class QLinkTest extends MatsimTestCase {
 		PersonDriverAgentImpl pa1 = new PersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
-		pa1.initialize();
 
 		QVehicleImpl v2 = new QVehicleImpl(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonDriverAgentImpl pa2 = new PersonDriverAgentImpl(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.initialize();
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());
@@ -305,6 +305,7 @@ public class QLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
+		p.addPlan(new PlanImpl());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicleImpl veh1 = new QVehicleImpl(new VehicleImpl(new IdImpl(1), vehType));

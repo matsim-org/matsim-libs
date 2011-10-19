@@ -5,17 +5,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -206,6 +199,8 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 		currentLinkId = ((Activity) selectedPlan.getPlanElements().get(0)).getLinkId();
 		this.simulation = simulation;
 		this.eventsManager = simulation.getEventsManager();
+		
+		this.simulation.getAgentCounter().incLiving();
 	}
 	
 	
@@ -303,12 +298,6 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 		// that the mobsim delivers to where it should deliver.  The corresponding notification method for network movement 
 		// is "notifyMoveOverNode". kai, jun'11
 		this.currentLinkId = linkId ;
-	}
-
-	@Override
-	public void initialize() {
-		// I am told this at the very beginning, after I'm given a vehicle.
-		simulation.getAgentCounter().incLiving();
 	}
 
 	@Override
