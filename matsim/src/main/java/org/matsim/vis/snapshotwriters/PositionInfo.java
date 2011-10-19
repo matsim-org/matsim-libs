@@ -33,15 +33,13 @@ import org.matsim.api.core.v01.Id;
  */
 public class PositionInfo implements AgentSnapshotInfo {
 
-	private static final long serialVersionUID = -8168936182264521667L;
-
-	private Id agentId;
-	private double easting;
-	private double northing;
-	private double azimuth;
-	private double colorValue;
-	private AgentState agentState;
-	private Id linkId;
+	private Id agentId = null;
+	private double easting = Double.NaN;
+	private double northing = Double.NaN;
+	private double azimuth = Double.NaN;
+	private double colorValue = 0;
+	private AgentState agentState = null;
+	private Id linkId = null;
 	private int type = 0;
 	private int user = 0;
 
