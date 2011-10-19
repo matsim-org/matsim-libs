@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Stack;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,11 +50,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author mrieser
  */
 public abstract class MatsimXmlParser extends DefaultHandler {
-
-	static {
-		System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
-		System.setProperty("sun.net.client.defaultReadTimeout", "10000");
-	}
 
 	private static final Logger log = Logger.getLogger(MatsimXmlParser.class);
 
@@ -218,7 +214,13 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 		// try to get the dtd from the web
 		log.info("Trying to load " + systemId + ". In some cases (e.g. network interface up but no connection), this may take a bit.");
 		try {
-			InputStream is = new URL(systemId).openStream();
+			URL url = new URL(systemId);
+      URLConnection urlConn = url.openConnection();
+      urlConn.setConnectTimeout(8000);
+      urlConn.setReadTimeout(8000);
+      urlConn.setAllowUserInteraction(false);         
+
+      InputStream is = urlConn.getInputStream();
 			/* If there was no exception until here, than the path is valid.
 			 * Return the opened stream as a source. If we would return null, then the SAX-Parser
 			 * would have to fetch the same file again, requiring two accesses to the webserver */
