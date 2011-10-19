@@ -18,14 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto.ttimematrix;
+package org.matsim.utils;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,81 +41,115 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * Calculates a least-cost-path tree using Dijkstra's algorithm for calculating a shortest-path
+ * tree, given a node as root of the tree.
+ * 
+ * @author balmermi, mrieser
+ */
 public class LeastCostPathTree {
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	private final static Logger log = Logger.getLogger(LeastCostPathTree.class);
+	// ////////////////////////////////////////////////////////////////////
 
 	private Node origin = null;
 	private double dTime = Time.UNDEFINED_TIME;
-
+	
 	private final TravelTime ttFunction;
 	private final TravelCost tcFunction;
-	private HashMap<Id,NodeData> nodeData;
+	private HashMap<Id, NodeData> nodeData;
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// constructors
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public LeastCostPathTree(TravelTime tt, TravelCost tc) {
-		log.info("init " + this.getClass().getName() + " module...");
 		this.ttFunction = tt;
 		this.tcFunction = tc;
-		log.info("done.");
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	public void calculate(final Network network, final Node origin, final double time) {
+		this.origin = origin;
+		this.dTime = time;
+		
+		nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
+		NodeData d = new NodeData();
+		d.time = time;
+		d.cost = 0;
+		nodeData.put(origin.getId(), d);
+
+		ComparatorCost comparator = new ComparatorCost(nodeData);
+		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500, comparator);
+		relaxNode(origin, pendingNodes);
+		while (!pendingNodes.isEmpty()) {
+			Node n = pendingNodes.poll();
+			relaxNode(n, pendingNodes);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////
 	// inner classes
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public static class NodeData {
 		private Node prev = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
-		public void reset() { this.prev = null; this.cost = Double.MAX_VALUE; this.time = 0; }
-		public void visit(final Node comingFrom, final double cost, final double time) {
+
+		/*package*/ void reset() {
+			this.prev = null;
+			this.cost = Double.MAX_VALUE;
+			this.time = 0;
+		}
+
+		/*package*/ void visit(final Node comingFrom, final double cost, final double time) {
 			this.prev = comingFrom;
 			this.cost = cost;
 			this.time = time;
 		}
-		public double getCost() { return this.cost; }
-		public double getTime() { return this.time; }
-		public Node getPrevNode() { return this.prev; }
+
+		public double getCost() {
+			return this.cost;
+		}
+
+		public double getTime() {
+			return this.time;
+		}
+
+		public Node getPrevNode() {
+			return this.prev;
+		}
 	}
 
 	static class ComparatorCost implements Comparator<Node> {
 		protected Map<Id, ? extends NodeData> nodeData;
-		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
+
+		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) {
+			this.nodeData = nodeData;
+		}
+
+		@Override
 		public int compare(final Node n1, final Node n2) {
 			double c1 = getCost(n1);
 			double c2 = getCost(n2);
-			if (c1 < c2) return -1;
-			if (c1 > c2) return +1;
+			if (c1 < c2)
+				return -1;
+			if (c1 > c2)
+				return +1;
 			return n1.getId().compareTo(n2.getId());
 		}
-		protected double getCost(final Node node) { return this.nodeData.get(node.getId()).getCost(); }
+
+		protected double getCost(final Node node) {
+			return this.nodeData.get(node.getId()).getCost();
+		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setOrigin(Node origin) {
-		this.origin = origin;
-	}
-
-	public final void setDepartureTime(double time) {
-		this.dTime = time;
-	}
-
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// get methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
-	public final HashMap<Id,NodeData> getTree() {
+	public final HashMap<Id, NodeData> getTree() {
 		return this.nodeData;
 	}
 
@@ -128,6 +161,9 @@ public class LeastCostPathTree {
 		return this.tcFunction;
 	}
 
+	/**
+	 * @return Returns the root of the calculated tree, or <code>null</code> if no tree was calculated yet.
+	 */
 	public final Node getOrigin() {
 		return this.origin;
 	}
@@ -136,9 +172,9 @@ public class LeastCostPathTree {
 		return this.dTime;
 	}
 
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// private methods
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
 		NodeData nData = nodeData.get(n.getId());
@@ -147,64 +183,41 @@ public class LeastCostPathTree {
 		for (Link l : n.getOutLinks().values()) {
 			Node nn = l.getToNode();
 			NodeData nnData = nodeData.get(nn.getId());
-			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
-			double visitCost = currCost+tcFunction.getLinkGeneralizedTravelCost(l,currTime);
-			double visitTime = currTime+ttFunction.getLinkTravelTime(l,currTime);
+			if (nnData == null) {
+				nnData = new NodeData();
+				this.nodeData.put(nn.getId(), nnData);
+			}
+			double visitCost = currCost + tcFunction.getLinkGeneralizedTravelCost(l, currTime);
+			double visitTime = currTime + ttFunction.getLinkTravelTime(l, currTime);
 			if (visitCost < nnData.getCost()) {
 				pendingNodes.remove(nn);
-				nnData.visit(n,visitCost,visitTime);
+				nnData.visit(n, visitCost, visitTime);
 				pendingNodes.add(nn);
 			}
 		}
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// run method
-	//////////////////////////////////////////////////////////////////////
-
-	public void run(final Network network) {
-//		log.info("running " + this.getClass().getName() + " module...");
-
-		nodeData = new HashMap<Id,NodeData>((int)(network.getNodes().size()*1.1),0.95f);
-		NodeData d = new NodeData();
-		d.time = dTime;
-		d.cost = 0;
-		nodeData.put(origin.getId(),d);
-
-		ComparatorCost comparator = new ComparatorCost(nodeData);
-		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
-		relaxNode(this.origin,pendingNodes);
-		while (!pendingNodes.isEmpty()) {
-			Node n = pendingNodes.poll();
-			relaxNode(n,pendingNodes);
-		}
-
-//		log.info("done.");
-	}
-
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 	// main method
-	//////////////////////////////////////////////////////////////////////
+	// ////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
-		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator());
-		LeastCostPathTree st = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig().planCalcScore()));
+		TravelTime ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new TravelTimeDistanceCostCalculator(ttc, scenario.getConfig()
+				.planCalcScore()));
 		Node origin = network.getNodes().get(new IdImpl(1));
-		st.setOrigin(origin);
-		st.setDepartureTime(8*3600);
-		st.run(network);
-		HashMap<Id,NodeData> tree = st.getTree();
+		st.calculate(network, origin, 8*3600);
+		HashMap<Id, NodeData> tree = st.getTree();
 		for (Id id : tree.keySet()) {
 			NodeData d = tree.get(id);
 			if (d.getPrevNode() != null) {
-				System.out.println(id+"\t"+d.getTime()+"\t"+d.getCost()+"\t"+d.getPrevNode().getId());
-			}
-			else {
-				System.out.println(id+"\t"+d.getTime()+"\t"+d.getCost()+"\t"+"0");
+				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNode().getId());
+			} else {
+				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + "0");
 			}
 		}
 	}

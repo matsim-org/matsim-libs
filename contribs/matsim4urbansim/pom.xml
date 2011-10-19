@@ -8,16 +8,10 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>matsim4urbansim</artifactId>
   <name>matsim4urbansim</name>
-  <version>0.4.0-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>sna</artifactId>
-  		<version>0.4.0-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>toronto</artifactId>
   		<version>0.4.0-SNAPSHOT</version>
   	</dependency>
   </dependencies>

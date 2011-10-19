@@ -54,8 +54,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.toronto.ttimematrix.LeastCostPathTree;
+import org.matsim.utils.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -114,6 +113,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	/**
 	 * calculating accessibility indicators
 	 */
+	@Override
 	public void notifyShutdown(ShutdownEvent event){
 		log.info("Entering notifyShutdown ..." );
 		
@@ -132,9 +132,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		NetworkImpl network = controler.getNetwork();
-		double depatureTime = 8.*3600;	// tnicolai: make configurable
-		lcptTravelTime.setDepartureTime(depatureTime);
-		lcptDistance.setDepartureTime(depatureTime);
+		final double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
 		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
@@ -164,10 +162,8 @@ public class ERSAControlerListener implements ShutdownListener{
 				Node fromNode = network.getNearestNode(coordFromZone);
 				assert( fromNode != null );
 				// starting Dijkstra
-				lcptTravelTime.setOrigin( fromNode );	// setting starting point
-				lcptTravelTime.run( network );			// run dijkstra on network
-				lcptDistance.setOrigin( fromNode );
-				lcptDistance.run( network );	
+				lcptTravelTime.calculate(network, fromNode, depatureTime);			// run dijkstra on network
+				lcptDistance.calculate(network, fromNode, depatureTime );	
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import java.io.BufferedWriter;
@@ -37,8 +56,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-
-import playground.toronto.ttimematrix.LeastCostPathTree;
+import org.matsim.utils.LeastCostPathTree;
 
 /**
  *
@@ -73,6 +91,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 	 *  - zone2zone impedances including travel times, travel costs and am walk time
 	 *  - logsum computation of workplace accessibility
 	 */
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
@@ -86,8 +105,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
 		NetworkImpl network = controler.getNetwork() ;
-		double depatureTime = 8.*3600 ;
-		lcpt.setDepartureTime(depatureTime);
+		final double depatureTime = 8.*3600 ;
 		
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
@@ -120,8 +138,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 				assert( coord != null );
 				Node fromNode = network.getNearestNode( coord );
 				assert( fromNode != null );
-				lcpt.setOrigin( fromNode );
-				lcpt.run(network);
+				lcpt.calculate(network, fromNode, depatureTime);
 				
 				// initialize accessibility for origin (from) zone
 				double accessibility 	= 0.;

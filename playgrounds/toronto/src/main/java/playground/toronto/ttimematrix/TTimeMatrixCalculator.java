@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.utils.LeastCostPathTree;
 
 public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 
@@ -181,9 +182,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 		int nofZones = ttimeMatrix.size();
 		int cnt = 0;
 		for (Id fzone : ttimeMatrix.keySet()) {
-			st.setOrigin(network.getNodes().get(fzone));
-			st.setDepartureTime(hour*3600);
-			st.run(network);
+			st.calculate(network, network.getNodes().get(fzone), hour*3600);
 			Map<Id,Tuple<Double,Integer>> tmap = ttimeMatrix.get(fzone);
 			for (Id tzone : tmap.keySet()) {
 				Tuple<Double,Integer> tuple = tmap.get(tzone);
@@ -229,10 +228,12 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// event handlers
 	//////////////////////////////////////////////////////////////////////
 	
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		departures.put(event.getPersonId().toString(),event);
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		AgentDepartureEvent dEvent = departures.remove(event.getPersonId().toString());
 		if (dEvent == null) throw new RuntimeException("Missing AgentDepartureEvent for AgentArrivalEvent: " + event.toString());
@@ -262,6 +263,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// reset
 	//////////////////////////////////////////////////////////////////////
 	
+	@Override
 	public void reset(int iteration) {
 		hour = 0;
 		departures.clear();

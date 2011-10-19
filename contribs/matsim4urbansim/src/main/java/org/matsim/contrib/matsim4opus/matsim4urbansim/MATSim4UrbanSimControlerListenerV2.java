@@ -36,8 +36,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
+import org.matsim.utils.LeastCostPathTree;
 
-import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
  *
@@ -73,6 +73,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 	 *  - zone2zone impedances including travel times, travel costs and am walk time
 	 *  - logsum computation of workplace accessibility
 	 */
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
@@ -90,7 +91,6 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 		
 		NetworkImpl network = controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
-		lcptTravelTime.setDepartureTime(depatureTime);
 		// stTravelDistance.setDepartureTime(depatureTime);
 		
 		// od-trip matrix (zonal based)
@@ -124,8 +124,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 				Id originZoneID = zones[fromZoneIndex].getZoneID();
 				
 				// run dijksrtra for current node as origin
-				lcptTravelTime.setOrigin( fromNode );
-				lcptTravelTime.run( network );
+				lcptTravelTime.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					

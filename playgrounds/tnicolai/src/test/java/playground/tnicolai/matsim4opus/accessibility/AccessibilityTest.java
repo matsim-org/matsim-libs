@@ -22,13 +22,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.toronto.ttimematrix.LeastCostPathTree;
 
 public class AccessibilityTest extends MatsimTestCase{
 	
@@ -261,8 +261,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
 		
 		// setting depature time not important here but necessary for LeastCostPathTree
-		double depatureTime = 8.*3600;
-		lcptTime.setDepartureTime(depatureTime);
+		final double depatureTime = 8.*3600;
 		// get a beta for accessibility computation
 		double beta_per_hr = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
@@ -276,8 +275,7 @@ public class AccessibilityTest extends MatsimTestCase{
 			Coord coord = originNode.getCoord();
 			assert( coord != null );
 			
-			lcptTime.setOrigin(originNode);
-			lcptTime.run(network);
+			lcptTime.calculate(network, originNode, depatureTime);
 			
 			double accessibilityTravelTimes = 0.;
 			
@@ -320,8 +318,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		LeastCostPathTree lcptTime = new LeastCostPathTree(ttc, new TravelTimeCostCalculatorTest(ttc, scenario.getConfig().planCalcScore(), dummyCostFactor));
 		
 		// setting depature time not important here but necessary for LeastCostPathTree
-		double depatureTime = 8.*3600;
-		lcptTime.setDepartureTime(depatureTime);
+		final double depatureTime = 8.*3600;
 		// get a beta for accessibility computation
 		double beta_per_hr = this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
@@ -339,8 +336,7 @@ public class AccessibilityTest extends MatsimTestCase{
 				Node originNode = network.getNearestNode( iov2.gridCentroid );
 				assert( originNode != null );
 				
-				lcptTime.setOrigin(originNode);
-				lcptTime.run(network);
+				lcptTime.calculate(network, originNode, depatureTime);
 				
 				double ttAccessibility = 0.;
 				

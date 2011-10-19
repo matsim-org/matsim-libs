@@ -18,11 +18,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.LeastCostPathTree.NodeData;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelDistanceCostCalculatorTest;
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
-import playground.toronto.ttimematrix.LeastCostPathTree;
-import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 public class LeastCostPathTreeTest extends MatsimTestCase{
 	
@@ -52,18 +52,14 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		Node destination = this.scenario.getNetwork().getNodes().get(new IdImpl(4));
 		assert( destination != null );
 
-		lcptTime.setOrigin(origin);
-		lcptTime.setDepartureTime(8*3600);
-		lcptTime.run(this.scenario.getNetwork());
+		lcptTime.calculate(this.scenario.getNetwork(), origin, 8*3600);
 		double spTravelTime = lcptTime.getTree().get( destination.getId() ).getTime();
 		double spTravelTimeCost = lcptTime.getTree().get( destination.getId() ).getCost(); // here cost = travel time
 		List<Node> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
 		printResults(spTravelTime, spTravelTimeCost); // travel time = 100s, cost = (50s+50s) * 0,003 = 0,3s
 		Assert.assertTrue( containsNode(spTimeVisitedNodes, 2));
 		
-		lcptDistance.setOrigin(origin);
-		lcptDistance.setDepartureTime(8*3600);
-		lcptDistance.run(this.scenario.getNetwork());
+		lcptDistance.calculate(this.scenario.getNetwork(), origin, 8*3600);
 		double spDistanceTime = lcptDistance.getTree().get( destination.getId() ).getTime();
 		double spDistanceCost = lcptDistance.getTree().get( destination.getId() ).getCost(); // here cost = travel distance
 		List<Node> spDistenceVisitedNodes = getVisitedNodes(lcptDistance, destination, "Travel Distance");

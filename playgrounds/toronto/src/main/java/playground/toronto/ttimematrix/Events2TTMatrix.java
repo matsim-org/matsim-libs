@@ -39,6 +39,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.utils.LeastCostPathTree;
 
 
 public class Events2TTMatrix {

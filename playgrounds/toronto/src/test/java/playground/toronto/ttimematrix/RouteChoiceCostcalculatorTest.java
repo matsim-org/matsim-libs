@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.toronto.ttimematrix;
 
 import java.util.ArrayList;
@@ -18,9 +37,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.LeastCostPathTree.NodeData;
 
-import playground.toronto.ttimematrix.LeastCostPathTree;
-import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
 
 public class RouteChoiceCostcalculatorTest {
 	
@@ -48,15 +67,9 @@ public class RouteChoiceCostcalculatorTest {
 		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
 		assert(origin != null);
 		
-		// set start node for spanning trees
-		spDistance.setOrigin( origin );
-		spDistance.setDepartureTime(0);
-		spTime.setOrigin( origin );
-		spTime.setDepartureTime(0);
-		
-		// run spanning trees
-		spDistance.run(this.scenario.getNetwork());
-		spTime.run(this.scenario.getNetwork());
+		// calculate spanning trees
+		spDistance.calculate(this.scenario.getNetwork(), origin, 0);
+		spTime.calculate(this.scenario.getNetwork(), origin, 0);
 		
 		// get destination node
 		Node destination = this.scenario.getNetwork().getNodes().get(new IdImpl(4));

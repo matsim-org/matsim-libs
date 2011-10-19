@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.kai.urbansim;
 
 import java.io.BufferedWriter;
@@ -16,8 +35,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.LeastCostPathTree;
 
-import playground.toronto.ttimematrix.LeastCostPathTree;
 
 /**
  *
@@ -33,6 +52,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		this.zones = zones ;
 	}
 
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
@@ -44,7 +64,6 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 
 		NetworkImpl network = controler.getNetwork() ;
 		double dpTime = 8.*3600 ;
-		st.setDepartureTime(dpTime);
 
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/travel_data.csv");
@@ -66,8 +85,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 				assert( coord != null ) ;
 				Node fromNode = network.getNearestNode( coord ) ;
 				assert( fromNode != null ) ;
-				st.setOrigin( fromNode ) ;
-				st.run(network) ;
+				st.calculate(network, fromNode, dpTime) ;
 				for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 					Coord toCoord = toZone.getCoord() ;
 					Node toNode = network.getNearestNode( toCoord ) ;

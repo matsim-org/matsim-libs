@@ -43,11 +43,11 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.MeasurementObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import playground.toronto.ttimematrix.LeastCostPathTree;
 
 
 
@@ -95,6 +95,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 		}
 	}
 	
+	@Override
 	protected Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl facilities, NetworkImpl network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
@@ -185,6 +186,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 			this.travelDataPath = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "travel_data.csv";
 		}
 		
+		@Override
 		public void notifyShutdown(ShutdownEvent event){
 			
 			long startTimeWriteTravelData, endTimeWriteTravelData;
@@ -203,7 +205,6 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 
 				NetworkImpl network = controler.getNetwork() ;
 				double depatureTime = 8.*3600 ;
-				lcpt.setDepartureTime(depatureTime);
 
 				try {
 					BufferedWriter writer = IOUtils.getBufferedWriter( travelDataPath );
@@ -224,8 +225,7 @@ public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
 						assert( coord != null ) ;
 						Node fromNode = network.getNearestNode( coord ) ;
 						assert( fromNode != null ) ;
-						lcpt.setOrigin( fromNode ) ;
-						lcpt.run(network) ;
+						lcpt.calculate(network, fromNode, depatureTime);
 						for ( ActivityFacility toZone : zones.getFacilities().values() ) {
 							Coord toCoord = toZone.getCoord() ;
 							Node toNode = network.getNearestNode( toCoord ) ;

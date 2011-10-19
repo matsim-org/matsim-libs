@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package tryouts.tests;
 
 import java.util.ArrayList;
@@ -18,10 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
-
-import playground.toronto.ttimematrix.LeastCostPathTree;
-import playground.toronto.ttimematrix.LeastCostPathTree.NodeData;
-
+import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.LeastCostPathTree.NodeData;
 
 public class TestSpanningTree {
 	
@@ -37,9 +54,7 @@ public class TestSpanningTree {
 		
 		// than set the start node
 		Node origin = network.getNodes().get(new IdImpl(4224));
-		lcpt.setOrigin(origin);
-		lcpt.setDepartureTime(8*3600);
-		lcpt.run(network);
+		lcpt.calculate(network, origin, 8*3600);
 
 		HashMap<Id, NodeData> tree = lcpt.getTree();
 		
