@@ -32,8 +32,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.yu.newPlans.NewPopulation;
-
 /**
  * writes new Plansfile, in which every person will has 2 plans, one with type
  * "iv" and the other with type "oev", whose leg mode will be "pt" and who will
@@ -47,7 +45,6 @@ public class NewAgentPtPlan extends NewPopulation {
 		super(network, population, filename);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void run(final Person person) {
 		if (Integer.parseInt(person.getId().toString()) < 1000000000) {
