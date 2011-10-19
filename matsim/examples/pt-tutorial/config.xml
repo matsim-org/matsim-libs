@@ -26,6 +26,7 @@
 		<param name="lastIteration" value="50" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="qsim">
@@ -34,7 +35,6 @@
 		<param name="endTime" value="30:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-		<param name = "snapshotFormat"	value = "otfvis"/> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="planCalcScore">
