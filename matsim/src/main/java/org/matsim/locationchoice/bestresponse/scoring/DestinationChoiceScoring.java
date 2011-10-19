@@ -57,10 +57,13 @@ public class DestinationChoiceScoring {
 		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
 			double fVar = 1.0;
 			if (act.getType().startsWith("s")) {
-				fVar = Double.parseDouble(config.findParam(LCEXP, "fShop"));
+				fVar = Double.parseDouble(config.locationchoice().getScaleEpsShopping());
+			}
+			else if (act.getType().startsWith("l")){
+				fVar = Double.parseDouble(config.locationchoice().getScaleEpsLeisure());
 			}
 			else {
-				fVar = Double.parseDouble(config.findParam(LCEXP, "fLeisure"));
+				fVar = 1.0;
 			}
 			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
 		}		
@@ -105,7 +108,7 @@ public class DestinationChoiceScoring {
 		long seed = (long) ((kp * kf) * Long.MAX_VALUE);
 		rnd.setSeed(seed);
 				
-		if (Boolean.parseBoolean(config.findParam(LCEXP, "gumbel"))) {
+		if (config.locationchoice().getEpsilonDistribution().equals("gumbel")) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextDouble();

@@ -32,9 +32,7 @@ public class ChoiceSet {
 	private int numberOfAlternatives;
 	
 	private int approximationLevel;	
-	// *************************************
-	private static String LCEXP = "locationchoiceExperimental";
-	
+	// *************************************	
 	private List<Id> destinations = new Vector<Id>();
 	private List<Id> notYetVisited = new Vector<Id>();
 	private PlansCalcRoute router = null;
@@ -47,8 +45,8 @@ public class ChoiceSet {
 		this.network = network;
 		this.config = config;
 		
-		this.exponent = Double.parseDouble(config.findParam(LCEXP, "csexponent"));
-		this.numberOfAlternatives = Integer.parseInt(config.findParam(LCEXP, "numberOfAlternatives"));
+		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
+		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
 	
 	public void addDestination(Id id) {
