@@ -56,7 +56,7 @@ public class CreatePopulation {
 		this.removeNonAnalysisPersons();
 			
 		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", config, 
-				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
+				Long.parseLong(config.locationchoice().getRandomSeed()));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
@@ -64,7 +64,7 @@ public class CreatePopulation {
 		maxEpsilonComputer.finishReplanning();
 		
 		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", config, 
-				Long.parseLong(config.findParam(LCEXP, "randomSeed")));
+				Long.parseLong(config.locationchoice().getRandomSeed()));
 		maxEpsilonComputer.prepareReplanning();
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			maxEpsilonComputer.handlePlan(p.getSelectedPlan());

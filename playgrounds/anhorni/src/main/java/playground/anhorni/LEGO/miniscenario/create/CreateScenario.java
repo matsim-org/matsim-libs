@@ -38,9 +38,7 @@ public class CreateScenario {
 	private long seed;
 	private String outPath = "src/main/java/playground/anhorni/input/LEGO/";
 	private String configFile;
-	
-	private final String LCEXP = "locationchoiceExperimental";
-		
+			
 	public static void main(final String[] args) {
 		CreateScenario scenarioCreator = new CreateScenario();	
 		scenarioCreator.init(args[0]);
@@ -61,7 +59,7 @@ public class CreateScenario {
 		Scenario scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).getScenario();
 		Config config = scenario.getConfig();
 		
-		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
+		this.seed = Long.parseLong(config.locationchoice().getRandomSeed());
 		rnd.setSeed(this.seed);
 		
 		CreateNetwork networkCreator = new CreateNetwork();

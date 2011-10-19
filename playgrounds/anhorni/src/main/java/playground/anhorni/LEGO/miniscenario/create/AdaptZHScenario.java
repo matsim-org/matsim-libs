@@ -64,9 +64,7 @@ public class AdaptZHScenario {
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder;
 	private long seed;
-	
-	private final String LCEXP = "locationchoiceExperimental";
-		
+			
 	public static void main(final String[] args) {		
 		AdaptZHScenario plansCreator = new AdaptZHScenario();		
 		plansCreator.run(args[0]);			
@@ -87,7 +85,7 @@ public class AdaptZHScenario {
 				config.getModule("facilities").getValue("inputFacilitiesFile"));
 		
 		this.outputFolder = config.getModule("controler").getValue("outputDirectory");
-		this.seed = Long.parseLong(config.findParam(LCEXP, "randomSeed"));
+		this.seed = Long.parseLong(config.locationchoice().getRandomSeed());
 		
 		double sampleFraction = 100.0 / Double.parseDouble(config.getModule("counts").getValue("countsScaleFactor"));
 		log.info("Sample fraction: " + sampleFraction);

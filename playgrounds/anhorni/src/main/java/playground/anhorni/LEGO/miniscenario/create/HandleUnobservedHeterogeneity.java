@@ -61,7 +61,7 @@ public class HandleUnobservedHeterogeneity {
 	}
 	
 	private double getRandom(double var) {
-		if (Boolean.parseBoolean(config.findParam(LCEXP, "gumbel"))) {
+		if (config.locationchoice().getEpsilonDistribution().equals("gumbel")) {
 			double uniform = rnd.getUniform(1.0);
 			// interval MUST be ]0,1[
 			while (uniform == 0.0 || uniform == 1.0) {
