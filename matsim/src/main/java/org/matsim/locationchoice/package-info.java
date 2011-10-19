@@ -106,21 +106,6 @@
  * 		Default: false <br>
  * 		Description: Either use Normal or Gumbel distribution for error terms
  * 	</li>
- *  <li><strong><font color="red">scoreElementDistance</font></strong><br>
- * 		Type and range: float (1.0 / 0.0) <br> 
- * 		Default: null <br>
- * 		Description: Score distance disutilities, or not
- * 	</li>
- * <li><strong><font color="red">linearDistanceUtility</font></strong><br>
- * 		Type and range: boolean (true / false) <br> 
- * 		Default: null <br>
- * 		Description: Apply linear disutility
- * 	</li>
- *  <li><strong><font color="red">scoreElementEpsilons</font></strong><br>
- * 		Type and range: float (1.0 / 0.0) <br> 
- * 		Default: null <br>
- * 		Description: Take into account random error terms, or not
- * 	</li>
  * <li><strong><font color="red">fShop</font></strong><br>
  * 		Type and range: float > 0.0 <br> 
  * 		Default: null <br>
@@ -131,39 +116,37 @@
  * 		Default: null <br>
  * 		Description: Scale the leisure activities epsilons
  * 	</li>
- * <li><strong><font color="red">travelTimes</font></strong><br>
- * 		Type and range: boolean (true / false)<br> 
- * 		Default: null <br>
- * 		Description: Score travel times
- * 	</li>
  * </ul>
  * 
  * <h3>Search Space Construction (v1)</h3>
  * <ul>
  * 	<li><strong><font color="red">tt_approximationLevel</font></strong><br>
  * 		Type and range: int (0,1,2)<br> 
- * 		Default: ... <br>
- * 		Description: ...
+ * 		Default: 0 <br>
+ * 		Description: 0: no approximation, routing for every OD-pair <br>
+ * 		1: Dijkstra trees forward and backwards See working paper Horni,Nagel,Axhausen 2011, page 13<br>
+ * 		2: based on travel distances
  * 	</li>
  * <li><strong><font color="red">searchSpaceBeta</font></strong><br>
  * 		Type and range: float <= 0.0 <br> 
- * 		Default: ... <br>
- * 		Description: ...
+ * 		Default: -0.0001 <br>
+ * 		Description: Defines an upper bound based on distance: travel costs := searchSpaceBeta * distance. See working paper Horni,Nagel,Axhausen 2011, page 11<br>
+ * 		Has to be derived from beta_{traveltime}
  * 	</li>
  * <li><strong><font color="red">maxDistanceEpsilon</font></strong><br>
- * 		Type and range: float <br> 
- * 		Default: ... <br>
- * 		Description: ...
- * 	</li>
- * <li><strong><font color="red">csexponent</font></strong><br>
- * 		Type and range: float <br> 
- * 		Default: ... <br>
- * 		Description: ...
+ * 		Type and range: float (-1 or > 0.0) <br> 
+ * 		Default: -1 <br>
+ * 		Description: Maximum search space radius [m]. "-1" means no explicit fixed search space limitation. 
  * 	</li>
  * <li><strong><font color="red">numberOfAlternatives</font></strong><br>
  * 		Type and range: int > 0 <br> 
  * 		Default: ... <br>
- * 		Description: ...
+ * 		Description: Number of alternatives taken into account for the probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
+ * 	</li>
+ *  <li><strong><font color="red">csexponent</font></strong><br>
+ * 		Type and range: float <br> 
+ * 		Default: ... <br>
+ * 		Description: Weighting of scores in the reduced choice set subject to probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
  * 	</li>
  * </ul>
  */
