@@ -91,12 +91,12 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 	@Override
 	public void finish() {
-		if (this.currentActivity == null) {
+		if (this.currentActivity != null) {
+			handleLastActivity(this.currentActivity); 
+//		} else {
 			// No activity has ended so far.
 			// This probably means that the plan contains at most one activity.
 			// We cannot handle that correctly, because we do not know what it is.
-		} else {
-			handleLastActivity(this.currentActivity); 
 		}
 	}
 

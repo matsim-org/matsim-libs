@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanomatConfigGroup.TripStructureAnalysisLayerOption;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
 
 /**
  * Changes the transportation mode of one random non-empty subtour in a plan to a randomly chosen
@@ -98,7 +99,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				changeLegModeTo(subTour, whatToDo.newTransportMode);
 //				logger.debug("Agent " + plan.getPerson().getId() + " changed their mode on subtour #"+whatToDo.subTourIndex+" to " + whatToDo.newTransportMode);
 			}
-		} else {
+//		} else {
 			// Nothing to do - the whole plan does not contain a
 			// subtour. It isn't even its own subtour because it isn't a
 			// tour.
