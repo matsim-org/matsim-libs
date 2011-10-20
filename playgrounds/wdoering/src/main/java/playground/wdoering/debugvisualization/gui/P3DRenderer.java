@@ -54,6 +54,8 @@ public class P3DRenderer extends PApplet
 	private double maxPosY; 
 	private double currentTime;
 	
+	private Console console;
+	
 	private int traceTimeRange = 3;
 	
 	private LinkedList<Scene> scenes;
@@ -78,10 +80,11 @@ public class P3DRenderer extends PApplet
 		this.paused = paused;
 	}
 	
-	public P3DRenderer(boolean liveMode, int traceTimeRange)
+	public P3DRenderer(boolean liveMode, int traceTimeRange, Console console)
 	{
 		this.traceTimeRange = traceTimeRange;
 		this.liveMode = liveMode;
+		this.console = console;
 	}
 	
 	public void setExtremeValues(Double[] extremeValues)
@@ -118,7 +121,7 @@ public class P3DRenderer extends PApplet
 						       (int)((double)(((float)agentCount-(float)j)/(float)agentCount)*255),
 						       (int)(255-(double)(((float)agentCount-(float)j)/(float)agentCount)*255)};
 				
-				//System.out.println(color[0] + "|" + color[1] + "|" + color[2]);
+				//console.println(color[0] + "|" + color[1] + "|" + color[2]);
 				
 				//add color to the color array
 				colors.add(color);
@@ -185,7 +188,7 @@ public class P3DRenderer extends PApplet
 							       (int)((double)(((float)agents.size()-(float)j)/(float)agents.size())*255),
 							       (int)(255-(double)(((float)agents.size()-(float)j)/(float)agents.size())*255)};
 					
-					//System.out.println(color[0] + "|" + color[1] + "|" + color[2]);
+					//console.println(color[0] + "|" + color[1] + "|" + color[2]);
 					
 					//add color to the color array
 					colors.add(color);
@@ -267,7 +270,7 @@ public class P3DRenderer extends PApplet
 				this.factorX = maxWidth / this.width;
 				this.factorY = maxHeight / this.height;
 				
-				//controller.console.println(((this.maxPosX-this.minPosX) /factorX));
+				//console.println(((this.maxPosX-this.minPosX) /factorX));
 			}
 			
 			
@@ -280,14 +283,14 @@ public class P3DRenderer extends PApplet
 			int sceneCount = 0;
 			boolean drawAgent = false;
 			
-			//System.out.println(timeSteps);
+			//console.println(timeSteps);
 			
 			if ((agents != null) && (timeSteps != null))
 			{
 				if (timeSteps.size()>0)
 				{
 					
-					//System.out.println("----- + + + + ----- " + timeSteps.size() + "| agents:" + agents.toString());
+					//console.println("----- + + + + ----- " + timeSteps.size() + "| agents:" + agents.toString());
 				
 					//Iterate through all agents and display the current data point + traces
 					Iterator agentsIterator = agents.entrySet().iterator();
@@ -318,27 +321,30 @@ public class P3DRenderer extends PApplet
 									for (int timeStep = 0; timeStep < traceDisplayCount-1; timeStep++)
 									{
 										
-										System.out.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + timeSteps.size());
+										console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + timeSteps.size());
 										
 										//extract current and next datapoint (to draw a trajectory line)
 										DataPoint currentDataPoint = dataPoints.get(timeSteps.get(timeStep));
 										DataPoint nextDataPoint = dataPoints.get(timeSteps.get(timeStep+1));
 										
-										//pick line color and make far away trajectories more transparent
-										float jFloat = (float)timeStep;
-										float iFloat = (float)traceDisplayCount;
-										stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
-										
-										System.out.println("@@@ cdp:" + currentDataPoint.toString());
-										System.out.println("@@@ x:"+ currentDataPoint.getPosX());
-										System.out.println("@@@ mipX:"+ minPosX);
-										System.out.println("@@@ fX:"+ factorX);
-										
-										//draw line
-										line((float)((currentDataPoint.getPosX() - minPosX) / factorX),
-											 (float)((currentDataPoint.getPosY() - minPosY) / factorY),
-											 (float)((nextDataPoint.getPosX()    - minPosX) / factorX),
-											 (float)((nextDataPoint.getPosY()    - minPosY) / factorY));		
+										if ((currentDataPoint != null )&&(nextDataPoint != null))
+										{
+											//pick line color and make far away trajectories more transparent
+											float jFloat = (float)timeStep;
+											float iFloat = (float)traceDisplayCount;
+											stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
+											
+											console.println("@@@ cdp:" + currentDataPoint.toString());
+											console.println("@@@ x:"+ currentDataPoint.getPosX());
+											console.println("@@@ mipX:"+ minPosX);
+											console.println("@@@ fX:"+ factorX);
+											
+											//draw line
+											line((float)((currentDataPoint.getPosX() - minPosX) / factorX),
+												 (float)((currentDataPoint.getPosY() - minPosY) / factorY),
+												 (float)((nextDataPoint.getPosX()    - minPosX) / factorX),
+												 (float)((nextDataPoint.getPosY()    - minPosY) / factorY));		
+										}
 									
 									}
 								
@@ -348,11 +354,11 @@ public class P3DRenderer extends PApplet
 							}
 							
 							DataPoint lastDataPoint = dataPoints.get(timeSteps.getLast());
-							//System.out.println("current agent: " + currentAgent.get);
-//							System.out.println("@________@________@: " + timeSteps.toString());
-//							System.out.println("TS GET LAST " + timeSteps.getLast());
-//							System.out.println("AVAILABLE DP: " + dataPoints.toString());
-//							System.out.println("| " + lastDataPoint.toString());
+							//console.println("current agent: " + currentAgent.get);
+//							console.println("@________@________@: " + timeSteps.toString());
+//							console.println("TS GET LAST " + timeSteps.getLast());
+//							console.println("AVAILABLE DP: " + dataPoints.toString());
+//							console.println("| " + lastDataPoint.toString());
 							
 							
 							if (lastDataPoint != null)
@@ -362,9 +368,9 @@ public class P3DRenderer extends PApplet
 								
 								float posX = (float)((lastDataPoint.getPosX()-minPosX) / factorX);
 								float posY = (float)((lastDataPoint.getPosY()-minPosY) / factorY);
-								System.out.println("********* MINPOS X: "+ minPosX +" | FACT X: " + factorX + "***************");
-								System.out.println("********* MINPOS Y: "+ minPosY +" | FACT Y: " + factorY + "***************");
-								System.out.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
+								console.println("********* MINPOS X: "+ minPosX +" | FACT X: " + factorX + "***************");
+								console.println("********* MINPOS Y: "+ minPosY +" | FACT Y: " + factorY + "***************");
+								console.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
 								ellipse (posX, posY, agentSize, agentSize);
 							}
 							
@@ -399,7 +405,7 @@ public class P3DRenderer extends PApplet
 						this.factorX = maxWidth / this.width;
 						this.factorY = maxHeight / this.height;
 						
-						//controller.console.println(((this.maxPosX-this.minPosX) /factorX));
+						//console.println(((this.maxPosX-this.minPosX) /factorX));
 					}
 					
 					
@@ -624,7 +630,7 @@ public class P3DRenderer extends PApplet
 		this.agents = agents;
 		this.timeSteps = timeSteps;
 		this.currentTime = timeSteps.getLast();
-		System.out.println("update view at " + this.currentTime + "!");
+		console.println("update view at " + this.currentTime + "!");
 	}
 
 	/**

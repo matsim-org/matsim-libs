@@ -27,7 +27,7 @@ public class GUIMainFrame extends JFrame {
 		setSize(768, 768);
 
 		setLayout(new BorderLayout());
-		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange);
+		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange, controller.console);
 
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);

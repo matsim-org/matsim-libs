@@ -44,7 +44,7 @@ public class Agent {
 	
 	public DataPoint removeDataPoint(Double time)
 	{
-		System.out.println("rem timestep:" + dataPoints.remove(time));
+		//System.out.println("rem timestep:" + dataPoints.remove(time));
 		DataPoint deletedDataPoint = dataPoints.get(time);
 		return deletedDataPoint;
 	}

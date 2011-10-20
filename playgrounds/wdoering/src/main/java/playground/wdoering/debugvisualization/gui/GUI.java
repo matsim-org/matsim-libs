@@ -45,7 +45,7 @@ public class GUI extends JFrame {
 		
 		//get toolbar and renderer (processing applet)
 		guiToolbar = new GUIToolbar(controller);
-		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange);
+		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange, controller.console);
 
 		//add elements to the jframe
 		add(renderer, BorderLayout.CENTER);
@@ -145,7 +145,6 @@ public class GUI extends JFrame {
 
 	public void updateExtremeValues(Double maxPosX, Double minPosX, Double maxPosY, Double minPosY)
 	{
-		System.out.println(maxPosX + "|" + minPosX + "|" + maxPosY + "|" + minPosY);
 		renderer.updateExtremeValues(maxPosX, minPosX, maxPosY, minPosY);		
 	}
 

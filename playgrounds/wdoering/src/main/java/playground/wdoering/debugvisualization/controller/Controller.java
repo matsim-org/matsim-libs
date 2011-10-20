@@ -29,7 +29,7 @@ import playground.wdoering.debugvisualization.gui.*;
  */
 public class Controller {
 
-	private static final long timeInterval = 100;
+	private static final long timeInterval = 30;
 	private GUI gui;
 	private Importer importer;
 	private HashMap<String,Agent> agents;
@@ -197,12 +197,12 @@ public class Controller {
 		
 		this.oldTime = realTime;
 				
-		System.out.println("ID:" + ID + "| time:" + time + "|");
+		console.println("ID:" + ID + "| time:" + time + "|");
 		
 		//on the first run in live mode the agents hashmap is still empty
 		if (agents == null)
 		{
-			//if (ID.equals("0")) System.out.println("NULL AGENT");
+			//if (ID.equals("0")) console.println("NULL AGENT");
 			agents = new HashMap<String,Agent>();
 			agents.put(ID, new Agent());
 		}
@@ -212,7 +212,7 @@ public class Controller {
 		if (currentAgent == null) currentAgent = new Agent(); 
 		
 		DataPoint dataPoint = new DataPoint(time, posX, posY);
-		System.out.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
+		console.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
 		currentAgent.addDataPoint(dataPoint);
 		
 		agents.put(ID, currentAgent);
@@ -221,7 +221,7 @@ public class Controller {
 		if (currentTime.equals(Double.NaN))
 		{
 			currentTime = time;
-			System.out.println("@@@@@@@@ ADD @@@@@@@");
+			console.println("@@@@@@@@ ADD @@@@@@@");
 			timeSteps.addLast(currentTime);			
 		}
 		else
@@ -229,7 +229,7 @@ public class Controller {
 			//if a timestep occured
 			if (!currentTime.equals(time))
 			{
-				System.out.println("time change occured!");
+				console.println("time change occured!");
 				
 				//recalculate extreme values
 				if (agents != null)
@@ -263,21 +263,21 @@ public class Controller {
 					
 				}
 				
-				System.out.println("-----++-----" + timeSteps.toString());
+				console.println("-----++-----" + timeSteps.toString());
 				//add timestep to the list
 				currentTime = time;
 				timeSteps.addLast(currentTime);
-				System.out.println("-----__------" + timeSteps.toString());
+				console.println("-----__------" + timeSteps.toString());
 				
 				
 				//if there are already more timesteps than the range of traces
 				//(timesteps) to show: truncate in timestep list and agent data
 				while (timeSteps.size() > traceTimeRange)
 				{
-					System.out.println("-@@@@@@@-++-----" + timeSteps.toString());
+					console.println("-@@@@@@@-++-----" + timeSteps.toString());
 					//delete the oldest timestamp from the timestep list
 					Double removedTimeStep = timeSteps.removeFirst();
-					System.out.println("-@@@@@@@----__------" + timeSteps.toString());
+					console.println("-@@@@@@@----__------" + timeSteps.toString());
 					
 					//remove oldest timesteps from agents
 					if (agents != null)

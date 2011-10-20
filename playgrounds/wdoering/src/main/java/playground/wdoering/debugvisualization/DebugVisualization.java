@@ -17,7 +17,7 @@ public class DebugVisualization {
 	public static void main(String[] args) {
 		
 		//console interface for status and debug tracking
-		Console console = new ConsoleImpl();
+		Console console = new ConsoleImpl(false);
 		
 		//argument syntax: DebugSim.java eventfile.xml networkfile.xml liveMode [=true / false / null||else(=false) ]
 		if (args.length > 0)
