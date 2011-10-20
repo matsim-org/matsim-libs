@@ -188,7 +188,8 @@ public class Importer implements XYVxVyEventsHandler {
 		nodes = new HashMap<Integer, DataPoint>();
 		links = new HashMap<Integer, int[]>();
 
-		try {
+		try
+		{
 			
 
 			File file = new File(networkFileName);

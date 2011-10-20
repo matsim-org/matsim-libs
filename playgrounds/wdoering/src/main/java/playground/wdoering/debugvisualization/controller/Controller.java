@@ -29,6 +29,7 @@ import playground.wdoering.debugvisualization.gui.*;
  */
 public class Controller {
 
+	private static final long timeInterval = 100;
 	private GUI gui;
 	private Importer importer;
 	private HashMap<String,Agent> agents;
@@ -43,7 +44,7 @@ public class Controller {
 	private int traceTimeRange = 2;
 	
 	public Console console;
-	private Long oldTime;
+	private Long oldTime = 0l;
 	
 	public boolean isLiveMode() {
 		return liveMode;
@@ -60,7 +61,7 @@ public class Controller {
 		minPosX = minPosY = Double.MAX_VALUE;
 		
 		
-		this.liveMode = false;
+		this.liveMode = liveMode;
 		this.traceTimeRange = traceTimeRange;
 		
 
@@ -102,7 +103,7 @@ public class Controller {
 		//Double[] extremeValues = {maxPosX, maxPosY, maxPosZ, minPosX, minPosY, minPosZ, maxTimeStep, minTimeStep};
 		//                          0        1        2        3        4        5        6            7
 		
-		System.out.println(extremeValues);
+		console.println(extremeValues.toString());
 		
 		maxPosX = (extremeValues[0] != null) ? extremeValues[0]:Double.MIN_VALUE;
 		maxPosY = (extremeValues[1] != null) ? extremeValues[1]:Double.MIN_VALUE;
@@ -181,20 +182,20 @@ public class Controller {
 	{
 		
 		//sleep until 1 sec has elapsed
-		/*long realTime = System.currentTimeMillis();
+		long realTime = System.currentTimeMillis();
 		long timeDiff = realTime - oldTime;
 		
-		if (timeDiff<=1000)
+		if (timeDiff<=timeInterval)
 		{
 			try {
-				Thread.sleep(1000-timeDiff);
+				Thread.sleep(timeInterval-timeDiff);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
-		this.oldTime = realTime;*/
+		this.oldTime = realTime;
 				
 		System.out.println("ID:" + ID + "| time:" + time + "|");
 		
@@ -211,19 +212,25 @@ public class Controller {
 		if (currentAgent == null) currentAgent = new Agent(); 
 		
 		DataPoint dataPoint = new DataPoint(time, posX, posY);
+		System.out.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
 		currentAgent.addDataPoint(dataPoint);
+		
 		agents.put(ID, currentAgent);
 		
 		//on the first run the current time is not set yet
 		if (currentTime.equals(Double.NaN))
 		{
 			currentTime = time;
+			System.out.println("@@@@@@@@ ADD @@@@@@@");
+			timeSteps.addLast(currentTime);			
 		}
 		else
 		{
 			//if a timestep occured
 			if (!currentTime.equals(time))
 			{
+				System.out.println("time change occured!");
+				
 				//recalculate extreme values
 				if (agents != null)
 				{
@@ -256,16 +263,21 @@ public class Controller {
 					
 				}
 				
+				System.out.println("-----++-----" + timeSteps.toString());
 				//add timestep to the list
-				timeSteps.addLast(currentTime);
 				currentTime = time;
+				timeSteps.addLast(currentTime);
+				System.out.println("-----__------" + timeSteps.toString());
+				
 				
 				//if there are already more timesteps than the range of traces
 				//(timesteps) to show: truncate in timestep list and agent data
 				while (timeSteps.size() > traceTimeRange)
 				{
+					System.out.println("-@@@@@@@-++-----" + timeSteps.toString());
 					//delete the oldest timestamp from the timestep list
 					Double removedTimeStep = timeSteps.removeFirst();
+					System.out.println("-@@@@@@@----__------" + timeSteps.toString());
 					
 					//remove oldest timesteps from agents
 					if (agents != null)
@@ -282,6 +294,7 @@ public class Controller {
 					}
 					
 				}
+				
 				
 				gui.updateExtremeValues(maxPosX, minPosX, maxPosY, minPosY);
 				gui.updateView(timeSteps, agents);

@@ -98,6 +98,60 @@ public class P3DRenderer extends PApplet
 	}
 
 	/**
+	 * sets the color model to use
+	 * 
+	 * @param agentCount number of agents to colorize
+	 */
+	public void setAgentColors(int agentCount)
+	{
+		//set up color matrix to display agents
+		this.colors = new ArrayList<int[]>();
+		
+		//give each agent a different (preattentive) color. If there are more then 10, generate the colors.  
+		if (agentCount>10)
+		{
+		
+			for (int j = 0; j < agentCount; j++)
+			{
+				//determine color
+				int[] color = {(int)((((float)agentCount-(float)j)/(float)agentCount)*255),
+						       (int)((double)(((float)agentCount-(float)j)/(float)agentCount)*255),
+						       (int)(255-(double)(((float)agentCount-(float)j)/(float)agentCount)*255)};
+				
+				//System.out.println(color[0] + "|" + color[1] + "|" + color[2]);
+				
+				//add color to the color array
+				colors.add(color);
+			}
+		}
+		else //otherwise use these 10 optimized colors (src: Colin Ware)
+		{
+		
+			String colorsRGB[] = {  "#FB253C",
+									"#F2F319",
+									"#3BCF49",
+									"#413FB0",
+									"#B82828",
+									"#AC0297",
+									"#FCA147",
+									"#98A192",
+									"#72D2D2",
+									"#FC82AF" };
+			
+			for (int j= 0; j < 10; j++)
+			{
+				int[] color = { Integer.parseInt(colorsRGB[j].substring(1,3),16),
+							    Integer.parseInt(colorsRGB[j].substring(3,5),16),
+							    Integer.parseInt(colorsRGB[j].substring(5,7),16)};
+				
+				colors.add(color);
+			}
+		}
+
+	}
+	
+	
+	/**
 	 * Sets extreme values
 	 * 
 	 * @param agents
@@ -203,6 +257,20 @@ public class P3DRenderer extends PApplet
 		
 		if (liveMode)
 		{
+			if ((extremeValues != null) && (factorX == 0.0f))
+			{
+				//get max values
+				float maxWidth = (float)(extremeValues[0]-extremeValues[3]);
+				float maxHeight = (float)(extremeValues[1]-extremeValues[4]);
+								
+				//refactor min/max values of event+network file
+				this.factorX = maxWidth / this.width;
+				this.factorY = maxHeight / this.height;
+				
+				//controller.console.println(((this.maxPosX-this.minPosX) /factorX));
+			}
+			
+			
 			//Stroke color
 			stroke(100,0,100,100);
 			background(127);
@@ -212,77 +280,102 @@ public class P3DRenderer extends PApplet
 			int sceneCount = 0;
 			boolean drawAgent = false;
 			
-			if ((agents != null) || (timeSteps != null) || (timeSteps.size()>0))
+			//System.out.println(timeSteps);
+			
+			if ((agents != null) && (timeSteps != null))
 			{
-				
-				//Iterate through all agents and display the current data point + traces
-				Iterator agentsIterator = agents.entrySet().iterator();
-				int agentCount = 0;
-				
-				//While there are still agents in the agents array
-				while (agentsIterator.hasNext())
+				if (timeSteps.size()>0)
 				{
 					
-					//Get current agent
-					Map.Entry pairs = (Map.Entry) agentsIterator.next();
-					Agent currentAgent = (Agent)pairs.getValue();
-					HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
+					//System.out.println("----- + + + + ----- " + timeSteps.size() + "| agents:" + agents.toString());
+				
+					//Iterate through all agents and display the current data point + traces
+					Iterator agentsIterator = agents.entrySet().iterator();
+					int agentCount = 0;
 					
-					//check if there are any data points for the current agent
-					if ((dataPoints != null) && (dataPoints.size() > 0))
+					//While there are still agents in the agents array
+					while (agentsIterator.hasNext())
 					{
-						//pick preattentive agent color
-						int[] agentColor = colors.get(agentCount);
-							
-						//draw node trajectories if there is more then one datapoint for the current agent
-						if (dataPoints.size() > 1)
+						
+						//Get current agent
+						Map.Entry pairs = (Map.Entry) agentsIterator.next();
+						Agent currentAgent = (Agent)pairs.getValue();
+						HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
+						
+						//check if there are any data points for the current agent
+						if ((dataPoints != null) && (dataPoints.size() > 0))
 						{
-							//number of lines (trajectories) to draw (between 2 and traceTimeRange)
-							int traceDisplayCount = Math.min(traceTimeRange, dataPoints.size());
-							
-								//loop through the datapoints with the corresponding timesteps
-								for (int timeStep = 0; timeStep < traceDisplayCount; timeStep++)
-								{
-									//extract current and next datapoint (to draw a trajectory line)
-									DataPoint currentDataPoint = dataPoints.get(timeSteps.get(timeStep));
-									DataPoint nextDataPoint = dataPoints.get(timeSteps.get(timeStep+1));
-									
-									//pick line color and make far away trajectories more transparent
-									float jFloat = (float)timeStep;
-									float iFloat = (float)traceDisplayCount;
-									stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
-									
-									//draw line
-									line((float)((currentDataPoint.getPosX() - minPosX) / factorX),
-										 (float)((currentDataPoint.getPosY() - minPosY) / factorY),
-										 (float)((nextDataPoint.getPosX()    - minPosX) / factorX),
-										 (float)((nextDataPoint.getPosY()    - minPosY) / factorY));		
+							//pick preattentive agent color
+							int[] agentColor = colors.get(agentCount);
 								
-								}
+							//draw node trajectories if there is more then one datapoint for the current agent
+							if (dataPoints.size() > 1)
+							{
+								//number of lines (trajectories) to draw (between 2 and traceTimeRange)
+								int traceDisplayCount = Math.min(traceTimeRange, dataPoints.size());
+								
+									//loop through the datapoints with the corresponding timesteps
+									for (int timeStep = 0; timeStep < traceDisplayCount-1; timeStep++)
+									{
+										
+										System.out.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + timeSteps.size());
+										
+										//extract current and next datapoint (to draw a trajectory line)
+										DataPoint currentDataPoint = dataPoints.get(timeSteps.get(timeStep));
+										DataPoint nextDataPoint = dataPoints.get(timeSteps.get(timeStep+1));
+										
+										//pick line color and make far away trajectories more transparent
+										float jFloat = (float)timeStep;
+										float iFloat = (float)traceDisplayCount;
+										stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
+										
+										System.out.println("@@@ cdp:" + currentDataPoint.toString());
+										System.out.println("@@@ x:"+ currentDataPoint.getPosX());
+										System.out.println("@@@ mipX:"+ minPosX);
+										System.out.println("@@@ fX:"+ factorX);
+										
+										//draw line
+										line((float)((currentDataPoint.getPosX() - minPosX) / factorX),
+											 (float)((currentDataPoint.getPosY() - minPosY) / factorY),
+											 (float)((nextDataPoint.getPosX()    - minPosX) / factorX),
+											 (float)((nextDataPoint.getPosY()    - minPosY) / factorY));		
+									
+									}
+								
+								
+	
+								
+							}
+							
+							DataPoint lastDataPoint = dataPoints.get(timeSteps.getLast());
+							//System.out.println("current agent: " + currentAgent.get);
+//							System.out.println("@________@________@: " + timeSteps.toString());
+//							System.out.println("TS GET LAST " + timeSteps.getLast());
+//							System.out.println("AVAILABLE DP: " + dataPoints.toString());
+//							System.out.println("| " + lastDataPoint.toString());
 							
 							
-
+							if (lastDataPoint != null)
+							{
+								//draw agent
+								fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+								
+								float posX = (float)((lastDataPoint.getPosX()-minPosX) / factorX);
+								float posY = (float)((lastDataPoint.getPosY()-minPosY) / factorY);
+								System.out.println("********* MINPOS X: "+ minPosX +" | FACT X: " + factorX + "***************");
+								System.out.println("********* MINPOS Y: "+ minPosY +" | FACT Y: " + factorY + "***************");
+								System.out.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
+								ellipse (posX, posY, agentSize, agentSize);
+							}
+							
+							
+							
 							
 						}
-						
-						DataPoint lastDataPoint = dataPoints.get(timeSteps.getLast());
-						
-						//draw agent
-						fill(color(agentColor[0], agentColor[1],agentColor[2],255));
-						
-						float posX = (float)((lastDataPoint.getPosX()-minPosX) / factorX);
-						float posY = (float)((lastDataPoint.getPosY()-minPosY) / factorY);
-						
-						ellipse (posX, posY, agentSize, agentSize);
-						
-						
-						
-						
-						
+						agentCount++;
 					}
-					agentCount++;
-				}
 				
+				}
 			}
 			
 			
@@ -527,6 +620,7 @@ public class P3DRenderer extends PApplet
 
 	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
 	{
+		setAgentColors(agents.size());
 		this.agents = agents;
 		this.timeSteps = timeSteps;
 		this.currentTime = timeSteps.getLast();

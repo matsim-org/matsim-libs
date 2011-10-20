@@ -61,6 +61,10 @@ public class DataPoint {
 		this.posY = posY;
 	}
 	
+	public String toString()
+	{
+		 return "[time: " + this.time + " | posX: " + posX + " | posY: " + posY +"]";
+	}
 	
 	
 	
