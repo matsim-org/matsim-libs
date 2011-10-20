@@ -58,7 +58,7 @@ public class LeastCostPathTree {
 	
 	private final TravelTime ttFunction;
 	private final TravelCost tcFunction;
-	private HashMap<Id, NodeData> nodeData;
+	private HashMap<Id, NodeData> nodeData = null;
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -212,8 +212,9 @@ public class LeastCostPathTree {
 		Node origin = network.getNodes().get(new IdImpl(1));
 		st.calculate(network, origin, 8*3600);
 		Map<Id, NodeData> tree = st.getTree();
-		for (Id id : tree.keySet()) {
-			NodeData d = tree.get(id);
+		for (Map.Entry<Id, NodeData> e : tree.entrySet()) {
+			Id id = e.getKey();
+			NodeData d = e.getValue();
 			if (d.getPrevNodeId() != null) {
 				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNodeId());
 			} else {
