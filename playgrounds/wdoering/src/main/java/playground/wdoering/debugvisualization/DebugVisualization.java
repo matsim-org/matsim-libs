@@ -23,7 +23,7 @@ public class DebugVisualization {
 		if (args.length > 0)
 		{
 			console.println("Initializing Debug Simulation.");
-			Controller controller = new Controller(args[0], args[1], console, false);
+			Controller controller = new Controller(args[0], args[1], console, 3, true);
 			
 		}
 		else

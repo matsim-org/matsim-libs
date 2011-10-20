@@ -16,9 +16,9 @@ public class GUIMainFrame extends JFrame {
 	P3DRenderer renderer;
 	Console console;
 
-	public GUIMainFrame(Controller controller) {
+	public GUIMainFrame(Controller controller, int traceTimeRange) {
 		
-		super("Embedded PApplet");
+		super("Debug Visualization");
 		this.guiToolbar = new GUIToolbar(controller);
 		
 		this.console = controller.console;
@@ -27,7 +27,7 @@ public class GUIMainFrame extends JFrame {
 		setSize(768, 768);
 
 		setLayout(new BorderLayout());
-		renderer = new P3DRenderer();
+		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange);
 
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -28,7 +29,7 @@ import org.w3c.dom.NodeList;
 
 public class Importer implements XYVxVyEventsHandler {
 
-	private HashMap<Integer, Agent> agents = null; 
+	private HashMap<String, Agent> agents = null; 
 	private HashMap<Integer, DataPoint> nodes = null;
 	private HashMap<Integer, int[]> links = null;
 	
@@ -43,7 +44,7 @@ public class Importer implements XYVxVyEventsHandler {
 	
 	private Double[] timeStepsAsDoubleValues;
 	
-	private ArrayList<Double> timeStepArray;
+	private LinkedList<Double> timeSteps;
 	
 	private Double maxTimeStep;
 	private Double minTimeStep;
@@ -51,6 +52,7 @@ public class Importer implements XYVxVyEventsHandler {
 	public Importer(Controller controller)
 	{
 		this.controller = controller;
+		
 	}
 
 	public void readEventFile(String fileName)
@@ -64,11 +66,11 @@ public class Importer implements XYVxVyEventsHandler {
 			doc.getDocumentElement().normalize();
 			NodeList eventList = doc.getElementsByTagName("event");
 
-			agents = new HashMap<Integer,Agent>();
+			agents = new HashMap<String,Agent>();
 
 			int currentAgent = 0;
 
-			timeStepArray = new ArrayList<Double>();
+			timeSteps = new LinkedList<Double>();
 			minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
 			maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
 
@@ -95,7 +97,7 @@ public class Importer implements XYVxVyEventsHandler {
 
 							//System.out.println("peng");
 							//System.out.println("x val:" + Double.valueOf(attributeList.getNamedItem("x").getNodeValue()));
-							int agentNumber = Integer.valueOf(attributeList.getNamedItem("person").getNodeValue());
+							String agentNumber = String.valueOf(attributeList.getNamedItem("person").getNodeValue());
 
 							//Get current agent data & check if agent data has already been collected
 							Agent agent = agents.get(agentNumber);
@@ -109,8 +111,8 @@ public class Importer implements XYVxVyEventsHandler {
 							Double posZ = Double.valueOf(attributeList.getNamedItem("z").getNodeValue());
 
 							//add time
-							if (!timeStepArray.contains(time))
-								timeStepArray.add(time);
+							if (!timeSteps.contains(time))
+								timeSteps.addLast(time);
 
 							//Determine minimum and maximum positions
 							maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
@@ -124,7 +126,7 @@ public class Importer implements XYVxVyEventsHandler {
 							agent.addDataPoint(time, posX, posY, posZ);
 
 							//add agent data to agents hashMap
-							agents.put(agentNumber, agent);
+							agents.put(String.valueOf(agentNumber), agent);
 
 						}
 					}
@@ -141,40 +143,10 @@ public class Importer implements XYVxVyEventsHandler {
 
 				if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					//Element fstElmnt = (Element) fstNode;
-
-
-					//			           
-					//			      NodeList fstNmElmntLst = fstElmnt.getElementsByTagName("firstname");
-					//			      Element fstNmElmnt = (Element) fstNmElmntLst.item(0);
-					//			      NodeList fstNm = fstNmElmnt.getChildNodes();
-					//			      System.out.println("First Name : "  + ((Node) fstNm.item(0)).getNodeValue());
-					//			      
-					//			      NodeList lstNmElmntLst = fstElmnt.getElementsByTagName("lastname");
-					//			      Element lstNmElmnt = (Element) lstNmElmntLst.item(0);
-					//			      NodeList lstNm = lstNmElmnt.getChildNodes();
-					//			      System.out.println("Last Name : " + ((Node) lstNm.item(0)).getNodeValue());
 				}
 
 			}
 			
-			
-//			Agent testAgent = (Agent)agents.get(0);
-//			System.out.println("tadps:"+testAgent.dataPoints.size());
-//			Iterator it = testAgent.dataPoints.entrySet().iterator();
-//			while (it.hasNext())
-//			{
-//				Map.Entry pairs = (Map.Entry) it.next();
-//				//System.out.println(pairs.getKey() + " = " + pairs.getValue());
-//				DataPoint dp = (DataPoint) pairs.getValue();
-//				System.out.println(dp.getPosX());
-//			}
-//			System.exit(0);
-//			System.out.println("timesteps:" + timeStepArray.size());
-//			for (Double timeStep : timeStepArray)
-//			{
-//				System.out.println("timestep:" + timeStep);
-//			}
 
 		} catch (Exception e) {
 			
@@ -184,7 +156,7 @@ public class Importer implements XYVxVyEventsHandler {
 		}
 	}
 
-	public HashMap<Integer, Agent> importAgentData()
+	public HashMap<String, Agent> importAgentData()
 	{
 
 
@@ -197,12 +169,18 @@ public class Importer implements XYVxVyEventsHandler {
 		return extremeValues;
 	}
 	
-	public Double[] getTimeSteps()
+	public LinkedList<Double> getTimeSteps()
 	{
-		timeStepsAsDoubleValues = timeStepArray.toArray(new Double[timeStepArray.size()]);
+		timeStepsAsDoubleValues = timeSteps.toArray(new Double[timeSteps.size()]);
 		Arrays.sort(timeStepsAsDoubleValues);
 		
-		return timeStepsAsDoubleValues;
+		timeSteps = new LinkedList<Double>();
+		for (Double timeStepValue : timeStepsAsDoubleValues)
+			timeSteps.addLast(timeStepValue);
+		
+		return timeSteps;
+		
+		//return timeStepsAsDoubleValues;
 	}
 
 	/**
@@ -218,6 +196,7 @@ public class Importer implements XYVxVyEventsHandler {
 		links = new HashMap<Integer, int[]>();
 
 		try {
+			
 
 			File file = new File(networkFileName);
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -231,6 +210,10 @@ public class Importer implements XYVxVyEventsHandler {
 
 			nodes = new HashMap<Integer,DataPoint>();
 
+			minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
+			maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
+			
+			
 			for (int s = 0; s < nodeList.getLength(); s++)
 			{
 
@@ -243,6 +226,9 @@ public class Importer implements XYVxVyEventsHandler {
 				int nodeID = Integer.valueOf(attributeList.getNamedItem("id").getNodeValue());
 				Double posX = Double.valueOf(attributeList.getNamedItem("x").getNodeValue());
 				Double posY = Double.valueOf(attributeList.getNamedItem("y").getNodeValue());
+				
+				maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
+				maxPosY = Math.max(maxPosY, posY); minPosY = Math.min(minPosY, posY);
 
 				//create a new dataPoint containing the coordinates
 				DataPoint nodeDataPoint = new DataPoint(posX, posY);
@@ -253,6 +239,9 @@ public class Importer implements XYVxVyEventsHandler {
 				System.out.println("node (" + nodeID + ") : x:" + posX + " | y: " + posY );
 
 			}
+			
+			//max/min timestep not relevant within network data & z value handling not implemented yet
+			maxPosZ = minPosZ = maxTimeStep = minTimeStep = Double.NaN;
 			
 
 			//Get links
@@ -318,7 +307,10 @@ public class Importer implements XYVxVyEventsHandler {
 			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
 		//event.getTime()
 		
+		controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getTime());
+		
 	}
+
 
 
 

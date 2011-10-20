@@ -1,8 +1,12 @@
 package playground.wdoering.debugvisualization.controller;
 
 
+import java.security.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -10,6 +14,7 @@ import org.matsim.core.events.EventsUtils;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
+import playground.wdoering.debugvisualization.model.Scene;
 import playground.wdoering.debugvisualization.gui.*;
 
 
@@ -26,60 +31,97 @@ public class Controller {
 
 	private GUI gui;
 	private Importer importer;
-	private HashMap<Integer,Agent> agents;
+	private HashMap<String,Agent> agents;
 	private HashMap<Integer,DataPoint> nodes;
 	private HashMap<Integer,int[]> links;
 	private Double[] extremeValues;
-	private Double[] timeSteps;
+	private Double maxPosX, minPosX, maxPosY, minPosY;
+	private LinkedList<Double> timeSteps;
 	private boolean liveMode;
+	private double currentTime = Double.NaN;
+	private Scene currentScene;
+	private int traceTimeRange = 2;
 	
 	public Console console;
+	private Long oldTime;
 	
-	public Controller(String eventFileName, String networkFileName, Console console, boolean liveMode)
+	public boolean isLiveMode() {
+		return liveMode;
+	}
+
+	public void setLiveMode(boolean liveMode) {
+		this.liveMode = liveMode;
+	}
+
+	public Controller(String eventFileName, String networkFileName, Console console, int traceTimeRange, boolean liveMode)
 	{
 		
-		this.liveMode = liveMode;
+		this.liveMode = false;
+		this.traceTimeRange = traceTimeRange;
+		
 
 		//set up importer. can surely be replaced.
 		this.importer = new Importer(this);
 		this.console = console;
 		
+		gui = new GUI(this, traceTimeRange);
+		
+		//read network file first
+		console.print("Importing network data...");
+		importer.readNetworkFile(networkFileName);
+		nodes = importer.getNodes();
+		links = importer.getLinks();
+		gui.setNetwork(nodes,links);
+		console.println("done.");
+		
 		if (liveMode)
 		{
+			//live mode (agent data is coming via event stream)
+			console.print("Launching LIVE MODE...");
+			
+			//Launches the LiveMode
 			EventsManager manager = EventsUtils.createEventsManager();
 			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
 			
-	
-			manager.addHandler(this.importer); // handler muss XYVxVyEventsHandler implementieren
+			
+
+			manager.addHandler(this.importer); // handler must implement XYVxVyEventsHandler
 			reader.parse("C:\\temp5\\events2.xml");
+			
 		}
 		else
 		{
+			//offline mode
+			console.print("Launching OFFLINE MODE...");
 			
 			//read file /w agent data
+			console.print("Importing agent data from event file...");
 			importer.readEventFile(eventFileName);
-			importer.readNetworkFile(networkFileName);
 			
 			//Import agent data
-			console.print("Importing agent data...");
 			agents = importer.importAgentData();
-			extremeValues = importer.getExtremeValues();
 			timeSteps = importer.getTimeSteps();
-			nodes = importer.getNodes();
-			links = importer.getLinks();
 			console.println("done.");
 	
+			//initialize GUI
 			console.print("Initializing GUI...");
-			gui = new GUI(this);
 			console.println("done.");
 	
-			gui.setAgentData(agents,extremeValues,timeSteps);
-			gui.setNetwork(nodes,links);
 		}
 		
+		extremeValues = importer.getExtremeValues();
+		//Double[] extremeValues = {maxPosX, maxPosY, maxPosZ, minPosX, minPosY, minPosZ, maxTimeStep, minTimeStep};
+		//                          0        1        2        3        4        5        6            7
+		
+		maxPosX = extremeValues[0];
+		maxPosY = extremeValues[1];
+		minPosX = extremeValues[3];
+		minPosY = extremeValues[4];
+		
+		gui.setAgentData(agents,extremeValues,timeSteps);
+		gui.setNetwork(nodes,links);
 		gui.init();
 		gui.setVisible(true);
-		
 		
 	}
 	
@@ -90,7 +132,8 @@ public class Controller {
 
 	public void play()
 	{
-		gui.play();
+		if (!liveMode)
+			gui.play();
 		
 	}
 
@@ -102,11 +145,12 @@ public class Controller {
 
 	public void rewind()
 	{
-		gui.rewind();
+		if (!liveMode)
+			gui.rewind();
 		
 	}
 	
-	public void updateAgentData(HashMap<Integer,Agent> agents)
+	public void updateAgentData(HashMap<String,Agent> agents)
 	{
 		gui.updateAgentData(agents);
 	}
@@ -116,7 +160,126 @@ public class Controller {
 		gui.updateCurrentTime(time);
 	}
 
-	
+	/**
+	 * this method is used to update agent events. it will transport new
+	 * agent data to the gui and update the scene. if a timechange occurs,
+	 * the whole scene is being redrawn.
+	 * 
+	 * @param String ID the agent ID
+	 * @param Double posX position X
+	 * @param Double posY position Y
+	 * @param Double time time
+	 */
+	public void updateAgentData(String ID, Double posX, Double posY, Double time)
+	{
+		
+		//sleep until 1 sec has elapsed
+		/*long realTime = System.currentTimeMillis();
+		long timeDiff = realTime - oldTime;
+		
+		if (timeDiff<=1000)
+		{
+			try {
+				Thread.sleep(1000-timeDiff);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		this.oldTime = realTime;*/
+				
+		
+		//on the first run in live mode the agents hashmap is still empty
+		if (agents == null)
+		{
+			agents = new HashMap<String,Agent>();
+			agents.put(ID, new Agent());
+		}
+		
+		//update agent list
+		Agent currentAgent = agents.get(ID);
+		DataPoint dataPoint = new DataPoint(time, posX, posY);
+		currentAgent.addDataPoint(dataPoint);
+		agents.put(ID, currentAgent);
+		
+		//on the first run the current time is not set yet
+		if (currentTime == Double.NaN)
+		{
+			currentTime = time;
+		}
+		else
+		{
+			//if a timestep occured
+			if (currentTime != time)
+			{
+				//recalculate extreme values
+				if (agents != null)
+				{
+					Iterator agentsIterator = agents.entrySet().iterator();
+					while (agentsIterator.hasNext())
+					{
+						//Get current agent
+						Map.Entry pairs = (Map.Entry) agentsIterator.next();
+						Agent agent = (Agent)pairs.getValue();
+						
+						HashMap<Double,DataPoint> dataPoints = agent.getDataPoints();
+						Iterator dataPointIterator = dataPoints.entrySet().iterator();
+						
+						while (dataPointIterator.hasNext())
+						{
+							//Get current datapoint
+							Map.Entry dataPointPairs = (Map.Entry) dataPointIterator.next();
+							DataPoint itDataPoint = (DataPoint)dataPointPairs.getValue();
+							
+							maxPosX = Math.max(itDataPoint.getPosX(), maxPosX);
+							minPosX = Math.min(itDataPoint.getPosX(), minPosX);
+							maxPosY = Math.max(itDataPoint.getPosY(), maxPosY);
+							minPosY = Math.min(itDataPoint.getPosY(), minPosY);
+							
+						}
+						
+					}
+					
+				}
+				
+				//add timestep to the list
+				timeSteps.addLast(currentTime);
+				currentTime = time;
+				
+				//if there are already more timesteps than the range of traces
+				//(timesteps) to show: truncate in timestep list and agent data
+				while (timeSteps.size() > traceTimeRange)
+				{
+					//delete the oldest timestamp from the timestep list
+					Double removedTimeStep = timeSteps.removeFirst();
+					
+					//remove oldest timesteps from agents
+					if (agents != null)
+					{
+						//iterate through all agents and delete oldest timestep
+						Iterator agentsIterator = agents.entrySet().iterator();
+						while (agentsIterator.hasNext())
+						{
+							//Get current agent
+							Map.Entry pairs = (Map.Entry) agentsIterator.next();
+							Agent agent = (Agent)pairs.getValue();
+							agent.removeDataPoint(removedTimeStep);
+						}
+					}
+					
+				}
+				
+				gui.updateExtremeValues(maxPosX, minPosX, maxPosY, minPosY);
+				gui.updateView(timeSteps, agents);
+				
+			}
+			
+		}		
+		
+
+		
+	}
 
 
 }

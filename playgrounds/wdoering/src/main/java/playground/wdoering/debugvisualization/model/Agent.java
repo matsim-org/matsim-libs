@@ -20,7 +20,7 @@ public class Agent {
 		this.dataPoints = dataPoints;
 	}
 
-	public void Agent ()
+	public void Agent ()	
 	{
 		
 	}
@@ -42,10 +42,12 @@ public class Agent {
 		dataPoints.put(time,dataPoint);
 	}
 	
-//	public DataPoint getDataPoint(int index)
-//	{
-//		return (DataPoint)this.dataPoints.get(index);
-//	}
+	public DataPoint removeDataPoint(Double time)
+	{
+		System.out.println("rem timestep:" + dataPoints.remove(time));
+		DataPoint deletedDataPoint = dataPoints.get(time);
+		return deletedDataPoint;
+	}
 
 	public DataPoint getDataPoint(double index)
 	{
