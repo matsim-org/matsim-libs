@@ -33,7 +33,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -44,6 +48,7 @@ import playground.droeder.realTimeNavigation.movingObjects.MovingAgentImpl;
 import playground.droeder.realTimeNavigation.movingObjects.MovingObject;
 import playground.droeder.realTimeNavigation.velocityObstacles.ReciprocalVelocityObstacleImpl;
 import playground.droeder.realTimeNavigation.velocityObstacles.VelocityObstacle;
+import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -62,7 +67,6 @@ public class VelocityObstacleTestRunner {
 	private static final int NUMOFOAGENTS = 10;
 	private static final double MAXSPEED = 1.0;
 	private static final double AGENTDIAMETER = 0.7;
-		//TODO agents in which distance should be considered, factor * maxSpeed
 	// ###############
 	final static String OUTDIR = DIR + "output/" + "agents" + String.valueOf(NUMOFOAGENTS) + "_quadTreeR" + String.valueOf(FACTORFORQUADTREE) + "/";
 	
@@ -82,12 +86,18 @@ public class VelocityObstacleTestRunner {
 	private HashMap<String, SortedMap<Integer, Coord>> vo;
 	private HashMap<String, SortedMap<String, String>> voAttrib;
 	private HashMap<String, List<Coord>> agentWay;
+	private EventsManager manager;
+	private String dir;
+	private double time;
 	
 	private static final Logger log = Logger
 			.getLogger(VelocityObstacleTestRunner.class);
 	
 	public static void main(String[] args){
-		VelocityObstacleTestRunner runner = new VelocityObstacleTestRunner();
+		EventsManager manager = EventsUtils.createEventsManager();
+		VelocityObstacleTestRunner runner = new VelocityObstacleTestRunner(manager, OUTDIR, 0.0);
+		EventWriter writer = new EventWriterXML(OUTDIR + "events.xml.gz");
+		manager.addHandler(writer);
 		
 		//create agentGeometry
 		int numOfParts = 18;
@@ -116,45 +126,23 @@ public class VelocityObstacleTestRunner {
 			runner.createAndAddMovingAgent(id, position, goal, maxSpeed, g);
 		}
 		
-		while(!runner.finished()){
-			runner.doStep(1);
-			if(runner.getStepCnt() > Math.pow(2, 12)){
-				log.info("stopped run after " + runner.getStepCnt() + "...");
-				break;
-			}
-		}
-		runner.dump(OUTDIR);
+		runner.run(1, Math.pow(2, 12));
+		runner.dump();
+		writer.closeFile();
 	}
 	
-	/**
-	 * @return
-	 */
-	private String getNumOfActiveAgents() {
-		return String.valueOf(this.objects.size());
-	}
 
-	/**
-	 * @return
-	 */
-	private boolean finished() {
-		if(this.objects.isEmpty()){
-			return true;
-		}
-		return false;
-	}
-
-	public VelocityObstacleTestRunner(){
+	public VelocityObstacleTestRunner(EventsManager manager, String outDir, double startTime){
+		this.manager = manager;
 		this.objects = new HashMap<Id, MovingObject>();
 		this.finished = new HashSet<Id>();
+		this.dir = outDir;
+		this.time = startTime;
+		if(!new File(outDir).exists()){
+			new File(outDir).mkdirs();
+			log.info("Output-Directory " + outDir + " not found! Created: " + outDir +" ...");
+		}
 		this.initQuad();
-	}
-	
-	private void initQuad(){
-		this.quadTree = null;
-		minX = Double.MAX_VALUE;
-		maxY = Double.MIN_VALUE;
-		minY = Double.MAX_VALUE;
-		maxX = Double.MIN_VALUE;
 	}
 	
 	public boolean createAndAddMovingAgent(Id id, Vector2D start, Vector2D goal, double maxSpeed, Geometry g){
@@ -163,6 +151,8 @@ public class VelocityObstacleTestRunner {
 			return false;
 		}
 		this.objects.put(id, new MovingAgentImpl(start, goal, maxSpeed, id, g));
+		this.manager.processEvent(new XYVxVyEventImpl(id, start.getX(), start.getY(), 
+				this.objects.get(id).getSpeed().getX(), this.objects.get(id).getSpeed().getY(), this.time));
 		findValuesForQuad(start);
 		return true;
 	}
@@ -188,17 +178,34 @@ public class VelocityObstacleTestRunner {
 	public Map<Id, MovingObject> getObjects(){
 		return this.objects;
 	}
+	
+	
+	public void run(double timeStep, double breakAfterSimStep){
+		while(!this.finished()){
+			this.doStep(timeStep);
+			if(this.getStepCnt() > breakAfterSimStep){
+				StringBuffer b = new StringBuffer();
+				for(Id id: this.objects.keySet()){
+					b.append(id.toString() + ", ");
+					System.out.println("arrived?: " + objects.get(id).arrived() + " current: " + objects.get(id).getCurrentPosition().toString() + "\tgoal:" +  ((MovingAgentImpl) objects.get(id)).getGoal());
+				}
+				log.info("stopped run after " + this.getStepCnt() + "... Agents with id: " + b.toString() + " did not arrive at their goal...");
+				break;
+			}
+		}
+	}
+	
 	/**
 	 * 
-	 * @param stepSize in seconds
+	 * @param timeStep in seconds
 	 */
-	public void doStep(double stepSize){
+	public void doStep(double timeStep){
 		if(quadTree == null){
 			buildQuadTree();
 		}
 		Map<Id, Vector2D> desiredVelocity = selectDesiredVelocity();
-		Map<Id, VelocityObstacle> vo= createVelocityObstacles(stepSize, desiredVelocity);
-		walk(stepSize, vo);
+		Map<Id, VelocityObstacle> vo= createVelocityObstacles(timeStep, desiredVelocity);
+		walk(timeStep, vo);
 	}
 
 	/**
@@ -249,29 +256,29 @@ public class VelocityObstacleTestRunner {
 
 	/**
 	 * @param vo 
-	 * @param stepSize 
+	 * @param timeStep 
 	 * 
 	 */
-	private void walk(double stepSize, Map<Id, VelocityObstacle> vo) {
+	private void walk(double timeStep, Map<Id, VelocityObstacle> vo) {
+		// TODO find a better way using quadtree. actually this quadtree throws an stackoverflowexception if it is not initialised in every timestep
 		this.initQuad();
+		// store positions
 		prepareForDump(vo);
+		//increase time
+		this.time += timeStep;
+		// Agents walk
 		for(MovingObject o: this.objects.values()){
-			o.calculateNextStep(stepSize, vo.get(o.getId()));
-		}
-		for(MovingObject o: this.objects.values()){
+			o.calculateNextStep(timeStep, vo.get(o.getId()));
 			o.processNextStep();
+			this.manager.processEvent(new XYVxVyEventImpl(o.getId(), o.getCurrentPosition().getX(), 
+					o.getCurrentPosition().getY(), o.getSpeed().getX(), o.getSpeed().getY(), this.time));
+			// TODO see above - problem with the quadtree
 			this.findValuesForQuad(o.getCurrentPosition());
 			if(o.arrived()){
-				this.finished.add(o.getId());
-				String id = o.getId().toString() + "_" + String.valueOf(cnt + 1);
-				this.agentPosition.put(id, o.getCurrentPosition().getCoord());
-				this.agentWay.get(o.getId().toString()).add(o.getCurrentPosition().getCoord());
-				
-				this.agentPositionAttrib.put(id, new TreeMap<String, String>());
-				this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
-				this.agentPositionAttrib.get(id).put("step", String.valueOf(cnt));
+				this.finishAgent(o);
 			}
 		}
+		// remove finished from Map
 		for(Id id : this.finished){
 			if(this.objects.containsKey(id)){
 				this.objects.remove(id);
@@ -284,11 +291,49 @@ public class VelocityObstacleTestRunner {
 			nxtmsg *= 2;
 		}
 	}
+	
+	private void finishAgent(MovingObject o){
+		this.finished.add(o.getId());
+		String id = o.getId().toString() + "_" + String.valueOf(cnt + 1);
+		this.agentPosition.put(id, o.getCurrentPosition().getCoord());
+		this.agentWay.get(o.getId().toString()).add(o.getCurrentPosition().getCoord());
+		
+		this.agentPositionAttrib.put(id, new TreeMap<String, String>());
+		this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
+		this.agentPositionAttrib.get(id).put("step", String.valueOf(this.cnt + 1));
+		this.agentPositionAttrib.get(id).put("time", String.valueOf(this.time));
+	}
+	
+	/**
+	 * @return
+	 */
+	private String getNumOfActiveAgents() {
+		return String.valueOf(this.objects.size());
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean finished() {
+		if(this.objects.isEmpty()){
+			return true;
+		}
+		return false;
+	}
+
+	private void initQuad(){
+		this.quadTree = null;
+		minX = Double.MAX_VALUE;
+		maxY = Double.MIN_VALUE;
+		minY = Double.MAX_VALUE;
+		maxX = Double.MIN_VALUE;
+	}
 
 	/**
 	 * @param vo
 	 */
 	private void prepareForDump(Map<Id, VelocityObstacle> vo) {
+		//init
 		if(first){
 			this.agentWay = new HashMap<String, List<Coord>>();
 			this.agentPosition = new HashMap<String, Coord>();
@@ -297,6 +342,7 @@ public class VelocityObstacleTestRunner {
 			this.voAttrib = new HashMap<String, SortedMap<String, String>>();
 			first = false;
 		}
+		// prepare objects
 		String id;
 		for(MovingObject o : this.objects.values()){
 			if(!agentWay.containsKey(o.getId().toString())){
@@ -308,9 +354,11 @@ public class VelocityObstacleTestRunner {
 			
 			this.agentPositionAttrib.put(id, new TreeMap<String, String>());
 			this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
-			this.agentPositionAttrib.get(id).put("step", String.valueOf(cnt));
+			this.agentPositionAttrib.get(id).put("step", String.valueOf(this.cnt));
+			this.agentPositionAttrib.get(id).put("time", String.valueOf(this.time));
 		}
 		
+		//prepare obstacles
 		for(Entry<Id, VelocityObstacle> e: vo.entrySet()){
 			id = e.getKey().toString() + "_" + String.valueOf(cnt);
 			if(!(e.getValue().getGeometry() == null)){
@@ -326,16 +374,15 @@ public class VelocityObstacleTestRunner {
 					this.voAttrib.put(id, new TreeMap<String, String>());
 					this.voAttrib.get(id).put("agent", e.getKey().toString());
 					this.voAttrib.get(id).put("step", String.valueOf(cnt));
+					this.voAttrib.get(id).put("time", String.valueOf(this.time));
 				}
 			}
 		}
 	}
-	
-	public void dump(String dir){
-		if(!new File(dir).exists()){
-			new File(dir).mkdirs();
-			log.info(dir + " not found! Created: " + dir +" ...");
-		}
+	/**
+	 * dumps the stored agent- and obstacledata to the out-directory, specified in the constructor
+	 */
+	public void dump(){
 		DaShapeWriter.writeDefaultLineString2Shape(dir + "vo-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "vo", this.vo, this.voAttrib);
 		DaShapeWriter.writeDefaultPoints2Shape(dir + "agentPosition-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "agentPosition", this.agentPosition, this.agentPositionAttrib);
 		DaShapeWriter.writeDefaultLineStrings2Shape(dir + "agentWay-Agents_"+ NUMOFOAGENTS + "-" + "QuadtreeFaktor_" + FACTORFORQUADTREE + ".shp", "agentWay", this.agentWay);

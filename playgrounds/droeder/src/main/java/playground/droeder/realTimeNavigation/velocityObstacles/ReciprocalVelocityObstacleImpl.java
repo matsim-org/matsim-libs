@@ -68,6 +68,7 @@ public class ReciprocalVelocityObstacleImpl extends AbstractVelocityObstacle {
 			//addition of the coordinates of both agentGeometries -> MinkowskiSum
 			for(Coordinate c : o.getGeometry().getCoordinates()){
 				//TODO reflection of the origin Geometry in its referencePoint -> not implemented yet, because its not necessary for a circle...
+				//TODO build the geometry as triangle, based on the speed of originObject...
 				for(Coordinate cc : super.theOne.getGeometry().getCoordinates()){
 					coords[ii] = new Coordinate(c.x + cc.x + translation.getX(), c.y + cc.y + translation.getY());
 					ii++;
@@ -77,7 +78,7 @@ public class ReciprocalVelocityObstacleImpl extends AbstractVelocityObstacle {
 			i++;
 		}
 		
-		// we want only one geometry
+		// we want only one, or at least the minimum number of, geometries
 		this.geometry = fac.createGeometryCollection(objects).buffer(0);
 		return this.geometry;
 	}

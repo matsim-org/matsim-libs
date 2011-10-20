@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.droeder.realTimeNavigation.movingObjects;
 
+import org.geotools.filter.spatial.EqualsImpl;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.droeder.Vector2D;
@@ -113,14 +115,15 @@ public class MovingAgentImpl extends AbstractMovingObject {
 	 * @return boolean false if agent arrived at goal
 	 */
 	private void calcNewPosition(double stepSize) {
-		if((this.goal.subtract(super.getCurrentPosition()).absolut()) < 0.01){
+		if((this.goal.subtract(super.getCurrentPosition()).absolut()) < 0.1){
 			//do nothing
 			this.arrived = true;
 		}else{
 			Vector2D r0 = new Vector2D(this.getCurrentPosition().getX(), this.getCurrentPosition().getY());
 			Vector2D translation = new Vector2D(stepSize, super.getSpeed());
-			double alpha1 = (this.getGoal().getX() - r0.getX())/(translation.getX());
-			double alpha2 = (this.getGoal().getY() - r0.getY())/(translation.getY());
+			//casting necessary
+			double alpha1 = ((int)((this.getGoal().getX() - r0.getX())/(translation.getX())*100))/100.0;
+			double alpha2 = ((int)((this.getGoal().getY() - r0.getY())/(translation.getY())*100))/100.0;
 			if((alpha1 < 1) && (alpha1 > 0) && (alpha2 < 1) && (alpha2 > 0) && (alpha1 == alpha2)){
 				super.setNewPosition(this.goal);
 			}else{
