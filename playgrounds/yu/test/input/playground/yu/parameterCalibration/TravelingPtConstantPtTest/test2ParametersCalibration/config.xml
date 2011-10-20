@@ -108,7 +108,6 @@
 		<param name="writePlansInterval" value="500" />
 
 		<param name="mobsim" value="qsim" />
-		<param name="snapshotFormat" value="otfvis" /> <!-- googleearth, transims, otfvis -->
 	</module>
 
 	<module name="counts">
@@ -139,8 +138,6 @@
 			run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="30:00:00" />
-
-		<param name="snapshotperiod" value="00:00:00" /> <!-- 00:00:00 means NO snapshot writing -->
 
 		<param name="flowCapacityFactor" value="0.1" />
 		<param name="storageCapacityFactor" value="0.3" />
