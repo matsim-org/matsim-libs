@@ -72,7 +72,7 @@ public class LocationChoiceConfigGroup extends Module {
 	private String radius = "null";
 	private String flexible_types = "null";
 		
-	private String algorithm = "random";
+	private String algorithm = "null";
 	private String tt_approximationLevel = "0";
 	private String travelTimes = "true";
 	private String searchSpaceBeta = "-0.0001";
