@@ -7,8 +7,8 @@
  * </ul>
  * 
  * <h2>Parameters:<a name="locationchoice_parameters"></a></h2>
- * Two basic versions of the destination choice module exist, one (<font color="blue">v0</font>) based on local search and Haegerstrand's time geography and the other (<font color="red">v1</font>) based on best response including error terms.
- * Parameters used in both versions are given in black.
+ * Two basic versions of the destination choice module exist, one (v0) based on local search and Haegerstrand's time geography and the other (v1) based on best response including error terms.
+ * Parameters required for v0 are given in <strong><font color="blue">blue</font></strong>, the ones used in v1 are given in <strong><font color="red">red</font></strong> and parameters applied in both versions are given in <strong>black</strong>.
  * <h3>General Parameters</h3>
  * <ul>
  * 	<li><strong><font color="blue">constrained</font></strong> (deprecated; use "algorithm" instead)<br>
@@ -33,14 +33,14 @@
  *  </li>
  *  <li><strong><font color="black">algorithm</font></strong><br>
  * 		Type and range: String (random, bestResponse, localSearchRecursive, localSearchSingleAct)<br>
- * 		Default: random <br>
+ * 		Default: null (for backwards compatibility) <br>
  * 		Description: Specifies which version of destination choice module should be applied. <br>
  * 		localSearchRecursive = time geography <br>
  * 		localSearchSingleAct = the same as simple_tg <br>
  * 		random = random mutation <br>
  * 		bestResponse = recent destination choice module <br>
  *  </li>
- *  <li><strong><font color="black">randomSeed</font></strong><br>
+ *  <li><strong><font color="red">randomSeed</font></strong><br>
  * 		Type and range: long <br>
  * 		Default: 221177 <br>
  * 		Description: Initial seed for generation of random error terms
@@ -118,7 +118,7 @@
  * 	</li>
  * </ul>
  * 
- * <h3>Search Space Construction (v1)</h3>
+ * <h3>Search Space Construction</h3>
  * <ul>
  * 	<li><strong><font color="red">tt_approximationLevel</font></strong><br>
  * 		Type and range: int (0,1,2)<br> 
