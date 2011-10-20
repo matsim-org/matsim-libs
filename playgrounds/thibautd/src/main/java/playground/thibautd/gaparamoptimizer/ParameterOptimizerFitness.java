@@ -63,9 +63,11 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// to avoid negative fitness errors
 	private static final double START_FITNESS = 1E7;
 	// parameters of the fitness
-	private static final double CHF_PER_MICROSEC = 1E-4;
+	private static final double CHF_PER_MICROSEC = 1E-7;
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
 	private static final int N_PLAN_EXEC = 1;
+
+	private static final boolean IS_MEMETIC = true;
 
 	// indices of the genes in the chromosome:
 	private static final int CHROM_LENGTH = 16;
@@ -366,6 +368,8 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		configGroup.setDirectFitnessWeight( 1d - weightDur - weightToggle );
 
 		configGroup.setMaxSimplexIterations( getIntValue( genes[SIMPLEX_ITERS_GENE] ) );
+
+		configGroup.setIsMemetic(""+IS_MEMETIC);
 
 		return configGroup;
 	}
