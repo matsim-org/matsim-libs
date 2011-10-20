@@ -55,8 +55,6 @@ import org.matsim.core.utils.misc.Time;
  */
 public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 	
-	private static boolean JUNIT_MODE = false ;
-
 	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
 	
 	private Population population = null;
@@ -70,66 +68,53 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	private final Map<StatType,Map<String,int[]>> legStatsContainer = new TreeMap<StatType,Map<String,int[]>>() ;
 	// yy should probably be "double" instead of "int" (not all data are integer counts; think of emissions).  kai, jul'11
 	
-	// container that contains the data boundaries:
+	// container that contains the data bin boundaries (arrays):
 	private final Map<StatType,double[]> dataBoundaries = new TreeMap<StatType,double[]>() ;
 	
-	private static final Map<StatType,Double> slotSize = new TreeMap<StatType,Double>() ;
-	private static final Map<StatType,Integer> maxIndex = new TreeMap<StatType,Integer>() ;
-	
-//	private static final int SLOT_SIZE = 300;	// 5-min slots
-//	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
-
 	// container that contains the sum (to write averages):
-	private final Map<StatType,Double> sumStats = new TreeMap<StatType,Double>() ;
+	private final Map<StatType,Map<String,Double>> sumsContainer = new TreeMap<StatType,Map<String,Double>>() ;
 	
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
-	// to avoid under- or overcounting with respect to loops.
-	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
+	// to avoid under- or over-counting with respect to loops.
+//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
 
 	public CalcLegTimes(final Population population) {
 		this.population = population;
 		
 		for ( StatType type : StatType.values() ) {
+
 			// instantiate the statistics containers:
 			Map<String,int[]> legStats = new TreeMap<String,int[]>() ;
 			this.legStatsContainer.put( type, legStats ) ;
 			
-			// set the sums & counts to zero:
-			this.sumStats.put( type, 0. ) ;
-			this.legCount.put( type, 0 ) ;
-			
+			Map<String,Double> sums = new TreeMap<String,Double>() ;
+			this.sumsContainer.put( type, sums ) ;
+						
+			// define the bin boundaries:
 			if ( type==StatType.duration ) {
-				slotSize.put( type, 300. ) ;
-				maxIndex.put( type, 12 ) ;
+				double[] dataBoundariesTmp = {0., 300., 600., 900., 1200., 1500., 1800., 2100., 2400., 2700., 3000., 3300., 3600.} ;
+				dataBoundaries.put( StatType.duration, dataBoundariesTmp ) ;
 			} else if ( type==StatType.beelineDistance ) {
-				slotSize.put(type,1000.) ;
-				maxIndex.put(type,50) ;
-				// yy would be better to have something like 100, 200, 500, 1000, 2000, 5000 etc. meters.  kai, jul'11
-				// Here it cometh:
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
 				dataBoundaries.put( StatType.beelineDistance, dataBoundariesTmp ) ;
-//				maxIndex.put(type,dataBoundariesTmp.length) ; // maxIndex no longer needed!
 			} else {
 				throw new RuntimeException("statistics container for type "+type.toString()+" not initialized.") ;
 			}
 		}
+		
+		// initialize everything (in the same way it is done between iterations):
+		reset(-1) ;
 	}
 	
 	private int getIndex( StatType type, final double dblVal) {
-		if ( type==StatType.beelineDistance ) {
-			double[] dataBoundariesTmp = dataBoundaries.get(type) ;
-			int ii = dataBoundariesTmp.length-1 ;
-			for ( ; ii>=0 ; ii-- ) {
-				if ( dataBoundariesTmp[ii] <= dblVal ) 
-					return ii ;
-			}
-			log.warn("leg statistics contains value that smaller than the smallest category; adding it to smallest category" ) ;
-			return 0 ;
-		} else {
-			int idx = (int)(dblVal / slotSize.get(type) );
-			if (idx > maxIndex.get(type)) idx = maxIndex.get(type);
-			return idx;
-		} 
+		double[] dataBoundariesTmp = dataBoundaries.get(type) ;
+		int ii = dataBoundariesTmp.length-1 ;
+		for ( ; ii>=0 ; ii-- ) {
+			if ( dataBoundariesTmp[ii] <= dblVal ) 
+				return ii ;
+		}
+		log.warn("leg statistics contains value that smaller than the smallest category; adding it to smallest category" ) ;
+		return 0 ;
 	}
 
 	@Override
@@ -137,7 +122,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		Integer cnt = this.agentLegs.get(event.getPersonId());
 		if (cnt == null) {
-			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1));
+			this.agentLegs.put(event.getPersonId(), 1);
 		} else {
 			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
 		}
@@ -156,61 +141,69 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			final Leg leg = (Leg)plan.getPlanElements().get(index+1) ;
 			final Activity toAct = (Activity)plan.getPlanElements().get(index + 2);
 			
+			// this defines to which legTypes this leg should belong for the statistical averaging:
 			List<String> legTypes = new ArrayList<String>() ;
+
+			// register the leg by activity type pair:
 			{
 				String legType = fromAct.getType() + "---" + toAct.getType();
 				legTypes.add(legType) ;
 			}
+			
+			// register the leg by mode:
 			{
-				String modeType = "zz_" + leg.getMode() ;
-				if ( !JUNIT_MODE ) {
-					legTypes.add(modeType) ;
-				}
+				String modeType = "zz_mode_" + leg.getMode() ;
+				legTypes.add(modeType) ;
 			}
 			
-			for ( String legType : legTypes ) {
-				for ( StatType type : StatType.values() ) {
+			// register the leg for the overall average:
+			legTypes.add("zzz_all") ;
+			
+			for ( StatType statType : StatType.values() ) {
 
-					Map<String,int[]> legStats = this.legStatsContainer.get(type) ;
-					int[] stats = legStats.get(legType);
+				// generate correct "item" for statType ...
+				double item = 0. ;
+				if ( statType==StatType.duration ) {
+					item = travTime ;
+				} else if ( statType==StatType.beelineDistance ) {
+					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
+						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
+					} else {
+						log.warn("activity coordinate not known; using `1.' for the distance") ;
+						item = 1. ;
+					}
+				} else {
+					throw new RuntimeException("`item' for statistics type not defined") ;
+				}
+
+				// go through all letTypes to which the leg belongs:
+				for ( String legType : legTypes ) {
+
+					// get correct statistics array by statType and legType:
+					int[] stats = this.legStatsContainer.get(statType).get(legType);
+
+					// if that statistics array does not exist yet, initialize it.
 					if (stats == null) {
-						Integer maxIndexTmp = maxIndex.get(type);
-						if ( type==StatType.beelineDistance ) {
-							// if, say, array length is 11, then the last index is 10:
-							maxIndexTmp = this.dataBoundaries.get(type).length-1 ;
-						}
-						stats = new int[maxIndexTmp+1];
-						for (int i = 0; i <= maxIndexTmp; i++) {
+						Integer len = this.dataBoundaries.get(statType).length ;
+						stats = new int[len];
+						for (int i = 0; i < len; i++) {
 							stats[i] = 0;
 						}
-						legStats.put(legType, stats);
-					}
-					double item = 0. ;
-					if ( type==StatType.duration ) {
-						item = travTime ;
-					} else if ( type==StatType.beelineDistance ) {
-						if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-							item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
-						} else {
-							log.warn("activity coordinate not known; using `1.' for the distance") ;
-							item = 1. ;
-						}
-					} else {
-						throw new RuntimeException("`item' for data type not defined") ;
-					}
-					stats[getIndex(type,item)]++;
-					double newItem = this.sumStats.get(type) + item ;
-					this.sumStats.put( type, newItem ) ;
+						this.legStatsContainer.get(statType).put(legType, stats);
 
-					int newCount = this.legCount.get(type) + 1 ;
-					this.legCount.put( type, newCount ) ;
+						// also initialize the sums container:
+						this.sumsContainer.get(statType).put(legType, 0.) ;
+					}
+					
+					// ... and add it to the correct bin in the container:
+					stats[getIndex(statType,item)]++;
+
+					double newItem = this.sumsContainer.get(statType).get(legType) + item ;
+					this.sumsContainer.get(statType).put( legType, newItem ) ;
+
 				}
 			}
 			
-//			this.legCnt++;
-//			log.error("with this version of code, the counter number of legs is not consistent with how often the " +
-//					"sum is used.  Should not be committed but accidents happen.  kai, jul'11") ;
-
 		}
 	}
 
@@ -218,27 +211,18 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	public void reset(final int iteration) {
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
-//		this.legStats.clear();
-//		this.sumTripDurations = 0;
 		
 		for ( StatType type : StatType.values() ) {
 			this.legStatsContainer.get(type).clear() ;
-			this.sumStats.put(type,0.) ;
-			this.legCount.put(type, 0) ;
+			this.sumsContainer.get(type).clear() ;
 		}
 
 	}
 
-//	public Map<String, int[]> getLegStats() {
-////		return this.legStatsDuration;
-//		return this.legStatsContainer.get( StatType.duration ) ;
-//	}
-	// used nowhere
-
 	@Deprecated // this is probably averageLegDuration.  kai, jul'11
 	public double getAverageTripDuration() {
-//		return (this.sumTripDurations / this.sumTrips);
-		return ( this.sumStats.get(StatType.duration) / this.legCount.get(StatType.duration) ) ;
+		throw new RuntimeException("not implemented") ;
+//		return ( this.sumsContainer.get(StatType.duration) / this.legCount.get(StatType.duration) ) ;
 	}
 
 	public void writeStats(final String filenameTmp) {
@@ -246,9 +230,6 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			String filename = filenameTmp ;
 			if ( type!=StatType.duration ) {
 				filename += type.toString() ;
-				if ( JUNIT_MODE ) {
-					continue;
-				}
 			}
 			BufferedWriter legStatsFile = null;
 			legStatsFile = IOUtils.getBufferedWriter(filename);
@@ -263,62 +244,44 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
-	public void writeStats(StatType type, final java.io.Writer out ) throws UncheckedIOException {
+	public void writeStats(StatType statType, final java.io.Writer out ) throws UncheckedIOException {
 		try {
 			
 			boolean first = true;
-			int[] sumOverCounts = null ;
-			for (Map.Entry<String, int[]> entry : this.legStatsContainer.get(type).entrySet()) {
-				String key = entry.getKey();
+			for (Map.Entry<String, int[]> entry : this.legStatsContainer.get(statType).entrySet()) {
+				String legType = entry.getKey();
 				int[] counts = entry.getValue();
 				
 				// header line etc:
 				if (first) {
 					first = false;
-					out.write("pattern");
+					out.write(statType.toString());
 					System.out.print( "counts.length: " + counts.length ) ;
 					for (int i = 0; i < counts.length; i++) {
-						if ( type == StatType.duration ) {
-							out.write("\t" + (int)(i*slotSize.get(type)/60) + "+");
-							// casting this to int is, in my view, counter-productive.  But it is necessitated by
-							// the current test.  kai, jul'11
-						} else {
-							out.write("\t" + this.dataBoundaries.get(type)[i] + "+" ) ;
-						}
+						out.write("\t" + this.dataBoundaries.get(statType)[i] + "+" ) ;
 					}
-					out.write("\n");
+					out.write("\t| average\n");
 					Logger.getLogger(this.getClass()).warn("Writing a file that is often called `tripXXX.txt', " +
 							"and which explicitly talks about `trips'.  It uses, however, _legs_ as unit of analysis. " +
 					"This makes a difference with intermodal trips.  kai, jul'11");
-					
-					sumOverCounts = new int[counts.length] ;
 				}
 				
 				// data:
-				out.write(key);
+				int cnt = 0 ;
+				out.write(legType);
 				for (int i = 0; i < counts.length; i++) {
 					out.write("\t" + counts[i]);
-					sumOverCounts[i] += counts[i] ;
+					cnt += counts[i] ;
 				}
-				out.write("\n");
+				out.write("\t| " + this.sumsContainer.get(statType).get(legType)/cnt + "\n" ) ;
 				
 			}
 			out.write("\n");
-			if (legCount.get(StatType.duration) == 0) {
-				out.write("average trip duration: no trips!");
-			} else {
-				if ( type!=StatType.duration ) { // temporary fix so that existing test does not fail.  should be adapted
-					out.write("all") ;
-					for (int i = 0; i < sumOverCounts.length; i++) {
-						out.write("\t" + sumOverCounts[i]/2);  // "/2" temporary fix since we sum up over mode and again over pattern
-					}
-					out.write("\n");
-					out.write("\n");
-				}
-				out.write("average trip duration: "
-						+ (this.sumStats.get(type) / legCount.get(type) ) + " seconds = "
-						+ Time.writeTime(((int)(this.sumStats.get(type) / legCount.get(type) ))));
+			
+			if ( first ) { // means there was no data
+				out.write("no legs, therefore no data") ;
 			}
+			
 			out.write("\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
