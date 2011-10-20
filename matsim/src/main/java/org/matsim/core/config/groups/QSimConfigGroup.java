@@ -38,7 +38,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String END_TIME = "endTime";
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
-	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
+//	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -112,6 +112,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setVehicleBehavior(value);
 		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)) {
 			setWriteSnapshotsInterval(Integer.parseInt(value));
+		} else if ( "snapshotFormat".equals(key) ) {
+			log.error( "The config entry `snapshotFormat' was removed from the qsim config group. " +
+					"It is now in the controler config group; please move it there.  Aborting ...") ;
+			throw new IllegalArgumentException(key);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -154,7 +158,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
-		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats.  'plansfile', `transims', `googleearth', and `otfvis'.  'netvis' is, I think, no longer possible.") ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
 		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
 		map.put(TRAFFIC_DYNAMICS, "`"

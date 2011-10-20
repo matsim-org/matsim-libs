@@ -86,6 +86,10 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 			setExternalExe(value);
 		} else if (TIMEOUT.equals(key)) {
 			setExternalTimeOut(Integer.parseInt(value));
+		} else if ( "snapshotFormat".equals(key) ) {
+			log.error( "The config entry `snapshotFormat' was removed from the simulation config group. " +
+					"It is now in the controler config group; please move it there.  Aborting ...") ;
+			throw new IllegalArgumentException(key);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
