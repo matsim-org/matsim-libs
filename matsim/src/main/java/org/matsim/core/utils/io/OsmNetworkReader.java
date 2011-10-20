@@ -20,7 +20,6 @@
 
 package org.matsim.core.utils.io;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +31,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -51,7 +48,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -151,15 +147,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * Parses the given osm file and creates a MATSim network from the data.
 	 *
 	 * @param osmFilename
-	 * @throws SAXException
-	 * @throws ParserConfigurationException
 	 * @throws UncheckedIOException
 	 */
 	public void parse(final String osmFilename) {
 		parse(osmFilename, null);
 	}
 
-	/*package*/ void parse(final InputStream stream) throws SAXException, ParserConfigurationException, IOException {
+	/*package*/ void parse(final InputStream stream) throws UncheckedIOException {
 		parse(null, stream);
 	}
 
@@ -223,7 +217,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param hierarchy The hierarchy layer the highway appears.
 	 * @param highwayType The type of highway these defaults are for.
 	 * @param lanes number of lanes on that road type
-	 * @param freespeed the free speed vehicles can drive on that road type
+	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 *
@@ -239,7 +233,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param hierarchy The hierarchy layer the highway appears in.
 	 * @param highwayType The type of highway these defaults are for.
 	 * @param lanes number of lanes on that road type
-	 * @param freespeed the free speed vehicles can drive on that road type
+	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
 	 * @param freespeedFactor the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
 	 * @param oneway <code>true</code> to say that this road is a oneway road
@@ -491,7 +485,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
 		if (maxspeedTag != null) {
 			try {
-				double maxspeed = Double.parseDouble(maxspeedTag);
+				double maxspeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 				if (maxspeed < freespeed) {
 					// freespeed doesn't always mean it's the maximum speed allowed.
 					// thus only correct freespeed if maxspeed is lower than freespeed.

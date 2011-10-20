@@ -20,25 +20,22 @@
 package org.matsim.core.utils.io;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.xml.sax.SAXException;
 
 /**
  * @author mrieser
@@ -48,10 +45,10 @@ public class OsmNetworkReaderTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testConversion() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversion() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -67,10 +64,10 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithDetails() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversionWithDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -88,10 +85,10 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithDetails_witMemoryOptimized() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversionWithDetails_witMemoryOptimized() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -110,10 +107,10 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettings() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversionWithSettings() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -131,10 +128,10 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettings_withMemoryOptimization() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversionWithSettings_withMemoryOptimization() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -152,10 +149,10 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversionWithSettingsAndDetails() throws SAXException, ParserConfigurationException, IOException {
+	public void testConversionWithSettingsAndDetails() {
 		String filename = this.utils.getClassInputDirectory() + "adliswil.osm.gz";
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
@@ -173,8 +170,8 @@ public class OsmNetworkReaderTest {
 	}
 
 	@Test
-	public void testConversion_MissingNodeRef() throws SAXException, ParserConfigurationException, IOException {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	public void testConversion_MissingNodeRef() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		CoordinateTransformation ct = new IdentityTransformation();
 
@@ -201,6 +198,60 @@ public class OsmNetworkReaderTest {
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getNodes().size());
 		Assert.assertEquals("incomplete ways should not be converted.", 0, net.getLinks().size());
+	}
+	
+	@Test
+	public void testConversion_maxspeeds() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network net = sc.getNetwork();
+		CoordinateTransformation ct = new IdentityTransformation();
+		
+		OsmNetworkReader reader = new OsmNetworkReader(net, ct);
+		reader.setKeepPaths(true);
+		reader.setHighwayDefaults(1, "motorway", 1, 50.0/3.6, 1.0, 2000.0);
 
+		String str = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+				"<osm version=\"0.6\" generator=\"Osmosis 0.36\">\n" +
+				"  <bound box=\"0,0,90,180\" origin=\"0.37-SNAPSHOT\"/>\n" +
+				"  <node id=\"1\" lat=\"10.0\" lon=\"60.0\"/>\n" +
+				"  <node id=\"2\" lat=\"15.0\" lon=\"90.0\"/>\n" +
+				"  <node id=\"3\" lat=\"20.0\" lon=\"120.0\"/>\n" +
+				"  <node id=\"4\" lat=\"25.0\" lon=\"90.0\"/>\n" +
+				"  <node id=\"5\" lat=\"30.0\" lon=\"60.0\"/>\n" +
+				"  <way id=\"1\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"1\"/>\n" +
+				"    <nd ref=\"2\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"  </way>\n" +
+				"  <way id=\"2\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"2\"/>\n" +
+				"    <nd ref=\"3\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"    <tag k=\"maxspeed\" v=\"40\"/>\n" + // lower speed limit than default
+				"  </way>\n" +
+				"  <way id=\"3\" version=\"6\" timestamp=\"2010-10-14T12:34:56Z\" uid=\"9876\" user=\"MATSim\" changeset=\"123456789\">\n" +
+				"    <nd ref=\"3\"/>\n" +
+				"    <nd ref=\"4\"/>\n" +
+				"    <tag k=\"highway\" v=\"motorway\"/>\n" +
+				"    <tag k=\"maxspeed\" v=\"60\"/>\n" + // higher speed limit than default
+				"  </way>\n" +
+				"</osm>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		/* this creates 6 links:
+		 * - links 1 & 2: for way 1, in both directions
+		 * - links 3 & 4: for way 2, in both directions
+		 * - links 5 & 6: for way 3, in both directions
+		 */
+		
+		Link link1 = net.getLinks().get(new IdImpl("1"));
+		Link link3 = net.getLinks().get(new IdImpl("3"));
+		Link link5 = net.getLinks().get(new IdImpl("5"));
+		Assert.assertNotNull("Could not find converted link 1.", link1);
+		Assert.assertNotNull("Could not find converted link 3", link3);
+		Assert.assertNotNull("Could not find converted link 5", link5);
+		Assert.assertEquals(50.0/3.6, link1.getFreespeed(), 1e-8);
+		Assert.assertEquals(40.0/3.6, link3.getFreespeed(), 1e-8);
+		Assert.assertEquals(50.0/3.6, link5.getFreespeed(), 1e-8); // only use maxspeed if its lower, see comment in OsmNetworkReader
 	}
 }
