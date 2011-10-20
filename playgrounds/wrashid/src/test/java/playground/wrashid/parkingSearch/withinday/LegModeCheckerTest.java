@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsertParkingActivitiesReplannerTest.java
+ * LegModeCheckerTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,97 +22,138 @@ package playground.wrashid.parkingSearch.withinday;
 
 import junit.framework.TestCase;
 
-import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculatorFactory;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-public class InsertParkingActivitiesReplannerTest extends TestCase {
+public class LegModeCheckerTest extends TestCase {
 
-	public void testInsertParkingActivities() {
+	public void testUpdateLegMode() {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		
 		PopulationFactory factory = sc.getPopulation().getFactory();
+		ActivityFacilitiesImpl facilities = ((ScenarioImpl) sc).getActivityFacilities();
 		
 		Person person = factory.createPerson(sc.createId("1"));
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
 		
+		String[] modes = {TransportMode.car, TransportMode.walk, TransportMode.car};
 		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
-		plan.addLeg(factory.createLeg(TransportMode.car));
+		plan.addLeg(factory.createLeg(modes[0]));
 		plan.addActivity(factory.createActivityFromLinkId("work", sc.createId("l4")));
-		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
-		plan.addLeg(factory.createLeg(TransportMode.walk));
+		plan.addLeg(factory.createLeg(modes[1]));
 		plan.addActivity(factory.createActivityFromLinkId("shopping", sc.createId("l5")));
-		plan.addLeg(factory.createLeg(TransportMode.pt));
+		plan.addLeg(factory.createLeg(modes[2]));
 		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
 		
 		/*
-		 * Set activity durations and coordinates
+		 * Set activity durations and coordinates and create facilities
 		 */
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof ActivityImpl) {
 				ActivityImpl activity = (ActivityImpl) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
+				activity.setFacilityId(activity.getLinkId());
+				
+				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(activity.getLinkId());
+				if (facility == null) {
+					facility = facilities.createFacility(activity.getLinkId(), activity.getCoord());
+				}
+				ActivityOption activityOption = facility.getActivityOptions().get(activity.getType());
+				if (activityOption == null) {
+					facility.createActivityOption(activity.getType());
+				}
 			}
 		}
 		
-		assertEquals(9, plan.getPlanElements().size());
-		
-		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
-		PersonalizableTravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()) ;
-		PersonalizableTravelCost travelCost = new TravelTimeDistanceCostCalculator(travelTime, sc.getConfig().planCalcScore());
-		
-		PlanAlgorithm plansAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCost, travelTime, routeFactory);
-		WithinDayInitialReplanner replanner = new InsertParkingActivitiesReplanner(sc.createId("replanner"), sc, plansAlgorithm);
-		
-		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(person, null);
-		replanner.doReplanning(agent);
-		
-		assertEquals(17, agent.getSelectedPlan().getPlanElements().size());
-				
 		/*
-		 * Add two consecutive car legs which cannot be handled by the Replanner
+		 * Create PlansCalcRoute object to reroute legs with adapted mode 
 		 */
-		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addActivity(factory.createActivityFromLinkId("leisure", sc.createId("l6")));
-		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		PersonalizableTravelTime travelTimes = new FreeSpeedTravelTimeCalculatorFactory().createFreeSpeedTravelTimeCalculator();
+		PersonalizableTravelCost travelCosts = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(travelTimes, config.planCalcScore());
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastDijkstraFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) (sc.getPopulation().getFactory())).getModeRouteFactory();
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCosts, travelTimes, leastCostPathCalculatorFactory, routeFactory);
+
+		/*
+		 * Create LegModeChecker to check and adapt leg modes
+		 */
+		LegModeChecker legModeChecker = new LegModeChecker(sc, plansCalcRoute);
+		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
 		
-		agent = new ExperimentalBasicWithindayAgent(person, null);
-		try {
-			replanner.doReplanning(agent);
-			Assert.fail("Expected RuntimeException, but there was none.");
-		} catch (RuntimeException e) { }
+		/*
+		 * Always change to car
+		 * Expect switch from car-walk-car to car-car-car 
+		 */
+		legModeChecker.setToCarProbability(1.0);
+		legModeChecker.run(plan);
+		assertEquals(modes[0], ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(TransportMode.car, ((Leg) plan.getPlanElements().get(3)).getMode());
+		assertEquals(modes[2], ((Leg) plan.getPlanElements().get(5)).getMode());
+		
+		/*
+		 * reset modes
+		 */
+		((Leg) plan.getPlanElements().get(1)).setMode(modes[0]);
+		((Leg) plan.getPlanElements().get(3)).setMode(modes[1]);
+		((Leg) plan.getPlanElements().get(5)).setMode(modes[2]);
+		
+		/*
+		 * Always change to non-car
+		 * Expect switch from car-walk-car to car-walk-walk
+		 */
+		legModeChecker.setToCarProbability(0.0);
+		legModeChecker.run(plan);
+		assertEquals(modes[0], ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(modes[1], ((Leg) plan.getPlanElements().get(3)).getMode());
+		assertEquals(TransportMode.walk, ((Leg) plan.getPlanElements().get(5)).getMode());
+		
+		/*
+		 * reset modes
+		 */
+		((Leg) plan.getPlanElements().get(1)).setMode(modes[0]);
+		((Leg) plan.getPlanElements().get(3)).setMode(modes[1]);
+		((Leg) plan.getPlanElements().get(5)).setMode(modes[2]);
+		
+		/*
+		 * Increase max distance between an activity and the parked car
+		 * Expect no mode switch
+		 */
+		legModeChecker.setToCarProbability(0.5);
+		legModeChecker.setMaxDistance(Double.MAX_VALUE);
+		legModeChecker.run(plan);
+		assertEquals(modes[0], ((Leg) plan.getPlanElements().get(1)).getMode());
+		assertEquals(modes[1], ((Leg) plan.getPlanElements().get(3)).getMode());
+		assertEquals(modes[2], ((Leg) plan.getPlanElements().get(5)).getMode());
 	}
 	
 	/*
