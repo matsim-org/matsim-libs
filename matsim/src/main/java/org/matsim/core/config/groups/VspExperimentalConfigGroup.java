@@ -145,7 +145,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		Map<String,String> map = super.getComments();
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
-				+WARN+"'.\n  When violating VSP defaults, this results in " +
+				+WARN+"'.\n\t\t" +
+						"When violating VSP defaults, this results in " +
 				"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
 		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
@@ -168,7 +169,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				"indicates if, for routing, the opportunity cost of time should be added to the mode-specific marginal " +
 				"utilities of time.\n\t\t" +
-				"Default is false although some of us (bk, kn) think this should always be true.\n" +
+				"Default is false although some of us (bk, kn) think this should always be true.\n\t\t" +
 				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
 				"obey this." ) ;
 		return map;
