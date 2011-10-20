@@ -36,9 +36,9 @@ public class Controller {
 	private HashMap<Integer,int[]> links;
 	private Double[] extremeValues;
 	private Double maxPosX, minPosX, maxPosY, minPosY;
-	private LinkedList<Double> timeSteps;
+	private LinkedList<Double> timeSteps = new LinkedList<Double>();
 	private boolean liveMode;
-	private double currentTime = Double.NaN;
+	private Double currentTime = Double.NaN;
 	private Scene currentScene;
 	private int traceTimeRange = 2;
 	
@@ -55,6 +55,10 @@ public class Controller {
 
 	public Controller(String eventFileName, String networkFileName, Console console, int traceTimeRange, boolean liveMode)
 	{
+		
+		maxPosX = maxPosY = Double.MIN_VALUE;
+		minPosX = minPosY = Double.MAX_VALUE;
+		
 		
 		this.liveMode = false;
 		this.traceTimeRange = traceTimeRange;
@@ -74,22 +78,7 @@ public class Controller {
 		gui.setNetwork(nodes,links);
 		console.println("done.");
 		
-		if (liveMode)
-		{
-			//live mode (agent data is coming via event stream)
-			console.print("Launching LIVE MODE...");
-			
-			//Launches the LiveMode
-			EventsManager manager = EventsUtils.createEventsManager();
-			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
-			
-			
-
-			manager.addHandler(this.importer); // handler must implement XYVxVyEventsHandler
-			reader.parse("C:\\temp5\\events2.xml");
-			
-		}
-		else
+		if (!liveMode)
 		{
 			//offline mode
 			console.print("Launching OFFLINE MODE...");
@@ -113,15 +102,33 @@ public class Controller {
 		//Double[] extremeValues = {maxPosX, maxPosY, maxPosZ, minPosX, minPosY, minPosZ, maxTimeStep, minTimeStep};
 		//                          0        1        2        3        4        5        6            7
 		
-		maxPosX = extremeValues[0];
-		maxPosY = extremeValues[1];
-		minPosX = extremeValues[3];
-		minPosY = extremeValues[4];
+		System.out.println(extremeValues);
+		
+		maxPosX = (extremeValues[0] != null) ? extremeValues[0]:Double.MIN_VALUE;
+		maxPosY = (extremeValues[1] != null) ? extremeValues[1]:Double.MIN_VALUE;
+		minPosX = (extremeValues[3] != null) ? extremeValues[3]:Double.MAX_VALUE;
+		minPosY = (extremeValues[4] != null) ? extremeValues[4]:Double.MAX_VALUE;
+		
+		timeSteps = new LinkedList<Double>();
 		
 		gui.setAgentData(agents,extremeValues,timeSteps);
 		gui.setNetwork(nodes,links);
 		gui.init();
 		gui.setVisible(true);
+		
+		if (liveMode)
+		{
+			//live mode (agent data is coming via event stream)
+			console.print("Launching LIVE MODE...");
+			
+			//Launches the LiveMode
+			EventsManager manager = EventsUtils.createEventsManager();
+			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
+			
+			manager.addHandler(this.importer); // handler must implement XYVxVyEventsHandler
+			reader.parse("C:\\temp5\\events2.xml");
+		}
+		
 		
 	}
 	
@@ -189,29 +196,33 @@ public class Controller {
 		
 		this.oldTime = realTime;*/
 				
+		System.out.println("ID:" + ID + "| time:" + time + "|");
 		
 		//on the first run in live mode the agents hashmap is still empty
 		if (agents == null)
 		{
+			//if (ID.equals("0")) System.out.println("NULL AGENT");
 			agents = new HashMap<String,Agent>();
 			agents.put(ID, new Agent());
 		}
 		
 		//update agent list
 		Agent currentAgent = agents.get(ID);
+		if (currentAgent == null) currentAgent = new Agent(); 
+		
 		DataPoint dataPoint = new DataPoint(time, posX, posY);
 		currentAgent.addDataPoint(dataPoint);
 		agents.put(ID, currentAgent);
 		
 		//on the first run the current time is not set yet
-		if (currentTime == Double.NaN)
+		if (currentTime.equals(Double.NaN))
 		{
 			currentTime = time;
 		}
 		else
 		{
 			//if a timestep occured
-			if (currentTime != time)
+			if (!currentTime.equals(time))
 			{
 				//recalculate extreme values
 				if (agents != null)
@@ -232,11 +243,13 @@ public class Controller {
 							Map.Entry dataPointPairs = (Map.Entry) dataPointIterator.next();
 							DataPoint itDataPoint = (DataPoint)dataPointPairs.getValue();
 							
-							maxPosX = Math.max(itDataPoint.getPosX(), maxPosX);
-							minPosX = Math.min(itDataPoint.getPosX(), minPosX);
-							maxPosY = Math.max(itDataPoint.getPosY(), maxPosY);
-							minPosY = Math.min(itDataPoint.getPosY(), minPosY);
-							
+							if (itDataPoint != null)
+							{
+								maxPosX = Math.max(itDataPoint.getPosX(), maxPosX);
+								minPosX = Math.min(itDataPoint.getPosX(), minPosX);
+								maxPosY = Math.max(itDataPoint.getPosY(), maxPosY);
+								minPosY = Math.min(itDataPoint.getPosY(), minPosY);
+							}
 						}
 						
 					}

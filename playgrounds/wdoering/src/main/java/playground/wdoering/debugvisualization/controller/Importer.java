@@ -33,21 +33,14 @@ public class Importer implements XYVxVyEventsHandler {
 	private HashMap<Integer, DataPoint> nodes = null;
 	private HashMap<Integer, int[]> links = null;
 	
-	private Double maxPosX;
-	private Double maxPosY;
-	private Double maxPosZ;
-	private Double minPosX;
-	private Double minPosY;
-	private Double minPosZ;
+	private Double maxPosX,maxPosY,maxPosZ,maxTimeStep=Double.MIN_VALUE;
+	private Double minPosX,minPosY,minPosZ,minTimeStep=Double.MAX_VALUE;
 	
 	private Controller controller = null;
 	
 	private Double[] timeStepsAsDoubleValues;
 	
 	private LinkedList<Double> timeSteps;
-	
-	private Double maxTimeStep;
-	private Double minTimeStep;
 
 	public Importer(Controller controller)
 	{
@@ -71,8 +64,8 @@ public class Importer implements XYVxVyEventsHandler {
 			int currentAgent = 0;
 
 			timeSteps = new LinkedList<Double>();
-			minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
-			maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
+			//minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
+			//maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
 
 			for (int s = 0; s < eventList.getLength(); s++) {
 
