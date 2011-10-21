@@ -101,7 +101,7 @@ public class DriverPassengerODCoordinatesExtractor {
 
 		DriverPassengerODCoordinatesExtractor extractor =
 			new DriverPassengerODCoordinatesExtractor(scenario.getPopulation());
-		extractor.writeCoords( config.controler().getOutputDirectory()+"/");
+		extractor.writeCoords( config.controler().getOutputDirectory());
 	}
 }
 
