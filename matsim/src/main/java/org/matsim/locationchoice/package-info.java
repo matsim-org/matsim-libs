@@ -116,6 +116,11 @@
  * 		Default: 1.0 <br>
  * 		Description: Scale the leisure activities epsilons
  * 	</li>
+ * <li><strong><font color="red">kValuesFile</font></strong><br>
+ * 		Type and range: String <br> 
+ * 		Default: null <br>
+ * 		Description: specifies the location of the k values file (created during pre-processing)
+ * 	</li>
  * </ul>
  * 
  * <h3>Search Space Construction</h3>
@@ -147,6 +152,11 @@
  * 		Type and range: float <br> 
  * 		Default: 3.0 <br>
  * 		Description: Weighting of scores in the reduced choice set subject to probabilistic choice. See working paper Horni,Nagel,Axhausen 2011, page 13
+ * 	</li>
+ * <li><strong><font color="red">maxEpsFile</font></strong><br>
+ * 		Type and range: String <br> 
+ * 		Default: null <br>
+ * 		Description: specifies the location of the maps eps file (created during pre-processing)
  * 	</li>
  * </ul>
  */
