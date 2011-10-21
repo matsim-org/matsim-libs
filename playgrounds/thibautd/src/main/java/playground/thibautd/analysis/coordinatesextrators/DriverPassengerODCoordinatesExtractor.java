@@ -39,7 +39,7 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  * @author thibautd
  */
 public class DriverPassengerODCoordinatesExtractor {
-	private static final String PU_REGEXP = "p*";
+	private static final String PU_REGEXP = "p.*";
 	
 	private final List<Coord> passengerOrigins = new ArrayList<Coord>();
 	private final List<Coord> passengerDestinations = new ArrayList<Coord>();
@@ -77,7 +77,7 @@ public class DriverPassengerODCoordinatesExtractor {
 					else {
 						currentList = driverDestinations;
 					}
-					relevantActivity = (Activity) elements[i - 2];
+					relevantActivity = (Activity) elements[i + 2];
 				}
 
 				if ( currentList != null ) {
