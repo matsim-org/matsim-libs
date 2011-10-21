@@ -159,9 +159,10 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			// register the leg for the overall average:
 			legTypes.add("zzz_all") ;
 			
+			// go through all types of statistics that are generated ...
 			for ( StatType statType : StatType.values() ) {
 
-				// generate correct "item" for statType ...
+				// .. generate correct "item" for statType ...
 				double item = 0. ;
 				if ( statType==StatType.duration ) {
 					item = travTime ;
@@ -176,13 +177,13 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 					throw new RuntimeException("`item' for statistics type not defined") ;
 				}
 
-				// go through all letTypes to which the leg belongs:
+				// ... go through all legTypes to which the leg belongs ...
 				for ( String legType : legTypes ) {
 
-					// get correct statistics array by statType and legType:
+					// ... get correct statistics array by statType and legType ...
 					int[] stats = this.legStatsContainer.get(statType).get(legType);
 
-					// if that statistics array does not exist yet, initialize it.
+					// ... if that statistics array does not exist yet, initialize it ...
 					if (stats == null) {
 						Integer len = this.dataBoundaries.get(statType).length ;
 						stats = new int[len];
@@ -191,11 +192,11 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 						}
 						this.legStatsContainer.get(statType).put(legType, stats);
 
-						// also initialize the sums container:
+						// ... also initialize the sums container ...
 						this.sumsContainer.get(statType).put(legType, 0.) ;
 					}
 					
-					// ... and add it to the correct bin in the container:
+					// ... finally add the "item" to the correct bin in the container:
 					stats[getIndex(statType,item)]++;
 
 					double newItem = this.sumsContainer.get(statType).get(legType) + item ;
@@ -221,7 +222,9 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 
 	@Deprecated // this is probably averageLegDuration.  kai, jul'11
 	public double getAverageTripDuration() {
-		throw new RuntimeException("not implemented") ;
+		log.warn("not implemented; returning fake zero") ;
+		return 0. ;
+//		throw new RuntimeException("not implemented") ;
 //		return ( this.sumsContainer.get(StatType.duration) / this.legCount.get(StatType.duration) ) ;
 	}
 

@@ -22,6 +22,7 @@ package playground.kai.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -82,6 +83,8 @@ class PopulationComparison {
 	}
 	
 	private void run() throws IOException {
+		
+		Random rnd = new Random(4711) ;
 
 		int simpleCnt = 0 ;
 		double simpleSum = 0. ;
@@ -96,17 +99,17 @@ class PopulationComparison {
 		
 		{
 			Config config1 = ConfigUtils.createConfig() ;
-			config1.network().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/output_network.xml.gz") ;
+			config1.network().setInputFile("/Users/nagel/kairuns/22jul-long-ba16ext/output_network.xml.gz") ;
 //			config1.plans().setInputFile("/Users/nagel/kairuns/18jun-base/kairun3-incl-ba16.reduced_plans.xml.gz") ;
-			config1.plans().setInputFile("/Users/nagel/kairuns/base-01jul/pop.xml.gz") ;
+			config1.plans().setInputFile("/Users/nagel/kairuns/23jul-base/pop.xml.gz") ;
 			sc1 = ScenarioUtils.loadScenario(config1) ;
 		}
 
 		{
 			Config config2 = ConfigUtils.createConfig() ;
-			config2.network().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/output_network.xml.gz") ;
+			config2.network().setInputFile("/Users/nagel/kairuns/22jul-long-ba16ext/output_network.xml.gz") ;
 //			config2.plans().setInputFile("/Users/nagel/kairuns/19jun-w-ba16ext/kairun5-incl-ba16ext.reduced_plans.xml.gz") ;
-			config2.plans().setInputFile("/Users/nagel/kairuns/16ba-ext-30jun/pop.xml.gz") ;
+			config2.plans().setInputFile("/Users/nagel/kairuns/23jul-ba16ext/pop.xml.gz") ;
 			sc2 = ScenarioUtils.loadScenario(config2) ;
 		}
 		
@@ -133,15 +136,18 @@ class PopulationComparison {
 				double deltaScore = person2.getSelectedPlan().getScore() - person1.getSelectedPlan().getScore() ;
 				double deltaLogsum = logsum(person2) - logsum(person1) ;
 				Coord homeCoord = ((Activity)person1.getSelectedPlan().getPlanElements().get(0)).getCoord() ;
-				double homeX = homeCoord.getX() + 100.* (0.5-Math.random()) ;
-				double homeY = homeCoord.getY() + 100.* (0.5-Math.random()) ;
+				double homeX = homeCoord.getX() + 100.* (0.5-rnd.nextDouble()) ;
+				double homeY = homeCoord.getY() + 100.* (0.5-rnd.nextDouble()) ;
 				
 				String str = homeX + "," + homeY + "," + deltaScore + "," + deltaLogsum + "," + deltaBestScore + "\n" ;
+				out.append( str ) ;
+
+				// console output:
 				if ( personCnt < 10 ) {
 					personCnt++ ;
 					System.out.print( str ) ;
 				}
-				out.append( str ) ;
+				// console output end.
 
 				Integer xbin = xxToBin(homeX) ;
 				Integer ybin = yyToBin(homeY) ;
@@ -182,16 +188,20 @@ class PopulationComparison {
 		for ( int ii=0 ; ii<LL ; ii++ ) {
 			for ( int jj=0 ; jj<MM ; jj++ ) {
 				double xx = binToXx(ii) ; double yy = binToYy(jj) ;
-				if ( cnt[ii][jj] > 20. ) {
+				if ( cnt[ii][jj] > 19. ) {
 					//				if ( weight[ii][jj] > 0. ) {
 					//					double xx = xsum[ii][jj]/cnt[ii][jj] ; double yy = ysum[ii][jj]/cnt[ii][jj] ;
 					double val = sum[ii][jj]/weight[ii][jj] ;
 					String str = xx + "," + yy + "," + val + "\n" ;
 					out2.append( str ) ;
+					
+					// console output:
 					if ( gridCnt < 10 ) {
 						gridCnt++ ;
 						System.out.print( str ) ;
 					}
+					// console output end.
+					
 //				} else {
 //					double val = simpleSum / simpleCnt ;
 //					String str = xx + "," + yy + "," + val + "\n" ;
