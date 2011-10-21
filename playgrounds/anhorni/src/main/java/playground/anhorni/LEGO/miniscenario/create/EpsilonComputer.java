@@ -62,7 +62,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 			for (Facility f : typedFacilities.values()) {
 				ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
 				act.setFacilityId(f.getId());
-				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, false);
+				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act);
 				
 				if (epsilon > maxEpsilon) {
 					maxEpsilon = epsilon;

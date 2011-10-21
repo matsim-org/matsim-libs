@@ -90,11 +90,12 @@ public class UtilitySampler {
 				act.setFacilityId(facility.getId());
 				act.setCoord(facility.getCoord());
 				act.setLinkId(facility.getLinkId());
+
+// do not use distance scoring anymore
+//				boolean distance = false;
+//				if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
 				
-				boolean distance = false;
-				if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
-				
-				double score = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, distance);
+				double score = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act);
 				if (score > maxScore) {
 					maxScore = score;
 					bestFacilityId = facility.getId();

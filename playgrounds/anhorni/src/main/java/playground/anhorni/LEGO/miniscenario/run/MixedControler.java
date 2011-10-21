@@ -27,9 +27,7 @@ import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStat
 
 
 public class MixedControler extends Controler {
-	
-	private final String LCEXP = "locationchoiceExperimental";
-			
+				
 	public MixedControler(final String[] args) {
 		super(args);	
 	}
@@ -44,11 +42,11 @@ public class MixedControler extends Controler {
     protected void setUp() {
       super.setUp();
       
-      double fLoad = Double.parseDouble(config.findParam(LCEXP, "scoreElementFLoad"));
-           
-      if (!(fLoad > 0.00000001)) {
+      // do not score load
+      //double fLoad = Double.parseDouble(config.findParam(LCEXP, "scoreElementFLoad"));       
+      //if (!(fLoad > 0.00000001)) {
     	  this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
-      }
+      //}
            
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
 			new MixedScoringFunctionFactory(this.config.planCalcScore(), this);

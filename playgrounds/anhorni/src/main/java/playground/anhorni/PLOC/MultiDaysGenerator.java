@@ -32,9 +32,7 @@ public class MultiDaysGenerator {
 	private ScenarioImpl scenarioWriteOut;
 	private NetworkImpl network;
 	private boolean temporalVar;
-	
-	private final String LCEXP = "locationchoiceExperimental";
-	
+		
 	public MultiDaysGenerator(Random randomNumberGenerator, PopulationImpl staticPopulation, ScenarioImpl scenarioWriteOut, 
 			NetworkImpl network, boolean temporalVar, ObjectAttributes personAttributes) {
 		this.randomNumberGenerator = randomNumberGenerator;
