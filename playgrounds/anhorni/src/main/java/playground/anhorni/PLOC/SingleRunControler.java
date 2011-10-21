@@ -65,7 +65,7 @@ public class SingleRunControler extends Controler {
       super.setUp();
             
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config.planCalcScore(), this);
+			new MixedScoringFunctionFactory(this.config, this);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "s"));

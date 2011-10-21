@@ -32,44 +32,23 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.locationchoice.utils.RandomFromVarDistr;
 
-import playground.anhorni.random.RandomFromVarDistr;
 
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
 	private Config config;
-	private final static Logger log = Logger.getLogger(CreatePopulation.class);
-	private RandomFromVarDistr rnd;
-	
+	private final static Logger log = Logger.getLogger(CreatePopulation.class);	
 	private final String LCEXP = "locationchoiceExperimental";
 			
 	public void createPopulation(ScenarioImpl scenario, Config config, RandomFromVarDistr rnd) {		
 		this.scenario = scenario;
-		this.config = config;
-		this.rnd = rnd;
-		
+		this.config = config;		
 		this.addPersons();
-		this.assignTasteValues();
 		
 		log.info("Finishing plans ...");
 		this.finishPlans();
 		this.removeNonAnalysisPersons();
-			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "shop", config, 
-				Long.parseLong(config.locationchoice().getRandomSeed()));
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
-		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenario, "leisure", config, 
-				Long.parseLong(config.locationchoice().getRandomSeed()));
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
 	}
 						
 	private void addPersons() {
@@ -175,10 +154,6 @@ public class CreatePopulation {
 //		return facilities.get(0);
 //	}
 	
-	private void assignTasteValues() {
-		HandleUnobservedHeterogeneity handler = new HandleUnobservedHeterogeneity(scenario, config, rnd);
-		handler.assign();
-	}
 				
 	public void write(String path) {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(path + "plans.xml");

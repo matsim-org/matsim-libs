@@ -7,22 +7,15 @@ import java.util.Random;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.core.scenario.ScenarioImpl;
-
-import playground.anhorni.LEGO.miniscenario.create.ComputeMaxEpsilons;
-import playground.anhorni.LEGO.miniscenario.create.HandleUnobservedHeterogeneity;
-import playground.anhorni.random.RandomFromVarDistr;
 
 public class MultiDaysGenerator {
 	
@@ -65,7 +58,6 @@ public class MultiDaysGenerator {
 			
 			String path = Create3TownsScenario.outputFolder + "/runs/run" + runId + "/day" + day;
 			new File(path).mkdirs();
-			this.adaptForDestinationChoice();
 			this.writePlansAndFacs(path + "/plans.xml", path + "/facilities.xml");
 			scenarioWriteOut.getPopulation().getPersons().clear();
 		}	
@@ -103,35 +95,7 @@ public class MultiDaysGenerator {
 			scenarioWriteOut.getPopulation().addPerson(pTmp);
 		}
 	}
-	
-	private void adaptForDestinationChoice() {	
-		ConfigReader configReader = new ConfigReader();
-		configReader.read();
-		
-		Config config = (ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(
-				"src/main/java/playground/anhorni/input/PLOC/3towns/config.xml").getScenario()).getConfig();
-				
-		RandomFromVarDistr rnd = new RandomFromVarDistr(this.randomNumberGenerator);
-		HandleUnobservedHeterogeneity hhandler = new HandleUnobservedHeterogeneity(this.scenarioWriteOut, config, rnd);
-		hhandler.assign(); 
 			
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "s", config,
-				Long.parseLong(config.locationchoice().getRandomSeed()));
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
-		
-		maxEpsilonComputer = new ComputeMaxEpsilons(10, scenarioWriteOut, "l", config,
-				Long.parseLong(config.locationchoice().getRandomSeed()));
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenarioWriteOut.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
-	}	
-		
 	public void writePlansAndFacs(String plansFile, String facsFile) {	
 		new PopulationWriter(scenarioWriteOut.getPopulation(), network).write(plansFile);
 		new FacilitiesWriter(this.scenarioWriteOut.getActivityFacilities()).write(facsFile);
