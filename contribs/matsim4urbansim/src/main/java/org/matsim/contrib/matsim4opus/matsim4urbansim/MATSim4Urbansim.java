@@ -66,7 +66,7 @@ public class MATSim4Urbansim {
 	// Benchmarking computation times and hard disc space ... 
 	Benchmark benchmark = null;
 	// indicates if MATSim run was successful
-	static boolean isSuccessulMATSimRun = Boolean.FALSE;
+	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
 	
 	/**
 	 * constructor
@@ -130,14 +130,16 @@ public class MATSim4Urbansim {
 		log.info("### DONE with demand generation from urbansim ###") ;
 
 		// set population in scenario
-		scenario.setPopulation(newPopulation);	
+		scenario.setPopulation(newPopulation);
 		// scenario.setFacilities(facilities); // tnicolai: suggest to implement method
 
 		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
 		
-		// saving results from current run
-		//saveRunOutputs();			// tnicolai: Experimental, comment out for matsim4urbansim release
-		//cleanUrbanSimOutput();	// tnicolai: Experimental, comment out for matsim4urbansim release
+		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for matsim4urbansim release
+			// saving results from current run
+			saveRunOutputs();			
+			cleanUrbanSimOutput();
+		}
 		
 	}
 	
@@ -255,7 +257,7 @@ public class MATSim4Urbansim {
 	}
 	
 	/**
-	 * 
+	 * cleaning matsim network
 	 * @param network
 	 */
 	void cleanNetwork(NetworkImpl network){
@@ -353,11 +355,15 @@ public class MATSim4Urbansim {
 	public static void main(String args[]){
 		MATSim4Urbansim m4u = new MATSim4Urbansim(args);
 		m4u.runMATSim();
-		MATSim4Urbansim.isSuccessulMATSimRun = Boolean.TRUE;
+		MATSim4Urbansim.isSuccessfulMATSimRun = Boolean.TRUE;
 	}
 	
+	/**
+	 * this method is only called/needed by "matsim4opus.matsim.MATSim4UrbanSimTest"
+	 * @return true if run was successful
+	 */
 	public static boolean getRunStatus(){
-		return MATSim4Urbansim.isSuccessulMATSimRun;
+		return MATSim4Urbansim.isSuccessfulMATSimRun;
 	}
 }
 
