@@ -81,7 +81,6 @@ public class InitMATSimScenario {
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
 			initStrategy();
-//			initPopulation(matsimParameter);	// tnicolai: test if this works for warm start ...
 			
 		}catch(Exception e){
 			e.printStackTrace();
@@ -108,6 +107,8 @@ public class InitMATSimScenario {
 		String matsim4OpusTemp = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp() );
 		String matsim4OpusBackup = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() ) + UtilityCollection.checkPathEnding( "backup" );
 		boolean isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
+		boolean backupRunData = matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
+		String testParameter = matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN, isTestRun ? "TRUE" : "FALSE");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE, samplingRate + "");
@@ -119,6 +120,8 @@ public class InitMATSimScenario {
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM, matsim4OpusTemp );
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM, matsim4OpusBackup );
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR, year + "");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM, backupRunData ? "TRUE" : "FALSE");
+		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM, testParameter);
 		// tnicolai: implement/make configurable the following flags (matsim4urbansim config/JAXB)
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA, 1 + "");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_TIMES, 1 + "");
@@ -154,6 +157,8 @@ public class InitMATSimScenario {
 		log.info("MATSIM_4_OPUS_TEMP: " + Constants.MATSIM_4_OPUS_TEMP ); 
 		log.info("MATSIM_4_OPUS_BACKUP: " + Constants.MATSIM_4_OPUS_BACKUP );
 		log.info("TestRun: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN) );
+		log.info("BACKUP_RUN_DATA: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM) );
+		log.info("TEST_PARAMETER: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM) );
 		log.info("Beta: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA) );
 		log.info("Beta Travel Times: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_TIMES) );
 		log.info("Beta ln(Travel Times): " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_TIMES) );

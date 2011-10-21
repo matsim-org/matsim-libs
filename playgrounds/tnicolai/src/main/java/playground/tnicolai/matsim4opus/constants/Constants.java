@@ -166,6 +166,8 @@ public class Constants {
 	public static final String MATSIM_4_OPUS_TEMP_PARAM = "matsim4OpusTempParam";
 	public static final String MATSIM_4_OPUS_BACKUP_PARAM = "matsim4OpusBackupParam";
 	public static final String YEAR = "year";
+	public static final String BACKUP_RUN_DATA_PARAM = "backupRunDataParam";
+	public static final String TEST_PARAMETER_PARAM = "testParameter";
 	public static final String COMPUTE_ZONE_2_ZONE_IMPEDANCE = "compute_zone2zone_impedance";
 	public static final String COMPUTE_LOGSUM = "compute_logsum";
 	public static final String RETURN_RAW_SUM = "return_raw_sum";
