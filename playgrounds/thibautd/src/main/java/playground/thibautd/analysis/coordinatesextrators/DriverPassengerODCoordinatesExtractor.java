@@ -57,7 +57,7 @@ public class DriverPassengerODCoordinatesExtractor {
 
 			List<Coord> currentList;
 			Activity relevantActivity;
-			for (int i = 3; i < elements.length; i += 2) {
+			for (int i = 2; i < elements.length; i += 2) {
 				currentList = null;
 				relevantActivity = null;
 
