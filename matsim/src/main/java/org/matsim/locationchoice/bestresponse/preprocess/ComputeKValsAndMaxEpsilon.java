@@ -21,7 +21,7 @@ public class ComputeKValsAndMaxEpsilon {
 	private ObjectAttributes personsKValues = new ObjectAttributes();
 	private ObjectAttributes personsMaxEps = new ObjectAttributes();
 	
-	public ComputeKValsAndMaxEpsilon(long seed) {
+	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 	}
