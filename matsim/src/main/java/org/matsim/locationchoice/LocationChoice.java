@@ -40,6 +40,7 @@ import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;

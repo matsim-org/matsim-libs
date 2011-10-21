@@ -22,6 +22,7 @@ package org.matsim.locationchoice;
 import java.util.Random;
 
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.testcases.MatsimTestCase;
 
 

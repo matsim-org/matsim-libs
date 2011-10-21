@@ -20,6 +20,7 @@
 package org.matsim.locationchoice;
 
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.testcases.MatsimTestCase;
 
 public class LocationChoiceTest extends MatsimTestCase {
