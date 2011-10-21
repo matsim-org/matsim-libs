@@ -37,8 +37,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scaleFactor";
-	private static final String RECURSIONTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
-	private static final String RECURSIONTRAVELSPEED = "recursionTravelSpeed";
+	private static final String GLOBALTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
+	private static final String GLOBALTRAVELSPEED = "recursionTravelSpeed";
 	private static final String MAX_RECURSIONS = "maxRecursions";
 	private static final String SIMPLE_TG = "simple_tg";
 	private static final String CENTER_NODE = "centerNode";
@@ -47,8 +47,6 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private static final String ALGO = "algorithm";
 	private static final String TT_APPROX_LEVEL = "tt_approximationLevel";
-	private static final String TT = "travelTimes";
-	private static final String SEARCHSPACEBETA = "searchSpaceBeta";
 	private static final String MAXDISTANCEEPSILON = "maxDistanceEpsilon";
 	private static final String PLANSELECTOR = "planSelector";
 	
@@ -58,6 +56,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String SCALE_EPS_LEISURE = "scaleEpsLeisure";
 	private static final String PROBCHOICESETSIZE = "probChoiceSetSize";
 	private static final String PROBCHOICEEXP = "probChoiceExponent";
+	
+	private static final String PKVALS_FILE = "pkValuesFile";
+	private static final String FKVALS_FILE = "fkValuesFile";
+	private static final String MAXEPS_FILE = "maxEpsFile";
 
 	//default values
 	private String constrained = "false";
@@ -74,8 +76,6 @@ public class LocationChoiceConfigGroup extends Module {
 		
 	private String algorithm = "null";
 	private String tt_approximationLevel = "0";
-	private String travelTimes = "true";
-	private String searchSpaceBeta = "-0.0001";
 	private String maxDistanceEpsilon = "-1.0";
 	private String planSelector = "SelectExpBeta";
 	
@@ -85,6 +85,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private String scaleEpsLeisure = "1.0";
 	private String probChoiceSetSize = "10";
 	private String probChoiceExponent ="3";
+	
+	private String pkValuesFile = "null";
+	private String fkValuesFile = "null";
+	private String maxEpsFile = "null";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -107,10 +111,10 @@ public class LocationChoiceConfigGroup extends Module {
 		if (SCALEFACTOR.equals(key)) {
 			return getScaleFactor();
 		}
-		if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
+		if (GLOBALTRAVELSPEEDCHANGE.equals(key)) {
 			return getRecursionTravelSpeedChange();
 		}
-		if (RECURSIONTRAVELSPEED.equals(key)) {
+		if (GLOBALTRAVELSPEED.equals(key)) {
 			return getRecursionTravelSpeed();
 		}
 		if (MAX_RECURSIONS.equals(key)) {
@@ -133,12 +137,6 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (TT_APPROX_LEVEL.equals(key)) {
 			return getTravelTimeApproximationLevel();
-		}
-		if (TT.equals(key)) {
-			return getTravelTimes();
-		}
-		if (SEARCHSPACEBETA.equals(key)) {
-			return getSearchSpaceBeta();
 		}
 		if (MAXDISTANCEEPSILON.equals(key)) {
 			return getMaxDistanceEpsilon();
@@ -163,6 +161,15 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (PROBCHOICEEXP.equals(key)) {
 			return getProbChoiceExponent();
+		}
+		if (PKVALS_FILE.equals(key)) {
+			return getpkValuesFile();
+		}
+		if (FKVALS_FILE.equals(key)) {
+			return getfkValuesFile();
+		}
+		if (MAXEPS_FILE.equals(key)) {
+			return getMaxEpsFile();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -203,7 +210,7 @@ public class LocationChoiceConfigGroup extends Module {
 				setScaleFactor(value);
 			}
 
-		} else if (RECURSIONTRAVELSPEEDCHANGE.equals(key)) {
+		} else if (GLOBALTRAVELSPEEDCHANGE.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 || Double.parseDouble(value) > 1.0 ) {
 				log.warn("'recursionTravelSpeedChange' must be [0..1]! Set to default value 0.1");
 				setRecursionTravelSpeedChange("0.1");
@@ -211,7 +218,7 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setRecursionTravelSpeedChange(value);
 			}
-		} else if (RECURSIONTRAVELSPEED.equals(key)) {
+		} else if (GLOBALTRAVELSPEED.equals(key)) {
 			if (Double.parseDouble(value) < 0.0 ) {
 				log.warn("'recursionTravelSpeed' must be positive! Set to default value 8.5");
 				setRecursionTravelSpeed("8.5");
@@ -261,20 +268,6 @@ public class LocationChoiceConfigGroup extends Module {
 			}
 			else {
 				setTravelTimeApproximationLevel(value);
-			}
-		} else if (TT.equals(key)) {
-			if (!(value.equals("true") || value.equals("false"))) {
-				log.warn("set 'travelTimes' to either 'true' or 'false'. Set to default value 'true' now");
-			}
-			else {
-				setTravelTimes(value);
-			}
-		} else if (SEARCHSPACEBETA.equals(key)) {
-			if (Double.parseDouble(value) >= 0.0) {
-				log.warn("set 'searchSpaceBeta' to a negative value. Set to default value '-0.0001' now.");
-			}
-			else {
-				setSearchSpaceBeta(value);
 			}
 		} else if (MAXDISTANCEEPSILON.equals(key)) {
 			setMaxDistanceEpsilon(value);
@@ -327,12 +320,34 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setProbChoiceExponent(value);
 			}
+		} else if (PKVALS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a persons k values file if available. Set to default value 'null' now");
+			}
+			else {
+				setpkValuesFile(value);
+			}
+		} else if (FKVALS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a facilities k values file if available. Set to default value 'null' now");
+			}
+			else {
+				setfkValuesFile(value);
+			}
+		} else if (MAXEPS_FILE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define a max eps file if available. Set to default value 'null' now");
+			}
+			else {
+				setMaxEpsFile(value);
+			}
 		}
 		else
 		{
 			throw new IllegalArgumentException(key);
 		}
 	}
+	
 	
 	@Override
 	public final TreeMap<String, String> getParams() {
@@ -341,8 +356,8 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, RESTR_FCN_FACTOR);
 		this.addParameterToMap(map, RESTR_FCN_EXP);
 		this.addParameterToMap(map, SCALEFACTOR);
-		this.addParameterToMap(map, RECURSIONTRAVELSPEEDCHANGE);
-		this.addParameterToMap(map, RECURSIONTRAVELSPEED);
+		this.addParameterToMap(map, GLOBALTRAVELSPEEDCHANGE);
+		this.addParameterToMap(map, GLOBALTRAVELSPEED);
 		this.addParameterToMap(map, MAX_RECURSIONS);
 		this.addParameterToMap(map, SIMPLE_TG);
 		this.addParameterToMap(map, CENTER_NODE);
@@ -350,8 +365,6 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, FLEXIBLE_TYPES);
 		this.addParameterToMap(map, ALGO);
 		this.addParameterToMap(map, TT_APPROX_LEVEL);
-		this.addParameterToMap(map, TT);
-		this.addParameterToMap(map, SEARCHSPACEBETA);
 		this.addParameterToMap(map, MAXDISTANCEEPSILON);
 		this.addParameterToMap(map, PLANSELECTOR);
 		this.addParameterToMap(map, RANDOMSEED);
@@ -360,6 +373,9 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, SCALE_EPS_LEISURE);
 		this.addParameterToMap(map, PROBCHOICESETSIZE);
 		this.addParameterToMap(map, PROBCHOICEEXP);
+		this.addParameterToMap(map, PKVALS_FILE);
+		this.addParameterToMap(map, FKVALS_FILE);
+		this.addParameterToMap(map, MAXEPS_FILE);
 		return map;
 	}
 
@@ -445,18 +461,6 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setTravelTimeApproximationLevel(String tt_approximationLevel) {
 		this.tt_approximationLevel = tt_approximationLevel;
 	}
-	public String getTravelTimes() {
-		return travelTimes;
-	}
-	public void setTravelTimes(String travelTimes) {
-		this.travelTimes = travelTimes;
-	}
-	public String getSearchSpaceBeta() {
-		return searchSpaceBeta;
-	}
-	public void setSearchSpaceBeta(String searchSpaceBeta) {
-		this.searchSpaceBeta = searchSpaceBeta;
-	}
 	public String getMaxDistanceEpsilon() {
 		return maxDistanceEpsilon;
 	}
@@ -504,5 +508,23 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setProbChoiceExponent(String probChoiceExponent) {
 		this.probChoiceExponent = probChoiceExponent;
+	}
+	public String getpkValuesFile() {
+		return pkValuesFile;
+	}
+	public void setpkValuesFile(String kValuesFile) {
+		this.pkValuesFile = kValuesFile;
+	}
+	public String getfkValuesFile() {
+		return fkValuesFile;
+	}
+	public void setfkValuesFile(String kValuesFile) {
+		this.fkValuesFile = kValuesFile;
+	}
+	public String getMaxEpsFile() {
+		return maxEpsFile;
+	}
+	public void setMaxEpsFile(String maxEpsFile) {
+		this.maxEpsFile = maxEpsFile;
 	}
 }

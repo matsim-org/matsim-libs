@@ -36,8 +36,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
+import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.random.RandomLocationMutator;
@@ -45,6 +47,8 @@ import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class LocationChoice extends AbstractMultithreadedModule {
 
@@ -53,6 +57,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
+	private ObjectAttributes personsMaxEps;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
@@ -94,7 +99,35 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		((NetworkImpl) this.network).connect();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
+		
+		this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
 	}
+	
+	private void createObjectAttributes(long seed) {
+		this.personsMaxEps = new ObjectAttributes();
+		
+		// check if object attributes files are available, other wise do preprocessing
+		String maxEpsValues = this.controler.getConfig().locationchoice().getMaxEpsFile();
+		if (!maxEpsValues.equals("null")) {
+			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEps);
+			try {
+				attributesReader.parse(maxEpsValues);
+			} catch  (UncheckedIOException e) {
+				// reading was not successful
+				this.computeAttributes(seed);
+			}
+		}
+		else {
+			this.computeAttributes(seed);
+		}
+	}
+	
+	private void computeAttributes(long seed) {
+		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed);
+		computer.run();
+		this.personsMaxEps = computer.getPersonsMaxEps();
+	}
+	
 
 	/**
 	 * Initialize the quadtrees of all available activity types
@@ -148,7 +181,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 			else if (algorithm.equals("bestResponse")) {
 				this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType));
+						this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEps));
 			}
 			else if (algorithm.equals("localSearchRecursive")) {
 				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,

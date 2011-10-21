@@ -52,18 +52,22 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.PlanUtils;
 import org.matsim.locationchoice.utils.QuadTreeRing;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private ActivityFacilitiesImpl facilities;
 	private Network network;
+	private ObjectAttributes personsMaxEps;
 			
 	public LocationMutatorBestResponse(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
-			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
+			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
+			ObjectAttributes personsMaxEps) {
 		super(network, controler, kn, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
+		this.personsMaxEps = personsMaxEps;
 		
 		this.initFlexibleTypes(controler.getConfig().locationchoice());
 	}
@@ -175,11 +179,12 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		PlanImpl planTmp = new PlanImpl(plan.getPerson());
 		planTmp.copyPlan(plan);			
 		scoringFunction.reset();
-		
-		if (Boolean.parseBoolean(this.controler.getConfig().locationchoice().getTravelTimes())) {
+
+// always use travel times
+//		if (Boolean.parseBoolean(this.controler.getConfig().locationchoice().getTravelTimes())) {
 			// plan, actToMove, actlegIndex, planTmp, scoringFunction, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, approximationLevel
 			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, 0);	
-		}
+//		}
 		scoringFunction.finish();
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();
@@ -190,17 +195,23 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private double getMaximumDistanceFromEpsilon(PersonImpl person, String type) {
 		double maxEpsilon = 0.0;
 		if (type.startsWith("s")) {
-			maxEpsilon = Double.parseDouble(person.getDesires().getDesc().split("_")[2]);
+			maxEpsilon = Double.parseDouble((String)this.personsMaxEps.getAttribute(person.getId().toString(), "s"));
 		}
 		else if (type.startsWith("l")) {
-			maxEpsilon = Double.parseDouble(person.getDesires().getDesc().split("_")[3]);
+			maxEpsilon = Double.parseDouble((String)this.personsMaxEps.getAttribute(person.getId().toString(), "l"));
 		}
-		// here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
+		
+		/* 
+		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
+		 */
 		double travelSpeedCrowFly = Double.parseDouble(this.controler.getConfig().locationchoice().getRecursionTravelSpeed());
 		double betaTime = this.controler.getConfig().planCalcScore().getTraveling_utils_hr();
-		double maxTravelTime = maxEpsilon / (-1.0 * betaTime) * 3600.0; //[s]
+		double maxTravelTime = Double.MAX_VALUE;
+		if (betaTime != 0.0) {
+			maxTravelTime = Math.abs(maxEpsilon / (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
+		}
 		// distance linear
-		double maxDistance = travelSpeedCrowFly * maxTravelTime;
+		double maxDistance = travelSpeedCrowFly * maxTravelTime; 
 		
 		// non-linear and tastes: exhaustive search for the moment
 		// later implement non-linear equation solver

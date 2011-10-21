@@ -34,6 +34,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringFunction {
 	static final Logger log = Logger.getLogger(MixedActivityScoringFunction.class);
@@ -46,12 +47,12 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
 			final ActivityFacilities facilities, final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			Config config) {
+			Config config, ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues) {
 		//super(plan, params, facilityPenalties, facilities);
 		super(plan, params, facilities);
 		this.facilities = facilities;
 		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(this.facilities, this.config);
+		this.destinationChoiceScoring = new DestinationChoiceScoring(this.facilities, this.config, facilitiesKValues, personsKValues);
 	}
 	
 	@Override

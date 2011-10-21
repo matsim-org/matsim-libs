@@ -68,10 +68,10 @@
  *		Description: This factor is used to grow or shrink the approximate set of locations (see above).<br>
  *					 radius<sub>i+1</sub> = ttb / 2 x recurisionTravelSpeed x (1.0 -+ recursionTravelSpeedChange)<sup>i</sup>, with i: recursion number 
  *	</li>
- *	<li><strong><font color="blue">recursionTravelSpeed</font></strong><br> 
+ *	<li><strong><font color="black">recursionTravelSpeed</font></strong><br> 
  *		Type and range: float > 0 <br> 
  *		Default: 8.5 <br>
- *		Description: Initial assumed travel speed for the investigation area in [m/s]
+ *		Description: Initial assumed travel speed for the investigation area in [m/s]. This value is also used to compute the search space for version 1.
  *	</li>
  *	<li><strong><font color="blue">maxRecursions</font></strong><br>
  *		Type and range: int >= 0 <br> 
@@ -116,10 +116,15 @@
  * 		Default: 1.0 <br>
  * 		Description: Scale the leisure activities epsilons
  * 	</li>
- * <li><strong><font color="red">kValuesFile</font></strong><br>
+ * <li><strong><font color="red">pkValuesFile</font></strong><br>
  * 		Type and range: String <br> 
  * 		Default: null <br>
- * 		Description: specifies the location of the k values file (created during pre-processing)
+ * 		Description: specifies the location of the persons k values file (created during previous pre-processing)
+ * 	</li>
+ * <li><strong><font color="red">fkValuesFile</font></strong><br>
+ * 		Type and range: String <br> 
+ * 		Default: null <br>
+ * 		Description: specifies the location of the facilities k values file (created during previous pre-processing)
  * 	</li>
  * </ul>
  * 
@@ -131,12 +136,6 @@
  * 		Description: 0: no approximation, routing for every OD-pair <br>
  * 		1: Dijkstra trees forward and backwards See working paper Horni,Nagel,Axhausen 2011, page 13<br>
  * 		2: based on travel distances
- * 	</li>
- * <li><strong><font color="red">searchSpaceBeta</font></strong><br>
- * 		Type and range: float <= 0.0 <br> 
- * 		Default: -0.0001 <br>
- * 		Description: Defines an upper bound based on distance: travel costs := searchSpaceBeta * distance. See working paper Horni,Nagel,Axhausen 2011, page 11<br>
- * 		Has to be derived from beta_{traveltime}
  * 	</li>
  * <li><strong><font color="red">maxDistanceEpsilon</font></strong><br>
  * 		Type and range: float (-1 or > 0.0) <br> 

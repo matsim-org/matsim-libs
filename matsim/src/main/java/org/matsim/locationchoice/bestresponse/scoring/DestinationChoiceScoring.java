@@ -25,20 +25,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class DestinationChoiceScoring { 
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
 	private ActivityFacilities facilities;
 	private Config config;
+	private ObjectAttributes facilitiesKValues;
+	private ObjectAttributes personsKValues;
 		
-	public DestinationChoiceScoring(ActivityFacilities facilities , Config config) {
+	public DestinationChoiceScoring(ActivityFacilities facilities , Config config, 
+			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues) {
 		this.facilities = facilities;
 		this.config = config;
+		this.facilitiesKValues = facilitiesKValues;
+		this.personsKValues = personsKValues;
 	}
 				
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act) {
@@ -95,9 +100,9 @@ public class DestinationChoiceScoring {
 //	}
 	
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		
-		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
-		double kf = Double.parseDouble(((ActivityFacilityImpl)facility).getDesc());
-		double kp = Double.parseDouble(person.getDesires().getDesc().split("_")[1]);
+		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);		
+		double kf = Double.parseDouble((String)this.facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
+		double kp = Double.parseDouble((String)this.personsKValues.getAttribute(person.getId().toString(), "k"));
 		
 		/* long seed = (long) ((kp + kf) * Math.pow(2.0, 40)); 
 		/* This was not a good solution.
