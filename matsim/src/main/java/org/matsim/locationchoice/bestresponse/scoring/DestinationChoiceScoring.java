@@ -22,7 +22,6 @@ package org.matsim.locationchoice.bestresponse.scoring;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -30,31 +29,31 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class DestinationChoiceScoring { 
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
 	private ActivityFacilities facilities;
 	private Config config;
-	
-	private static String LCEXP = "locationchoiceExperimental";
-	
+		
 	public DestinationChoiceScoring(ActivityFacilities facilities , Config config) {
 		this.facilities = facilities;
 		this.config = config;
 	}
 				
-	public double getDestinationScore(PlanImpl plan, ActivityImpl act, boolean distance) {
+	public double getDestinationScore(PlanImpl plan, ActivityImpl act) {
 		if (!(act.getType().startsWith("s") || act.getType().startsWith("l"))) return 0.0;
 		double score = 0.0;
+
+// do not use distance scoring anymore
+//		if (distance) {
+//			score += this.getDistanceUtility(plan.getPerson(), act, 
+//					plan.getPreviousActivity(plan.getPreviousLeg(act)),
+//					plan.getNextActivity(plan.getNextLeg(act)));
+//		}
 		
-		if (distance) {
-			score += this.getDistanceUtility(plan.getPerson(), act, 
-					plan.getPreviousActivity(plan.getPreviousLeg(act)),
-					plan.getNextActivity(plan.getNextLeg(act)));
-		}
-		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
+// always use epsilons now
+//		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
 			double fVar = 1.0;
 			if (act.getType().startsWith("s")) {
 				fVar = Double.parseDouble(config.locationchoice().getScaleEpsShopping());
@@ -66,33 +65,34 @@ public class DestinationChoiceScoring {
 				fVar = 1.0;
 			}
 			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
-		}		
+//		}		
 		return score;
 	}
-	
-	private double getDistanceUtility(PersonImpl person, ActivityImpl act, Activity actPre, Activity actPost) {
-		
-		double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
-		
-		double distance = ((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()) + 
-		((CoordImpl)act.getCoord()).calcDistance(actPost.getCoord()) - distanceDirect;
-		
-		double beta = Double.parseDouble(this.config.locationchoice().getSearchSpaceBeta());
-		
-		double utilityDistanceObserved = 0.0;
-		if (Boolean.parseBoolean(config.findParam(LCEXP, "linearDistanceUtility"))) {
-			utilityDistanceObserved = beta * distance;
-		}
-		else {
-			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * beta * (-1.0));
-		}
-		double utilityDistanceUnobserved = 0.0;		
-		if (Double.parseDouble(config.findParam(LCEXP, "varTastes")) > 0.000001) {
-			utilityDistanceObserved = 0;
-			utilityDistanceUnobserved = Double.parseDouble(person.getDesires().getDesc().split("_")[0]) * distance;
-		}
-		return utilityDistanceObserved + utilityDistanceUnobserved;
-	}
+
+// do not use distance scoring anymore
+//	private double getDistanceUtility(PersonImpl person, ActivityImpl act, Activity actPre, Activity actPost) {
+//		
+//		double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
+//		
+//		double distance = ((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()) + 
+//		((CoordImpl)act.getCoord()).calcDistance(actPost.getCoord()) - distanceDirect;
+//		
+//		double beta = Double.parseDouble(this.config.locationchoice().getSearchSpaceBeta());
+//		
+//		double utilityDistanceObserved = 0.0;
+//		if (Boolean.parseBoolean(config.findParam(LCEXP, "linearDistanceUtility"))) {
+//			utilityDistanceObserved = beta * distance;
+//		}
+//		else {
+//			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * beta * (-1.0));
+//		}
+//		double utilityDistanceUnobserved = 0.0;		
+//		if (Double.parseDouble(config.findParam(LCEXP, "varTastes")) > 0.000001) {
+//			utilityDistanceObserved = 0;
+//			utilityDistanceUnobserved = Double.parseDouble(person.getDesires().getDesc().split("_")[0]) * distance;
+//		}
+//		return utilityDistanceObserved + utilityDistanceUnobserved;
+//	}
 	
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);

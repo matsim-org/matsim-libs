@@ -44,8 +44,6 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	private Config config;
 	// ------------------------------------
 	
-	private final String LCEXP = "locationchoiceExperimental";
-
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
 			final ActivityFacilities facilities, final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			Config config) {
@@ -58,9 +56,10 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	
 	@Override
 	public void finish() {		
-		boolean distance = false;
-				
-		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
+		
+		// do not use distance scoring anymore
+//		boolean distance = false;				
+//		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementDistance")) > 0.000001) distance = true;
 		
 		// ----------------------------------------------------------
 		// The initial score is set when scoring during or just after the mobsim. 
@@ -77,13 +76,17 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 		// ----------------------------------------------------------
 		
 		super.finish();
-			
-		if (!(Boolean.parseBoolean(this.config.locationchoice().getTravelTimes())) || distance) {
-			this.score = 0.0;
-		}		
+
+/* always use tt, thus 
+* this.config.locationchoice().getTravelTimes() is always true)  
+* i.e., score is never set to zero
+*		if (!(Boolean.parseBoolean(this.config.locationchoice().getTravelTimes())) || distance) {
+*			this.score = 0.0;
+		}
+*/		
 		for (PlanElement pe : super.plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, distance);
+				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe);
 			}
 		}
 	}
