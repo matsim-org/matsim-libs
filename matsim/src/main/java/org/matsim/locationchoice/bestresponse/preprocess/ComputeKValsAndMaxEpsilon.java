@@ -24,6 +24,8 @@ public class ComputeKValsAndMaxEpsilon {
 	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
+		this.scenario = scenario;
+		this.config = config;
 	}
 	
 	public void assignKValues() {				
