@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.RandomLocationMutator;
+import org.matsim.locationchoice.random.RandomLocationMutator;
 
 public class ConnectHomesAndWorkplaces {
 
