@@ -70,6 +70,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 			}
 		}
 		// temporarily store maxEpsilon here: (s_l)
+		if (((PersonImpl)p).getDesires() == null) ((PersonImpl)p).createDesires("");
 		((PersonImpl)p).getDesires().setDesc(((PersonImpl)p).getDesires().getDesc() + "_" + maxEpsilon);	
 	}
 }
