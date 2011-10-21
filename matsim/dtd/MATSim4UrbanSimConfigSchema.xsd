@@ -79,7 +79,8 @@
 			<xs:element name="matsim4opusOutput" type="xs:token"/>
 			<xs:element name="matsim4opusTemp" type="xs:token"/>
 			<xs:element name="isTestRun" type="xs:boolean"/>
-			
+			<xs:element name="testParameter" type="xs:token"/>
+			<xs:element name="backupRunData" type="xs:boolean"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>
