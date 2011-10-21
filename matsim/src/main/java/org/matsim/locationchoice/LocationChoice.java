@@ -123,7 +123,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 	
 	private void computeAttributes(long seed) {
-		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed);
+		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed, this.controler.getScenario(), this.controler.getConfig());
 		computer.run();
 		this.personsMaxEps = computer.getPersonsMaxEps();
 	}
