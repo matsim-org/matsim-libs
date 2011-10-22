@@ -2,6 +2,7 @@ package org.matsim.locationchoice.bestresponse.preprocess;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -18,6 +19,7 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private Config config;
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
+	private static final Logger log = Logger.getLogger(ComputeMaxEpsilons.class);
 		
 	public ComputeMaxEpsilons(ScenarioImpl scenario, String type, Config config, 
 			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues) {
@@ -25,6 +27,9 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 		this.scenario = scenario;
 		this.type = type;
 		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(type);
+		if (this.typedFacilities.size() == 0) {
+			log.warn("There are no facilities for type : " + type);
+		}
 		this.config = config; 
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
