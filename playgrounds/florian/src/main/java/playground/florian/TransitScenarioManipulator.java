@@ -32,7 +32,7 @@ class TransitScenarioManipulator {
 		// MANIPULATE
 		TransitScenarioManipulator tsman = new TransitScenarioManipulator(sc);
 //		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Subway","dummy_Rail","dummy_Tram","dummy_Funicular"});
-		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Tram"});
+		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Subway"});
 		// WRITE NEW SCENARIO
 		VehicleWriterV1 vw = new VehicleWriterV1(newSc.getVehicles());
 		vw.writeFile("./transitVehicles_new.xml");

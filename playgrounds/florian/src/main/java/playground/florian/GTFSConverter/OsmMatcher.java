@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 class OsmMatcher {
 
 	static String gtfsTransitSchedule = "./transitSchedule_new.xml";
-	static String osmTransitSchedule = "./transitSchedule_all.xml";
+	static String osmTransitSchedule = "./transitSchedule_subway.xml";
 	
 	
 	public static void main(String[] args) {
