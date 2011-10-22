@@ -195,10 +195,10 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private double getMaximumDistanceFromEpsilon(PersonImpl person, String type) {
 		double maxEpsilon = 0.0;
 		if (type.startsWith("s")) {
-			maxEpsilon = Double.parseDouble((String)this.personsMaxEps.getAttribute(person.getId().toString(), "s"));
+			maxEpsilon = (Double) this.personsMaxEps.getAttribute(person.getId().toString(), "s");
 		}
 		else if (type.startsWith("l")) {
-			maxEpsilon = Double.parseDouble((String)this.personsMaxEps.getAttribute(person.getId().toString(), "l"));
+			maxEpsilon = (Double) this.personsMaxEps.getAttribute(person.getId().toString(), "l");
 		}
 		
 		/* 
