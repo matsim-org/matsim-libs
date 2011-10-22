@@ -101,8 +101,8 @@ public class DestinationChoiceScoring {
 	
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);		
-		double kf = Double.parseDouble((String)this.facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
-		double kp = Double.parseDouble((String)this.personsKValues.getAttribute(person.getId().toString(), "k"));
+		double kf = (Double) this.facilitiesKValues.getAttribute(facility.getId().toString(), "k");
+		double kp = (Double) this.personsKValues.getAttribute(person.getId().toString(), "k");
 		
 		/* long seed = (long) ((kp + kf) * Math.pow(2.0, 40)); 
 		/* This was not a good solution.
