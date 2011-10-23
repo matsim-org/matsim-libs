@@ -50,9 +50,6 @@ class OsmMatcher {
 	private TransitSchedule gtfsTs;
 	private TransitSchedule osmTs;
 	
-	private Map<Id,Id> gtfsTransitLineToRouteAssignments = new HashMap<Id,Id>();
-	private Map<Id,Id> osmTransitLineToRouteAssignments = new HashMap<Id,Id>();
-	
 	CoordinateTransformation osmTrafo = new IdentityTransformation();
 	CoordinateTransformation gtfsTrafo = new IdentityTransformation();
 	
@@ -63,7 +60,7 @@ class OsmMatcher {
 	
 	
 	public void matchSchedules(){
-		Map<Id, Id> osmStopToGtfsStopAssignments = this.matchStops();
+		Map<Id, List<Id>> osmStopToGtfsStopAssignments = this.matchStops();
 		this.writeStationResult(osmStopToGtfsStopAssignments);
 		Map<Id,Id> osmRouteToGtfsRouteAssignments = this.matchRoutes();
 		this.writeRouteResult(osmRouteToGtfsRouteAssignments);
@@ -71,11 +68,12 @@ class OsmMatcher {
 		this.writeLineResult(osmLineToGtfsLineAssignments);
 	}
 	
-	private Map<Id,Id> matchStops(){
-		Map<Id,Id> result = new HashMap<Id,Id>();
+	private Map<Id, List<Id>> matchStops(){
+		Map<Id,List<Id>> result = new HashMap<Id,List<Id>>();
 		List<TransitStopFacility> osmStops = new ArrayList<TransitStopFacility>();
 		osmStops.addAll(osmTs.getFacilities().values());
 		for(TransitStopFacility stop: gtfsTs.getFacilities().values()){
+			List<Id> idList = new ArrayList<Id>();
 			Id gtfsId = stop.getId();
 			Id osmId = null;
 			for(TransitStopFacility osmStop: osmStops){
@@ -84,12 +82,13 @@ class OsmMatcher {
 				String gtfsInfo = idInfos[idInfos.length-2].trim();
 				String gtfsIdString = gtfsId.toString().trim();
 				if(gtfsInfo.equalsIgnoreCase(gtfsIdString)){
-					break;
-				}else{
-					osmId = new IdImpl("NONE FOUND");
+					idList.add(osmId);
 				}
 			}
-			result.put(gtfsId, osmId);
+			if(idList.isEmpty()){
+				idList.add(new IdImpl("NONE FOUND"));
+			}
+			result.put(gtfsId, idList);
 		}
 		return result;
 	}
@@ -167,15 +166,17 @@ class OsmMatcher {
 		return result;
 	}
 
-	private void writeStationResult(Map<Id,Id> osmStopToGtfsStopAssignments){
+	private void writeStationResult(Map<Id, List<Id>> osmStopToGtfsStopAssignments){
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./osmStopToGtfsStopAssignments.txt")));
 			for(Id gtfsId: osmStopToGtfsStopAssignments.keySet()){
-				if(osmStopToGtfsStopAssignments.get(gtfsId).toString().equalsIgnoreCase("NONE FOUND")){
-					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
-				}else{
-					bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + " --> " + osmTs.getFacilities().get(osmStopToGtfsStopAssignments.get(gtfsId)).getName() + " (" + osmStopToGtfsStopAssignments.get(gtfsId) + ")\n");
-				}
+				for(Id osmId: osmStopToGtfsStopAssignments.get(gtfsId)){
+					if(osmId.toString().equalsIgnoreCase("NONE FOUND")){
+						bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + "\t\t\t --> \t\t\t" + "NONE FOUND \n");
+					}else{
+						bw.write(gtfsTs.getFacilities().get(gtfsId).getName() + " (" + gtfsId + ") " + " --> " + osmTs.getFacilities().get(osmId).getName() + " (" + osmId + ")\n");
+					}
+				}	
 			}
 			bw.flush();
 			bw.close();
