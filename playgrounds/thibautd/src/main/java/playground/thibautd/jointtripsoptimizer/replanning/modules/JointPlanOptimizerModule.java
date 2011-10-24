@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.jointtripsoptimizer.replanning.modules;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -37,7 +37,7 @@ import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigG
  * @author thibautd
  */
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
-	private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
+	//private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
 
 	private final JointReplanningConfigGroup configGroup;
 	private final Network network;
@@ -49,8 +49,8 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	public JointPlanOptimizerModule(
 			final Controler controler) {
 		super(controler.getConfig().global());
-		log.debug("JointPlanOptimizerModule constructor called with controler "+
-				controler);
+		//log.debug("JointPlanOptimizerModule constructor called with controler "+
+		//		controler);
 
 		// used for getting the routing algorithm
 		this.controler = controler;
@@ -74,7 +74,7 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		log.debug("JointPlanOptimizerModule.getPlanAlgoInstance called");
+		//log.debug("JointPlanOptimizerModule.getPlanAlgoInstance called");
 
 		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.createRoutingAlgorithm(
 				this.travelCost, this.travelTime);
