@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-import org.matsim.contrib.sna.gis.CRSUtils;
+import playground.tnicolai.matsim4opus.gis.CRSUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -16,7 +16,7 @@ import com.vividsolutions.jts.geom.Point;
 
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 import playground.tnicolai.matsim4opus.constants.Constants;
 
 public class TestDistance {

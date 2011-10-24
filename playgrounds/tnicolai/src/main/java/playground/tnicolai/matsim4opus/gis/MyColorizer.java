@@ -28,8 +28,8 @@ import gnu.trove.TObjectDoubleIterator;
 
 import java.awt.Color;
 
-import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+import playground.tnicolai.matsim4opus.gis.graph.spatial.io.ColorUtils;
+import playground.tnicolai.matsim4opus.gis.graph.spatial.io.Colorizable;
 
 /**
  * @author illenberger

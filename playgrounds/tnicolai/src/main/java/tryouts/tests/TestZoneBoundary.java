@@ -27,9 +27,12 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.gis.Zone;
 import org.matsim.contrib.sna.gis.ZoneLayer;
+
+import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.tnicolai.matsim4opus.gis.CRSUtils;
+import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -38,9 +41,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-
-import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 /**
  * @author thomas
