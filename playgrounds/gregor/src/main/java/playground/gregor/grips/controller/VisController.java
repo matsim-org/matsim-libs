@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -18,6 +19,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -37,24 +39,10 @@ public class VisController {
 	public static void main (String [] args) {
 		Config config = ConfigUtils.loadConfig(args[0]);
 
-
-		Module module = config.getModule("sim2d");
-		Sim2DConfigGroup s = null;
-		if (module == null) {
-			s = new Sim2DConfigGroup();
-		} else {
-			s = new Sim2DConfigGroup(module);
-		}
-		config.getModules().put("sim2d", s);
-
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		((PopulationFactoryImpl)scenario.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		ScenarioUtils.loadScenario(scenario);
-
-		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(scenario);
-		//		loader.load2DScenario();
 
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
@@ -69,40 +57,23 @@ public class VisController {
 			config.addQSimConfigGroup(new QSimConfigGroup());
 		}
 
-		//		ScenarioLoader2DImpl loader2 = new ScenarioLoader2DImpl(this.s/cenarioData);
-		//		loader2.loadScenario();
-
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		//		PedVisPeekABot vis = new PedVisPeekABot(5,scenario);
-		//		vis.setOffsets(386128,5820182);
-		//		vis.setFloorShapeFile(s.getFloorShapeFile());
-		//		vis.drawNetwork(scenario.getNetwork());
-		//		events.addHandler(vis);
 
 		ControlerIO controlerIO = new ControlerIO(config.controler().getOutputDirectory());
-		QSim qSim = (QSim) new HybridQ2DMobsimFactory().createMobsim(scenario, events);
+		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
 
-		//		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(qSim);
-		//		qSim.addQueueSimulationListeners(queueSimulationFeature);
-		//		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
-		//		//		queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis().isShowTeleportedAgents());
-		//		qSim.setControlerIO(controlerIO);
-		//		qSim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		//		WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","hh");
+		//
 		//		JXMapOTFVisClient.run(scenario.getConfig(), server, wms);
 		JXMapOTFVisClient.run(scenario.getConfig(), server);
-		qSim.run();
-
-
-
 
 		qSim.run();
 	}

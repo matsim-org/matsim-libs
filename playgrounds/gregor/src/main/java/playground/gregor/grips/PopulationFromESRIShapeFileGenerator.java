@@ -82,6 +82,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			Activity act2 = pb.createActivityFromLinkId("post-evac", this.safeLinkId);
 			act2.setEndTime(0);
 			plan.addActivity(act2);
+			plan.setScore(0.);
 			pers.addPlan(plan);
 		}
 	}

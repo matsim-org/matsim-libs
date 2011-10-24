@@ -65,8 +65,17 @@ public class ScenarioGenerator {
 
 		c.global().setCoordinateSystem("EPSG:32632");
 
-		c.controler().setLastIteration(0);
+		c.controler().setLastIteration(10);
 		c.controler().setOutputDirectory(getGripsConfig(c).getOutputDir()+"/output");
+
+		c.strategy().setMaxAgentPlanMemorySize(3);
+
+		c.strategy().addParam("maxAgentPlanMemorySize", "3");
+		c.strategy().addParam("Module_1", "ReRoute");
+		c.strategy().addParam("ModuleProbability_1", "0.1");
+		c.strategy().addParam("Module_2", "ChangeExpBeta");
+		c.strategy().addParam("ModuleProbability_2", "0.9");
+
 		new ConfigWriter(c).write(getGripsConfig(c).getOutputDir() + "/config.xml");
 
 	}
@@ -93,10 +102,29 @@ public class ScenarioGenerator {
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
 		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+		pre.setMinimalDuration(49);
+		pre.setClosingTime(49);
+		pre.setEarliestEndTime(49);
+		pre.setLatestStartTime(49);
+		pre.setOpeningTime(49);
+
+
 		ActivityParams post = new ActivityParams("post-evac");
 		post.setTypicalDuration(49); // dito
+		post.setMinimalDuration(49);
+		post.setClosingTime(49);
+		post.setEarliestEndTime(49);
+		post.setLatestStartTime(49);
+		post.setOpeningTime(49);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		sc.getConfig().planCalcScore().addActivityParams(post);
+
+		//		sc.getConfig().planCalcScore().addParam("activityPriority_0", "1");
+		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_0", "00:00:49");
+		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_0", "00:00:49");
+		//		sc.getConfig().planCalcScore().addParam("activityPriority_1", "1");
+		//		sc.getConfig().planCalcScore().addParam("activityTypicalDuration_1", "00:00:49");
+		//		sc.getConfig().planCalcScore().addParam("activityMinimalDuration_1", "00:00:49");
 
 
 	}

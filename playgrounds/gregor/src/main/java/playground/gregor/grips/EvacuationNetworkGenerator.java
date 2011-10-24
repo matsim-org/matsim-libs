@@ -106,13 +106,6 @@ public class EvacuationNetworkGenerator {
 		 */
 		for (Node node : this.network.getNodes().values()) {
 
-			if (node.getId().toString().equals("92223619")){
-				int stopIt = 0;
-				stopIt++;
-				Point ppp = MGC.coord2Point(node.getCoord());
-				double dist = ppp.distance(((Polygon)this.evacuationArea).getExteriorRing());
-				System.out.println(dist);
-			}
 			int inCat = 0;
 			for (Link l : node.getInLinks().values()) {
 				LineString ls = geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(l.getFromNode().getCoord()),MGC.coord2Coordinate(l.getToNode().getCoord())});
