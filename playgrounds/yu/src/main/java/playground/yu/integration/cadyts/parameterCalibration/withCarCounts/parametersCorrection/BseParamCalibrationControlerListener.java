@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.network.LinkImpl;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import cadyts.interfaces.matsim.MATSimChoiceParameterCalibrator;
 import cadyts.measurements.SingleLinkMeasurement.TYPE;
@@ -41,18 +42,16 @@ import cadyts.supply.SimResults;
  *
  */
 public abstract class BseParamCalibrationControlerListener implements
-		ControlerListener {
-//	protected boolean watching = false;
+		ControlerListener, CalibrationConfig {
+	// protected boolean watching = false;
 	protected VolumesAnalyzer volumes = null;
 	protected double countsScaleFactor = 1d, distanceFilter = 0d;
 	protected Coord distanceFilterCenterNodeCoord = null;
 	protected MATSimChoiceParameterCalibrator<Link> calibrator = null;
 	protected SimResults<Link> resultsContainer = null;
 	protected CadytsChoice chooser;
-	protected final static int DEFAULT_CALIBRATION_START_TIME = 1,
-			DEFAULT_CALIBRATION_END_TIME = 24;
+
 	protected int writeLinkUtilOffsetsInterval = 100;
-	public static final String BSE_CONFIG_MODULE_NAME = "bse";
 
 	protected class SimResultsContainerImpl implements SimResults<Link> {
 		/***/

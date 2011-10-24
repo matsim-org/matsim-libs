@@ -35,17 +35,17 @@ import utilities.misc.DynamicDataXMLFileIO;
 public class BseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
 	/***/
 	private static final long serialVersionUID = 1L;
-	private Network net;
+	private Network network;
 
 	public BseLinkCostOffsetsXMLFileIO(Network net) {
 		super();
-		this.net = net;
+		this.network = net;
 	}
 
 	@Override
 	protected Link attrValue2key(String linkId) {
 		System.out.println("-----attrValue2key------:\t" + linkId);
-		Link link = net.getLinks().get(new IdImpl(linkId));
+		Link link = network.getLinks().get(new IdImpl(linkId));
 		System.out.println("link :\t" + link);
 		return link;
 	}
@@ -64,13 +64,6 @@ public class BseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
 	@Override
 	public void startElement(String uri, String localName, String name,
 			Attributes attributes) {
-
-		// StringBuilder sb = new StringBuilder();
-		// for (int i = 0; i < attributes.getLength(); i++) {
-		// sb.append("\t" + attributes.getQName(i) + "\t"
-		// + attributes.getValue(i));
-		// }
-		// System.out.println("element :\t" + name + "\t" + sb);
 		super.startElement(uri, localName, name, attributes);
 	}
 }

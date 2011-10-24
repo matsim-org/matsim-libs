@@ -222,8 +222,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			throw new RuntimeException("BSE requires counts-data.");
 		}
 
-		caliStartTime = Integer.parseInt(config.findParam(
-				BSE_CONFIG_MODULE_NAME, "startTime"));
+		String caliStartTimeStr = config.findParam(BSE_CONFIG_MODULE_NAME,
+				"startTime");
+
+		caliStartTime = caliStartTimeStr != null ? Integer
+				.parseInt(caliStartTimeStr) : DEFAULT_CALIBRATION_START_TIME;
+
 		caliEndTime = Integer.parseInt(config.findParam(BSE_CONFIG_MODULE_NAME,
 				"endTime"));
 
@@ -406,25 +410,36 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			writer = new SimpleWriter(ctlIO.getOutputFilename("parameters.log"));
 			StringBuffer sb = new StringBuffer("iter");
 			for (int i = 0; i < paramNames.length; i++) {
+				sb.append("\tavg. ");
+				sb.append(paramNames[i]);
+
+			}
+			for (int i = 0; i < paramNames.length; i++) {
 				sb.append("\t");
 				sb.append(paramNames[i]);
 
 			}
 			writer.writeln(sb);
 		}
+
 		{
 			writerCV = new SimpleWriter(
 					ctlIO.getOutputFilename("parameterCovariance.log"));
-			StringBuffer sb = new StringBuffer("iter\tcovariance ["
-					+ paramNames[0]);
+			StringBuffer sb = new StringBuffer("iter\t" + "VAR{"
+					+ paramNames[0]
+			// "covariance ["
+			);
 			for (int i = 1; i < paramNames.length; i++) {
 				sb.append(", ");
 				sb.append(paramNames[i]);
 			}
-			sb.append("]\texpectation of variance\tvariance of expectation");
+			sb.append("|eps}"
+			// "]\texpectation of variance\tvariance of expectation"
+			);
 
 			writerCV.writeln(sb);
 		}
+
 		{
 			StringBuffer sb = new StringBuffer(paramNames[0]);
 			for (int i = 1; i < paramNames.length; i++) {
@@ -604,22 +619,25 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				}
 			}
 			// ************************************************
-			if (calibrator.getParameterCovariance() != null) {
+			if (calibrator.getParameterCovarianceExpOfVarComponent()
+			// getParameterCovariance()
+			!= null) {
 				writerCV.writeln(iter
-						+ "\t"
-						+ calibrator.getParameterCovariance()
-								.toSingleLineString()
+						// + "\t"
+						// + calibrator.getParameterCovariance()
+						// .toSingleLineString()
 						+ "\t"
 						+ calibrator.getParameterCovarianceExpOfVarComponent()
 								.toSingleLineString()
-						+ "\t"
-						+ calibrator.getParameterCovarianceVarOfExpComponent()
-								.toSingleLineString());
+				// + "\t"
+				// + calibrator.getParameterCovarianceVarOfExpComponent()
+				// .toSingleLineString()
+				);
 			}
 			writerCV.flush();
 
-			// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION AGAIN!!!***
-			Vector params = calibrator.getParameters();
+			// ###################################################
+			Vector avgParams = calibrator.getAvgParameters();
 			PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
 
 			// VERY IMPORTANT #########################################
@@ -642,24 +660,44 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 												 * pos. of param in Parameters
 												 * in Cadyts
 												 */);
-					double paramScaleFactor = Events2Score4PC.paramScaleFactorList
-							.get(paramNameIndex);
 
-					double value = params.get(i);
+					// double paramScaleFactor =
+					// Events2Score4PC.paramScaleFactorList
+					// .get(paramNameIndex);
+
+					double value = avgParams.get(i);
+					// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
+					// AGAIN!!!***
 					if (scoringCfg.getParams().containsKey(paramNames[i])) {
 						scoringCfg.addParam(paramNames[i],
-								Double.toString(value / paramScaleFactor));
+								Double.toString(value
+								// / paramScaleFactor
+								));
 					} else/* bse */{
 						config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-								Double.toString(value / paramScaleFactor));
+								Double.toString(value
+								// / paramScaleFactor
+								));
 					}
-
+					// *****************************************************
+					// ****SET CALIBRATED PARAMETERS IN MNL*****************
 					mnl.setParameter(paramNameIndex, value);
 
 					// text output
-					paramArrays[i][iter - firstIter] = value / paramScaleFactor;
+					paramArrays[i][iter - firstIter] = value
+					// / paramScaleFactor
+					;
 					sb.append("\t");
-					sb.append(value / paramScaleFactor);
+					sb.append(value
+					// /paramScaleFactor
+					);
+				}
+
+				// ********calibrator.getParameters() JUST FOR ANALYSIS********
+				Vector params = calibrator.getParameters();
+				for (int i = 0; i < paramNames.length; i++) {
+					sb.append("\t");
+					sb.append(params.get(i));
 				}
 
 				writer.writeln(sb);
@@ -723,17 +761,17 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 								double absLlh = (simVal - cntVal)
 										* (simVal - cntVal) / 2d / var;
 								llhSum -= absLlh;
-								System.out.println("Accumulated Llh over "
-										+ avgLlhOverIters
-										+ " iterations at it." + iter + " =\t"
-										+ llhSum + "\tadded llh =\t-" + absLlh);
+								// System.out.println("Accumulated Llh over "
+								// + avgLlhOverIters
+								// + " iterations at it." + iter + " =\t"
+								// + llhSum + "\tadded llh =\t-" + absLlh);
 							}
 						}
 					}
 				}
 			}
 			if (iter % writeLlhInterval == 0) {
-				// TODO calculate avg. value of llh
+				// calculate avg. value of llh
 				double avgLlh = llhSum / avgLlhOverIters;
 				System.out.println("avgLlh over " + avgLlhOverIters
 						+ " iterations at it." + iter + " =\t" + avgLlh);

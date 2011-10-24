@@ -137,13 +137,20 @@ public class Covariance2DfromParameters {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String paramFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/4Presentation/fi500var4params.log", //
-		outputFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/4Presentation/fi500var4params2kWindow.log";
-		int width = 2000;
+		String paramFilename, outputFilename;
+		int width;
+		if (args.length != 3) {
+			paramFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/fi1kVar4cadyts4rB/pureParams.log";
+			outputFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/fi1kVar4cadyts4rB/pureParams1kWindows.log.log";
+			width = 1000;
+		} else {
+			paramFilename = args[0];
+			outputFilename = args[1];
+			width = Integer.parseInt(args[2]);
+		}
 
 		Covariance2DfromParameters cfp = new Covariance2DfromParameters(
 				paramFilename, width, outputFilename);
-
 	}
 
 }
