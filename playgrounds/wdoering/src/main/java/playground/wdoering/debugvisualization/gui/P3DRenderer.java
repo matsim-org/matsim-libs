@@ -94,6 +94,10 @@ public class P3DRenderer extends PApplet
 		
 		this.width = width;
 		this.height = height;
+
+		
+		setAgentColors(255);
+		
 	}
 	
 	public void setExtremeValues(Double[] extremeValues)
@@ -116,6 +120,22 @@ public class P3DRenderer extends PApplet
 	 */
 	public void setAgentColors(int agentCount)
 	{
+		this.colors = new ArrayList<int[]>();
+		for (int j = 0; j < agentCount; j++)
+		{
+			//determine color
+			int[] color = {(int)((((float)agentCount-(float)j)/(float)agentCount)*255),
+					       (int)((double)(((float)agentCount-(float)j)/(float)agentCount)*255),
+					       (int)(255-(double)(((float)agentCount-(float)j)/(float)agentCount)*255)};
+			
+			//console.println(color[0] + "|" + color[1] + "|" + color[2]);
+			
+			//add color to the color array
+			this.colors.add(color);
+		}
+		
+		
+		/*
 		//set up color matrix to display agents
 		this.colors = new ArrayList<int[]>();
 		
@@ -159,6 +179,7 @@ public class P3DRenderer extends PApplet
 				colors.add(color);
 			}
 		}
+		*/
 
 	}
 	
@@ -236,7 +257,7 @@ public class P3DRenderer extends PApplet
 
 	}
 
-	float c;
+	float c = 1;
 
 	//not implemented yet
 	PImage b = loadImage("C:\\temp5\\Erdgeschoss.jpg");
@@ -262,17 +283,16 @@ public class P3DRenderer extends PApplet
 		
 	}
 
-//	public void mousePressed() {
-//		  if(bover) { 
-//		    locked = true; 
-//		    fill(255, 255, 255);
-//		  } else {
-//		    locked = false;
-//		  }
-//		  bdifx = mouseX-bx; 
-//		  bdify = mouseY-by; 
-//
-//		}	
+	public void mousePressed()
+	{
+	  if(!mousePressed)
+	    mousePressed = true; 
+	}
+	
+	public void mouseReleased()
+	{
+		  mousePressed = false;
+	}	
 	
 	/**
 	 * draw function. calculating proportions.
@@ -301,8 +321,19 @@ public class P3DRenderer extends PApplet
 			}
 			
 			
-			background(127);
+			background(33);
 			fill(0, 0, 0);
+			
+			if (mousePressed)
+			{
+				c=c+2.1f;
+				//scale(1/c, 1/c, c);
+				//background(33,255,127+(c%127));
+				
+			}
+				//background(200);
+				
+				
 			
 //			smooth();
 //			strokeWeight(4); 
@@ -347,7 +378,12 @@ public class P3DRenderer extends PApplet
 						if ((dataPoints != null) && (dataPoints.size() > 0))
 						{
 							//pick preattentive agent color
-							int[] agentColor = colors.get(agentCount);
+							int[] agentColor = new int[3];
+							
+							if (colors.size()<=agentCount)
+								setAgentColors(agentCount+1);
+							
+							agentColor = colors.get(agentCount);
 								
 							//draw node trajectories if there is more then one datapoint for the current agent
 							if (dataPoints.size() > 1)
@@ -524,7 +560,8 @@ public class P3DRenderer extends PApplet
 							int tweenCount = 0;
 		
 							//pick preattentive agent color
-							int[] agentColor = colors.get(currentAgent);
+							int[] agentColor = new int[3];
+							agentColor = colors.get(currentAgent);
 							
 							//first check if there is any datapoint stored to the current time step
 							if (dataPoints.get(timeSteps.get(iInt)) != null) 
@@ -624,7 +661,7 @@ public class P3DRenderer extends PApplet
 	public void setAnimationSpeed(Float speed)
 	{
 		// TODO Auto-generated method stub
-		c = 100;
+		//c = 100;
 		// c = speed;
 
 	}

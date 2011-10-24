@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
@@ -29,7 +30,7 @@ import playground.wdoering.debugvisualization.gui.*;
  */
 public class Controller {
 
-	private static final long timeInterval = 30;
+	private static final long timeInterval = 15;
 	private static final int width = 600;
 	private static final int height = 600;
 	
@@ -55,6 +56,11 @@ public class Controller {
 
 	public void setLiveMode(boolean liveMode) {
 		this.liveMode = liveMode;
+	}
+	
+	public Controller() //klasse scenario + handler übergeben
+	{
+		
 	}
 
 	public Controller(String eventFileName, String networkFileName, Console console, int traceTimeRange, boolean liveMode)
@@ -136,6 +142,14 @@ public class Controller {
 		
 	}
 	
+	public Controller(EventsManager e, Scenario sc) {
+		
+		this.importer = new Importer(this);
+		e.addHandler(this.importer);
+		
+		// TODO Auto-generated constructor stub
+	}
+
 	public void setAnimationSpeed(Float speed)
 	{
 		gui.setAnimationSpeed(speed);
