@@ -100,7 +100,11 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		((NetworkImpl) this.network).connect();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
 		
-		this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
+		//only compute oa for best response module
+		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		if (algorithm.equals("bestResponse")) {
+			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
+		}
 	}
 	
 	private void createObjectAttributes(long seed) {
