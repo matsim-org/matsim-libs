@@ -46,6 +46,10 @@ public class Agent {
 	{
 		//System.out.println("rem timestep:" + dataPoints.remove(time));
 		DataPoint deletedDataPoint = dataPoints.get(time);
+		deletedDataPoint = dataPoints.remove(time);
+		
+		//System.out.println("dp:" + deletedDataPoint.toString());
+		
 		return deletedDataPoint;
 	}
 

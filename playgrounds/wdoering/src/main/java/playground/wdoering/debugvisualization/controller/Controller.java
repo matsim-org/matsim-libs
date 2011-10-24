@@ -30,6 +30,9 @@ import playground.wdoering.debugvisualization.gui.*;
 public class Controller {
 
 	private static final long timeInterval = 30;
+	private static final int width = 600;
+	private static final int height = 600;
+	
 	private GUI gui;
 	private Importer importer;
 	private HashMap<String,Agent> agents;
@@ -69,7 +72,7 @@ public class Controller {
 		this.importer = new Importer(this);
 		this.console = console;
 		
-		gui = new GUI(this, traceTimeRange);
+		gui = new GUI(this, traceTimeRange, width, height);
 		
 		//read network file first
 		console.print("Importing network data...");
@@ -263,11 +266,6 @@ public class Controller {
 					
 				}
 				
-				console.println("-----++-----" + timeSteps.toString());
-				//add timestep to the list
-				currentTime = time;
-				timeSteps.addLast(currentTime);
-				console.println("-----__------" + timeSteps.toString());
 				
 				
 				//if there are already more timesteps than the range of traces
@@ -298,6 +296,10 @@ public class Controller {
 				
 				gui.updateExtremeValues(maxPosX, minPosX, maxPosY, minPosY);
 				gui.updateView(timeSteps, agents);
+				
+				currentTime = time;
+				timeSteps.addLast(currentTime);
+				
 				
 			}
 			

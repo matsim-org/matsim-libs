@@ -14,7 +14,9 @@ import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
+import processing.core.PShapeSVG.Font;
 
 //import processing.core.*;
 //import processing.opengl.*;
@@ -37,6 +39,8 @@ public class P3DRenderer extends PApplet
 	private HashMap<Integer, int[]> links;
 	//private LinkedList<HashMap<Integer, Agent>>;
 	
+	private int width;
+	private int height;
 	
 	private Double[] extremeValues;
 	private LinkedList<Double> timeSteps;
@@ -53,6 +57,8 @@ public class P3DRenderer extends PApplet
 	private double minPosY; 
 	private double maxPosY; 
 	private double currentTime;
+	
+	private boolean mousePressed = false;
 	
 	private Console console;
 	
@@ -80,11 +86,14 @@ public class P3DRenderer extends PApplet
 		this.paused = paused;
 	}
 	
-	public P3DRenderer(boolean liveMode, int traceTimeRange, Console console)
+	public P3DRenderer(boolean liveMode, int traceTimeRange, Console console, int width, int height)
 	{
 		this.traceTimeRange = traceTimeRange;
 		this.liveMode = liveMode;
 		this.console = console;
+		
+		this.width = width;
+		this.height = height;
 	}
 	
 	public void setExtremeValues(Double[] extremeValues)
@@ -235,8 +244,8 @@ public class P3DRenderer extends PApplet
 
 	public void setup()
 	{
-		size(768, 768, P3D);
-		frameRate(30);
+		size(width, height, P3D);
+		frameRate(60);
 
 		noStroke();
 		
@@ -244,8 +253,27 @@ public class P3DRenderer extends PApplet
 		paused=false;
 		rewind=false;
 		
+		PFont font;
+		//System.out.println(System.getProperty("user.dir"));
+		
+		font = loadFont(System.getProperty("user.dir") + "\\src\\main\\java\\playground\\wdoering\\debugvisualization\\fonts\\LucidaConsole-12.vlw"); 
+		textFont(font); 
+		
+		
 	}
 
+//	public void mousePressed() {
+//		  if(bover) { 
+//		    locked = true; 
+//		    fill(255, 255, 255);
+//		  } else {
+//		    locked = false;
+//		  }
+//		  bdifx = mouseX-bx; 
+//		  bdify = mouseY-by; 
+//
+//		}	
+	
 	/**
 	 * draw function. calculating proportions.
 	 * iterating through agent data, drawing agents,
@@ -255,7 +283,6 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		
-
 
 		
 		if (liveMode)
@@ -274,11 +301,20 @@ public class P3DRenderer extends PApplet
 			}
 			
 			
-			//Stroke color
-			stroke(100,0,100,100);
 			background(127);
-						
-			noStroke();
+			fill(0, 0, 0);
+			
+//			smooth();
+//			strokeWeight(4); 
+			
+			textMode(SCREEN);
+			
+			//noStroke();
+			
+			//Stroke color
+//			smooth();
+//			strokeWeight(4); 
+			//stroke(100,0,100,100);
 			
 			int sceneCount = 0;
 			boolean drawAgent = false;
@@ -303,6 +339,8 @@ public class P3DRenderer extends PApplet
 						//Get current agent
 						Map.Entry pairs = (Map.Entry) agentsIterator.next();
 						Agent currentAgent = (Agent)pairs.getValue();
+						String currentAgentID = (String)pairs.getKey();
+						
 						HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
 						
 						//check if there are any data points for the current agent
@@ -353,7 +391,7 @@ public class P3DRenderer extends PApplet
 								
 							}
 							
-							DataPoint lastDataPoint = dataPoints.get(timeSteps.getLast());
+							DataPoint lastDataPoint = dataPoints.get(currentTime);
 							//console.println("current agent: " + currentAgent.get);
 //							console.println("@________@________@: " + timeSteps.toString());
 //							console.println("TS GET LAST " + timeSteps.getLast());
@@ -364,15 +402,36 @@ public class P3DRenderer extends PApplet
 							if (lastDataPoint != null)
 							{
 								//draw agent
-								fill(color(agentColor[0], agentColor[1],agentColor[2],255));
 								
 								float posX = (float)((lastDataPoint.getPosX()-minPosX) / factorX);
 								float posY = (float)((lastDataPoint.getPosY()-minPosY) / factorY);
 								console.println("********* MINPOS X: "+ minPosX +" | FACT X: " + factorX + "***************");
 								console.println("********* MINPOS Y: "+ minPosY +" | FACT Y: " + factorY + "***************");
 								console.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
+								
+								//stroke
+//								SMOOTH();
+//								STROKEWEIGHT(4); 
+//								STROKE(0,0,0);
+
+								//noStroke();
+								
+								int halfAgentSize = (int) agentSize / 2;
+								
+								if    ((mouseX < posX+halfAgentSize) && (mouseX > posX-halfAgentSize)
+								    && (mouseY < posY+halfAgentSize) && (mouseY > posY-halfAgentSize))
+									fill(255, 255, 255,255);
+								else
+									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+									
 								ellipse (posX, posY, agentSize, agentSize);
+								
+								fill(0, 0, 0, 255);
+								text(currentAgentID,posX+(agentSize/2)-12,posY+(agentSize/2)-6);
+								
 							}
+							else
+								console.println("agent " + currentAgentID + " missing at " + currentTime + " (" + timeSteps.getLast() + ") :" + dataPoints.toString());
 							
 							
 							

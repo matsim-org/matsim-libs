@@ -16,7 +16,7 @@ public class GUIMainFrame extends JFrame {
 	P3DRenderer renderer;
 	Console console;
 
-	public GUIMainFrame(Controller controller, int traceTimeRange) {
+	public GUIMainFrame(Controller controller, int traceTimeRange, int width, int height) {
 		
 		super("Debug Visualization");
 		this.guiToolbar = new GUIToolbar(controller);
@@ -24,10 +24,10 @@ public class GUIMainFrame extends JFrame {
 		this.console = controller.console;
 		
 
-		setSize(768, 768);
+		setSize(width, height + 48);
 
 		setLayout(new BorderLayout());
-		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange, controller.console);
+		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange, controller.console, width, height);
 
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);
