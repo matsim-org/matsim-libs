@@ -37,6 +37,8 @@ import org.matsim.contrib.matsim4opus.constants.Constants;
 import org.matsim.contrib.matsim4opus.gis.MyColorizer;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.SpatialGridTableWriter;
+import org.matsim.contrib.matsim4opus.gis.Zone;
+import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.gis.io.FeatureKMLWriter;
 import org.matsim.contrib.matsim4opus.gis.io.FeatureSHP;
 import org.matsim.contrib.matsim4opus.utils.ProgressBar;
@@ -44,8 +46,6 @@ import org.matsim.contrib.matsim4opus.utils.helperObjects.JobClusterObject;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.WorkplaceObject;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 

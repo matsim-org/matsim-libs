@@ -38,8 +38,8 @@ import net.opengis.kml._2.StyleType;
 
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.matsim4opus.gis.CRSUtils;
+import org.matsim.contrib.matsim4opus.gis.graph.spatial.io.Colorizable;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
