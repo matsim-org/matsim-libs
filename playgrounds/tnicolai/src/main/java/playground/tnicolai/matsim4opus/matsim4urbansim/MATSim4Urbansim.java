@@ -114,6 +114,7 @@ public class MATSim4Urbansim {
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();
 		cleanNetwork(network);
+		modifyNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
@@ -267,6 +268,17 @@ public class MATSim4Urbansim {
 		( new NetworkCleaner() ).run(network);
 		log.info("... finished cleaning network.");
 		log.info(""); 
+	}
+	
+	/**
+	 * This method allows to modify the MATSim network
+	 * This needs to be implemented by another class
+	 * 
+	 * @param network
+	 */
+	void modifyNetwork(NetworkImpl network){
+		// this is just a stub and does nothing. 
+		// This needs to be implemented/overwritten by another class
 	}
 	
 	/**
