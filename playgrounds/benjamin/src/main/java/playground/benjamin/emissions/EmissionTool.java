@@ -21,33 +21,23 @@ package playground.benjamin.emissions;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
-import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreator;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreatorDetailed;
 import playground.benjamin.emissions.dataTypes.VisumRoadTypes;
-
-import com.healthmarketscience.jackcess.Database;
 
 public class EmissionTool {
 	private static final Logger logger = Logger.getLogger(EmissionTool.class);
@@ -70,7 +60,7 @@ public class EmissionTool {
 //	private static String netFile = runDirectory + "output_network.xml.gz";
 //	private static String vehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml";
 
-	private static String hbefaDatabase = "../../detailedEval/emissions/hbefa/hotEmissions_all_vehicleTypes.MDB";
+	private static String hbefaDatabaseFile = "../../detailedEval/emissions/hbefa/hotEmissions_all_vehicleTypes.MDB";
 	
 	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
 	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
@@ -89,65 +79,65 @@ public class EmissionTool {
 		this.scenario = ScenarioUtils.createScenario(config);
 	}
 
-	private void run(String[] args) throws IOException {
+	private void run(String[] args) throws IOException, ClassNotFoundException, SQLException {
 		
-		loadDatabase();
+		establishDatabaseConnection();
 		
-		loadScenario();
-		Network network = scenario.getNetwork();
-		
-		// create two event manager
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
-		
-		// read different hbefa tables
-		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
-		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
-		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
-		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
-		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
-		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
-
-		// read the vehicle file
-		Vehicles vehicles = new VehiclesImpl();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-		vehicleReader.readFile(vehicleFile);
-
-		// TODO: make the following homogeneous?!?
-		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
-		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
-		
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
-				roadTypes,
-				roadTypesTrafficSituations,
-				hbefaWarmEmissionTableCreatorDetailed,
-				hbefaAvgWarmEmissionTableCreator,
-				hbefaAvgWarmEmissionTableCreatorHDV,
-				emissionEventsManager);
-		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
-		// create the handler
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
-				vehicles,
-				network,
-				warmEmissionAnalysisModule);
-		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
-				network,
-				hbefaAvgColdEmissionTableCreator,
-				coldEmissionAnalysisModule,
-				emissionEventsManager);
-		// create the writer for emission events
-		EventWriterXML emissionEventWriter = new EventWriterXML(outputFile);
-		// add the handler
-		eventsManager.addHandler(warmEmissionHandler);
-		eventsManager.addHandler(coldEmissionHandler);
-		emissionEventsManager.addHandler(emissionEventWriter);
-		//create the reader and read the file
-		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-		matsimEventsReader.readFile(eventsFile);
-		emissionEventWriter.closeFile();
-		logger.info("Terminated. Output can be found in " + outputFile);
+//		loadScenario();
+//		Network network = scenario.getNetwork();
+//		
+//		// create two event manager
+//		EventsManager eventsManager = EventsUtils.createEventsManager();
+//		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
+//		
+//		// read different hbefa tables
+//		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
+//		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
+//		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
+//		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
+//		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
+//		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+//		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
+//		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
+//
+//		// read the vehicle file
+//		Vehicles vehicles = new VehiclesImpl();
+//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+//		vehicleReader.readFile(vehicleFile);
+//
+//		// TODO: make the following homogeneous?!?
+//		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
+//		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+//		
+//		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
+//				roadTypes,
+//				roadTypesTrafficSituations,
+//				hbefaWarmEmissionTableCreatorDetailed,
+//				hbefaAvgWarmEmissionTableCreator,
+//				hbefaAvgWarmEmissionTableCreatorHDV,
+//				emissionEventsManager);
+//		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
+//		// create the handler
+//		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
+//				vehicles,
+//				network,
+//				warmEmissionAnalysisModule);
+//		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
+//				network,
+//				hbefaAvgColdEmissionTableCreator,
+//				coldEmissionAnalysisModule,
+//				emissionEventsManager);
+//		// create the writer for emission events
+//		EventWriterXML emissionEventWriter = new EventWriterXML(outputFile);
+//		// add the handler
+//		eventsManager.addHandler(warmEmissionHandler);
+//		eventsManager.addHandler(coldEmissionHandler);
+//		emissionEventsManager.addHandler(emissionEventWriter);
+//		//create the reader and read the file
+//		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+//		matsimEventsReader.readFile(eventsFile);
+//		emissionEventWriter.closeFile();
+//		logger.info("Terminated. Output can be found in " + outputFile);
 	}
 
 	private String[][] createRoadTypesTafficSituation(
@@ -212,10 +202,15 @@ public class EmissionTool {
 		scenarioLoader.loadScenario();
 	}
 
-	private void loadDatabase() throws IOException {
-		System.out.println(Database.open(new File(hbefaDatabase))
-				.getTable("MyTable")
-				.display());
+	private void establishDatabaseConnection() throws IOException, ClassNotFoundException, SQLException{
+//		File hbefaFile = new File(hbefaDatabaseFile);
+//		boolean readOnly = true;
+//		Database.open(hbefaFile, readOnly);
+		
+		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        String database = "jdbc:odbc:Driver={Microsoft Access Driver (hbefaDatabaseFile)};DBQ=myDB.mdb;";
+        Connection conn = DriverManager.getConnection(database, "", "");
+        Statement s = conn.createStatement();
 	}
 
 	public static void main (String[] args) throws Exception{
