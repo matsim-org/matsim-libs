@@ -26,9 +26,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.benjamin.events.emissions.WarmEmissionEvent;
-import playground.benjamin.events.emissions.WarmEmissionEventHandler;
-import playground.benjamin.events.emissions.WarmPollutant;
+import playground.benjamin.emissions.events.WarmEmissionEvent;
+import playground.benjamin.emissions.events.WarmEmissionEventHandler;
+import playground.benjamin.emissions.events.WarmPollutant;
 
 /**
  * @author benjamin

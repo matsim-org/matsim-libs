@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import playground.benjamin.events.emissions.ColdPollutant;
-import playground.benjamin.events.emissions.EmissionEventsReader;
-import playground.benjamin.events.emissions.WarmPollutant;
+import playground.benjamin.emissions.events.ColdPollutant;
+import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.emissions.events.WarmPollutant;
 
 /**
  * @author benjamin
