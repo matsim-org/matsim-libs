@@ -43,12 +43,12 @@ public class DebugVisualization {
 		//argument syntax: DebugSim.java eventfile.xml networkfile.xml liveMode [=true / false / null||else(=false) ]
 		if (args.length > 0)
 		{
-			console.println("Initializing Debug Simulation.");
+			//console.println("Initializing Debug Simulation.");
 			//Controller controller = new Controller(args[0], args[1], console, 3, true);
 			Controller controller = new Controller(e, sc);
 			
-			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
-			reader.parse(args[0]);
+			//XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
+			//reader.parse(args[0]);
 			
 		}
 		else

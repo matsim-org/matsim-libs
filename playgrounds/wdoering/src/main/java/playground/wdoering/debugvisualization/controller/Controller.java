@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
@@ -142,9 +143,14 @@ public class Controller {
 		
 	}
 	
-	public Controller(EventsManager e, Scenario sc) {
+	public Controller(EventsManager e, Scenario sc)
+	{
 		
-		this.importer = new Importer(this);
+		//Network network = sc.getNetwork();
+		
+		
+		
+		this.importer = new Importer(this, sc);
 		e.addHandler(this.importer);
 		
 		// TODO Auto-generated constructor stub

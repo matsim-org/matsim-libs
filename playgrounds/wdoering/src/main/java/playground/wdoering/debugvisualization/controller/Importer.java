@@ -20,6 +20,10 @@ import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -45,6 +49,56 @@ public class Importer implements XYVxVyEventsHandler {
 	public Importer(Controller controller)
 	{
 		this.controller = controller;
+		
+	}
+
+	public Importer(Controller controller, Scenario sc)
+	{
+		Network network = sc.getNetwork();
+		
+//		private HashMap<Integer, DataPoint> nodes = null;
+//		private HashMap<Integer, int[]> links = null;
+		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
+		
+		Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = network.getNodes();
+		
+		int k = 0;
+		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
+		{
+			k++;
+			System.out.println("");
+			System.out.println("---------------------------------");
+		    System.out.println(node.getKey() + "|" + node.getValue());
+		    org.matsim.api.core.v01.network.Node currentNode;
+		    currentNode = (org.matsim.api.core.v01.network.Node)node.getValue();
+		    
+		    Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
+		    Map<Id, ? extends Link> outLinks = currentNode.getOutLinks();
+		    
+		    System.out.println("IN LINKS");
+		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
+		    	System.out.println(inLink.getKey() + "|" + inLink.getValue());
+		    
+		    System.out.println("OUT LINKS");
+		    for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
+		    	System.out.println(outLink.getKey() + "|" + outLink.getValue());
+
+		    
+		    if (k>100) System.exit(0);
+		    
+		    //@TODO: matsim nodes auf datapoints übertragen
+		    //@TODO: thread suspend ? (stepper implementieren)
+		}
+
+
+		
+//		for (Iterator iterator = networkNodes.iterator(); iterator.hasNext();) {
+//			type type = (type) iterator.next();
+//			
+//		}
+		
+		
+		
 		
 	}
 
