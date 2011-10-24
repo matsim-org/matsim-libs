@@ -28,24 +28,24 @@ public class DebugVisualization {
 		
 		//console interface for status and debug tracking
 		Console console = new ConsoleImpl(false);
-		
-		Config c = ConfigUtils.createConfig();
-		
-		c.network().setInputFile(args[1]);
-		
-		Scenario sc = ScenarioUtils.loadScenario(c);
-		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
-		
-		EventsManager e = EventsUtils.createEventsManager();
-		
+//		
+//		Config c = ConfigUtils.createConfig();
+//		
+//		c.network().setInputFile(args[1]);
+//		
+//		Scenario sc = ScenarioUtils.loadScenario(c);
+//		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
+//		
+//		EventsManager e = EventsUtils.createEventsManager();
+//		
 		
 		
 		//argument syntax: DebugSim.java eventfile.xml networkfile.xml liveMode [=true / false / null||else(=false) ]
 		if (args.length > 0)
 		{
 			//console.println("Initializing Debug Simulation.");
-			//Controller controller = new Controller(args[0], args[1], console, 3, true);
-			Controller controller = new Controller(e, sc);
+			Controller controller = new Controller(args[0], args[1], console, 3, true);
+			//Controller controller = new Controller(e, sc);
 			
 			//XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
 			//reader.parse(args[0]);

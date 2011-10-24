@@ -54,7 +54,7 @@ public class Importer implements XYVxVyEventsHandler {
 
 	public Importer(Controller controller, Scenario sc)
 	{
-		Network network = sc.getNetwork();
+		/*Network network = sc.getNetwork();
 		
 //		private HashMap<Integer, DataPoint> nodes = null;
 //		private HashMap<Integer, int[]> links = null;
@@ -99,7 +99,7 @@ public class Importer implements XYVxVyEventsHandler {
 		
 		
 		
-		
+		*/
 	}
 
 	public void readEventFile(String fileName)
