@@ -44,7 +44,8 @@
 		<dependency>
 			<groupId>cadyts</groupId>
 			<artifactId>cadyts</artifactId>
-			<version>1.2.0-20110929</version>
+<!-- 			<version>1.2.0-20110929</version> -->
+			<version>1.2.0-20111019</version>
 		</dependency>
 		<dependency>
 			<groupId>mtj</groupId>

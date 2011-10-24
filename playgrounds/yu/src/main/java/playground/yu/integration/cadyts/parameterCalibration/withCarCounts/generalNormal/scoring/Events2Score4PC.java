@@ -53,7 +53,7 @@ import utilities.math.BasicStatistics;
 
 /**
  * @author yu
- *
+ * 
  */
 public abstract class Events2Score4PC extends EventsToScore implements
 		CadytsChoice {
@@ -175,7 +175,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	 * set Attr. and Utility (not the score in MATSim) of plans of a person.
 	 * This method should be called after removedPlans, i.e. there should be
 	 * only choiceSetSize plans in the memory of an agent.
-	 *
+	 * 
 	 * @param person
 	 * @param monetaryDistanceCostRateCarStats
 	 */
@@ -359,8 +359,9 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) data.getSecond()).startActivity(event.getTime(),
-					(Activity) data.getFirst().getPlanElements().get(index));
+			((ScoringFunctionAdapter) data.getSecond()).startActivity(
+					event.getTime(), (Activity) data.getFirst()
+							.getPlanElements().get(index));
 		}
 	}
 
@@ -370,10 +371,10 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.getPersonId());
 		if (planAndScoringFunction != null) {
 			int index = getAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) planAndScoringFunction.getSecond()).endActivity(
-					event.getTime(),
-					(Activity) planAndScoringFunction.getFirst()
-							.getPlanElements().get(index));
+			((ScoringFunctionAdapter) planAndScoringFunction.getSecond())
+					.endActivity(event.getTime(),
+							(Activity) planAndScoringFunction.getFirst()
+									.getPlanElements().get(index));
 		}
 	}
 
@@ -399,12 +400,14 @@ public abstract class Events2Score4PC extends EventsToScore implements
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
+		super.handleEvent(event);
 		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) data.getSecond()).startLeg(event.getTime(),
-					(Leg) data.getFirst().getPlanElements().get(index));
+			((ScoringFunctionAdapter) data.getSecond()).startLeg(
+					event.getTime(), (Leg) data.getFirst().getPlanElements()
+							.get(index));
 		}
 	}
 }
