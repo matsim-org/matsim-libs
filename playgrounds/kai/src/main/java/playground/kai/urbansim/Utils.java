@@ -50,7 +50,7 @@ public class Utils {
 			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
 
 			String header = reader.readLine() ;
-			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header ) ;
+			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header, null ) ;
 
 			String line = reader.readLine() ;
 			while ( line != null ) {
@@ -111,8 +111,26 @@ public class Utils {
 	 * @param line
 	 * @return idxFromKey as described above (mapping from column headers into column numbers)
 	 */
-	static Map<String,Integer> createIdxFromKey( String line ) {
-		String[] keys = line.split("[\t\n]+") ;
+	public static Map<String,Integer> createIdxFromKey( String line ) {
+		return createIdxFromKey(line, "[\t\n]+");
+	}
+
+	/**
+	 * This is used to parse a header line from a tab-delimited urbansim header and generate a Map that allows to look up column
+	 * numbers (starting from 0) by giving the header line.
+	 *
+	 * I.e. if you have a header "from_id <tab> to_id <tab> travel_time", then idxFromKey.get("to_id") will return "1".
+	 *
+	 * This makes the reading of column-oriented files independent from the sequence of the columns.
+	 *
+	 * Could be made more general by putting the separator into the argument.
+	 *
+	 * @param line
+	 * @param fieldSeparator TODO
+	 * @return idxFromKey as described above (mapping from column headers into column numbers)
+	 */
+	public static Map<String,Integer> createIdxFromKey( String line, String fieldSeparator ) {
+		String[] keys = line.split( fieldSeparator ) ;
 
 		Map<String,Integer> idxFromKey = new HashMap<String, Integer>() ;
 		for ( int ii=0 ; ii<keys.length ; ii++ ) {
@@ -120,7 +138,7 @@ public class Utils {
 		}
 		return idxFromKey ;
 	}
-
+	
 	private static final String ACT_HOME = "home" ;
 	private static final String ACT_WORK = "work" ;
 

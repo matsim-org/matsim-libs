@@ -64,7 +64,7 @@ public class ReadFromUrbansimParcelModel {
 			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
 
 			String line = reader.readLine() ;
-			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line ) ;
+			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line, null ) ;
 
 			while ( (line = reader.readLine()) != null ) {
 				String[] parts = line.split("[\t]+");
@@ -144,7 +144,7 @@ public class ReadFromUrbansimParcelModel {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
 
 			String line = reader.readLine();
-			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line ) ;
+			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( line, null ) ;
 
 			// We consider two cases:
 			// (1) We have an old population.  Then we look for those people who have the same id.

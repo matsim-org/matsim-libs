@@ -73,7 +73,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 			BufferedReader reader = IOUtils.getBufferedReader(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/gridcells.tab" ) ;
 
 			String header = reader.readLine() ;
-			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header ) ;
+			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header, null ) ;
 
 			String line = reader.readLine() ;
 			while ( line != null ) {
@@ -120,7 +120,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 			BufferedReader reader = IOUtils.getBufferedReader(Matsim4Urbansim.PATH_TO_OPUS_MATSIM+"tmp/households.tab");
 
 			String header = reader.readLine();
-			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header ) ;
+			Map<String,Integer> idxFromKey = Utils.createIdxFromKey( header, null ) ;
 
 			String line = reader.readLine();
 			while (line != null) {
