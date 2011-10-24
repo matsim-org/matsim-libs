@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHandler.java
+ * EmissionEventHotImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events.emissions;
+package playground.benjamin.emissions.events;
 
-import org.matsim.core.events.handler.EventHandler;
+public enum WarmPollutant {
+	
+	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
+	CO2_TOTAL("CO2(total)");
+	
+	private String key;
 
-/**
- * Implement this to get notified when HotEmissionEvents are thrown
- * @author benjamin
- *
- */
+	WarmPollutant(String key) {
+		this.key = key;
+	}
 
-public interface WarmEmissionEventHandler extends EventHandler {
-	public void handleEvent (WarmEmissionEvent event);
+	public String getText() {
+		return key;
+	}
 }

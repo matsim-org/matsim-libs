@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEvent.java
+ * EmissionEventHotImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,28 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events.emissions;
+package playground.benjamin.emissions.events;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
-
-/**
- * Event to indicate that emissions were produced.
- * @author benjamin
- *
- */
-public interface ColdEmissionEvent extends Event{
-
-	public final static String EVENT_TYPE = "coldEmissionEvent";
+public enum ColdPollutant {
 	
-	public final static String ATTRIBUTE_LINK_ID = "linkId";
-	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
+	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
+	CO("CO"), HC("HC");
 	
-	public Id getLinkId();
-	
-	public Id getVehicleId();
+	private String key;
 
-	public Map<ColdPollutant, Double> getColdEmissions();
+	ColdPollutant(String key) {
+		this.key = key;
+	}
+
+	public String getText() {
+		return key;
+	}
+	
+	public static ColdPollutant getValue(String key){
+		for(ColdPollutant cp : ColdPollutant.values()){
+			String cpString = cp.getText();
+			if(cpString.equals(key)){
+				return cp;
+			}
+		}
+		return null;
+	}
 }

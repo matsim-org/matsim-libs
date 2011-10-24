@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHotImpl.java
+ * EmissionEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events.emissions;
+package playground.benjamin.emissions.events;
 
-public enum ColdPollutant {
-	
-	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
-	CO("CO"), HC("HC");
-	
-	private String key;
+import org.matsim.core.events.handler.EventHandler;
 
-	ColdPollutant(String key) {
-		this.key = key;
-	}
+/**
+ * Implement this to get notified when ColdEmissionEvents are thrown
+ * @author benjamin
+ *
+ */
 
-	public String getText() {
-		return key;
-	}
-	
-	public static ColdPollutant getValue(String key){
-		for(ColdPollutant cp : ColdPollutant.values()){
-			String cpString = cp.getText();
-			if(cpString.equals(key)){
-				return cp;
-			}
-		}
-		return null;
-	}
+public interface ColdEmissionEventHandler extends EventHandler {
+	public void handleEvent (ColdEmissionEvent event);
 }

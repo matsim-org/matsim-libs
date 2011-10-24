@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.events.emissions;
+package playground.benjamin.emissions.events;
 
 import java.util.Map;
 import java.util.Map.Entry;
