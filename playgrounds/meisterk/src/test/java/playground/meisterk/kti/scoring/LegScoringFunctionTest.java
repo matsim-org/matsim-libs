@@ -176,6 +176,7 @@ public class LegScoringFunctionTest extends MatsimTestCase {
 				testPlan,
 				charyparNagelParams,
 				config,
+                network,
 				this.ktiConfigGroup);
 		double actualLegScore = testee.calcLegScore(Time.parseTime("06:00:00"), Time.parseTime("06:30:00"), testLeg);
 

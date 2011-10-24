@@ -156,7 +156,7 @@ public class PlanomatTest extends MatsimTestCase {
 //				this.scenario.getConfig().planomat().getRoutingCapability(),
 //				plansCalcRoute);
 
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().planCalcScore());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.scenario.getConfig().planCalcScore(), this.scenario.getNetwork());
 
 		log.info("Testing " + testRun.toString() + "...");
 

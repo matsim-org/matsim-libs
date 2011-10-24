@@ -46,7 +46,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 	private final static Logger log = Logger.getLogger(TRBScoringFunctionFactory.class);
 
 	public TRBScoringFunctionFactory(PlanCalcScoreConfigGroup config, Controler controler) {
-		super(config);
+		super(config, controler.getNetwork());
 		this.controler = controler;
 		this.init();
 	}
@@ -94,7 +94,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.charyparN
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.charyparNagel.LegScoringFunction(super.getParams()));
+				new org.matsim.core.scoring.charyparNagel.LegScoringFunction(super.getParams(), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(

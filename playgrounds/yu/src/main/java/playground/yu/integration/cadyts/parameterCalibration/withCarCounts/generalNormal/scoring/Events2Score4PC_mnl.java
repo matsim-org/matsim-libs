@@ -28,11 +28,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -67,8 +67,8 @@ public class Events2Score4PC_mnl extends Events2Score4PC implements
 	boolean setUCinMNL = true;
 
 	public Events2Score4PC_mnl(Config config, ScoringFunctionFactory sfFactory,
-			Population pop) {
-		super(config, sfFactory, pop);
+			Scenario scenario) {
+		super(config, sfFactory, scenario);
 		mnl = createMultinomialLogit(config);
 
 		String setUCinMNLStr = config.findParam(

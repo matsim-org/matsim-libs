@@ -21,6 +21,7 @@ package playground.benjamin.scoring.income.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
@@ -46,8 +47,8 @@ public class BKickLegScoring extends LegScoringFunction {
 
 	private Plan plan;
 
-	public BKickLegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb) {
-		super(params);
+	public BKickLegScoring(final Plan plan, final CharyparNagelScoringParameters params, PersonHouseholdMapping hhdb, Network network) {
+		super(params, network);
 		this.plan = plan;
 		Income income = hhdb.getHousehold(plan.getPerson().getId()).getIncome();
 		this.incomePerTrip = this.calculateIncomePerTrip(income);

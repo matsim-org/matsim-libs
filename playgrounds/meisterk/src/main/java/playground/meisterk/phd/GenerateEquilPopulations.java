@@ -97,7 +97,7 @@ public class GenerateEquilPopulations {
 
 		EventsManager emptyEvents = EventsUtils.createEventsManager();
 		TravelTimeCalculator tTravelEstimator = new TravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore());
+		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(config.planCalcScore(), scenario.getNetwork());
 		PersonalizableTravelCost travelCostEstimator = new TravelTimeDistanceCostCalculator(tTravelEstimator, config.planCalcScore());
 
 		Controler dummyControler = new Controler(scenario);

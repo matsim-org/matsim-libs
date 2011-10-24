@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
 import org.matsim.core.scoring.interfaces.AgentStuckScoring;
@@ -43,7 +44,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
  *
  */
 // in order to get attributes, e.g. actDur, legDurCar, legDurPt, stuck?
-public class ScoringFunctionAccumulator4PC implements ScoringFunction {
+public class ScoringFunctionAccumulator4PC extends ScoringFunctionAdapter {
 	protected CharyparNagelScoringParameters params;
 
 	protected ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();

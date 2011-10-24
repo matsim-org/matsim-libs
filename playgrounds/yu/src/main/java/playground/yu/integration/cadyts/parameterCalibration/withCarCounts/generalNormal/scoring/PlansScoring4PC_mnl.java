@@ -45,7 +45,7 @@ public class PlansScoring4PC_mnl extends PlansScoring4PC implements
 		Controler ctl = event.getControler();
 
 		planScorer = new Events2Score4PC_mnl(ctl.getConfig(), ctl
-				.getScoringFunctionFactory(), ctl.getPopulation());
+				.getScoringFunctionFactory(), ctl.getScenario());
 
 		log.debug(
 				"PlansScoring4PC_mnl loaded ScoringFunctionFactory");

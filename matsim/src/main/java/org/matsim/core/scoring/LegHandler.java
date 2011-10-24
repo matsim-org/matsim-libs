@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NetherlandsController.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,36 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.netherlands.controller;
+package org.matsim.core.scoring;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.population.LegImpl;
 
-public class NetherlandsController extends Controler {
 
-	public NetherlandsController(final String[] args) {
-		super(args);
-	}
-	
-	/*
-	 * We use a Scoring Function that get the Facility Opening Times from
-	 * the Facilities instead of the Config File.
-	 */
-	@Override
-	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario());
-	}
+public interface LegHandler {
 
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: NetherlandsController config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new NetherlandsController(args);
-			controler.run();
-		}
-		System.exit(0);
-	}
+    void handleLeg(Id agentId, Leg leg);
+
 }

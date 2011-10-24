@@ -77,9 +77,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	@Override
 	public void endActivity(final double time, final Activity act) {
 		assert act != null;
-		if (this.currentActivity != null && act != this.currentActivity) {
-			throw new RuntimeException();
-		}
+		assert currentActivity == null || currentActivity.getType().equals(act.getType());
 		if (this.firstAct) {
 			this.firstActivityEndTime = time;
 			this.firstActivity = act;
@@ -94,7 +92,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		if (this.currentActivity != null) {
 			handleLastActivity(this.currentActivity); 
 //		} else {
-			// No activity has ended so far.
+			// No activity has started so far.
 			// This probably means that the plan contains at most one activity.
 			// We cannot handle that correctly, because we do not know what it is.
 		}
@@ -230,6 +228,8 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 	}
 
 	private void handleLastActivity(Activity lastActivity) {
+        assert firstActivity != null;
+        assert lastActivity != null;
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
 			// the first Act and the last Act have the same type
 			this.score += calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity); // SCENARIO_DURATION

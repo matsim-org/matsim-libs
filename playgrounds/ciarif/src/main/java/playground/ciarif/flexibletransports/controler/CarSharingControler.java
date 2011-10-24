@@ -71,7 +71,7 @@ public class CarSharingControler extends Controler
       this.config, 
       this.ftConfigGroup, 
       this.getFacilityPenalties(), 
-      this.getFacilities());
+      this.getFacilities(), network);
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 //
     FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);

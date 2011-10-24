@@ -39,7 +39,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private Config config;
 
 	public MixedScoringFunctionFactory(Config config, Controler controler) {
-		super(config.planCalcScore());				
+		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.config = config;
 		
@@ -93,7 +93,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 				this.facilitiesKValues, this.personsKValues);
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams()));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams(), controler.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 		return scoringFunctionAccumulator;
 	}

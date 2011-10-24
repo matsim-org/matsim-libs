@@ -20,9 +20,11 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
@@ -35,18 +37,18 @@ import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
-	private final ActivityFacilities facilities;
-	
-	public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final ActivityFacilities facilities) {
+    private Scenario scenario;
+
+    public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
 		this.params = new CharyparNagelScoringParameters(config);
-		this.facilities = facilities;
+		this.scenario = scenario;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params, this.facilities));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesScoringFunction(plan, params, ((ScenarioImpl) scenario).getActivityFacilities()));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 

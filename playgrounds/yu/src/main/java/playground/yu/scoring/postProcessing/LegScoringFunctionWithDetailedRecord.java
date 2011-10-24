@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PlanImpl;
@@ -51,8 +52,8 @@ public class LegScoringFunctionWithDetailedRecord extends LegScoringFunction {
 	private Plan plan;
 
 	public LegScoringFunctionWithDetailedRecord(Plan plan,
-			CharyparNagelScoringParameters params) {
-		super(params);
+                                                CharyparNagelScoringParameters params, Network network) {
+		super(params, network);
 		this.plan = plan;
 	}
 

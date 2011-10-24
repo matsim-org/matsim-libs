@@ -22,6 +22,7 @@ package org.matsim.core.scoring;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -29,13 +30,16 @@ import org.matsim.core.scoring.interfaces.AgentStuckScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * The accumulator adds up the different parts of the score.
  * @see http://www.matsim.org/node/263
  * @author rashid_waraich
  */
-public class ScoringFunctionAccumulator implements ScoringFunction {
+public class ScoringFunctionAccumulator extends ScoringFunctionAdapter {
+
+    private static Logger log = Logger.getLogger(ScoringFunctionAccumulator.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<ActivityScoring>();
@@ -99,8 +103,9 @@ public class ScoringFunctionAccumulator implements ScoringFunction {
 	public double getScore() {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
-			score += basicScoringFunction.getScore();
-//			log.trace("Score after scoring function: " + basicScoringFunction.getClass().getName() + " is: " + score);
+            double contribution = basicScoringFunction.getScore();
+			// log.debug("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
+            score += contribution;
 		}
 		return score;
 	}

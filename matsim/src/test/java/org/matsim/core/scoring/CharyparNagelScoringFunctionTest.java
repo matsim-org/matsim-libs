@@ -21,24 +21,31 @@
 package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.events.AgentMoneyEventImpl;
+import org.matsim.core.events.*;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.Arrays;
 
 /**
  * Test the correct working of the CharyparNagelScoringFunction according to the formulas in:
@@ -54,536 +61,588 @@ import org.matsim.testcases.MatsimTestCase;
  */
 public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
 
-	protected Config config = null;
-	private NetworkImpl network = null;
-	private PersonImpl person = null;
-	private PlanImpl plan = null;
+    protected Config config = null;
+    private PersonImpl person = null;
+    private PlanImpl plan = null;
+    private Scenario scenario;
+    private NetworkImpl network;
+    private int firstLegStartTime;
+    private int firstLegTravelTime;
+    private int thirdLegTravelTime;
+    private int fourthLegTravelTime;
+    private int secondLegTravelTime;
+    private int secondLegStartTime;
+    private int thirdLegStartTime;
+    private int fourthLegStartTime;
+    private EventsToScore eventsToScore;
 
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		this.config = loadConfig(null);
-		PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
-		scoring.setBrainExpBeta(2.0);
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        firstLegStartTime = 07 * 3600;
+        firstLegTravelTime = 30 * 60;
+        thirdLegTravelTime = 30 * 60;
+        secondLegStartTime = 10 * 3600;
+        secondLegTravelTime = 15 * 60;
+        thirdLegStartTime = 13 * 3600;
+        fourthLegStartTime = 16 * 3600;
+        fourthLegTravelTime = 15 * 60;
+        this.config = loadConfig(null);
+        PlanCalcScoreConfigGroup scoring = this.config.planCalcScore();
+        scoring.setBrainExpBeta(2.0);
 
-		scoring.setConstantCar(0.0);
-		scoring.setConstantPt(0.0);
-		scoring.setConstantWalk(0.0);
-		scoring.setConstantBike(0.0);
-		
-		scoring.setEarlyDeparture_utils_hr(0.0);
-		scoring.setLateArrival_utils_hr(0.0);
-		scoring.setWaiting_utils_hr(0.0);
-		scoring.setPerforming_utils_hr(0.0);
-		scoring.setTraveling_utils_hr(0.0);
-		scoring.setTravelingPt_utils_hr(0.0);
-		scoring.setTravelingWalk_utils_hr(0.0);
-		scoring.setTravelingBike_utils_hr(0.0);
+        scoring.setConstantCar(0.0);
+        scoring.setConstantPt(0.0);
+        scoring.setConstantWalk(0.0);
+        scoring.setConstantBike(0.0);
 
-		scoring.setMarginalUtilityOfMoney(1.) ;
-//		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setMonetaryDistanceCostRateCar(0.0) ;
-		scoring.setMonetaryDistanceCostRatePt(0.0);
-		
+        scoring.setEarlyDeparture_utils_hr(0.0);
+        scoring.setLateArrival_utils_hr(0.0);
+        scoring.setWaiting_utils_hr(0.0);
+        scoring.setPerforming_utils_hr(0.0);
+        scoring.setTraveling_utils_hr(0.0);
+        scoring.setTravelingPt_utils_hr(0.0);
+        scoring.setTravelingWalk_utils_hr(0.0);
+        scoring.setTravelingBike_utils_hr(0.0);
 
-		// setup activity types h and w for scoring
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
-		params.setTypicalDuration(15*3600);
-		scoring.addActivityParams(params);
+        scoring.setMarginalUtilityOfMoney(1.) ;
+        scoring.setMonetaryDistanceCostRateCar(0.0) ;
+        scoring.setMonetaryDistanceCostRatePt(0.0);
 
-		params = new PlanCalcScoreConfigGroup.ActivityParams("w");
-		params.setTypicalDuration(3*3600);
-		scoring.addActivityParams(params);
 
-		this.network = NetworkImpl.createNetwork();
-		Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
-		Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
-		Node node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
-		Node node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
-		Node node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
-		Node node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
-		Node node7 = this.network.createAndAddNode(new IdImpl("7"), new CoordImpl(16500.0, 0.0));
-		Node node8 = this.network.createAndAddNode(new IdImpl("8"), new CoordImpl(17000.0, 0.0));
-		Node node9 = this.network.createAndAddNode(new IdImpl("9"), new CoordImpl(22000.0, 0.0));
-		Node node10 = this.network.createAndAddNode(new IdImpl("10"), new CoordImpl(22500.0, 0.0));
-		
-		Link link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
-		this.network.createAndAddLink(new IdImpl("2"), node2, node3, 5000, 50, 3600, 1);
-		Link link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
-		this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
-		Link link5 = this.network.createAndAddLink(new IdImpl("5"), node5, node6, 500, 25, 3600, 1);
-		this.network.createAndAddLink(new IdImpl("6"), node6, node7, 5000, 50, 3600, 1);
-		Link link7 = this.network.createAndAddLink(new IdImpl("7"), node7, node8, 500, 25, 3600, 1);
-		this.network.createAndAddLink(new IdImpl("8"), node8, node9, 5000, 50, 3600, 1);
-		Link link9 = this.network.createAndAddLink(new IdImpl("9"), node9, node10, 500, 25, 3600, 1);
+        // setup activity types h and w for scoring
+        PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
+        params.setTypicalDuration(15*3600);
+        scoring.addActivityParams(params);
 
-		this.person = new PersonImpl(new IdImpl("1"));
-		this.plan = this.person.createAndAddPlan(true);
+        params = new PlanCalcScoreConfigGroup.ActivityParams("w");
+        params.setTypicalDuration(3*3600);
+        scoring.addActivityParams(params);
 
-		this.plan.createAndAddActivity("h", link1.getId());
-		Leg leg = this.plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
-		leg.setRoute(route);
-		// does not match the network distances or travel times! WHY? --- benjamin mar'11
-		route.setDistance(25000.0);
-		route.setTravelTime(0.5*3600);
-		
-		this.plan.createAndAddActivity("w", link3.getId());
-		leg = this.plan.createAndAddLeg(TransportMode.pt);
-		route = new LinkNetworkRouteImpl(link3.getId(), link5.getId());
-		// (why is this "car"?  We found it that way. benjamin/kai, jun'11)
-		leg.setRoute(route);
-		// does not match the network distances or travel times! WHY? --- benjamin mar'11
-		route.setDistance(20000.0);
-		route.setTravelTime(0.25*3600);
-		
-		this.plan.createAndAddActivity("w", link5.getId());
-		leg = this.plan.createAndAddLeg(TransportMode.walk);
-		route = new LinkNetworkRouteImpl(link5.getId(), link7.getId());
-		leg.setRoute(route);
-		// does not match the network distances or travel times! WHY? --- benjamin mar'11
-		route.setDistance(25000.0);
-		route.setTravelTime(0.5*3600);
+        this.scenario = ScenarioUtils.createScenario(config);
+        this.network = (NetworkImpl) this.scenario.getNetwork();
+        Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
+        Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
+        Node node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
+        Node node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
+        Node node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
+        Node node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
+        Node node7 = this.network.createAndAddNode(new IdImpl("7"), new CoordImpl(16500.0, 0.0));
+        Node node8 = this.network.createAndAddNode(new IdImpl("8"), new CoordImpl(17000.0, 0.0));
+        Node node9 = this.network.createAndAddNode(new IdImpl("9"), new CoordImpl(22000.0, 0.0));
+        Node node10 = this.network.createAndAddNode(new IdImpl("10"), new CoordImpl(22500.0, 0.0));
 
-		this.plan.createAndAddActivity("w", link7.getId());
-		leg = this.plan.createAndAddLeg(TransportMode.bike);
-		route = new LinkNetworkRouteImpl(link7.getId(), link9.getId());
-		leg.setRoute(route);
-		// does not match the network distances or travel times! WHY? --- benjamin mar'11
-		route.setDistance(20000.0);
-		route.setTravelTime(0.25*3600);
-		
-		this.plan.createAndAddActivity("h", link9.getId());
-	}
+        Link link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
+        Link link2 = this.network.createAndAddLink(new IdImpl("2"), node2, node3, 25000, 50, 3600, 1);
+        Link link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
+        this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
+        Link link5 = this.network.createAndAddLink(new IdImpl("5"), node5, node6, 500, 25, 3600, 1);
+        this.network.createAndAddLink(new IdImpl("6"), node6, node7, 5000, 50, 3600, 1);
+        Link link7 = this.network.createAndAddLink(new IdImpl("7"), node7, node8, 500, 25, 3600, 1);
+        this.network.createAndAddLink(new IdImpl("8"), node8, node9, 5000, 50, 3600, 1);
+        Link link9 = this.network.createAndAddLink(new IdImpl("9"), node9, node10, 500, 25, 3600, 1);
 
-	@Override
-	protected void tearDown() throws Exception {
-		this.config = null;
-		this.network = null;
-		this.person = null;
-		this.plan = null;
-		super.tearDown();
-	}
-	
-	private ScoringFunction getScoringFunctionInstance(final PlanImpl somePlan) {
-		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore());
-		return charyparNagelScoringFunctionFactory.createNewScoringFunction(somePlan);
-	}
+        this.person = new PersonImpl(new IdImpl("1"));
+        this.plan = this.person.createAndAddPlan(true);
 
-	private double calcScore() {
-		ScoringFunction testee = getScoringFunctionInstance(new PlanImpl());
-		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
-		
-		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
-		testee.endLeg(07*3600 + 30*60);
-		
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(10*3600, (Activity) this.plan.getPlanElements().get(2));
-		
-		testee.startLeg(10*3600, (Leg) this.plan.getPlanElements().get(3));
-		testee.endLeg(10*3600 + 15*60);
-		
-		testee.startActivity(10*3600 + 15*60, (Activity) this.plan.getPlanElements().get(4));
-		testee.endActivity(13*3600, (Activity) this.plan.getPlanElements().get(4));
-		
-		testee.startLeg(13*3600, (Leg) this.plan.getPlanElements().get(5));
-		testee.endLeg(13*3600 + 30*60);
-		
-		testee.startActivity(13*3600 + 30*60, (Activity) this.plan.getPlanElements().get(6));
-		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(6));
-		
-		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(7));
-		testee.endLeg(16*3600 + 15*60);
-		
-		testee.startActivity(16*3600 + 15*60, (Activity) this.plan.getPlanElements().get(8));
-		
+        ActivityImpl firstActivity = this.plan.createAndAddActivity("h", link1.getId());
+        firstActivity.setEndTime(firstLegStartTime);
+
+        Leg leg = this.plan.createAndAddLeg(TransportMode.car);
+        leg.setDepartureTime(firstLegStartTime);
+        leg.setTravelTime(firstLegTravelTime);
+        NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
+        route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
+        leg.setRoute(route1);
+
+        ActivityImpl secondActivity = this.plan.createAndAddActivity("w", link3.getId());
+        secondActivity.setStartTime(firstLegStartTime + firstLegTravelTime);
+        secondActivity.setEndTime(secondLegStartTime);
+        leg = this.plan.createAndAddLeg(TransportMode.pt);
+        leg.setDepartureTime(secondLegStartTime);
+        leg.setTravelTime(secondLegTravelTime);
+        Route route2 = new GenericRouteImpl(link3.getId(), link5.getId());
+        leg.setRoute(route2);
+        route2.setDistance(20000.0);
+
+        ActivityImpl thirdActivity = this.plan.createAndAddActivity("w", link5.getId());
+        thirdActivity.setStartTime(secondLegStartTime + secondLegTravelTime);
+        thirdActivity.setEndTime(thirdLegStartTime);
+        leg = this.plan.createAndAddLeg(TransportMode.walk);
+        leg.setDepartureTime(thirdLegStartTime);
+        leg.setTravelTime(thirdLegTravelTime);
+        Route route3 = new GenericRouteImpl(link5.getId(), link7.getId());
+        leg.setRoute(route3);
+
+        ActivityImpl fourthActivity = this.plan.createAndAddActivity("w", link7.getId());
+        fourthActivity.setStartTime(thirdLegStartTime + thirdLegTravelTime);
+        fourthActivity.setEndTime(fourthLegStartTime);
+        leg = this.plan.createAndAddLeg(TransportMode.bike);
+        leg.setDepartureTime(fourthLegStartTime);
+        leg.setTravelTime(fourthLegTravelTime);
+        Route route4 = new GenericRouteImpl(link7.getId(), link9.getId());
+        leg.setRoute(route4);
+
+        ActivityImpl fifthActivity = this.plan.createAndAddActivity("h", link9.getId());
+        fifthActivity.setStartTime(fourthLegStartTime + fourthLegTravelTime);
+        this.scenario.getPopulation().addPerson(this.person);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        this.config = null;
+        this.network = null;
+        this.person = null;
+        this.plan = null;
+        super.tearDown();
+    }
+
+    private ScoringFunction getScoringFunctionInstance(final PlanImpl somePlan) {
+        CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), scenario.getNetwork());
+        return charyparNagelScoringFunctionFactory.createNewScoringFunction(somePlan);
+    }
+
+    private double calcScore() {
+        CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), scenario.getNetwork());
+        ScoringFunctionAccumulator testee = (ScoringFunctionAccumulator) charyparNagelScoringFunctionFactory.createNewScoringFunction(new PlanImpl());
+        testee.handleActivity((Activity) this.plan.getPlanElements().get(0));
+		testee.handleLeg((Leg) this.plan.getPlanElements().get(1));
+		testee.handleActivity((Activity) this.plan.getPlanElements().get(2));
+		testee.handleLeg((Leg) this.plan.getPlanElements().get(3));
+		testee.handleActivity((Activity) this.plan.getPlanElements().get(4));
+		testee.handleLeg((Leg) this.plan.getPlanElements().get(5));
+		testee.handleActivity((Activity) this.plan.getPlanElements().get(6));
+		testee.handleLeg((Leg) this.plan.getPlanElements().get(7));
+		testee.handleActivity((Activity) this.plan.getPlanElements().get(8));
 		testee.finish();
-		return testee.getScore();
-	}
+		double score = testee.getScore();
+        double scoreFromEvents = calcScoreFromEvents();
+        assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents);
+        return score;
+    }
 
-	/**
-	 * The reference implementation to calculate the zero utility duration, the duration of
-	 * an activity at which its utility is zero.
-	 *
-	 * @param typicalDuration_h The typical duration of the activity in hours
-	 * @param priority
-	 * @return the duration (in hours) at which the activity has a utility of 0.
-	 */
-	private double getZeroUtilDuration_h(final double typicalDuration_h, final double priority) {
-		return typicalDuration_h * Math.exp(-10.0 / typicalDuration_h / priority);
-	}
+    private double calcScoreFromEvents() {
+        CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), scenario.getNetwork());
+        eventsToScore = new EventsToScore(this.scenario, charyparNagelScoringFunctionFactory);
+        handleFirstActivity((Activity) this.plan.getPlanElements().get(0));
+        handleLeg((Leg) this.plan.getPlanElements().get(1));
+        handleActivity((Activity) this.plan.getPlanElements().get(2));
+        handleLeg((Leg) this.plan.getPlanElements().get(3));
+        handleActivity((Activity) this.plan.getPlanElements().get(4));
+        handleLeg((Leg) this.plan.getPlanElements().get(5));
+        handleActivity((Activity) this.plan.getPlanElements().get(6));
+        handleLeg((Leg) this.plan.getPlanElements().get(7));
+        handleLastActivity((Activity) this.plan.getPlanElements().get(8));
+        eventsToScore.finish();
+        return this.plan.getScore();
+    }
 
-	/**
-	 * Test the calculation of the zero-utility-duration.
-	 */
-	public void testZeroUtilityDuration() {
-		double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
-		double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
+    private void handleFirstActivity(Activity activity) {
+        eventsToScore.handleEvent(new ActivityEndEventImpl(activity.getEndTime(), person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+    }
 
-		ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
-		assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), EPSILON);
+    private void handleLastActivity(Activity activity) {
+        eventsToScore.handleEvent(new ActivityStartEventImpl(activity.getStartTime(), person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+    }
 
-		params = new ActivityUtilityParameters("h", 1.0, 16.0 * 3600);
-		assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), EPSILON);
+    private void handleLeg(Leg leg) {
+        eventsToScore.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
+        if (leg.getRoute() instanceof NetworkRoute) {
+            eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), leg.getRoute().getStartLinkId()));
+            for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+                eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime(), person.getId(), linkId));
+                eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), linkId));
+            }
+            eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getEndLinkId()));
+        } else {
+            eventsToScore.handleEvent(new TravelEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getDistance()));
+        }
+        eventsToScore.handleEvent(new AgentArrivalEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
+    }
 
-		params = new ActivityUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
-		assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), EPSILON);
-	}
+    private void handleActivity(Activity activity) {
+        eventsToScore.handleEvent(new ActivityStartEventImpl(activity.getStartTime(), person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+        eventsToScore.handleEvent(new ActivityEndEventImpl(activity.getEndTime(), person.getId(), activity.getLinkId(), activity.getFacilityId(), activity.getType()));
+    }
 
-	/**
-	 * Test the scoring function when all parameters are set to 0.
-	 */
-	public void testZero() {
-		assertEquals(0.0, calcScore(), EPSILON);
-	}
+    /**
+     * The reference implementation to calculate the zero utility duration, the duration of
+     * an activity at which its utility is zero.
+     *
+     * @param typicalDuration_h The typical duration of the activity in hours
+     * @param priority
+     * @return the duration (in hours) at which the activity has a utility of 0.
+     */
+    private double getZeroUtilDuration_h(final double typicalDuration_h, final double priority) {
+        return typicalDuration_h * Math.exp(-10.0 / typicalDuration_h / priority);
+    }
 
-	public void testTravelingAndConstantCar() {
-		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
-		assertEquals(-3.0, calcScore(), EPSILON);
-		this.config.planCalcScore().setConstantCar(-6.0) ;
-		assertEquals(-9.0, calcScore(), EPSILON);
-	}
+    /**
+     * Test the calculation of the zero-utility-duration.
+     */
+    public void testZeroUtilityDuration() {
+        double zeroUtilDurW = getZeroUtilDuration_h(8.0, 1.0);
+        double zeroUtilDurH = getZeroUtilDuration_h(16.0, 1.0);
+        double zeroUtilDurW2 = getZeroUtilDuration_h(8.0, 2.0);
 
-	public void testTravelingPtAndConstantPt() {
-		this.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
-		assertEquals(-2.25, calcScore(), EPSILON);
-		this.config.planCalcScore().setConstantPt(-3.0) ;
-		assertEquals(-5.25, calcScore(), EPSILON);
-	}
-	
-	public void testTravelingWalkAndConstantWalk() {
-		this.config.planCalcScore().setTravelingWalk_utils_hr(-18.0);
-		assertEquals(-9.0, calcScore(), EPSILON ) ;
-		this.config.planCalcScore().setConstantWalk(-1.0);
-		assertEquals(-10.0, calcScore(), EPSILON);
-	}
-	
-	public void testTravelingBikeAndConstantBike(){
-		this.config.planCalcScore().setTravelingBike_utils_hr(-6.0);
-		assertEquals(-1.5, calcScore(), EPSILON ) ;
-		this.config.planCalcScore().setConstantBike(-2.0);
-		assertEquals(-3.5, calcScore(), EPSILON);
-	}
+        ActivityUtilityParameters params = new ActivityUtilityParameters("w", 1.0, 8.0 * 3600);
+        assertEquals(zeroUtilDurW, params.getZeroUtilityDuration(), EPSILON);
 
-	/**
-	 * Test the performing part of the scoring function.
-	 */
-	public void testPerforming() {
-		double perf = +6.0;
-		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
+        params = new ActivityUtilityParameters("h", 1.0, 16.0 * 3600);
+        assertEquals(zeroUtilDurH, params.getZeroUtilityDuration(), EPSILON);
 
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
-				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+        params = new ActivityUtilityParameters("w2", 2.0, 8.0 * 3600); // test that the priority is respected as well
+        assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration(), EPSILON);
+    }
 
-		perf = +3.0;
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
-				+ perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
-	}
+    /**
+     * Test the scoring function when all parameters are set to 0.
+     */
+    public void testZero() {
+        assertEquals(0.0, calcScore(), EPSILON);
+    }
 
-	/**
-	 * Test the performing part of the scoring function when an activity has an OpeningTime set.
-	 */
-	public void testOpeningTime() {
-		double perf = +6.0;
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		double initialScore = calcScore();
+    public void testTravelingAndConstantCar() {
+        this.config.planCalcScore().setTraveling_utils_hr(-6.0);
+        assertEquals(-3.0, calcScore(), EPSILON);
+        this.config.planCalcScore().setConstantCar(-6.0) ;
+        assertEquals(-9.0, calcScore(), EPSILON);
+    }
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early to the FIRST work activity and has to wait
-		double score = calcScore();
+    public void testTravelingPtAndConstantPt() {
+        this.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
+        assertEquals(-2.25, calcScore(), EPSILON);
+        this.config.planCalcScore().setConstantPt(-3.0) ;
+        assertEquals(-5.25, calcScore(), EPSILON);
+    }
 
-		// check the difference between 2.5 and 2.0 hours of working
-		assertEquals(perf * 3.0 * Math.log(2.5 / 2.0), initialScore - score, EPSILON);
-	}
+    public void testTravelingWalkAndConstantWalk() {
+        this.config.planCalcScore().setTravelingWalk_utils_hr(-18.0);
+        assertEquals(-9.0, calcScore(), EPSILON ) ;
+        this.config.planCalcScore().setConstantWalk(-1.0);
+        assertEquals(-10.0, calcScore(), EPSILON);
+    }
 
-	/**
-	 * Test the performing part of the scoring function when an activity has a ClosingTime set.
-	 */
-	public void testClosingTime() {
-		double perf = +6.0;
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		double initialScore = calcScore();
+    public void testTravelingBikeAndConstantBike(){
+        this.config.planCalcScore().setTravelingBike_utils_hr(-6.0);
+        assertEquals(-1.5, calcScore(), EPSILON ) ;
+        this.config.planCalcScore().setConstantBike(-2.0);
+        assertEquals(-3.5, calcScore(), EPSILON);
+    }
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long at the LAST work activity
-		double score = calcScore();
+    /**
+     * Test the performing part of the scoring function.
+     */
+    public void testPerforming() {
+        double perf = +6.0;
+        double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
+        double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
 
-		// check the difference between 2.5 and 1.5 hours working
-		assertEquals(perf * 3.0 * Math.log(2.5 / 1.5), initialScore - score, EPSILON);
-	}
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+                + perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
-	/**
-	 * Test the performing part of the scoring function when an activity has OpeningTime and ClosingTime set.
-	 */
-	public void testOpeningClosingTime() {
-		double perf = +6.0;
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		double initialScore = calcScore();
+        perf = +3.0;
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+                + perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+    }
 
-		// test1: agents has to wait before and after
+    /**
+     * Test the performing part of the scoring function when an activity has an OpeningTime set.
+     */
+    public void testOpeningTime() {
+        double perf = +6.0;
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        double initialScore = calcScore();
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
-		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
-		double score = calcScore();
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setOpeningTime(8*3600.0); // now the agent arrives 30min early to the FIRST work activity and has to wait
+        double score = calcScore();
 
-		// check the differences for all work activities
-		assertEquals(perf * 3.0 * Math.log(2.5 / 2.0)
-					+ perf * 3.0 * Math.log(2.75 / 2.75)
-					+ perf * 3.0 * Math.log(2.5 / 1.5)
-					, initialScore - score, EPSILON);
+        // check the difference between 2.5 and 2.0 hours of working
+        assertEquals(perf * 3.0 * Math.log(2.5 / 2.0), initialScore - score, EPSILON);
+    }
 
-		// test 2: agents has to wait all the time, because work place opens later
+    /**
+     * Test the performing part of the scoring function when an activity has a ClosingTime set.
+     */
+    public void testClosingTime() {
+        double perf = +6.0;
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        double initialScore = calcScore();
 
-		wParams.setOpeningTime(20*3600.0);
-		wParams.setClosingTime(21*3600.0);
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setClosingTime(15*3600.0); // now the agent stays 1h too long at the LAST work activity
+        double score = calcScore();
 
-		// only the home-activity should add to the score
-		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+        // check the difference between 2.5 and 1.5 hours working
+        assertEquals(perf * 3.0 * Math.log(2.5 / 1.5), initialScore - score, EPSILON);
+    }
 
-		// test 3: agents has to wait all the time, because work place opened earlier
+    /**
+     * Test the performing part of the scoring function when an activity has OpeningTime and ClosingTime set.
+     */
+    public void testOpeningClosingTime() {
+        double perf = +6.0;
+        double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        double initialScore = calcScore();
 
-		wParams.setOpeningTime(1*3600.0);
-		wParams.setClosingTime(2*3600.0);
+        // test1: agents has to wait before and after
 
-		// only the home-activity should add to the score
-		assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
-	}
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
+        wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
+        double score = calcScore();
 
-	/**
-	 * Test the waiting part of the scoring function.
-	 */
-	public void testWaitingTime() {
-		double waiting = -10.0;
-		this.config.planCalcScore().setWaiting_utils_hr(waiting);
+        // check the differences for all work activities
+        assertEquals(perf * 3.0 * Math.log(2.5 / 2.0)
+                + perf * 3.0 * Math.log(2.75 / 2.75)
+                + perf * 3.0 * Math.log(2.5 / 1.5)
+                , initialScore - score, EPSILON);
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
-		wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
+        // test 2: agents has to wait all the time, because work place opens later
 
-		// the agent spends 1.5h waiting at the work place
-		assertEquals(waiting * 1.5, calcScore(), EPSILON);
-	}
+        wParams.setOpeningTime(20*3600.0);
+        wParams.setClosingTime(21*3600.0);
 
-	/**
-	 * Test the scoring function in regards to early departures.
-	 */
-	public void testEarlyDeparture() {
-		double disutility = -10.0;
-		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
+        // only the home-activity should add to the score
+        assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setEarliestEndTime(10.75 * 3600.0); // require the agent to work until 16:45
+        // test 3: agents has to wait all the time, because work place opened earlier
 
-		// the agent left 45mins too early
-		assertEquals(disutility * 0.75, calcScore(), EPSILON);
-	}
+        wParams.setOpeningTime(1*3600.0);
+        wParams.setClosingTime(2*3600.0);
 
-	/**
-	 * Test the scoring function in regards to early departures.
-	 */
-	public void testMinimumDuration() {
-		double disutility = -10.0;
-		this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
+        // only the home-activity should add to the score
+        assertEquals(perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(), EPSILON);
+    }
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setMinimalDuration(3 * 3600.0); // require the agent to be 3 hours at every working activity
+    /**
+     * Test the waiting part of the scoring function.
+     */
+    public void testWaitingTime() {
+        double waiting = -10.0;
+        this.config.planCalcScore().setWaiting_utils_hr(waiting);
 
-		// the agent overall works 1.25h too short
-		assertEquals(disutility * 1.25, calcScore(), EPSILON);
-	}
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setOpeningTime( 8*3600.0); // the agent arrives 30min early
+        wParams.setClosingTime(15*3600.0); // the agent stays 1h too long
 
-	/**
-	 * Test the scoring function in regards to late arrival.
-	 */
-	public void testLateArrival() {
-		double disutility = -10.0;
-		this.config.planCalcScore().setLateArrival_utils_hr(disutility);
+        // the agent spends 1.5h waiting at the work place
+        assertEquals(waiting * 1.5, calcScore(), EPSILON);
+    }
 
-		ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
-		wParams.setLatestStartTime(13 * 3600.0); // agent should start working latest at 13 o'clock
+    /**
+     * Test the scoring function in regards to early departures.
+     */
+    public void testEarlyDeparture() {
+        double disutility = -10.0;
+        this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
-		// the agent arrived 30mins late
-		assertEquals(disutility * 0.5, calcScore(), EPSILON);
-	}
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setEarliestEndTime(10.75 * 3600.0); // require the agent to work until 16:45
 
-	/**
-	 * Test that the stuck penalty is correctly computed. It should be the worst (dis)utility the agent
-	 * could gain.
-	 */
-	public void testStuckPenalty() {
-		// test 1 where late arrival has the biggest impact
-		this.config.planCalcScore().setLateArrival_utils_hr(-18.0);
-		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
+        // the agent left 45mins too early
+        assertEquals(disutility * 0.75, calcScore(), EPSILON);
+    }
 
-		ScoringFunction testee = getScoringFunctionInstance(this.plan);
-		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
-		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
-		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(2));
-		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
-		testee.agentStuck(16*3600 + 7.5*60);
-		testee.finish();
-		testee.getScore();
+    /**
+     * Test the scoring function in regards to early departures.
+     */
+    public void testMinimumDuration() {
+        double disutility = -10.0;
+        this.config.planCalcScore().setEarlyDeparture_utils_hr(disutility);
 
-		assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setMinimalDuration(3 * 3600.0); // require the agent to be 3 hours at every working activity
 
-		// test 2 where traveling has the biggest impact
-		this.config.planCalcScore().setLateArrival_utils_hr(-3.0);
-		this.config.planCalcScore().setTraveling_utils_hr(-6.0);
+        // the agent overall works 1.25h too short
+        assertEquals(disutility * 1.25, calcScore(), EPSILON);
+    }
 
-		testee = getScoringFunctionInstance(this.plan);
-		testee.endActivity(07*3600, (Activity) this.plan.getPlanElements().get(0));
-		testee.startLeg(07*3600, (Leg) this.plan.getPlanElements().get(1));
-		testee.endLeg(07*3600 + 30*60);
-		testee.startActivity(07*3600 + 30*60, (Activity) this.plan.getPlanElements().get(2));
-		testee.endActivity(16*3600, (Activity) this.plan.getPlanElements().get(2));
-		testee.startLeg(16*3600, (Leg) this.plan.getPlanElements().get(3));
-		testee.agentStuck(16*3600 + 7.5*60);
-		testee.finish();
-		testee.getScore();
+    /**
+     * Test the scoring function in regards to late arrival.
+     */
+    public void testLateArrival() {
+        double disutility = -10.0;
+        this.config.planCalcScore().setLateArrival_utils_hr(disutility);
 
-		assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
-	}
+        ActivityParams wParams = this.config.planCalcScore().getActivityParams("w");
+        wParams.setLatestStartTime(13 * 3600.0); // agent should start working latest at 13 o'clock
 
-	public void testDistanceCostScoringCar() {
-		// test 1 where marginalUtitityOfMoney is fixed to 1.0
-		this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
+        // the agent arrived 30mins late
+        assertEquals(disutility * 0.5, calcScore(), EPSILON);
+    }
+
+    /**
+     * Test that the stuck penalty is correctly computed. It should be the worst (dis)utility the agent
+     * could gain.
+     */
+    public void testStuckPenalty() {
+        // test 1 where late arrival has the biggest impact
+        this.config.planCalcScore().setLateArrival_utils_hr(-18.0);
+        this.config.planCalcScore().setTraveling_utils_hr(-6.0);
+
+        ScoringFunction testee = getScoringFunctionInstance(this.plan);
+        testee.handleActivity((Activity) this.plan.getPlanElements().get(0));
+        testee.handleLeg((Leg) this.plan.getPlanElements().get(1));
+        testee.handleActivity((Activity) this.plan.getPlanElements().get(2));
+        testee.handleLeg((Leg) this.plan.getPlanElements().get(3));
+
+        testee.agentStuck(16*3600 + 7.5*60);
+        testee.finish();
+        testee.getScore();
+
+        assertEquals(24 * -18.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
+
+        // test 2 where traveling has the biggest impact
+        this.config.planCalcScore().setLateArrival_utils_hr(-3.0);
+        this.config.planCalcScore().setTraveling_utils_hr(-6.0);
+
+        testee = getScoringFunctionInstance(this.plan);
+        testee.handleActivity((Activity) this.plan.getPlanElements().get(0));
+        testee.handleLeg((Leg) this.plan.getPlanElements().get(1));
+        testee.handleActivity((Activity) this.plan.getPlanElements().get(2));
+        testee.handleLeg((Leg) this.plan.getPlanElements().get(3));
+        testee.agentStuck(16*3600 + 7.5*60);
+        testee.finish();
+        testee.getScore();
+
+        assertEquals(24 * -6.0 - 6.0 * 0.50, testee.getScore(), EPSILON); // stuck penalty + 30min traveling
+    }
+
+    public void testDistanceCostScoringCar() {
+        // test 1 where marginalUtitityOfMoney is fixed to 1.0
+        this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistanceCar(-0.00001);
-		this.config.planCalcScore().setMonetaryDistanceCostRateCar(-0.00001) ;
-		
-		assertEquals(-0.25, calcScore(), EPSILON);
-		
-		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		this.config.planCalcScore().setMonetaryDistanceCostRateCar(-1.0) ;
-		this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
-		
-		assertEquals(-12500.0, calcScore(), EPSILON);
-	}
-	
-	public void testDistanceCostScoringPt() {
-		// test 1 where marginalUtitityOfMoney is fixed to 1.0
-		this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
+        this.config.planCalcScore().setMonetaryDistanceCostRateCar(-0.00001) ;
+
+        assertEquals(-0.25, calcScore(), EPSILON);
+
+        // test 2 where MonetaryDistanceCostRate is fixed to -1.0
+        this.config.planCalcScore().setMonetaryDistanceCostRateCar(-1.0) ;
+        this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
+
+        assertEquals(-12500.0, calcScore(), EPSILON);
+    }
+
+    public void testDistanceCostScoringPt() {
+        // test 1 where marginalUtitityOfMoney is fixed to 1.0
+        this.config.planCalcScore().setMarginalUtilityOfMoney(1.0);
 //		this.config.charyparNagelScoring().setMarginalUtlOfDistancePt(-0.00001);
-		this.config.planCalcScore().setMonetaryDistanceCostRatePt(-0.00001) ;
-		
-		assertEquals(-0.20, calcScore(), EPSILON);
-		
-		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
-		this.config.planCalcScore().setMonetaryDistanceCostRatePt(-1.0) ;
-		this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
-		
-		assertEquals(-10000.0, calcScore(), EPSILON);
-	}
+        this.config.planCalcScore().setMonetaryDistanceCostRatePt(-0.00001) ;
 
-	/**
-	 * Test how the scoring function reacts when the first and the last activity do not have the same act-type.
-	 */
-	public void testDifferentFirstLastAct() {
-		// change the last act to something different than the first act
-		((Activity) this.plan.getPlanElements().get(8)).setType("h2");
+        assertEquals(-0.20, calcScore(), EPSILON);
 
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
-		params.setTypicalDuration(8*3600);
-		this.config.planCalcScore().addActivityParams(params);
+        // test 2 where MonetaryDistanceCostRate is fixed to -1.0
+        this.config.planCalcScore().setMonetaryDistanceCostRatePt(-1.0) ;
+        this.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
-		double perf = +6.0;
-		this.config.planCalcScore().setPerforming_utils_hr(perf);
-		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
-		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);
+        assertEquals(-10000.0, calcScore(), EPSILON);
+    }
 
-		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
-				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
-				+ Math.max(0.0, perf * 15.0 * Math.log(7.0 / zeroUtilDurH))
-				+ perf * 8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
-	}
-	
-	/**
-	 * Sets up the configuration to be useful for scoring plans. This implementation
-	 * sets the parameters for scoring functions returned by
-	 * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own
-	 * custom scoring function.
-	 *
-	 * @param config
-	 */
-	protected void setupScoringConfig(final Config config) {
-		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
-		scoring.setBrainExpBeta(2.0);
-		scoring.setLateArrival_utils_hr(-18.0);
-		scoring.setEarlyDeparture_utils_hr(0.0);
-		scoring.setPerforming_utils_hr(6.0);
-		scoring.setTraveling_utils_hr(-6.0);
-		scoring.setTravelingPt_utils_hr(0.0);
+    /**
+     * Test how the scoring function reacts when the first and the last activity do not have the same act-type.
+     */
+    public void testDifferentFirstLastAct() {
+        // change the last act to something different than the first act
+        ((Activity) this.plan.getPlanElements().get(8)).setType("h2");
 
-//		scoring.setMarginalUtlOfDistanceCar(0.0);
-		scoring.setMonetaryDistanceCostRateCar(0.0) ;
-		scoring.setMarginalUtilityOfMoney(1.);
+        PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
+        params.setTypicalDuration(8*3600);
+        this.config.planCalcScore().addActivityParams(params);
 
-		scoring.setWaiting_utils_hr(0.0);
+        double perf = +6.0;
+        this.config.planCalcScore().setPerforming_utils_hr(perf);
+        double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
+        double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
+        double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);
 
-		// setup activity types h and w for scoring
-		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
-		params.setTypicalDuration(16*3600);
-		scoring.addActivityParams(params);
+        assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.75/zeroUtilDurW)
+                + perf * 3.0 * Math.log(2.5/zeroUtilDurW)
+                + Math.max(0.0, perf * 15.0 * Math.log(7.0 / zeroUtilDurH))
+                + perf * 8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(), EPSILON);
+    }
 
-		params = new PlanCalcScoreConfigGroup.ActivityParams("work");
-		params.setTypicalDuration(8*3600);
-		scoring.addActivityParams(params);
-	}
+    /**
+     * Sets up the configuration to be useful for scoring plans. This implementation
+     * sets the parameters for scoring functions returned by
+     * {@link CharyparNagelScoringFunctionFactory}, overwrite it to test your own
+     * custom scoring function.
+     *
+     * @param config
+     */
+    protected void setupScoringConfig(final Config config) {
+        PlanCalcScoreConfigGroup scoring = config.planCalcScore();
+        scoring.setBrainExpBeta(2.0);
+        scoring.setLateArrival_utils_hr(-18.0);
+        scoring.setEarlyDeparture_utils_hr(0.0);
+        scoring.setPerforming_utils_hr(6.0);
+        scoring.setTraveling_utils_hr(-6.0);
+        scoring.setTravelingPt_utils_hr(0.0);
+        scoring.setMonetaryDistanceCostRateCar(0.0) ;
+        scoring.setMarginalUtilityOfMoney(1.);
 
-	/**
-	 * Tests if the scoring function correctly handles {@link AgentMoneyEventImpl}.
-	 * It generates one person with one plan having two activities (home, work)
-	 * and a car-leg in between. It then tests the scoring function by calling
-	 * several methods on an instance of the scoring function with the
-	 * aforementioned plan.
-	 */
-	public void testAddMoney() {
-		setupScoringConfig(this.config);
+        scoring.setWaiting_utils_hr(0.0);
 
-		// score the same plan twice
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
-		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
-		Activity act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
-		ScoringFunction sf1 = getScoringFunctionInstance(new PlanImpl());
-		sf1.startActivity(0, act1a);
-		sf1.endActivity(7*3600, act1a);
-		sf1.startLeg(7*3600, leg1);
-		sf1.endLeg(7*3600+100);
-		sf1.startActivity(7*3600+100, act1b);
-		sf1.endActivity(24*3600, act1b);
-		sf1.finish();
-		double score1 = sf1.getScore();
+        // setup activity types h and w for scoring
+        PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        params.setTypicalDuration(16*3600);
+        scoring.addActivityParams(params);
 
-		ScoringFunction sf2 = getScoringFunctionInstance(new PlanImpl());
-		sf2.startActivity(0, act1a);
-		sf2.addMoney(1.23);
-		sf2.endActivity(7*3600, act1a);
-		sf2.startLeg(7*3600, leg1);
-		sf2.addMoney(-2.46);
-		sf2.endLeg(7*3600+100);
-		sf2.startActivity(7*3600+100, act1b);
-		sf2.addMoney(4.86);
-		sf2.endActivity(24*3600, act1b);
-		sf2.addMoney(-0.28);
-		sf2.finish();
-		double score2 = sf2.getScore();
+        params = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        params.setTypicalDuration(8*3600);
+        scoring.addActivityParams(params);
+    }
 
-		assertEquals(1.23 - 2.46 + 4.86 - 0.28, score2 - score1, EPSILON);
-	}
-	
+    /**
+     * Tests if the scoring function correctly handles {@link AgentMoneyEventImpl}.
+     * It generates one person with one plan having two activities (home, work)
+     * and a car-leg in between. It then tests the scoring function by calling
+     * several methods on an instance of the scoring function with the
+     * aforementioned plan.
+     */
+    public void testAddMoney() {
+        setupScoringConfig(this.config);
+
+        // score the same plan twice
+        PersonImpl person1 = new PersonImpl(new IdImpl(1));
+        PlanImpl plan1 = person1.createAndAddPlan(true);
+        Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
+        Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
+        leg1.setDepartureTime(secondLegStartTime);
+        leg1.setTravelTime(secondLegTravelTime);
+        Route route2 = new GenericRouteImpl(null, null);
+        leg1.setRoute(route2);
+        route2.setDistance(20000.0);
+        Activity act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+        ScoringFunction sf1 = getScoringFunctionInstance(new PlanImpl());
+        sf1.handleActivity(act1a);
+        sf1.handleLeg(leg1);
+        sf1.handleActivity(act1b);
+
+        sf1.finish();
+        double score1 = sf1.getScore();
+
+        ScoringFunction sf2 = getScoringFunctionInstance(new PlanImpl());
+        sf2.handleActivity(act1a);
+        sf2.addMoney(1.23);
+        sf2.handleLeg(leg1);
+        sf2.addMoney(-2.46);
+        sf2.handleActivity(act1b);
+        sf2.addMoney(4.86);
+        sf2.addMoney(-0.28);
+        sf2.finish();
+        double score2 = sf2.getScore();
+
+        assertEquals(1.23 - 2.46 + 4.86 - 0.28, score2 - score1, EPSILON);
+    }
+
 }

@@ -76,7 +76,7 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 					.planCalcScore();
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.000245);
 			ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-					scoringCfg));
+					scoringCfg, event.getControler().getNetwork()));
 		}
 	}
 

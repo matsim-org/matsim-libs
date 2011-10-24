@@ -765,7 +765,7 @@ public class Controler {
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory(this.config.planCalcScore());
+		return new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
 	}
 
 	/**

@@ -20,6 +20,8 @@
 
 package org.matsim.core.scoring.charyparNagel;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -41,9 +43,11 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final CharyparNagelScoringParameters params;
+    protected Network network;
 
-	public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config) {
+    public CharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
 		this.params = new CharyparNagelScoringParameters(config);
+        this.network = network;
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;

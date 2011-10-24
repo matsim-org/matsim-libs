@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -42,6 +43,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -82,8 +84,8 @@ public abstract class Events2Score4PC extends EventsToScore implements
 	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
 
 	public Events2Score4PC(Config config, ScoringFunctionFactory factory,
-			Population population) {
-		super(population, factory, config.planCalcScore().getLearningRate());
+			Scenario scenario) {
+		super(scenario, factory, config.planCalcScore().getLearningRate());
 		attrNameList.clear();
 		this.config = config;
 		// #####################################
@@ -112,7 +114,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 		initialAttrNameScaleFactor("constantWalk");
 		// #####################################
 		scoring = config.planCalcScore();
-		pop = population;
+		pop = scenario.getPopulation();
 		maxPlansPerAgent = config.strategy().getMaxAgentPlanMemorySize();
 		sfFactory = factory;
 	}
@@ -357,7 +359,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			data.getSecond().startActivity(event.getTime(),
+			((ScoringFunctionAdapter) data.getSecond()).startActivity(event.getTime(),
 					(Activity) data.getFirst().getPlanElements().get(index));
 		}
 	}
@@ -368,7 +370,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.getPersonId());
 		if (planAndScoringFunction != null) {
 			int index = getAgentPlanElementIndex(event.getPersonId());
-			planAndScoringFunction.getSecond().endActivity(
+			((ScoringFunctionAdapter) planAndScoringFunction.getSecond()).endActivity(
 					event.getTime(),
 					(Activity) planAndScoringFunction.getFirst()
 							.getPlanElements().get(index));
@@ -401,7 +403,7 @@ public abstract class Events2Score4PC extends EventsToScore implements
 				.getPersonId());
 		if (data != null) {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			data.getSecond().startLeg(event.getTime(),
+			((ScoringFunctionAdapter) data.getSecond()).startLeg(event.getTime(),
 					(Leg) data.getFirst().getPlanElements().get(index));
 		}
 	}

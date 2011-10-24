@@ -23,6 +23,7 @@ package playground.anhorni.locationchoice;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -47,12 +48,14 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 
 	private final CharyparNagelScoringParameters params;
 	private final ActivityFacilities facilities;
-	
-	public LocationChoiceScoringFunctionFactory(final PlanCalcScoreConfigGroup config, 
-			final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
+    private Network network;
+
+    public LocationChoiceScoringFunctionFactory(final PlanCalcScoreConfigGroup config,
+                                                final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Network network) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
+        this.network = network;
 	}
 	
 	@Override
@@ -60,7 +63,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 		
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new LocationChoiceScoringFunction(plan, params, facilityPenalties, this.facilities));
-		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(params, network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;

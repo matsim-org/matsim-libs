@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -331,10 +332,11 @@ public class JointEventsToScore implements
 			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
-		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan); 
+		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan);
 
-		if (!leg.getJoint()) {
-			this.getScoringFunctionForAgent(individualId).startLeg(time, leg);
+        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(individualId);
+        if (!leg.getJoint()) {
+			((ScoringFunctionAdapter) scoringFunctionForAgent).startLeg(time, leg);
 			this.incrIndexInEvents(individualId);
 			return;
 		}
@@ -346,7 +348,7 @@ public class JointEventsToScore implements
 		if (this.examinedLegsForDeparture.keySet().containsAll(leg.getLinkedElementsIds())) {
 			double correctedTime = this.getDepartureTime(leg);
 
-			this.getScoringFunctionForAgent(individualId).startLeg(correctedTime, leg);
+			((ScoringFunctionAdapter) scoringFunctionForAgent).startLeg(correctedTime, leg);
 			this.incrIndexInEvents(individualId);
 		}
 	}
@@ -368,10 +370,11 @@ public class JointEventsToScore implements
 			final double time) {
 		int indexInPlan = this.getIndexInPlan(individualId);
 		Plan individualPlan = this.getScoringDataForAgent(individualId).getFirst();
-		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan); 
+		JointLeg leg = (JointLeg) individualPlan.getPlanElements().get(indexInPlan);
 
-		if (!leg.getJoint()) {
-			this.getScoringFunctionForAgent(individualId).endLeg(time);
+        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(individualId);
+        if (!leg.getJoint()) {
+			((ScoringFunctionAdapter) scoringFunctionForAgent).endLeg(time);
 			this.incrIndexInPlan(individualId);
 			this.incrIndexInEvents(individualId);
 			return;
@@ -384,7 +387,7 @@ public class JointEventsToScore implements
 		if (this.examinedLegsForArrival.keySet().containsAll(leg.getLinkedElementsIds())) {
 			double correctedTime = this.getArrivalTime(leg);
 
-			this.getScoringFunctionForAgent(individualId).startLeg(correctedTime, leg);
+			((ScoringFunctionAdapter) scoringFunctionForAgent).startLeg(correctedTime, leg);
 			this.incrIndexInPlan(individualId);
 			this.incrIndexInEvents(individualId);
 		}
@@ -413,7 +416,8 @@ public class JointEventsToScore implements
 		Activity activity = (Activity) individualPlan.getPlanElements().get(indexInPlan);
 
 		//if (!activity.getType().equals(JointActingTypes.DROP_OFF)) {
-			this.getScoringFunctionForAgent(individualId).startActivity(time, activity);
+        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(individualId);
+        ((ScoringFunctionAdapter) scoringFunctionForAgent).startActivity(time, activity);
 			this.incrIndexInEvents(individualId);
 		//}
 	}
@@ -426,7 +430,8 @@ public class JointEventsToScore implements
 		Activity activity = (Activity) individualPlan.getPlanElements().get(indexInPlan);
 
 		//if (!activity.getType().equals(JointActingTypes.PICK_UP)) {
-			this.getScoringFunctionForAgent(individualId).endActivity(time, activity);
+        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(individualId);
+        ((ScoringFunctionAdapter) scoringFunctionForAgent).endActivity(time, activity);
 			this.incrIndexInPlan(individualId);
 			this.incrIndexInEvents(individualId);
 		//}

@@ -43,11 +43,12 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
 	public void testAddMoney() {
-		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Population population = scenario.getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
-		EventsToScore e2s = new EventsToScore(population, sfFactory, 1.0);
+		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 
@@ -81,7 +82,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	}
 
-	private static class MockScoringFunction implements ScoringFunction {
+	private static class MockScoringFunction extends ScoringFunctionAdapter {
 
 		protected int cntMoney = 0;
 		protected int cntStuck = 0;
@@ -118,7 +119,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			return 0;
 		}
 
-		public void reset() {
+        public void reset() {
 			this.cntReset++;
 		}
 

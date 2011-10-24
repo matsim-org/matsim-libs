@@ -70,7 +70,7 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 			scoringCfg.setMonetaryDistanceCostRateCar(-0.00036);
 			ctl
 					.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory(
-							scoringCfg));
+							scoringCfg, event.getControler().getNetwork()));
 		}
 	}
 

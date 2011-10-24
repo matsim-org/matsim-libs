@@ -28,6 +28,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -116,8 +117,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
   {
     if (leg instanceof LegImpl)
     {
-      function.startLeg(leg.getDepartureTime(), leg);
-      function.endLeg(((LegImpl)leg).getArrivalTime());
+      ((ScoringFunctionAdapter) function).startLeg(leg.getDepartureTime(), leg);
+      ((ScoringFunctionAdapter) function).endLeg(((LegImpl)leg).getArrivalTime());
     }
     function.finish();
     return function.getScore();

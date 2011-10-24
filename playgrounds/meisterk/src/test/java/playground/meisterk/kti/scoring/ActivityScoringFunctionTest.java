@@ -166,12 +166,12 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
-				this.scenario.getConfig(),
+				this.scenario,
 				this.ktiConfigGroup,
 				emptyFacilityPenalties,
 				this.scenario.getActivityFacilities());
 		
-		EventsToScore eventsToScore = new EventsToScore(this.scenario.getPopulation(), factory, this.scenario.getConfig().planCalcScore().getLearningRate());
+		EventsToScore eventsToScore = new EventsToScore(this.scenario, factory, this.scenario.getConfig().planCalcScore().getLearningRate());
 
 		double commonEndAndStartTime = Time.parseTime("23:40:00");
 		eventsToScore.handleEvent(new ActivityEndEventImpl(commonEndAndStartTime, TEST_PERSON_ID, link.getId(), facilityHome.getId(), ACTIVITY_TYPE_HOME));
@@ -391,15 +391,14 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 
 		TreeMap<Id, FacilityPenalty> emptyFacilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		KTIYear3ScoringFunctionFactory factory = new KTIYear3ScoringFunctionFactory(
-				this.scenario.getConfig(),
+				this.scenario,
 				this.ktiConfigGroup,
 				emptyFacilityPenalties,
 				this.scenario.getActivityFacilities());
 		
 		Plan plan = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID).getSelectedPlan(); 
-		ScoringFunction testee = factory.createNewScoringFunction(plan);
+		ScoringFunctionAccumulator testee = (ScoringFunctionAccumulator) factory.createNewScoringFunction(plan);
 
-		assertTrue(testee instanceof ScoringFunctionAccumulator);
 		assertEquals(1, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().size());
 		assertEquals(ActivityScoringFunction.class, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0).getClass());
 		ActivityScoringFunction asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0);

@@ -215,7 +215,7 @@ import org.matsim.core.utils.misc.Time;
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		EventsToScore scoring = new EventsToScore(referencePopulation, new CharyparNagelScoringFunctionFactory(config));
+		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
 		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
 		sim.run();

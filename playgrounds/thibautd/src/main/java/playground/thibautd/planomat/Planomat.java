@@ -42,6 +42,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
@@ -213,9 +214,9 @@ public class Planomat implements PlanAlgorithm {
 		List<? extends PlanElement> actslegs = plan.getPlanElements();
 		int numLegs = actslegs.size() / 2;
 
-		ScoringFunction scoringFunction = null;
+		ScoringFunctionAdapter scoringFunction = null;
 		if (action.equals(StepThroughPlanAction.EVALUATE)) {
-			scoringFunction = this.scoringFunctionFactory.createNewScoringFunction(plan);
+			scoringFunction = (ScoringFunctionAdapter) this.scoringFunctionFactory.createNewScoringFunction(plan);
 		}
 		// TODO this as a quick and dirty implementation that takes a lot of resources
 		// replace activity duration encoding with double [0.0,1.0] or time slots, respectively

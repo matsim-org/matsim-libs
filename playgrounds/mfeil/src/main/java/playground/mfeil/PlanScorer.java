@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
@@ -39,7 +40,7 @@ public class PlanScorer {
 	}
 
 	public double getScore(final Plan plan) {
-		ScoringFunction function = this.factory.createNewScoringFunction(plan);
+		ScoringFunctionAdapter function = (ScoringFunctionAdapter) this.factory.createNewScoringFunction(plan);
 		boolean firstActivityDone = false;
 
 		for (PlanElement pe : plan.getPlanElements()) {

@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
@@ -75,13 +76,13 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 	}
 
 	private double getScore(final JointPlan plan) {
-		ScoringFunction fitnessFunction;
+		ScoringFunctionAdapter fitnessFunction;
 		Activity currentActivity;
 		Leg currentLeg;
 		double now;
 
 		for (Plan indivPlan : plan.getIndividualPlans().values()) {
-			fitnessFunction =
+			fitnessFunction = (ScoringFunctionAdapter)
 				this.scoringFunctionFactory.createNewScoringFunction(indivPlan);
 			now = 0d;
 	

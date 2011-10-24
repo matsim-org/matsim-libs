@@ -64,7 +64,7 @@ public class KTIControler extends Controler {
 	protected void setUp() {
 
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				super.config,
+				getScenario(),
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());

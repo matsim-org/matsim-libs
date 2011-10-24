@@ -23,9 +23,9 @@ package playground.meisterk.kti.scoring;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
@@ -35,18 +35,18 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory {
 
-	private final Config config;
+    private final Scenario scenario;
 	private final KtiConfigGroup ktiConfigGroup;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
-	
+
 	public KTIYear3ScoringFunctionFactory(
-			final Config config, 
+			final Scenario scenario,
 			final KtiConfigGroup ktiConfigGroup,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities) {
-		super(config.planCalcScore());
-		this.config = config;
+		super(scenario.getConfig().planCalcScore(), scenario.getNetwork());
+		this.scenario = scenario;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
@@ -59,13 +59,14 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.char
 		
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				plan, 
-				super.getParams(), 
+				super.getParams(),
 				this.facilityPenalties,
 				this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				plan, 
 				super.getParams(),
-				config,
+				scenario.getConfig(),
+                scenario.getNetwork(),
 				this.ktiConfigGroup));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.MoneyScoringFunction(super.getParams()));
 		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction(super.getParams()));

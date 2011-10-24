@@ -1,22 +1,30 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * KTIFlowsController.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * ${file_name}
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) ${year} by the members listed in the COPYING,        *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
+ *
+ * ${filecomment}
+ * ${package_declaration}
+ *
+ * ${typecomment}
+ * ${type_declaration}
+ */
 
 package playground.christoph.controler;
 
@@ -79,7 +87,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	protected void setUp() {
 
 		KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				super.config,
+				this.scenarioData,
 				this.ktiConfigGroup,
 				this.getFacilityPenalties(),
 				this.getFacilities());

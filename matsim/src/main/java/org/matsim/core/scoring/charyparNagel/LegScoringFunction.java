@@ -21,13 +21,17 @@
 package org.matsim.core.scoring.charyparNagel;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -48,9 +52,11 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 	private Leg currentLeg;
+    protected Network network;
 
-	public LegScoringFunction(final CharyparNagelScoringParameters params) {
+    public LegScoringFunction(final CharyparNagelScoringParameters params, Network network) {
 		this.params = params;
+        this.network = network;
 		this.reset();
 	}
 
@@ -99,8 +105,8 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = route.getDistance();
-				if ( distanceWrnCnt<1 ) {
+				dist = RouteUtils.calcDistance((LinkNetworkRoute) route, network);
+                if ( distanceWrnCnt<1 ) {
 				/*
 				 * TODO the route-distance does not contain the length of the
 				 * first or last link of the route, because the route doesn't

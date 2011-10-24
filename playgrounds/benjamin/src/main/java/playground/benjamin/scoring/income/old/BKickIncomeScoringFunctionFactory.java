@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.benjamin.scoring.income.old;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
@@ -39,12 +40,14 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 	private PlanCalcScoreConfigGroup configGroup;
 	private CharyparNagelScoringParameters params;
 	private PersonHouseholdMapping hhdb;
+    private Network network;
 
-	public BKickIncomeScoringFunctionFactory(
-			PlanCalcScoreConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping) {
+    public BKickIncomeScoringFunctionFactory(
+            PlanCalcScoreConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping, Network network) {
 		this.configGroup = charyparNagelScoring;
 		this.params = new CharyparNagelScoringParameters(configGroup);
 		this.hhdb = hhmapping;
+        this.network = network;
 	}
 
 	public ScoringFunction createNewScoringFunction(Plan plan) {
@@ -53,7 +56,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
 
-		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb));
+		scoringFunctionAccumulator.addScoringFunction(new BKickLegScoring(plan, params, this.hhdb, network));
 
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(params));
 

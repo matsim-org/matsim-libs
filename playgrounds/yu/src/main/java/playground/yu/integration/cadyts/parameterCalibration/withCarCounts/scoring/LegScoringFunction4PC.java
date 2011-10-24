@@ -21,6 +21,7 @@
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.RouteWRefs;
@@ -33,8 +34,8 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			travTimeAttrWalk/* [h] */= 0d;
 
 	public LegScoringFunction4PC(Plan plan,
-			CharyparNagelScoringParameters params) {
-		super(params);
+                                 CharyparNagelScoringParameters params, Network network) {
+		super(params, network);
 	}
 
 	public double getTravTimeAttrPt() {

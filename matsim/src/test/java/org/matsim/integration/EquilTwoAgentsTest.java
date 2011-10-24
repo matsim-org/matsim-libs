@@ -82,7 +82,7 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 				double agent2LeaveHomeTime = ((PlanImpl) controler.getPopulation().getPersons().get(id2).getPlans().get(0)).getFirstActivity().getEndTime();
 				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
 
-				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getPopulation(), controler.getScoringFunctionFactory());
+				EquilTwoAgentsTest.this.planScorer = new EventsToScore(controler.getScenario(), controler.getScoringFunctionFactory());
 				controler.getEvents().addHandler(EquilTwoAgentsTest.this.planScorer);
 			}
 		});

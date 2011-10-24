@@ -24,97 +24,100 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.api.experimental.events.handler.*;
+import org.matsim.core.events.TravelEvent;
+import org.matsim.core.events.TravelEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
- * Calculates continuously the score of the selected plans of a given population
+ * Calculates continuously the score of the selected plans of a given scenario
  * based on events.<br>
  * Departure- and Arrival-Events *must* be provided to calculate the score,
  * AgentStuck-Events are used if available to add a penalty to the score. The
  * final score are written to the selected plans of each person in the
- * population.
+ * scenario.
  *
  * @author mrieser
  */
 public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
+		AgentMoneyEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkLeaveEventHandler,
+        LinkEnterEventHandler, TravelEventHandler {
 
-	private Population population = null;
+	private Scenario scenario = null;
 	private ScoringFunctionFactory sfFactory = null;
 	private final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
-	private final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
 	private double scoreSum = 0.0;
 	private long scoreCount = 0;
 	private final double learningRate;
+    private EventsToActivities eventsToActivities;
+    private EventsToLegs eventsToLegs;
+    private DistributeToScoringFunctions handler;
 
-	/**
+    private class DistributeToScoringFunctions implements ActivityHandler, LegHandler {
+
+        @Override
+        public void handleActivity(Id agentId, Activity activity) {
+            ScoringFunction scoringFunctionForAgent = getScoringFunctionForAgent(agentId);
+            if (scoringFunctionForAgent != null) {
+                scoringFunctionForAgent.handleActivity(activity);
+            }
+        }
+
+        @Override
+        public void handleLeg(Id agentId, Leg leg) {
+            ScoringFunction scoringFunctionForAgent = getScoringFunctionForAgent(agentId);
+            if (scoringFunctionForAgent != null) {
+                scoringFunctionForAgent.handleLeg(leg);
+            }
+        }
+    }
+
+    /**
 	 * Initializes EventsToScore with a learningRate of 1.0.
 	 *
-	 * @param population
+	 * @param scenario
 	 * @param factory
 	 */
-	public EventsToScore(final Population population, final ScoringFunctionFactory factory) {
-		this(population, factory, 1.0);
+	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory) {
+		this(scenario, factory, 1.0);
 	}
 
-	public EventsToScore(final Population population, final ScoringFunctionFactory factory, final double learningRate) {
+	public EventsToScore(final Scenario scenario, final ScoringFunctionFactory factory, final double learningRate) {
 		super();
-		this.population = population;
+		this.scenario = scenario;
 		this.sfFactory = factory;
 		this.learningRate = learningRate;
-	}
-
-	private int getAgentPlanElementIndex(Id personId) {
-		Integer index = this.agentPlanElementIndex.get(personId);
-		if (index == null) {
-			this.agentPlanElementIndex.put(personId, Integer.valueOf(0));
-			return 0;
-		}
-		return index.intValue();
-	}
-	
-	private int increaseAgentPlanElementIndex(final Id personId) {
-		Integer index = this.agentPlanElementIndex.get(personId);
-		if (index == null) {
-			this.agentPlanElementIndex.put(personId, Integer.valueOf(1));
-			return 1;
-		}
-		this.agentPlanElementIndex.put(personId, Integer.valueOf(1 + index.intValue()));
-		return 1 + index.intValue();
+        this.eventsToActivities = new EventsToActivities();
+        this.handler = new DistributeToScoringFunctions();
+        this.eventsToActivities.setActivityHandler(this.handler);
+        this.eventsToLegs = new EventsToLegs();
+        this.eventsToLegs.setLegHandler(this.handler);
 	}
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
-		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event.getPersonId());
-		if (data != null) {
-			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			data.getSecond().startLeg(event.getTime(), (Leg) data.getFirst().getPlanElements().get(index));
-		}
+		eventsToLegs.handleEvent(event);
 	}
 
-	@Override
+    @Override
+    public void handleEvent(LinkEnterEvent event) {
+        eventsToLegs.handleEvent(event);
+    }
+
+    @Override
+    public void handleEvent(LinkLeaveEvent event) {
+        eventsToLegs.handleEvent(event);
+    }
+
+    @Override
 	public void handleEvent(final AgentArrivalEvent event) {
-		ScoringFunction sf = getScoringFunctionForAgent(event.getPersonId());
-		if (sf != null) {
-			sf.endLeg(event.getTime());
-		}
+		eventsToLegs.handleEvent(event);
 	}
 
 	@Override
@@ -135,27 +138,26 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
-		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event.getPersonId());
-		if (planAndScoringFunction != null) {
-			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			planAndScoringFunction.getSecond().startActivity(event.getTime(), (Activity) planAndScoringFunction.getFirst().getPlanElements().get(index));
-		}
+		eventsToActivities.handleEvent(event);
 	}
 
-	@Override
+    @Override
 	public void handleEvent(final ActivityEndEvent event) {
-		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event.getPersonId());
-		if (planAndScoringFunction != null) {
-			int index = getAgentPlanElementIndex(event.getPersonId());
-			planAndScoringFunction.getSecond().endActivity(event.getTime(), (Activity) planAndScoringFunction.getFirst().getPlanElements().get(index));
-		}
+		eventsToActivities.handleEvent(event);
 	}
 
-	/**
+    @Override
+    public void handleEvent(TravelEvent travelEvent) {
+        eventsToLegs.handleEvent(travelEvent);
+    }
+
+
+    /**
 	 * Finishes the calculation of the plans' scores and assigns the new scores
 	 * to the plans.
 	 */
 	public void finish() {
+        eventsToActivities.finish();
 		for (Map.Entry<Id, Tuple<Plan, ScoringFunction>> entry : this.agentScorers.entrySet()) {
 			Plan plan = entry.getValue().getFirst();
 			ScoringFunction sf = entry.getValue().getSecond();
@@ -203,8 +205,9 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 
 	@Override
 	public void reset(final int iteration) {
+        this.eventsToActivities.reset(iteration);
+        this.eventsToLegs.reset(iteration);
 		this.agentScorers.clear();
-		this.agentPlanElementIndex.clear();
 		this.scoreCount = 0;
 		this.scoreSum = 0.0;
 	}
@@ -212,7 +215,7 @@ public class EventsToScore implements AgentArrivalEventHandler, AgentDepartureEv
 	private Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(final Id agentId) {
 		Tuple<Plan, ScoringFunction> data = this.agentScorers.get(agentId);
 		if (data == null) {
-			Person person = this.population.getPersons().get(agentId);
+			Person person = this.scenario.getPopulation().getPersons().get(agentId);
 			if (person == null) {
 				return null;
 			}

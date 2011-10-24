@@ -22,6 +22,7 @@ package playground.johannes.coopsim.eval;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -50,8 +51,8 @@ public class JointActivityScoringFactory extends CharyparNagelScoringFunctionFac
 	
 	private final double beta;
 	
-	public JointActivityScoringFactory(SocialGraph graph, VisitorTracker tracker, PlanCalcScoreConfigGroup config, double beta) {
-		super(config);
+	public JointActivityScoringFactory(SocialGraph graph, VisitorTracker tracker, PlanCalcScoreConfigGroup config, double beta, Scenario scenario) {
+		super(config, scenario.getNetwork());
 		this.tracker = tracker;
 		this.beta = beta;
 		this.accumulators = new HashMap<Person, ScoringFunctionAccumulator>();

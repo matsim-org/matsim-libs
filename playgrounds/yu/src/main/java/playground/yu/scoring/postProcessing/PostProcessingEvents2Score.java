@@ -20,8 +20,6 @@
 
 package playground.yu.scoring.postProcessing;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -62,8 +60,8 @@ public class PostProcessingEvents2Score {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord scoringFactory = new CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-				scenario.getConfig().planCalcScore());
-		EventsToScore events2score = new EventsToScore(pop, scoringFactory);
+				scenario.getConfig().planCalcScore(), scenario.getNetwork());
+		EventsToScore events2score = new EventsToScore(scenario, scoringFactory);
 		events.addHandler(events2score);
 		new MatsimEventsReader(events).readFile(eventsFilename);
 

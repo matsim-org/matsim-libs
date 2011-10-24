@@ -56,12 +56,10 @@ import org.matsim.core.utils.misc.RouteUtils;
 public class MyControler extends Controler {
 	private static class MyCharyparNagelScoringFunctionFactory extends
 			CharyparNagelScoringFunctionFactory {
-		private final Network network;
 
 		public MyCharyparNagelScoringFunctionFactory(
 				PlanCalcScoreConfigGroup config, final Network network) {
-			super(config);
-			this.network = network;
+			super(config, network);
 		}
 
 		@Override
@@ -86,12 +84,10 @@ public class MyControler extends Controler {
 		private final static Logger log = Logger
 				.getLogger(MyLegScoringFunction.class);
 		private static int distanceWrnCnt = 0;
-		private final Network network;
 
 		public MyLegScoringFunction(Plan plan,
 				CharyparNagelScoringParameters params, final Network network) {
-			super(params);
-			this.network = network;
+			super(params, network);
 		}
 
 		@Override
@@ -114,7 +110,7 @@ public class MyControler extends Controler {
 					dist = route.getDistance();
 					if (Double.isNaN(dist)) {
 						dist = RouteUtils.calcDistance((NetworkRoute) route,
-								network);
+								super.network);
 					}
 					if (distanceWrnCnt < 1) {
 						/*

@@ -20,6 +20,7 @@
 
 package playground.yu.scoring.postProcessing;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
@@ -33,8 +34,8 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 		extends CharyparNagelScoringFunctionFactory {
 
 	public CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-			PlanCalcScoreConfigGroup config) {
-		super(config);
+            PlanCalcScoreConfigGroup config, Network network) {
+		super(config, network);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -44,7 +45,7 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 				.addScoringFunction(new ActivityScoringFunction(getParams()));
 
 		LegScoringFunctionWithDetailedRecord legScoring = new LegScoringFunctionWithDetailedRecord(
-				plan, getParams());
+				plan, getParams(), network);
 		scoringFunctionAccumulator.addScoringFunction(legScoring);
 
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(

@@ -51,7 +51,7 @@ public class ScoringFromLeg extends LegScoringFunction {
 	private Plan plan;
 
 	public ScoringFromLeg(final Plan plan, final CharyparNagelScoringParameters params, Network network, double householdIncomePerDay) {
-		super(params);
+		super(params, network);
 		this.plan = plan;
 		this.incomePerDay = householdIncomePerDay;
 		this.network = network;

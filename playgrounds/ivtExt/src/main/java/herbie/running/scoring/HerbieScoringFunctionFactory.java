@@ -48,7 +48,7 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.charyp
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities, 
 			final Network network) {
-		super(config.planCalcScore());
+		super(config.planCalcScore(), network);
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;

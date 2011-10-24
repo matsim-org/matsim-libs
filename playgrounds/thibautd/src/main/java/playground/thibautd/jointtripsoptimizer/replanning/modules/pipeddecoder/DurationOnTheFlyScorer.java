@@ -41,6 +41,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
@@ -684,7 +685,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 		private int indexInPlan = 0;
 		private int indexInChromosome = 0;
 		private double now = 0d;
-		public final ScoringFunction scoringFunction;
+		public final ScoringFunctionAdapter scoringFunction;
 		public final List<PlanElement> planElements;
 		public final Plan individualPlan;
 		private final Activity lastActivity;
@@ -697,7 +698,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 		public IndividualValuesWrapper(
 				final ScoringFunction scoringFunction,
 				final Plan indivPlan) {
-			this.scoringFunction = scoringFunction;
+			this.scoringFunction = (ScoringFunctionAdapter) scoringFunction;
 			this.individualPlan = indivPlan;
 			this.planElements = indivPlan.getPlanElements();
 			this.lastActivity = (Activity) this.planElements.get(this.planElements.size() - 1);

@@ -2,6 +2,7 @@ package playground.ciarif.flexibletransports.scoring;
 
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
@@ -18,13 +19,15 @@ import playground.meisterk.kti.scoring.ActivityScoringFunction;
 public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactory
 {
   private final Config config;
+  private final Network network;
   private final FtConfigGroup ftConfigGroup;
   private final TreeMap<Id, FacilityPenalty> facilityPenalties;
   private final ActivityFacilities facilities;
 
-  public FtScoringFunctionFactory(Config config, FtConfigGroup ftConfigGroup, TreeMap<Id, FacilityPenalty> facilityPenalties, ActivityFacilities facilities)
+  public FtScoringFunctionFactory(Config config, FtConfigGroup ftConfigGroup, TreeMap<Id, FacilityPenalty> facilityPenalties, ActivityFacilities facilities, Network network)
   {
-    super(config.planCalcScore());
+    super(config.planCalcScore(), network);
+    this.network = network;
     this.config = config;
     this.ftConfigGroup = ftConfigGroup;
     this.facilityPenalties = facilityPenalties;
@@ -44,7 +47,7 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
       new LegScoringFunction((PlanImpl)plan, 
       super.getParams(), 
       this.config, 
-      this.ftConfigGroup));
+      this.ftConfigGroup, network));
     scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(super.getParams()));
     scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(super.getParams()));
 

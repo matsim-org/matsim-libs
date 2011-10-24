@@ -42,6 +42,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;

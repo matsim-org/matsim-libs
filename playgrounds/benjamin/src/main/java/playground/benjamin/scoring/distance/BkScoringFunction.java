@@ -33,6 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ActivityUtilityParameters;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -40,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  * @author dgrether
  *
  */
-public class BkScoringFunction implements ScoringFunction {
+public class BkScoringFunction extends ScoringFunctionAdapter {
 
 	protected final Person person;
 	protected final Plan plan;
@@ -97,7 +98,7 @@ public class BkScoringFunction implements ScoringFunction {
 		this.score = INITIAL_SCORE;
 	}
 
-	public void startActivity(final double time, final Activity act) {
+    public void startActivity(final double time, final Activity act) {
 		// the activity is currently handled by startLeg()
 	}
 

@@ -241,48 +241,6 @@ public class PSSControlerDumbCharging extends PSSControler {
 				return new ScoringFunction() {
 					
 					@Override
-					public void startLeg(double time, Leg leg) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void startActivity(double time, Activity act) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void reset() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public double getScore() {
-						// TODO Auto-generated method stub
-						return 0;
-					}
-					
-					@Override
-					public void finish() {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void endLeg(double time) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
-					public void endActivity(double time, Activity act) {
-						// TODO Auto-generated method stub
-						
-					}
-					
-					@Override
 					public void agentStuck(double time) {
 						// TODO Auto-generated method stub
 						
@@ -293,7 +251,32 @@ public class PSSControlerDumbCharging extends PSSControler {
 						// TODO Auto-generated method stub
 						
 					}
-				};
+
+                    @Override
+                    public void handleActivity(Activity activity) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void handleLeg(Leg leg) {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void finish() {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public double getScore() {
+                        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+                    }
+
+                    @Override
+                    public void reset() {
+                        //To change body of implemented methods use File | Settings | File Templates.
+                    }
+                };
 			}
 		});
 		

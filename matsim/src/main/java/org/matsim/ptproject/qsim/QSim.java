@@ -20,17 +20,6 @@
 
 package org.matsim.ptproject.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,23 +50,11 @@ import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.MobsimTimer;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
-import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.*;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.*;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -85,6 +62,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
+
+import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * Implementation of a queue-based transport simulation.

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -46,7 +47,7 @@ import org.matsim.core.utils.misc.Time;
  * @author mfeil
  */
 
-public class JohScoringFunctionForChessboard implements ScoringFunction {
+public class JohScoringFunctionForChessboard extends ScoringFunctionAdapter {
 
 	protected final Person person;
 	protected final Plan plan;

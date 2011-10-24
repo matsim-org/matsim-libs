@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -181,6 +182,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	@Override
 	public final void notifyTeleportToLink(final Id linkId) {
 		this.currentLinkId = linkId;
+        double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
+        this.simulation.getEventsManager().processEvent(new TravelEventImpl(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override

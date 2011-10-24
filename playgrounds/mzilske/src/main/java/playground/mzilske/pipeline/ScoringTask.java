@@ -35,7 +35,7 @@ public class ScoringTask implements ScenarioSinkSource, AgentArrivalEventHandler
 	
 	public void initialize(Scenario scenario) {
 		if (eventsToScore == null) {
-			eventsToScore = new EventsToScore(scenario.getPopulation(), scoringFunctionFactory, learningRate);
+			eventsToScore = new EventsToScore(scenario, scoringFunctionFactory, learningRate);
 		}
 		sink.initialize(scenario);
 	}

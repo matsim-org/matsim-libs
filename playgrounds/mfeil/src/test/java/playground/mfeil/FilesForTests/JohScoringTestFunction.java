@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.Time;
 
 import playground.mfeil.JohActUtilityParameters;
@@ -48,7 +48,7 @@ import playground.mfeil.JohActUtilityParameters;
  * @author mfeil
  */
 
-public class JohScoringTestFunction implements ScoringFunction {
+public class JohScoringTestFunction extends ScoringFunctionAdapter {
 
 	protected final Person person;
 	protected final Plan plan;

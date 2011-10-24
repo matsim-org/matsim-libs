@@ -28,7 +28,7 @@ import org.matsim.core.events.AgentMoneyEventImpl;
  * A Scoring Function that only respects the travel time.
  * @author cdobler
  */
-public class OnlyTimeDependentScoringFunction implements ScoringFunction {
+public class OnlyTimeDependentScoringFunction extends ScoringFunctionAdapter {
 	
 	private double score;
 	private double startTime;
@@ -47,7 +47,7 @@ public class OnlyTimeDependentScoringFunction implements ScoringFunction {
 	public void startActivity(final double time, final Activity activity) {
 	}
 
-	/**
+    /**
 	 * Tells the scoring function that the agents starts a new leg.
 	 *
 	 * @param time The time at which the agent starts the new leg.

@@ -42,7 +42,7 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 
 	public CharyparNagelScoringFunctionFactory4PC(
 			final PlanCalcScoreConfigGroup config, final Network network) {
-		super(config);
+		super(config, network);
 		this.network = network;
 	}
 

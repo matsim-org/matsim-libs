@@ -3,6 +3,7 @@ package playground.ciarif.flexibletransports.scoring;
 import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -29,9 +30,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	private PlanImpl plan;
 	private static final Logger log = Logger.getLogger(LegScoringFunction.class);
 
-	public LegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config, FtConfigGroup ftConfigGroup)
+	public LegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config, FtConfigGroup ftConfigGroup, Network network)
 	{
-		super(params);
+		super(params, network);
 		this.plan = plan;
 		this.ftConfigGroup = ftConfigGroup;
 		this.plansCalcRouteConfigGroup = config.plansCalcRoute();

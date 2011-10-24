@@ -44,12 +44,10 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 			distanceAttrWalk/* [m] */;
 
 	private int carLegNo = 0, ptLegNo = 0, walkLegNo = 0;
-	private final Network network;
 
 	public LegScoringFunction4PC(Plan plan,
 			CharyparNagelScoringParameters params, Network network) {
-		super(params);
-		this.network = network;
+		super(params, network);
 	}
 
 	public double getTravTimeAttrPt() {

@@ -54,7 +54,7 @@ public class BKickIncomeControler extends BkControler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb);
+		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
 	}
 	
 	@Override

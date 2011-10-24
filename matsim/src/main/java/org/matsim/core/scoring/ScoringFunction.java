@@ -36,47 +36,15 @@ import org.matsim.core.events.AgentMoneyEventImpl;
  */
 public interface ScoringFunction {
 
+    public void handleActivity(Activity activity);
+
+    public void handleLeg(Leg leg);
+
 	/* In the case when every agent will have it's own scoring function, a
 	 * method named "startPlan(Plan plan)" (or something similar) may be
 	 * needed to reset the score calculation from iteration to iteration.
 	 * -marcel, 21jun07
 	 */
-
-	/**
-	 * Tells the scoring function that the agent begins with an activity.
-	 *
-	 * @param time The time at which the mentioned activity starts.
-	 * @param act The activity the agent starts. Can be used to get the activity
-	 * type, exact location, facility, opening times and other information.
-	 */
-	public void startActivity(final double time, final Activity act);
-
-	/**
-	 * Tells the scoring function that the agent stops with an activity.
-	 * The activity is always the same one which started previously,
-	 * except if it is the first activity, which never starts.
-	 *
-	 * @param time The time at which the agent stops performing the current
-	 * activity.
-	 * @param activity 
-	 */
-	public void endActivity(final double time, Activity activity);
-
-	/**
-	 * Tells the scoring function that the agents starts a new leg.
-	 *
-	 * @param time The time at which the agent starts the new leg.
-	 * @param leg The leg the agent starts. Can be used to get leg mode and other
-	 * information about the leg.
-	 */
-	public void startLeg(final double time, final Leg leg);
-
-	/**
-	 * Tells the scoring function that the current leg ends.
-	 *
-	 * @param time The time at which the current leg ends.
-	 */
-	public void endLeg(final double time);
 
 	/**
 	 * Tells the scoring function that the agent got stuck in the simulation and

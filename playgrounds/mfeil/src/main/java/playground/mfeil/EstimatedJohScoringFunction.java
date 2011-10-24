@@ -35,6 +35,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -51,7 +52,7 @@ import org.matsim.core.utils.misc.Time;
  * @author mfeil
  */
 
-public class EstimatedJohScoringFunction implements ScoringFunction {
+public class EstimatedJohScoringFunction extends ScoringFunctionAdapter {
 
 	protected final Person person;
 	protected final Plan plan;
