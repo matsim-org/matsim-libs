@@ -26,7 +26,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 
-import playground.benjamin.events.emissions.ColdPollutant;
+import playground.benjamin.emissions.events.ColdPollutant;
 
 
 public class HbefaColdEmissionTableCreator {

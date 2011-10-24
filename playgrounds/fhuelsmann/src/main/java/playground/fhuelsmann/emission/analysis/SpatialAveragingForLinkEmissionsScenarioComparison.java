@@ -37,9 +37,9 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.events.emissions.ColdPollutant;
-import playground.benjamin.events.emissions.EmissionEventsReader;
-import playground.benjamin.events.emissions.WarmPollutant;
+import playground.benjamin.emissions.events.ColdPollutant;
+import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.emissions.events.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkWarmEventHandler;
 
