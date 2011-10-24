@@ -135,6 +135,8 @@ public class GenerateMATSimConfig {
 		urbansimParameterType.setMatsim4OpusTemp( Constants.MATSIM_4_OPUS_TEMP );
 		urbansimParameterType.setSamplingRate( 0.01 );		// just 1% random sample for testing ...
 		urbansimParameterType.setIsTestRun( this.isTestRun );
+		urbansimParameterType.setTestParameter("");
+		urbansimParameterType.setBackupRunData(false);
 		
 		Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
 		matsim4UrbanSimType.setUrbansimParameter(urbansimParameterType);
