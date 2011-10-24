@@ -361,6 +361,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
 			this.setMaxSimplexIterations(value);
 		}
+		else if (param_name.equals(MAX_POP_SIZE)) {
+			this.setMaxPopulationSize(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
