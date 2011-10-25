@@ -65,25 +65,8 @@ public class EditRoutes {
 		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
 		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 
-		Route route = leg.getRoute();
-
-		// if the route type is not supported (e.g. because it is a walking agent)
-		if (!(route instanceof NetworkRoute)) return false;
-
-		NetworkRoute oldRoute = (NetworkRoute) route;
-
-		if (oldRoute != null) {
-			// Update the startLinkId if it has changed.
-			if (!fromActivity.getLinkId().equals(oldRoute.getStartLinkId())) {
-				oldRoute.setStartLinkId(fromActivity.getLinkId());
-			}
-
-			// Update the endLinkId if it has changed.
-			if (!toActivity.getLinkId().equals(oldRoute.getEndLinkId())) {
-				oldRoute.setEndLinkId(toActivity.getLinkId());
-			}
-		}
-
+		Route oldRoute = leg.getRoute();
+		
 		/*
 		 * We create a new Plan which contains only the Leg
 		 * that should be replanned and its previous and next
@@ -100,17 +83,19 @@ public class EditRoutes {
 		newPlan.addActivity(toActivity);
 		planAlgorithm.run(newPlan);
 
+		/*
+		 * If possible, reuse existing route objects. Someone might already be
+		 * using a reference to that object.
+		 */
 		Route newRoute = leg.getRoute();
-
-		if (oldRoute != null) {
-			// If the Route Object was replaced...
-			if (oldRoute != newRoute) {
+		if (oldRoute != null && oldRoute != newRoute) {
+			if (oldRoute instanceof NetworkRoute && newRoute instanceof NetworkRoute) {
 				List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
-				oldRoute.setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
+				((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
 				leg.setRoute(oldRoute);
 			}
 		}
-
+		
 		return true;
 	}
 
