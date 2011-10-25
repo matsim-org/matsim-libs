@@ -485,7 +485,7 @@ public class CompareScenarios {
 
 				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-				CalcLegTimes calcLegTimes = new CalcLegTimes(plansSubPop);
+				CalcLegTimes calcLegTimes = new CalcLegTimes();
 				events.addHandler(calcLegTimes);
 
 				results.add(new CaseStudyResult(scenarioName, plansSubPop, calcLegTimes, planAverageScore, calcAverageTripLength));
