@@ -121,7 +121,13 @@ public class PlanTimesAdapter {
 					scoringFunction.endLeg(arrivalTime);
 										
 					scoringFunction.startActivity(arrivalTime, act);
-					scoringFunction.endActivity(arrivalTime + actDur, act);
+					if (planElementIndex < plan.getPlanElements().size() -1) {
+						// last home activity do not finish act
+						scoringFunction.endActivity(arrivalTime + actDur, act);
+					}
+					else {
+						scoringFunction.finish();
+					}
 				}				
 			}
 		}

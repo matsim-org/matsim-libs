@@ -185,7 +185,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 			// plan, actToMove, actlegIndex, planTmp, scoringFunction, leastCostPathCalculatorForward, leastCostPathCalculatorBackward, approximationLevel
 			cs.adaptAndScoreTimes((PlanImpl) plan, 0, planTmp, scoringFunction, null, null, 0);	
 //		}
-		scoringFunction.finish();
+		// not needed anymore
+		//scoringFunction.finish();
 		double score = scoringFunction.getScore();
 		scoringFunction.reset();
 		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)planTmp);		

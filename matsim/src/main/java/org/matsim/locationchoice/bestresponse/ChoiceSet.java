@@ -145,7 +145,9 @@ public class ChoiceSet {
 			planTmp.copyPlan(plan);
 			this.adaptAndScoreTimes((PlanImpl)plan,  actlegIndex,  planTmp, scoringFunction,
 					leastCostPathCalculatorForward, leastCostPathCalculatorBackward, this.approximationLevel);
-			scoringFunction.finish();
+			
+			// not needed anymore
+			//scoringFunction.finish();
 			double score = scoringFunction.getScore();
 			scoringFunction.reset();
 									
