@@ -40,7 +40,7 @@ public class StopsAndRoutes2Shape{
 	Map<String, Tuple<Coord, Coord>> preMatched;
 	
 	
-	private final String PATH = DaPaths .OUTPUT + "bvg09/";
+	private final String PATH = DaPaths .PROJECTS + "bvg09/";
 	
 	private final String VISUMSCHEDULEFILE = PATH + "intermediateTransitSchedule.xml";
 	private final String VISUMNETWORK = PATH + "intermediateNetwork.xml";

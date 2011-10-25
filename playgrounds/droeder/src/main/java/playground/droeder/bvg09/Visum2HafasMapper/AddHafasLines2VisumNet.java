@@ -59,7 +59,7 @@ import playground.droeder.DaPaths;
 public class AddHafasLines2VisumNet {
 
 	private final static Logger log = Logger.getLogger(AddHafasLines2VisumNet.class);
-	private final String PATH = DaPaths.OUTPUT + "bvg09/";
+	private final String PATH = DaPaths.PROJECTS + "bvg09/";
 
 	private final String NETFILE = PATH + "intermediateNetwork.xml";
 	private final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";

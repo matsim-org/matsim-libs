@@ -26,16 +26,15 @@ package playground.droeder;
 public interface DaPaths {
 	
 	final String VSP =  "D:/VSP/";
+	
 	final String SHAREDSVN = VSP + "shared-svn/";
+		final String BVG09 = SHAREDSVN + "bvg09_urdaten/";
+
 	final String STUDIES = SHAREDSVN + "studies/";
-	
-	final String DGSTUDIES = STUDIES + "dgrether/";
-	final String DASTUDIES = STUDIES + "droeder/";
-	
-	final String BVG09 = SHAREDSVN + "bvg09_urdaten/";
-	final String SIM2D = VSP + "2D_Sim/";
-	
-	final String OUTPUT = VSP + "output/";
+		final String DASTUDIES = STUDIES + "droeder/";
+
+	final String PROJECTS = VSP + "projects/";
+		final String SIM2D = VSP + "2D_Sim/";
 	
 	
 	

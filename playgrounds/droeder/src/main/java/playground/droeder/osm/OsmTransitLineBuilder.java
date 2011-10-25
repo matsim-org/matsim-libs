@@ -305,10 +305,10 @@ public class OsmTransitLineBuilder {
 	}
 	
 	public static void main(String[] args){
-		final String OSM = DaPaths.OUTPUT + "osm2/";
+		final String OSM = DaPaths.PROJECTS + "osm2/";
 		final String INFILE = OSM + "berlin_subway.osm";
 		
-		final String HAFAS = DaPaths.OUTPUT + "bvg09/";
+		final String HAFAS = DaPaths.PROJECTS + "bvg09/";
 		final String HAFASTRANSITFILE = HAFAS + "transitSchedule-HAFAS-Coord.xml";
 		ScenarioImpl hafas = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		hafas.getConfig().scenario().setUseTransit(true);

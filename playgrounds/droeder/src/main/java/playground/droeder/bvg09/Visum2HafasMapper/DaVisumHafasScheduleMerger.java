@@ -43,7 +43,7 @@ public class DaVisumHafasScheduleMerger {
 
 	private static Logger log = Logger.getLogger(DaVisumHafasScheduleMerger.class);
 
-	private static String path = DaPaths.OUTPUT + "bvg09/";
+	private static String path = DaPaths.PROJECTS + "bvg09/";
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
 	private static String HafasTransitScheduleFile = path + "transitSchedule-HAFAS.xml";

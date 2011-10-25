@@ -57,7 +57,7 @@ public class Visum2HafasMapper{
 	private static final Logger log = Logger
 			.getLogger(Visum2HafasMapper.class);
 	
-	private static String PATH = DaPaths.OUTPUT + "bvg09/";
+	private static String PATH = DaPaths.PROJECTS + "bvg09/";
  	
 	private static String VISUM = PATH + "intermediateTransitSchedule.xml";
 	private static String HAFAS = PATH + "transitSchedule-HAFAS-Coord.xml";

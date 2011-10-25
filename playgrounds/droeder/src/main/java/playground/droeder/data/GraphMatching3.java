@@ -515,8 +515,8 @@ public class GraphMatching3 {
 //	}
 	
 	public static void main(String[] args){
-		final String PATH = DaPaths.OUTPUT + "bvg09/";
-		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+		final String PATH = DaPaths.PROJECTS + "bvg09/";
+		final String OUT = DaPaths.PROJECTS + "geoAlgorithm/";
 		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 		

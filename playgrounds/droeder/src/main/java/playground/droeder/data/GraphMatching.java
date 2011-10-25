@@ -637,7 +637,7 @@ public class GraphMatching {
 		match.addEdge(new MatchingEdge(new IdImpl("me54"), m5, m4));
 		
 		
-		final String OUT = DaPaths.OUTPUT + "geoAlgorithm/";
+		final String OUT = DaPaths.PROJECTS + "geoAlgorithm/";
 		GraphMatching gm = new GraphMatching(ref, match);
 		gm.setMaxAngle(Math.PI/4);
 		gm.setMaxDist(25.0);

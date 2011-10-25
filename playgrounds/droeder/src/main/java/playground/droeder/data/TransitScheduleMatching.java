@@ -67,7 +67,7 @@ public class TransitScheduleMatching {
 	private TransitSchedule hafasSched;
 	
 	public static void main(String[] args){
-		final String DIR = DaPaths.OUTPUT;
+		final String DIR = DaPaths.PROJECTS;
 		final String OSM = DIR + "osm/";
 		final String HAFAS = DIR + "bvg09/";
 		

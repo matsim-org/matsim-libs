@@ -75,12 +75,12 @@ public class MatchedLines2newSchedule {
 	}
 
 	public static void main(String[] args){
-		final String DIR = DaPaths.OUTPUT + "osm/";
+		final String DIR = DaPaths.PROJECTS + "osm/";
 		final String MATCHEDLINES = DIR + "manuallyMatchedRoutes.csv";
 		
 		final String OSMNET = DIR + "osm_berlin_subway_net.xml";
 		final String OSMSCHED = DIR + "osm_berlin_subway_sched.xml";
-		final String HAFASSCHED = DaPaths.OUTPUT + "bvg09/transitSchedule-HAFAS-Coord.xml";
+		final String HAFASSCHED = DaPaths.PROJECTS + "bvg09/transitSchedule-HAFAS-Coord.xml";
 		final String OUTSCHED = DIR + "manuallyMatchedSched.xml";
 		
 		final Set<String[]> matchedLines = DaFileReader.readFileContent(MATCHEDLINES, ";", true);

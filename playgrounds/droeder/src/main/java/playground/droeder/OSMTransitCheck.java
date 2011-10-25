@@ -45,7 +45,7 @@ import playground.droeder.gis.DaShapeWriter;
  */
 public class OSMTransitCheck {
 	public static void main(String[] args){
-		String DIR = DaPaths.OUTPUT + "osm/";
+		String DIR = DaPaths.PROJECTS + "osm/";
 		
 		/*
 		 * generate berlin_subway.osm with osmosis

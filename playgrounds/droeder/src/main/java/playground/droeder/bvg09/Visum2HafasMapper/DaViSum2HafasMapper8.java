@@ -153,7 +153,7 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 			}
 		}
 		
-		DaShapeWriter.writePointDist2Shape(DaPaths.OUTPUT + "bvg09/matchedDist.shp", points, attribs);
+		DaShapeWriter.writePointDist2Shape(DaPaths.PROJECTS + "bvg09/matchedDist.shp", points, attribs);
 	}
 	
 }

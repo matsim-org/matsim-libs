@@ -89,7 +89,7 @@ public class Journal2Matsim2Journal {
 	private static final Logger log = Logger
 			.getLogger(Journal2Matsim2Journal.class);
 	
-	private static final String INPUTDIR = DaPaths.OUTPUT + "journals/";
+	private static final String INPUTDIR = DaPaths.PROJECTS + "journals/";
 	
 	private String inFile = null;
 	private String networkFile = null;
