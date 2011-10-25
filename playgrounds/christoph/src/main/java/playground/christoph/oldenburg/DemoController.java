@@ -24,18 +24,15 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -46,7 +43,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -150,20 +146,6 @@ public class DemoController extends WithinDayController implements SimulationIni
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {		
 		initReplanners((QSim)e.getQueueSimulation());
-		
-		/*
-		 * We replace the selected plan of each agent with the executed plan which
-		 * is adapted by the within day replanning modules.
-		 */
-		for (MobsimAgent agent : ((QSim)e.getQueueSimulation()).getAgents()) {
-			if (agent instanceof ExperimentalBasicWithindayAgent) {
-				Plan executedPlan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
-				PersonImpl person = (PersonImpl)((ExperimentalBasicWithindayAgent) agent).getPerson();
-				person.removePlan(person.getSelectedPlan());
-				person.addPlan(executedPlan);
-				person.setSelectedPlan(executedPlan);
-			}
-		}
 	}
 	
 	@Override
