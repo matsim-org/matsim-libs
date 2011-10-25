@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.io.Serializable;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 
@@ -51,10 +52,16 @@ public class InfoText implements Serializable {
 		this.y = y;
 	}
 
-	public void draw(TextRenderer renderer, GL gl, Rect rect) {
-		renderer.beginRendering((int) (rect.maxX - rect.minX), (int) (rect.maxY - rect.minY));
+	public void draw(TextRenderer renderer, GLAutoDrawable drawable, Rect rect) {
+        int width = (int) (rect.maxX - rect.minX);
+        int height = (int) (rect.maxY - rect.minY);
+        int screenWidth = drawable.getWidth();
+        float widthRatio = (float) screenWidth / (float) width;
+        int screenHeight = drawable.getHeight();
+        float heightRatio = (float) screenHeight / (float) height;
+        renderer.beginRendering(screenWidth, screenHeight);
 		renderer.setColor(color.getRed()/255.f, color.getGreen()/255.f, color.getBlue()/255.f, color.getAlpha()/255.f);
-		renderer.draw(text, (int) (x - rect.minX), (int) (y - rect.minY));
+		renderer.draw(text, (int) ((x - rect.minX) * widthRatio) , (int) ((y - rect.minY) * heightRatio));
 		renderer.endRendering();
 	}
 

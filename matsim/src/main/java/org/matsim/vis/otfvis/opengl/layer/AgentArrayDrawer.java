@@ -105,9 +105,8 @@ final class AgentArrayDrawer extends OTFGLAbstractDrawable {
 	}
 
 	private static void setAgentSize(GL gl) {
-		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize();
-		double scale = OTFClientControl.getInstance().getMainOTFDrawer().getScale();
-		gl.glPointSize(agentSize / (float) scale);
+		float agentSize = OTFClientControl.getInstance().getOTFVisConfig().getAgentSize() / 10.f;
+		gl.glPointSize(agentSize);
 	}
 
 	void addAgent(char[] id, float startX, float startY, Color mycolor, boolean saveId){

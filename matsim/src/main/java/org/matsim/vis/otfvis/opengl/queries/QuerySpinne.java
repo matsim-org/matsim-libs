@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -125,7 +126,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 				this.vert = BufferUtil.copyFloatBuffer(FloatBuffer.wrap(this.vertex));
 				this.agentText = new InfoText(this.linkIdString, this.vertex[0], this.vertex[1] );
-				this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getGl(), drawer.getViewBoundsAsQuadTreeRect());
+				this.agentText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 			}
 
 			this.vert.position(0);
@@ -169,10 +170,10 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			double minX = bounds.minX + (bounds.maxX -bounds.minX)*0.01;
 			double maxY = bounds.minY + (bounds.maxY -bounds.minY)*0.15;
 			double minY = bounds.minY + (bounds.maxY -bounds.minY)*0.01;
-			GL gl = OTFGLAbstractDrawable.getGl();
+			GLAutoDrawable gl = OTFGLAbstractDrawable.getDrawable();
 			Color color = new Color(255,255,255,200);
-			gl.glEnable(GL.GL_BLEND);
-			drawQuad(gl, minX, maxX, minY, maxY, color);
+			gl.getGL().glEnable(GL.GL_BLEND);
+			drawQuad(gl.getGL(), minX, maxX, minY, maxY, color);
 			double horOf = (maxY-minY)/12;
 			double verOf = (maxX-minX)/12;
 
@@ -184,15 +185,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 			Color c3 = colorizer3.getColor(maxCount);
 
 			double a=1,b=4,c=1,d=3;
-			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
+			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c1);
 			InfoText text1 = new InfoText("Count: 0" , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
 			text1.draw(drawer.getTextRenderer(), gl, drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=5;d=7;
-			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
+			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c2);
 			InfoText text2 = new InfoText("Count: " + (maxCount/2) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
 			text2.draw(drawer.getTextRenderer(),gl, drawer.getViewBoundsAsQuadTreeRect());
 			a=1;b=4;c=9;d=11;
-			drawQuad(gl, minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
+			drawQuad(gl.getGL(), minX +a*verOf, minX+b*verOf, minY+c*horOf, minY+d*horOf, c3);
 			InfoText text3 = new InfoText("Count: " + (maxCount) , (float)(minX+(b+1)*verOf), (float) (minY+c*horOf));
 			text3.draw(drawer.getTextRenderer(),gl, drawer.getViewBoundsAsQuadTreeRect());
 		}

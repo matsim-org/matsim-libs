@@ -110,7 +110,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 				gl.glEnd();
 				drawCircle(gl, (float)pos.x, (float)pos.y, 100.f);
 				InfoText text = new InfoText("Bus " + id, (float)pos.x+ 250, (float)pos.y+ 250);
-				text.draw(drawer.getTextRenderer(), gl, drawer.getViewBoundsAsQuadTreeRect());
+				text.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 
 			}
 			gl.glDisable(GL.GL_BLEND);

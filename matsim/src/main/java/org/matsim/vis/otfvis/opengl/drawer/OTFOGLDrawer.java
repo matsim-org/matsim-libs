@@ -418,7 +418,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		GL gl = drawable.getGL();
-		OTFGLAbstractDrawable.setGl(gl);
+		OTFGLAbstractDrawable.setGl(drawable);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		gl.glClearColor(components[0], components[1], components[2], components[3]);
 		gl.glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -437,7 +437,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 		if (otfVisConfig.isDrawingLinkIds() && isZoomBigEnoughForLabels()) {
 			Map<Coord, String> coordStringPairs = findVisibleLinks();
-			displayLinkIds(coordStringPairs, gl);
+			displayLinkIds(coordStringPairs, drawable);
 		}
 
 		if (otfVisConfig.drawTime()) {
@@ -488,7 +488,7 @@ public class OTFOGLDrawer implements GLEventListener {
 		// Do nothing.
 	}
 
-	private void displayLinkIds(Map<Coord, String> linkIds, GL gl) {
+	private void displayLinkIds(Map<Coord, String> linkIds, GLAutoDrawable glAutoDrawable) {
 		String testText = "0000000";
 		Rectangle2D test = textRenderer.getBounds(testText);
 		Map<Coord, Boolean> xymap = new HashMap<Coord, Boolean>(); // Why is here a Map used, and not a Set?
@@ -510,14 +510,15 @@ public class OTFOGLDrawer implements GLEventListener {
 				i++;
 			}
 			xymap.put(text, Boolean.TRUE);
+            GL gl = glAutoDrawable.getGL();
 			gl.glColor4f(0.f, 0.2f, 1.f, 0.5f);//Blue
 			gl.glLineWidth(2);
 			gl.glBegin(GL.GL_LINE_STRIP);
-			gl.glVertex3d(east, north,0);
-			gl.glVertex3d((float)text.getX(), (float)text.getY(),0);
+			gl.glVertex3d(east, north, 0);
+			gl.glVertex3d((float) text.getX(), (float) text.getY(), 0);
 			gl.glEnd();
 			InfoText infoText = new InfoText(linkId, (float)text.getX(), (float)text.getY());
-			infoText.draw(textRenderer, gl, this.getViewBoundsAsQuadTreeRect());
+			infoText.draw(textRenderer, glAutoDrawable, this.getViewBoundsAsQuadTreeRect());
 		}
 	}
 
@@ -671,7 +672,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		GL gl = drawable.getGL();
-		OTFGLAbstractDrawable.setGl(gl);
+		OTFGLAbstractDrawable.setGl(drawable);
 		gl.setSwapInterval(0);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
 		gl.glClearColor(components[0], components[1], components[2], components[3]);

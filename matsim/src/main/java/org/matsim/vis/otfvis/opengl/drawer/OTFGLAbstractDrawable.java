@@ -21,6 +21,7 @@
 package org.matsim.vis.otfvis.opengl.drawer;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GLAutoDrawable;
 
 import org.matsim.vis.otfvis.data.OTFDrawable;
 
@@ -47,11 +48,15 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	// So we have to cache it. In the OpenGL community, it is generally
 	// recommended *not* to store GL contexts anywhere, because the driver may create and pass
 	// a new one at any time.  michaz
-	private static GL gl; 
+	private static GLAutoDrawable gl;
 
-	@Override
+    public static GLAutoDrawable getDrawable() {
+        return gl;
+    }
+
+    @Override
 	public final void draw() {
-		onDraw(gl);
+		onDraw(gl.getGL());
 	}
 	
 	/**
@@ -67,7 +72,7 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	 * 
 	 */
 	public final void glInit() {
-		onInit(gl);
+		onInit(gl.getGL());
 	}
 	
 	protected void onInit(GL gl) {
@@ -76,12 +81,12 @@ public abstract class OTFGLAbstractDrawable implements OTFDrawable {
 	
 	abstract protected void onDraw( GL gl ) ;
 
-	static void setGl(GL gl) {
+	static void setGl(GLAutoDrawable gl) {
 		OTFGLAbstractDrawable.gl = gl;
 	}
 	
 	public final static GL getGl() {
-		return gl;
+		return gl.getGL();
 	}
 
 }

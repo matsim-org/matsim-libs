@@ -41,6 +41,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.DrawingUtils;
@@ -153,8 +154,8 @@ public class FacilityDrawer {
 				for (VisBusStop stop : this.stops) {
 					if ( stop.linkId!=null ) {
 						stop.stopText = new InfoText(stop.buildText(), (float) stop.x - 100.0f, (float) stop.y + 50.0f); 
-						OTFOGLDrawer drawer = (OTFOGLDrawer) OTFClientControl.getInstance().getMainOTFDrawer();
-						stop.stopText.draw(drawer.getTextRenderer(), gl, drawer.getViewBoundsAsQuadTreeRect());
+						OTFOGLDrawer drawer = OTFClientControl.getInstance().getMainOTFDrawer();
+						stop.stopText.draw(drawer.getTextRenderer(), OTFGLAbstractDrawable.getDrawable(), drawer.getViewBoundsAsQuadTreeRect());
 					}
 				}
 			}
