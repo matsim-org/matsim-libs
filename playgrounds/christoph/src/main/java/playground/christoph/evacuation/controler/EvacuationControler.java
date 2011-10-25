@@ -21,11 +21,17 @@
 package playground.christoph.evacuation.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
-import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -34,64 +40,40 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalControler;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
-import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.mobsim.WithinDayQSim;
-import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
-import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InsecureActivityPerformingIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InsecureLegPerformingIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.SecureActivityPerformingIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.SecureLegPerformingIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToRescueFacilityReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToSecureFacilityReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
-public class EvacuationControler extends MultiModalControler {
+public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, SimulationBeforeSimStepListener, 
+	StartupListener, AfterMobsimListener {
 
-	/*
-	 * If more than one iteration are simulated, within day replanning is
-	 * deactivated (replanning is performed only one when the evacuation
-	 * starts).
-	 */
-	public boolean doIterations = true;
-
-//	public boolean multiModal = true;
+	//	public boolean multiModal = true;
 
 	/*
 	 * Define the Probability that an Agent uses the
 	 * Replanning Strategy. It is possible to assign
 	 * multiple Strategies to the Agents.
 	 */
-	protected double pInitialReplanning = 0.0;
-	protected double pDuringActivityReplanning = 1.0;
-	protected double pDuringLegReplanning = 1.0;
-
-	/*
-	 * Probability, that an agent really performs a replanning.
-	 * Should be 1.0 for within day runs and ~ 0.1 for iterative runs.
-	 */
-	protected double pReplanning = 0.1;
+//	protected double pInitialReplanning = 0.0;
+//	protected double pDuringActivityReplanning = 1.0;
+//	protected double pDuringLegReplanning = 1.0;
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -99,30 +81,32 @@ public class EvacuationControler extends MultiModalControler {
 	protected int numReplanningThreads = 6;
 
 	/*
-	 * The EventsFile which is used to get the initial TravelTimes for the
-	 * TravelTimeCalculator.
+	 * Identifiers
 	 */
-	protected String initialEventsFile = "../../matsim/mysimulations/multimodal/input_10pct_zrhCutC/events_initial_traveltimes.txt.gz";
+	protected DuringActivityIdentifier activityPerformingIdentifier;
+	protected DuringLegIdentifier legPerformingIdentifier;
+//	protected InitialIdentifier initialIdentifier;
+//	protected DuringActivityIdentifier duringSecureActivityIdentifier;
+//	protected DuringActivityIdentifier duringInsecureActivityIdentifier;
+//	protected DuringLegIdentifier duringSecureLegIdentifier;
+//	protected DuringLegIdentifier duringInsecureLegIdentifier;
+//	protected DuringLegIdentifier currentInsecureLegIdentifier;
+	
+	/*
+	 * Replanners
+	 */
+	protected WithinDayDuringActivityReplanner currentActivityToMeetingPointReplanner;
+	protected WithinDayDuringLegReplanner currentLegToMeetingPointReplanner;
+//	protected WithinDayInitialReplanner initialReplanner;
+//	protected WithinDayDuringActivityReplanner duringSecureActivityReplanner;
+//	protected WithinDayDuringActivityReplanner duringInsecureActivityReplanner;
+//	protected WithinDayDuringLegReplanner duringSecureLegReplanner;
+//	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
+//	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
 
-	protected PersonalizableTravelTime travelTime;
-
-	protected InitialIdentifier initialIdentifier;
-	protected DuringActivityIdentifier duringSecureActivityIdentifier;
-	protected DuringActivityIdentifier duringInsecureActivityIdentifier;
-	protected DuringLegIdentifier duringSecureLegIdentifier;
-	protected DuringLegIdentifier duringInsecureLegIdentifier;
-	protected DuringLegIdentifier currentInsecureLegIdentifier;
-	protected WithinDayInitialReplanner initialReplanner;
-	protected WithinDayDuringActivityReplanner duringSecureActivityReplanner;
-	protected WithinDayDuringActivityReplanner duringInsecureActivityReplanner;
-	protected WithinDayDuringLegReplanner duringSecureLegReplanner;
-	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
-	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
-
-	protected SelectHandledAgentsByProbability selector;
-	protected ReplanningManager replanningManager;
+	protected HouseholdsUtils householdsUtils;
+//	protected SelectHandledAgentsByProbability selector;
 	protected WithinDayQSim sim;
-	protected FixedOrderSimulationListener fosl;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
@@ -130,14 +114,11 @@ public class EvacuationControler extends MultiModalControler {
 		super(args);
 
 		setConstructorParameters();
+		
+		// register this as a Controller and Simulation Listener
+		super.getFixedOrderSimulationListener().addSimulationListener(this);
+		super.addControlerListener(this);
 	}
-
-//	// only for Batch Runs
-//	public EvacuationControler(Config config) {
-//		super(config);
-//
-//		setConstructorParameters();
-//	}
 
 	private void setConstructorParameters() {
 
@@ -152,6 +133,68 @@ public class EvacuationControler extends MultiModalControler {
 //		setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 	}
 
+	/*
+	 * When the Controller Startup Event is created, the EventsManager
+	 * has already been initialized. Therefore we can initialize now
+	 * all Objects, that have to be registered at the EventsManager.
+	 */
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), getNetwork());
+		
+		super.createAndInitReplanningManager(numReplanningThreads);
+		super.createAndInitTravelTimeCollector();
+		super.createAndInitActivityReplanningMap();
+		super.createAndInitLinkReplanningMap();
+		
+		householdsUtils = new HouseholdsUtils(this.scenarioData);
+		this.getEvents().addHandler(householdsUtils);
+		this.getFixedOrderSimulationListener().addSimulationListener(householdsUtils);
+		householdsUtils.printStatistics();
+	}
+	
+	@Override
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		initReplannings((QSim)e.getQueueSimulation());
+		
+		/*
+		 * We replace the selected plan of each agent with the executed plan which
+		 * is adapted by the within day replanning modules.
+		 * So far, this is necessary because some modules, like e.g. EventsToScore,
+		 * use person.getSelectedPlan(). However, when using within-day replanning
+		 * the selected plan might be different than the executed plan which
+		 * in turn will result in code that crashes...
+		 */
+		for (MobsimAgent agent : ((QSim)e.getQueueSimulation()).getAgents()) {
+			if (agent instanceof ExperimentalBasicWithindayAgent) {
+				Plan executedPlan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
+				PersonImpl person = (PersonImpl)((ExperimentalBasicWithindayAgent) agent).getPerson();
+				person.removePlan(person.getSelectedPlan());
+				person.addPlan(executedPlan);
+				person.setSelectedPlan(executedPlan);
+			}
+		}
+	}
+	
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		
+		// do replanning only in the time-step where the Evacuation has started.
+		if (e.getSimulationTime() == EvacuationConfig.evacuationTime) {
+			this.getReplanningManager().doDuringActivityReplanning(true);
+			this.getReplanningManager().doDuringLegReplanning(true);
+		} else {
+			this.getReplanningManager().doDuringActivityReplanning(false);
+			this.getReplanningManager().doDuringLegReplanning(false);
+		}
+	}
+	
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		householdsUtils.printStatistics();
+		householdsUtils.printClosingStatistics();
+	}
+	
 	@Override
 	protected void loadData() {
 		super.loadData();
@@ -159,10 +202,10 @@ public class EvacuationControler extends MultiModalControler {
 		/*
 		 * both only for WithinDay without iterations
 		 */
-//		// Add Rescue Links to Network
+		// Add Rescue Links to Network
 //		new AddExitLinksToNetwork(this.scenarioData).createExitLinks();
 
-//		// Add secure Facilities to secure Links.
+		// Add secure Facilities to secure Links.
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
 	}
 
@@ -170,32 +213,21 @@ public class EvacuationControler extends MultiModalControler {
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	protected void initReplanningRouter() {
-
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+	protected void initReplannings(QSim sim) {
 		
-		// iterative
-		if (doIterations) {
-			travelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator());
-
-			((TravelTimeCalculatorWithBuffer) this.getTravelTimeCalculator()).initTravelTimes(initialEventsFile);
-		}
-		// within day
-		else {
-			travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
-			fosl.addSimulationBeforeSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
-			fosl.addSimulationAfterSimStepListener((TravelTimeCollector) travelTime);	// for TravelTimeCollector
-			this.events.addHandler((TravelTimeCollector) travelTime);	// for TravelTimeCollector
-		}
-
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		AgentCounterI agentCounter = sim.getAgentCounter();
+		
 		// without social costs
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
+		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCollector());
 
-//		CloneablePlansCalcRoute router = new CloneablePlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
 //		MultiModalPlansCalcRoute router = new MultiModalPlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, this.getTravelTimeCollector(), factory, routeFactory);
 
+		/*
+		 * Intial Replanners
+		 */
 //		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
 //		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId(), this.scenarioData);
@@ -204,112 +236,73 @@ public class EvacuationControler extends MultiModalControler {
 //		this.replanningManager.addIntialReplanner(this.initialReplanner);
 
 		/*
-		 * Create ActivityReplanningMap here and reuse it for both duringActivityReplanners!
+		 * During Activity Replanners
 		 */
-		ActivityReplanningMap activityReplanningMap = new ActivityReplanningMap();
-		this.getEvents().addHandler(activityReplanningMap);
-		fosl.addSimulationListener(activityReplanningMap);
+		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
+		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, agentCounter, router, 1.0, householdsUtils).createReplanner();
+		this.currentActivityToMeetingPointReplanner.addAgentsToReplanIdentifier(this.activityPerformingIdentifier);
+		this.getReplanningManager().addDuringActivityReplanner(this.currentActivityToMeetingPointReplanner);
+		
+//		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(this.getActivityReplanningMap(), EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+//		this.selector.addIdentifier(this.duringSecureActivityIdentifier, this.pDuringActivityReplanning);
+//		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+//		this.duringSecureActivityReplanner.addAgentsToReplanIdentifier(this.duringSecureActivityIdentifier);
+//		this.duringSecureActivityReplanner.setReplanningProbability(pReplanning);
+//		this.getReplanningManager().addDuringActivityReplanner(this.duringSecureActivityReplanner);
 
-		this.duringSecureActivityIdentifier = new SecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-		this.selector.addIdentifier(this.duringSecureActivityIdentifier, this.pDuringActivityReplanning);
-		this.duringSecureActivityReplanner = new ExtendCurrentActivityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.duringSecureActivityReplanner.addAgentsToReplanIdentifier(this.duringSecureActivityIdentifier);
-		this.duringSecureActivityReplanner.setReplanningProbability(pReplanning);
-		this.replanningManager.addDuringActivityReplanner(this.duringSecureActivityReplanner);
-
-		this.duringInsecureActivityIdentifier = new InsecureActivityPerformingIdentifierFactory(activityReplanningMap, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-		this.selector.addIdentifier(this.duringInsecureActivityIdentifier, this.pDuringActivityReplanning);
-		this.duringInsecureActivityReplanner = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
-		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
-		this.replanningManager.addDuringActivityReplanner(this.duringInsecureActivityReplanner);
+//		this.duringInsecureActivityIdentifier = new InsecureActivityPerformingIdentifierFactory(this.getActivityReplanningMap(), EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+//		this.selector.addIdentifier(this.duringInsecureActivityIdentifier, this.pDuringActivityReplanning);
+//		this.duringInsecureActivityReplanner = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+//		this.duringInsecureActivityReplanner.addAgentsToReplanIdentifier(this.duringInsecureActivityIdentifier);
+//		this.duringInsecureActivityReplanner.setReplanningProbability(pReplanning);
+//		this.getReplanningManager().addDuringActivityReplanner(this.duringInsecureActivityReplanner);
 
 		/*
-		 * Create LegReplanningMap here and reuse it for all three duringLegReplanners!
+		 * During Leg Replanners
 		 */
-		LinkReplanningMap linkReplanningMap = new LinkReplanningMap();
-		this.getEvents().addHandler(linkReplanningMap);
-		fosl.addSimulationListener(linkReplanningMap);
+		this.legPerformingIdentifier = new LegPerformingIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
+		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, agentCounter, router, 1.0, householdsUtils).createReplanner();
+		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
+		this.getReplanningManager().addDuringLegReplanner(this.currentLegToMeetingPointReplanner);
+		
+//		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(this.getLinkReplanningMap(), network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+//		this.selector.addIdentifier(this.duringSecureLegIdentifier, this.pDuringLegReplanning);
+//		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+//		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
+//		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
+//		this.getReplanningManager().addDuringLegReplanner(this.duringSecureLegReplanner);
 
-		this.duringSecureLegIdentifier = new SecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-		this.selector.addIdentifier(this.duringSecureLegIdentifier, this.pDuringLegReplanning);
-		this.duringSecureLegReplanner = new CurrentLegToSecureFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.duringSecureLegReplanner.addAgentsToReplanIdentifier(this.duringSecureLegIdentifier);
-		this.duringSecureLegReplanner.setReplanningProbability(pReplanning);
-		this.replanningManager.addDuringLegReplanner(this.duringSecureLegReplanner);
+//		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifierFactory(this.getLinkReplanningMap(), network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
+//		this.selector.addIdentifier(this.duringInsecureLegIdentifier, this.pDuringLegReplanning);
+//		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+//		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
+//		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
+//		this.getReplanningManager().addDuringLegReplanner(this.duringInsecureLegReplanner);
 
-		this.duringInsecureLegIdentifier = new InsecureLegPerformingIdentifierFactory(linkReplanningMap, network, EvacuationConfig.centerCoord, EvacuationConfig.innerRadius).createIdentifier();
-		this.selector.addIdentifier(this.duringInsecureLegIdentifier, this.pDuringLegReplanning);
-		this.duringInsecureLegReplanner = new CurrentLegToRescueFacilityReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.duringInsecureLegReplanner.addAgentsToReplanIdentifier(this.duringInsecureLegIdentifier);
-		this.duringInsecureLegReplanner.setReplanningProbability(pReplanning);
-		this.replanningManager.addDuringLegReplanner(this.duringInsecureLegReplanner);
-
-		this.currentInsecureLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.selector.addIdentifier(this.currentInsecureLegIdentifier, this.pDuringLegReplanning);
-		this.currentInsecureLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
-		this.currentInsecureLegReplanner.addAgentsToReplanIdentifier(this.currentInsecureLegIdentifier);
-		this.currentInsecureLegReplanner.setReplanningProbability(pReplanning);
-		this.replanningManager.addDuringLegReplanner(this.currentInsecureLegReplanner);
+//		this.currentInsecureLegIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()).createIdentifier();
+//		this.selector.addIdentifier(this.currentInsecureLegIdentifier, this.pDuringLegReplanning);
+//		this.currentInsecureLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+//		this.currentInsecureLegReplanner.addAgentsToReplanIdentifier(this.currentInsecureLegIdentifier);
+//		this.currentInsecureLegReplanner.setReplanningProbability(pReplanning);
+//		this.getReplanningManager().addDuringLegReplanner(this.currentInsecureLegReplanner);
 	}
 
 	@Override
 	protected void setUp() {
-		/*
-		 * SimStepParallelEventsManagerImpl might be moved to org.matsim.
-		 * Then this piece of code could be placed in the controller.
-		 */
-		if (this.events instanceof ParallelEventsManagerImpl) {
-			log.info("Replacing ParallelEventsManagerImpl with SimStepParallelEventsManagerImpl. This is needed for Within-Day Replanning.");
-			SimStepParallelEventsManagerImpl manager = new SimStepParallelEventsManagerImpl();
-			this.fosl.addSimulationAfterSimStepListener(manager);
-			this.events = manager;
-		}
-		
+
 		super.setUp();
 
-		replanningManager = new ReplanningManager(numReplanningThreads);
-
-		selector = new SelectHandledAgentsByProbability();
-		fosl.addSimulationListener(selector);
-
-		/*
-		 * Use a FixedOrderQueueSimulationListener to bundle the Listeners and
-		 * ensure that they are started in the needed order.
-		 */
-		fosl.addSimulationInitializedListener(replanningManager);
-		fosl.addSimulationBeforeSimStepListener(replanningManager);
-
-		this.getQueueSimulationListener().add(fosl);
-		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
-
-		log.info("Creating additional Plans");
-		clonePlans();
+//		selector = new SelectHandledAgentsByProbability();
+//		this.getFixedOrderSimulationListener().addSimulationListener(selector);
 	}
 
 	/*
-	 * Ensure that each person holds the maximum amount of allowed Plans.
-	 * This is necessary because the replanning is done within day where
-	 * no additional plans are created.
-	 */
-	protected void clonePlans() {
-		if (doIterations) {
-			for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
-				while (person.getPlans().size() < this.config.strategy().getMaxAgentPlanMemorySize()) {
-					((PersonImpl) person).copySelectedPlan();
-				}
-			}
-		}
-	}
-
-	/*
-	 * Always use a EvacuationQSimFactory - it will return
+	 * Always use a MultiModalMobsimFactory - it will return
 	 * a (Parallel)QSim using a MultiModalQNetwork.
 	 */
 	@Override
 	public MobsimFactory getMobsimFactory() {
-		return new MultiModalMobsimFactory(super.getMobsimFactory(), travelTime);
+		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCollector());
 	}
 
 	/*
@@ -329,5 +322,5 @@ public class EvacuationControler extends MultiModalControler {
 		}
 		System.exit(0);
 	}
-
+	
 }
