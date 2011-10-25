@@ -20,17 +20,23 @@
 
 package org.matsim.analysis;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -92,7 +98,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testNoEvents() {
 
-		CalcLegTimes testee = new CalcLegTimes(this.population);
+		CalcLegTimes testee = new CalcLegTimes();
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -104,34 +110,43 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testAveraging() {
 
-		CalcLegTimes testee = new CalcLegTimes(this.population);
+		CalcLegTimes testee = new CalcLegTimes();
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(testee);
 
+
 		LegImpl leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:10:00"));
 		leg.setArrivalTime(Time.parseTime("07:30:00"));
+		testee.handleEvent(new ActivityEndEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act1"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-
+		testee.handleEvent(new ActivityStartEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2"));
+		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
 		leg.setArrivalTime(Time.parseTime("07:10:00"));
+		testee.handleEvent(new ActivityEndEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new ActivityStartEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3"));
 
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
 		leg.setArrivalTime(Time.parseTime("31:22:00"));
+		testee.handleEvent(new ActivityEndEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-
+		testee.handleEvent(new ActivityStartEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4"));
+		
 		leg = new LegImpl(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
 		leg.setArrivalTime(Time.parseTime("30:12:01"));
+		testee.handleEvent(new ActivityEndEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4"));
 		testee.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new AgentArrivalEventImpl(leg.getArrivalTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
+		testee.handleEvent(new ActivityStartEventImpl(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act5"));
 
 		this.runTest(testee);
 	}

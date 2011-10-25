@@ -22,17 +22,18 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,46 +48,45 @@ import org.matsim.core.utils.misc.Time;
  * Also calculates the average trip duration.
  * Trips ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler, 
+	ActivityEndEventHandler, ActivityStartEventHandler {
 
 	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
 	
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private Population population = null;
-	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
-	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
-	private final TreeMap<String, int[]> legStats = new TreeMap<String, int[]>();
+	private final Map<Id, Double> agentDepartures = new HashMap<Id, Double>();
+	private final Map<Id, Double> agentArrivals = new HashMap<Id, Double>();
+	private final Map<String, int[]> legStats = new TreeMap<String, int[]>();
+	private final Map<Id, String> previousActivityTypes = new HashMap<Id, String>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 
-	public CalcLegTimes(final Population population) {
-		this.population = population;
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		this.previousActivityTypes.put(event.getPersonId(), event.getActType());
 	}
-
+	
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
-		Integer cnt = this.agentLegs.get(event.getPersonId());
-		if (cnt == null) {
-			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1));
-		} else {
-			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
-		}
 	}
 
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
+		this.agentArrivals.put(event.getPersonId(), event.getTime());
+	}
+
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
-		Person agent = this.population.getPersons().get(event.getPersonId());
-		if (depTime != null && agent != null) {
-			double travTime = event.getTime() - depTime;
-			int legNr = this.agentLegs.get(event.getPersonId());
-			Plan plan = agent.getSelectedPlan();
-			int index = (legNr - 1) * 2;
-			String fromActType = ((Activity)plan.getPlanElements().get(index)).getType();
-			String toActType = ((Activity)plan.getPlanElements().get(index + 2)).getType();
+		Double arrTime = this.agentArrivals.remove(event.getPersonId());
+		if (depTime != null) {
+			double travTime = arrTime - depTime;
+			String fromActType = previousActivityTypes.remove(event.getPersonId());
+			String toActType = event.getActType();
 			String legType = fromActType + "---" + toActType;
 			int[] stats = this.legStats.get(legType);
 			if (stats == null) {
@@ -103,16 +103,17 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	
 	@Override
 	public void reset(final int iteration) {
+		this.previousActivityTypes.clear();
 		this.agentDepartures.clear();
-		this.agentLegs.clear();
 		this.legStats.clear();
 		this.sumTripDurations = 0;
 		this.sumTrips = 0;
 	}
 
-	public TreeMap<String, int[]> getLegStats() {
+	public Map<String, int[]> getLegStats() {
 		return this.legStats;
 	}
 
@@ -178,5 +179,4 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 			}
 		}
 	}
-
 }

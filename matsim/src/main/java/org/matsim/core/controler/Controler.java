@@ -592,7 +592,7 @@ public class Controler {
 		this.linkStats = new CalcLinkStats(this.network);
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 		this.events.addHandler(this.volumes);
-		this.legTimes = new CalcLegTimes(this.population);
+		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(this.legTimes);
 
 		if (this.scoringFunctionFactory == null) {
