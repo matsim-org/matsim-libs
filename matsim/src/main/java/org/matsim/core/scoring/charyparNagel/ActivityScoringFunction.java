@@ -62,6 +62,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 	@Override
 	public void reset() {
+        this.firstAct = true;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
