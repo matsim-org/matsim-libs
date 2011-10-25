@@ -698,6 +698,14 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 		public IndividualValuesWrapper(
 				final ScoringFunction scoringFunction,
 				final Plan indivPlan) {
+			// very dirty way of having the current code work with the changed
+			// scoring function interface.
+			// TODO: use scoring function, and modify the scoring procedure
+			// to be compatible.
+			// Problem: the improvement in speed given by the OTF approach will
+			// probably disapear, as activity instanciations will have to be
+			// performed.
+			// -----------------------------------------------------------------
 			this.scoringFunction = (ScoringFunctionAdapter) scoringFunction;
 			this.individualPlan = indivPlan;
 			this.planElements = indivPlan.getPlanElements();

@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
@@ -76,34 +76,44 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 	}
 
 	private double getScore(final JointPlan plan) {
-		ScoringFunctionAdapter fitnessFunction;
+		ScoringFunction fitnessFunction;
 		Activity currentActivity;
 		Leg currentLeg;
-		double now;
+		//double now;
 
 		for (Plan indivPlan : plan.getIndividualPlans().values()) {
-			fitnessFunction = (ScoringFunctionAdapter)
+			fitnessFunction =
 				this.scoringFunctionFactory.createNewScoringFunction(indivPlan);
-			now = 0d;
+			//now = 0d;
 	
 			// step through plan and score it
 			List<PlanElement> elements = indivPlan.getPlanElements();
 			Activity lastActivity = (Activity) elements.get(elements.size() - 1);
-			for (PlanElement pe : indivPlan.getPlanElements()) {
+			for (PlanElement pe : elements) {
 				if (pe instanceof Activity) {
 					currentActivity = (Activity) pe;
-					fitnessFunction.startActivity(now, currentActivity);
-					now = currentActivity.getEndTime();
-					if ( !(currentActivity == lastActivity) ) {
-						fitnessFunction.endActivity(now, currentActivity);
+					//fitnessFunction.startActivity(now, currentActivity);
+					//now = currentActivity.getEndTime();
+					//if ( !(currentActivity == lastActivity) ) {
+					//	fitnessFunction.endActivity(now, currentActivity);
+					//}
+
+					// Quick and dirty fix to have everithing working with the
+					// changed ScoringFunction interface: if last activity has an
+					// end time defined, the last activity is counted twice
+					// ---------------------------------------------------------
+					if ( currentActivity == lastActivity ) {
+						currentActivity.setEndTime( Time.UNDEFINED_TIME );
 					}
+					fitnessFunction.handleActivity( currentActivity );
 				}
 				else if (pe instanceof Leg) {
 					currentLeg = (Leg) pe;
-					now = currentLeg.getDepartureTime();
-					fitnessFunction.startLeg(now, currentLeg);
-					now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
-					fitnessFunction.endLeg(now);
+					//now = currentLeg.getDepartureTime();
+					//fitnessFunction.startLeg(now, currentLeg);
+					//now = currentLeg.getDepartureTime() + currentLeg.getTravelTime();
+					//fitnessFunction.endLeg(now);
+					fitnessFunction.handleLeg( currentLeg );
 				}
 				else {
 					throw new IllegalArgumentException("unrecognized plan element type");

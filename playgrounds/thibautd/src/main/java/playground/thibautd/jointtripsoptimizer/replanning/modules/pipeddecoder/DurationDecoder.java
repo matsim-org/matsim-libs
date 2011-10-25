@@ -411,11 +411,14 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 				geneIndex,
 				individualValues.getNow(),
 				individualValues.getJointTravelTime());
+
 		destination.setStartTime(individualValues.getNow());
 		destination.setMaximumDuration(currentDuration);
 		individualValues.addToNow(currentDuration);
 		destination.setEndTime(individualValues.getNow());
+
 		constructedPlan.addActivity(destination);
+
 		individualValues.addToIndexInChromosome(1);
 		individualValues.resetTravelTime();
 	}
