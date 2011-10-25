@@ -9,6 +9,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -26,7 +27,7 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 		super(config.global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.type = type;
-		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(type);
+		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(ActTypeConverter.convert2FullType(type));
 		if (this.typedFacilities.size() == 0) {
 			log.warn("There are no facilities for type : " + type);
 		}
