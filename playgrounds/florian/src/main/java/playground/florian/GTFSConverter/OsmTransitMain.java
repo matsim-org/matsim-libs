@@ -36,12 +36,12 @@ public class OsmTransitMain {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		new OsmTransitMain("../../osm/torino.osm", TransformationFactory.WGS84, TransformationFactory.WGS84, "../../osm/torino/network.xml", "../../osm/torino/transitSchedule_bus.xml").convertOsm2Matsim();
+		new OsmTransitMain("../../osm/torino.osm", TransformationFactory.WGS84, TransformationFactory.WGS84, "../../osm/torino/network.xml", "../../osm/torino/transitSchedule_tram.xml").convertOsm2Matsim();
 	}
 	
 	public void convertOsm2Matsim(){
 //		convertOsm2Matsim(new String[]{"bus","light_rail","subway","train","tram"});
-		convertOsm2Matsim(new String[]{"bus"});
+		convertOsm2Matsim(new String[]{"tram"});
 	}
 		
 	public void convertOsm2Matsim(String[] transitFilter){

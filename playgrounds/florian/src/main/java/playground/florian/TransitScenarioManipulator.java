@@ -25,19 +25,19 @@ class TransitScenarioManipulator {
 	
 	public static void main(String[] args) {
 		// READ SCENARIO
-		Config c = ConfigUtils.loadConfig("./config_gtfs.xml");
+		Config c = ConfigUtils.loadConfig("../../gtfsOutput/config_gtfs.xml");
 		ScenarioImpl sc = (ScenarioImpl)(ScenarioUtils.createScenario(c));
-		new VehicleReaderV1(sc.getVehicles()).readFile("./transitVehicles_gtfs.xml");
-		new TransitScheduleReader(sc).readFile("./transitSchedule_gtfs.xml");
+		new VehicleReaderV1(sc.getVehicles()).readFile("../../gtfsOutput/transitVehicles_gtfs.xml");
+		new TransitScheduleReader(sc).readFile("../../gtfsOutput/transitSchedule_gtfs.xml");
 		// MANIPULATE
 		TransitScenarioManipulator tsman = new TransitScenarioManipulator(sc);
 //		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Subway","dummy_Rail","dummy_Tram","dummy_Funicular"});
-		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Subway"});
+		ScenarioImpl newSc = tsman.extractTransitVehicleTypes(new String[]{"dummy_Tram"});
 		// WRITE NEW SCENARIO
 		VehicleWriterV1 vw = new VehicleWriterV1(newSc.getVehicles());
-		vw.writeFile("./transitVehicles_new.xml");
+		vw.writeFile("../../gtfsOutput/transitVehicles_new.xml");
 		TransitScheduleWriter tsw = new TransitScheduleWriter(newSc.getTransitSchedule());
-		tsw.writeFile("./transitSchedule_new.xml");
+		tsw.writeFile("../../gtfsOutput/transitSchedule_new.xml");
 	}
 	
 	//#######################################################################################

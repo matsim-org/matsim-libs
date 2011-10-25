@@ -99,20 +99,20 @@ public class GtfsConverter {
 
 	private void writeNetwork() {
 		new NetworkWriter(scenario.getNetwork()).write("./network.xml");
-		System.out.println("Wrote Network to " + new File("./network.xml").getAbsolutePath());
+		System.out.println("Wrote Network to " + new File("../../gtfsOutput/network.xml").getAbsolutePath());
 	}
 
 
 	private void writeConfig() {
 		ConfigWriter cw = new ConfigWriter(config);
 		cw.setPrettyPrint(true);
-		cw.write("./config.xml");
+		cw.write("../../gtfsOutput/config.xml");
 	}
 
 	private void writeTransitSchedule() {
 		System.out.println("Writing TransitSchedule.");
 		TransitScheduleWriter tsw = new TransitScheduleWriter(ts);
-		tsw.writeFile("./transitSchedule.xml");
+		tsw.writeFile("../../gtfsOutput/transitSchedule.xml");
 	}
 
 	public void setDate(long date) {
@@ -255,9 +255,9 @@ public class GtfsConverter {
 		Set<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		config.transit().setVehiclesFile("../playgrounds/florian/transitVehicles.xml");
-		config.transit().setTransitScheduleFile("../playgrounds/florian/transitSchedule.xml");
-		config.network().setInputFile("../playgrounds/florian/network.xml");
+		config.transit().setVehiclesFile("../gtfsOutput/transitVehicles.xml");
+		config.transit().setTransitScheduleFile("../gtfsOutput/transitSchedule.xml");
+		config.network().setInputFile("../gtfsOutput/network.xml");
 	}
 
 	private List<Id> getUsedTripIds(GtfsSource tripsSource, List<String> usedServiceIds) {
@@ -772,7 +772,7 @@ public class GtfsConverter {
 
 	private void writeVehicles() {
 		VehicleWriterV1 vw = new VehicleWriterV1(scenario.getVehicles());
-		vw.writeFile("./transitVehicles.xml");
+		vw.writeFile("../../gtfsOutput/transitVehicles.xml");
 	}
 
 	private int getWeekday(long date) {
