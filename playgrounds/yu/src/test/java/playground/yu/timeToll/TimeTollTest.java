@@ -62,7 +62,7 @@ public class TimeTollTest extends MatsimTestCase {
 		@Override
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			if (event.getIteration() == event.getControler().getLastIteration()) {
-				clt = new CalcLegTimes(event.getControler().getPopulation());
+				clt = new CalcLegTimes();
 				event.getControler().getEvents().addHandler(clt);
 			}
 		}
