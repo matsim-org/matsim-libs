@@ -46,27 +46,30 @@ public class SCAGNetworkConverter {
 	public static void main(String[] args) {
 
 		args = new String[] {
-				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/scagnetwork/scagnetworknode.shp",
+				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/scagnetwork/scagnetworknode_Project_UTM_Zone_11N.shp",
+				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/scagnetwork/scagnetworknodelink_Project_UTM_Zone_11N.shp",
 				"D:/balmermi/documents/eclipse/output/ucsb"
 		};
 
-		if (args.length != 2) {
-			log.error("SCAGNetworkConverter nodeShpFile outputBase");
+		if (args.length != 3) {
+			log.error("SCAGNetworkConverter nodeShpFile linkShpFile outputBase");
 			System.exit(-1);
 		}
 		
 		// store input parameters
 		String nodeShpFile = args[0];
-		String outputBase = args[1];
+		String linkShpFile = args[1];
+		String outputBase = args[2];
 
 		// print input parameters
 		log.info("nodeShpFile: "+nodeShpFile);
+		log.info("linkShpFile: "+linkShpFile);
 		log.info("outputBase: "+outputBase);
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ObjectAttributes nodeObjectAttributes = new ObjectAttributes();
 		new SCAGShp2Nodes(nodeShpFile, nodeObjectAttributes).run(scenario.getNetwork());
-//		new SCAGShp2Links().run(scenario.getNetwork());
+		new SCAGShp2Links().run(scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(outputBase+"/network.xml.gz");
 		new NetworkWriteAsTable(outputBase).run(scenario.getNetwork());
 		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(outputBase+"/nodeObjectAttributes.xml.gz");

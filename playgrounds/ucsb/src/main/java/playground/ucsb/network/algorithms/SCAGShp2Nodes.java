@@ -49,10 +49,11 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 	private final ObjectAttributes nodeObjectAttributes;
 	
 	private static final String ID_NAME = "ID";
+	private static final String ZONE_CENTR = "ZONE_CENTR";
 	private static final String NODE_TYPE = "NODE_TYPE";
+	private static final String METROLINK_NODE = "METROLINK_";
+	private static final String URBAN_RAIL_NODE = "URBAN_RAIL";
 	
-	private static final int MIN_NODE_ID = 4193;
-
 	/**
 	 * @param nodeShpFile
 	 * @param nodeObjectAttributes
@@ -75,21 +76,35 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 				Feature f = (Feature)o;
 				fCnt++;
 				
+				// node id
 				Object id = f.getAttribute(ID_NAME);
 				if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
 				Id nodeId = new IdImpl(id.toString().trim());
-				int intId = Integer.parseInt(id.toString());
+
+				// ignore node if it is a zone centroid
+				String zoneCentr = f.getAttribute(ZONE_CENTR).toString().trim(); // "Y" := centroid ; "" := not a centroid 
+				if (zoneCentr.equals("Y")) { continue; }
+
+				// get coord
+				Coordinate c = f.getBounds().centre();
+
+				// add node
+				Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
+				network.addNode(n);
+
+				// node type
+				int nodeType = Integer.parseInt(f.getAttribute(NODE_TYPE).toString().trim()); // range = [0-5]
+				nodeObjectAttributes.putAttribute(nodeId.toString(),NODE_TYPE,nodeType);
 				
-				// TODO [ni]: would it be more clever to use the centroid attribute to distinguish?
-				if (intId >= MIN_NODE_ID) {
-					Coordinate c = f.getBounds().centre();
-					Node n = network.getFactory().createNode(nodeId, new CoordImpl(c.x,c.y));
-					network.addNode(n);
-					
-					Object nodeType = f.getAttribute(NODE_TYPE);
-					int intNodeType = Integer.parseInt(nodeType.toString());
-					nodeObjectAttributes.putAttribute(nodeId.toString(),NODE_TYPE,intNodeType);
-				}
+				// metro link station
+				boolean isMetroLinkStation = false;
+				if (Integer.parseInt(f.getAttribute(METROLINK_NODE).toString().trim()) == 1) { isMetroLinkStation = true; }
+				nodeObjectAttributes.putAttribute(nodeId.toString(),METROLINK_NODE,isMetroLinkStation);
+				
+				// urban rail station
+				boolean isUrbanRailStation = false;
+				if (Integer.parseInt(f.getAttribute(URBAN_RAIL_NODE).toString().trim()) == 1) { isUrbanRailStation = true; }
+				nodeObjectAttributes.putAttribute(nodeId.toString(),URBAN_RAIL_NODE,isUrbanRailStation);
 			}
 		} catch (IOException e) {
 			Gbl.errorMsg("fCnt "+fCnt+": IOException while parsing "+nodeShpFile+".");
