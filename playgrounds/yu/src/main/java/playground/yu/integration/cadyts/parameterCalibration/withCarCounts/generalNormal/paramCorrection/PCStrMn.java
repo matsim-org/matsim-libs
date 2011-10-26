@@ -38,7 +38,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.PlanToPlanStep;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.MultinomialLogitCreator;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationStrategyManager;
@@ -86,7 +86,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 		// cadyts class - create new BasicStatistics Objects
 		betaTravelingPtStats = new BasicStatistics();
 
-		((Events2Score4PC_mnl) chooser).createWriter();
+		((Events2Score4PC) chooser).createWriter();
 		for (Person person : population.getPersons().values()) {
 			// now there could be #maxPlansPerAgent+?# Plans in choice set
 			// *********************UTILITY CORRECTION********************
@@ -101,7 +101,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 			 */
 			chooser.setPersonScore(person);
 		}
-		((Events2Score4PC_mnl) chooser).closeWriter();
+		((Events2Score4PC) chooser).closeWriter();
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 				} else {// with planInnovation
 					singleMnl = new MultinomialLogitCreator()
 							.createSingle(config);
-					((Events2Score4PC_mnl) chooser).setSinglePlanAttrs(
+					((Events2Score4PC) chooser).setSinglePlanAttrs(
 							oldSelected, singleMnl);
 				}
 			} else {// ***********iter-firstIter<=maxPlanPerAgent************
@@ -190,7 +190,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					/*
 					 * Vector p = new Vector(1/* (single-)choiceSetSize /);
 					 * p.set(0, 1d/* 100% /);
-					 *
+					 * 
 					 * Matrix d = new Matrix(1/* n-choiceSetSize /,
 					 * paramDimension // m-size of parameters that has to be
 					 * calibrated ); for (int i = 0; i < paramDimension; i++) {
@@ -219,7 +219,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					/*
 					 * FUNCTIONS FOR CALIBRATOR 1,2 Vector probs =
 					 * mnl.getProbs();
-					 *
+					 * 
 					 * if (Double.isNaN(probs.sum())) {
 					 * log.fatal("mnl/probs/NaN"); System.out
 					 * .println("selecteIdx from ChangeExpBeta (MATSim)\t" +
@@ -230,15 +230,15 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 					 * plans.get(i).getScore()); if (plans.get(i).isSelected())
 					 * { System.out.println("\tselected"); } else {
 					 * System.out.println(); } } }
-					 *
+					 * 
 					 * List<Integer> attrIndices = new ArrayList<Integer>(); for
 					 * (String paramName : PCCtlListener.paramNames) {
-					 * attrIndices.add(Events2Score4PC.attrNameList
+					 * attrIndices.add(Events2Score4PC_mnl.attrNameList
 					 * .indexOf(paramName)); }
-					 *
+					 * 
 					 * Matrix dProb_dParameters = mnl.get_dProb_dParameters(
 					 * attrIndices, false// with/out ASC /);
-					 *
+					 * 
 					 * List<? extends Matrix> d2ChoiceProb_dParam2 = mnl
 					 * .get_d2P_dbdb(delta, attrIndices, false); FUNCTIONS FOR
 					 * CALIBRATOR 1,2

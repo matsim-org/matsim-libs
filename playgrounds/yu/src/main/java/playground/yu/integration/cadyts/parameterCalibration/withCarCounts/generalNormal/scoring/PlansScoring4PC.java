@@ -23,6 +23,8 @@
  */
 package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -37,12 +39,22 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author yu
  * 
  */
-public abstract class PlansScoring4PC implements StartupListener,
-		ScoringListener, IterationStartsListener {
-
+public class PlansScoring4PC implements StartupListener, ScoringListener,
+		IterationStartsListener {
+	private final static Logger log = Logger.getLogger(PlansScoring4PC.class);
 	protected Events2Score4PC planScorer;
 
-	public abstract void notifyStartup(final StartupEvent event);
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		Controler ctl = event.getControler();
+
+		planScorer = new Events2Score4PC(ctl.getConfig(),
+				ctl.getScoringFunctionFactory(), ctl.getScenario());
+
+		log.debug("PlansScoring4PC loaded ScoringFunctionFactory");
+
+		ctl.getEvents().addHandler(planScorer);
+	}
 
 	public Events2Score4PC getPlanScorer() {
 		return planScorer;

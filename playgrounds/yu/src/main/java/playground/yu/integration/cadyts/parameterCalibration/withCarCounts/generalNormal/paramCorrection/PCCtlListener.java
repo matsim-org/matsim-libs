@@ -51,7 +51,6 @@ import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC_mnl;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
@@ -172,8 +171,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 		Vector initialParams = new Vector(paramDim);
 		for (int i = 0; i < initialParams.size(); i++) {
-			// double paramScaleFactor = Events2Score4PC.paramScaleFactorList
-			// .get(Events2Score4PC.attrNameList.indexOf(paramNames[i]));
+			// double paramScaleFactor =
+			// Events2Score4PC_mnl_mnl.paramScaleFactorList
+			// .get(Events2Score4PC_mnl_mnl.attrNameList.indexOf(paramNames[i]));
 
 			if (scoringCfg.getParams().containsKey(paramNames[i])) {
 
@@ -662,7 +662,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 												 */);
 
 					// double paramScaleFactor =
-					// Events2Score4PC.paramScaleFactorList
+					// Events2Score4PC_mnl_mnl.paramScaleFactorList
 					// .get(paramNameIndex);
 
 					double value = avgParams.get(i);
@@ -705,12 +705,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			}
 			/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-			((Events2Score4PC_mnl) chooser).setMultinomialLogit(mnl);
+			((Events2Score4PC) chooser).setMultinomialLogit(mnl);
 
 			CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
 					config.planCalcScore(), ctl.getNetwork());
 			ctl.setScoringFunctionFactory(sfFactory);
-			((Events2Score4PC_mnl) chooser).setSfFactory(sfFactory);
+			((Events2Score4PC) chooser).setSfFactory(sfFactory);
 
 			strategyManager.setChooser(chooser);
 

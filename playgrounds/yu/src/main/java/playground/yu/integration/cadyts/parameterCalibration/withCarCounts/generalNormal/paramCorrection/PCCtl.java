@@ -36,15 +36,15 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.utils.misc.StringUtils;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC_mnl;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
  * "constantPt", "constantWalk", "monetaryDistanceCostRateCar",
  * "monetaryDistanceCostRatePt", "marginalUtlOfDistanceWalk"can be calibrated.
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class PCCtl extends BseParamCalibrationControler {
 
@@ -73,7 +73,7 @@ public class PCCtl extends BseParamCalibrationControler {
 
 		// ******DEACTIVATE SCORING & ROADPRICING IN MATSIM******
 		// the default handling of plans
-		plansScoring4PC = new PlansScoring4PC_mnl();
+		plansScoring4PC = new PlansScoring4PC();
 		addCoreControlerListener(plansScoring4PC);
 
 		// load road pricing, if requested

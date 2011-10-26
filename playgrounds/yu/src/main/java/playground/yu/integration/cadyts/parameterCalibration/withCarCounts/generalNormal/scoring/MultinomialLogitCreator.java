@@ -57,26 +57,23 @@ public class MultinomialLogitCreator {
 			mnl.setASC(i, 0);
 		}
 		// travelTime
-		int attrNameIndex = Events2Score4PC.attrNameList.indexOf("traveling");
-		mnl.setCoefficient(attrNameIndex, traveling
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		int attrNameIndex = Events2Score4PC.attrNameList
+				.indexOf("traveling");
+		mnl.setCoefficient(attrNameIndex, traveling);
 
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("travelingPt");
-		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr());
 
-		attrNameIndex = Events2Score4PC.attrNameList.indexOf("travelingWalk");
-		mnl.setCoefficient(attrNameIndex, scoring.getTravelingWalk_utils_hr()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		attrNameIndex = Events2Score4PC.attrNameList
+				.indexOf("travelingWalk");
+		mnl.setCoefficient(attrNameIndex, scoring.getTravelingWalk_utils_hr());
 
 		//
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("performing");
-		mnl.setCoefficient(attrNameIndex, scoring.getPerforming_utils_hr()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex, scoring.getPerforming_utils_hr());
 		//
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("stuck");
-		mnl.setCoefficient(attrNameIndex, betaStuck
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex, betaStuck);
 
 		// distances
 		attrNameIndex = Events2Score4PC.attrNameList
@@ -84,39 +81,30 @@ public class MultinomialLogitCreator {
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRateCar()
-						* scoring.getMarginalUtilityOfMoney()
-						* Events2Score4PC.paramScaleFactorList
-								.get(attrNameIndex));
+						* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = Events2Score4PC.attrNameList
 				.indexOf("monetaryDistanceCostRatePt");
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRatePt()
-						* scoring.getMarginalUtilityOfMoney()
-						* Events2Score4PC.paramScaleFactorList
-								.get(attrNameIndex));
+						* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = Events2Score4PC.attrNameList
 				.indexOf("marginalUtlOfDistanceWalk");
-		mnl.setCoefficient(
-				attrNameIndex,
-				scoring.getMarginalUtlOfDistanceWalk()
-						* Events2Score4PC.paramScaleFactorList
-								.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex,
+				scoring.getMarginalUtlOfDistanceWalk());
 
 		// constants
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("constantCar");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantCar()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantCar());
 
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("constantPt");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantPt()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantPt());
 
-		attrNameIndex = Events2Score4PC.attrNameList.indexOf("constantWalk");
-		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk()
-				* Events2Score4PC.paramScaleFactorList.get(attrNameIndex));
+		attrNameIndex = Events2Score4PC.attrNameList
+				.indexOf("constantWalk");
+		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk());
 
 		return mnl;
 	}
