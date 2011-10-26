@@ -50,7 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.data.GraphMatching;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
@@ -305,10 +305,10 @@ public class OsmTransitLineBuilder {
 	}
 	
 	public static void main(String[] args){
-		final String OSM = DaPaths.PROJECTS + "osm2/";
+		final String OSM = DRPaths.PROJECTS + "osm2/";
 		final String INFILE = OSM + "berlin_subway.osm";
 		
-		final String HAFAS = DaPaths.PROJECTS + "bvg09/";
+		final String HAFAS = DRPaths.PROJECTS + "bvg09/";
 		final String HAFASTRANSITFILE = HAFAS + "transitSchedule-HAFAS-Coord.xml";
 		ScenarioImpl hafas = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		hafas.getConfig().scenario().setUseTransit(true);

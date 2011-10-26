@@ -24,7 +24,7 @@ import java.util.Set;
 import org.geotools.feature.Feature;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.Analysis.Trips.travelTime.V1.TTtripAnalysisV1;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class BvgTripAnalysisRunnerV1 {
 	public static void main(String[] args){
-		final String OUTDIR = DaPaths.VSP + "BVG09_Auswertung/"; 
+		final String OUTDIR = DRPaths.VSP + "BVG09_Auswertung/"; 
 		final String INDIR = OUTDIR + "input/";
 		
 		final String NETWORKFILE = INDIR + "network.final.xml.gz";

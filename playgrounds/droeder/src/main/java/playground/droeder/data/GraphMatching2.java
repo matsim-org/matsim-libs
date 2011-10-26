@@ -43,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
@@ -511,8 +511,8 @@ public class GraphMatching2 {
 //	}
 	
 	public static void main(String[] args){
-		final String PATH = DaPaths.PROJECTS + "bvg09/";
-		final String OUT = DaPaths.PROJECTS + "geoAlgorithm/";
+		final String PATH = DRPaths.PROJECTS + "bvg09/";
+		final String OUT = DRPaths.PROJECTS + "geoAlgorithm/";
 		final String VISUMTRANSITFILE = PATH + "intermediateTransitSchedule.xml";
 		final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";
 		

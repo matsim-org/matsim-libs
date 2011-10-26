@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.filters.AbstractPersonFilter;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -153,7 +153,7 @@ public class PersonLocationFilter extends AbstractPersonFilter{
 	}
 		
 		if((this.b + this.brb + this.b2brb) >= this.neededSize){
-			new PopulationWriter(this.pop, this.net).writeV4(DaPaths.VSP + "BVG09_Auswertung/testPopulation" + this.i + ".xml");
+			new PopulationWriter(this.pop, this.net).writeV4(DRPaths.VSP + "BVG09_Auswertung/testPopulation" + this.i + ".xml");
 			this.reset();
 			this.i++;
 		}

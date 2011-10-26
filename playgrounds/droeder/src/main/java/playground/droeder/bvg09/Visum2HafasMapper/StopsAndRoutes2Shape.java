@@ -16,7 +16,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.gis.DaShapeWriter;
 
 public class StopsAndRoutes2Shape{
@@ -40,7 +40,7 @@ public class StopsAndRoutes2Shape{
 	Map<String, Tuple<Coord, Coord>> preMatched;
 	
 	
-	private final String PATH = DaPaths .PROJECTS + "bvg09/";
+	private final String PATH = DRPaths .PROJECTS + "bvg09/";
 	
 	private final String VISUMSCHEDULEFILE = PATH + "intermediateTransitSchedule.xml";
 	private final String VISUMNETWORK = PATH + "intermediateNetwork.xml";

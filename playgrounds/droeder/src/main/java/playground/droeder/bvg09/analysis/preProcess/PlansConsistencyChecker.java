@@ -39,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.population.filters.AbstractPersonFilter;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 /**
  * @author droeder
@@ -49,7 +49,7 @@ public class PlansConsistencyChecker {
 	
 	
 	public static void main(String[] args){
-		final String PATH = DaPaths.VSP + "BVG09_Auswertung/input/"; 
+		final String PATH = DRPaths.VSP + "BVG09_Auswertung/input/"; 
 		final String PLANS = PATH + "bvg.run128.25pct.100.plans.selected.xml.gz";
 		final String NETWORK = PATH + "network.final.xml.gz";
 		

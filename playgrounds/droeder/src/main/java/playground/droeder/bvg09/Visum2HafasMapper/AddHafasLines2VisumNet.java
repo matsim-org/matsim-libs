@@ -54,12 +54,12 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 public class AddHafasLines2VisumNet {
 
 	private final static Logger log = Logger.getLogger(AddHafasLines2VisumNet.class);
-	private final String PATH = DaPaths.PROJECTS + "bvg09/";
+	private final String PATH = DRPaths.PROJECTS + "bvg09/";
 
 	private final String NETFILE = PATH + "intermediateNetwork.xml";
 	private final String HAFASTRANSITFILE = PATH + "transitSchedule-HAFAS-Coord.xml";

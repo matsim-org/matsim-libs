@@ -78,7 +78,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.run.Controler;
 
 import playground.droeder.DaFileReader;
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 
 /**
@@ -89,7 +89,7 @@ public class Journal2Matsim2Journal {
 	private static final Logger log = Logger
 			.getLogger(Journal2Matsim2Journal.class);
 	
-	private static final String INPUTDIR = DaPaths.PROJECTS + "journals/";
+	private static final String INPUTDIR = DRPaths.PROJECTS + "journals/";
 	
 	private String inFile = null;
 	private String networkFile = null;

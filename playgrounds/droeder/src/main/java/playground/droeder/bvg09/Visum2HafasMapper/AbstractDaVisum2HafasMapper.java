@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 /**
  * @author droeder
@@ -52,7 +52,7 @@ public abstract class AbstractDaVisum2HafasMapper {
 	protected static final Logger log = Logger.getLogger(DaVisum2HafasMapper1.class);
 	
 	
-	private static String PATH = DaPaths.PROJECTS + "bvg09/";
+	private static String PATH = DRPaths.PROJECTS + "bvg09/";
  	
 	private static String VISUM = PATH + "intermediateTransitSchedule.xml";
 	private static String HAFAS = PATH + "transitSchedule-HAFAS-Coord.xml";

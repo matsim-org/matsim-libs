@@ -30,7 +30,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,18 +45,18 @@ public class PlanExtractor {
 	 */
 	public static void main(String[] args) {
 		Set<Feature> features = null;
-		features = new ShapeFileReader().readFileAndInitialize(DaPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
+		features = new ShapeFileReader().readFileAndInitialize(DRPaths.VSP + "BVG09_Auswertung/BerlinSHP/Berlin.shp");
 		
 		Geometry g =  (Geometry) features.iterator().next().getAttribute(0);
 		
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(sc).parse(DaPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");
+		new NetworkReaderMatsimV1(sc).parse(DRPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");
 		
 		((PopulationImpl) sc.getPopulation()).setIsStreaming(true);
 		PersonLocationFilter algo = new PersonLocationFilter(g, 1000, sc.getNetwork());
 		((PopulationImpl) sc.getPopulation()).addAlgorithm(algo);
-		new MatsimPopulationReader(sc).parse(DaPaths.VSP + "BVG09_Auswertung/input/bvg.run128.25pct.100.plans.selected.xml.gz");
+		new MatsimPopulationReader(sc).parse(DRPaths.VSP + "BVG09_Auswertung/input/bvg.run128.25pct.100.plans.selected.xml.gz");
 		
 	}
 

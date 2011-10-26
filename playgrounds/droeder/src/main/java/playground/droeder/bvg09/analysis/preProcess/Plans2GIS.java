@@ -34,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.gis.DaShapeWriter;
 
 /**
@@ -45,8 +45,8 @@ public class Plans2GIS {
 	
 	public static void main(String[] args){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new NetworkReaderMatsimV1(sc).parse(DaPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");
-		new MatsimPopulationReader(sc).parse(DaPaths.VSP + "BVG09_Auswertung/testPopulation1.xml");
+		new NetworkReaderMatsimV1(sc).parse(DRPaths.VSP + "BVG09_Auswertung/input/network.final.xml.gz");
+		new MatsimPopulationReader(sc).parse(DRPaths.VSP + "BVG09_Auswertung/testPopulation1.xml");
 		
 		Map<String, SortedMap<Integer, Coord>> lineStrings = new HashMap<String, SortedMap<Integer, Coord>>();
 		
@@ -67,7 +67,7 @@ public class Plans2GIS {
 			}
 		}
 		
-		DaShapeWriter.writeDefaultLineString2Shape(DaPaths.VSP + "BVG09_Auswertung/trips.shp", "BerlinTrips", lineStrings, null);
+		DaShapeWriter.writeDefaultLineString2Shape(DRPaths.VSP + "BVG09_Auswertung/trips.shp", "BerlinTrips", lineStrings, null);
 	}
 
 }

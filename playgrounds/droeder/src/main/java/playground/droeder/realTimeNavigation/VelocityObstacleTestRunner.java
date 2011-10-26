@@ -41,7 +41,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.Vector2D;
 import playground.droeder.gis.DaShapeWriter;
 import playground.droeder.realTimeNavigation.movingObjects.MovingAgentImpl;
@@ -60,7 +60,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  */
 public class VelocityObstacleTestRunner {
 	//Directory
-	final static String DIR = DaPaths.VSP + "2D_Sim/";
+	final static String DIR = DRPaths.VSP + "2D_Sim/";
 	//parameters for run
 	// (FACTORFORQUADTREE * MAXSPEED [m/s] * stepSize [s]) is distance in which the quadTree is looking for objects to build the VO 
 	private static final double FACTORFORQUADTREE = 10.0;

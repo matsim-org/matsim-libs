@@ -13,7 +13,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.gis.DaShapeWriter;
 
 public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
@@ -153,7 +153,7 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 			}
 		}
 		
-		DaShapeWriter.writePointDist2Shape(DaPaths.PROJECTS + "bvg09/matchedDist.shp", points, attribs);
+		DaShapeWriter.writePointDist2Shape(DRPaths.PROJECTS + "bvg09/matchedDist.shp", points, attribs);
 	}
 	
 }

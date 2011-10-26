@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 /**
  * @author droeder
@@ -49,11 +49,11 @@ public class AddCoordToHafasTransitSchedule {
 	private static final Logger log = Logger
 			.getLogger(AddCoordToHafasTransitSchedule.class);
 	
-	private static String PATH_PREFIX = DaPaths.BVG09 + "BVG-Fahrplan_2008/Daten/1_Mo-Do/";
+	private static String PATH_PREFIX = DRPaths.BVG09 + "BVG-Fahrplan_2008/Daten/1_Mo-Do/";
 	private static String COORDFILE = PATH_PREFIX + "bfkoord";
 //	private static String FILENAME = "D:/Berlin/BVG/berlin-bvg09/pt/nullfall_M44_344_U8/alldat";
-	private static String INFILENAME = DaPaths.PROJECTS + "bvg09/transitSchedule-HAFAS.xml";
-	private static String OUTFILENAME = DaPaths.PROJECTS + "bvg09/transitSchedule-HAFAS-Coord.xml";
+	private static String INFILENAME = DRPaths.PROJECTS + "bvg09/transitSchedule-HAFAS.xml";
+	private static String OUTFILENAME = DRPaths.PROJECTS + "bvg09/transitSchedule-HAFAS-Coord.xml";
 	
 	private ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Map<Id, Coord> facilityCoord = new HashMap<Id, Coord>();

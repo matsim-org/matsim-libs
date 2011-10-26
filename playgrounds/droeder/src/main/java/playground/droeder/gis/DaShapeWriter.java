@@ -65,7 +65,7 @@ public class DaShapeWriter {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static void writeLinks2Shape(String fileName, Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes){
+	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, String>> attributes){
 		if(attributes == null){
 			initLineFeatureType("links", null);
 		}else{
@@ -78,7 +78,7 @@ public class DaShapeWriter {
 		write(createLinkFeatures(links, attributes), fileName);
 	}
 	
-	public static void writeNodes2Shape(String fileName, Map<Id, Node> nodes){
+	public static void writeNodes2Shape(String fileName, Map<Id, ? extends Node> nodes){
 		initPointFeatureType("nodes", null);
 		write(createNodeFeatures(nodes), fileName);
 	}
@@ -258,7 +258,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createLinkFeatures(Map<Id, Link> links, Map<Id, SortedMap<String, String>> attributes) {
+	private static Collection<Feature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, String>> attributes) {
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -306,7 +306,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createNodeFeatures(Map<Id, Node> nodes){
+	private static Collection<Feature> createNodeFeatures(Map<Id, ? extends Node> nodes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		

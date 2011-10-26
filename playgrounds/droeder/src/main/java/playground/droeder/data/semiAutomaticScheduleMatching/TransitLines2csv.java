@@ -30,7 +30,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 
 /**
  * @author droeder
@@ -40,10 +40,10 @@ public class TransitLines2csv {
 	
 	public static void main (String[] args){
 		
-		final String DIR = DaPaths.PROJECTS + "osm/";
+		final String DIR = DRPaths.PROJECTS + "osm/";
 		
 		final String OSMSCHED = DIR + "osm_berlin_subway_sched.xml";
-		final String HAFASSCHED = DaPaths.PROJECTS + "bvg09/transitSchedule-HAFAS-Coord.xml";
+		final String HAFASSCHED = DRPaths.PROJECTS + "bvg09/transitSchedule-HAFAS-Coord.xml";
 		
 		final String OSMOUT = DIR + "osmLines.csv";
 		final String HAFASOUT = DIR + "hafasLines.csv";

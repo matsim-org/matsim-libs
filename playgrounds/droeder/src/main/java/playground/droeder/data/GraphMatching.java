@@ -37,7 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
 import playground.droeder.data.graph.MatchingNode;
@@ -637,7 +637,7 @@ public class GraphMatching {
 		match.addEdge(new MatchingEdge(new IdImpl("me54"), m5, m4));
 		
 		
-		final String OUT = DaPaths.PROJECTS + "geoAlgorithm/";
+		final String OUT = DRPaths.PROJECTS + "geoAlgorithm/";
 		GraphMatching gm = new GraphMatching(ref, match);
 		gm.setMaxAngle(Math.PI/4);
 		gm.setMaxDist(25.0);

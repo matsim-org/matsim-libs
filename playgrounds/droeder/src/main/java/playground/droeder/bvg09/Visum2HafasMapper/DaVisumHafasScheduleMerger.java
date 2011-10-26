@@ -30,7 +30,7 @@ import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.StopPoint;
 import org.matsim.visum.VisumNetworkReader;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 /**
  * doesn't work yet. need to be checked
  *
@@ -43,11 +43,11 @@ public class DaVisumHafasScheduleMerger {
 
 	private static Logger log = Logger.getLogger(DaVisumHafasScheduleMerger.class);
 
-	private static String path = DaPaths.PROJECTS + "bvg09/";
+	private static String path = DRPaths.PROJECTS + "bvg09/";
 	private static String InNetworkFile = path + "intermediateNetwork.xml";
 	private static String InTransitScheduleFile = path + "intermediateTransitSchedule.xml";
 	private static String HafasTransitScheduleFile = path + "transitSchedule-HAFAS.xml";
-	private static String InVisumNetFile = DaPaths.BVG09 + "nullfall2009-05-25.net";
+	private static String InVisumNetFile = DRPaths.BVG09 + "nullfall2009-05-25.net";
 	// private static String OutNetworkFile = path + "network.xml";
 	private static String OutTransitScheduleFile = path + "mergedTransitSchedule.xml";
 

@@ -43,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.DaPaths;
+import playground.droeder.DRPaths;
 import playground.droeder.GeoCalculator;
 import playground.droeder.data.graph.MatchingEdge;
 import playground.droeder.data.graph.MatchingGraph;
@@ -67,7 +67,7 @@ public class TransitScheduleMatching {
 	private TransitSchedule hafasSched;
 	
 	public static void main(String[] args){
-		final String DIR = DaPaths.PROJECTS;
+		final String DIR = DRPaths.PROJECTS;
 		final String OSM = DIR + "osm/";
 		final String HAFAS = DIR + "bvg09/";
 		
