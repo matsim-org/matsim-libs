@@ -519,6 +519,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, ITER_MIN_NUM);
 		this.addParameterToMap(map, MONITORING_PERIOD);
 		this.addParameterToMap(map, DO_MONITOR);
+		this.addParameterToMap(map, MIN_IMPROVEMENT);
 		this.addParameterToMap(map, STRUCTURE_LAYER);
 		this.addParameterToMap(map, DOUBLETTES);
 		this.addParameterToMap(map, DYNAMIC_CO_RATES);
