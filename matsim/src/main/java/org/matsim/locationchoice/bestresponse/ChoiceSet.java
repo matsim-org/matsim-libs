@@ -85,7 +85,7 @@ public class ChoiceSet {
 			ScoringFunctionAccumulator scoringFunction, Plan plan, 
 			TravelTime travelTime, TravelCost travelCost, int iteration) {
 				
-		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, person, coordPre, coordPost, facilities, scoringFunction, plan, travelTime, travelCost);
+		TreeMap<Double, Id> map = this.createChoiceSet(actlegIndex, facilities, scoringFunction, plan, travelTime, travelCost);
 		
 		// score 0 is included as random range = 0.0d (inclusive) to 1.0d (exclusive)
 		// TODO: Do I have to modify the seed here by the iteration number (i.e., do we in every iteration chose the same value)?
@@ -104,8 +104,7 @@ public class ChoiceSet {
 		return id;
 	}
 	
-	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, Person person,
-			Coord coordPre, Coord coordPost, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
+	private TreeMap<Double,Id> createChoiceSet(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
 			Plan plan, TravelTime travelTime, TravelCost travelCost) {
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
