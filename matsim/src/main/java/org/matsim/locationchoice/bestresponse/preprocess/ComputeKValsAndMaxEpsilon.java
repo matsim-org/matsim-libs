@@ -19,7 +19,7 @@ public class ComputeKValsAndMaxEpsilon {
 	
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
-	private ObjectAttributes personsMaxEps = new ObjectAttributes();
+	private ObjectAttributes personsMaxEpsUnscaled = new ObjectAttributes();
 	
 	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config) {
 		rnd = new RandomFromVarDistr();
@@ -76,11 +76,11 @@ public class ComputeKValsAndMaxEpsilon {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			double maxShop = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[0]);
 			double maxLeisure = Double.parseDouble(((PersonImpl)person).getDesires().getDesc().split("_")[1]);
-			this.personsMaxEps.putAttribute(person.getId().toString(), "s", maxShop);
-			this.personsMaxEps.putAttribute(person.getId().toString(), "l", maxLeisure);
+			this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), "s", maxShop);
+			this.personsMaxEpsUnscaled.putAttribute(person.getId().toString(), "l", maxLeisure);
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxEps);
-		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxEps.xml");
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxEpsUnscaled);
+		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + "personsMaxEpsUnscaled.xml");
 	}
 
 	public ObjectAttributes getFacilitiesKValues() {
@@ -95,10 +95,10 @@ public class ComputeKValsAndMaxEpsilon {
 	public void setPersonsKValues(ObjectAttributes personsKValues) {
 		this.personsKValues = personsKValues;
 	}
-	public ObjectAttributes getPersonsMaxEps() {
-		return personsMaxEps;
+	public ObjectAttributes getPersonsMaxEpsUnscaled() {
+		return personsMaxEpsUnscaled;
 	}
-	public void setPersonsMaxEps(ObjectAttributes personsMaxEps) {
-		this.personsMaxEps = personsMaxEps;
+	public void setPersonsMaxEpsUnscaled(ObjectAttributes personsMaxEpsUnscaled) {
+		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 	}
 }

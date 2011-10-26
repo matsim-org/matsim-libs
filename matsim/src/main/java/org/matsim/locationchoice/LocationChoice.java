@@ -57,7 +57,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
-	private ObjectAttributes personsMaxEps;
+	private ObjectAttributes personsMaxEpsUnscaled;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
@@ -108,12 +108,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 	
 	private void createObjectAttributes(long seed) {
-		this.personsMaxEps = new ObjectAttributes();
+		this.personsMaxEpsUnscaled = new ObjectAttributes();
 		
 		// check if object attributes files are available, other wise do preprocessing
 		String maxEpsValues = this.controler.getConfig().locationchoice().getMaxEpsFile();
 		if (!maxEpsValues.equals("null")) {
-			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEps);
+			ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(this.personsMaxEpsUnscaled);
 			try {
 				attributesReader.parse(maxEpsValues);
 			} catch  (UncheckedIOException e) {
@@ -129,7 +129,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed, this.controler.getScenario(), this.controler.getConfig());
 		computer.run();
-		this.personsMaxEps = computer.getPersonsMaxEps();
+		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 	}
 	
 
@@ -185,7 +185,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 			else if (algorithm.equals("bestResponse")) {
 				this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEps));
+						this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled));
 			}
 			else if (algorithm.equals("localSearchRecursive")) {
 				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,

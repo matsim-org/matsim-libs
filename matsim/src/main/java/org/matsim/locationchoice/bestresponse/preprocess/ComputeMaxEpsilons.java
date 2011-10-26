@@ -40,6 +40,6 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.scenario.getActivityFacilities(), config, 
 				this.facilitiesKValues, this.personsKValues);
-		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer);
+		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer, this.config);
 	}
 }

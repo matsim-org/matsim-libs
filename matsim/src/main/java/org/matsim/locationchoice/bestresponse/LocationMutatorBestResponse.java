@@ -58,16 +58,16 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private ActivityFacilitiesImpl facilities;
 	private Network network;
-	private ObjectAttributes personsMaxEps;
+	private ObjectAttributes personsMaxEpsUnscaled;
 			
 	public LocationMutatorBestResponse(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxEps) {
+			ObjectAttributes personsMaxEpsUnscaled) {
 		super(network, controler, kn, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
-		this.personsMaxEps = personsMaxEps;
+		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 		
 		this.initFlexibleTypes(controler.getConfig().locationchoice());
 	}
@@ -195,12 +195,16 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	
 	private double getMaximumDistanceFromEpsilon(PersonImpl person, String type) {
 		double maxEpsilon = 0.0;
+		double scale = 1.0;
 		if (type.startsWith("s")) {
-			maxEpsilon = (Double) this.personsMaxEps.getAttribute(person.getId().toString(), "s");
+			scale = Double.parseDouble(this.config.getScaleEpsShopping());
+			maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), "s");
 		}
 		else if (type.startsWith("l")) {
-			maxEpsilon = (Double) this.personsMaxEps.getAttribute(person.getId().toString(), "l");
+			scale = Double.parseDouble(this.config.getScaleEpsLeisure());
+			maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), "l");
 		}
+		maxEpsilon *= scale;
 		
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
