@@ -41,6 +41,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
         ActivityImpl activity = activities.get(event.getPersonId());
         if (activity == null) {
             ActivityImpl firstActivity = new ActivityImpl(event.getActType(), event.getLinkId());
+            firstActivity.setFacilityId(event.getFacilityId());
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
@@ -51,6 +52,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     @Override
     public void handleEvent(ActivityStartEvent event) {
         ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+        activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
         activities.put(event.getPersonId(), activity);
     }
