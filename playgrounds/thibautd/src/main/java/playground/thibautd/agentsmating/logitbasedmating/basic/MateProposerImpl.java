@@ -21,13 +21,9 @@ package playground.thibautd.agentsmating.logitbasedmating.basic;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -162,7 +158,7 @@ public class MateProposerImpl implements MateProposer {
 				double jointTravelTime = passengerWrapper.distance * BEE_FLY_SPEED;
 
 				double earliestPossibleArrivalTimeAtPassenger =
-					Math.min( passengerEarliestDeparture , driverEarliestDeparture + pickUpTravelTime )
+					Math.max( passengerEarliestDeparture , driverEarliestDeparture + pickUpTravelTime )
 					+ jointTravelTime;
 				double lattestAcceptableArrivalTimeAtPassenger =
 					Math.min( passengerLattestArrival , driverLattestArrival - dropOffTravelTime );
