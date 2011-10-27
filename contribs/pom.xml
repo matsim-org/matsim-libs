@@ -73,7 +73,6 @@
 	<modules>
 		<module>evacuation</module>
 		<module>gtfs2matsimtransitschedule</module>
-		<module>matsim4urbansim</module>
 		<module>sna</module>
 	</modules>
 	<repositories>
