@@ -53,6 +53,12 @@ public class BkControlerIncome extends BkControler {
 
 	@Override
 	protected void setUp() {
+		// yyyy Could you please, when you have time and see this, describe why you need inheritance and cannot solve this with
+		// the controler listeners?  I seem to remember that this has to do with the fact that
+		// (1) between Controler constructor and controler.run() is too early, and
+		// (2) during "notifyStartup" is too late.
+		// Is this correct?  If so, why?
+		// Thanks, kai oct'11
 
 		this.addInstallTravelCostCalculatorFactoryControlerListener();
 
