@@ -125,8 +125,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			mate1 = (IChromosome) parent1.clone();
 			mate2 = (IChromosome) parent2.clone();
 
-			//doBooleanCrossOver(mate1, mate2);
-			//doModeCrossOver(mate1, mate2);
+			doBooleanCrossOver(mate1, mate2);
+			doModeCrossOver(mate1, mate2);
 			if (i < numOfWholeCo) {
 				doDoubleWholeCrossOver(mate1, mate2);
 			}
@@ -157,12 +157,14 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		boolean value1;
 		boolean value2;
 		// loop over boolean genes
-		for (int i=0; i < this.N_BOOL; i++) {
-			value1 = ((BooleanGene) mate1.getGene(i)).booleanValue();
-			value2 = ((BooleanGene) mate2.getGene(i)).booleanValue();
-
+		int crossingPoint = randomGenerator.nextInt(N_BOOL);
+		for (int i=0; i < N_BOOL; i++) {
 			// exchange values with proba O.5
-			if (this.randomGenerator.nextInt(2) == 0) {
+			//if (this.randomGenerator.nextInt(2) == 0) {
+			if (i >= crossingPoint) {
+				value1 = ((BooleanGene) mate1.getGene(i)).booleanValue();
+				value2 = ((BooleanGene) mate2.getGene(i)).booleanValue();
+
 				mate1.getGene(i).setAllele(value2);
 				mate2.getGene(i).setAllele(value1);
 			}
@@ -179,14 +181,16 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		Object value2;
 
 		// loop over boolean genes
-		for (int i=this.N_BOOL + this.N_DOUBLE;
-				i < this.N_BOOL + this.N_DOUBLE + this.N_MODE;
+		int crossingPoint = N_BOOL + N_DOUBLE + randomGenerator.nextInt(N_MODE);
+		for (int i=N_BOOL + N_DOUBLE;
+				i < N_BOOL + N_DOUBLE + N_MODE;
 				i++) {
-			value1 = mate1.getGene(i).getAllele();
-			value2 = mate2.getGene(i).getAllele();
-
 			// exchange values with proba O.5
-			if (this.randomGenerator.nextInt(2) == 0) {
+			//if (this.randomGenerator.nextInt(2) == 0) {
+			if (i >= crossingPoint) {
+				value1 = mate1.getGene(i).getAllele();
+				value2 = mate2.getGene(i).getAllele();
+
 				mate1.getGene(i).setAllele(value2);
 				mate2.getGene(i).setAllele(value1);
 			}
