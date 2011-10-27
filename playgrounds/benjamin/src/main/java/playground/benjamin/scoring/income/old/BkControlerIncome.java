@@ -36,6 +36,7 @@ import playground.benjamin.BkPaths;
  *
  */
 @Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
+            // for a better use case of personalizable travel costs and personalizable scoring, please refer to {@link BkRouterTest} and {@link BkScoringTest}. benjamin, oct'11
 public class BkControlerIncome extends BkControler {
 
 	private PersonHouseholdMapping personHouseholdMapping;
@@ -54,6 +55,7 @@ public class BkControlerIncome extends BkControler {
 
 	@Override
 	@Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
+	            // for a better use case of personalizable travel costs and personalizable scoring, please refer to {@link BkRouterTest} and {@link BkScoringTest}. benjamin, oct'11
 	protected void setUp() {
 
 		this.addInstallTravelCostCalculatorFactoryControlerListener();
