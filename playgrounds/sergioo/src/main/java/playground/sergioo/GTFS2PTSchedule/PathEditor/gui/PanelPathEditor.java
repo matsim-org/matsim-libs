@@ -82,7 +82,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private boolean withNetwork = true;
 	private boolean withLinksStops = true;
 	private boolean withLines = true;
-	private int wheelRotation;
 	
 	//Methods
 	public PanelPathEditor(Window window) {

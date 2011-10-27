@@ -36,6 +36,7 @@ import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Camera;
+import playground.sergioo.Visualizer2D.LayersPanel;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionListener {
@@ -301,7 +302,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 			}
 		}
 	}
-	public void setActivePanel(NetworkNodesPanel panel) {
+	public void setActivePanel(LayersPanel panel) {
 		layersPanels.put(PanelIds.ACTIVE, panel);
 	}
 	public NodesMatching getSelectedNodesMatching() {
@@ -392,39 +393,23 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	public void verifyMatchings() {
 		if(matchingProcess == null) {
-			Set<Link> wrongLinks = new HashSet<Link>();
-			for(Link link:((NetworkNodesPanel)layersPanels.get(PanelIds.A)).getLinks())
-				if(!(isInNetworkAMatchings(link.getFromNode()) && isInNetworkAMatchings(link.getToNode()))) {
-					wrongLinks.add(link);
-				}
-			if(wrongLinks.size()==0) {
-				Node node = getRepeatedNode();
-				if(node == null)
+			Node node = getRepeatedNode();
+			if(node == null) {
+				Set<Link> wrongLinks = new HashSet<Link>();
+				for(Link link:((NetworkNodesPanel)layersPanels.get(PanelIds.A)).getLinks())
+					if(!(isInNetworkAMatchings(link.getFromNode()) && isInNetworkAMatchings(link.getToNode())))
+						wrongLinks.add(link);
+				if(wrongLinks.size()==0)
 					JOptionPane.showMessageDialog(this, "Yes!!!");
-				else
-					JOptionPane.showMessageDialog(this, "No, the node "+node.getId()+" is repeated");
+				else {
+					JOptionPane.showMessageDialog(this, "No, "+wrongLinks.size()+" links");
+					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setLinksLayer(wrongLinks);
+					/*centerCamera(wrongLinks.iterator().next().getCoord());
+					*/
+				}
 			}
-			else {
-				JOptionPane.showMessageDialog(this, "No, "+wrongLinks.size()+" links");
-				((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setLinksLayer(wrongLinks);
-				/*centerCamera(wrongLinks.iterator().next().getCoord());
-				*/
-			}
-		}
-	}
-	public void centerCamera(Coord coord) {
-		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(coord);
-		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(coord);
-	}
-	public void save() {
-		try {
-			PrintWriter writer = new PrintWriter(CrossingMatchingStep.MATCHINGS_FILE);
-			for(NodesMatching nodesMatching:nodesMatchings)
-				writer.println(nodesMatching.toString());
-			writer.close();
-			JOptionPane.showMessageDialog(this, "Saved");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			else
+				JOptionPane.showMessageDialog(this, "No, the node "+node.getId()+" is repeated");
 		}
 	}
 	private boolean isInNetworkAMatchings(Node networkNode) {
@@ -451,7 +436,21 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		}
 		return null;
 	}
-	
+	public void centerCamera(Coord coord) {
+		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(coord);
+		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(coord);
+	}
+	public void save() {
+		try {
+			PrintWriter writer = new PrintWriter(CrossingMatchingStep.MATCHINGS_FILE);
+			for(NodesMatching nodesMatching:nodesMatchings)
+				writer.println(nodesMatching.toString());
+			writer.close();
+			JOptionPane.showMessageDialog(this, "Saved");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		for(Options option:Options.values())

@@ -5,28 +5,37 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
+import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
-import playground.sergioo.Visualizer2D.LayersWindow;
 
 public class CrossingMatchingStep extends MatchingStep {
 
@@ -34,6 +43,7 @@ public class CrossingMatchingStep extends MatchingStep {
 	//Constants
 
 	public static final File MATCHINGS_FILE = new File("./data/matching/matchings.txt");
+	public static final File CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
 	
 	@SuppressWarnings("unchecked")
 	public static final Tuple<Id, Id>[] NEAR_NODES_LOW = new Tuple[] {
@@ -99,7 +109,10 @@ public class CrossingMatchingStep extends MatchingStep {
 	//Attributes
 	
 	private double radius;
-
+	
+	private Map<Link, Tuple<Link,Double>> linksChanged = new HashMap<Link, Tuple<Link,Double>>();
+	private Set<Link> linksA = new HashSet<Link>();
+	private Set<Link> linksB = new HashSet<Link>();
 
 	//Methods
 
@@ -146,16 +159,8 @@ public class CrossingMatchingStep extends MatchingStep {
 	
 	@Override
 	public void process(Network oldNetworkA, Network oldNetworkB) {
-		System.out.println("Do you want to load the matchings?");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String res = "";
-		try {
-			res = reader.readLine();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		res = JOptionPane.showInputDialog("Do you want to load the matchings?");
-		if(res.equalsIgnoreCase("y") || res.equalsIgnoreCase("yes")) {
+		int res = JOptionPane.showConfirmDialog(null,"Do you want to load the matchings?");
+		if(res == JOptionPane.YES_OPTION) {
 			loadNodesMatchings();
 		}
 		else {
@@ -198,14 +203,63 @@ public class CrossingMatchingStep extends MatchingStep {
 						}
 					}
 		}
-		LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", networkA, networkB, nodesMatchings);
+		/*LayersWindow windowHR2 = new DoubleNetworkMatchingWindow("Networks reduced", networkA, networkB, nodesMatchings);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}*/
+		applyCapacitiesSimples();
+		JOptionPane.showMessageDialog(null,"Simples done!");
+		TravelMinCost travelMinCost = new TravelMinCost() {
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				return getLinkMinimumTravelCost(link);
 			}
+			public double getLinkMinimumTravelCost(Link link) {
+				return link.getLength();
+			}
+		};
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength();
+			}
+		};
+		PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelMinCost);
+		preProcessData.run(networkB);
+		AStarLandmarks aStarLandmarks = new AStarLandmarks(networkB, preProcessData, timeFunction);
+		applyCapacitiesASimple(aStarLandmarks);
+		JOptionPane.showMessageDialog(null,"SimplesA done!");
+		preProcessData = new PreProcessLandmarks(travelMinCost);
+		preProcessData.run(networkA);
+		aStarLandmarks = new AStarLandmarks(networkA, preProcessData, timeFunction);
+		applyCapacitiesBSimple(aStarLandmarks);
+		JOptionPane.showMessageDialog(null,"SimplesB done!");
+		try {
+			PrintWriter writer = new PrintWriter(CAPACITIES_FILE);
+			for(Entry<Link, Tuple<Link,Double>> linkE:linksChanged.entrySet())
+				writer.println(linkE.getKey().getId()+":::"+linkE.getValue().getFirst().getId()+":::"+linkE.getValue().getSecond());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			PrintWriter writer = new PrintWriter("./data/matching/capacities/simpleLinksA.txt");
+			for(Link linkA:linksA)
+				writer.println(linkA.getId());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		try {
+			PrintWriter writer = new PrintWriter("./data/matching/capacities/simpleLinksB.txt");
+			for(Link linkB:linksB)
+				writer.println(linkB.getId());
+			writer.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 		networkSteps.add(new CrossingReductionStep(region, nodesMatchings));
 		networkSteps.add(new EdgeDeletionStep(region));
 	}
@@ -231,6 +285,115 @@ public class CrossingMatchingStep extends MatchingStep {
 		}
 	}
 	
+	private void applyCapacitiesSimples() {
+		for(Link linkA: networkA.getLinks().values()) {
+			NodesMatching nodesMatchingFrom = null, nodesMatchingTo = null;
+			FROM_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeA:nodesMatching.getComposedNodeA().getNodes())
+						if(linkA.getFromNode().getId().equals(nodeA.getId())) {
+							nodesMatchingFrom = nodesMatching;
+							break FROM_NODE;
+						}
+			TO_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeA:nodesMatching.getComposedNodeA().getNodes())
+						if(linkA.getToNode().getId().equals(nodeA.getId())) {
+							nodesMatchingTo = nodesMatching;
+							break TO_NODE;
+						}
+			if(nodesMatchingFrom!=null && nodesMatchingTo!=null) {
+				linksA .add(linkA);
+				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
+					for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes())
+						for(Link linkB: networkB.getLinks().values())
+							if(linkB.getFromNode().getId().equals(nodeFrom.getId()) && linkB.getToNode().getId().equals(nodeTo.getId()))
+								applyCapacities(((ComposedLink)linkA).getLinks(), ((ComposedLink)linkB).getLinks());
+			}
+		}
+	}
+	
+	private void applyCapacitiesASimple(AStarLandmarks aStarLandmarks) {
+		for(Link linkA:linksA) {
+			NodesMatching nodesMatchingFrom = null, nodesMatchingTo = null;
+			FROM_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeA:nodesMatching.getComposedNodeA().getNodes())
+						if(linkA.getFromNode().getId().equals(nodeA.getId())) {
+							nodesMatchingFrom = nodesMatching;
+							break FROM_NODE;
+						}
+			TO_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeA:nodesMatching.getComposedNodeA().getNodes())
+						if(linkA.getToNode().getId().equals(nodeA.getId())) {
+							nodesMatchingTo = nodesMatching;
+							break TO_NODE;
+						}
+			if(nodesMatchingFrom!=null && nodesMatchingTo!=null)
+				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
+					for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes()) {
+						List<Link> linksTo = new ArrayList<Link>();
+						Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+						for(Link linkPath:path.links)
+							linksTo.addAll(((ComposedLink)linkPath).getLinks());
+						applyCapacities(((ComposedLink)linkA).getLinks(), linksTo);
+					}
+		}
+	}
+	
+	private void applyCapacitiesBSimple(AStarLandmarks aStarLandmarks) {
+		for(Link linkB: networkB.getLinks().values()) {
+			NodesMatching nodesMatchingFrom = null, nodesMatchingTo = null;
+			FROM_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeB:nodesMatching.getComposedNodeB().getNodes())
+						if(linkB.getFromNode().getId().equals(nodeB.getId())) {
+							nodesMatchingFrom = nodesMatching;
+							break FROM_NODE;
+						}
+			TO_NODE:
+				for(NodesMatching nodesMatching:nodesMatchings)
+					for(Node nodeB:nodesMatching.getComposedNodeB().getNodes())
+						if(linkB.getToNode().getId().equals(nodeB.getId())) {
+							nodesMatchingTo = nodesMatching;
+							break TO_NODE;
+						}
+			if(nodesMatchingFrom!=null && nodesMatchingTo!=null) {
+				linksB.add(linkB);
+				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeA().getNodes())
+					for(Node nodeTo:nodesMatchingTo.getComposedNodeA().getNodes()) {
+						List<Link> linksFrom = new ArrayList<Link>();
+						Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+						for(Link linkPath:path.links)
+							linksFrom.addAll(((ComposedLink)linkPath).getLinks());
+						applyCapacities(linksFrom, ((ComposedLink)linkB).getLinks());
+					}
+			}
+		}
+	}
+	
+	private void applyCapacities(List<Link> linksFrom, List<Link> linksTo) {
+		for(Link linkTo:linksTo) {
+			if(!linksChanged.containsKey(linkTo)) {
+				double shortestDistance=Double.MAX_VALUE;
+				Link nearest = linksFrom.iterator().hasNext()?linksFrom.iterator().next():null;
+				for(Link linkFrom:linksFrom) {
+					double distance = CoordUtils.calcDistance(nearest.getCoord(), linkFrom.getCoord());
+					if(distance<shortestDistance && nearest.getCapacity()!=0) {
+						shortestDistance = distance;
+						nearest = linkFrom;
+					}
+				}
+				if(nearest!=null && nearest.getCapacity()!=0) {
+					linksChanged.put(linkTo, new Tuple<Link,Double>(nearest,nearest.getCapacity()));
+					System.out.println(linkTo.getId()+":::"+nearest.getId()+":::"+nearest.getCapacity());
+					System.out.println(linksChanged.size());
+				}
+			}
+		}
+	}
+
 	private List<Node> sortNodesA() {
 		List<Node> sortedNodes = new ArrayList<Node>(networkA.getNodes().values());
 		for(int i=0; i<sortedNodes.size()-1; i++) {
@@ -244,6 +407,5 @@ public class CrossingMatchingStep extends MatchingStep {
 		}
 		return sortedNodes;
 	}
-
 
 }

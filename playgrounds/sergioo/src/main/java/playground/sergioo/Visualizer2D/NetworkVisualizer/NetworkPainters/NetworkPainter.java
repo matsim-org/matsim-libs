@@ -62,10 +62,15 @@ public class NetworkPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		try {
 			for(Link link:networkPainterManager.getNetworkLinks(layersPanel.getCamera()))
-				paintLink(g2, layersPanel, link, networkStroke, 0.5, networkColor);
+				paintSimpleLink(g2, layersPanel, link, networkStroke, networkColor);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	protected void paintSimpleLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, Color color) {
+		Coord from = link.getFromNode().getCoord();
+		Coord to = link.getToNode().getCoord();
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(from, to), stroke, color);
 	}
 	protected void paintLink(Graphics2D g2, LayersPanel layersPanel, Link link, Stroke stroke, double pointSize, Color color) {
 		Coord from = link.getFromNode().getCoord();
@@ -74,7 +79,6 @@ public class NetworkPainter extends Painter {
 		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(from, to), stroke, color);
 		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(to, new CoordImpl(to.getX()-LONG_ARROW*pointSize*Math.sin(Math.PI/2-angle-ANGLE_ARROW), to.getY()-LONG_ARROW*pointSize*Math.cos(Math.PI/2-angle-ANGLE_ARROW))), stroke, color);
 		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(to, new CoordImpl(to.getX()-LONG_ARROW*pointSize*Math.sin(Math.PI/2-angle+ANGLE_ARROW), to.getY()-LONG_ARROW*pointSize*Math.cos(Math.PI/2-angle+ANGLE_ARROW))), stroke, color);
-		paintCircle(g2, layersPanel, link.getToNode().getCoord(), pointSize, color);
 	}
 	
 }

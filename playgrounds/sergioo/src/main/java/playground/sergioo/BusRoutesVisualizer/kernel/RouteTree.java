@@ -21,17 +21,14 @@ public class RouteTree {
 	//Attributes
 	private Map<String, Stop>[] activeStops;
 	private Set<Link>[] links;
-	private StopRoutes root;
 	private final Network network;
 	private final String stop;
-	private final int numTransfers;
 	
 	//Methods
 	public RouteTree(Network network, String code, int numTransfers, Map<String, String[]> finishedTrips, Map<String, Stop> stops) {
 		super();
 		this.network = network;
 		this.stop = code;
-		this.numTransfers = numTransfers;
 		activeStops = new Map[numTransfers+2];
 		links = new Set[numTransfers+2];
 		for(int i=0;i<activeStops.length;i++) {
@@ -39,7 +36,6 @@ public class RouteTree {
 			links[i]=new HashSet<Link>();
 		}
 		links[0].add(network.getLinks().get(new IdImpl(stops.get(stop).getLinkId())));
-		this.root = new StopRoutes(network, null, stop, numTransfers,finishedTrips,stops,activeStops,links);
 		System.out.println();
 	}
 	public Set<Link>[] getLinks() {
@@ -57,12 +53,6 @@ public class RouteTree {
 		}
 		return res;
 	}
-	public String getStopId(int pos) {
-		return "";
-	}
-	public Link getLink(String selectedLinkId) {
-		return null;
-	}
 	public Collection<Link> getNetworkLinks(double xMin, double yMin, double xMax, double yMax) {
 		Collection<Link> links =  new HashSet<Link>();
 		for(Link link:network.getLinks().values()) {
@@ -79,16 +69,6 @@ public class RouteTree {
 				return stop.getPoint();
 		}
 		return null;
-	}
-	public String getIndexNearestLink(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
-		String nearest = "";
-		return nearest;
-	}
-	public String getIdNearestStop(double x, double y) {
-		Coord coord = new CoordImpl(x, y);
-		String nearest = "";
-		return nearest;
 	}
 	public Node getNearestNode(double x, double y) {
 		Coord point = new CoordImpl(x, y);

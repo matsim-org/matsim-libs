@@ -18,7 +18,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -118,7 +117,6 @@ public class NetworksShpXmlMatcherMain {
 		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory networkFactory = network.getFactory();
-		long linkLongId=0;
 		for(Feature feature:features)
 			if(feature.getFeatureType().getTypeName().equals("emme_links")) {
 				Coordinate[] coords = feature.getDefaultGeometry().getCoordinates();
@@ -134,13 +132,12 @@ public class NetworksShpXmlMatcherMain {
 					toNode = networkFactory.createNode(idToNode, new CoordImpl(coords[coords.length-1].x, coords[coords.length-1].y));
 					network.addNode(toNode);
 				}
-				Link link = network.getFactory().createLink(new IdImpl(linkLongId), fromNode, toNode);
+				Link link = network.getFactory().createLink(new IdImpl(idFromNode+"-->"+idToNode), fromNode, toNode);
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
 				((LinkImpl)link).setOrigId(feature.getID());
 				network.addLink(link);
-				linkLongId++;
 			}
 		return network;
 	}

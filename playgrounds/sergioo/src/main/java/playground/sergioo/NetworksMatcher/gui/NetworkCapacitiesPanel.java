@@ -20,7 +20,6 @@
 
 package playground.sergioo.NetworksMatcher.gui;
 
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -32,28 +31,20 @@ import java.awt.event.MouseWheelListener;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.collections.Tuple;
 
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Labels;
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Options;
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
-import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
-import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.Visualizer2D.Layer;
 import playground.sergioo.Visualizer2D.LayersPanel;
-import playground.sergioo.Visualizer2D.LinesPainter;
-import playground.sergioo.Visualizer2D.PointsPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
-public class NetworkNodesPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
+public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	
 	/**
 	 * 
@@ -61,17 +52,16 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	private static final long serialVersionUID = 1L;
 	
 	//Attributes
-	private final DoubleNetworkMatchingWindow doubleNetworkWindow;
+	private final DoubleNetworkCapacitiesWindow doubleNetworkWindow;
 	private int iniX;
 	private int iniY;
 	
 	//Methods
-	public NetworkNodesPanel(DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkPainter networkPainter) {
+	public NetworkCapacitiesPanel(MatchingOptions matchingOption, DoubleNetworkCapacitiesWindow doubleNetworkWindow, NetworkPainter networkPainter, NetworkPainter linksPainter) {
 		super();
 		this.doubleNetworkWindow = doubleNetworkWindow;
 		addLayer(new Layer(networkPainter));
-		addLayer(new Layer(null));
-		addLayer(new Layer(null));
+		addLayer(new Layer(linksPainter));
 		this.setBackground(backgroundColor);
 		calculateBoundaries();
 		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
@@ -80,63 +70,12 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		addMouseWheelListener(this);
 		addKeyListener(this);
 		setFocusable(true);
-	}
-	public NetworkNodesPanel(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption, DoubleNetworkMatchingWindow doubleNetworkWindow, NetworkPainter networkPainter, List<Color> colors) {
-		super();
-		this.doubleNetworkWindow = doubleNetworkWindow;
-		addLayer(new Layer(networkPainter));
-		addLayer(new Layer(new MatchingsPainter(nodesMatchings, matchingOption, colors), false));
-		addLayer(new Layer(new LinesPainter(), false));
-		PointsPainter pointsPainter = new PointsPainter();
-		Tuple<Id,Id>[] tuples = null;
-		tuples = matchingOption.equals(MatchingsPainter.MatchingOptions.A)?CrossingMatchingStep.NEAR_NODES_LOW:CrossingMatchingStep.NEAR_NODES_HIGH;
-		for(Tuple<Id,Id> ids:tuples) {
-			Node node = networkPainter.getNetwork().getNodes().get(ids.getFirst());
-			if(node!=null)
-				pointsPainter.addPoint(node.getCoord());
-		}
-		addLayer(new Layer(pointsPainter));
-		this.setBackground(backgroundColor);
-		calculateBoundaries();
-		super.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
-		addMouseListener(this);
-		addMouseMotionListener(this);
-		addMouseWheelListener(this);
-		addKeyListener(this);
-		setFocusable(true);
-	}
-	public void setMatchings(Collection<NodesMatching> nodesMatchings, MatchingOptions matchingOption, List<Color> colors) {
-		getLayer(1).setPainter(new MatchingsPainter(nodesMatchings, matchingOption, colors));
 	}
 	public void setNetwork(Network network) {
 		((NetworkNodesPainter)getLayer(0).getPainter()).setNetwork(network);
 	}
-	public Set<Node> getSelectedNodes() {
-		return ((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getSelectedNodesAndClear();
-	}
-	public void selectNodes(Set<Node> nodes) {
-		((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNodes(nodes);
-	}
-	public void selectLink(String id) {
-		Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(id);
-		if(link!=null)
-			doubleNetworkWindow.centerCamera(link.getCoord());
-	}
-	public void selectNode(String id) {
-		Node node = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(id);
-		if(node!=null)
-			doubleNetworkWindow.centerCamera(node.getCoord());
-	}
-	public Collection<? extends Link> getLinks() {
-		return ((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getLinks();
-	}
-	public void setLinksLayer(Set<Link> wrongLinks) {
-		((LinesPainter)getLayer(2).getPainter()).clearLines();
-		for(Link link: wrongLinks)
-			((LinesPainter)getLayer(2).getPainter()).addLine(link.getFromNode().getCoord(), link.getToNode().getCoord());
-	}
-	public void clearNodesSelection() {
-		((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).clearNodesSelection();
+	public Link getSelectedLink() {
+		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getSelectedLink();
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
@@ -150,7 +89,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	}
 	public String getLabelText(playground.sergioo.Visualizer2D.LayersWindow.Labels label) {
 		try {
-			return (String) NetworkNodesPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
+			return (String) NetworkPainterManager.class.getMethod("refresh"+label.getText(), new Class[0]).invoke(((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager(), new Object[0]);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -171,20 +110,20 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 			camera.centerCamera(getWorldX(e.getX()), getWorldY(e.getY()));
 		else {
 			if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectLink(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().unselectLink();
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().unselectLink();
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
-			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODES);
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
-			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
-				doubleNetworkWindow.refreshLabel(Labels.NODES);
+			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
+				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().unselectNode();
+				doubleNetworkWindow.refreshLabel(Labels.NODE);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {
 				camera.zoomIn(getWorldX(e.getX()), getWorldY(e.getY()));
@@ -244,27 +183,18 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
 		case 'o':
-			((NetworkPainter)getPrincipalLayer().getPainter()).getNetworkPainterManager().selectOppositeLink();
+			((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectOppositeLink();
 			doubleNetworkWindow.refreshLabel(Labels.LINK);
 			break;
 		case 'v':
 			viewAll();
 			doubleNetworkWindow.cameraChange(camera);
 			break;
-		case 'm':
-			doubleNetworkWindow.setNetworksSeparated();
-			break;
-		case 'f':
-			doubleNetworkWindow.finalNetworks();
-			break;
-		case 'l':
-			getLayer(2).changeVisible();
-			break;
-		case 'p':
-			getLayer(3).changeVisible();
-			break;
 		case 'n':
 			getLayer(1).changeVisible();
+			break;
+		case 'm':
+			((NetworkCapacitiesPainter)getLayer(1).getPainter()).changeMode();
 			break;
 		}
 		repaint();
@@ -272,26 +202,8 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 	@Override
 	public void keyPressed(KeyEvent e) {
 		switch(e.getKeyCode()) {
-		case KeyEvent.VK_UP:
-			doubleNetworkWindow.nextNetwork();
-			break;
-		case KeyEvent.VK_DOWN:
-			doubleNetworkWindow.previousNetwork();
-			break;
-		case KeyEvent.VK_SPACE:
-			doubleNetworkWindow.selectMatch();
-			break;
 		case KeyEvent.VK_ENTER:
-			if(doubleNetworkWindow.getSelectedNodesMatching()==null)
-				doubleNetworkWindow.match();
-			else
-				doubleNetworkWindow.modifyMatch();
-			break;
-		case KeyEvent.VK_BACK_SPACE:
-			doubleNetworkWindow.deleteMatch();
-			break;
-		case KeyEvent.VK_DELETE:
-			doubleNetworkWindow.clearSelection();
+			doubleNetworkWindow.applyCapacity();
 			break;
 		}
 		doubleNetworkWindow.setVisible(true);

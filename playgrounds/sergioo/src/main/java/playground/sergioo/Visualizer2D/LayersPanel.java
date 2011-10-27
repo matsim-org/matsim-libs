@@ -53,6 +53,9 @@ public abstract class LayersPanel extends JPanel {
 	public Camera getCamera() {
 		return camera;
 	}
+	public void centerCamera(Coord coord) {
+		camera.centerCamera(coord.getX(), coord.getY());
+	}
 	protected Collection<Layer> getAllLayers() {
 		return layers;
 	}

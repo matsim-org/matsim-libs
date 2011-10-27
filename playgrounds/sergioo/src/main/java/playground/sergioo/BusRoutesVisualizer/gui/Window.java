@@ -139,17 +139,11 @@ public class Window extends JFrame implements ActionListener {
 	public String refreshStop() {
 		return selectedStopId;
 	}
-	public void selectLink(double x, double y) {
-		selectedLinkId = routeTree.getIndexNearestLink(x, y);
-		labels[Label.LINK.ordinal()].setText(refreshLink());
-	}
 	public void unselectLink() {
 		selectedLinkId = "";
 		labels[Label.LINK.ordinal()].setText("");
 	}
 	public void selectStop(double x, double y) {
-		selectedStopId = routeTree.getIdNearestStop(x, y);
-		labels[Label.STOP.ordinal()].setText(refreshStop());
 		selectedLinkId = routeTree.getLinkIdStop(selectedStopId);
 		labels[Label.LINK.ordinal()].setText(selectedLinkId==""?"":refreshLink());
 	}
@@ -171,9 +165,6 @@ public class Window extends JFrame implements ActionListener {
 	}
 	public Collection<Link> getStopLinks() {
 		return routeTree.getStopLinks();
-	}
-	public Link getSelectedLink() {
-		return selectedLinkId==""?null:routeTree.getLink(selectedLinkId);
 	}
 	public Coord getSelectedStop() {
 		return selectedStopId==""?null:routeTree.getStop(selectedStopId);

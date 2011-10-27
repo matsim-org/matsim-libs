@@ -1,4 +1,4 @@
-package playground.sergioo.VehicleTypeChanger;
+package playground.sergioo.PTVehiclesEditor;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;

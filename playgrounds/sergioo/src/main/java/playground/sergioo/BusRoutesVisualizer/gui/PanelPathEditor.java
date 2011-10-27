@@ -159,12 +159,6 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 	private void paintSelected(Graphics2D g2) {
 		g2.setColor(selectedColor);
 		g2.setStroke(selectedStroke);
-		Link link=window.getSelectedLink();
-		if(link!=null) {
-			paintLink(link, g2);
-			Shape circle = new Ellipse2D.Double(camera.getIntX(link.getToNode().getCoord().getX())-pointsSize*3,camera.getIntY(link.getToNode().getCoord().getY())-pointsSize*3,pointsSize*6,pointsSize*6);
-			g2.fill(circle);
-		}
 		if(withStops) {		
 			Coord stop=window.getSelectedStop();
 			if(stop!=null) {
@@ -197,11 +191,7 @@ public class PanelPathEditor extends JPanel implements MouseListener, MouseMotio
 		if(e.getClickCount()==2 && e.getButton()==MouseEvent.BUTTON3)
 			camera.centerCamera(camera.getDoubleX(e.getX()), camera.getDoubleY(e.getY()));
 		else {
-			if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON1)
-				window.selectLink(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
-			else if(window.getOption().equals(Option.SELECT_LINK) && e.getButton()==MouseEvent.BUTTON3)
-				window.unselectLink();
-			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
+			if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON1)
 				window.selectStop(camera.getDoubleX(e.getX()),camera.getDoubleY(e.getY()));
 			else if(window.getOption().equals(Option.SELECT_STOP) && e.getButton()==MouseEvent.BUTTON3)
 				window.unselectStop();
