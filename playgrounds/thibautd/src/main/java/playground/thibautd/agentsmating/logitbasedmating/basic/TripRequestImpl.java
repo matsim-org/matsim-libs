@@ -42,6 +42,7 @@ public class TripRequestImpl implements TripRequest {
 	private final Id origin;
 	private final Id destination;
 	private final double departureTime;
+	private final double arrivalTime;
 
 	public TripRequestImpl(
 			final String mode,
@@ -51,6 +52,7 @@ public class TripRequestImpl implements TripRequest {
 			final Id originLinkId,
 			final Id destinationLinkId,
 			final double departureTime,
+			final double arrivalTime,
 			final DecisionMaker decisionMaker,
 			final List<Alternative> otherAlternatives) {
 		this.alternativeDelegate = new AlternativeImpl(mode, attributes);
@@ -61,6 +63,7 @@ public class TripRequestImpl implements TripRequest {
 		this.origin = originLinkId;
 		this.destination = destinationLinkId;
 		this.departureTime = departureTime;
+		this.arrivalTime = arrivalTime;
 	}
 
 	@Override
@@ -113,6 +116,12 @@ public class TripRequestImpl implements TripRequest {
 	public double getDepartureTime() {
 		return departureTime;
 	}
+
+	@Override
+	public double getPlanArrivalTime() {
+		return arrivalTime;
+	}
+
 
 	@Override
 	public boolean equals(final Object object) {

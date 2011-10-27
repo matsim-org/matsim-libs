@@ -56,6 +56,7 @@ public interface TripRequest extends Alternative {
 	public Id getOriginLinkId();
 	public Id getDestinationLinkId();
 	public double getDepartureTime();
+	public double getPlanArrivalTime();
 
 	public enum Type {
 		DRIVER,
