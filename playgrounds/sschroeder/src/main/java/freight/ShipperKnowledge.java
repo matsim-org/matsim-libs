@@ -1,10 +1,10 @@
 package freight;
 
+import org.matsim.visum.VisumNetwork.TimeProfile;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.matsim.visum.VisumNetwork.TimeProfile;
 
 
 

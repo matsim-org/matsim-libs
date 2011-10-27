@@ -1,14 +1,13 @@
 package city2000w;
 
+import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
+import org.matsim.core.utils.io.IOUtils;
+import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
+import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
-
-import org.matsim.core.utils.io.IOUtils;
-
-import playground.mzilske.freight.events.ShipmentDeliveredEvent;
-import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
-import playground.mzilske.freight.events.ShipmentPickedUpEvent;
-import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
 
 public class CarrierActivityWriter implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler{
 

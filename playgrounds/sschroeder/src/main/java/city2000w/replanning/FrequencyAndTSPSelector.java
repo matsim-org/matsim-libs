@@ -1,36 +1,19 @@
 package city2000w.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
+import freight.*;
+import freight.utils.TimePeriod;
+import freight.utils.TimePeriods;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.api.TimeWindow;
 import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TimeWindow;
-import playground.mzilske.freight.api.Offer;
-import playground.mzilske.freight.events.OfferUtils;
-import playground.mzilske.freight.events.QueryTSPOffersEvent;
-import playground.mzilske.freight.events.Service;
-import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
-import playground.mzilske.freight.events.ShipperTSPContractCanceledEvent;
-import freight.CommodityFlow;
-import freight.ScheduledCommodityFlow;
-import freight.ShipperAgentTracker;
-import freight.ShipperImpl;
-import freight.ShipperPlan;
-import freight.ShipperShipment;
-import freight.ShipperUtils;
-import freight.TSPUtils;
-import freight.TlcCostFunction;
-import freight.utils.TimePeriod;
-import freight.utils.TimePeriods;
+import playground.mzilske.freight.events.*;
+
+import java.util.*;
 
 public class FrequencyAndTSPSelector implements ShipperPlanStrategyModule {
 	

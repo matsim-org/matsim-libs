@@ -1,33 +1,17 @@
 package city2000w;
 
+import kid.*;
+import kid.filter.*;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import kid.KiDDataReader;
-import kid.KiDSchema;
-import kid.KiDStats;
-import kid.ScheduledVehicle;
-import kid.ScheduledVehicles;
-import kid.Vehicle;
-import kid.filter.And;
-import kid.filter.HandelFilter;
-import kid.filter.KernstadtFilter;
-import kid.filter.LkwKleiner3Punkt5TFilter;
-import kid.filter.PkwFilter;
-import kid.filter.PkwGewerblichFilter;
-import kid.filter.PkwPrivatFilter;
-import kid.filter.SattelzugmaschinenFilter;
-import kid.filter.VehicleFilter;
-import kid.filter.VerarbeitendesGewerbeFilter;
-import kid.filter.WeekFilter;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
 
 
 public class KiDDataHochrechnungsRunner {

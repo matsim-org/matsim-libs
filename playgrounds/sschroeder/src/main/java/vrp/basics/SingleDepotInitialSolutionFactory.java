@@ -17,10 +17,10 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.Collection;
-
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
+
+import java.util.Collection;
 
 
 public interface SingleDepotInitialSolutionFactory {

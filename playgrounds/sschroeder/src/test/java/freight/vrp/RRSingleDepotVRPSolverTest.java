@@ -1,33 +1,31 @@
 package freight.vrp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.Tour.Delivery;
-import playground.mzilske.freight.carrier.Tour.Pickup;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
 import vrp.algorithms.ruinAndRecreate.factories.StandardRuinAndRecreateFactory;
 import vrp.basics.CrowFlyCosts;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class RRSingleDepotVRPSolverTest extends TestCase{
 	

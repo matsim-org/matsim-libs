@@ -17,23 +17,19 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import junit.framework.TestCase;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityConstraint;
 import vrp.algorithms.ruinAndRecreate.factories.StandardRuinAndRecreateFactory;
-import vrp.api.Constraints;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.Node;
-import vrp.api.SingleDepotVRP;
+import vrp.api.*;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
 import vrp.basics.Tour;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * test case: example is take from: http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html

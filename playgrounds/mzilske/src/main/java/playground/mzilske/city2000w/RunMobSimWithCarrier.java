@@ -18,13 +18,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.mzilske.freight.api.CarrierAgentFactory;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierAgent;
-import playground.mzilske.freight.carrier.CarrierAgentImpl;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
-import playground.mzilske.freight.carrier.CarrierPlanReader;
+import org.matsim.contrib.freight.api.CarrierAgentFactory;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierAgent;
+import org.matsim.contrib.freight.carrier.CarrierAgentImpl;
+import org.matsim.contrib.freight.carrier.CarrierAgentTracker;
+import org.matsim.contrib.freight.carrier.CarrierDriverAgentFactoryImpl;
+import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 
 
 public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener {
@@ -101,7 +101,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(carrierAgentTracker);
-		carrierAgentTracker.createPlanAgents();
+        carrierAgentTracker.createPlans();
 	}
 
 	@Override

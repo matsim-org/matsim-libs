@@ -2,7 +2,6 @@ package kid.filter;
 
 import kid.KiDSchema;
 import kid.Vehicle;
-
 import org.apache.log4j.Logger;
 
 

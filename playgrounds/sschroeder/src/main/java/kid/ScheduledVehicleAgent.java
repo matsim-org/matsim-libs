@@ -1,5 +1,6 @@
 package kid;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -8,8 +9,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 
 public class ScheduledVehicleAgent {

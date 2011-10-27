@@ -3,7 +3,6 @@ package freight.vrp;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-
 import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
 import vrp.api.Costs;
 import vrp.api.Customer;

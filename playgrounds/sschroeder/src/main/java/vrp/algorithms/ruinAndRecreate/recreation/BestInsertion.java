@@ -17,14 +17,7 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.recreation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
 import vrp.algorithms.ruinAndRecreate.api.RecreationStrategy;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
@@ -36,6 +29,8 @@ import vrp.basics.RandomNumberGeneration;
 import vrp.basics.SingleDepotInitialSolutionFactory;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
+
+import java.util.*;
 
 
 /**

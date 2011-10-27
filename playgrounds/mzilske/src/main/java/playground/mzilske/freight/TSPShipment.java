@@ -2,7 +2,8 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.Shipment;
+import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.Shipment;
 
 public class TSPShipment implements Shipment{
 	

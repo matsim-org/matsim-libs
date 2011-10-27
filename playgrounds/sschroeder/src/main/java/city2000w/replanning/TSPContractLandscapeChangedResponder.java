@@ -1,37 +1,14 @@
 package city2000w.replanning;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TransportChain;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.carrier.*;
+import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainLeg;
-import playground.mzilske.freight.TransportChainBuilder;
-import playground.mzilske.freight.TransportServiceProvider;
-import playground.mzilske.freight.api.Offer;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
-import playground.mzilske.freight.carrier.Shipment;
-import playground.mzilske.freight.events.CarrierOfferRejectEvent;
-import playground.mzilske.freight.events.OfferUtils;
-import playground.mzilske.freight.events.QueryCarrierOffersEvent;
-import playground.mzilske.freight.events.Service;
-import playground.mzilske.freight.events.TSPCarrierContractAcceptEvent;
-import playground.mzilske.freight.events.TSPCarrierContractCanceledEvent;
-import playground.mzilske.freight.events.TransportChainAddedEvent;
-import playground.mzilske.freight.events.TransportChainRemovedEvent;
+import playground.mzilske.freight.events.*;
+
+import java.util.*;
 
 public class TSPContractLandscapeChangedResponder implements TSPPlanStrategyModule{
 

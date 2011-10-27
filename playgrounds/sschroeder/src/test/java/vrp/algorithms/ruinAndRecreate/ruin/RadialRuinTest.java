@@ -17,10 +17,6 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.ruin;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import vrp.VRPTestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
@@ -29,6 +25,10 @@ import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.TourActivity;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class RadialRuinTest extends VRPTestCase {
 

@@ -1,12 +1,10 @@
 package vrp.vrpInstances;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-
+import freight.vrp.ChartListener;
+import freight.vrp.RuinAndRecreateReport;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
 import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateWithTimeWindowsFactory;
@@ -16,8 +14,9 @@ import vrp.basics.Coordinate;
 import vrp.basics.CrowFlyCosts;
 import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.SingleDepotVRPBuilder;
-import freight.vrp.ChartListener;
-import freight.vrp.RuinAndRecreateReport;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 
 /**
  * test instances for the capacitated vrp with pickup and deliveries and time windows. 

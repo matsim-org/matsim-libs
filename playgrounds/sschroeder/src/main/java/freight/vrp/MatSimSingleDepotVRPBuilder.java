@@ -1,8 +1,7 @@
 package freight.vrp;
 
 import org.matsim.api.core.v01.Id;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.SingleDepotVRP;

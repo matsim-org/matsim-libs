@@ -1,16 +1,16 @@
 package sandbox;
 
+import org.apache.commons.math.stat.Frequency;
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.charts.BarChart;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.commons.math.stat.Frequency;
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.charts.BarChart;
-import org.matsim.core.utils.io.IOUtils;
 
 public class Plotter {
 	

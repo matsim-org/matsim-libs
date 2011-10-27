@@ -1,10 +1,9 @@
 package city2000w.replanning;
 
-import org.matsim.api.core.v01.network.Network;
-
-import playground.mzilske.freight.carrier.Carrier;
 import city2000w.VRPCarrierPlanBuilder;
 import freight.vrp.VRPSolverFactory;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.Carrier;
 
 public class ReRouteVehicles implements CarrierPlanStrategyModule{
 

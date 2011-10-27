@@ -1,9 +1,9 @@
 package sandbox;
 
-import java.util.List;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.log4j.Logger;
+
+import java.util.List;
 
 public class Classifier {
 	

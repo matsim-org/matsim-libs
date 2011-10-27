@@ -17,18 +17,9 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import vrp.api.*;
 
-import vrp.api.Constraints;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.MultipleDepotsVRP;
-import vrp.api.Node;
-import vrp.api.VRP;
+import java.util.*;
 
 public class MultipleDepotVRPBuilder {
 	

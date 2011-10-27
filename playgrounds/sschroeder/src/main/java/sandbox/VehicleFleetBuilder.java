@@ -1,18 +1,16 @@
 package sandbox;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import kid.ScheduledVehicles;
-
 import org.apache.commons.math.stat.Frequency;
 import org.apache.log4j.Logger;
-
-import playground.mzilske.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carrier;
 import sandbox.Classifier.FrequencyClass;
 import sandbox.SandBoxTrafficGenerator.Company;
 import stats.EmpiricalWalker;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VehicleFleetBuilder {
 	

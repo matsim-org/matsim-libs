@@ -2,7 +2,6 @@ package city2000w;
 
 import kid.KiDPlanAgentCreator;
 import kid.WIVERMobsimFactory;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;

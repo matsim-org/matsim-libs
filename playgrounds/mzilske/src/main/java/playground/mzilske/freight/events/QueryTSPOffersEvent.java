@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.mzilske.freight.api.Offer;
+import org.matsim.contrib.freight.api.Offer;
 
 public class QueryTSPOffersEvent implements Event{
 

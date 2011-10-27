@@ -1,11 +1,10 @@
 package freight;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.Actor;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.matsim.api.core.v01.Id;
-
-import playground.mzilske.freight.api.Actor;
 
 
 public class ShipperImpl implements Actor{

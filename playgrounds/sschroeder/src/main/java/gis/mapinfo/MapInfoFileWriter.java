@@ -3,12 +3,12 @@
  */
 package gis.mapinfo;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
 
 
 

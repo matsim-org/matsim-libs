@@ -1,7 +1,8 @@
 package kid.filter;
 
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -9,9 +10,7 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.List;
 
 public class RegionFilter implements SimpleFeatureFilter, NetworkLinkFilter, NetworkNodeFilter{
 

@@ -1,26 +1,14 @@
 package city2000w;
 
 import gis.arcgis.NutsRegionShapeReader;
+import kid.*;
+import kid.filter.*;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import kid.KiDDataReader;
-import kid.KiDSchema;
-import kid.KiDShapeFileWriter;
-import kid.ScheduledVehicles;
-import kid.Vehicle;
-import kid.filter.And;
-import kid.filter.BusinessSectorFilter;
-import kid.filter.GeoRegionFilter;
-import kid.filter.LkwKleiner3Punkt5TFilter;
-import kid.filter.LogicVehicleFilter;
-import kid.filter.StuttgartRegionFilter;
-import kid.filter.VehicleFilter;
-
-import org.opengis.feature.simple.SimpleFeature;
 
 
 

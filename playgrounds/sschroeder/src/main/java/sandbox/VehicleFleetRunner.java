@@ -1,21 +1,19 @@
 package sandbox;
 
+import kid.KiDDataReader;
+import kid.ScheduledVehicles;
+import kid.filter.BusinessSectorFilter;
+import org.apache.commons.math.stat.Frequency;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import sandbox.Classifier.FrequencyClass;
+import sandbox.SandBoxTrafficGenerator.Company;
+import sandbox.VehicleFleetBuilder.CompanyClass;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import kid.KiDDataReader;
-import kid.ScheduledVehicles;
-import kid.filter.BusinessSectorFilter;
-
-import org.apache.commons.math.stat.Frequency;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-
-import sandbox.Classifier.FrequencyClass;
-import sandbox.SandBoxTrafficGenerator.Company;
-import sandbox.VehicleFleetBuilder.CompanyClass;
 
 public class VehicleFleetRunner {
 

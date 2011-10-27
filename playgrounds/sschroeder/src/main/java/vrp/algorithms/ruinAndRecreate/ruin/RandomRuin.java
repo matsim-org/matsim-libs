@@ -17,13 +17,7 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.ruin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
-
 import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
@@ -32,6 +26,11 @@ import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.RandomNumberGeneration;
 import vrp.basics.VrpUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 
 
 

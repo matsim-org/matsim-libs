@@ -17,37 +17,16 @@
  ******************************************************************************/
 package vrp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
+import org.junit.Ignore;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.algorithms.ruinAndRecreate.constraints.CapacityPickupsDeliveriesSequenceConstraint;
-import vrp.api.Constraints;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.Node;
-import vrp.api.SingleDepotVRP;
-import vrp.api.VRP;
-import vrp.basics.Coordinate;
-import vrp.basics.CustomerImpl;
-import vrp.basics.ManhattanCosts;
-import vrp.basics.NodeImpl;
-import vrp.basics.Nodes;
-import vrp.basics.Relation;
-import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
-import vrp.basics.SingleDepotVRPBuilder;
-import vrp.basics.Tour;
-import vrp.basics.TourActivityFactory;
-import vrp.basics.VehicleType;
-import vrp.basics.VrpUtils;
+import vrp.api.*;
+import vrp.basics.*;
+
+import java.util.*;
 
 @Ignore
 public class VRPTestCase extends TestCase{

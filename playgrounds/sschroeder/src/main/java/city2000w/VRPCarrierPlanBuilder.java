@@ -1,22 +1,15 @@
 package city2000w;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import freight.vrp.VRPSolver;
+import freight.vrp.VRPSolverFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.*;
 
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.carrier.CarrierCapabilities;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierPlan;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.ScheduledTour;
-import playground.mzilske.freight.carrier.Tour;
-import freight.vrp.VRPSolver;
-import freight.vrp.VRPSolverFactory;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class VRPCarrierPlanBuilder {
 

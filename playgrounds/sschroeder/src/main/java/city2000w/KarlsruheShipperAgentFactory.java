@@ -1,13 +1,12 @@
 package city2000w;
 
-import org.apache.log4j.Logger;
-
-import playground.mzilske.freight.Contract;
 import freight.BasicShipperAgentImpl;
 import freight.ShipperAgent;
 import freight.ShipperAgentTracker;
 import freight.ShipperImpl;
 import freight.api.ShipperAgentFactory;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.api.Contract;
 
 public class KarlsruheShipperAgentFactory implements ShipperAgentFactory{
 

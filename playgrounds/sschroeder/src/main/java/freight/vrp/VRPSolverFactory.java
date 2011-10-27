@@ -1,11 +1,10 @@
 package freight.vrp;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
 
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
+import java.util.Collection;
 
 public interface VRPSolverFactory {
 	

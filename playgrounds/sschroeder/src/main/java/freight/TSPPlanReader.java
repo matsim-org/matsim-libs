@@ -1,28 +1,18 @@
 package freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+import playground.mzilske.freight.*;
 
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TimeWindow;
-import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportChainBuilder;
-import playground.mzilske.freight.TransportServiceProvider;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
+import java.util.*;
 
 public class TSPPlanReader extends MatsimXmlParser{
 

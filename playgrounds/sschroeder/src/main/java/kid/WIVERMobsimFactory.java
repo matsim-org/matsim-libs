@@ -19,9 +19,6 @@
 
 package kid;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,18 +30,15 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
-import playground.mrieser.core.mobsim.impl.ActivityHandler;
-import playground.mrieser.core.mobsim.impl.CarDepartureHandler;
-import playground.mrieser.core.mobsim.impl.DefaultTimestepSimEngine;
-import playground.mrieser.core.mobsim.impl.LegHandler;
-import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
-import playground.mrieser.core.mobsim.impl.TeleportationHandler;
+import playground.mrieser.core.mobsim.impl.*;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....

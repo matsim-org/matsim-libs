@@ -1,19 +1,13 @@
 package freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
 import playground.mzilske.freight.TSPOffer;
+
+import java.util.*;
 
 public class ShipperPlanReader extends MatsimXmlParser{
 

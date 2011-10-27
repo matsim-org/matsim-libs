@@ -1,18 +1,16 @@
 package gis.arcgis;
 
-import java.util.List;
-
 import kid.GeotoolsTransformation;
 import kid.filter.DefaultFeatureFilter;
 import kid.filter.SimpleFeatureFilter;
-
 import org.apache.log4j.Logger;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
 import utils.RegionSchema;
+
+import java.util.List;
 
 
 public class NutsRegionShapeReader {

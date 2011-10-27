@@ -1,9 +1,8 @@
 package city2000w;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.api.CarrierAgentFactory;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -17,15 +16,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.mzilske.city2000w.AnotherCity2000WMobsimFactory;
-import playground.mzilske.freight.api.CarrierAgentFactory;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierAgent;
-import playground.mzilske.freight.carrier.CarrierAgentImpl;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
-import playground.mzilske.freight.carrier.CarrierPlanReader;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener{
@@ -104,7 +98,6 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(carrierAgentTracker);
-		carrierAgentTracker.createPlanAgents();
 	}
 
 	@Override

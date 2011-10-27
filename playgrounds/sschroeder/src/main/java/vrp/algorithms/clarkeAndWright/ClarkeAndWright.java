@@ -20,15 +20,7 @@
  */
 package vrp.algorithms.clarkeAndWright;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.PriorityQueue;
-
 import org.apache.log4j.Logger;
-
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.Node;
@@ -37,6 +29,8 @@ import vrp.basics.OtherDepotActivity;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.VrpUtils;
+
+import java.util.*;
 
 
 /**

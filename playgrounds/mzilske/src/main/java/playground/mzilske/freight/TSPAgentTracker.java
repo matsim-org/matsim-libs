@@ -9,18 +9,18 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.Shipment;
 import playground.mzilske.freight.api.TSPAgentFactory;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.Shipment;
 import playground.mzilske.freight.events.QueryTSPOffersEvent;
 import playground.mzilske.freight.events.QueryTSPOffersEventHandler;
-import playground.mzilske.freight.events.ShipmentDeliveredEvent;
 import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
-import playground.mzilske.freight.events.ShipmentPickedUpEvent;
 import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
 import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
 import playground.mzilske.freight.events.ShipperTSPContractAcceptEventHandler;

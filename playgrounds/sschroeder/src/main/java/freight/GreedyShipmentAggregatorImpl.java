@@ -1,22 +1,14 @@
 package freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-
+import freight.utils.GreedyShipmentAggregator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.Shipment;
 
-import playground.mzilske.freight.TimeWindow;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
-import playground.mzilske.freight.carrier.Shipment;
-import freight.utils.GreedyShipmentAggregator;
+import java.util.*;
 
 public class GreedyShipmentAggregatorImpl implements GreedyShipmentAggregator{
 	

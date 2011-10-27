@@ -19,6 +19,7 @@
 
 package playground.mzilske.city2000w;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,8 +45,8 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.osm.JXMapOTFVisClient;
+import org.matsim.contrib.freight.carrier.CarrierAgentTracker;
+import playground.mzilske.freight.MarcelSimAgentSource;
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....
 public class AnotherCity2000WMobsimFactory implements MobsimFactory {
@@ -107,25 +108,26 @@ public class AnotherCity2000WMobsimFactory implements MobsimFactory {
 		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 		planSim.addMobsimFeature(netFeature); // order of features is important!
 
+        Collection<Plan> freightPlans = freightAgentTracker.createPlans();
+
 		if (useOTFVis) {
 			OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, eventsManager);
-			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap();
+            Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap(freightPlans);
 			server.addAdditionalPlans(freightAgentPlans);
 //			JXMapOTFVisClient.run(scenario.getConfig(), server);
-			 OTFClientLive.run(scenario.getConfig(), server);
+			OTFClientLive.run(scenario.getConfig(), server);
 			VisNetwork visNetwork = netFeature.getVisNetwork();
 			OTFVisFeature otfvisFeature = new OTFVisFeature(visNetwork, server.getSnapshotReceiver());
 			planSim.addMobsimFeature(otfvisFeature);
 		}
 		
-		planSim.addAgentSource(freightAgentTracker);
+		planSim.addAgentSource(new MarcelSimAgentSource(freightPlans));
 		return planSim;
 	}
 
-	private Map<Id, Plan> createFreightAgentPlanMap() {
+	private Map<Id, Plan> createFreightAgentPlanMap(Collection<Plan> freightPlans) {
 		Map<Id, Plan> result = new HashMap<Id, Plan>();
-		for(PlanAgent planAgent : freightAgentTracker.getAgents()) {
-			Plan plan = planAgent.getPlan();
+		for(Plan plan : freightPlans) {
 			result.put(plan.getPerson().getId(), plan);
 		}
 		return result;

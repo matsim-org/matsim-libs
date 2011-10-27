@@ -1,9 +1,9 @@
 package kid.filter;
 
+import kid.Vehicle;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import kid.Vehicle;
 
 
 public abstract class LogicVehicleFilter implements VehicleFilter{

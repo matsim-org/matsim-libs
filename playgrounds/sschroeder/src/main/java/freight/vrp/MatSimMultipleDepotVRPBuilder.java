@@ -1,22 +1,17 @@
 package freight.vrp;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.MultipleDepotsVRP;
 import vrp.api.VRP;
-import vrp.basics.CrowFlyCosts;
-import vrp.basics.Tour;
-import vrp.basics.VRPWithMultipleDepotsImpl;
-import vrp.basics.Vehicle;
-import vrp.basics.VehicleType;
+import vrp.basics.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MatSimMultipleDepotVRPBuilder {
 	

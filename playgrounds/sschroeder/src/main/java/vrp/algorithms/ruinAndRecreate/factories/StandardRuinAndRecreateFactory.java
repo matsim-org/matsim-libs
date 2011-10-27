@@ -17,18 +17,13 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.factories;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinStrategyManager;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
-import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentWithTimeWindowFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.algorithms.ruinAndRecreate.recreation.BestInsertion;
 import vrp.algorithms.ruinAndRecreate.recreation.RecreationListener;
@@ -41,6 +36,9 @@ import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Creates ready to use ruin-and-recreate-algorithms.

@@ -17,13 +17,12 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
 import vrp.api.Costs;
 import vrp.api.Node;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**

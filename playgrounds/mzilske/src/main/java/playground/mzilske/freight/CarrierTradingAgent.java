@@ -2,8 +2,8 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 
 public interface CarrierTradingAgent {
 	

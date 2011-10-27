@@ -1,8 +1,8 @@
 package vrp.api;
 
-import java.util.Map;
-
 import vrp.basics.VehicleType;
+
+import java.util.Map;
 
 public interface MultipleDepotsVRP extends VRP{
 	

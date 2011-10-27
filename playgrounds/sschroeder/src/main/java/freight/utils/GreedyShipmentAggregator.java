@@ -1,9 +1,9 @@
 package freight.utils;
 
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+
 import java.util.Collection;
 import java.util.Map;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
 
 public interface GreedyShipmentAggregator {
 	

@@ -1,7 +1,6 @@
 package freight.vrp;
 
 import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;

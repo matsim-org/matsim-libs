@@ -1,14 +1,9 @@
 package city2000w;
 
 import gis.arcgis.NutsRegionShapeReader;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import kid.GeotoolsTransformation;
 import kid.filter.RegionFilter;
 import kid.filter.SimpleFeatureFilter;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -18,9 +13,11 @@ import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
 import utils.NetworkFuser;
 import utils.RegionSchema;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class KarlsruheNetworkCreator {
 

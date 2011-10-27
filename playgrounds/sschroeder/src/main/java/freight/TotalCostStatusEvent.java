@@ -1,11 +1,10 @@
 package freight;
 
-import java.util.Map;
-
+import freight.listener.ShipperEventImpl;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
-import freight.listener.ShipperEventImpl;
+import java.util.Map;
 
 public class TotalCostStatusEvent extends ShipperEventImpl implements Event{
 	private double totCost;

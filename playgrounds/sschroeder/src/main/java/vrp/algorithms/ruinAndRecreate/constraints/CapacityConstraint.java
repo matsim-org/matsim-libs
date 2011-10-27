@@ -21,7 +21,6 @@
 package vrp.algorithms.ruinAndRecreate.constraints;
 
 import org.apache.log4j.Logger;
-
 import vrp.api.Constraints;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;

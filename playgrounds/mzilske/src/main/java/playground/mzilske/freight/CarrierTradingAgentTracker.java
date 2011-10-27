@@ -5,9 +5,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import playground.mzilske.freight.carrier.NoOffer;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.NoOffer;
 import playground.mzilske.freight.events.CarrierOfferAcceptEvent;
 import playground.mzilske.freight.events.CarrierOfferAcceptEventHandler;
 import playground.mzilske.freight.events.CarrierOfferRejectEvent;

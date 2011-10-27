@@ -3,10 +3,10 @@
  */
 package stats;
 
-import java.util.Iterator;
-
 import org.apache.commons.math.stat.Frequency;
 import org.matsim.core.gbl.MatsimRandom;
+
+import java.util.Iterator;
 
 /**
  * @author stefan schroeder

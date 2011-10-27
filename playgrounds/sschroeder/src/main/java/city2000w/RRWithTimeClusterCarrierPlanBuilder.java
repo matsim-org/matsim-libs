@@ -1,30 +1,17 @@
 package city2000w;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
+import freight.TourScheduler;
+import freight.utils.*;
+import freight.vrp.VRPSolver;
+import freight.vrp.VRPSolverFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.*;
 
-import playground.mzilske.freight.carrier.CarrierCapabilities;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierPlan;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.ScheduledTour;
-import playground.mzilske.freight.carrier.Shipment;
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.TourBuilder;
-import freight.TourScheduler;
-import freight.utils.GreedyShipmentAggregator;
-import freight.utils.ShipmentClustererImpl;
-import freight.utils.TimePeriod;
-import freight.utils.TimePeriods;
-import freight.utils.TimeSchema;
-import freight.vrp.VRPSolver;
-import freight.vrp.VRPSolverFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 public class RRWithTimeClusterCarrierPlanBuilder {
 	

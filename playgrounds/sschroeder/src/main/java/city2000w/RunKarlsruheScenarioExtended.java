@@ -3,68 +3,28 @@
  */
 package city2000w;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import city2000w.replanning.*;
+import freight.*;
+import freight.utils.TimePeriod;
+import freight.vrp.RRPDTWSolverFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPContract;
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TransportChainAgentFactoryImpl;
-import playground.mzilske.freight.TransportServiceProvider;
-import playground.mzilske.freight.TransportServiceProviders;
+import playground.mzilske.freight.*;
 import playground.mzilske.freight.api.TSPAgentFactory;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierDriverAgentFactoryImpl;
-import playground.mzilske.freight.carrier.CarrierPlan;
-import playground.mzilske.freight.carrier.CarrierPlanReader;
-import playground.mzilske.freight.carrier.CarrierPlanWriter;
-import playground.mzilske.freight.carrier.Carriers;
-import city2000w.replanning.CarrierContractLandscapeChangedResponder;
-import city2000w.replanning.CarrierPlanStrategy;
-import city2000w.replanning.CarrierSelector;
-import city2000w.replanning.FrequencyAndTSPSelector;
-import city2000w.replanning.PlanStrategyManager;
-import city2000w.replanning.ReRouteVehicles;
-import city2000w.replanning.ShipperPlanStrategy;
-import city2000w.replanning.TSPContractLandscapeChangedResponder;
-import city2000w.replanning.TSPPlanStrategy;
-import freight.ShipperAgentTracker;
-import freight.ShipperImpl;
-import freight.ShipperPlanReader;
-import freight.ShipperPlanWriter;
-import freight.Shippers;
-import freight.TSPPlanReader;
-import freight.TSPPlanWriter;
-import freight.TlcCostFunction;
-import freight.utils.TimePeriod;
-import freight.vrp.RRPDTWSolverFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -179,7 +139,6 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Controler controler = event.getControler();
 		controler.getEvents().addHandler(carrierAgentTracker);
-		carrierAgentTracker.createPlanAgents();
 	}
 
 	@Override

@@ -1,17 +1,16 @@
 package freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.api.TimeWindow;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.Contract;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPOffer;
 import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TimeWindow;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ShipperUtils {
 	

@@ -2,21 +2,10 @@ package city2000w;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.Contract;
 import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.BasicTSPAgentImpl;
-import playground.mzilske.freight.Contract;
-import playground.mzilske.freight.CostMemory;
-import playground.mzilske.freight.CostMemoryImpl;
-import playground.mzilske.freight.TSPAgent;
-import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPOffer;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainLeg;
-import playground.mzilske.freight.TransportChainAgent;
-import playground.mzilske.freight.TransportChainAgentFactory;
-import playground.mzilske.freight.TransportServiceProvider;
 import playground.mzilske.freight.api.TSPAgentFactory;
 
 public class KarlsruheTSPAgentFactory implements TSPAgentFactory {

@@ -17,9 +17,9 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate;
 
-import java.util.Collection;
-
 import vrp.basics.Tour;
+
+import java.util.Collection;
 
 /**
  * Collector of algo-information. Can be listened to.

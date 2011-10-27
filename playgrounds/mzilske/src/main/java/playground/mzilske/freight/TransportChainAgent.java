@@ -1,6 +1,7 @@
 package playground.mzilske.freight;
 
-import playground.mzilske.freight.carrier.Shipment;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Shipment;
 
 
 public interface TransportChainAgent {

@@ -1,14 +1,14 @@
 package city2000w.replanning;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import freight.CommodityFlow;
 import freight.ScheduledCommodityFlow;
 import freight.ShipperContract;
 import freight.ShipperImpl;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ShipperPlanStrategy implements PlanStrategy<ShipperImpl>{
 

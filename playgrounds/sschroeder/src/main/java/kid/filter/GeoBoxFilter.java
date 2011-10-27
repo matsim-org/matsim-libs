@@ -1,13 +1,12 @@
 package kid.filter;
 
-import java.util.Collection;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import kid.KiDUtils;
 import kid.ScheduledTransportChain;
 import kid.ScheduledVehicle;
 import kid.ScheduledVehicleFilter;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Collection;
 
 public class GeoBoxFilter implements ScheduledVehicleFilter {
 

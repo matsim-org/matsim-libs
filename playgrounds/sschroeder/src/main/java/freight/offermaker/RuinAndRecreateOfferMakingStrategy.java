@@ -1,14 +1,13 @@
 package freight.offermaker;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.core.gbl.MatsimRandom;
+import playground.mzilske.freight.OfferMaker;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.OfferMaker;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierOffer;
 
 public class RuinAndRecreateOfferMakingStrategy implements OfferMaker{
 	

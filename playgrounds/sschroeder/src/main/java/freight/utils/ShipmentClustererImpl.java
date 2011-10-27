@@ -1,12 +1,8 @@
 package freight.utils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
+import org.matsim.contrib.freight.carrier.Shipment;
 
-import playground.mzilske.freight.carrier.Shipment;
+import java.util.*;
 
 public class ShipmentClustererImpl implements ShipmentClusterer{
 

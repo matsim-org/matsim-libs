@@ -1,25 +1,15 @@
 package freight.offermaker;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
+import freight.vrp.Locations;
+import freight.vrp.MatSim2VRPTransformation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.basic.v01.IdImpl;
-
 import playground.mzilske.freight.OfferMaker;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.ScheduledTour;
-import playground.mzilske.freight.carrier.Tour.Delivery;
-import playground.mzilske.freight.carrier.Tour.Pickup;
-import playground.mzilske.freight.carrier.Tour.TourElement;
 import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
 import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder;
 import vrp.algorithms.ruinAndRecreate.basics.TourActivityStatusUpdaterImpl;
@@ -30,8 +20,11 @@ import vrp.api.VRP;
 import vrp.basics.CrowFlyCosts;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
-import freight.vrp.Locations;
-import freight.vrp.MatSim2VRPTransformation;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MarginalCostOM implements OfferMaker{
 	
@@ -241,7 +234,7 @@ public class MarginalCostOM implements OfferMaker{
 		return false;
 	}
 
-	private Tour makeTour(playground.mzilske.freight.carrier.Tour tour, MatSim2VRPTransformation vrpTrafo) {
+	private Tour makeTour(org.matsim.contrib.freight.carrier.Tour tour, MatSim2VRPTransformation vrpTrafo) {
 		Tour vrpTour = new Tour();
 		Customer depotCustomer = vrpTrafo.getCustomer(makeId("depot"));
 		vrpTour.getActivities().add(VrpUtils.createTourActivity(depotCustomer));

@@ -3,17 +3,16 @@
  */
 package sandbox;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import kid.KiDSchema;
 import kid.ScheduledVehicle;
 import kid.ScheduledVehicles;
 import kid.Vehicle;
-
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.BarChart;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author stefan

@@ -1,10 +1,9 @@
 package freight;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.api.TimeWindow;
 
-import playground.mzilske.freight.TimeWindow;
-
-public class ShipperShipment implements playground.mzilske.freight.carrier.Shipment{
+public class ShipperShipment implements org.matsim.contrib.freight.carrier.Shipment{
 	
 	
 	private Id from;

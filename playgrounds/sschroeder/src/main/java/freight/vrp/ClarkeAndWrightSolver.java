@@ -1,11 +1,10 @@
 package freight.vrp;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
-
-import playground.mzilske.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierContract;
 import vrp.basics.Tour;
+
+import java.util.Collection;
 
 public class ClarkeAndWrightSolver implements VRPSolver {
 
@@ -45,7 +44,7 @@ public class ClarkeAndWrightSolver implements VRPSolver {
 	}
 
 	@Override
-	public Collection<playground.mzilske.freight.carrier.Tour> solve() {
+	public Collection<org.matsim.contrib.freight.carrier.Tour> solve() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -3,23 +3,16 @@
  */
 package sandbox;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.MatsimRandom;
+import sandbox.SandBoxTrafficGenerator.Company;
+import sandbox.SandBoxTrafficGenerator.Region;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierImpl;
-import playground.mzilske.freight.carrier.CarrierPlan;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.ScheduledTour;
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.TourBuilder;
-import sandbox.SandBoxTrafficGenerator.Company;
-import sandbox.SandBoxTrafficGenerator.Region;
 
 
 

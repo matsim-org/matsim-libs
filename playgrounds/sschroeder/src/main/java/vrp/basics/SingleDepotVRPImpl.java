@@ -17,17 +17,16 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SingleDepotVRPImpl implements SingleDepotVRP{
 

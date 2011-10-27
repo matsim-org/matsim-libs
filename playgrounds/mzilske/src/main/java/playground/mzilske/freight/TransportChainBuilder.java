@@ -6,12 +6,13 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
+import org.matsim.contrib.freight.api.TimeWindow;
 import playground.mzilske.freight.TransportChain.ChainElement;
 import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.TransportChain.Delivery;
 import playground.mzilske.freight.TransportChain.PickUp;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 
 
 public class TransportChainBuilder {

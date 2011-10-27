@@ -1,22 +1,15 @@
 package freight;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Tour.Delivery;
+import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.core.basic.v01.IdImpl;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.ScheduledTour;
-import playground.mzilske.freight.carrier.Shipment;
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.Tour.Delivery;
-import playground.mzilske.freight.carrier.Tour.Pickup;
-import playground.mzilske.freight.carrier.Tour.TourElement;
-import playground.mzilske.freight.carrier.TourBuilder;
 
 public class TourSchedulerImpl implements TourScheduler{
 	

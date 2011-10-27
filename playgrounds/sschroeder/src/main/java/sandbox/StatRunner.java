@@ -1,17 +1,15 @@
 package sandbox;
 
+import kid.KiDDataReader;
+import kid.ScheduledVehicles;
+import kid.filter.BusinessSectorFilter;
+import org.apache.commons.math.stat.Frequency;
+import sandbox.Classifier.FrequencyClass;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import kid.KiDDataReader;
-import kid.ScheduledVehicles;
-import kid.filter.BusinessSectorFilter;
-
-import org.apache.commons.math.stat.Frequency;
-
-import sandbox.Classifier.FrequencyClass;
 
 public class StatRunner {
 

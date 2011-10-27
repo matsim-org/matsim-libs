@@ -1,14 +1,14 @@
 package gis.arcgis;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import java.io.File;
+import java.io.IOException;
 
 public class ShapeFileReader {
 

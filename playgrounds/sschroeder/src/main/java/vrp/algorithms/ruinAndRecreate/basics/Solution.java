@@ -17,9 +17,9 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.basics;
 
-import java.util.Collection;
-
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
+
+import java.util.Collection;
 
 
 /**

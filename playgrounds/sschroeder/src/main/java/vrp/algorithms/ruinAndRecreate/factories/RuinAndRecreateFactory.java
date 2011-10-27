@@ -1,11 +1,11 @@
 package vrp.algorithms.ruinAndRecreate.factories;
 
-import java.util.Collection;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.Tour;
+
+import java.util.Collection;
 
 public interface RuinAndRecreateFactory {
 

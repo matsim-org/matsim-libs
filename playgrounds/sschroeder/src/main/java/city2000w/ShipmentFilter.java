@@ -1,6 +1,6 @@
 package city2000w;
 
-import playground.mzilske.freight.carrier.Shipment;
+import org.matsim.contrib.freight.carrier.Shipment;
 
 public interface ShipmentFilter {
 	public boolean judge(Shipment shipment);

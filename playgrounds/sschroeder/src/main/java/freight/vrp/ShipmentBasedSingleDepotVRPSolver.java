@@ -7,33 +7,27 @@ package freight.vrp;
  * the Carrier-Problem into a VehicleRoutingProblem, runs the vehicleRoutingEngine and transforms the results of the engine into MatSim-tours.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateFactory;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
-import vrp.basics.DeliveryFromDepot;
-import vrp.basics.PickupToDepot;
-import vrp.basics.SingleDepotInitialSolutionFactory;
-import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
-import vrp.basics.TourActivity;
-import vrp.basics.VehicleType;
+import vrp.basics.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class ShipmentBasedSingleDepotVRPSolver implements VRPSolver{
 	

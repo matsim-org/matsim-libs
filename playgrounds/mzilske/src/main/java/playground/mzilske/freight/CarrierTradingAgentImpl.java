@@ -4,9 +4,9 @@ import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 
 public class CarrierTradingAgentImpl implements CarrierTradingAgent {
 

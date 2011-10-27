@@ -2,7 +2,7 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 
 public interface OfferMaker {
 

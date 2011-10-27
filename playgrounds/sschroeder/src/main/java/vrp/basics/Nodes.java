@@ -17,10 +17,10 @@
  ******************************************************************************/
 package vrp.basics;
 
+import vrp.api.Node;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import vrp.api.Node;
 
 
 /**

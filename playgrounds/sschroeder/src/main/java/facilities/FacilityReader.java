@@ -1,15 +1,14 @@
 package facilities;
 
-import java.util.Collection;
-import java.util.Stack;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.Collection;
+import java.util.Stack;
 
 
 

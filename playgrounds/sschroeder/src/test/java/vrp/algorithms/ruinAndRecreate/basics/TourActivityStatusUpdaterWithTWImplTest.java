@@ -17,13 +17,13 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.basics;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import vrp.VRPTestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.api.Customer;
 import vrp.basics.Tour;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class TourActivityStatusUpdaterWithTWImplTest extends VRPTestCase{
 	

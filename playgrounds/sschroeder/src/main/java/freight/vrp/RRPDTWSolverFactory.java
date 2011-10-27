@@ -1,15 +1,14 @@
 package freight.vrp;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.network.Network;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import vrp.algorithms.ruinAndRecreate.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
 import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateWithTimeWindowsFactory;
 import vrp.basics.CrowFlyCosts;
 import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
+
+import java.util.Collection;
 
 public class RRPDTWSolverFactory implements VRPSolverFactory{
 

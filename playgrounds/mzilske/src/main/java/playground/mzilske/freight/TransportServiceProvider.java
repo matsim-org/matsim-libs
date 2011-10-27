@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.api.Actor;
+import org.matsim.contrib.freight.api.Actor;
 
 public interface TransportServiceProvider extends Actor{
 

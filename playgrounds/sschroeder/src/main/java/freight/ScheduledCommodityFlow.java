@@ -1,9 +1,9 @@
 package freight;
 
-import java.util.Collection;
-
-import playground.mzilske.freight.Contract;
+import org.matsim.contrib.freight.api.Contract;
 import playground.mzilske.freight.TSPOffer;
+
+import java.util.Collection;
 
 public class ScheduledCommodityFlow {
 	

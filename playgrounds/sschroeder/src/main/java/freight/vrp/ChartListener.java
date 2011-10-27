@@ -1,13 +1,12 @@
 package freight.vrp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.charts.XYLineChart;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateEvent;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

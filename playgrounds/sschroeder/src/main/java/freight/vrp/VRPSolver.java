@@ -1,8 +1,8 @@
 package freight.vrp;
 
-import java.util.Collection;
+import org.matsim.contrib.freight.carrier.Tour;
 
-import playground.mzilske.freight.carrier.Tour;
+import java.util.Collection;
 
 public interface VRPSolver {
 

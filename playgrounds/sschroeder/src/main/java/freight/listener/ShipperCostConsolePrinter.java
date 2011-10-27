@@ -1,8 +1,7 @@
 package freight.listener;
 
-import org.apache.log4j.Logger;
-
 import freight.DetailedCostStatusEvent;
+import org.apache.log4j.Logger;
 
 public class ShipperCostConsolePrinter implements ShipperDetailedCostStatusHandler, ShipperTotalCostStatusHandler{
 

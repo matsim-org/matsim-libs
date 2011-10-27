@@ -3,17 +3,12 @@ package city2000w;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.api.CarrierAgentFactory;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.mzilske.freight.CostMemory;
 import playground.mzilske.freight.CostMemoryImpl;
 import playground.mzilske.freight.MarginalCostOfContractCalculator;
-import playground.mzilske.freight.api.CarrierAgentFactory;
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierAgent;
-import playground.mzilske.freight.carrier.CarrierAgentImpl;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierDriverAgentFactory;
 
 public class KarlsruheCarrierAgentFactory implements CarrierAgentFactory{
 

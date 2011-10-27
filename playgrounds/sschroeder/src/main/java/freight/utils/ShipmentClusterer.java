@@ -1,9 +1,9 @@
 package freight.utils;
 
+import org.matsim.contrib.freight.carrier.Shipment;
+
 import java.util.Collection;
 import java.util.Map;
-
-import playground.mzilske.freight.carrier.Shipment;
 
 public interface ShipmentClusterer {
 	

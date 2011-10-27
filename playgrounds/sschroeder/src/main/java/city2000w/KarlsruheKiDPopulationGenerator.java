@@ -1,21 +1,11 @@
 package city2000w;
 
+import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 import gis.arcgis.NutsRegionShapeReader;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import kid.KiDDataReader;
-import kid.KiDPlanAgentCreator;
-import kid.KiDStatWriter;
-import kid.KiDUtils;
-import kid.ScheduledVehicles;
+import kid.*;
 import kid.filter.And;
 import kid.filter.AtLeastOneActivitiesInSelectedRegionsFilter;
 import kid.filter.LogicVehicleFilter;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -29,7 +19,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class KarlsruheKiDPopulationGenerator {

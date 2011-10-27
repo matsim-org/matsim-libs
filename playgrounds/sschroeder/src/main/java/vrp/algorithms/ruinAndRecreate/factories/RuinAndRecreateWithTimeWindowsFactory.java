@@ -1,10 +1,6 @@
 package vrp.algorithms.ruinAndRecreate.factories;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.RuinStrategyManager;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
@@ -22,6 +18,9 @@ import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.Tour;
 import vrp.basics.Vehicle;
 import vrp.basics.VrpUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFactory{
 

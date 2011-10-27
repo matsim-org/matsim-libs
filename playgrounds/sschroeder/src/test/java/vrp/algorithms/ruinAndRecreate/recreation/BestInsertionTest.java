@@ -17,10 +17,6 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.recreation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import vrp.VRPTestCase;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.basics.RRTourAgentFactory;
@@ -28,11 +24,11 @@ import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
 import vrp.api.SingleDepotVRP;
-import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
-import vrp.basics.SingleDepotVRPBuilder;
-import vrp.basics.Tour;
-import vrp.basics.TourActivity;
-import vrp.basics.VehicleType;
+import vrp.basics.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class BestInsertionTest extends VRPTestCase{
 	BestInsertion bestInsertion;

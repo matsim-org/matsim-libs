@@ -1,11 +1,10 @@
 package city2000w.replanning;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.matsim.contrib.freight.api.Actor;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.mzilske.freight.api.Actor;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlanStrategyManager<T extends Actor> {
 	

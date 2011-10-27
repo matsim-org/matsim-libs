@@ -1,20 +1,19 @@
 package freight.vrp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.carrier.Tour;
-import playground.mzilske.freight.carrier.TourBuilder;
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.algorithms.ruinAndRecreate.factories.RuinAndRecreateFactory;
 import vrp.api.SingleDepotVRP;
 import vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import vrp.basics.TourActivity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class ActivityBasedSingleDepotVRPSolver {
 	

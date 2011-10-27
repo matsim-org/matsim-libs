@@ -17,15 +17,14 @@
  ******************************************************************************/
 package vrp.basics;
 
+import org.apache.log4j.Logger;
+import vrp.api.Customer;
+import vrp.api.SingleDepotVRP;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import vrp.api.Customer;
-import vrp.api.SingleDepotVRP;
 
 public class SingleDepotInitialSolutionFactoryImpl implements SingleDepotInitialSolutionFactory{
 

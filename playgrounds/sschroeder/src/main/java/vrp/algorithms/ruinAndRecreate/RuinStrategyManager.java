@@ -17,12 +17,12 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate;
 
+import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
+import vrp.basics.RandomNumberGeneration;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
-import vrp.basics.RandomNumberGeneration;
 
 
 /**

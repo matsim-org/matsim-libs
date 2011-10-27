@@ -1,35 +1,24 @@
 package city2000w;
 
+import freight.offermaker.OfferSelectorImpl;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
+import playground.mzilske.freight.*;
+import playground.mzilske.freight.TransportChain.ChainTriple;
+import playground.mzilske.freight.events.OfferUtils;
+import playground.mzilske.freight.events.QueryCarrierOffersEvent;
+import playground.mzilske.freight.events.Service;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.TSPAgentTracker;
-import playground.mzilske.freight.TSPCapabilities;
-import playground.mzilske.freight.TSPContract;
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TimeWindow;
-import playground.mzilske.freight.TransportChain;
-import playground.mzilske.freight.TransportChain.ChainTriple;
-import playground.mzilske.freight.TransportChainBuilder;
-import playground.mzilske.freight.api.Offer;
-import playground.mzilske.freight.carrier.CarrierAgentTracker;
-import playground.mzilske.freight.carrier.CarrierContract;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
-import playground.mzilske.freight.events.OfferUtils;
-import playground.mzilske.freight.events.QueryCarrierOffersEvent;
-import playground.mzilske.freight.events.Service;
-import freight.offermaker.OfferSelectorImpl;
 
 public class SimpleTSPPlanBuilder {
 	

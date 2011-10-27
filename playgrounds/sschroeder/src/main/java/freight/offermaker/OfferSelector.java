@@ -1,8 +1,8 @@
 package freight.offermaker;
 
-import java.util.Collection;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 
-import playground.mzilske.freight.carrier.CarrierOffer;
+import java.util.Collection;
 
 interface OfferSelector {
 

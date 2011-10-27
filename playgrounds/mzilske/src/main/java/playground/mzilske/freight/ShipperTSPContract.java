@@ -2,10 +2,11 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.api.Offer;
-import playground.mzilske.freight.carrier.Shipment;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.carrier.Shipment;
 
-public class ShipperTSPContract implements Contract{
+public class ShipperTSPContract implements Contract {
 
 	private Id shipperId;
 	

@@ -1,19 +1,18 @@
 package freight.vrp;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.Shipment;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.Shipment;
 import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.basics.Coordinate;
 import vrp.basics.VrpUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * Vehicle Routing Algorithms used here require a customer/node related data structure. Thus, VRPTransformation transforms carrier-shipments into vrp-customers. 

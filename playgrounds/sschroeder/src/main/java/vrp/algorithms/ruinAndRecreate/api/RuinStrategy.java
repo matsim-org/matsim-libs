@@ -17,10 +17,10 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.api;
 
-import java.util.List;
-
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
+
+import java.util.List;
 
 
 /**

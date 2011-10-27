@@ -1,16 +1,11 @@
 package freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
-
-import playground.mzilske.freight.Contract;
+import org.matsim.contrib.freight.api.Contract;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPShipment;
+
+import java.util.*;
 
 /**
  * 
@@ -134,7 +129,7 @@ public class ShipperAgentImpl implements ShipperAgent {
 	}
 
 	/* (non-Javadoc)
-	 * @see freight.ShipperAgent#informTSPContractAccept(playground.mzilske.freight.Contract)
+	 * @see freight.ShipperAgent#informTSPContractAccept(org.matsim.contrib.freight.api.Contract)
 	 */
 	@Override
 	public void informTSPContractAccept(Contract contract) {
@@ -143,7 +138,7 @@ public class ShipperAgentImpl implements ShipperAgent {
 	}
 
 	/* (non-Javadoc)
-	 * @see freight.ShipperAgent#informTSPContractCanceled(playground.mzilske.freight.Contract)
+	 * @see freight.ShipperAgent#informTSPContractCanceled(org.matsim.contrib.freight.api.Contract)
 	 */
 	@Override
 	public void informTSPContractCanceled(Contract contract) {

@@ -17,16 +17,15 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Customer;
 import vrp.api.MultipleDepotsVRP;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VRPWithMultipleDepotsImpl implements MultipleDepotsVRP{
 

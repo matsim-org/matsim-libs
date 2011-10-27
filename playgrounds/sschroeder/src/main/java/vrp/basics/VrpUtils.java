@@ -17,9 +17,6 @@
  ******************************************************************************/
 package vrp.basics;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
 import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
 import vrp.algorithms.ruinAndRecreate.basics.Shipment;
@@ -27,6 +24,9 @@ import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.Customer;
 import vrp.api.Node;
 import vrp.api.VRP;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

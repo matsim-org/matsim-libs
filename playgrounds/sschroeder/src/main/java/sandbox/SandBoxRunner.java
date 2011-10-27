@@ -1,10 +1,10 @@
 package sandbox;
 
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import playground.mzilske.freight.carrier.Carrier;
-import playground.mzilske.freight.carrier.CarrierPlanWriter;
 
 public class SandBoxRunner {
 

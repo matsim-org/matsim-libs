@@ -17,11 +17,7 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate.basics;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer;
 import vrp.algorithms.ruinAndRecreate.api.TourActivityStatusUpdater;
 import vrp.algorithms.ruinAndRecreate.api.TourAgent;
@@ -32,6 +28,9 @@ import vrp.api.Customer;
 import vrp.basics.Tour;
 import vrp.basics.TourActivity;
 import vrp.basics.Vehicle;
+
+import java.util.Collection;
+import java.util.Collections;
 
 
 /**

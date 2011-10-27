@@ -17,16 +17,12 @@
  ******************************************************************************/
 package vrp.basics;
 
+import vrp.api.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import vrp.api.Constraints;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.Node;
-import vrp.api.SingleDepotVRP;
 
 public class SingleDepotVRPBuilder {
 	

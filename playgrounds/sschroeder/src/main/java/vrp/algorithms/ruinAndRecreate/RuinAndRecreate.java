@@ -17,24 +17,17 @@
  ******************************************************************************/
 package vrp.algorithms.ruinAndRecreate;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.apache.log4j.Logger;
-
-import vrp.algorithms.ruinAndRecreate.api.RecreationStrategy;
-import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
-import vrp.algorithms.ruinAndRecreate.api.RuinStrategy;
-import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
-import vrp.algorithms.ruinAndRecreate.api.ThresholdFunction;
-import vrp.algorithms.ruinAndRecreate.api.TourAgent;
-import vrp.algorithms.ruinAndRecreate.api.TourAgentFactory;
+import vrp.algorithms.ruinAndRecreate.api.*;
 import vrp.algorithms.ruinAndRecreate.basics.Solution;
 import vrp.api.SingleDepotVRP;
 import vrp.api.VRP;
 import vrp.basics.Tour;
 import vrp.basics.VrpUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 
 /**

@@ -1,13 +1,12 @@
 package freight.offermaker;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import org.matsim.contrib.freight.api.Offer;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.mzilske.freight.api.Offer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class OfferSelectorImpl<T extends Offer>  {
 

@@ -1,11 +1,10 @@
 package kid.filter;
 
-import java.util.Set;
-
 import kid.KiDSchema;
 import kid.Vehicle;
-
 import org.apache.log4j.Logger;
+
+import java.util.Set;
 
 
 public class BusinessSectorFilter implements VehicleFilter{

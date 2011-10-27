@@ -1,24 +1,15 @@
 package freight.offermaker;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import freight.TSPUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 import org.matsim.core.gbl.MatsimRandom;
-
-import playground.mzilske.freight.TSPAgentImpl;
-import playground.mzilske.freight.TSPContract;
-import playground.mzilske.freight.TSPOffer;
-import playground.mzilske.freight.TSPOfferMaker;
-import playground.mzilske.freight.TSPPlan;
-import playground.mzilske.freight.TSPPlanBuilder;
-import playground.mzilske.freight.TSPShipment;
-import playground.mzilske.freight.TransportChain;
+import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainTriple;
-import playground.mzilske.freight.TransportServiceProvider;
-import playground.mzilske.freight.carrier.CarrierOffer;
-import freight.TSPUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CarrierCostRequester implements TSPOfferMaker{
 

@@ -1,13 +1,11 @@
 package freight.vrp;
 
 import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.core.basic.v01.IdImpl;
-
-import playground.mzilske.freight.carrier.CarrierShipment;
-import playground.mzilske.freight.carrier.CarrierUtils;
 import vrp.api.Constraints;
 import vrp.api.Costs;
 import vrp.api.Node;

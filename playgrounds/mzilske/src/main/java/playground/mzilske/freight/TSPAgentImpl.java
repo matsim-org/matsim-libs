@@ -3,16 +3,13 @@
  */
 package playground.mzilske.freight;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import playground.mzilske.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.CarrierOffer;
 import playground.mzilske.freight.events.TSPTotalCostHandler.TSPCostEvent;
 
 

@@ -1,14 +1,13 @@
 package kid;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class KiDUtils {
 	

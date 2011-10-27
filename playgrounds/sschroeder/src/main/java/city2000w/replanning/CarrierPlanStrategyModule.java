@@ -1,6 +1,6 @@
 package city2000w.replanning;
 
-import playground.mzilske.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carrier;
 
 public interface CarrierPlanStrategyModule {
 	

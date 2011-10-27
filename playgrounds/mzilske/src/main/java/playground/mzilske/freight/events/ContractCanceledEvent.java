@@ -2,9 +2,9 @@ package playground.mzilske.freight.events;
 
 import java.util.Map;
 
+import org.matsim.contrib.freight.api.Contract;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.mzilske.freight.Contract;
 
 public abstract class ContractCanceledEvent implements Event{
 

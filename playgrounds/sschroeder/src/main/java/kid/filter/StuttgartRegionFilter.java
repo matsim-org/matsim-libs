@@ -3,12 +3,11 @@
  */
 package kid.filter;
 
+import org.opengis.feature.simple.SimpleFeature;
+import utils.RegionSchema;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.opengis.feature.simple.SimpleFeature;
-
-import utils.RegionSchema;
 
 
 /**

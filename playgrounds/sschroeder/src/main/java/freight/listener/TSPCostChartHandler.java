@@ -1,17 +1,16 @@
 package freight.listener;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.io.IOUtils;
+import playground.mzilske.freight.events.TSPTotalCostHandler;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.utils.io.IOUtils;
-
-import playground.mzilske.freight.events.TSPTotalCostHandler;
 
 public class TSPCostChartHandler implements TSPTotalCostHandler{
 	

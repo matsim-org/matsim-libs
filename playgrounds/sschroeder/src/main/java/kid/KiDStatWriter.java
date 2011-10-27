@@ -1,9 +1,9 @@
 package kid;
 
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
-
-import org.matsim.core.utils.io.IOUtils;
 
 public class KiDStatWriter {
 	

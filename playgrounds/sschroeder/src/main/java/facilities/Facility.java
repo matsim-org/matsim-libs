@@ -1,11 +1,10 @@
 package facilities;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Facility {
 	

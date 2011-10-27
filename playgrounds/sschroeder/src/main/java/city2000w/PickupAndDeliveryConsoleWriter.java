@@ -1,10 +1,9 @@
 package city2000w;
 
 import org.apache.log4j.Logger;
-
-import playground.mzilske.freight.events.ShipmentDeliveredEvent;
+import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
-import playground.mzilske.freight.events.ShipmentPickedUpEvent;
 import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
 
 public class PickupAndDeliveryConsoleWriter implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler{

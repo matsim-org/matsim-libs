@@ -1,14 +1,14 @@
 package city2000w.replanning;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPShipment;
 import playground.mzilske.freight.TransportChain;
 import playground.mzilske.freight.TransportServiceProvider;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TSPPlanStrategy implements PlanStrategy<TransportServiceProvider>{
 	

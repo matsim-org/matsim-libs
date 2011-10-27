@@ -1,10 +1,10 @@
 package freight.vrp;
 
-import java.util.Collection;
-
 import vrp.algorithms.ruinAndRecreate.RuinAndRecreateEvent;
 import vrp.algorithms.ruinAndRecreate.api.RuinAndRecreateListener;
 import vrp.basics.Tour;
+
+import java.util.Collection;
 
 public class RuinAndRecreateReport implements RuinAndRecreateListener{
 
