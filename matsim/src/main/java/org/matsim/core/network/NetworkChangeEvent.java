@@ -119,7 +119,7 @@ public class NetworkChangeEvent {
 	 * @param links a collection of links affected by this event.
 	 */
 	public void addLinks(Collection<Link> links) {
-		links.addAll(links);
+		this.links.addAll(links);
 	}
 	
 	/**
