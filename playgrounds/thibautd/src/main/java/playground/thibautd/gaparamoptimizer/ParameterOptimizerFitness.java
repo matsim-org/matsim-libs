@@ -65,7 +65,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// parameters of the fitness
 	private static final double CHF_PER_MICROSEC = 1E-7;
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
-	private static final int N_PLAN_EXEC = 1;
+	private static final int N_PLAN_EXEC = 3;
 
 	private static final boolean IS_MEMETIC = true;
 
@@ -93,7 +93,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// bounds
 	//private static final int MAX_POP_SIZE = 100;
 	private static final double MAX_POP_INTERCEPT = 0;
-	private static final double MIN_POP_SLOPE = 0;
+	private static final double MIN_POP_SLOPE = 1;
 	private static final double MAX_POP_SLOPE = 1;
 	private static final double MAX_DISCRETE_SCALE = 1E7;
 	//private static final int MAX_WINDOW_SIZE = 20;
@@ -103,10 +103,10 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final double MAX_NON_UNIFORM = 50d;
 	private static final double MAX_CO_RATE = 0.5;
 	private static final double MAX_OPT_WEIGHT = 0.5;
-	private static final int MIN_SIMPLEX_ITERS = 30;
-	private static final int MAX_SIMPLEX_ITERS = 60;
+	private static final int MIN_SIMPLEX_ITERS = 60;
+	private static final int MAX_SIMPLEX_ITERS = 300;
 
-	private static final int MAX_POP_SIZE = 60;
+	private static final int MAX_POP_SIZE = Integer.MAX_VALUE;
 
 	// kept for cloning
 	private final ScoringFunctionFactory scoringFunctionFactory;

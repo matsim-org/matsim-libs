@@ -52,9 +52,11 @@ public class JgapParameterOptimizerConfig extends Configuration {
 	private static final long serialVersionUID = 1L;
 
 	private static final int POP_SIZE = 30;
-	private static final int MUTATION_RATE = 30;
+	private static final int MUTATION_RATE = 10;
 	private static final double CO_RATE = 0.6d;
 	private static final double ORIG_RATE = 0.8d;
+	private static final boolean DOUBLETTES = false;
+	private static final long SEED = 1984;
 
 	/**
 	 * @param plans the JointPlans to use as test instances
@@ -91,15 +93,16 @@ public class JgapParameterOptimizerConfig extends Configuration {
 
 			// seed the default JGAP pseudo-random generator with a matsim random
 			// number, so that the simulations are reproducible.
-			this.setRandomGenerator(new StockRandomGenerator());
-			//((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
+			this.setRandomGenerator( new StockRandomGenerator() );
+			((StockRandomGenerator) this.getRandomGenerator()).setSeed( SEED );
 
 			// selector
-			NaturalSelector selector = new BestChromosomesSelector(this, ORIG_RATE);
+			BestChromosomesSelector selector = new BestChromosomesSelector(this, ORIG_RATE);
 			//NaturalSelector selector = new WeightedRouletteSelector(this);
-			this.addNaturalSelector(selector, false);
+			selector.setDoubletteChromosomesAllowed( DOUBLETTES );
+			this.addNaturalSelector( selector , false );
 
-			this.setPreservFittestIndividual(false);
+			//this.setPreservFittestIndividual( false );
 
 			this.setSampleChromosome(fitness.getSampleChromosome());
 

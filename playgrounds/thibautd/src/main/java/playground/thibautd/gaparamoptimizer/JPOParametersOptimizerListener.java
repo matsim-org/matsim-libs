@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -66,7 +67,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 	private final String outputFileName = "optimizedConf.xml";
 	private String outputDirectory = null;
 	private final static int N_GEN = 30;
-	private final static int N_PLANS = 5;
+	//private final static int N_PLANS = 5;
 
 	//private final static int MIN_MEMBERS = 3;
 	//private final static int MAX_MEMBERS = 20;
@@ -97,8 +98,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 	private List<JointPlan> getSamplePlans(final PopulationOfCliques popOfCliques) {
 		List<Clique> cliques = new ArrayList<Clique>(popOfCliques.getCliques().values());
-		Collections.shuffle(cliques);
-		List<JointPlan> output = new ArrayList<JointPlan>(N_PLANS);
+		Collections.shuffle( cliques , new Random( 1234 ));
+		List<JointPlan> output = new ArrayList<JointPlan>();
 		JointPlan currentPlan;
 
 		//log.debug("drawing "+N_PLANS+" test instances.");
@@ -129,7 +130,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		//}
 
 		//int[] sizes = {1,3,4,6,20,57};
-		int[] sizes = {1,3,4,6,7,10};
+		int[] sizes = {3,3,5,6,9};
 
 		for (int size : sizes) {
 			for (int i=0; i < cliques.size(); i++) {
@@ -158,7 +159,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			) {
 		log.debug("optimizing parameters...");
 		log.debug("nGenerations: "+N_GEN);
-		log.debug("nPlans: "+N_PLANS);
+		//log.debug("nPlans: "+N_PLANS);
 		Configuration jgapConfig = new JgapParameterOptimizerConfig(
 				plans,
 				scoringFunctionFactory,
@@ -169,7 +170,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 
 		Genotype population;
 		try {
-			population = Genotype.randomInitialGenotype(jgapConfig);
+			population = Genotype.randomInitialGenotype( jgapConfig );
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e);
 		}
