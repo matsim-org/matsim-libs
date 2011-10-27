@@ -183,18 +183,29 @@ public class MatingPlatformImpl extends MatingPlatform {
 			if (!stillModifiable) return;
 			stillModifiable = false;
 
-			// normally, the set we iterate on (drivers or passengers)
-			// have no importance.
-			// However, using a mating proposer based on events, it is
-			// probably more efficient to iterate on passengers
-			// -------------------------------------------------------
-			for (Vertex passenger : passengerVertices) {
-				List<Vertex> possibleDrivers = proposer.proposeMateList(
-						passenger,
-						driverVertices);
-				
-				for (Vertex driver : possibleDrivers) {
-					new Edge( driver, passenger );
+			try {
+				for (Vertex passenger : passengerVertices) {
+					List<Vertex> possibleDrivers = proposer.proposeMateList(
+							passenger,
+							driverVertices);
+					
+					for (Vertex driver : possibleDrivers) {
+						new Edge( driver, passenger );
+					}
+				}
+			} catch (MateProposer.UnhandledMatingDirectionException e) {
+				try {
+					for (Vertex driver : driverVertices) {
+						List<Vertex> possiblePassengers = proposer.proposeMateList(
+								driver,
+								passengerVertices);
+						
+						for (Vertex passenger : possiblePassengers) {
+							new Edge( driver, passenger );
+						}
+					}
+				} catch (MateProposer.UnhandledMatingDirectionException e2) {
+					throw new RuntimeException(e2);
 				}
 			}
 		}
@@ -297,7 +308,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 					final TripRequest proposedMate) {
 				DecisionMaker decider = request.getDecisionMaker();
 				TripRequest cpAlternative =
-					proposer.changePerspective(
+					model.changePerspective(
 							proposedMate,
 							request);
 

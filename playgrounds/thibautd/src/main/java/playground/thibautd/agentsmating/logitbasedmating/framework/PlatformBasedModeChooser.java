@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.population.Population;
  *
  * @author thibautd
  */
-public class PlateformBasedModeChooser {
+public class PlatformBasedModeChooser {
 	private MatingPlatform platform = null;
 	private ChoiceModel model = null;
 	private CliquesConstructor cliquesConstructor = null;

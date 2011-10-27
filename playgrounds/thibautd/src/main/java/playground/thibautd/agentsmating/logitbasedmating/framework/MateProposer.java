@@ -28,34 +28,39 @@ import java.util.List;
  */
 public interface MateProposer {
 	/**
-	 * @return true if mate proposition is reflexive.
-	 */
-	public boolean isReflexive();
-
-	/**
 	 * @param trip the trip for which a mate is searched
 	 * @param allPossibleMates a list of all requests corresponding to the possible
 	 * mates, from the mate perspective.
 	 *
 	 * @return a list of mates proposals, from the mate perspective. This should
 	 * be a sublist of allPossibleMates.
+	 *
+	 * @throws UnhandledMatingDirectionException if the direction (affecting drivers to passengers
+	 * or passengers to driver) is not handled. This must be thrown for one direction
+	 * at most, and always the same.
 	 */
 	public <T extends TripRequest> List<T> proposeMateList(
 			TripRequest trip,
-			List<T> allPossibleMates);
+			List<T> allPossibleMates) throws UnhandledMatingDirectionException;
 
-	/**
-	 * Changes the attributes of a request to match charateristics of another agent.
-	 *
-	 * @param tripToConsider the trip to change (the parameter instance must not be modified)
-	 * @param perspective the "perspective" under which the trip is to see. That is,
-	 * the returned alternative must be a valid alternative for mode choice for this
-	 * trip, for this decision maker.
-	 *
-	 * @return the new alternative
-	 */
-	public TripRequest changePerspective(
-			TripRequest tripToConsider,
-			TripRequest perspective);
+	public class UnhandledMatingDirectionException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public UnhandledMatingDirectionException() {
+			super();
+		}
+
+		public UnhandledMatingDirectionException(final String msg) {
+			super(msg);
+		}
+
+		public UnhandledMatingDirectionException(final String msg, final Throwable cause) {
+			super(msg, cause);
+		}
+
+		public UnhandledMatingDirectionException(final Throwable cause) {
+			super(cause);
+		}
+	}
 }
 
