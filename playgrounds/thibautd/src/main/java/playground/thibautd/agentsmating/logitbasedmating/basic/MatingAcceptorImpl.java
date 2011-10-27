@@ -17,33 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.agentsmating.logitbasedmating.basic;
-
-import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
-import playground.thibautd.agentsmating.logitbasedmating.framework.MatingAcceptor;
-import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
-
-/**
- * Default implementation of the {@link MatingAcceptor} interface.
- * It accepts a mating based on the probability that driver and passenger accept it,
- * knowing the other modes alternatives.
- *
- * @author thibautd
- */
-public class MatingAcceptorImpl implements MatingAcceptor {
-	private final ChoiceModel model;
-
-	public MatingAcceptorImpl(
-			final ChoiceModel model) {
-		this.model = model;
-	}
-
-	@Override
-	public boolean acceptMating(
-			final TripRequest driver,
-			final TripRequest passenger) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-}
+//package playground.thibautd.agentsmating.logitbasedmating.basic;
+//
+//import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
+//import playground.thibautd.agentsmating.logitbasedmating.framework.MatingAcceptor;
+//import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
+//
+///**
+// * Default implementation of the {@link MatingAcceptor} interface.
+// * It accepts a mating based on the probability that driver and passenger accept it,
+// * knowing the other modes alternatives.
+// *
+// * @author thibautd
+// */
+//public class MatingAcceptorImpl implements MatingAcceptor {
+//	private final ChoiceModel model;
+//
+//	public MatingAcceptorImpl(
+//			final ChoiceModel model) {
+//		this.model = model;
+//	}
+//
+//	@Override
+//	public boolean acceptMating(
+//			final TripRequest driver,
+//			final TripRequest passenger) {
+//		// TODO Auto-generated method stub
+//		return false;
+//	}
+//}
 
