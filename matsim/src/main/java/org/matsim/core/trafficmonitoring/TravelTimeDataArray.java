@@ -51,6 +51,13 @@ public class TravelTimeDataArray implements TravelTimeData {
 			this.travelTimes[i] = -1.0;
 		}
 	}
+	
+	@Override
+	public void resetTravelTime( final int timeSlot ) {
+		this.timeSum[timeSlot] = 0.0;
+		this.timeCnt[timeSlot] = 0;
+		this.travelTimes[timeSlot] = -1.0;
+	}
 
 	@Override
 	public void addTravelTime(final int timeSlot, final double traveltime) {

@@ -316,6 +316,7 @@ public class TravelTimeCalculator
 					double time = r.getTravelTime(i, i * this.timeSlice);
 					double minTime = prevTravelTime - this.timeSlice;
 					if (time < minTime) {
+						r.resetTravelTime(i) ;
 						r.addTravelTime(i, minTime);
 						prevTravelTime = minTime;
 					} else {

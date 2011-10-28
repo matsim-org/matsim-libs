@@ -23,6 +23,8 @@ package org.matsim.core.trafficmonitoring;
 public interface TravelTimeData {
 
 	public abstract void resetTravelTimes();
+	
+	public abstract void resetTravelTime( final int timeSlot ) ;
 
 	abstract void addTravelTime(final int timeSlot, final double traveltime);
 
