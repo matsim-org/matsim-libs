@@ -19,7 +19,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package tryouts.tests;
 
@@ -27,9 +27,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
-
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.tnicolai.matsim4opus.gis.CRSUtils;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
@@ -51,20 +50,20 @@ public class TestZoneBoundary {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		
+	public static void main(final String[] args) {
+
 		int resolution = 100;
 		ZoneLayer<Double> startZones = null;
 		String psrcSHPFile = "/Users/thomas/Development/opus_home/data/psrc_parcel/shapefiles/boundary.shp";
-		
+
 		String swissMunicipalityZones = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1G08.shp";
 		String swissCountryZone = "/Users/thomas/Documents/SVN_Studies/tnicolai/ersa/data/zones/G1L08.shp";
-		
-		
+
+
 		try {
 //			Geometry swissExample1 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 //			Geometry swissExample2 = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
-//			
+//
 //			double maxX1 = swissExample1.getEnvelopeInternal().getMaxX();
 //			double minX1 = swissExample1.getEnvelopeInternal().getMinX();
 //			double maxY1 = swissExample1.getEnvelopeInternal().getMaxY();
@@ -73,7 +72,7 @@ public class TestZoneBoundary {
 //			double minX2 = swissExample2.getEnvelopeInternal().getMinX();
 //			double maxY2 = swissExample2.getEnvelopeInternal().getMaxY();
 //			double minY2 = swissExample2.getEnvelopeInternal().getMinY();
-			
+
 			Geometry boundary = FeatureSHP.readFeatures(psrcSHPFile).iterator().next().getDefaultGeometry();
 			Envelope env = boundary.getEnvelopeInternal();
 			System.out.println("X_MIN: " + env.getMinX() + " , X_MAX: " + env.getMaxX() + " , Y_MIN: " + env.getMinY() + " , Y_MAX: " + env.getMaxY());
@@ -81,35 +80,35 @@ public class TestZoneBoundary {
 			double area = boundary.getArea();
 			Coordinate[] cordinate = boundary.getCoordinates();
 
-			
-			startZones= ZoneLayerSHP.read(psrcSHPFile);	
+
+			startZones= ZoneLayerSHP.read(psrcSHPFile);
 			startZones.overwriteCRS(CRSUtils.getCRS(21781));
 			startZones = createGridLayer(resolution, boundary);
-			
-			
+
+
 			int i = 0;
 			for(Zone zone: startZones.getZones()){
 				System.out.println(zone.getAttribute());
 				i++;
 			}
 			System.out.println("number of zones = " + i);
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 	}
-	
-	public static <T> ZoneLayer<T> createGridLayer(double resolution, Geometry boundary) {
+
+	public static <T> ZoneLayer<T> createGridLayer(final double resolution, final Geometry boundary) {
 		GeometryFactory factory = new GeometryFactory();
 		Set<Zone<T>> zones = new HashSet<Zone<T>>();
 		Envelope env = boundary.getEnvelopeInternal();
-		
+
 		int skippedPoints = 0;
 		int setPoints = 0;
-		
+
 		System.out.println("X_MIN: " + env.getMinX() + " , X_MAX: " + env.getMaxX() + " , Y_MIN: " + env.getMinY() + " , Y_MAX: " + env.getMaxY());
-		
+
 		for(double x = env.getMinX(); x < env.getMaxX(); x += resolution) {
 			for(double y = env.getMinY(); y < env.getMaxY(); y += resolution) {
 				Point point = factory.createPoint(new Coordinate(x, y));
@@ -120,21 +119,21 @@ public class TestZoneBoundary {
 					coords[2] = new Coordinate(x + resolution, y + resolution);
 					coords[3] = new Coordinate(x + resolution, y);
 					coords[4] = point.getCoordinate();
-					
+
 					LinearRing linearRing = factory.createLinearRing(coords);
 					Polygon polygon = factory.createPolygon(linearRing, null);
 					polygon.setSRID(21781);
 					Zone<T> zone = new Zone<T>(polygon);
 					zones.add(zone);
-					
+
 					setPoints++;
 				}
 				else skippedPoints++;
 			}
 		}
-		
+
 		System.out.println(setPoints + " were set and " + skippedPoints + " have been skipped.");
-		
+
 		ZoneLayer<T> layer = new ZoneLayer<T>(zones);
 		return layer;
 	}

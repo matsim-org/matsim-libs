@@ -26,14 +26,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.benjamin.events.emissions.EmissionTestWriter;
-
 public class NoiseWriter {
-	private static final Logger logger = Logger
-			.getLogger(EmissionTestWriter.class);
+	private static final Logger logger = Logger.getLogger(NoiseWriter.class);
 	private static String runDirectory = "../../run981/";
 
-	public void writeEvents(List<NoiseEventImpl> list) {
+	public void writeEvents(final List<NoiseEventImpl> list) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		String outputfile = runDirectory + "noiseEvents.xml";
 		EventWriterXML eWriter = new EventWriterXML(outputfile);
