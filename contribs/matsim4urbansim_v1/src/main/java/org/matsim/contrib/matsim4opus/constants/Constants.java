@@ -119,16 +119,17 @@ public class Constants {
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
 	
-//	/** debugging flags */
-//	public static final String DEFAULT_MATSIM_CONFIG_FILE = "/Users/thomas/Development/opus_home/opus_matsim/matsim_config/seattle_matsim_0.xml";
 	/** test run */
 	public static final int TEST_RUN_SUCCESSFUL = 0;
 	public static final int TEST_RUN_FAILD = -1;
 	
 	/** xsd on matsim.org */
-	public static final String MATSIM_4_URBANSIM_XSD = "http://www.matsim.org/files/dtd/MATSim4UrbanSimConfigSchema.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL = "/dtd/MATSim4UrbanSimConfigSchema.xsd";
-	public static final String XSD_FILE_NAME = "MATSim4UrbanSimConfigSchema.xsd";
+	public static final String MATSIM_4_URBANSIM_XSD_V1 = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V1 = "/dtd/matsim4urbansim_v1";
+	public static final String XSD_FILE_NAME_V1 = "matsim4urbansim_v1";
+	public static final String MATSIM_4_URBANSIM_XSD_V2 = "http://matsim.org/files/dtd/matsim4urbansim_v2.xsd";
+	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V2 = "/dtd/matsim4urbansim_v2";
+	public static final String XSD_FILE_NAME_V2 = "matsim4urbansim_v2";
 	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
