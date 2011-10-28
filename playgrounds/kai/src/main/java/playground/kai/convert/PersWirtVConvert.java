@@ -84,7 +84,9 @@ public class PersWirtVConvert {
 					newPlan = pop.getFactory().createPlan() ;
 					newPerson.addPlan(newPlan) ; // not consistent with immutable object
 					
-					act = pop.getFactory().createActivityFromCoord("dummy", fromCoord ) ;
+					int sourceTypeIdx = Integer.parseInt( parts[idxFromKey.get("\"sourcetype\"")] ) ;
+					String sourceType = locationTypeAsString(sourceTypeIdx);
+					act = pop.getFactory().createActivityFromCoord("@"+sourceType, fromCoord ) ;
 					newPlan.addActivity(act) ;
 				}
 				double tripStartTime = Time.parseTime( parts[idxFromKey.get("\"start_time\"")].replace('"', ' ').trim() ) ;
@@ -99,7 +101,30 @@ public class PersWirtVConvert {
 				Leg leg = pop.getFactory().createLeg("car") ;
 				newPlan.addLeg(leg) ;
 				
-				act = pop.getFactory().createActivityFromCoord("dummy", toCoord) ;
+				int purposeIdx         = Integer.parseInt( parts[idxFromKey.get("\"purpose\"")] ) ;
+				String purpose = null ;
+				switch ( purposeIdx ) {
+				case 1 : purpose = "comm. pickup/deliv. of goods" ; break ;
+				case 2 : purpose = "comm. activity" ; break ;
+				case 3 : purpose = "comm. pickup/deliv. of persons" ; break ;
+				case 4 : purpose = "comm. support activity" ; break ;
+				case 5 : purpose = "return to base" ; break ;
+				case 6 : purpose = "work" ; break ;
+				case 7 : purpose = "education" ; break ;
+				case 8 : purpose = "shopping" ; break ;
+				case 9 : purpose = "leisure" ; break ;
+				case 10: purpose = "priv. pickup/deliv. of persons" ; break ;
+				case 11: purpose = "other priv. act." ; break ;
+				case 12: purpose = "home" ; break ;
+				case 21: purpose = "comm. unspec." ; break ;
+				case 22: purpose = "priv. unspec." ; break ;
+				default: purpose = "unknown activity key" ; break ;
+				}
+				
+				int destinationTypeIdx = Integer.parseInt( parts[idxFromKey.get("\"destinationtype\"")] ) ;
+				String destinationType = locationTypeAsString(destinationTypeIdx);
+				
+				act = pop.getFactory().createActivityFromCoord(purpose+"@"+destinationType, toCoord) ;
 				newPlan.addActivity(act) ;
 				
 			}
@@ -113,6 +138,22 @@ public class PersWirtVConvert {
 		}
 		
 		Logger.getLogger("dummy").info("done") ;
+	}
+
+	private static String locationTypeAsString(int destinationTypeIdx) {
+		String destinationType = null ;
+		switch ( destinationTypeIdx ) {
+		case 1 : destinationType = "goods interchange location" ; break ;
+		case 2 : destinationType = "warehouse" ; break ;
+		case 3 : destinationType = "construction site" ; break ;
+		case 4 : destinationType = "own company" ; break ;
+		case 5 : destinationType = "other company" ; break ;
+		case 6 : destinationType = "hh of customer" ; break ;
+		case 7 : destinationType = "other comm. loc." ; break ;
+		case 8 : destinationType = "priv. loc." ; break ;
+		default: destinationType = "unknown location key" ;
+		}
+		return destinationType;
 	}
 
 	private static GeotoolsTransformation transformer = new GeotoolsTransformation("WGS84","DHDN_GK4") ;
