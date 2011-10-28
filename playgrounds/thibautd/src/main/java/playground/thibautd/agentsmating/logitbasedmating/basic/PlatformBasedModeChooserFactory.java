@@ -20,6 +20,7 @@
 package playground.thibautd.agentsmating.logitbasedmating.basic;
 
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -53,12 +54,16 @@ public class PlatformBasedModeChooserFactory implements MatsimFactory {
 		return createModeChooser(
 				scenario.getPopulation(),
 				choiceModel,
-				defaultPlatform( choiceModel ),
+				defaultPlatform( choiceModel , scenario ),
 				defaultCliquesConstructor( scenario ));
 	}
 
-	private MatingPlatform defaultPlatform( final ChoiceModel model ) {
-		return new MatingPlatformImpl( model, new MateProposerImpl() );
+	private MatingPlatform defaultPlatform(
+			final ChoiceModel model,
+			final Scenario scenario ) {
+		return new MatingPlatformImpl(
+				model,
+				new MateProposerImpl( scenario.getNetwork() ));
 	}
 
 	private CliquesConstructor defaultCliquesConstructor( final ScenarioImpl scenario ) {

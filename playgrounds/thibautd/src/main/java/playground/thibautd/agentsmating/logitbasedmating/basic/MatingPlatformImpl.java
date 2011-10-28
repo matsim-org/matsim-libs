@@ -478,6 +478,11 @@ public class MatingPlatformImpl extends MatingPlatform {
 			public double getDepartureTime() {
 				return request.getDepartureTime();
 			}
+
+			@Override
+			public double getPlanArrivalTime() {
+				return request.getPlanArrivalTime();
+			}
 		}
 	}
 
