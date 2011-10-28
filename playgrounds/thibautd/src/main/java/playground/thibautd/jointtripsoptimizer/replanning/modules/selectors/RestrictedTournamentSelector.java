@@ -22,6 +22,7 @@ package playground.thibautd.jointtripsoptimizer.replanning.modules.selectors;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.jgap.Configuration;
 import org.jgap.IChromosome;
@@ -57,6 +58,7 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 	private final int windowSize;
 	private final Configuration jgapConfig;
 	private final ChromosomeDistanceComparator distanceComparator;
+	private final Random random;
 
 	/**
 	 * @param jgapConfig the config used in the optimisation. The sample Chomosome
@@ -82,6 +84,7 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 		this.windowSize = Math.max(1, paramWindowSize);
 
 		this.jgapConfig = jgapConfig;
+		this.random = new Random( jgapConfig.getRandomGenerator().nextLong() + 194534 );
 		this.distanceComparator = distanceComparator;
 	}
 
@@ -143,21 +146,23 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 	}
 
 	private List<IChromosome> getWindow() {
-		List<IChromosome> window = new ArrayList<IChromosome>(this.windowSize);
-		int index;
-		List<Integer> selected = new ArrayList<Integer>(this.windowSize);
-		RandomGenerator generator =  this.jgapConfig.getRandomGenerator();
+		//List<IChromosome> window = new ArrayList<IChromosome>(this.windowSize);
+		//int index;
+		//List<Integer> selected = new ArrayList<Integer>(this.windowSize);
+		// RandomGenerator generator =  this.jgapConfig.getRandomGenerator();
+		Collections.shuffle( agedIndividuals , random );
 		
-		for (int i=0; i < this.windowSize; i++) {
-			do {
-				index = generator.nextInt(this.windowSize);
-			} while (selected.contains(index));
+		//for (int i=0; i < this.windowSize; i++) {
+		//	do {
+		//		index = generator.nextInt(this.windowSize);
+		//	} while (selected.contains(index));
 
-			selected.add(index);
-			window.add(this.agedIndividuals.get(index));
-		}
+		//	selected.add(index);
+		//	window.add(this.agedIndividuals.get(index));
+		//	window.add(this.agedIndividuals.get(index));
+		//}
 
-		return window;
+		return this.agedIndividuals.subList(0, windowSize);
 	}
 }
 
