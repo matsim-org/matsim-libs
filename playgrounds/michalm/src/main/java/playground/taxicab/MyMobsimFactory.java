@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 /**
  * @author nagel
@@ -50,7 +50,10 @@ public class MyMobsimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager events) {
 
-		Netsim mobsim = new QSim( sc, events ) ;
+		QSim mobsim = new QSim( sc, events ) ;
+		
+		DepartureHandler departureHandler = new TaxiModeDepartureHandler(mobsim) ;
+		mobsim.addDepartureHandler(departureHandler) ;
 
 		// commented out but we may need this later
 //		if ( replanningType.equals( ReplanningType.general ) ) {
