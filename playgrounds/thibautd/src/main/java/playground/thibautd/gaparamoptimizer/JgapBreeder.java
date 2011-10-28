@@ -33,7 +33,13 @@ import org.jgap.Population;
  */
 public class JgapBreeder extends GABreeder {
 	private static final long serialVersionUID = 1L;
-	private static final int N_THREADS = 10;
+	private final int nThreads;
+
+	public JgapBreeder(
+			final int nThreads) {
+		super();
+		this.nThreads = nThreads;
+	}
 
 	@Override
 	protected void updateChromosomes(
@@ -47,12 +53,12 @@ public class JgapBreeder extends GABreeder {
 			}
 		}
 
-		int step = toScore.size() / N_THREADS;
+		int step = toScore.size() / nThreads;
 		int first = 0;
 
 		// launch fitness computing in threads
 		List<Thread> threads = new ArrayList<Thread>();
-		for (int i=0; i < N_THREADS; i++) {
+		for (int i=0; i < nThreads; i++) {
 			Thread thread = new Thread(new Scorer(toScore.subList(first, first + step), a_conf));
 			threads.add(thread);
 			thread.start();

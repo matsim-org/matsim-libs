@@ -65,7 +65,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	// parameters of the fitness
 	private static final double CHF_PER_MICROSEC = 1E-7;
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
-	private static final int N_PLAN_EXEC = 3;
+	private static final int N_PLAN_EXEC = 2;
 
 	private static final boolean IS_MEMETIC = true;
 

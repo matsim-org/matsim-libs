@@ -51,7 +51,7 @@ public class JgapParameterOptimizerConfig extends Configuration {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int POP_SIZE = 30;
+	private static final int POP_SIZE = 20;
 	private static final int MUTATION_RATE = 10;
 	private static final double CO_RATE = 0.6d;
 	private static final double ORIG_RATE = 0.8d;
@@ -88,7 +88,7 @@ public class JgapParameterOptimizerConfig extends Configuration {
 
 		try {
 			// default JGAP objects initializations
-			this.setBreeder(new JgapBreeder());
+			this.setBreeder(new JgapBreeder( controler.getConfig().global().getNumberOfThreads() ));
 			this.setEventManager(new EventManager());
 
 			// seed the default JGAP pseudo-random generator with a matsim random

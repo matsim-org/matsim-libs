@@ -67,7 +67,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 	private final String outputFileName = "optimizedConf.xml";
 	private String outputDirectory = null;
 	private final static int N_GEN = 30;
-	//private final static int N_PLANS = 5;
+	private final static int[] SIZES = {3,5,6,9};
+	private final static int N_PLANS = SIZES.length;
 
 	//private final static int MIN_MEMBERS = 3;
 	//private final static int MAX_MEMBERS = 20;
@@ -130,9 +131,8 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 		//}
 
 		//int[] sizes = {1,3,4,6,20,57};
-		int[] sizes = {3,3,5,6,9};
 
-		for (int size : sizes) {
+		for (int size : SIZES) {
 			for (int i=0; i < cliques.size(); i++) {
 				currentPlan = (JointPlan) cliques.get(i).getSelectedPlan();
 				int currentSize = currentPlan.getClique().getMembers().size();;
@@ -159,7 +159,7 @@ public class JPOParametersOptimizerListener implements ReplanningListener {
 			) {
 		log.debug("optimizing parameters...");
 		log.debug("nGenerations: "+N_GEN);
-		//log.debug("nPlans: "+N_PLANS);
+		log.debug("nPlans: "+N_PLANS);
 		Configuration jgapConfig = new JgapParameterOptimizerConfig(
 				plans,
 				scoringFunctionFactory,
