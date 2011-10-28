@@ -55,7 +55,7 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas
  *
  */
-public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
+public class MATSim4UrbanSimMeasurement extends MATSim4UrbanSim {
 	
 	private MeasurementObject measurements;
 	

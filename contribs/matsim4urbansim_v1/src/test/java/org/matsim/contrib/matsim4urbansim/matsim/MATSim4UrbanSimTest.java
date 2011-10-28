@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.MATSim4Urbansim;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.MATSim4UrbanSim;
 import org.matsim.contrib.matsim4urbansim.matsimTestData.GenerateOPUSTestEnvironment;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
@@ -99,8 +99,8 @@ public class MATSim4UrbanSimTest extends MatsimTestCase{
 		String [] args = new String[]{matsimConfigPath}; // create program arguments for MATSim
 		
 		
-		MATSim4Urbansim.main(args);
-		boolean status = MATSim4Urbansim.getRunStatus();
+		MATSim4UrbanSim.main(args);
+		boolean status = MATSim4UrbanSim.getRunStatus();
 		
 		return status;
 	}

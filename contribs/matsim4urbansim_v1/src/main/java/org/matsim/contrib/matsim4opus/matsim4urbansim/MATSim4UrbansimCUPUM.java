@@ -42,7 +42,7 @@ import org.matsim.core.network.NetworkImpl;
  * @author thomas
  *
  */
-class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
+class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbansimCUPUM.class);
