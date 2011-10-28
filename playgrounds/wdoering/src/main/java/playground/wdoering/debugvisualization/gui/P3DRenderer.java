@@ -106,6 +106,7 @@ public class P3DRenderer extends PApplet
 		//                          0        1        2        3        4        5        6            7
 		
 		this.extremeValues = extremeValues;
+		
 		this.maxPosX = extremeValues[0];
 		this.maxPosY = extremeValues[1];
 		this.minPosX = extremeValues[3];		
@@ -120,7 +121,7 @@ public class P3DRenderer extends PApplet
 	 */
 	public void setAgentColors(int agentCount)
 	{
-		this.colors = new ArrayList<int[]>();
+		colors = new ArrayList<int[]>();
 		for (int j = 0; j < agentCount; j++)
 		{
 			//determine color
@@ -131,8 +132,10 @@ public class P3DRenderer extends PApplet
 			//console.println(color[0] + "|" + color[1] + "|" + color[2]);
 			
 			//add color to the color array
-			this.colors.add(color);
+			colors.add(color);
 		}
+		
+		System.out.println("color count:" + colors.size());
 		
 		
 		/*
@@ -203,51 +206,51 @@ public class P3DRenderer extends PApplet
 		this.timeSteps = timeSteps;	
 		
 		//set up color matrix to display agents
-		this.colors = new ArrayList<int[]>();
+		//this.colors = new ArrayList<int[]>();
 		
-		if (agents !=null)
-		{
-			//give each agent a different (preattentive) color. If there are more then 10, generate the colors.  
-			if (agents.size()>10)
-			{
-			
-				for (int j = 0; j < agents.size(); j++)
-				{
-					//determine color
-					int[] color = {(int)((((float)agents.size()-(float)j)/(float)agents.size())*255),
-							       (int)((double)(((float)agents.size()-(float)j)/(float)agents.size())*255),
-							       (int)(255-(double)(((float)agents.size()-(float)j)/(float)agents.size())*255)};
-					
-					//console.println(color[0] + "|" + color[1] + "|" + color[2]);
-					
-					//add color to the color array
-					colors.add(color);
-				}
-			}
-			else //otherwise use these 10 optimized colors (src: Colin Ware)
-			{
-			
-				String colorsRGB[] = {  "#FB253C",
-										"#F2F319",
-										"#3BCF49",
-										"#413FB0",
-										"#B82828",
-										"#AC0297",
-										"#FCA147",
-										"#98A192",
-										"#72D2D2",
-										"#FC82AF" };
-				
-				for (int j= 0; j < agents.size(); j++)
-				{
-					int[] color = { Integer.parseInt(colorsRGB[j].substring(1,3),16),
-								    Integer.parseInt(colorsRGB[j].substring(3,5),16),
-								    Integer.parseInt(colorsRGB[j].substring(5,7),16)};
-					
-					colors.add(color);
-				}
-			}
-		}
+//		if (agents !=null)
+//		{
+//			//give each agent a different (preattentive) color. If there are more then 10, generate the colors.  
+//			if (agents.size()>10)
+//			{
+//			
+//				for (int j = 0; j < agents.size(); j++)
+//				{
+//					//determine color
+//					int[] color = {(int)((((float)agents.size()-(float)j)/(float)agents.size())*255),
+//							       (int)((double)(((float)agents.size()-(float)j)/(float)agents.size())*255),
+//							       (int)(255-(double)(((float)agents.size()-(float)j)/(float)agents.size())*255)};
+//					
+//					//console.println(color[0] + "|" + color[1] + "|" + color[2]);
+//					
+//					//add color to the color array
+//					colors.add(color);
+//				}
+//			}
+//			else //otherwise use these 10 optimized colors (src: Colin Ware)
+//			{
+//			
+//				String colorsRGB[] = {  "#FB253C",
+//										"#F2F319",
+//										"#3BCF49",
+//										"#413FB0",
+//										"#B82828",
+//										"#AC0297",
+//										"#FCA147",
+//										"#98A192",
+//										"#72D2D2",
+//										"#FC82AF" };
+//				
+//				for (int j= 0; j < agents.size(); j++)
+//				{
+//					int[] color = { Integer.parseInt(colorsRGB[j].substring(1,3),16),
+//								    Integer.parseInt(colorsRGB[j].substring(3,5),16),
+//								    Integer.parseInt(colorsRGB[j].substring(5,7),16)};
+//					
+//					colors.add(color);
+//				}
+//			}
+//		}
 
 	}
 
@@ -260,7 +263,7 @@ public class P3DRenderer extends PApplet
 	float c = 1;
 
 	//not implemented yet
-	PImage b = loadImage("C:\\temp5\\Erdgeschoss.jpg");
+	PImage b = loadImage("http://upload.wikimedia.org/wikipedia/commons/thumb/1/10/LaBelle_Blueprint.jpg/250px-LaBelle_Blueprint.jpg");
 	private long oldTime;
 
 	public void setup()
@@ -303,8 +306,40 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		
-
+		background(33);
+		fill(0, 0, 0);
 		
+		//FIRST
+		
+		//Draw Network
+		if ((nodes!=null) && (links!=null))
+		{
+			//Stroke color
+			stroke(100,0,100,100);
+			
+			//Iterate through all nodes and the draw links
+			for (Iterator linksIterator = links.values().iterator(); linksIterator.hasNext();)
+			{
+				int[] fromTo = (int[]) linksIterator.next();
+				
+				DataPoint fromDataPoint = nodes.get(fromTo[0]);
+				DataPoint ToDataPoint = nodes.get(fromTo[1]);
+				
+				//draw a line (from - to - datapoint)
+				line((float)((fromDataPoint.getPosX()-minPosX)/factorX),
+					(float)((fromDataPoint.getPosY()-minPosY)/factorY),
+					(float)((ToDataPoint.getPosX()-minPosX)/factorX),
+					(float)((ToDataPoint.getPosY()-minPosY)/factorY));
+					
+				
+			}
+			noStroke();
+		}
+
+
+		//SECOND
+		
+		//draw agents
 		if (liveMode)
 		{
 			if ((extremeValues != null) && (factorX == 0.0f))
@@ -321,8 +356,6 @@ public class P3DRenderer extends PApplet
 			}
 			
 			
-			background(33);
-			fill(0, 0, 0);
 			
 			if (mousePressed)
 			{
@@ -380,8 +413,8 @@ public class P3DRenderer extends PApplet
 							//pick preattentive agent color
 							int[] agentColor = new int[3];
 							
-							if (colors.size()<=agentCount)
-								setAgentColors(agentCount+1);
+//							if (colors.size()<=agentCount)
+//								setAgentColors(agentCount+1);
 							
 							agentColor = colors.get(agentCount);
 								
@@ -516,30 +549,6 @@ public class P3DRenderer extends PApplet
 					
 					iInt = (int)(Math.floor(i));
 		
-					//Draw Network
-					if ((nodes!=null) && (links!=null))
-					{
-						//Stroke color
-						stroke(100,0,100,100);
-						
-						//Iterate through all nodes and the draw links
-						for (Iterator linksIterator = links.values().iterator(); linksIterator.hasNext();)
-						{
-							int[] fromTo = (int[]) linksIterator.next();
-							
-							DataPoint fromDataPoint = nodes.get(fromTo[0]);
-							DataPoint ToDataPoint = nodes.get(fromTo[1]);
-							
-							//draw a line (from - to - datapoint)
-							line((float)((fromDataPoint.getPosX()-minPosX)/factorX),
-								(float)((fromDataPoint.getPosY()-minPosY)/factorY),
-								(float)((ToDataPoint.getPosX()-minPosX)/factorX),
-								(float)((ToDataPoint.getPosY()-minPosY)/factorY));
-								
-							
-						}
-						noStroke();
-					}
 					
 					//Draw Agents and trajectories
 					int currentAgent = 0;
@@ -722,7 +731,7 @@ public class P3DRenderer extends PApplet
 
 	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
 	{
-		setAgentColors(agents.size());
+		//setAgentColors(agents.size());
 		this.agents = agents;
 		this.timeSteps = timeSteps;
 		this.currentTime = timeSteps.getLast();

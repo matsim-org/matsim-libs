@@ -48,6 +48,9 @@ public class Controller {
 	private Scene currentScene;
 	private int traceTimeRange = 2;
 	
+	EventsManager eventsManager;
+	Scenario scenario;
+	
 	public Console console;
 	private Long oldTime = 0l;
 	
@@ -70,10 +73,8 @@ public class Controller {
 		maxPosX = maxPosY = Double.MIN_VALUE;
 		minPosX = minPosY = Double.MAX_VALUE;
 		
-		
 		this.liveMode = liveMode;
 		this.traceTimeRange = traceTimeRange;
-		
 
 		//set up importer. can surely be replaced.
 		this.importer = new Importer(this);
@@ -137,21 +138,53 @@ public class Controller {
 			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(manager);
 			
 			manager.addHandler(this.importer); // handler must implement XYVxVyEventsHandler
-			reader.parse("C:\\temp5\\events2.xml");
+			reader.parse("C:\\temp\\events2.xml");
 		}
 		
 		
 	}
 	
-	public Controller(EventsManager e, Scenario sc)
+	public Controller(EventsManager e, Scenario sc, Console console)
 	{
+
+		//assign console
+		this.console = console;
 		
-		//Network network = sc.getNetwork();
+		//set to live mode
+		this.liveMode = true;
 		
 		
+		//assign scenario and eventsmanager
+		this.scenario = sc;
+		this.eventsManager = e;
 		
-		this.importer = new Importer(this, sc);
-		e.addHandler(this.importer);
+		//import network data via network file and 
+		console.print("Importing network data...");
+		this.importer = new Importer(this, scenario);
+		nodes = importer.getNodes();
+		links = importer.getLinks();		
+		
+		//set determined extreme value coordinates
+		extremeValues = importer.getExtremeValues();
+		maxPosX = (extremeValues[0] != null) ? extremeValues[0]:Double.MIN_VALUE;
+		maxPosY = (extremeValues[1] != null) ? extremeValues[1]:Double.MIN_VALUE;
+		minPosX = (extremeValues[3] != null) ? extremeValues[3]:Double.MAX_VALUE;
+		minPosY = (extremeValues[4] != null) ? extremeValues[4]:Double.MAX_VALUE;
+		
+		//import scenario data finished
+		console.println("done.");
+		
+		//set up gui and network
+		gui = new GUI(this, traceTimeRange, width, height);
+		
+		//process final mandatory display data
+		timeSteps = new LinkedList<Double>();
+		gui.setAgentData(agents,extremeValues,timeSteps);
+		gui.setNetwork(nodes,links);
+		gui.init();
+		gui.setVisible(true);
+		
+		eventsManager.addHandler(this.importer);
 		
 		// TODO Auto-generated constructor stub
 	}
@@ -203,6 +236,9 @@ public class Controller {
 	 */
 	public void updateAgentData(String ID, Double posX, Double posY, Double time)
 	{
+		
+		//@TODO: capsulate truncate old data function and maybe even more
+		//for a better readability
 		
 		//sleep until 1 sec has elapsed
 		long realTime = System.currentTimeMillis();

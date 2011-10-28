@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -54,7 +55,10 @@ public class Importer implements XYVxVyEventsHandler {
 
 	public Importer(Controller controller, Scenario sc)
 	{
-		/*Network network = sc.getNetwork();
+		
+		this.controller = controller;
+		
+		Network network = sc.getNetwork();
 		
 //		private HashMap<Integer, DataPoint> nodes = null;
 //		private HashMap<Integer, int[]> links = null;
@@ -62,29 +66,72 @@ public class Importer implements XYVxVyEventsHandler {
 		
 		Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = network.getNodes();
 		
-		int k = 0;
+		//int k = 0;
+		
+		minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
+		maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
+		
+		
+		nodes = new HashMap<Integer, DataPoint>();
+		links = new HashMap<Integer, int[]>();
+		
 		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
 		{
-			k++;
+			//k++;
 			System.out.println("");
 			System.out.println("---------------------------------");
+			
 		    System.out.println(node.getKey() + "|" + node.getValue());
+		    
+		    //store current node in variable
 		    org.matsim.api.core.v01.network.Node currentNode;
 		    currentNode = (org.matsim.api.core.v01.network.Node)node.getValue();
 		    
-		    Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
+		    
+		    //get coordinates of the current node
+		    double posX = currentNode.getCoord().getX();
+		    double posY = currentNode.getCoord().getY();
+		    
+		    //recalculate min and max values
+			maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
+			maxPosY = Math.max(maxPosY, posY); minPosY = Math.min(minPosY, posY);
+		    
+		    //store node as DataPoint
+			DataPoint nodeDataPoint = new DataPoint(posX, posY);
+			
+			//transform id to string (@TODO: use IdImpl)
+			int nodeID = Integer.valueOf(currentNode.getId().toString());
+			
+			//store node datapoint + id to nodes hashmap
+			nodes.put(nodeID, nodeDataPoint);
+		    		    
+			//get in and out links
+		    //Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
 		    Map<Id, ? extends Link> outLinks = currentNode.getOutLinks();
 		    
-		    System.out.println("IN LINKS");
-		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
-		    	System.out.println(inLink.getKey() + "|" + inLink.getValue());
+//		    System.out.println("IN LINKS");
+//		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
+//		    {
+//		    	System.out.println(inLink.getKey() + "|" + inLink.getValue());
+//		    	
+//		    }
 		    
 		    System.out.println("OUT LINKS");
 		    for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
-		    	System.out.println(outLink.getKey() + "|" + outLink.getValue());
-
+		    {
+				int from = Integer.valueOf(outLink.getValue().getFromNode().getId().toString());
+				int to = Integer.valueOf(outLink.getValue().getToNode().getId().toString());
+				
+				System.out.println(Integer.valueOf(outLink.getKey().toString()) + ": from: " + from + "| to: "  + to );
+				
+				//internal structure
+				int[] fromTo = {from, to};
+				
+				//store to links hashmap
+				links.put(Integer.valueOf(outLink.getKey().toString()),fromTo);
+		    }
 		    
-		    if (k>100) System.exit(0);
+		    //if (k>100) System.exit(0);
 		    
 		    //@TODO: matsim nodes auf datapoints übertragen
 		    //@TODO: thread suspend ? (stepper implementieren)
@@ -99,7 +146,7 @@ public class Importer implements XYVxVyEventsHandler {
 		
 		
 		
-		*/
+		
 	}
 
 	public void readEventFile(String fileName)
@@ -352,10 +399,10 @@ public class Importer implements XYVxVyEventsHandler {
 	public void handleEvent(XYVxVyEvent event)
 	{
 		if (controller!=null)
+		{
 			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
-		//event.getTime()
-		
-		controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getTime());
+			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getTime());
+		}
 		
 	}
 
