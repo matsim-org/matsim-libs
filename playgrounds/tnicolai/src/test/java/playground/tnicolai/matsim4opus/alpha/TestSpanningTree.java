@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tryouts.tests;
+package playground.tnicolai.matsim4opus.alpha;
 
 import java.util.ArrayList;
 import java.util.List;
