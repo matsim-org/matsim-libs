@@ -76,7 +76,6 @@
 		<module>gtfs2matsimtransitschedule</module>
         <module>freight</module>
 		<module>matsim4urbansim_v1</module>
-		<module>sna</module>
 	</modules>
 	<repositories>
 		<repository>
