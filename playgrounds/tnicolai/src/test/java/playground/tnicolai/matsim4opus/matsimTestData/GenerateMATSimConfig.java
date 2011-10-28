@@ -149,7 +149,7 @@ public class GenerateMATSimConfig {
 		try {
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
-			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD, tempDir , Constants.XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD_V1, tempDir , Constants.XSD_FILE_NAME_V1);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			if(file2XSD == null || !file2XSD.exists()){
 				System.err.println("Did not find xml schema!");

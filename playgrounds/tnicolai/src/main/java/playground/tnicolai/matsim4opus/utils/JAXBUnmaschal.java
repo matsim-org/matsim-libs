@@ -87,7 +87,7 @@ public class JAXBUnmaschal {
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
-			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD, tempDir , Constants.XSD_FILE_NAME);
+			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD_V1, tempDir , Constants.XSD_FILE_NAME_V1);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			// tnicolai: debugging
 			// file2XSD = new File("/Users/thomas/Development/vspworkspace/matsim/dtd/matsim4urbansim_v1.xsd");

@@ -132,9 +132,9 @@ public class LoadFile {
 		// if no internet connection, trying to load xsd schema locally from matsim/dtd/ directory
 		if(! isInternetStream){
 			log.info("Trying to access local dtd folder at standard location ./dtd...");
-			File dtdFile = new File( Constants.MATSIM_4_URBANSIM_XSD_LOCAL );
+			File dtdFile = new File( Constants.MATSIM_4_URBANSIM_XSD_LOCAL_V1 );
 			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
-			URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL);
+			URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_V1);
 			System.out.println( localUrl.getPath() );
 			output = new File( localUrl.getPath() );
 			log.info("Found local xsd at: " + localUrl.getPath() );

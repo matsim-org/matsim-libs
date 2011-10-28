@@ -124,9 +124,12 @@ public class Constants {
 	public static final int TEST_RUN_FAILD = -1;
 	
 	/** xsd on matsim.org */
-	public static final String MATSIM_4_URBANSIM_XSD = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL = "/dtd/matsim4urbansim_v1";
-	public static final String XSD_FILE_NAME = "matsim4urbansim_v1";
+	public static final String MATSIM_4_URBANSIM_XSD_V1 = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V1 = "/dtd/matsim4urbansim_v1";
+	public static final String XSD_FILE_NAME_V1 = "matsim4urbansim_v1";
+	public static final String MATSIM_4_URBANSIM_XSD_V2 = "http://matsim.org/files/dtd/matsim4urbansim_v2.xsd";
+	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V2 = "/dtd/matsim4urbansim_v2";
+	public static final String XSD_FILE_NAME_V2 = "matsim4urbansim_v2";
 	
 	/** MATSim properties */
 	public static final String MATSIM_PROPERTIES_FILE = "matsim.properties";
