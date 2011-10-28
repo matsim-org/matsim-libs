@@ -22,9 +22,11 @@ package playground.johannes.coopsim.analysis;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.sna.math.DummyDiscretizer;
 
@@ -54,35 +56,63 @@ public class JointActivityTask extends TrajectoryAnalyzerTask {
 	
 	@Override
 	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
-		DescriptiveStatistics timeStats = new DescriptiveStatistics();
-		DescriptiveStatistics visitorStats = new DescriptiveStatistics();
-
+		DescriptiveStatistics timeStatsAll = new DescriptiveStatistics();
+		DescriptiveStatistics visitorStatsAll = new DescriptiveStatistics();
+		Map<String, DescriptiveStatistics> timeStatsTypeMap = new HashMap<String, DescriptiveStatistics>();
+		Map<String, DescriptiveStatistics> visitorStatsTypeMap = new HashMap<String, DescriptiveStatistics>();
+		
 		for (Trajectory t : trajectories) {
 			Person person = t.getPerson();
 			SocialVertex ego = personVertexMap.get(person);
-
+			String type = ((Activity) t.getElements().get(2)).getType();
+			
+			DescriptiveStatistics timeStatsType = timeStatsTypeMap.get(type);
+			DescriptiveStatistics visitorStatsType = visitorStatsTypeMap.get(type);
+			
+			if(timeStatsType == null) {
+				timeStatsType = new DescriptiveStatistics();
+				timeStatsTypeMap.put(type, timeStatsType);
+				visitorStatsType = new DescriptiveStatistics();
+				visitorStatsTypeMap.put(type, visitorStatsType);
+			}
+			
 			int visitors = 0;
 			for (SocialVertex alter : ego.getNeighbours()) {
 				double time = tracker.timeOverlap(person, alter.getPerson().getPerson());
 				if (time > 0) {
-					timeStats.addValue(time);
+					timeStatsType.addValue(time);
+					timeStatsAll.addValue(time);
 					visitors++;
 				}
 			}
-
-			visitorStats.addValue(visitors);
+			visitorStatsType.addValue(visitors);
+			visitorStatsAll.addValue(visitors);
 		}
 
 		String timeKey = "t_joint";
-		results.put(timeKey, timeStats);
-
+		results.put(timeKey, timeStatsAll);
+		for(Entry<String, DescriptiveStatistics> entry : timeStatsTypeMap.entrySet()) {
+			results.put("t_joint_" + entry.getKey(), entry.getValue());
+		}
+		
 		String visitorKey = "visitors";
-		results.put(visitorKey, visitorStats);
-
+		results.put(visitorKey, visitorStatsAll);
+		for(Entry<String, DescriptiveStatistics> entry : visitorStatsTypeMap.entrySet()) {
+			results.put("visitors_" + entry.getKey(), entry.getValue());
+		}
+		
 		if (outputDirectoryNotNull()) {
 			try {
-				writeHistograms(timeStats, timeKey, 50, 50);
-				writeHistograms(visitorStats, new DummyDiscretizer(), visitorKey, false);
+				writeHistograms(timeStatsAll, timeKey, 50, 50);
+				writeHistograms(visitorStatsAll, new DummyDiscretizer(), visitorKey, false);
+				
+				for(Entry<String, DescriptiveStatistics> entry : timeStatsTypeMap.entrySet()) {
+					writeHistograms(entry.getValue(), "t_joint_" + entry.getKey(), 50, 50);
+				}
+				
+				for(Entry<String, DescriptiveStatistics> entry : visitorStatsTypeMap.entrySet()) {
+					writeHistograms(entry.getValue(), new DummyDiscretizer(), "visitors_" + entry.getKey(), false);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

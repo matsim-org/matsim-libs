@@ -35,9 +35,16 @@ public class RandomAlters implements ActivityGroupGenerator {
 	
 	private final double proba;
 	
+	private final double min;
+	
 	public RandomAlters(double proba, Random random) {
+		this(proba, 0, random);
+	}
+	
+	public RandomAlters(double proba, int min, Random random) {
 		this.proba = proba;
 		this.random = random;
+		this.min = min;
 	}
 	
 	@Override
@@ -51,6 +58,15 @@ public class RandomAlters implements ActivityGroupGenerator {
 			}
 		}
 		
+		while(group.size() < min + 1) {
+			SocialVertex alter = ego.getNeighbours().get(random.nextInt(ego.getNeighbours().size()));
+			if(!group.contains(alter))
+				group.add(alter);
+			
+			if(group.size() == ego.getNeighbours().size() + 1)
+				break;
+		}
+				
 		return group;
 	}
 

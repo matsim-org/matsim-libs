@@ -288,18 +288,24 @@ public class Simulator {
 		ActivityGroupSelector groupSelector = new ActivityGroupSelector();
 		ActivityGroupGenerator generator = null;
 		String type = config.getParam("socialnets", "groupGenerator");
-		if(type.equals("randomAlter"))
+		if(type.equals("randomAlter")) {
 			generator = new RandomAlter(random);
-		else if(type.equals("randomAlters")) {
-			double p = Double.parseDouble(config.getParam("socialnets", "alterProba"));
-			generator = new RandomAlters(p, random);
+			groupSelector.addGenerator(ActivityType.visit.name(), generator);
+			groupSelector.addGenerator(ActivityType.gastro.name(), generator);
+			groupSelector.addGenerator(ActivityType.culture.name(), generator);
+		} else if(type.equals("randomAlters")) {
+			double p = Double.parseDouble(config.getParam("socialnets", "alterProba_visit"));
+			groupSelector.addGenerator(ActivityType.visit.name(), new RandomAlters(p, 1, random));
+			
+			p = Double.parseDouble(config.getParam("socialnets", "alterProba_culture"));
+			groupSelector.addGenerator(ActivityType.gastro.name(), new RandomAlters(p, random));
+			
+			p = Double.parseDouble(config.getParam("socialnets", "alterProba_gastro"));
+			groupSelector.addGenerator(ActivityType.culture.name(), new RandomAlters(p, random));
 		} else {
 			throw new IllegalArgumentException(String.format("Activity group generator \"%1$s\" unknown.", type));
 		}
 		
-		groupSelector.addGenerator(ActivityType.visit.name(), generator);
-		groupSelector.addGenerator(ActivityType.gastro.name(), generator);
-		groupSelector.addGenerator(ActivityType.culture.name(), generator);
 		choiceSelector.addComponent(groupSelector);
 		/*
 		 * initialize facility selector

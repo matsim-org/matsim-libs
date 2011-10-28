@@ -63,7 +63,7 @@ public class InitialStateGenerator {
 			((ActivityImpl)home1).setFacilityId(homeFac.getId());
 			home1.setEndTime(8*60*60);
 			
-			Activity home2 = factory.createActivityFromLinkId("home", homeFac.getLinkId());
+			Activity home2 = factory.createActivityFromLinkId("idle", homeFac.getLinkId());
 			((ActivityImpl)home2).setFacilityId(homeFac.getId());
 			home2.setEndTime(16*60*60);
 			

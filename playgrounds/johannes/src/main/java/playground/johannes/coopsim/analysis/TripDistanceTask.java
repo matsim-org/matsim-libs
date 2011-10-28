@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -70,6 +71,16 @@ public class TripDistanceTask extends TrajectoryAnalyzerTask {
 			results.put(key, stats);
 			try {
 				writeHistograms(stats, key, 50, 50);
+				
+				double[] values = stats.getValues();
+				LinearDiscretizer lin = new LinearDiscretizer(500.0);
+				DescriptiveStatistics linStats = new DescriptiveStatistics();
+				for(double d : values)
+					linStats.addValue(lin.discretize(d));
+				
+				TrajectoryAnalyzerTask.overwriteStratification(50, 1);
+				writeHistograms(linStats, key + ".lin", 50, 50);
+				TrajectoryAnalyzerTask.overwriteStratification(30, 1);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

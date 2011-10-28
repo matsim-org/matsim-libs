@@ -29,52 +29,56 @@ import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class ActivityEvaluator implements Evaluator {
 
 	private final static String HOME = "home";
 	
+	private final static String IDLE = "idle";
+
+	private final static double IDLE_PENALTY = -1E6;
+	
 	private final static double SCALE = -1.0;
-	
+
 	private final double beta;
-	
+
 	private final Map<Person, Desires> desires;
-	
+
 	private final Map<String, Double> priorities;
-	
+
 	public ActivityEvaluator(double beta, Map<Person, Desires> desires, Map<String, Double> priorities) {
 		this.beta = beta;
 		this.desires = desires;
 		this.priorities = priorities;
 	}
-	
+
 	@Override
 	public double evaluate(Trajectory trajectory) {
 		double score = 0;
-		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
-			Activity act =  (Activity) trajectory.getElements().get(i);
-			
-			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
-			
-			double t_star = Math.max(t, 3600);
-			if(!act.getType().equals(HOME)) {
-				t_star = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
-			}
-			
-			double priority = getPriority(act.getType());
-			
-			double t_zero = t_star * Math.exp(SCALE/(t_star * priority * beta));
-			if(t_zero == 0)
-				throw new IllegalArgumentException("t_zero must not be 0!");
-//			t_zero = Math.max(t_zero, 1.0);
+		for (int i = 0; i < trajectory.getElements().size(); i += 2) {
+			Activity act = (Activity) trajectory.getElements().get(i);
 
-			score += beta * t_star * Math.log(t/t_zero);
+			if (act.getType().equals(IDLE)) {
+				score += IDLE_PENALTY;
+			} else if(!act.getType().equals(HOME)) {
+				double t = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
+
+				double t_star = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
+
+				double priority = getPriority(act.getType());
+
+				double t_zero = t_star * Math.exp(SCALE / (t_star * priority * beta));
+				if (t_zero == 0)
+					throw new IllegalArgumentException("t_zero must not be 0!");
+
+				score += beta * t_star * Math.log(t / t_zero);
+			}
 		}
-		
+
 		return score;
 	}
-	
+
 	private double getPriority(String type) {
 		return priorities.get(type);
 	}

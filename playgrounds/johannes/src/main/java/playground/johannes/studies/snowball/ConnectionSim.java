@@ -57,7 +57,7 @@ public class ConnectionSim {
 	private static final String MODULENAME = "snowballsim";
 	
 	public static void main(String[] args) {
-		MultiThreading.setNumAllowedThreads(4);
+		MultiThreading.setNumAllowedThreads(1);
 		/*
 		 * Load config.
 		 */

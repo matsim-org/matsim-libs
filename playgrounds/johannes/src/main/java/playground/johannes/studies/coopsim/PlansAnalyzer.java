@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -42,6 +41,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ArrivalTimeTask;
+import playground.johannes.coopsim.analysis.JointActivityTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
@@ -49,6 +49,7 @@ import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.PseudoSim;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+import playground.johannes.coopsim.pysical.VisitorTracker;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
 
@@ -66,13 +67,13 @@ public class PlansAnalyzer {
 		netReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/network/ivtch.xml");
 		
 		MatsimPopulationReader reader = new MatsimPopulationReader(scenario);
-		reader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run34/output/6000000/plans.xml.gz");
+		reader.readFile("/Volumes/cluster.math.tu-berlin.de/net/ils2/jillenberger/leisure/runs/run68/output/20800000/plans.xml.gz");
 		
 		SocialSparseGraphMLReader reader2 = new SocialSparseGraphMLReader();
-		SocialGraph graph = reader2.readGraph("/Users/jillenberger/Work/socialnets/locationChoice/mcmc.backup/run336/output/20000000000/graph.graphml");
+		SocialGraph graph = reader2.readGraph("/Users/jillenberger/Work/socialnets/locationChoice/mcmc.backup/run333/output/60000000000/graph.graphml", scenario.getPopulation());
 		
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
-		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.leisure.xml");
+		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
 		
 		FacilityValidator.generate(scenario.getActivityFacilities(), scenario.getNetwork(), graph);
 		
@@ -92,6 +93,10 @@ public class PlansAnalyzer {
 		
 		TravelTime travelTime = new TravelTimeCalculator(scenario.getNetwork(), 900, 86400, new TravelTimeCalculatorConfigGroup());
 		
+		VisitorTracker tracker = new VisitorTracker();
+		eventManager.addHandler(tracker);
+		tracker.reset(0);
+		
 		sim.run(plans, scenario.getNetwork(), travelTime, eventManager);
 		
 		Set<Trajectory> trajectories = builder.trajectories();
@@ -102,9 +107,10 @@ public class PlansAnalyzer {
 		composite.addTask(new ActivityDurationTask());
 		composite.addTask(new TripDistanceTask(scenario.getActivityFacilities()));
 		composite.addTask(new ActTypeShareTask());
+		composite.addTask(new JointActivityTask(graph, tracker));
 		
-		TrajectoryAnalyzerTask.overwriteStratification(30, 1);
+		TrajectoryAnalyzerTask.overwriteStratification(50, 1);
 		
-		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run34/");
+		TrajectoryAnalyzer.analyze(trajectories, composite, "/Users/jillenberger/Work/socialnets/locationChoice/analysis/run68/");
 	}
 }

@@ -58,7 +58,9 @@ public class JointActivityScoring implements BasicScoring {
 	@Override
 	public void finish() {
 		double time = tracker.timeOverlap(ego.getPerson().getPerson(), alters);
-		score = time * beta;
+		if(time >= 1)
+			score = Math.log(time) * beta;
+		
 	}
 
 	@Override
