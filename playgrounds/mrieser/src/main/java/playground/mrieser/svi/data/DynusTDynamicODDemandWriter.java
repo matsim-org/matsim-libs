@@ -27,10 +27,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
+/**
+ * @author mrieser
+ */
 public class DynusTDynamicODDemandWriter {
 
 	private final static Logger log = Logger.getLogger(DynusTDynamicODDemandWriter.class);
-	
+
 	private final ZoneIdToIndexMapping zoneMapping;
 	private final DynamicODMatrix demand;
 
@@ -38,7 +41,7 @@ public class DynusTDynamicODDemandWriter {
 		this.demand = demand;
 		this.zoneMapping = zoneMapping;
 	}
-	
+
 	public void writeTo(final String filename) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 		Formatter formatter = new Formatter(writer);
@@ -48,7 +51,7 @@ public class DynusTDynamicODDemandWriter {
 		int nOfZones = this.zoneMapping.getNumberOfZones();
 		String[] zoneIds = this.zoneMapping.getIndexToIdMapping();
 		double overallMultiplicationFactor = 1.0;
-		
+
 		try {
 			writer.write(Integer.toString(nOfTimeBins));
 			writer.write(" ");
@@ -70,13 +73,13 @@ public class DynusTDynamicODDemandWriter {
 				writer.write(Double.toString(time / 60.0));
 				writer.write("\r\n");
 				Map<String, Map<String, Integer>> matrix = this.demand.getMatrixForTimeBin(i);
-				for (int fromZoneIndex = 0; fromZoneIndex < nOfZones; fromZoneIndex++) {
+				for (int fromZoneIndex = 1; fromZoneIndex <= nOfZones; fromZoneIndex++) {
 					Map<String, Integer> row = null;
 					if (matrix != null) {
 						row = matrix.get(zoneIds[fromZoneIndex]);
 					}
 					int cnt = 0;
-					for (int toZoneIndex = 0; toZoneIndex < nOfZones; toZoneIndex++) {
+					for (int toZoneIndex = 1; toZoneIndex <= nOfZones; toZoneIndex++) {
 						Integer value = null;
 						if (row != null) {
 							value = row.get(zoneIds[toZoneIndex]);
@@ -88,7 +91,7 @@ public class DynusTDynamicODDemandWriter {
 							writer.write(value.toString());
 						}
 						cnt++;
-						if (cnt == 6 || toZoneIndex == (nOfZones - 1)) {
+						if (cnt == 6 || toZoneIndex == (nOfZones)) {
 							cnt = 0;
 							writer.write("\r\n");
 						}

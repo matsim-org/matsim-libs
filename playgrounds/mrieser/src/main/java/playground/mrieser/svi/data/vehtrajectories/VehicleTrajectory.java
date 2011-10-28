@@ -17,38 +17,73 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.data.vehtrajectories;
 
 /**
  * @author mrieser
  */
-public class ZoneIdToIndexMapping {
+public class VehicleTrajectory {
 
-	private int nOfZones = 0;
-	private String[] array = new String[0];
+	private final int vehNr;
+	private final int tag;
+	private final String origZ;
+	private final String destZ;
+	private final double startTime;
+	private final double travelTime;
+	private int[] travelledNodes;
 
-	public void addMapping(final String zoneId, final int index) {
-		if (this.array.length < (index + 1)) {
-			String[] tmp = new String[index * 2 + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.array.length);
-			this.array = tmp;
-		}
-		this.array[index] = zoneId;
-		if (this.nOfZones < index) {
-			this.nOfZones = index;
-		}
+	/**
+	 * @param vehNr
+	 * @param tag
+	 * @param origZ
+	 * @param destZ
+	 * @param startTime departure time in seconds since midnight
+	 * @param travelTime travel time in seconds
+	 */
+	public VehicleTrajectory(final int vehNr, final int tag, final String origZ, final String destZ, final double startTime, final double travelTime) {
+		this.vehNr = vehNr;
+		this.tag = tag;
+		this.origZ = origZ;
+		this.destZ = destZ;
+		this.startTime = startTime;
+		this.travelTime = travelTime;
 	}
 
-	public int getNumberOfZones() {
-		return this.nOfZones;
+	public void setTravelledNodes(final int[] nodes) {
+		this.travelledNodes = nodes;
 	}
 
-	public String[] getIndexToIdMapping() {
-		if ((this.array.length + 1) != this.nOfZones) {
-			String[] tmp = new String[this.nOfZones + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.nOfZones + 1);
-			this.array = tmp;
-		}
-		return this.array;
+	public int[] getTravelledNodes() {
+		return this.travelledNodes;
+	}
+
+	public int getVehNr() {
+		return this.vehNr;
+	}
+
+	public int getTag() {
+		return this.tag;
+	}
+
+	public String getOrigZone() {
+		return this.origZ;
+	}
+
+	public String getDestZone() {
+		return this.destZ;
+	}
+
+	/**
+	 * @return departure time in seconds since midnight
+	 */
+	public double getStartTime() {
+		return this.startTime;
+	}
+
+	/**
+	 * @return travel time in seconds
+	 */
+	public double getTravelTime() {
+		return this.travelTime;
 	}
 }

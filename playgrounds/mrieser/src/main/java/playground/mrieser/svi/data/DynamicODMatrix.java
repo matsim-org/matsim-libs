@@ -22,25 +22,28 @@ package playground.mrieser.svi.data;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author mrieser
+ */
 public class DynamicODMatrix {
 
 	private final Map<Integer, Map<String, Map<String, Integer>>> odms = new HashMap<Integer, Map<String, Map<String, Integer>>>();
 	private final int binSize;
 	private final double maxTime;
-	
+
 	public DynamicODMatrix(final int binSize, final double maxTime) {
 		this.binSize = binSize;
 		this.maxTime = maxTime;
 	}
-	
+
 	public int getBinSize() {
 		return this.binSize;
 	}
-	
+
 	public int getNOfBins() {
 		return (int) this.maxTime / this.binSize;
 	}
-	
+
 	public Map<String, Map<String, Integer>> getMatrixForTimeBin(final int timeBinIndex) {
 		return this.odms.get(timeBinIndex);
 	}
@@ -70,10 +73,10 @@ public class DynamicODMatrix {
 			}
 		}
 	}
-	
+
 	private int getTimeSlot(final double time) {
-		if (time > maxTime) {
-			return (int) this.maxTime / binSize;
+		if (time > this.maxTime) {
+			return (int) this.maxTime / this.binSize;
 		}
 		if (time < 0) {
 			return 0;

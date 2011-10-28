@@ -26,14 +26,17 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.StringUtils;
 
+/**
+ * @author mrieser
+ */
 public class ZoneIdToIndexMappingReader {
 
 	private final ZoneIdToIndexMapping mapping;
-	
+
 	public ZoneIdToIndexMappingReader(final ZoneIdToIndexMapping mapping) {
 		this.mapping = mapping;
 	}
-	
+
 	public void readFile(final String filename) {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
 		try {

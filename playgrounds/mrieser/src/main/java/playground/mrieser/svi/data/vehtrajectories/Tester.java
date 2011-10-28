@@ -17,38 +17,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.data.vehtrajectories;
+
+import playground.mrieser.svi.data.ZoneIdToIndexMapping;
+import playground.mrieser.svi.data.ZoneIdToIndexMappingReader;
 
 /**
  * @author mrieser
  */
-public class ZoneIdToIndexMapping {
+public class Tester {
 
-	private int nOfZones = 0;
-	private String[] array = new String[0];
+	public static void main(final String[] args) {
 
-	public void addMapping(final String zoneId, final int index) {
-		if (this.array.length < (index + 1)) {
-			String[] tmp = new String[index * 2 + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.array.length);
-			this.array = tmp;
-		}
-		this.array[index] = zoneId;
-		if (this.nOfZones < index) {
-			this.nOfZones = index;
-		}
-	}
+		String zoneMappingFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/L41_Kreuzlingen_Konstanz_Nachfrage/l41 ZoneNo_TAZ_mapping.csv";
+		String vehTrajectoryFilename = "/Volumes/Data/virtualbox/exchange/kreuzlingen/output8/VehTrajectory.dat";
 
-	public int getNumberOfZones() {
-		return this.nOfZones;
-	}
+		ZoneIdToIndexMapping zoneMapping = new ZoneIdToIndexMapping();
+		new ZoneIdToIndexMappingReader(zoneMapping).readFile(zoneMappingFilename);
 
-	public String[] getIndexToIdMapping() {
-		if ((this.array.length + 1) != this.nOfZones) {
-			String[] tmp = new String[this.nOfZones + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.nOfZones + 1);
-			this.array = tmp;
-		}
-		return this.array;
+		DynamicTravelTimeMatrix matrix = new DynamicTravelTimeMatrix(600, 30*3600.0);
+		new VehicleTrajectoriesReader(new CalculateTravelTimeMatrixFromVehTrajectories(matrix), zoneMapping).readFile(vehTrajectoryFilename);
+		matrix.dump();
 	}
 }

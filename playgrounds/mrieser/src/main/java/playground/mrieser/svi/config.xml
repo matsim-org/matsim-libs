@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/data1/matsim/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/data1/matsim/population.xml" />
+	</module>
+
+	<module name="dynus-t">
+		<param name="zonesShapes" value="/Volumes/Data/projects/sviDosierungsanlagen/scenarios/kreuzlingen/data1/Test_Zonen.shp" />
+		<param name="zonesMapping" value="/Volumes/Data/projects/sviDosierungsanlagen/scenarios/L41_Kreuzlingen_Konstanz_Nachfrage/l41 ZoneNo_TAZ_mapping.csv" />
+		<param name="dynusTDirectory" value="/Volumes/Data/virtualbox/exchange/kreuzlingen/3.0x86 Beta" />
+		<param name="modelDirectory" value="/Volumes/Data/virtualbox/exchange/kreuzlingen/test" />
+		<param name="outputDirectory" value="/Volumes/Data/virtualbox/exchange/kreuzlingen/testRun" />
+	</module>
+
+</config>

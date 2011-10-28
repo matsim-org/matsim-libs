@@ -23,21 +23,22 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.ExeRunner;
 
 public class DynusTExe {
 
 	private final static Logger log = Logger.getLogger(DynusTExe.class);
-	
+
 	private final String dynusTDir;
 	private final String modelDir;
 	private final String tmpDir;
-	
+
 	public DynusTExe(final String dynusTExeDir, final String modelDir, final String tmpDir) {
 		this.dynusTDir = dynusTExeDir;
 		this.modelDir = modelDir;
 		this.tmpDir = tmpDir;
 	}
-	
+
 	public void runDynusT() {
 		final String[] exeFiles = new String[] {
 				"DynusT.exe",
@@ -75,9 +76,9 @@ public class DynusTExe {
 
 				"parameter.dat"
 		};
-		
+
 		log.info("Creating iteration-directory...");
-		File iterDir = new File(tmpDir);
+		File iterDir = new File(this.tmpDir);
 		if (!iterDir.exists()) {
 			iterDir.mkdir();
 		}
@@ -91,14 +92,15 @@ public class DynusTExe {
 			log.info("  Copying " + filename);
 			IOUtils.copyFile(new File(this.modelDir + "/" + filename), new File(this.tmpDir + "/" + filename));
 		}
-		
-		String cmd = this.dynusTDir + "/DynusT.exe";
+
+		String logfileName = this.tmpDir + "/dynus-t.log";
+
+		String cmd = this.tmpDir + "/DynusT.exe";
 		log.info("running command: " + cmd);
-//		String logfileName = "dynus-t.log";
-//		int timeout = 3600;
-//		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
-//		if (exitcode != 0) {
-//			throw new RuntimeException("There was a problem running Dynus-T. exit code: " + exitcode);
-//		}
+		int timeout = 14400; // 4 hours should hopefully be enough
+		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
+		if (exitcode != 0) {
+			throw new RuntimeException("There was a problem running Dynus-T. exit code: " + exitcode);
+		}
 	}
 }

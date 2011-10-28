@@ -17,38 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mrieser.svi.data;
+package playground.mrieser.svi.data.vehtrajectories;
 
 /**
  * @author mrieser
  */
-public class ZoneIdToIndexMapping {
+public class CalculateTravelTimeMatrixFromVehTrajectories implements VehicleTrajectoryHandler {
 
-	private int nOfZones = 0;
-	private String[] array = new String[0];
+	private final DynamicTravelTimeMatrix matrix;
 
-	public void addMapping(final String zoneId, final int index) {
-		if (this.array.length < (index + 1)) {
-			String[] tmp = new String[index * 2 + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.array.length);
-			this.array = tmp;
-		}
-		this.array[index] = zoneId;
-		if (this.nOfZones < index) {
-			this.nOfZones = index;
-		}
+	public CalculateTravelTimeMatrixFromVehTrajectories(final DynamicTravelTimeMatrix matrix) {
+		this.matrix = matrix;
 	}
 
-	public int getNumberOfZones() {
-		return this.nOfZones;
+	@Override
+	public void handleVehicleTrajectory(final VehicleTrajectory trajectory) {
+		this.matrix.addTravelTime(trajectory.getStartTime(), trajectory.getTravelTime(), trajectory.getOrigZone(), trajectory.getDestZone());
 	}
 
-	public String[] getIndexToIdMapping() {
-		if ((this.array.length + 1) != this.nOfZones) {
-			String[] tmp = new String[this.nOfZones + 1];
-			System.arraycopy(this.array, 0, tmp, 0, this.nOfZones + 1);
-			this.array = tmp;
-		}
-		return this.array;
-	}
+
 }
