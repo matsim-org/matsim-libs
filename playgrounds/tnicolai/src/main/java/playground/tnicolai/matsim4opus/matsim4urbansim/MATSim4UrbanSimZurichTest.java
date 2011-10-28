@@ -6,7 +6,7 @@ import org.matsim.core.network.NetworkImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
 
-public class MATSim4UrbanSimZurichTest extends MATSim4Urbansim{
+public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimZurichTest.class);

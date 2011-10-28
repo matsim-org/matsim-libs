@@ -139,7 +139,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author thomas
  *
  */
-class MATSim4UrbanSimERSA extends MATSim4Urbansim{
+class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	
 	// Logger
 	private static final Logger logger = Logger.getLogger(MATSim4UrbanSimERSA.class);

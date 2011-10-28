@@ -55,7 +55,7 @@ import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
  * @author thomas
  *
  */
-public class MATSim4UrbanSimMeasurement extends MATSim4Urbansim {
+public class MATSim4UrbanSimMeasurement extends MATSim4UrbanSim {
 	
 	private MeasurementObject measurements;
 	

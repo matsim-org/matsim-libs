@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
  * @author thomas
  *
  */
-class MATSim4UrbansimCUPUM extends MATSim4Urbansim{
+class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 	
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbansimCUPUM.class);
