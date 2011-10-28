@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
@@ -36,7 +37,6 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.Mating;
 import playground.thibautd.agentsmating.logitbasedmating.framework.MatingPlatform;
 import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
 import playground.thibautd.agentsmating.logitbasedmating.framework.UnexistingAttributeException;
-
 
 /**
  * Default implementation of a mating platform.
@@ -465,16 +465,6 @@ public class MatingPlatformImpl extends MatingPlatform {
 			}
 
 			@Override
-			public Id getOriginLinkId() {
-				return request.getOriginLinkId();
-			}
-
-			@Override
-			public Id getDestinationLinkId() {
-				return request.getDestinationLinkId();
-			}
-
-			@Override
 			public double getDepartureTime() {
 				return request.getDepartureTime();
 			}
@@ -482,6 +472,18 @@ public class MatingPlatformImpl extends MatingPlatform {
 			@Override
 			public double getPlanArrivalTime() {
 				return request.getPlanArrivalTime();
+			}
+
+			@Override
+			public Activity getOrigin() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			@Override
+			public Activity getDestination() {
+				// TODO Auto-generated method stub
+				return null;
 			}
 		}
 	}

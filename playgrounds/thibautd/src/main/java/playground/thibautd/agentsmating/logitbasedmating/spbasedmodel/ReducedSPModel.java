@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
+import java.lang.Override;
+
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.TransportMode;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.LogitModel;
@@ -28,6 +31,7 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMakerFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
 import playground.thibautd.agentsmating.logitbasedmating.framework.UnexistingAttributeException;
+import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTimeEstimatorFactory;
 
 /**
  * @author thibautd
@@ -76,8 +80,22 @@ public class ReducedSPModel extends LogitModel {
 
 	// factories
 	private final DecisionMakerFactory decisionMakerFactory = new ReducedSPModelDecisionMakerFactory();
-	private final ChoiceSetFactory choiceSetFactory = new ReducedSPModelChoiceSetFactory();
+	private final ChoiceSetFactory choiceSetFactory; //new ReducedSPModelChoiceSetFactory();
 
+	// /////////////////////////////////////////////////////////////////////////
+	// constructor
+	// /////////////////////////////////////////////////////////////////////////
+	public ReducedSPModel(
+			final Network network,
+			final SimpleLegTravelTimeEstimatorFactory estimatorFactory) {
+		choiceSetFactory = new ReducedSPModelChoiceSetFactory(
+				network,
+				estimatorFactory);
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// getters
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public DecisionMakerFactory getDecisionMakerFactory() {
 		return decisionMakerFactory;
@@ -120,7 +138,7 @@ public class ReducedSPModel extends LogitModel {
 			throw new RuntimeException( e );
 		}
 
-		throw new RuntimeException("unhandled mode");
+		throw new RuntimeException("unhandled mode: "+alternative.getMode());
 	}
 
 	private double carUtility(

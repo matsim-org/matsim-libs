@@ -22,6 +22,7 @@ package playground.thibautd.agentsmating.logitbasedmating.framework;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 
 /**
  * Represents a car-pooling trip "request", that is, a choice of the car-pooling
@@ -53,10 +54,18 @@ public interface TripRequest extends Alternative {
 	 */
 	public int getIndexInPlan();
 
-	public Id getOriginLinkId();
-	public Id getDestinationLinkId();
+	//public Id getOriginLinkId();
+	//public Id getDestinationLinkId();
 	public double getDepartureTime();
 	public double getPlanArrivalTime();
+	/**
+	 * @return the origin activity, as it appears in the input plan
+	 */
+	public Activity getOrigin();
+	/**
+	 * @return the destination activity, as it appears in the input plan
+	 */
+	public Activity getDestination();
 
 	public enum Type {
 		DRIVER,

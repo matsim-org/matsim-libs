@@ -184,10 +184,8 @@ public class MateProposerImpl implements MateProposer {
 		public Wrapper(
 				final T request) {
 			this.request = request;
-			this.origin = network.getLinks().get(
-					request.getOriginLinkId()).getCoord();
-			this.destination = network.getLinks().get(
-					request.getDestinationLinkId()).getCoord();
+			this.origin = request.getOrigin().getCoord();
+			this.destination = request.getDestination().getCoord();
 			this.distance = CoordUtils.calcDistance( origin , destination );
 		}
 	}

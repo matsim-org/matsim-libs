@@ -22,7 +22,7 @@ package playground.thibautd.agentsmating.logitbasedmating.basic;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
@@ -34,36 +34,65 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.UnexistingAtt
  * @author thibautd
  */
 public class TripRequestImpl implements TripRequest {
+	public static final String DRIVER_MODE = "driver";
+	public static final String PASSENGER_MODE = "passenger";
+
 	private final Alternative alternativeDelegate;
 	private final Type type;
 	private final DecisionMaker decisionMaker;
 	private final List<Alternative> alternatives;
 	private final int indexInPlan;
-	private final Id origin;
-	private final Id destination;
-	private final double departureTime;
+	//private final Id origin;
+	//private final Id destination;
+	private final Activity origin;
+	private final Activity destination;
+	//private final double departureTime;
 	private final double arrivalTime;
 
 	public TripRequestImpl(
 			final String mode,
 			final Map<String, Object> attributes,
-			final Type tripType,
 			final int indexInPlan,
-			final Id originLinkId,
-			final Id destinationLinkId,
-			final double departureTime,
+			final Activity origin,
+			final Activity destination,
 			final double arrivalTime,
 			final DecisionMaker decisionMaker,
 			final List<Alternative> otherAlternatives) {
-		this.alternativeDelegate = new AlternativeImpl(mode, attributes);
-		this. type = tripType;
+		this(new AlternativeImpl(mode, attributes),
+			indexInPlan,
+			origin,
+			destination,
+			arrivalTime,
+			decisionMaker,
+			otherAlternatives);
+	}
+
+	public TripRequestImpl(
+			final Alternative baseAlternative,
+			final int indexInPlan,
+			final Activity origin,
+			final Activity destination,
+			final double arrivalTime,
+			final DecisionMaker decisionMaker,
+			final List<Alternative> otherAlternatives) {
+		this.alternativeDelegate = baseAlternative;
+		this.type = stringToType( baseAlternative.getMode() );
 		this.decisionMaker = decisionMaker;
 		this.alternatives = otherAlternatives;
 		this.indexInPlan = indexInPlan;
-		this.origin = originLinkId;
-		this.destination = destinationLinkId;
-		this.departureTime = departureTime;
+		this.origin = origin;
+		this.destination = destination;
 		this.arrivalTime = arrivalTime;
+	}
+
+	private Type stringToType( final String mode ) {
+		if ( mode.equals( DRIVER_MODE ) ) {
+			return Type.DRIVER;
+		}
+		if ( mode.equals( PASSENGER_MODE ) ) {
+			return Type.PASSENGER;
+		}
+		throw new IllegalArgumentException("unhandled mode: "+mode);
 	}
 
 	@Override
@@ -103,18 +132,8 @@ public class TripRequestImpl implements TripRequest {
 	}
 
 	@Override
-	public Id getOriginLinkId() {
-		return origin;
-	}
-
-	@Override
-	public Id getDestinationLinkId() {
-		return destination;
-	}
-
-	@Override
 	public double getDepartureTime() {
-		return departureTime;
+		return this.origin.getEndTime();
 	}
 
 	@Override
@@ -122,6 +141,15 @@ public class TripRequestImpl implements TripRequest {
 		return arrivalTime;
 	}
 
+	@Override
+	public Activity getOrigin() {
+		return origin;
+	}
+
+	@Override
+	public Activity getDestination() {
+		return destination;
+	}
 
 	@Override
 	public boolean equals(final Object object) {
@@ -135,8 +163,8 @@ public class TripRequestImpl implements TripRequest {
 			getTripType().equals( other.getTripType() ) &&
 			getAttributes().equals( other.getAttributes() ) &&
 			getAlternatives().equals( other.getAlternatives() ) &&
-			getOriginLinkId().equals( other.getOriginLinkId() ) &&
-			getDestinationLinkId().equals( other.getDestinationLinkId() ) &&
+			getOrigin().equals( other.getOrigin() ) &&
+			getDestination().equals( other.getDestination() ) &&
 			( Math.abs( getDepartureTime() - other.getDepartureTime() ) < 1E-7 );
 	}
 
