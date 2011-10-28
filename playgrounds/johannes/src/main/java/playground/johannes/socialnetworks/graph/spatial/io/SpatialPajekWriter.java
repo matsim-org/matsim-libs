@@ -27,10 +27,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 
+import playground.johannes.sna.graph.spatial.SpatialSparseEdge;
+import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
+import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.io.PajekAttributes;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
 import playground.johannes.socialnetworks.graph.io.PajekWriter;

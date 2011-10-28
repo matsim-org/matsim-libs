@@ -33,13 +33,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.GraphUtils;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Components;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.GraphUtils;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.Components;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;

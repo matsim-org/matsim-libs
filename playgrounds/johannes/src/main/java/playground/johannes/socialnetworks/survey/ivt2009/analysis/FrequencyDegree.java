@@ -28,11 +28,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.math.Distribution;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;

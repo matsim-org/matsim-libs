@@ -22,16 +22,16 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexFilter;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
-import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.VertexFilter;
+import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 

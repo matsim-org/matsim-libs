@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.studies.netanalysis;
 
-import org.matsim.contrib.sna.gis.ZoneLayer;
 
+import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerKMLWriter;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.analysis.GenderNumeric;

@@ -30,11 +30,12 @@ import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.snowball.SampledVertex;
 
 
 /**

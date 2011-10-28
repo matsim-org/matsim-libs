@@ -26,10 +26,10 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 

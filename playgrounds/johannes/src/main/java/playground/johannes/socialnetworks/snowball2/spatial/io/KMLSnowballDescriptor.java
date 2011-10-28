@@ -21,8 +21,8 @@ package playground.johannes.socialnetworks.snowball2.spatial.io;
 
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
+import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

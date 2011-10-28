@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 
 /**
  * This estimator normalizes the estimates from a delegate estimator such that

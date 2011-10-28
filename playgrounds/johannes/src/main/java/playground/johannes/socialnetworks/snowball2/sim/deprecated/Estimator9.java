@@ -21,11 +21,11 @@ package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
 import gnu.trove.TIntIntHashMap;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**

@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;

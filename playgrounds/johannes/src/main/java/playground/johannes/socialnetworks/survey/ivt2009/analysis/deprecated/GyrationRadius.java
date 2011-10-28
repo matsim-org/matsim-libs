@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger

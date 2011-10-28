@@ -23,10 +23,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballStatistics;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballStatistics;
 
 /**
  * @author illenberger

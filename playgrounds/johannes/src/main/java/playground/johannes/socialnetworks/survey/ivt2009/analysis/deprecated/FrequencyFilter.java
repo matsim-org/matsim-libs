@@ -22,11 +22,11 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
 
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;

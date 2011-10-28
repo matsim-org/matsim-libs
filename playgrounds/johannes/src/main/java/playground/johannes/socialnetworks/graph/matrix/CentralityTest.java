@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

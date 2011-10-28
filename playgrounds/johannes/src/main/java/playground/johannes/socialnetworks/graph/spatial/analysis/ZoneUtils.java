@@ -25,13 +25,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.gis.io.FeatureKMLWriter;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;

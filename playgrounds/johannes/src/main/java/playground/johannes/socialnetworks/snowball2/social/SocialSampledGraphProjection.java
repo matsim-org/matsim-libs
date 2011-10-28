@@ -21,9 +21,9 @@ package playground.johannes.socialnetworks.snowball2.social;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;

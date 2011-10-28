@@ -26,10 +26,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.sna.util.MultiThreading;
 
 import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
 import playground.johannes.coopsim.mental.planmod.PlanModEngine;
+import playground.johannes.sna.util.MultiThreading;
 
 /**
  * @author illenberger

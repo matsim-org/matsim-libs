@@ -25,13 +25,13 @@ import gnu.trove.TObjectDoubleIterator;
 import java.util.Collection;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Transitivity;
-import org.matsim.contrib.sna.math.DescriptivePiStatistics;
-import org.matsim.contrib.sna.math.DescriptivePiStatisticsFactory;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.Transitivity;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 
 
 /**

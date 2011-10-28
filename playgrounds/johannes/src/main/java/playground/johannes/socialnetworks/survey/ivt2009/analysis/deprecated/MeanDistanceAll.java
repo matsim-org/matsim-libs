@@ -24,11 +24,11 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.util.ProgressLogger;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 

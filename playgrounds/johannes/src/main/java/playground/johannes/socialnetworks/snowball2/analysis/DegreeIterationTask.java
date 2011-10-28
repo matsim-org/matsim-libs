@@ -32,11 +32,12 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

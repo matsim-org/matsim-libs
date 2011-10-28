@@ -26,13 +26,13 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.SparseEdge;
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.Vertex;
 
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.SparseEdge;
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseGraphBuilder;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.graph.analysis.GirvanNewmanAlgorithm;
 
 /**

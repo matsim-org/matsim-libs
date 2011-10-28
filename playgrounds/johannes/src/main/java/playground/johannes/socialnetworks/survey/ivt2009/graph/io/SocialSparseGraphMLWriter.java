@@ -21,10 +21,10 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import java.util.List;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseVertex;

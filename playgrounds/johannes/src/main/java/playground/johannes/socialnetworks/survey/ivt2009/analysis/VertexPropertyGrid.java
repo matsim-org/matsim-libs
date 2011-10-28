@@ -22,11 +22,11 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.graph.analysis.VertexProperty;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.PointUtils;
 import playground.johannes.socialnetworks.graph.spatial.analysis.ZoneUtils;
 

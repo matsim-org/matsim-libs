@@ -20,8 +20,9 @@
 package playground.johannes.socialnetworks.gis;
 
 import org.geotools.geometry.jts.JTS;
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.opengis.referencing.operation.TransformException;
+
+import playground.johannes.sna.gis.CRSUtils;
 
 import com.vividsolutions.jts.geom.Point;
 

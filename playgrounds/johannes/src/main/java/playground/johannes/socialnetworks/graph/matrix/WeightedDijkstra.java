@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.matrix;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.graph.matrix.Dijkstra;
 
 /**
  * @author illenberger

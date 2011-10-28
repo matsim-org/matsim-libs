@@ -24,14 +24,15 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.io.GraphMLWriter;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import playground.johannes.sna.graph.io.GraphMLWriter;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

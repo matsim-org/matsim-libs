@@ -27,9 +27,10 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
+
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Distribution;
 
 
 /**

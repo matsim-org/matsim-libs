@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 /**

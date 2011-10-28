@@ -24,8 +24,8 @@ import gnu.trove.TObjectDoubleIterator;
 
 import java.awt.Color;
 
-import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
+import playground.johannes.sna.graph.spatial.io.ColorUtils;
+import playground.johannes.sna.graph.spatial.io.Colorizable;
 
 /**
  * @author jillenberger

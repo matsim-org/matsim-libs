@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.spatial.generators;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 
 /**
  * @author illenberger

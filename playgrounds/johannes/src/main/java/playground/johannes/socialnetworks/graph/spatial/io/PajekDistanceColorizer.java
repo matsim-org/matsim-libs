@@ -25,11 +25,11 @@ package playground.johannes.socialnetworks.graph.spatial.io;
 
 import gnu.trove.TObjectDoubleHashMap;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.sna.graph.spatial.SpatialSparseEdge;
+import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
+import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.io.PajekColorizer;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Distance;
 

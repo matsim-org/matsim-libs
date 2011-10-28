@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009;
 
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
 
+import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetailComposite;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjectionBuilder;

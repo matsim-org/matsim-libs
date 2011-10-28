@@ -29,18 +29,19 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
-import org.matsim.contrib.sna.graph.analysis.RandomPartition;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
-import org.matsim.contrib.sna.snowball.sim.SamplerListener;
 import org.matsim.core.config.Config;
+
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
+import playground.johannes.sna.graph.analysis.RandomPartition;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 
 /**
  * @author illenberger

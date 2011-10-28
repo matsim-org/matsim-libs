@@ -24,12 +24,12 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.DegreeTask;
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import playground.johannes.sna.graph.analysis.TransitivityTask;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
 import playground.johannes.socialnetworks.graph.analysis.TopologyAnalyzerTask;
 
 /**

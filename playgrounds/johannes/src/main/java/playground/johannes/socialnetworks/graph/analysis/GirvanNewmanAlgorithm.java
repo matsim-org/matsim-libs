@@ -34,18 +34,18 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.EdgeDecorator;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphProjection;
-import org.matsim.contrib.sna.graph.SparseGraphProjectionBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.VertexDecorator;
-import org.matsim.contrib.sna.graph.analysis.Components;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.EdgeDecorator;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphProjection;
+import playground.johannes.sna.graph.SparseGraphProjectionBuilder;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.VertexDecorator;
+import playground.johannes.sna.graph.analysis.Components;
+import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
 import playground.johannes.socialnetworks.graph.io.PajekCommunityColorizer;
 import playground.johannes.socialnetworks.graph.spatial.io.SpatialPajekWriter;
 

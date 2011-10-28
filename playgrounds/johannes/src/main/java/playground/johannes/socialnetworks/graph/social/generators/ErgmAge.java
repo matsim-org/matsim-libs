@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.social.generators;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.mcmc.ErgmTerm;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

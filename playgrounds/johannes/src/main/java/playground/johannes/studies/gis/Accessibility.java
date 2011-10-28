@@ -29,13 +29,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,6 +37,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;

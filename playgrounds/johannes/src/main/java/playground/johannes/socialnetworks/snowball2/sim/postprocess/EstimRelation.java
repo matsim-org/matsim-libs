@@ -30,11 +30,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author illenberger

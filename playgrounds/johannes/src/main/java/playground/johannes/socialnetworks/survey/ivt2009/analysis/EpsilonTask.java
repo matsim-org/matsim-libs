@@ -32,16 +32,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
-import org.matsim.contrib.sna.util.TXTWriter;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;

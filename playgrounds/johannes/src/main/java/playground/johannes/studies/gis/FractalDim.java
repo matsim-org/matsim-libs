@@ -29,13 +29,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.matsim.contrib.sna.math.DescriptivePiStatistics;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.util.ProgressLogger;
-import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityOption;
@@ -45,6 +38,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 

@@ -23,14 +23,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.io.GraphMLWriter;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.io.SampledGraphML;
 import org.matsim.core.utils.collections.Tuple;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.io.GraphMLWriter;
+import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.io.SampledGraphML;
 
 
 /**

@@ -22,11 +22,11 @@ package playground.johannes.socialnetworks.snowball2.spatial.io;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.snowball.SampledEdgeDecorator;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
-import org.matsim.contrib.sna.snowball.sim.SamplerListener;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.snowball.SampledEdgeDecorator;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 
 
 /**

@@ -29,13 +29,14 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.sna.snowball.sim.SampleAnalyzer;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
+
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.sim.SampleAnalyzer;
+import playground.johannes.sna.snowball.sim.Sampler;
 
 
 /**

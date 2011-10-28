@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.PointUtils;
 import playground.johannes.socialnetworks.gis.SpatialGrid;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;

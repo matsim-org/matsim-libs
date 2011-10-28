@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
 
 import playground.johannes.coopsim.Profiler;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.graph.matrix.Dijkstra;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;

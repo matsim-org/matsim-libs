@@ -28,10 +28,10 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.statistics.Correlations;

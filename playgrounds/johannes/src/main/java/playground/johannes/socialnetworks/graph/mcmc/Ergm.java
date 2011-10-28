@@ -23,9 +23,9 @@
  */
 package playground.johannes.socialnetworks.graph.mcmc;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.util.Composite;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.util.Composite;
 
 
 

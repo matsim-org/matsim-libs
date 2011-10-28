@@ -28,12 +28,12 @@ import gnu.trove.TObjectDoubleIterator;
 
 import java.util.TreeSet;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**

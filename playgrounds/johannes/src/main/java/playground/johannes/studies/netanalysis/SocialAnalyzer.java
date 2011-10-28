@@ -21,8 +21,8 @@ package playground.johannes.studies.netanalysis;
 
 import java.io.IOException;
 
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
 
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;

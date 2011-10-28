@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseEdge;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialSparseEdge;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 
 /**

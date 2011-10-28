@@ -21,8 +21,8 @@ package playground.johannes.socialnetworks.snowball2.sim;
 
 import gnu.trove.TIntIntHashMap;
 
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

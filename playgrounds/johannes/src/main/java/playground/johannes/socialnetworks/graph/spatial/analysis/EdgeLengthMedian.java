@@ -24,10 +24,10 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.DistanceCalculatorFactory;
 
 /**

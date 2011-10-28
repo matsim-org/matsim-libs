@@ -21,11 +21,11 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.DescriptivePiStatistics;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;
 
 import com.vividsolutions.jts.geom.Point;

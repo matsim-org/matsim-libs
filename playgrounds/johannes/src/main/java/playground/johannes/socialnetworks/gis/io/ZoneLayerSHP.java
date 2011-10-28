@@ -32,8 +32,9 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
 import org.geotools.feature.IllegalAttributeException;
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
+
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
 
 /**
  * Utility class to read and write zone layers into shape (.shp) files.

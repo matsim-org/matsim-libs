@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
+import playground.johannes.sna.graph.Vertex;
 
 /**
  * @author illenberger

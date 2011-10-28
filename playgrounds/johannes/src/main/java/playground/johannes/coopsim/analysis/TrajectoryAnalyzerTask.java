@@ -27,12 +27,12 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

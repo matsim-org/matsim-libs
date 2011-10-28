@@ -29,11 +29,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.DummyDiscretizer;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.VertexProperty;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.DummyDiscretizer;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**

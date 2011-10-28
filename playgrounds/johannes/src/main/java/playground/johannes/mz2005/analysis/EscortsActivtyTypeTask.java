@@ -26,11 +26,11 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.sna.util.TXTWriter;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.mz2005.io.EscortData;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

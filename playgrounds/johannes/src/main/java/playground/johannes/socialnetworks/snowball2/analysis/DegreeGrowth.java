@@ -30,13 +30,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
-import org.matsim.contrib.sna.snowball.sim.SamplerListener;
+
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
 
 /**
  * @author illenberger

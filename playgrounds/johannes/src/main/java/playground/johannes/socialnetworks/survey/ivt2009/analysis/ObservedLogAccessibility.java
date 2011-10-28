@@ -23,11 +23,11 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.analysis.LogAccessibility;
 

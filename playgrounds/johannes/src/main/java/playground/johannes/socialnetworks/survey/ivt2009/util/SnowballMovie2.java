@@ -27,22 +27,22 @@ import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.VertexDecorator;
-import org.matsim.contrib.sna.graph.analysis.VertexFilter;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetailComposite;
-import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
-import org.matsim.contrib.sna.snowball.sim.SamplerListener;
-import org.matsim.contrib.sna.snowball.sim.SamplerListenerComposite;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.VertexDecorator;
+import playground.johannes.sna.graph.analysis.VertexFilter;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetailComposite;
+import playground.johannes.sna.graph.spatial.io.KMLPartitions;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
+import playground.johannes.sna.snowball.sim.Sampler;
+import playground.johannes.sna.snowball.sim.SamplerListener;
+import playground.johannes.sna.snowball.sim.SamplerListenerComposite;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 import playground.johannes.socialnetworks.snowball2.io.SeedColorizer;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledEdgeDecorator;

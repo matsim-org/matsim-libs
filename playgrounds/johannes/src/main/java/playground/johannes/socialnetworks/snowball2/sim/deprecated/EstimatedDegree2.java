@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.snowball2.sim.deprecated;
 
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.math.DescriptivePiStatisticsFactory;
-import org.matsim.contrib.sna.snowball.SampledEdge;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.EstimatedDegree;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
+import playground.johannes.sna.snowball.SampledEdge;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.EstimatedDegree;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 /**

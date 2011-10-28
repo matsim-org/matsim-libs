@@ -21,8 +21,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph;
 
 import java.util.List;
 
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 
+import playground.johannes.sna.graph.spatial.SpatialSparseVertex;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

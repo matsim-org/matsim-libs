@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.EdgeDecorator;
-import org.matsim.contrib.sna.graph.VertexDecorator;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.EdgeDecorator;
+import playground.johannes.sna.graph.VertexDecorator;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 
 
 /**

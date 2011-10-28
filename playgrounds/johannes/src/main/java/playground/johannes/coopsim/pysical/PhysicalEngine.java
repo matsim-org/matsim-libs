@@ -23,11 +23,12 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.sna.util.MultiThreading;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
+
+import playground.johannes.sna.util.MultiThreading;
 
 /**
  * @author illenberger

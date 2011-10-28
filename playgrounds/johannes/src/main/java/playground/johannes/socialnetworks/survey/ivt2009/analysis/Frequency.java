@@ -27,9 +27,9 @@ import java.util.Set;
 import javax.swing.text.AbstractDocument.LeafElement;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

@@ -30,15 +30,16 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.SparseEdge;
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.io.GraphMLWriter;
+
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.SparseEdge;
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseGraphBuilder;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.io.GraphMLWriter;
 
 
 

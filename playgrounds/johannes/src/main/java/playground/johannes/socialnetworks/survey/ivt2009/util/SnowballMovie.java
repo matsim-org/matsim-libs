@@ -26,17 +26,17 @@ import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.FixedSizeRandomPartition;
-import org.matsim.contrib.sna.graph.analysis.RandomPartition;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
+import playground.johannes.sna.graph.analysis.RandomPartition;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.KMLPartitions;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLTimeSpan;
 import playground.johannes.socialnetworks.snowball2.spatial.io.TimeTagger2;
 

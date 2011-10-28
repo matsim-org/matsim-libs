@@ -30,16 +30,16 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.sna.util.TXTWriter;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.spatial.analysis.AcceptanceProbability;

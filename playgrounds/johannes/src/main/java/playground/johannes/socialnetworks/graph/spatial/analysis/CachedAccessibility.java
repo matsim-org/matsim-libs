@@ -24,8 +24,8 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Vertex;
 
+import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.graph.analysis.CachedVertexProperty;
 
 /**

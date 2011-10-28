@@ -22,8 +22,9 @@ package playground.johannes.socialnetworks.graph.mcmc;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
+
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 
 /**
  * @author illenberger

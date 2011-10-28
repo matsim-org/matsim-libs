@@ -21,10 +21,10 @@ package playground.johannes.socialnetworks.graph.io;
 
 import java.io.IOException;
 
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.SparseGraphBuilder;
+import playground.johannes.sna.graph.Vertex;
 
 
 /**

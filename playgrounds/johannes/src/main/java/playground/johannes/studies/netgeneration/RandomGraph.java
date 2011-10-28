@@ -27,12 +27,12 @@ import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
+import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.socialnetworks.graph.generators.RandomGraphGenerator;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.social.io.SocialSparseVertexPool;

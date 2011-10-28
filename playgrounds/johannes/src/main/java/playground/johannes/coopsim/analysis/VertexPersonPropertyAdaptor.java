@@ -28,9 +28,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

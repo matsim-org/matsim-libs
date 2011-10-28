@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.graph.spatial.analysis;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.analysis.AbstractVertexProperty;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 
+import playground.johannes.sna.graph.analysis.AbstractVertexProperty;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 

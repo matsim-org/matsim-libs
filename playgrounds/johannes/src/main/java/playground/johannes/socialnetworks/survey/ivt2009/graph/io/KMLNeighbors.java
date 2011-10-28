@@ -21,8 +21,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.graph.io;
 
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
 
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**

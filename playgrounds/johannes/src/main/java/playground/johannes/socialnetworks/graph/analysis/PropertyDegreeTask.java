@@ -26,11 +26,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.Transitivity;
-import org.matsim.contrib.sna.util.TXTWriter;
+
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.graph.analysis.Transitivity;
+import playground.johannes.sna.util.TXTWriter;
 
 
 /**

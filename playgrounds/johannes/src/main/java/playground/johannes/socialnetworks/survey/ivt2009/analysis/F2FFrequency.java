@@ -23,8 +23,8 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Edge;
 
+import playground.johannes.sna.graph.Edge;
 import playground.johannes.socialnetworks.graph.analysis.AbstractEdgeProperty;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 

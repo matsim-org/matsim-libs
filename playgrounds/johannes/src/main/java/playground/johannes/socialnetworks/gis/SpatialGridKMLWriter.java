@@ -41,15 +41,15 @@ import net.opengis.kml._2.StyleType;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.experimental.max.MaxCore;
-import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.LinearDiscretizer;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
+import playground.johannes.sna.graph.spatial.io.ColorUtils;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.statistics.Normalizer;
 
 import com.vividsolutions.jts.geom.Coordinate;

@@ -21,12 +21,13 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.snowball.SampledGraphProjection;
 
 
 /**
@@ -77,7 +78,7 @@ public class SpatialSampledGraphProjection <G extends SpatialGraph, V extends Sp
 	}
 
 	/**
-	 * @see {@link SampledGraphProjection#getVertex(org.matsim.contrib.sna.graph.spatial.SpatialVertex)}
+	 * @see {@link SampledGraphProjection#getVertex(playground.johannes.sna.graph.spatial.SpatialVertex)}
 	 */
 	@Override
 	public SpatialSampledVertexDecorator<V> getVertex(V v) {

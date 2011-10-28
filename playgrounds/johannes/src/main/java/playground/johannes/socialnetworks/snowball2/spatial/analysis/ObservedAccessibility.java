@@ -23,10 +23,10 @@ import gnu.trove.TObjectDoubleHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.graph.spatial.analysis.Accessibility;
 import playground.johannes.socialnetworks.snowball2.spatial.SpatialSampledVertexDecorator;

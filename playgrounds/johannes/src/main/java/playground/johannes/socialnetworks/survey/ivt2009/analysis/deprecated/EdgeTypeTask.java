@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.math.Distribution;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.math.Distribution;
 import playground.johannes.socialnetworks.graph.social.SocialEdge;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 

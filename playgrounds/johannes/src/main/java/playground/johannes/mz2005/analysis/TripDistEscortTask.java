@@ -29,7 +29,6 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
@@ -37,6 +36,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.mz2005.io.EscortData;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 
 /**

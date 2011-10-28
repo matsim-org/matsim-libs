@@ -23,10 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Edge;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.Vertex;
+
+import playground.johannes.sna.graph.Edge;
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.Vertex;
 
 /**
  * @author illenberger

@@ -22,8 +22,8 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.sna.gis.ZoneLayer;
 
+import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 

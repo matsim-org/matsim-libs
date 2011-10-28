@@ -33,9 +33,10 @@ import org.geotools.feature.FeatureType;
 import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
+
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

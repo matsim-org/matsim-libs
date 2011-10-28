@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
-import org.matsim.contrib.sna.snowball.SampledVertex;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.ColorUtils;
+import playground.johannes.sna.snowball.SampledVertex;
 import playground.johannes.socialnetworks.snowball2.spatial.io.KMLSampledComponents;
 
 /**

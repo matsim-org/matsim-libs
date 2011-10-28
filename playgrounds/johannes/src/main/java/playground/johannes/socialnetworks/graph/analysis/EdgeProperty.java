@@ -24,7 +24,8 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Edge;
+
+import playground.johannes.sna.graph.Edge;
 
 /**
  * @author illenberger

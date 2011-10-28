@@ -30,14 +30,14 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.analysis.VertexProperty;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
-import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.analysis.VertexProperty;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
+import playground.johannes.sna.graph.spatial.io.KMLPartitions;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
 
 /**
  * @author illenberger

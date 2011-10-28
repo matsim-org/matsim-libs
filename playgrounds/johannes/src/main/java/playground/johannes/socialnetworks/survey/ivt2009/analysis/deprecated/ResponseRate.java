@@ -23,7 +23,7 @@ import gnu.trove.TIntIntHashMap;
 
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.SampledVertex;
 
 /**
  * @author illenberger

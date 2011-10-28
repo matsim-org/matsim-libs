@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
 
 /**
  * @author illenberger

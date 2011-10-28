@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 
-import org.matsim.contrib.sna.graph.analysis.DegreeTask;
-import org.matsim.contrib.sna.graph.analysis.TransitivityTask;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.analysis.EstimatedTransitivity;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
 
+import playground.johannes.sna.graph.analysis.DegreeTask;
+import playground.johannes.sna.graph.analysis.TransitivityTask;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.analysis.EstimatedTransitivity;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;

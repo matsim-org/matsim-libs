@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.graph;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.testcases.MatsimTestCase;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
 import playground.johannes.socialnetworks.graph.spatial.io.Population2SpatialGraph;
 
 /**

@@ -30,17 +30,17 @@ import java.util.Set;
 import net.opengis.kml._2.FolderType;
 import net.opengis.kml._2.PlacemarkType;
 
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.KMLIconVertexStyle;
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
-import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphKMLWriter;
-import org.matsim.contrib.sna.math.Distribution;
-import org.matsim.contrib.sna.util.ProgressLogger;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialSparseGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
+import playground.johannes.sna.graph.spatial.io.KMLPartitions;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphKMLWriter;
+import playground.johannes.sna.math.Distribution;
+import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;

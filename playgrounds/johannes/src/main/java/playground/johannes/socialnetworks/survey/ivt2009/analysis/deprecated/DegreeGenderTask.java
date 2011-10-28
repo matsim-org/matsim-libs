@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.Graph;
-import org.matsim.contrib.sna.graph.analysis.Degree;
-import org.matsim.contrib.sna.graph.analysis.ModuleAnalyzerTask;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.analysis.ObservedDegree;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.graph.Graph;
+import playground.johannes.sna.graph.analysis.Degree;
+import playground.johannes.sna.graph.analysis.ModuleAnalyzerTask;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.analysis.ObservedDegree;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
 /**

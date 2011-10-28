@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.graph.analysis;
 
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
+import playground.johannes.sna.graph.analysis.ComponentsTask;
 
 /**
  * @author illenberger

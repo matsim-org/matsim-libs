@@ -38,11 +38,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.math.DescriptivePiStatistics;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.math.Histogram;
-import org.matsim.contrib.sna.util.TXTWriter;
+
+import playground.johannes.sna.math.DescriptivePiStatistics;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

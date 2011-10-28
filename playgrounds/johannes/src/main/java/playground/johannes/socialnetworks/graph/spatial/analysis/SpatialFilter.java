@@ -23,15 +23,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
-import org.matsim.contrib.sna.gis.CRSUtils;
-import org.matsim.contrib.sna.graph.GraphBuilder;
-import org.matsim.contrib.sna.graph.spatial.SpatialEdge;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 
+import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.sna.graph.GraphBuilder;
+import playground.johannes.sna.graph.spatial.SpatialEdge;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 import com.vividsolutions.jts.geom.Geometry;

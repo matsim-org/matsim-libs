@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.graph.SparseEdge;
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.analysis.GraphAnalyzer;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
 
+import playground.johannes.sna.graph.SparseEdge;
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.analysis.GraphAnalyzer;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.snowball.SampledGraphProjection;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 import playground.johannes.socialnetworks.snowball2.io.SampledGraphProjMLReader;
 

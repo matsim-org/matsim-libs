@@ -22,9 +22,9 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Gender;
 import playground.johannes.socialnetworks.graph.social.analysis.SocioMatrix;

@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.util.MultiThreading;
-import org.matsim.contrib.sna.util.ProgressLogger;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.util.MultiThreading;
+import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.SpatialCostFunction;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 

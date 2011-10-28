@@ -22,10 +22,10 @@ package playground.johannes.socialnetworks.survey.ivt2009.analysis.deprecated;
 import java.io.IOException;
 
 import org.geotools.feature.Feature;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.snowball.SampledGraphProjection;
-import org.matsim.contrib.sna.snowball.SampledGraphProjectionBuilder;
 
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.snowball.SampledGraphProjection;
+import playground.johannes.sna.snowball.SampledGraphProjectionBuilder;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphMLWriter;

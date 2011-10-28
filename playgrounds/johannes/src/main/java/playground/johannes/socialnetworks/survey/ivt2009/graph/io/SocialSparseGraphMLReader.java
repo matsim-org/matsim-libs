@@ -25,14 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.sna.graph.io.AbstractGraphMLReader;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphML;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.xml.sax.Attributes;
 
+import playground.johannes.sna.graph.io.AbstractGraphMLReader;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphML;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.io.SocialGraphML;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;

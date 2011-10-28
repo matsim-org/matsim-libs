@@ -27,9 +27,10 @@ import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.util.MultiThreading;
-import org.matsim.contrib.sna.util.ProgressLogger;
+
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.util.MultiThreading;
+import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author illenberger

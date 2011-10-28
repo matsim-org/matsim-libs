@@ -20,7 +20,8 @@
 package playground.johannes.socialnetworks.statistics;
 
 import org.apache.commons.math.stat.descriptive.UnivariateStatistic;
-import org.matsim.contrib.sna.math.UnivariatePiStatistic;
+
+import playground.johannes.sna.math.UnivariatePiStatistic;
 
 /**
  * @author illenberger

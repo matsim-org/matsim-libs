@@ -30,12 +30,12 @@ import java.util.Set;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.gis.GravityCostFunction;
 import playground.johannes.socialnetworks.graph.analysis.VertexPropertyCorrelation;
 import playground.johannes.socialnetworks.graph.social.SocialGraph;

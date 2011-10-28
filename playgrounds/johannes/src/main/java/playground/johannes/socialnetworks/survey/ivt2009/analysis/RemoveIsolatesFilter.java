@@ -24,13 +24,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseGraphBuilder;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
-import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseGraphBuilder;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLReader;
+import playground.johannes.sna.graph.spatial.io.SpatialGraphMLWriter;
 import playground.johannes.socialnetworks.graph.analysis.GraphFilter;
 
 

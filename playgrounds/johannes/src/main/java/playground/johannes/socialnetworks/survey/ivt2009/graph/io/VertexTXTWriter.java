@@ -24,8 +24,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledGraphProjection;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseEdge;

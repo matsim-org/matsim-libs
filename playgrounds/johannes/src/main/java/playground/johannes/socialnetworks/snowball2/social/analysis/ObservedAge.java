@@ -25,8 +25,8 @@ import gnu.trove.TDoubleObjectHashMap;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.sna.snowball.analysis.SnowballPartitions;
 
+import playground.johannes.sna.snowball.analysis.SnowballPartitions;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 import playground.johannes.socialnetworks.graph.social.analysis.Age;
 import playground.johannes.socialnetworks.snowball2.social.SocialSampledVertexDecorator;

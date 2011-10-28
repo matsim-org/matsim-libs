@@ -28,13 +28,13 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.contrib.sna.graph.Vertex;
-import org.matsim.contrib.sna.math.Discretizer;
-import org.matsim.contrib.sna.math.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.sna.snowball.SampledGraph;
-import org.matsim.contrib.sna.snowball.SampledVertex;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
 
+import playground.johannes.sna.graph.Vertex;
+import playground.johannes.sna.math.Discretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.snowball.SampledGraph;
+import playground.johannes.sna.snowball.SampledVertex;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
 import playground.johannes.socialnetworks.snowball2.sim.SampleStats;
 
 

@@ -28,12 +28,12 @@ import java.util.Set;
 
 import net.opengis.kml._2.FolderType;
 
-import org.matsim.contrib.sna.graph.analysis.Components;
-import org.matsim.contrib.sna.graph.spatial.SpatialGraph;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.graph.spatial.io.ColorUtils;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
-import org.matsim.contrib.sna.graph.spatial.io.KMLPartitions;
+import playground.johannes.sna.graph.analysis.Components;
+import playground.johannes.sna.graph.spatial.SpatialGraph;
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.graph.spatial.io.ColorUtils;
+import playground.johannes.sna.graph.spatial.io.Colorizable;
+import playground.johannes.sna.graph.spatial.io.KMLPartitions;
 
 
 /**

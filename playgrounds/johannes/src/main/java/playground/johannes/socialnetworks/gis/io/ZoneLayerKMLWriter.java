@@ -24,10 +24,10 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.sna.gis.Zone;
-import org.matsim.contrib.sna.gis.ZoneLayer;
-import org.matsim.contrib.sna.graph.spatial.io.Colorizable;
 
+import playground.johannes.sna.gis.Zone;
+import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.sna.graph.spatial.io.Colorizable;
 import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import com.vividsolutions.jts.geom.Geometry;

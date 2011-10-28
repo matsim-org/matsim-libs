@@ -26,9 +26,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.matsim.contrib.sna.util.TXTWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author illenberger

@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.contrib.sna.math.Distribution;
+import playground.johannes.sna.math.Distribution;
 
 /**
  * @author illenberger

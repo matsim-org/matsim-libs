@@ -30,9 +30,10 @@ import java.util.List;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.sna.graph.matrix.AdjacencyMatrix;
-import org.matsim.contrib.sna.graph.matrix.Dijkstra;
-import org.matsim.contrib.sna.util.MultiThreading;
+
+import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
+import playground.johannes.sna.graph.matrix.Dijkstra;
+import playground.johannes.sna.util.MultiThreading;
 
 /**
  * A class to calculate centrality measures on graph represented as an adjacency

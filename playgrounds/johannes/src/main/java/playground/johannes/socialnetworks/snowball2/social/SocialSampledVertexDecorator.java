@@ -22,8 +22,8 @@ package playground.johannes.socialnetworks.snowball2.social;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
 
+import playground.johannes.sna.snowball.SampledVertexDecorator;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 

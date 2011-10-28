@@ -21,7 +21,7 @@ package playground.johannes.coopsim.mental.planmod;
 
 import java.util.Map;
 
-import org.matsim.contrib.sna.util.Composite;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author illenberger

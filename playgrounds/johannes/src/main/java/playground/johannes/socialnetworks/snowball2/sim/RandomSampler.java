@@ -24,19 +24,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.contrib.sna.graph.SparseEdge;
-import org.matsim.contrib.sna.graph.SparseGraph;
-import org.matsim.contrib.sna.graph.SparseVertex;
-import org.matsim.contrib.sna.graph.analysis.AnalyzerTask;
-import org.matsim.contrib.sna.graph.analysis.ComponentsTask;
-import org.matsim.contrib.sna.graph.analysis.GraphSizeTask;
-import org.matsim.contrib.sna.graph.analysis.RandomPartition;
-import org.matsim.contrib.sna.graph.io.SparseGraphMLReader;
-import org.matsim.contrib.sna.snowball.analysis.PiEstimator;
-import org.matsim.contrib.sna.snowball.analysis.SimplePiEstimator;
-import org.matsim.contrib.sna.snowball.sim.IterationSampleAnalyzer;
-import org.matsim.contrib.sna.snowball.sim.Sampler;
 
+import playground.johannes.sna.graph.SparseEdge;
+import playground.johannes.sna.graph.SparseGraph;
+import playground.johannes.sna.graph.SparseVertex;
+import playground.johannes.sna.graph.analysis.AnalyzerTask;
+import playground.johannes.sna.graph.analysis.ComponentsTask;
+import playground.johannes.sna.graph.analysis.GraphSizeTask;
+import playground.johannes.sna.graph.analysis.RandomPartition;
+import playground.johannes.sna.graph.io.SparseGraphMLReader;
+import playground.johannes.sna.snowball.analysis.PiEstimator;
+import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
+import playground.johannes.sna.snowball.sim.IterationSampleAnalyzer;
+import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskComposite;
 import playground.johannes.socialnetworks.snowball2.analysis.SeedAPLTask;
 

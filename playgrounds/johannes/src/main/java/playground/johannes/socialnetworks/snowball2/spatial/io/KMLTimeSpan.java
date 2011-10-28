@@ -25,7 +25,7 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.PlacemarkType;
 import net.opengis.kml._2.TimeSpanType;
 
-import org.matsim.contrib.sna.graph.spatial.io.KMLObjectDetail;
+import playground.johannes.sna.graph.spatial.io.KMLObjectDetail;
 
 /**
  * @author illenberger

@@ -22,8 +22,9 @@ package playground.johannes.socialnetworks.snowball2.spatial;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.sna.graph.spatial.SpatialVertex;
-import org.matsim.contrib.sna.snowball.SampledVertexDecorator;
+
+import playground.johannes.sna.graph.spatial.SpatialVertex;
+import playground.johannes.sna.snowball.SampledVertexDecorator;
 
 
 import com.vividsolutions.jts.geom.Point;
