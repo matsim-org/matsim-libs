@@ -26,6 +26,37 @@ import org.matsim.core.api.internal.MatsimFactory;
  * @author thibautd
  */
 public interface DecisionMakerFactory extends MatsimFactory {
-	public DecisionMaker createDecisionMaker(Person agent);
+	/**
+	 * Creates a decision maker instance representing this agent in the choice
+	 * process.
+	 *
+	 * @param agent the agent to represent
+	 * @return the DecisionMaker representation of the agent
+	 *
+	 * @throws UnelectableAgentException if the agent is not a valid decision
+	 * maker (e.g. he has no license whereas the models can only handle driver
+	 * agents)
+	 */
+	public DecisionMaker createDecisionMaker(Person agent) throws UnelectableAgentException;
+
+	public static class UnelectableAgentException extends Exception {
+		private static final long serialVersionUID = 1L;
+
+		public UnelectableAgentException() {
+			super();
+		}
+
+		public UnelectableAgentException( final String msg ) {
+			super( msg );
+		}
+
+		public UnelectableAgentException( final Throwable cause ) {
+			super( cause );
+		}
+
+		public UnelectableAgentException( final String msg, final Throwable cause ) {
+			super( msg , cause );
+		}
+	}
 }
 

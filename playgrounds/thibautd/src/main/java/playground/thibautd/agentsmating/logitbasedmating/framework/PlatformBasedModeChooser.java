@@ -135,7 +135,14 @@ public class PlatformBasedModeChooser {
 		checkProcessingState();
 
 		for (Person person : population.getPersons().values()) {
-			DecisionMaker decisionMaker = getDecisionMakerFactory().createDecisionMaker(person);
+			DecisionMaker decisionMaker;
+			try {
+				decisionMaker = getDecisionMakerFactory().createDecisionMaker(person);
+			} catch (DecisionMakerFactory.UnelectableAgentException e) {
+				// this agent cannot be handled: jump to the next one
+				continue;
+			}
+
 			// TODO: check if other plans
 			Plan plan = person.getSelectedPlan();
 			List<PlanElement> planElements = plan.getPlanElements();
