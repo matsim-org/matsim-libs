@@ -20,6 +20,8 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -74,12 +76,16 @@ public class WithinDayController extends Controler {
 	 * ===================================================================
 	 */
 	public void createAndInitTravelTimeCollector() {
+		this.createAndInitTravelTimeCollector(null);
+	}
+	
+	public void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
 		if (this.events == null) {
 			log.warn("Cannot create and init the TravelTimeCollector. EventsManager has not be initialized yet!");
 			return;
 		}
 		if (travelTime == null) {
-			travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData);
+			travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData, analyzedModes);
 			fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);
 			fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);
 			fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);

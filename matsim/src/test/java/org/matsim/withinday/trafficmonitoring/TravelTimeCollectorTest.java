@@ -77,7 +77,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 			Scenario scenario = controler.getScenario();
 			EventsManager eventsManager = controler.getEvents();
 			
-			TravelTimeCollector travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(scenario);
+			TravelTimeCollector travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(scenario, null);
 			MobsimListenerForTests listener = new MobsimListenerForTests(scenario, travelTime);
 			eventsManager.addHandler(travelTime);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FreeSpeedTravelTimeCalculatorFactory.java
+ * TravelTimeCollectorFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,26 +20,20 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimFactory;
 
 public class TravelTimeCollectorFactory implements MatsimFactory {
 
-	public TravelTimeCollector createTravelTimeCollector(final Scenario scenario) {
-		return new TravelTimeCollector(scenario, TravelTimeCollectorFactory.getNextId());
+	public TravelTimeCollector createTravelTimeCollector(final Scenario scenario, Set<String> analyzedModes) {
+		return new TravelTimeCollector(scenario, analyzedModes);
 	}
 	
-	public TravelTimeCollector createTravelTimeCollector(final Network network, int numThreads) {
-		return new TravelTimeCollector(network, numThreads, TravelTimeCollectorFactory.getNextId());
+	public TravelTimeCollector createTravelTimeCollector(final Network network, int numThreads, Set<String> analyzedModes) {
+		return new TravelTimeCollector(network, numThreads, analyzedModes);
 	}
 	
-	/*
-	 * Each TravelTimeCollector gets a unique Id.
-	 */
-	private static int idCount = 0;
-	private synchronized static int getNextId() {
-		idCount++;
-		return idCount;
-	}
 }

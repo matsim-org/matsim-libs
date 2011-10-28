@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
@@ -65,8 +66,7 @@ import org.matsim.core.utils.misc.Time;
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
  * 
- * TODO: 
- * - take transport mode for multi-modal simulations into account
+ * TODO:
  * - make storedTravelTimesBinSize configurable (e.g. via config)
  * 
  * @author cdobler
@@ -98,21 +98,33 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	private int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
 	
+	private Set<Id> agentsToFilter;
+	private final Set<String> analyzedModes;
+	private final boolean filterModes;
+	
+	
 	// use the factory
-	/*package*/ TravelTimeCollector(Scenario scenario, int id) {
+	/*package*/ TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
 		 * the number of available threads according to the config file.
 		 */
-		this(scenario.getNetwork(), scenario.getConfig().global().getNumberOfThreads(), id);
+		this(scenario.getNetwork(), scenario.getConfig().global().getNumberOfThreads(), analyzedModes);
 	}
 
 	// use the factory
-	/*package*/ TravelTimeCollector(Network network, int numOfThreads, int id) {
+	/*package*/ TravelTimeCollector(Network network, int numOfThreads, Set<String> analyzedModes) {
 		this.network = network;
 		this.numOfThreads = numOfThreads;
-		// this.id = id;
 
+		if (analyzedModes == null || analyzedModes.size() == 0) {
+			this.filterModes = false;
+			this.analyzedModes = null;
+		} else {
+			this.analyzedModes = new HashSet<String>(analyzedModes);
+			filterModes = true;
+		}
+		
 		init();
 	}
 
@@ -120,7 +132,8 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		regularActiveTrips = new HashMap<Id, TripBin>();
 		travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
 		changedLinks = new HashMap<Double, Collection<Link>>();
-
+		agentsToFilter = new HashSet<Id>();
+		
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
 			travelTimeInfos.put(link.getId(), travelTimeInfo);
@@ -161,6 +174,12 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		/* 
+		 * If only some modes are analyzed, we check whether the agent
+		 * performs a trip with one of those modes. if not, we skip the event.
+		 */
+		if (filterModes && agentsToFilter.contains(event.getPersonId())) return;
+		
 		Id personId = event.getPersonId();
 		double time = event.getTime();
 
@@ -211,13 +230,21 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 		Id personId = event.getPersonId();
 
 		this.regularActiveTrips.remove(personId);
+		
+		// try to remove agent from set with filtered agents
+		if (filterModes) this.agentsToFilter.remove(event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-
+		/* 
+		 * If filtering transport modes is enabled and the agents
+		 * starts a leg on a non analyzed transport mode, add the agent
+		 * to the filtered agents set.
+		 */
+		if (filterModes && !analyzedModes.contains(event.getLegMode())) this.agentsToFilter.add(event.getPersonId());
 	}
-
+	
 	/*
 	 * Initially set free speed travel time.
 	 */
