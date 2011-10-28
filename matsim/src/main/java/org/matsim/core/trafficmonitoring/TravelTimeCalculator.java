@@ -308,7 +308,10 @@ public class TravelTimeCalculator
 		synchronized(data) {
 			if (data.needsConsolidation) {
 				TravelTimeData r = data.ttData;
-				double prevTravelTime = r.getTravelTime(1, 0.0);
+				double prevTravelTime = r.getTravelTime(0, 0.0);
+				// changed (1, 0.0) to (0, 0.0) since Michal has convinced me (by a test) that using "1" is wrong
+				// because you get the wrong result for time slot number 1.  This change does not affect the existing
+				// unit tests.  kai, oct'11
 				for (int i = 1; i < this.numSlots; i++) {
 					double time = r.getTravelTime(i, i * this.timeSlice);
 					double minTime = prevTravelTime - this.timeSlice;
