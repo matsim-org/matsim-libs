@@ -39,7 +39,6 @@ public class ReducedSPModel extends LogitModel {
 	public static final String A_COST = "cost";
 	public static final String A_WALKING_TIME = "walkingTime";
 	public static final String A_PARK_COST = "parkingCost";
-	public static final String A_IS_CAR_ALWAYS_AVAIL = "carAvailability";
 	public static final String A_WAITING_TIME = "waitingTime";
 	public static final String A_N_TRANSFERS = "nTransfers";
 
@@ -48,6 +47,7 @@ public class ReducedSPModel extends LogitModel {
 	public static final String A_IS_MALE = "isMale";
 	public static final String A_SPEAKS_GERMAN = "speaksGerman";
 	public static final String A_HAS_PT_ABO = "hasPtAbo";
+	public static final String A_IS_CAR_ALWAYS_AVAIL = "carAvailability";
 
 	// model parameters.
 	// TODO: less hard-coded?
@@ -132,8 +132,8 @@ public class ReducedSPModel extends LogitModel {
 			P_BETA_COST * alternative.getAttribute( A_COST ) +
 			P_BETA_WALK_CAR * alternative.getAttribute( A_WALKING_TIME ) +
 			P_BETA_PARK_CAR * alternative.getAttribute( A_PARK_COST ) +
-			P_BETA_MALE_CAR * alternative.getAttribute( A_IS_MALE ) +
-			P_BETA_CAR_AVAIL * alternative.getAttribute( A_IS_CAR_ALWAYS_AVAIL );
+			P_BETA_MALE_CAR * decisionMaker.getAttribute( A_IS_MALE ) +
+			P_BETA_CAR_AVAIL * decisionMaker.getAttribute( A_IS_CAR_ALWAYS_AVAIL );
 	}
 
 	private double ptUtility(
@@ -145,8 +145,8 @@ public class ReducedSPModel extends LogitModel {
 			P_BETA_COST * alternative.getAttribute( A_COST ) +
 			P_BETA_WALK_PT * alternative.getAttribute( A_WALKING_TIME ) +
 			P_BETA_WAIT_PT * alternative.getAttribute( A_WAITING_TIME ) +
-			P_BETA_ABO_PT * alternative.getAttribute( A_HAS_PT_ABO ) +
-			P_BETA_AGE_LOG_PT * Math.log( alternative.getAttribute( A_AGE ) ) +
+			P_BETA_ABO_PT * decisionMaker.getAttribute( A_HAS_PT_ABO ) +
+			P_BETA_AGE_LOG_PT * Math.log( decisionMaker.getAttribute( A_AGE ) ) +
 			P_BETA_TRANSFERS_PT * alternative.getAttribute( A_N_TRANSFERS );
 	}
 
@@ -157,8 +157,8 @@ public class ReducedSPModel extends LogitModel {
 			P_BETA_TT_CPP * alternative.getAttribute( A_TRAVEL_TIME ) +
 			P_BETA_COST * alternative.getAttribute( A_COST ) +
 			P_BETA_WALK_CPP * alternative.getAttribute( A_WALKING_TIME ) +
-			P_BETA_FEMALE_CP * (1 - alternative.getAttribute( A_IS_MALE )) +
-			P_BETA_GERMAN_CP * alternative.getAttribute( A_SPEAKS_GERMAN );
+			P_BETA_FEMALE_CP * (1 - decisionMaker.getAttribute( A_IS_MALE )) +
+			P_BETA_GERMAN_CP * decisionMaker.getAttribute( A_SPEAKS_GERMAN );
 	}
 
 	private double cpdUtility(
@@ -170,8 +170,8 @@ public class ReducedSPModel extends LogitModel {
 			P_BETA_COST * alternative.getAttribute( A_COST ) +
 			P_BETA_WALK_CPD * alternative.getAttribute( A_WALKING_TIME ) +
 			P_BETA_PARK_CPD * alternative.getAttribute( A_PARK_COST ) +
-			P_BETA_FEMALE_CP * (1 - alternative.getAttribute( A_IS_MALE )) +
-			P_BETA_GERMAN_CP * alternative.getAttribute( A_SPEAKS_GERMAN );
+			P_BETA_FEMALE_CP * (1 - decisionMaker.getAttribute( A_IS_MALE )) +
+			P_BETA_GERMAN_CP * decisionMaker.getAttribute( A_SPEAKS_GERMAN );
 	}
 
 
