@@ -67,6 +67,7 @@ import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -89,7 +90,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 	double ofX = 0;
 	double ofY = 0;
 
-	double scale = 0.5;
+	double scale = 1;
 
 	private static final double TWO_PI = Math.PI * 2;
 	private static final double PI_HALF = Math.PI/2;
@@ -135,15 +136,33 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		Iterator it = fs.getFeatures().iterator();
 		while (it.hasNext()) {
 			Feature ft = (Feature) it.next();
-			MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
-			for (int i = 0; i < mp.getNumGeometries(); i++) {
-				Geometry geo = mp.getGeometryN(i);
-				if (geo instanceof Polygon) {
-					drawPolygon((Polygon) geo);
-				}
 
+			if (ft.getDefaultGeometry() instanceof MultiPolygon) {
+				MultiPolygon mp = (MultiPolygon) ft.getDefaultGeometry();
+				for (int i = 0; i < mp.getNumGeometries(); i++) {
+					Geometry geo = mp.getGeometryN(i);
+					if (geo instanceof Polygon) {
+						drawPolygon((Polygon) geo);
+					}
+
+				}
+			} else if (ft.getDefaultGeometry() instanceof MultiLineString) {
+				MultiLineString ml = (MultiLineString)ft.getDefaultGeometry();
+				for (int i = 0; i < ml.getNumGeometries(); i++) {
+					Geometry geo = ml.getGeometryN(i);
+					if (geo instanceof LineString) {
+						drawLineString((LineString)geo);
+					}
+				}
 			}
 
+		}
+	}
+
+	private void drawLineString(LineString geo) {
+
+		for (int i = 0; i < geo.getNumPoints() - 1; i++) {
+			drawSegment(geo.getPointN(i), geo.getPointN(i + 1));
 		}
 	}
 
@@ -332,7 +351,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/dfg/events.xml", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}

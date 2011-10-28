@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -20,7 +19,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class MultiPolygonFromLineStrings {
 
-	private static final double FETCH_RADIUS = 0.2;
+	private static final double FETCH_RADIUS = 0.1;
 
 	GeometryFactory geofac = new GeometryFactory();
 
@@ -77,9 +76,11 @@ public class MultiPolygonFromLineStrings {
 					coords[i] = ls1.getCoordinateN(i);
 				}
 				int j = ls1.getNumPoints();
-				for (int i = ls1.getNumPoints()-1; i >= 0; i--) {
-					coords[j++] = ls1.getCoordinateN(i);
+				for (int i = ls1.getNumPoints()-1; i > 0; i--) {
+					Coordinate c = ls1.getCoordinateN(i);
+					coords[j++] = new Coordinate(c.x+0.001,c.y+0.001);
 				}
+				coords[j] = ls1.getCoordinateN(0);
 				LinearRing lr = this.geofac.createLinearRing(coords);
 				Polygon polygon = (Polygon) this.geofac.createPolygon(lr, null).buffer(0.1);
 				ps.add(polygon);

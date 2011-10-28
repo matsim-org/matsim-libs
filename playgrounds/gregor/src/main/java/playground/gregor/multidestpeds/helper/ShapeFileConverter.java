@@ -16,8 +16,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class ShapeFileConverter {
 
 	public static void main(String [] args) throws IOException {
-		String input = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries.shp";
-		String output = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_transformt.shp";
+		String input = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/walls.shp";
+		String output = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/walls_transformed.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(input);
 		Iterator it = fs.getFeatures().iterator();
 		List<Feature> fts = new ArrayList<Feature>();

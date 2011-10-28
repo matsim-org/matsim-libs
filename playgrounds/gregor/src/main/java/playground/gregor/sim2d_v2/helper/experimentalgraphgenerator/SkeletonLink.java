@@ -30,4 +30,15 @@ public class SkeletonLink {
 		return false;
 	}
 
+	public SkeletonNode getDeadEndNode() {
+		if (this.fromNode.getLinkedLinks().size() == 1) {
+			return this.fromNode;
+		}
+
+		if (this.toNode.getLinkedLinks().size() == 1) {
+			return this.toNode;
+		}
+		return null;
+	}
+
 }

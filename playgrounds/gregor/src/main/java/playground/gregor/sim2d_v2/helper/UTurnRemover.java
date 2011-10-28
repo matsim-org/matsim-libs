@@ -22,8 +22,10 @@ package playground.gregor.sim2d_v2.helper;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,6 +45,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
@@ -88,14 +91,16 @@ public class UTurnRemover implements PersonAlgorithm, IterationStartsListener{
 		Activity a2 = (Activity) list.get(2);
 		if (l0FromId.equals(l1ToId)) {
 			((ActivityImpl)a1).setLinkId(l1);
+			Link lin = this.sc.getNetwork().getLinks().get(l1);
+			((ActivityImpl)a1).setCoord(lin.getCoord());
 			needToReRoute = true;
 		}
 		//
-//		Id lmId = a2.getLinkId();
-		Id lmToId = this.sc.getNetwork().getLinks().get(l0Id).getToNode().getId();
+		Id lmId = a2.getLinkId();
+		Id lmToId = this.sc.getNetwork().getLinks().get(lmId).getToNode().getId();
 
 		Id ln = route.getLinkIds().get(route.getLinkIds().size()-1);
-		Id lnFromId = this.sc.getNetwork().getLinks().get(l1).getFromNode().getId();
+		Id lnFromId = this.sc.getNetwork().getLinks().get(ln).getFromNode().getId();
 
 		if (lmToId.equals(lnFromId)) {
 			((ActivityImpl)a2).setLinkId(ln);

@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -23,8 +24,11 @@ import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 
+import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
 import playground.gregor.pedvis.OTFVisMobsimFeature;
+import playground.gregor.pedvis.PedVisPeekABot;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.helper.UTurnRemover;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
 
@@ -73,11 +77,17 @@ public class HybridVis {
 
 		EventsManager events = EventsUtils.createEventsManager();
 
-		//		PedVisPeekABot vis = new PedVisPeekABot(5,scenario);
-		//		vis.setOffsets(386128,5820182);
-		//		vis.setFloorShapeFile(s.getFloorShapeFile());
-		//		vis.drawNetwork(scenario.getNetwork());
-		//		events.addHandler(vis);
+		PedVisPeekABot vis = new PedVisPeekABot(1,scenario);
+		//		vis.setOffsets(scenario.getNetwork());
+		vis.setFloorShapeFile(s.getFloorShapeFile());
+		vis.drawNetwork(scenario.getNetwork());
+		events.addHandler(vis);
+
+		//		events.addHandler(new DensityEstimatorFactory(events, scenario).createDensityEstimator());
+
+
+
+
 
 		ControlerIO controlerIO = new ControlerIO(config.controler().getOutputDirectory());
 		QSim qSim = (QSim) new HybridQ2DMobsimFactory().createMobsim(scenario, events);

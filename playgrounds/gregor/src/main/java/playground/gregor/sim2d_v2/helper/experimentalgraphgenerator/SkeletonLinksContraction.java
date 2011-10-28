@@ -17,6 +17,8 @@ public class SkeletonLinksContraction {
 
 	private static final double MIN_DIST = 0.25;
 
+	private static final double SAFE_CONTRACTION_LENGTH = .1;
+
 	private static double CONTRACTION_THRESHOLD = 1.5;
 
 	private final GeometryFactory geofac = new GeometryFactory();
@@ -83,7 +85,7 @@ public class SkeletonLinksContraction {
 			}
 		}
 
-		if (!intersecting(others,c)) {
+		if (!intersecting(others,c) || link.getLength() <= SAFE_CONTRACTION_LENGTH) {
 			for (SkeletonLink rmLink : rmLinks) {
 				this.skeleton.removeLink(rmLink);
 				this.killed.add(rmLink);

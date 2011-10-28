@@ -27,6 +27,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.TickEvent;
+import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 
 /**

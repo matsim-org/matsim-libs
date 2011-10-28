@@ -46,7 +46,7 @@ public class DrivingForceModule implements ForceModule {
 	 */
 	public DrivingForceModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
-		this.tau = 1/1.52;
+		this.tau = 0.5; //1/1.52;
 	}
 
 	/*

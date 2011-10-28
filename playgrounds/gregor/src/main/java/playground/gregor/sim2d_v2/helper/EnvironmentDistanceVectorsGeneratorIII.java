@@ -268,7 +268,9 @@ public class EnvironmentDistanceVectorsGeneratorIII {
 		}
 		c.getModules().put("sim2d", s);
 
-		StaticEnvironmentDistancesField fl = new EnvironmentDistanceVectorsGeneratorIII(c).generate();
+		EnvironmentDistanceVectorsGeneratorIII gen = new EnvironmentDistanceVectorsGeneratorIII(c);
+		gen.setResolution(1);
+		StaticEnvironmentDistancesField fl = gen.generate();
 		new EnvironmentDistancesWriter().write(s.getStaticEnvFieldFile(), fl);
 	}
 }

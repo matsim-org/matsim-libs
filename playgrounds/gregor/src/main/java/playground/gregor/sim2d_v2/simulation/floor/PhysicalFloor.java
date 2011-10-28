@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -54,8 +52,6 @@ import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * @author laemmel
@@ -69,23 +65,14 @@ public class PhysicalFloor implements Floor {
 	private long movementTime = 0;
 
 
-	// needed to generated "finish lines"
-	private static final double COS_LEFT = Math.cos(Math.PI / 2);
-	// needed to generated "finish lines"
-	private static final double SIN_LEFT = Math.sin(Math.PI / 2);
-	// needed to generated "finish lines"
-	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
-	// needed to generated "finish lines"
-	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
+
 
 	private final List<ForceModule> forceModules = new ArrayList<ForceModule>();
 	protected final List<DynamicForceModule> dynamicForceModules = new ArrayList<DynamicForceModule>();
 
 	protected final Set<Agent2D> agents = new LinkedHashSet<Agent2D>();
 	private final Scenario scenario;
-	private HashMap<Id, LineString> finishLines;
 
-	private final GeometryFactory geofac = new GeometryFactory();
 
 	private final double sim2DTimeStepSize;
 	private final boolean emitXYZAzimuthEvents;
@@ -93,9 +80,10 @@ public class PhysicalFloor implements Floor {
 	private final Sim2DConfigGroup sim2DConfig;
 	private final EventsManager em;
 	private final Collection<? extends Link> links;
+	private FinishLineCrossedChecker finishLineCrossChecker;
 
 
-	private static final boolean MS_FORCE_UPDATE = true;
+	private static final boolean MS_FORCE_UPDATE = false;
 	private static final int MAX_NUM_OF_THREADS = 4;
 
 	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents) {
@@ -128,7 +116,7 @@ public class PhysicalFloor implements Floor {
 		}
 
 		if (this.sim2DConfig.isEnableEnvironmentForceModule()){
-			this.forceModules.add(new EnvironmentForceModule(this, this.scenario));
+			this.forceModules.add(new EnvironmentForceModuleII(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCollisionPredictionEnvironmentForceModule()){
@@ -147,7 +135,9 @@ public class PhysicalFloor implements Floor {
 			m.init();
 		}
 
-		createFinishLines();
+		this.finishLineCrossChecker  = new FinishLineCrossedChecker(this.scenario);
+		this.finishLineCrossChecker.init();
+
 
 	}
 
@@ -162,29 +152,6 @@ public class PhysicalFloor implements Floor {
 
 	public Envelope getEnvelope() {
 		return this.envelope;
-	}
-
-	private void createFinishLines() {
-
-		this.finishLines = new HashMap<Id, LineString>();
-		for (Link link : this.links) {
-			Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
-			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
-			Coordinate c = new Coordinate(from.x - to.x, from.y - to.y);
-			// length of finish line is 30 m// TODO does this make sense?
-			double scale = 30 / Math.sqrt(Math.pow(c.x, 2) + Math.pow(c.y, 2));
-			c.x *= scale;
-			c.y *= scale;
-			Coordinate c1 = new Coordinate(COS_LEFT * c.x + SIN_LEFT * c.y, -SIN_LEFT * c.x + COS_LEFT * c.y);
-			c1.x += to.x;
-			c1.y += to.y;
-			Coordinate c2 = new Coordinate(COS_RIGHT * c.x + SIN_RIGHT * c.y, -SIN_RIGHT * c.x + COS_RIGHT * c.y);
-			c2.x += to.x;
-			c2.y += to.y;
-			LineString ls = this.geofac.createLineString(new Coordinate[] { c1, c2 });
-
-			this.finishLines.put(link.getId(), ls);
-		}
 	}
 
 	/* (non-Javadoc)
@@ -213,6 +180,7 @@ public class PhysicalFloor implements Floor {
 
 		for (; it.hasNext();) {
 			Agent2D agent = it.next();
+
 			if (moveAgentAndCheckForEndOfLeg(agent, time)){
 
 				it.remove();
@@ -221,6 +189,7 @@ public class PhysicalFloor implements Floor {
 
 			}
 		}
+
 
 	}
 
@@ -278,9 +247,7 @@ public class PhysicalFloor implements Floor {
 	 * 
 	 */
 	protected boolean checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
-		LineString finishLine = this.finishLines.get(agent.getCurrentLinkId());
-		LineString trajectory = this.geofac.createLineString(new Coordinate[] { oldPos, newPos });
-		if (trajectory.crosses(finishLine)) {
+		if (this.finishLineCrossChecker.crossesFinishLine(agent.getCurrentLinkId(),agent.chooseNextLinkId(),oldPos,newPos)) {
 			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId());
 			this.em.processEvent(e);
 

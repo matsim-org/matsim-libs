@@ -32,7 +32,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class GraphGenerator {
@@ -54,22 +53,31 @@ public class GraphGenerator {
 	public void run() {
 
 		List<LineString> ls =  extractLineStrings();
+		//		new LineStringSnapper().run(ls, this.envelope);
 
 		MultiPoint mp = new DenseMultiPointFromLineString().getDenseMultiPointFromLineString(ls);
 		Geometry boundary = new MultiPolygonFromLineStrings().getMultiPolygon(ls, this.envelope);
 
 		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
+		//		vdb.setTolerance(0.2);
 		vdb.setSites(mp);
 		GeometryCollection dia = (GeometryCollection) vdb.getDiagram(geofac);
 		boundary = boundary.buffer(0.01);
 
 		Skeleton skeleton = new SkeletonExtractor().extractSkeleton(dia, boundary);
+		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeleton.shp");
+		skeleton.dumpIntersectingNodes("/Users/laemmel/tmp/vis/skeletonNodes.shp");
 
 		new SkeletonSimplifier().simplifySkeleton(skeleton,boundary);
+		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonSimpl.shp");
 
 		new SkeletonLinksContraction().contractShortSkeletonLinks(skeleton, boundary);
+		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonContr.shp");
 
 		new Puncher().punchSkeleton(skeleton, this.envelope);
+
+		new StubRemover().run(skeleton);
+		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonStubRM.shp");
 
 		createNetwork(skeleton);
 
@@ -124,8 +132,8 @@ public class GraphGenerator {
 
 
 	public static void main(String [] args) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
-
-		String floorplan = "/Users/laemmel/devel/sim2dDemo/raw_input/floorplan.shp";
+		//		String floorplan = "/Users/laemmel/tmp/voronoi/test.shp";
+		String floorplan = "/Users/laemmel/devel/sim2dDemoII/raw_input/floorplan.shp";
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		ShapeFileReader reader = new ShapeFileReader();
@@ -136,8 +144,10 @@ public class GraphGenerator {
 		}
 
 		new GraphGenerator(sc,geos,reader.getBounds()).run();
-		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/sim2dDemo/input/network.xml");
-		String [] argsII = {"/Users/laemmel/devel/sim2dDemo/input/network.xml","/Users/laemmel/devel/sim2dDemo/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemo/raw_input/networkLP.shp","EPSG:3395"};
+		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/devel/sim2dDemoII/input/network.xml");
+		//		String [] argsII = {"/Users/laemmel/devel/sim2dDemoII/input/network.xml","/Users/laemmel/devel/sim2dDemoII/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemoII/raw_input/networkP.shp","EPSG:3395"};
+		new NetworkWriter(sc.getNetwork()).write("/Users/laemmel/tmp/voronoi/network.xml");
+		String [] argsII = {"/Users/laemmel/tmp/voronoi/network.xml","/Users/laemmel/devel/sim2dDemoII/raw_input/networkL.shp","/Users/laemmel/devel/sim2dDemoII/raw_input/networkP.shp","EPSG:3395"};
 		Links2ESRIShape.main(argsII);
 	}
 

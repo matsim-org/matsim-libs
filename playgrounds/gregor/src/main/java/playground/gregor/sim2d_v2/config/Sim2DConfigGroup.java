@@ -72,11 +72,11 @@ public class Sim2DConfigGroup extends Module {
 
 
 
-	private boolean enableCollisionPredictionEnvironmentForceModule = true;
+	private boolean enableCollisionPredictionEnvironmentForceModule = false;
 	private boolean enableDrivingForceModule = true;
 
 
-	private boolean enableEnvironmentForceModule = false;
+	private boolean enableEnvironmentForceModule = true;
 
 
 	private boolean enablePathForceModule = true;

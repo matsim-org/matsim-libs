@@ -1,6 +1,5 @@
 package playground.gregor.sim2d_v2.helper;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,13 +11,10 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-public class PopulationGenerator {
+public class SimplePopulationGenerator {
 
 
 
@@ -29,7 +25,7 @@ public class PopulationGenerator {
 
 	private final Scenario sc;
 
-	public PopulationGenerator(Scenario sc) {
+	public SimplePopulationGenerator(Scenario sc) {
 		this.sc = sc;
 	}
 
@@ -40,7 +36,7 @@ public class PopulationGenerator {
 
 
 		for (int i = 0; i < NUM_PERSONS; i++) {
-			Person pers = pb.createPerson(this.sc.createId(Integer.toString(i)));
+			Person pers = pb.createPerson(this.sc.createId("g"+Integer.toString(i)));
 			pop.addPerson(pers);
 			Plan plan = pb.createPlan();
 			Activity act = pb.createActivityFromLinkId("pre-evac", fromLinkId);
@@ -63,7 +59,7 @@ public class PopulationGenerator {
 		Config c = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(c);
 
-		new PopulationGenerator(sc).generate();
+		new SimplePopulationGenerator(sc).generate();
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(c.plans().getInputFile());
 
 	}

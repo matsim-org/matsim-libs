@@ -29,6 +29,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 
@@ -39,17 +40,19 @@ import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 public class PathForceModule implements ForceModule {
 
 	private final PhysicalFloor floor;
-	private HashMap<Id, Coordinate> drivingDirections;
-	private HashMap<Id, Coordinate> fromCoords;
-	private HashMap<Id, LineString> linkGeos;
+	private HashMap<Id, LinkInfo> linkGeos;
 
 	int redraws = 0;
 	private final double deltaT;
 
+	private static final double VIRTUAL_LENGTH = 1000;
+
+	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
+	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =1.13*Agent2D.AGENT_WEIGHT;
-	private static final double Bpath = 1;
+	private static final double Apath =10;
+	private static final double Bpath = .5;
 
 
 	/**
@@ -70,9 +73,7 @@ public class PathForceModule implements ForceModule {
 	@Override
 	public void init() {
 
-		this.drivingDirections = new HashMap<Id, Coordinate>();
-		this.fromCoords = new HashMap<Id, Coordinate>();
-		this.linkGeos = new HashMap<Id, LineString>();
+		this.linkGeos = new HashMap<Id, LinkInfo>();
 		GeometryFactory geofac = new GeometryFactory();
 		for (Link link : this.floor.getLinks()) {
 			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
@@ -81,9 +82,25 @@ public class PathForceModule implements ForceModule {
 			double length = Math.sqrt(Math.pow(c.x, 2) + Math.pow(c.y, 2));
 			c.x /= length;
 			c.y /= length;
-			this.drivingDirections.put(link.getId(), c);
-			this.fromCoords.put(link.getId(), from);
-			this.linkGeos.put(link.getId(), geofac.createLineString(new Coordinate[] { from, to }));
+
+			Coordinate virtualFrom = new Coordinate(from.x - c.x*VIRTUAL_LENGTH, from.y - c.y * VIRTUAL_LENGTH);
+
+
+			LineString ls = geofac.createLineString(new Coordinate[] { virtualFrom, to });
+
+
+			Coordinate perpendicularVec = new Coordinate(COS_RIGHT * c.x + SIN_RIGHT * c.y, -SIN_RIGHT * c.x + COS_RIGHT * c.y);
+
+
+
+
+			LinkInfo li = new LinkInfo();
+			li.ls = ls;
+			li.perpendicularVector = perpendicularVec;
+
+
+
+			this.linkGeos.put(link.getId(), li);
 
 		}
 	}
@@ -97,32 +114,44 @@ public class PathForceModule implements ForceModule {
 	 */
 	@Override
 	public void run(Agent2D agent) {
-		Coordinate drivingDir = this.drivingDirections.get(agent.getCurrentLinkId());
-		Coordinate fromNode = this.fromCoords.get(agent.getCurrentLinkId());
 
-		double hypotenuse = agent.getPosition().distance(fromNode);
+		Coordinate pos = agent.getPosition();
+		LinkInfo li = this.linkGeos.get(agent.getCurrentLinkId());
+		LineString ls = li.ls;
 
-
-		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(this.linkGeos.get(agent.getCurrentLinkId()));
-		//		if (pathDist < Bpath){
-		//			return;
-		//		}
-		//
-		double scale = Math.sqrt(Math.pow(hypotenuse, 2) - Math.pow(pathDist, 2));
-
-		double deltaX = (fromNode.x - agent.getPosition().x) + drivingDir.x * scale;
-		double deltaY = (fromNode.y - agent.getPosition().y) + drivingDir.y * scale;
-
-		double f = Math.exp(pathDist / Bpath) * this.deltaT; //deltaT is needed here to make path force independent of temporal resolution
-		deltaX *= f / pathDist;
-		deltaY *= f / pathDist;
-
-		deltaX = Apath * deltaX;
-		deltaY = Apath * deltaY;
+		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls);
+		if (pathDist <= 0){
+			return;
+		}
 
 
-		agent.getForce().incrementX(deltaX);
-		agent.getForce().incrementY(deltaY);
 
+
+
+		double f = Apath * Math.exp(pathDist / Bpath);
+
+
+		Point orig = ls.getStartPoint();
+		Point dest = ls.getEndPoint();
+		double x2 = orig.getX() - dest.getX();
+		double y2 = orig.getY() - dest.getY();
+		double x3 = orig.getX() - pos.x;
+		double y3 = orig.getY() - pos.y;
+		boolean rightHandSide = x2*y3 - y2*x3 < 0 ? false : true;
+		double dx = rightHandSide == true ? -li.perpendicularVector.x : li.perpendicularVector.x;
+		double dy = rightHandSide == true ? -li.perpendicularVector.y : li.perpendicularVector.y;
+
+		double fx  = dx * f;
+		double fy = dy * f;
+
+
+		agent.getForce().incrementX(fx);
+		agent.getForce().incrementY(fy);
+
+	}
+
+	private static final class LinkInfo {
+		LineString ls;
+		Coordinate perpendicularVector;
 	}
 }

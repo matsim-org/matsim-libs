@@ -19,13 +19,17 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.scenario;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
 import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 public class ScenarioLoader2DImpl  {
+
+	private static final Logger log = Logger.getLogger(ScenarioLoader2DImpl.class);
 
 	private StaticEnvironmentDistancesField sff;
 
@@ -42,20 +46,28 @@ public class ScenarioLoader2DImpl  {
 	}
 
 	public void load2DScenario() {
-
 		loadStaticEnvironmentDistancesField();
+		loadFloorShape();
+	}
+
+	private void loadFloorShape() {
+		String file = this.sim2DConfig.getFloorShapeFile();
+		ShapeFileReader reader = new ShapeFileReader();
+		reader.readFileAndInitialize(file);
+		this.scenarioData.addScenarioElement(reader);
 	}
 
 	private void loadStaticEnvironmentDistancesField() {
 
-		if (this.sim2DConfig.getStaticEnvFieldFile() == null) {
-			throw new RuntimeException("this mode is not longer supported!");
+		if (this.sim2DConfig.getStaticEnvFieldFile() != null) {
+			log.warn("this mode is not longer supported!");
 		} else  {
 			loadStaticEnvironmentDistancesField(this.sim2DConfig.getStaticEnvFieldFile());
+			this.scenarioData.addScenarioElement(this.sff);
 		}
 
 
-		this.scenarioData.addScenarioElement(this.sff);
+
 
 	}
 

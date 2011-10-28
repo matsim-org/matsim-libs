@@ -61,6 +61,7 @@ public class Skeleton {
 	//DEBUG
 	public void dumpLinks(String file) {
 		GeometryFactory geofac = new GeometryFactory();
+
 		for (SkeletonLink link : this.links) {
 			SkeletonNode from = link.getFromNode();
 			SkeletonNode to = link.getToNode();
