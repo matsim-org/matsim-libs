@@ -119,8 +119,6 @@ public class Constants {
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
 	
-//	/** debugging flags */
-//	public static final String DEFAULT_MATSIM_CONFIG_FILE = "/Users/thomas/Development/opus_home/opus_matsim/matsim_config/seattle_matsim_0.xml";
 	/** test run */
 	public static final int TEST_RUN_SUCCESSFUL = 0;
 	public static final int TEST_RUN_FAILD = -1;

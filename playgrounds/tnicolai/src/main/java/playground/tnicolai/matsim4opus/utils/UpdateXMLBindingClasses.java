@@ -136,7 +136,7 @@ public class UpdateXMLBindingClasses {
 			log.warn("XSD location not given (optional)...");
 			String tmpDir = TempDirectoryUtil.createCustomTempDirectory("xsd");
 			// set default location			
-			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD, tmpDir, "MATSim4UrbanSimConfigSchema.xsd");
+			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD, tmpDir, Constants.XSD_FILE_NAME);
 			xsdLocation = loadFile.loadMATSim4UrbanSimXSDString();
 			
 			log.warn("Set xsd default location to: " + xsdLocation);

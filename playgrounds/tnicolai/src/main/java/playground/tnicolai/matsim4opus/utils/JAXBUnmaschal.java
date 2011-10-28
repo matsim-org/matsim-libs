@@ -83,14 +83,14 @@ public class JAXBUnmaschal {
 
 			// crate a schema factory ...
 			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-			// ... and initialize it with an xsd (xsd lies in the urbansim project)
-			
-			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
+			// ... and initialize it with an xsd
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
+			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
 			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD, tempDir , Constants.XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
-//			File file2XSD = new File("/Users/thomas/Development/vspworkspace/matsim/dtd/MATSim4UrbanSimConfigSchema.xsd");
+			// tnicolai: debugging
+			// file2XSD = new File("/Users/thomas/Development/vspworkspace/matsim/dtd/matsim4urbansim_v1.xsd");
 			
 			if(file2XSD == null || !file2XSD.exists()){
 				log.error(file2XSD.getCanonicalPath() + " not found!!!");
@@ -106,8 +106,7 @@ public class JAXBUnmaschal {
 			unmarschaller.setSchema(schema);
 			
 			File inputFile = new File( matsimConfigFile );
-			if(!inputFile.exists())
-				log.error(inputFile.getCanonicalPath() + " not found!!!");
+			isFileAvailable(inputFile);
 			// contains the content of the MATSim config.
 			Object object = unmarschaller.unmarshal(inputFile);
 			
@@ -153,6 +152,13 @@ public class JAXBUnmaschal {
 			} catch (IOException e) {
 				// no warning needed here
 			}
+		}
+	}
+	
+	private void isFileAvailable(File file){
+		if(!file.exists()){
+			log.error(matsimConfigFile + " not found!!!");
+			System.exit(-1);
 		}
 	}
 
