@@ -455,7 +455,7 @@ public class Controler {
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.network);
+				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
 			}
 		});
 

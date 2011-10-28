@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -89,7 +89,8 @@ public class PersonPrepareForSimTest {
 			pop.addPerson(person);
 		}
 
-		new PersonPrepareForSim(new DummyRouter(), (NetworkImpl) net).run(person);
+		new PersonPrepareForSim(new DummyRouter(), (ScenarioImpl) sc).run(person);
+		new PersonPrepareForSim(new DummyRouter(), ((ScenarioImpl) sc).getNetwork()).run(person);
 
 		Assert.assertEquals(l1.getId(), a1.getLinkId());
 		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode

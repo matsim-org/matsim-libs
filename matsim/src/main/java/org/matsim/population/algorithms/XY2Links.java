@@ -24,9 +24,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * Assigns each activity in a plan a link where the activity takes place
@@ -37,10 +41,28 @@ import org.matsim.core.population.ActivityImpl;
 public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final NetworkImpl network;
+	private final ActivityFacilities facilities;
+	private final boolean hasFacilities;
 
-	public XY2Links(final NetworkImpl network) {
+	/**
+	 * When running XY2Links with given facilities, the linkIds of activities are
+	 * taken from the facilities where they are performed. This ensures that the
+	 * activity is performed at the same link where the facility is located. 
+	 */
+	public XY2Links(final NetworkImpl network, final ActivityFacilities facilities) {
 		super();
 		this.network = network;
+		this.facilities = facilities;
+		hasFacilities = (facilities != null);
+	}
+
+	public XY2Links(final ScenarioImpl scenario) {
+		this(scenario.getNetwork(), scenario.getActivityFacilities());
+	}
+	
+	@Deprecated
+	public XY2Links(final NetworkImpl network) {
+		this(network, null);
 	}
 
 	/** Assigns links to each activity in all plans of the person. */
@@ -58,14 +80,27 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 	}
 
 	private void processPlan(final Plan plan) {
-		List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			ActivityImpl act = (ActivityImpl)actslegs.get(j);
-			LinkImpl link = this.network.getNearestLink(act.getCoord());
-			if (null == link) {
-				throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
+		List<PlanElement> planElements = plan.getPlanElements();
+		for (PlanElement planElement : planElements) {
+			if (planElement instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) planElement;
+				
+				if (hasFacilities) {
+					if (act.getFacilityId() != null) {
+						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId()); 
+						if (facility != null) act.setLinkId(facility.getLinkId());
+						if (act.getLinkId() != null) continue;
+					}
+				}
+
+				// If the linkId is still null get nearest link from the network
+				LinkImpl link = this.network.getNearestLink(act.getCoord());
+				if (null == link) {
+					throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
+				}
+				act.setLinkId(link.getId());				
 			}
-			act.setLinkId(link.getId());
+			else continue;
 		}
 	}
 }

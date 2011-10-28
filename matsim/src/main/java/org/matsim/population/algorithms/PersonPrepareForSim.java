@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -57,6 +58,23 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
+	public PersonPrepareForSim(final PlanAlgorithm router, final ScenarioImpl scenario) {
+		super();
+		this.router = router;
+		this.network = scenario.getNetwork();
+		NetworkImpl net = scenario.getNetwork();
+		if (NetworkUtils.isMultimodal(network)) {
+			log.info("Network seems to be multimodal. XY2Links will only use car links.");
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			net = NetworkImpl.createNetwork();
+			HashSet<String> modes = new HashSet<String>();
+			modes.add(TransportMode.car);
+			filter.filter(net, modes);
+		}
+		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
+	}
+	
+	@Deprecated
 	public PersonPrepareForSim(final PlanAlgorithm router, final NetworkImpl network) {
 		super();
 		this.router = router;
