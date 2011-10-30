@@ -17,6 +17,16 @@ public abstract class ComposedLink extends LinkImpl {
 	private final List<Link> links;
 	
 	
+	//Static methods
+	
+	public static double getAngle(Link link) {
+		return Math.atan2(link.getToNode().getCoord().getY()-link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
+	}
+	
+	public static double getLength(Link link) {
+		return Math.hypot(link.getToNode().getCoord().getY()-link.getFromNode().getCoord().getY(), link.getToNode().getCoord().getX()-link.getFromNode().getCoord().getX());
+	}
+	
 	//Methods
 	
 	public ComposedLink(Link link, Node from, Node to, Network network) {

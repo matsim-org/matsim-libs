@@ -26,8 +26,11 @@ public class TransitScheduleAfter24H {
 			for(TransitRoute transitRoute:transitLine.getRoutes().values()) {
 				List<Departure> newDepartures = new ArrayList<Departure>();
 				for(Departure departure:transitRoute.getDepartures().values())
-					if(departure.getDepartureTime()<numSeconds)
-						newDepartures.add(transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime()));
+					if(departure.getDepartureTime()<numSeconds) {
+						Departure newDeparture = transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime());
+						newDeparture.setVehicleId(departure.getVehicleId());
+						newDepartures.add(newDeparture);
+					}
 				for(Departure departure:newDepartures)
 					transitRoute.addDeparture(departure);
 			}

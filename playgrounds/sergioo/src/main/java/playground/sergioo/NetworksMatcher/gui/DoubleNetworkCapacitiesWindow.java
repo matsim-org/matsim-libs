@@ -196,9 +196,9 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 			res = JOptionPane.showInputDialog("Please write the link Id");
 			if(res!=null && !res.equals(""))
 				if(isA)
-					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).selectLink(res);
+					((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).selectLink(res);
 				else
-					((NetworkNodesPanel)layersPanels.get(PanelIds.B)).selectLink(res);
+					((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).selectLink(res);
 		}
 	}
 	public void findNode() {
@@ -210,14 +210,14 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 			res = JOptionPane.showInputDialog("Please write the node Id");
 			if(res!=null && !res.equals(""))
 				if(isA)
-					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).selectNode(res);
+					((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).selectNode(res);
 				else
-					((NetworkNodesPanel)layersPanels.get(PanelIds.B)).selectNode(res);
+					((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).selectNode(res);
 		}
 	}
 	public void centerCamera(Coord coord) {
-		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(coord);
-		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(coord);
+		layersPanels.get(PanelIds.A).centerCamera(coord);
+		layersPanels.get(PanelIds.B).centerCamera(coord);
 	}
 	public void save() {
 		try {

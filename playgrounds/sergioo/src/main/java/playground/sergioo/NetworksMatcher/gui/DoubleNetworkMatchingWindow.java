@@ -437,8 +437,8 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		return null;
 	}
 	public void centerCamera(Coord coord) {
-		((NetworkNodesPanel)layersPanels.get(PanelIds.A)).centerCamera(coord);
-		((NetworkNodesPanel)layersPanels.get(PanelIds.B)).centerCamera(coord);
+		layersPanels.get(PanelIds.A).centerCamera(coord);
+		layersPanels.get(PanelIds.B).centerCamera(coord);
 	}
 	public void save() {
 		try {

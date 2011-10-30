@@ -35,6 +35,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Options;
@@ -76,6 +77,16 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	}
 	public Link getSelectedLink() {
 		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getSelectedLink();
+	}
+	public void selectLink(String id) {
+		Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(id);
+		if(link!=null)
+			doubleNetworkWindow.centerCamera(link.getCoord());
+	}
+	public void selectNode(String id) {
+		Node node = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(id);
+		if(node!=null)
+			doubleNetworkWindow.centerCamera(node.getCoord());
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();

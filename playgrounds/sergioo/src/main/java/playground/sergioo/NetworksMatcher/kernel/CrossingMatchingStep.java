@@ -30,12 +30,15 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
+import playground.sergioo.Visualizer2D.LayersWindow;
+import util.geometry.Functions2D;
 
 public class CrossingMatchingStep extends MatchingStep {
 
@@ -43,7 +46,12 @@ public class CrossingMatchingStep extends MatchingStep {
 	//Constants
 
 	public static final File MATCHINGS_FILE = new File("./data/matching/matchings.txt");
+	
 	public static final File CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
+	
+	private static final double MAX_ANGLE_DIFFERENCE = Math.PI/3;
+	
+	private static final double MAX_LENGTH_FRACTION = 1.5;
 	
 	@SuppressWarnings("unchecked")
 	public static final Tuple<Id, Id>[] NEAR_NODES_LOW = new Tuple[] {
@@ -104,7 +112,7 @@ public class CrossingMatchingStep extends MatchingStep {
 		new Tuple<Id, Id>(new IdImpl("EW16/NE3"), new IdImpl("NE3")),
 		new Tuple<Id, Id>(new IdImpl("NE17"), new IdImpl("PTC"))
 	};
-
+	
 	
 	//Attributes
 	
@@ -211,8 +219,9 @@ public class CrossingMatchingStep extends MatchingStep {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}*/
+		loadSimpleLinks();
 		applyCapacitiesSimples();
-		JOptionPane.showMessageDialog(null,"Simples done!");
+		//JOptionPane.showMessageDialog(null,"Simples done!");
 		TravelMinCost travelMinCost = new TravelMinCost() {
 			public double getLinkGeneralizedTravelCost(Link link, double time) {
 				return getLinkMinimumTravelCost(link);
@@ -230,12 +239,12 @@ public class CrossingMatchingStep extends MatchingStep {
 		preProcessData.run(networkB);
 		AStarLandmarks aStarLandmarks = new AStarLandmarks(networkB, preProcessData, timeFunction);
 		applyCapacitiesASimple(aStarLandmarks);
-		JOptionPane.showMessageDialog(null,"SimplesA done!");
+		//JOptionPane.showMessageDialog(null,"SimplesA done!");
 		preProcessData = new PreProcessLandmarks(travelMinCost);
 		preProcessData.run(networkA);
 		aStarLandmarks = new AStarLandmarks(networkA, preProcessData, timeFunction);
 		applyCapacitiesBSimple(aStarLandmarks);
-		JOptionPane.showMessageDialog(null,"SimplesB done!");
+		//JOptionPane.showMessageDialog(null,"SimplesB done!");
 		try {
 			PrintWriter writer = new PrintWriter(CAPACITIES_FILE);
 			for(Entry<Link, Tuple<Link,Double>> linkE:linksChanged.entrySet())
@@ -244,26 +253,33 @@ public class CrossingMatchingStep extends MatchingStep {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		try {
-			PrintWriter writer = new PrintWriter("./data/matching/capacities/simpleLinksA.txt");
-			for(Link linkA:linksA)
-				writer.println(linkA.getId());
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		try {
-			PrintWriter writer = new PrintWriter("./data/matching/capacities/simpleLinksB.txt");
-			for(Link linkB:linksB)
-				writer.println(linkB.getId());
-			writer.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 		networkSteps.add(new CrossingReductionStep(region, nodesMatchings));
 		networkSteps.add(new EdgeDeletionStep(region));
 	}
 	
+	private void loadSimpleLinks() {
+		try {
+			BufferedReader bufferedReader = new BufferedReader(new FileReader("./data/matching/capacities/simpleLinksA.txt"));
+			String line = bufferedReader.readLine();
+			while(line!=null) {
+				linksA.add(networkA.getLinks().get(new IdImpl(line)));
+				line = bufferedReader.readLine();
+			}
+			bufferedReader.close();
+			bufferedReader = new BufferedReader(new FileReader("./data/matching/capacities/simpleLinksB.txt"));
+			line = bufferedReader.readLine();
+			while(line!=null) {
+				linksB.add(networkB.getLinks().get(new IdImpl(line)));
+				line = bufferedReader.readLine();
+			}
+			bufferedReader.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void loadNodesMatchings() {
 		try {
 			nodesMatchings.clear();
@@ -286,7 +302,7 @@ public class CrossingMatchingStep extends MatchingStep {
 	}
 	
 	private void applyCapacitiesSimples() {
-		for(Link linkA: networkA.getLinks().values()) {
+		for(Link linkA: linksA) {
 			NodesMatching nodesMatchingFrom = null, nodesMatchingTo = null;
 			FROM_NODE:
 				for(NodesMatching nodesMatching:nodesMatchings)
@@ -302,14 +318,11 @@ public class CrossingMatchingStep extends MatchingStep {
 							nodesMatchingTo = nodesMatching;
 							break TO_NODE;
 						}
-			if(nodesMatchingFrom!=null && nodesMatchingTo!=null) {
-				linksA .add(linkA);
-				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
-					for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes())
-						for(Link linkB: networkB.getLinks().values())
-							if(linkB.getFromNode().getId().equals(nodeFrom.getId()) && linkB.getToNode().getId().equals(nodeTo.getId()))
-								applyCapacities(((ComposedLink)linkA).getLinks(), ((ComposedLink)linkB).getLinks());
-			}
+			for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
+				for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes())
+					for(Link linkB: linksB)
+						if(linkB.getFromNode().getId().equals(nodeFrom.getId()) && linkB.getToNode().getId().equals(nodeTo.getId()))
+							applyCapacities(((ComposedLink)linkA).getLinks(), ((ComposedLink)linkB).getLinks());
 		}
 	}
 	
@@ -330,20 +343,28 @@ public class CrossingMatchingStep extends MatchingStep {
 							nodesMatchingTo = nodesMatching;
 							break TO_NODE;
 						}
-			if(nodesMatchingFrom!=null && nodesMatchingTo!=null)
-				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
-					for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes()) {
-						List<Link> linksTo = new ArrayList<Link>();
-						Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
-						for(Link linkPath:path.links)
-							linksTo.addAll(((ComposedLink)linkPath).getLinks());
-						applyCapacities(((ComposedLink)linkA).getLinks(), linksTo);
+			for(Node nodeFrom:nodesMatchingFrom.getComposedNodeB().getNodes())
+				for(Node nodeTo:nodesMatchingTo.getComposedNodeB().getNodes()) {
+					List<Link> linksTo = new ArrayList<Link>();
+					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+					if(path!=null && path.links.size()>0) {
+						double pathLength = 0;
+						for(Link link:path.links)
+							pathLength+=ComposedLink.getLength(link);
+						if(Functions2D.getAnglesDifference(ComposedLink.getAngle(path.links.get(0)),ComposedLink.getAngle(linkA))<MAX_ANGLE_DIFFERENCE &&
+								Functions2D.getAnglesDifference(ComposedLink.getAngle(path.links.get(path.links.size()-1)),ComposedLink.getAngle(linkA))<MAX_ANGLE_DIFFERENCE &&
+								pathLength<(1+MAX_LENGTH_FRACTION)*ComposedLink.getLength(linkA) && pathLength>(1-MAX_LENGTH_FRACTION)*ComposedLink.getLength(linkA)) {
+							for(Link linkPath:path.links)
+								linksTo.addAll(((ComposedLink)linkPath).getLinks());
+							applyCapacities(((ComposedLink)linkA).getLinks(), linksTo);
+						}
 					}
+				}
 		}
 	}
 	
 	private void applyCapacitiesBSimple(AStarLandmarks aStarLandmarks) {
-		for(Link linkB: networkB.getLinks().values()) {
+		for(Link linkB:linksB) {
 			NodesMatching nodesMatchingFrom = null, nodesMatchingTo = null;
 			FROM_NODE:
 				for(NodesMatching nodesMatching:nodesMatchings)
@@ -359,17 +380,23 @@ public class CrossingMatchingStep extends MatchingStep {
 							nodesMatchingTo = nodesMatching;
 							break TO_NODE;
 						}
-			if(nodesMatchingFrom!=null && nodesMatchingTo!=null) {
-				linksB.add(linkB);
-				for(Node nodeFrom:nodesMatchingFrom.getComposedNodeA().getNodes())
-					for(Node nodeTo:nodesMatchingTo.getComposedNodeA().getNodes()) {
-						List<Link> linksFrom = new ArrayList<Link>();
-						Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
-						for(Link linkPath:path.links)
-							linksFrom.addAll(((ComposedLink)linkPath).getLinks());
-						applyCapacities(linksFrom, ((ComposedLink)linkB).getLinks());
+			for(Node nodeFrom:nodesMatchingFrom.getComposedNodeA().getNodes())
+				for(Node nodeTo:nodesMatchingTo.getComposedNodeA().getNodes()) {
+					List<Link> linksFrom = new ArrayList<Link>();
+					Path path = aStarLandmarks.calcLeastCostPath(nodeFrom, nodeTo, 0);
+					if(path!=null && path.links.size()>0) {
+						double pathLength = 0;
+						for(Link link:path.links)
+							pathLength+=ComposedLink.getLength(link);
+						if(Functions2D.getAnglesDifference(ComposedLink.getAngle(path.links.get(0)),ComposedLink.getAngle(linkB))<MAX_ANGLE_DIFFERENCE &&
+								Functions2D.getAnglesDifference(ComposedLink.getAngle(path.links.get(path.links.size()-1)),ComposedLink.getAngle(linkB))<MAX_ANGLE_DIFFERENCE &&
+								pathLength<(1+MAX_LENGTH_FRACTION)*ComposedLink.getLength(linkB) && pathLength>(1-MAX_LENGTH_FRACTION)*ComposedLink.getLength(linkB)) {
+							for(Link linkPath:path.links)
+								linksFrom.addAll(((ComposedLink)linkPath).getLinks());
+							applyCapacities(linksFrom, ((ComposedLink)linkB).getLinks());
+						}
 					}
-			}
+				}
 		}
 	}
 	
@@ -387,8 +414,7 @@ public class CrossingMatchingStep extends MatchingStep {
 				}
 				if(nearest!=null && nearest.getCapacity()!=0) {
 					linksChanged.put(linkTo, new Tuple<Link,Double>(nearest,nearest.getCapacity()));
-					System.out.println(linkTo.getId()+":::"+nearest.getId()+":::"+nearest.getCapacity());
-					System.out.println(linksChanged.size());
+					//System.out.println(linksChanged.size());
 				}
 			}
 		}
