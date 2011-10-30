@@ -43,7 +43,7 @@ public class TaxiModeDepartureHandler implements DepartureHandler {
 			mobsim.getEventsManager().processEvent( 
 					new PassengerTaxiRequestEvent( now, agent.getId(), linkId, agent.getMode() )) ;
 			
-			this.mobsim.registerAgentAtPtWaitLocation(agent) ; 
+			this.mobsim.registerAdditionalAgentOnLink(agent) ; 
 
 			
 			return true ;
