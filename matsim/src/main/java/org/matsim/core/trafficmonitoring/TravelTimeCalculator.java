@@ -308,19 +308,36 @@ public class TravelTimeCalculator
 		synchronized(data) {
 			if (data.needsConsolidation) {
 				TravelTimeData r = data.ttData;
+
+				// initialize prevTravelTime with ttime from time bin 0 and time 0.  (The interface comment already states that
+				// having both as argument does not make sense.)
 				double prevTravelTime = r.getTravelTime(0, 0.0);
 				// changed (1, 0.0) to (0, 0.0) since Michal has convinced me (by a test) that using "1" is wrong
 				// because you get the wrong result for time slot number 1.  This change does not affect the existing
 				// unit tests.  kai, oct'11
+				
+				// go from time slot 1 forward in time:
 				for (int i = 1; i < this.numSlots; i++) {
-					double time = r.getTravelTime(i, i * this.timeSlice);
-					double minTime = prevTravelTime - this.timeSlice;
-					if (time < minTime) {
-						r.resetTravelTime(i) ;
-						r.addTravelTime(i, minTime);
-						prevTravelTime = minTime;
+					
+					// once more the getter is weird since it needs both the time slot and the time:
+					double travelTime = r.getTravelTime(i, i * this.timeSlice);
+					
+					// if the travel time in the previous time slice was X, then now it is X-S, where S is the time slice:
+					double minTravelTime = prevTravelTime - this.timeSlice;
+
+					// if the travel time that has been measured so far is less than that minimum travel time, then do something:
+					if (travelTime < minTravelTime) {
+
+						// these TWO statements effectively set the travel time to the minTravelTime:
+//						r.resetTravelTime(i) ; // removing that line again since it makes planomat scores _worse_.  Does
+						// not make sense to me ...  Kai, oct'11
+						r.addTravelTime(i, minTravelTime);
+
+						prevTravelTime = minTravelTime;
+						// (it seems a bit odd that this remembers "minTravelTime" and not getTravelTime(.,.), since they do
+						// not need to be the same.  kai, oct'11)
 					} else {
-						prevTravelTime = time;
+						prevTravelTime = travelTime;
 					}
 				}
 				data.needsConsolidation = false;

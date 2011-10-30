@@ -24,7 +24,10 @@ public interface TravelTimeData {
 
 	public abstract void resetTravelTimes();
 	
-	public abstract void resetTravelTime( final int timeSlot ) ;
+	/** Selectively reset the travel time accounting for a certain time slot.  This may be necessary for some version of
+	 * "consolidateData", but right now it is not needed.  kai, oct'11
+	 */
+//	public abstract void resetTravelTime( final int timeSlot ) ;
 
 	abstract void addTravelTime(final int timeSlot, final double traveltime);
 

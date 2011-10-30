@@ -52,13 +52,13 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 		this.travelTimes.clear();
 	}
 	
-	@Override
-	public void resetTravelTime( final int timeSlice ) {
-		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
-		if ( curr != null ) {
-			this.travelTimes.remove( curr ) ;
-		}
-	}
+//	@Override
+//	public void resetTravelTime( final int timeSlice ) {
+//		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
+//		if ( curr != null ) {
+//			this.travelTimes.remove( curr ) ;
+//		}
+//	}
 
 	@Override
 	public void addTravelTime(final int timeSlice, final double traveltime) {
