@@ -245,7 +245,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 				TransitStopFacility stop = this.schedule.getFacilities().get(route.getAccessStopId());
 				if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
 					this.agentTracker.addAgentToStop((PassengerAgent) planAgent, stop.getId());
-					this.getMobsim().registerAgentAtPtWaitLocation(planAgent) ;
+					this.getMobsim().registerAdditionalAgentOnLink(planAgent) ;
 				} else {
 					throw new TransitAgentTriesToTeleportException("Agent "+planAgent.getId() + " tries to enter a transit stop at link "+stop.getLinkId()+" but really is at "+linkId+"!");
 				}

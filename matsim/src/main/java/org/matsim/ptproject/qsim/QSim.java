@@ -592,13 +592,13 @@ public class QSim implements VisMobsim, Netsim {
 			Id linkId = agent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.registerAgentOnLink(agent);
+			qLink.registerAdditionalAgentOnLink(agent);
 			// }
 		}
 	}
 
 	@Override
-	public final void registerAgentAtPtWaitLocation(final MobsimAgent planAgent) {
+	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		// called by TransitEngine
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
 															// this needed? Does
@@ -612,7 +612,7 @@ public class QSim implements VisMobsim, Netsim {
 														// kai, jun'11
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.registerAgentOnLink(planAgent);
+			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
 
@@ -627,13 +627,13 @@ public class QSim implements VisMobsim, Netsim {
 			Id linkId = agent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.unregisterAgentOnLink(agent);
+			qLink.unregisterAdditionalAgentOnLink(agent);
 			// }
 		}
 	}
 
 	@Override
-	public final void unregisterAgentAtPtWaitLocation(
+	public final void unregisterAdditionalAgentOnLink(
 			final MobsimAgent planAgent) {
 		// called by TransitDriver
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
@@ -643,7 +643,7 @@ public class QSim implements VisMobsim, Netsim {
 			Id linkId = planAgent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.unregisterAgentOnLink(planAgent);
+			qLink.unregisterAdditionalAgentOnLink(planAgent);
 		}
 	}
 

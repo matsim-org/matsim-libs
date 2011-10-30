@@ -616,13 +616,13 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 
 	@Override
-	public void registerAgentAtPtWaitLocation(MobsimAgent planAgent) {
+	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
 		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
-	public void unregisterAgentAtPtWaitLocation(MobsimAgent planAgent) {
+	public void unregisterAdditionalAgentOnLink(MobsimAgent planAgent) {
 		throw new UnsupportedOperationException() ;
 	}
 

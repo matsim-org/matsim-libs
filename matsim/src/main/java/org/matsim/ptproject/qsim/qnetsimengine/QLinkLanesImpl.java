@@ -538,12 +538,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void registerAgentOnLink(MobsimAgent planAgent) {
+	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
 		agentsInActivities.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	public void unregisterAgentOnLink(MobsimAgent planAgent) {
+	public void unregisterAdditionalAgentOnLink(MobsimAgent planAgent) {
 		agentsInActivities.remove(planAgent.getId());
 	}
 

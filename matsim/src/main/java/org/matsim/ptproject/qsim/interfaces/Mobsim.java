@@ -120,15 +120,15 @@ public interface Mobsim extends ObservableSimulation {
 
 	Collection<MobsimAgent> getActivityEndsList() ;
 	
-	/**Registering and unregistering agents on links for visualization.  
+	/**Registering and unregistering agents on links for visualization (and maybe other purposes).  
 	 * 
 	 * Design decision: In theory, the links could also ask the central
 	 * "activities" or "agentTracker" data structures, but in practice this is too slow.  kai, aug'10
 	 * 
-	 * yyyy not sure if this could not be the more general "registerOnLink" function.  kai, aug'10
+	 * This needs the "getCurrentLinkId()" of the MobsimAgent filled with meaningful information.
 	 * 	 */
-	void registerAgentAtPtWaitLocation( final MobsimAgent planAgent ) ;
-	void unregisterAgentAtPtWaitLocation( final MobsimAgent planAgent ) ;
+	void registerAdditionalAgentOnLink( final MobsimAgent agent ) ;
+	void unregisterAdditionalAgentOnLink( final MobsimAgent agent ) ;
 
 
 
