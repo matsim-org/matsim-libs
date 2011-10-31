@@ -218,26 +218,24 @@ public class CreateCensusV2Households {
 //	    		log.info("only z: " + censusData.PERSON_ID");
 	    		censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
 	    	} else if (WKAT == 3 && GEM2 > 0 && PARTNR > 0) {
-//	    		if (censusData.PERSON_ID < PARTNR) censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
-//	    		else censusDataMap.put(scenario.createId(String.valueOf(PARTNR)), censusData);
 	    		
 	    		CensusData cd = censusDataMap.get(scenario.createId(String.valueOf(PARTNR)));
 	    		if (cd == null) {
 	    			censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
 	    		} else {
-	    			cd.PERSON_ID = PARTNR;
-	    			censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
+		    		/*
+		    		 * There is already a partner-entry in the map: reuse its Id but overwrite
+		    		 * all other data.
+		    		 */
+	    			censusDataMap.remove(scenario.createId(String.valueOf(PARTNR)));
+	    			censusDataMap.put(scenario.createId(String.valueOf(PARTNR)), censusData);
 	    		}
-	    		
 	    	} else if (WKAT == 4 && GEM2 > 0 && PARTNR > 0) {
-//	    		continue;
-//	    		if (censusDataMap.get(scenario.createId(String.valueOf(PARTNR))) != null) continue;
-//	    		else censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
-	    		
 	    		CensusData cd = censusDataMap.get(scenario.createId(String.valueOf(PARTNR)));
 	    		if (cd == null) {
 	    			censusDataMap.put(scenario.createId(String.valueOf(censusData.PERSON_ID)), censusData);
 	    		} else {
+	    			// there is already a partner-entry which will be used
 	    			continue;
 	    		}
 	    	} else log.warn("Unknown combination!");    	
@@ -315,6 +313,13 @@ public class CreateCensusV2Households {
 			Coord homeFacilityCoord = facilities.getFacilities().get(homeFacilityId).getCoord();
 			
 			Household household = households.getHouseholds().get(householdId);
+			
+			if (person.getId().equals(scenario.createId("802686"))) {
+				log.info("found!");
+				log.info("housholdid " + householdId);
+				log.info("description " + description);
+			}
+			
 			if (household == null) {
 				household = households.getFactory().createHousehold(householdId);
 				households.getHouseholds().put(householdId, household);
@@ -512,10 +517,10 @@ public class CreateCensusV2Households {
 					
 //					boolean reassigned = reassignInBuilding(personId, houseHolds, random);
 					boolean reassigned = reassignInMunicipality(personId, households, random);
-					if (!reassigned) notReassignableInMunicipality.incCounter();
-					if (!reassigned) log.info("Not reassignable HHPT 9802: " + personId.toString());
-					
-					if (reassigned) {
+					if (!reassigned) {
+						notReassignableInMunicipality.incCounter();
+						log.info("Not reassignable HHPT 9802: " + personId.toString());
+					} else {
 						/*
 						 * Remove the person from its original household and increase the reassigned counter. 
 						 */
@@ -612,8 +617,11 @@ public class CreateCensusV2Households {
 		 * Choose randomly one of the usable households and add the person.
 		 */
 		int r = random.nextInt(useableHouseholds.size());
-		houseHolds.getHouseholds().get(useableHouseholds.get(r)).getMemberIds().add(personId);
-		reassignHousehold(personId, useableHouseholds.get(r));
+		int oldHousehold = censusDataMap.get(personId).HHNR; 
+		Id newHousehold = useableHouseholds.get(r);
+		houseHolds.getHouseholds().get(newHousehold).getMemberIds().add(personId);
+		reassignHousehold(personId, newHousehold);
+		log.info("\t\t reassigned within municipality: person " + personId + " from household " + oldHousehold + " to " + newHousehold);
 		
 		return true;
 	}
@@ -648,8 +656,11 @@ public class CreateCensusV2Households {
 		 * Choose randomly one of the usable households and add the person.
 		 */
 		int r = random.nextInt(useableHouseholds.size());
-		houseHolds.getHouseholds().get(useableHouseholds.get(r)).getMemberIds().add(personId);
-		reassignHousehold(personId, useableHouseholds.get(r));
+		int oldHousehold = censusDataMap.get(personId).HHNR; 
+		Id newHousehold = useableHouseholds.get(r);
+		houseHolds.getHouseholds().get(newHousehold).getMemberIds().add(personId);
+		reassignHousehold(personId, newHousehold);
+		log.info("\t\t reassigned within building: person " + personId + " from household " + oldHousehold + " to " + newHousehold);
 		
 		return true;
 	}
@@ -657,8 +668,8 @@ public class CreateCensusV2Households {
 	/*
 	 * If a person is assigned to a different household or the members of a household
 	 * have different home facilities, this has to be corrected. This methods replaces
-	 * all points within a person to the home facility with the home facility of a given
-	 * household. 
+	 * all points within the plans of a person to the home facility with the home facility 
+	 * of a given household. 
 	 */
 	private void reassignHousehold(Id personId, Id newHouseholdId) {
 		Knowledges knowledges = ((ScenarioImpl) scenario).getKnowledges();
