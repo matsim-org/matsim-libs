@@ -237,6 +237,8 @@ public class VehiclesDataProcessor {
 												if(result2.next())
 													vehicleType.setEngineInformation( new EngineInformationImpl(FuelType.valueOf(result2.getString(2)), result2.getDouble(3)));
 												vehicleType.setDoorOperationMode(DoorOperationMode.valueOf(result.getString(8)));
+												vehicleType.setAccessTime(result.getDouble(10)/fraction);
+												vehicleType.setEgressTime(result.getDouble(11)/fraction);
 												vehicles.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 											}
 										}
@@ -255,7 +257,7 @@ public class VehiclesDataProcessor {
 	public static void main(String[] args) {
 		try {
 			VehiclesDataProcessor vehiclesDataProcessor =  new VehiclesDataProcessor();
-			vehiclesDataProcessor.relateVehiclesToTransitSchedule("./data/currentSimulation/transitScheduleWVWAM.xml", "./data/currentSimulation/vehiclesGood25PercentSampleWAM.xml", 0.25);
+			vehiclesDataProcessor.relateVehiclesToTransitSchedule("./data/currentSimulation/transitScheduleWV.xml", "./data/currentSimulation/vehiclesGood.xml", 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {

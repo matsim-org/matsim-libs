@@ -77,6 +77,12 @@ public class NetworkPainterManager {
 			return network.getLinks().get(selectedLinkId);
 		return null;
 	}
+	public Link getOppositeToSelectedLink() {
+		Id id = getIdOppositeLink(getSelectedLink());
+		if(id != null)
+			return network.getLinks().get(id);
+		return null;
+	}
 	public Node getSelectedNode() {
 		if(selectedNodeId != null)
 			return network.getNodes().get(selectedNodeId);

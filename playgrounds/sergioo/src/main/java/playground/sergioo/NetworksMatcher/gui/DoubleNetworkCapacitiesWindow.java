@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -26,6 +28,12 @@ import javax.swing.border.TitledBorder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.TravelMinCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
@@ -63,9 +71,14 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 	}
 	public enum Tool {
 		APPLY_CAPACITY("Apply capacity",0,0,1,1,"applyCapacity"),
-		FIND_LINK("Find link",1,0,1,1,"findLink"),
-		FIND_NODE("Find node",2,0,1,1,"findNode"),
-		SAVE("Save",3,0,1,1,"save");
+		APPLY_CAPACITY_OPP("Apply capacity opposite",0,0,1,1,"applyCapacityOpp"),
+		APPLY_CAPACITY_PATH("Apply capacity to path",1,0,1,1,"applyCapacityPath"),
+		DELETE_CAPACITY("Delete capacity",2,0,1,1,"deleteCapacity"),
+		DELETE_CAPACITY_OPP("Delete capacity with opposite",3,0,1,1,"deleteCapacityOpp"),
+		UNDO("Undo",4,0,1,1,"undo"),
+		FIND_LINK("Find link",5,0,1,1,"findLink"),
+		FIND_NODE("Find node",6,0,1,1,"findNode"),
+		SAVE("Save",7,0,1,1,"save");
 		String caption;
 		int gx;int gy;
 		int sx;int sy;
@@ -97,6 +110,9 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 	private boolean networksSeparated = true;
 	private JPanel panelsPanel;
 	private Map<Link, Tuple<Link,Double>> linksChanged;
+	private Map<Link, Tuple<Link,Double>> undoLinksChanged;
+	private Node firstNode;
+	private AStarLandmarks aStarLandmarksB;
 
 	//Methods
 	private DoubleNetworkCapacitiesWindow(String title) {
@@ -154,7 +170,6 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 			toolsPanel.add(toolButton,gbc);
 		}
 		this.add(toolsPanel, BorderLayout.NORTH);
-		
 		layersPanels.put(PanelIds.A, new NetworkCapacitiesPanel(MatchingOptions.A, this, new NetworkPainter(networkA, new Color(150,150,255)), new NetworkCapacitiesPainter(networkA, true, linksChanged)));
 		layersPanels.put(PanelIds.B, new NetworkCapacitiesPanel(MatchingOptions.B, this, new NetworkPainter(networkB, new Color(150,150,255)), new NetworkCapacitiesPainter(networkB, false, linksChanged)));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
@@ -166,6 +181,22 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 		panelsPanel.add(layersPanels.get(PanelIds.A));
 		panelsPanel.add(layersPanels.get(PanelIds.B));
 		this.add(panelsPanel, BorderLayout.CENTER);
+		TravelMinCost travelMinCost = new TravelMinCost() {
+			public double getLinkGeneralizedTravelCost(Link link, double time) {
+				return getLinkMinimumTravelCost(link);
+			}
+			public double getLinkMinimumTravelCost(Link link) {
+				return link.getLength();
+			}
+		};
+		TravelTime timeFunction = new TravelTime() {	
+			public double getLinkTravelTime(Link link, double time) {
+				return link.getLength();
+			}
+		};
+		PreProcessLandmarks preProcessData = new PreProcessLandmarks(travelMinCost);
+		preProcessData.run(networkB);
+		aStarLandmarksB = new AStarLandmarks(networkB, preProcessData, timeFunction);
 	}
 	public void cameraChange(Camera camera) {
 		if(networksSeparated) {
@@ -183,9 +214,57 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 		layersPanels.put(PanelIds.ACTIVE, panel);
 	}
 	public void applyCapacity() {
+		saveUndoLinksChanged();
 		Link linkA=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).getSelectedLink();
 		Link linkB=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getSelectedLink();
-		linksChanged.put(linkB,new Tuple<Link, Double>(linkA, linkA.getCapacity()));
+		if(linkA!=null && linkB!=null)
+			linksChanged.put(linkB,new Tuple<Link, Double>(linkA, linkA.getCapacity()));
+	}
+	public void applyCapacityOpp() {
+		applyCapacity();
+		Link linkA=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).getSelectedLink();
+		Link linkBOpp=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getOppositeToSelectedLink();
+		if(linkA!=null && linkBOpp!=null)
+			linksChanged.put(linkBOpp,new Tuple<Link, Double>(linkA, linkA.getCapacity()));
+	}
+	public void applyCapacityPath() {
+		firstNode =((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getSelectedNode();
+		if(firstNode!=null)
+			((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).setPathActive();
+	}
+	public void applyCapacityPath2() {
+		saveUndoLinksChanged();
+		Link linkA=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.A)).getSelectedLink();
+		Node secondNode=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getSelectedNode();
+		Path path = aStarLandmarksB.calcLeastCostPath(firstNode, secondNode, 0);
+		if(path!=null && linkA!=null)
+			for(Link linkB:path.links)
+				linksChanged.put(linkB,new Tuple<Link, Double>(linkA, linkA.getCapacity()));
+	}
+	public void deleteCapacity() {
+		saveUndoLinksChanged();
+		Link linkB = ((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getSelectedLink();
+		if(linkB!=null)
+			linksChanged.remove(linkB);
+	}
+	public void deleteCapacityOpp() {
+		deleteCapacity();
+		Link linkBOpp=((NetworkCapacitiesPanel)layersPanels.get(PanelIds.B)).getOppositeToSelectedLink();
+		if(linkBOpp!=null)
+			linksChanged.remove(linkBOpp);
+	}
+	private void saveUndoLinksChanged() {
+		undoLinksChanged = new HashMap<Link, Tuple<Link,Double>>();
+		for(Entry<Link, Tuple<Link,Double>> linkEntry:linksChanged.entrySet())
+			undoLinksChanged.put(linkEntry.getKey(), new Tuple<Link, Double>(linkEntry.getValue().getFirst(), linkEntry.getValue().getSecond()));
+	}
+	public void undo() {
+		if(undoLinksChanged!=null) {
+			linksChanged.clear();
+			for(Entry<Link, Tuple<Link,Double>> linkEntry:undoLinksChanged.entrySet())
+				linksChanged.put(linkEntry.getKey(), new Tuple<Link, Double>(linkEntry.getValue().getFirst(), linkEntry.getValue().getSecond()));
+			undoLinksChanged = null;
+		}
 	}
 	public void findLink() {
 		String res = JOptionPane.showInputDialog("Please write \"A\" for the left network and \"B\" for the right one");

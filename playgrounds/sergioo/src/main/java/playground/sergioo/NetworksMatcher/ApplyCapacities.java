@@ -30,6 +30,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow;
+import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.Visualizer2D.LayersWindow;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -104,8 +105,9 @@ public class ApplyCapacities {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		for(Node node:networkLowResolution.getNodes().values())
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
-		Map<Link, Tuple<Link,Double>> result = loadCapacities(new File("./data/matching/capacities/linksChanged50.txt"), networkLowResolution, networkHighResolution);
-		LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities 50", networkLowResolution, networkHighResolution, result);
+		CrossingMatchingStep.CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
+		Map<Link, Tuple<Link,Double>> result = loadCapacities(CrossingMatchingStep.CAPACITIES_FILE, networkLowResolution, networkHighResolution);
+		LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())
 			try {
@@ -114,7 +116,5 @@ public class ApplyCapacities {
 				e.printStackTrace();
 			}
 	}
-
-	
 	
 }

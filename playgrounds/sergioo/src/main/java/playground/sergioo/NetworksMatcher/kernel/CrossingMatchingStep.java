@@ -47,7 +47,7 @@ public class CrossingMatchingStep extends MatchingStep {
 
 	public static final File MATCHINGS_FILE = new File("./data/matching/matchings.txt");
 	
-	public static final File CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
+	public static File CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
 	
 	private static final double MAX_ANGLE_DIFFERENCE = Math.PI/3;
 	

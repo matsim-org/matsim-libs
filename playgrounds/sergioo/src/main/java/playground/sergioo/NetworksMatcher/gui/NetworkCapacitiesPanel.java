@@ -56,6 +56,8 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	private final DoubleNetworkCapacitiesWindow doubleNetworkWindow;
 	private int iniX;
 	private int iniY;
+	private boolean activePath;
+	private boolean controlKeyPressed;
 	
 	//Methods
 	public NetworkCapacitiesPanel(MatchingOptions matchingOption, DoubleNetworkCapacitiesWindow doubleNetworkWindow, NetworkPainter networkPainter, NetworkPainter linksPainter) {
@@ -75,8 +77,15 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 	public void setNetwork(Network network) {
 		((NetworkNodesPainter)getLayer(0).getPainter()).setNetwork(network);
 	}
+	public Node getSelectedNode() {
+		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getSelectedNode();
+	}
+	
 	public Link getSelectedLink() {
 		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getSelectedLink();
+	}
+	public Link getOppositeToSelectedLink() {
+		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getOppositeToSelectedLink();
 	}
 	public void selectLink(String id) {
 		Link link = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectLink(id);
@@ -87,6 +96,9 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 		Node node = ((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager().selectNode(id);
 		if(node!=null)
 			doubleNetworkWindow.centerCamera(node.getCoord());
+	}
+	public void setPathActive() {
+		activePath = true;
 	}
 	private void calculateBoundaries() {
 		Collection<Coord> coords = new ArrayList<Coord>();
@@ -131,6 +143,10 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON1) {
 				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().selectNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODE);
+				if(activePath) {
+					doubleNetworkWindow.applyCapacityPath2();
+					activePath = false;
+				}
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODE) && e.getButton()==MouseEvent.BUTTON3) {
 				((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager().unselectNode();
@@ -216,13 +232,37 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 		case KeyEvent.VK_ENTER:
 			doubleNetworkWindow.applyCapacity();
 			break;
+		case KeyEvent.VK_SPACE:
+			doubleNetworkWindow.applyCapacityOpp();
+			break;
+		case KeyEvent.VK_ALT:
+			doubleNetworkWindow.applyCapacityPath();
+			break;
+		case KeyEvent.VK_BACK_SPACE:
+			doubleNetworkWindow.deleteCapacity();
+			break;
+		case KeyEvent.VK_DELETE:
+			doubleNetworkWindow.deleteCapacityOpp();
+			break;
+		case KeyEvent.VK_CONTROL:
+			controlKeyPressed = true;
+			break;
+		case KeyEvent.VK_Z:
+			if(controlKeyPressed)
+				doubleNetworkWindow.undo();
+			break;
 		}
 		doubleNetworkWindow.setVisible(true);
 		doubleNetworkWindow.repaint();
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
+		switch(e.getKeyCode()) {
+		case KeyEvent.VK_CONTROL:
+			controlKeyPressed = false;
+			break;
+		}
 	}
+	
 	
 }
