@@ -157,6 +157,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		boolean value1;
 		boolean value2;
 		// loop over boolean genes
+		if (N_BOOL == 0) return;
 		int crossingPoint = randomGenerator.nextInt(N_BOOL);
 		for (int i=0; i < N_BOOL; i++) {
 			// exchange values with proba O.5
@@ -181,6 +182,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		Object value2;
 
 		// loop over boolean genes
+		if (N_MODE == 0) return;
 		int crossingPoint = N_BOOL + N_DOUBLE + randomGenerator.nextInt(N_MODE);
 		for (int i=N_BOOL + N_DOUBLE;
 				i < N_BOOL + N_DOUBLE + N_MODE;
