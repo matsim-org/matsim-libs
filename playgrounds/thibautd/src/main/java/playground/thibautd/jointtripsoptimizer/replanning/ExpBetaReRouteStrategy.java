@@ -20,22 +20,20 @@
 package playground.thibautd.jointtripsoptimizer.replanning;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.thibautd.jointtripsoptimizer.replanning.reroute.JointReRouteModule;
 
 /**
- * {@link JointPlanStrategy} using an {@link BestPlanSelector} to select a plan
+ * {@link JointPlanStrategy} using an {@link ExpBetaPlanSelector} to select a plan
  * and uses {@link JointReRouteModule} on it.
  *
  * @author thibautd
  */
-public class ReRouteStrategy extends JointPlanStrategy {
+public class ExpBetaReRouteStrategy extends JointPlanStrategy {
 
-	public ReRouteStrategy(final Controler controler) {
-		// TODO: use a JointPlan specific selector?
-		// + pass it from the config file
-		this.planSelector = new BestPlanSelector();
+	public ExpBetaReRouteStrategy(final Controler controler) {
+		this.planSelector = new ExpBetaPlanSelector(controler.getConfig().planCalcScore());
 
 		this.addStrategyModule(new JointReRouteModule(controler));
 	}
