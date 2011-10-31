@@ -28,11 +28,13 @@ import org.apache.log4j.Logger;
 
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.controler.events.ControlerEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.charts.XYLineChart;
 
 import playground.thibautd.utils.XYChartUtils;
@@ -51,7 +53,7 @@ import playground.thibautd.utils.XYChartUtils;
  * @author thibautd
  */
 public class ModeAnalysis implements
-			AgentArrivalEventHandler, ShutdownListener, StartupListener {
+			AgentArrivalEventHandler, ShutdownListener, StartupListener, IterationEndsListener {
 	private static final Logger log =
 		Logger.getLogger(ModeAnalysis.class);
 
@@ -59,15 +61,21 @@ public class ModeAnalysis implements
 	private static final String Y_TITLE = "n legs";
 
 	private final static int NO_VALUE = Integer.MIN_VALUE;
-	private final static String fileName = "modeEvolution";
+	private final static String FILE_NAME = "modeEvolution";
 	private final static String title = "Number of legs";
 	private final static int height = 600;
 	private final static int width = 800;
+
+	private final boolean outputAtEachIteration;
 
 	private Map<String, Counter> modeCount = null;
 	private final List<Map<String, Counter>> iterationsModeCounts =
 			new ArrayList<Map<String, Counter>>();
 	private int firstIter = NO_VALUE;
+
+	public ModeAnalysis(final boolean outputAtEachIteration) {
+		this.outputAtEachIteration = outputAtEachIteration;
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// Handling methods
@@ -93,10 +101,19 @@ public class ModeAnalysis implements
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
+		if (!outputAtEachIteration) outputGraphs( event );
+	}
+
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+		if (outputAtEachIteration) outputGraphs( event );
+	}
+
+	private void outputGraphs(final ControlerEvent event) {
 		List<String> modes = getUsedModes();
 		double[] xAxis = getXAxis();
 		Map<String, double[]> yAxes = getYAxes(modes);
-		String fileName = event.getControler().getControlerIO().getOutputFilename(this.fileName);
+		String fileName = event.getControler().getControlerIO().getOutputFilename(FILE_NAME);
 		XYLineChart globalChart = new XYLineChart(title+", all modes", X_TITLE, Y_TITLE);
 		XYLineChart particularChart;
 

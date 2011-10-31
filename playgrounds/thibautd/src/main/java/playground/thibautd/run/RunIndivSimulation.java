@@ -47,7 +47,7 @@ public class RunIndivSimulation {
 		//controler.addControlerListener(new CliqueScoreStats(
 		//			"scoresStats",
 		//			true));
-		controler.addControlerListener(new ModeAnalysis());
+		controler.addControlerListener(new ModeAnalysis( true ));
 		//controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new JointReplanningControlerListener());
 

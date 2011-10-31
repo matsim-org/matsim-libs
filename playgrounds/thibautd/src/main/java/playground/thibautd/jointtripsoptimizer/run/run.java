@@ -23,7 +23,6 @@ import org.matsim.core.controler.Controler;
 
 import playground.thibautd.analysis.listeners.CliqueScoreStats;
 import playground.thibautd.analysis.listeners.ModeAnalysis;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
 
 /**
@@ -42,7 +41,7 @@ public class run {
 		controler.addControlerListener(new CliqueScoreStats(
 					"scoresStats",
 					true));
-		controler.addControlerListener(new ModeAnalysis());
+		controler.addControlerListener(new ModeAnalysis( true ));
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new JointReplanningControlerListener());
 
