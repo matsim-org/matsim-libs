@@ -2,12 +2,12 @@ package playground.michalm.demand;
 
 import java.util.*;
 
-import playground.michalm.demand.Zone.Act;
-import playground.michalm.demand.Zone.Group;
-
 import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.io.*;
 import org.xml.sax.*;
+
+import playground.michalm.demand.Zone.Act;
+import playground.michalm.demand.Zone.Group;
 
 
 public class ZoneXMLReader
@@ -23,6 +23,8 @@ public class ZoneXMLReader
 
     private Map<Id, Zone> zones = new TreeMap<Id, Zone>();
 
+    private List<Zone> fileOrderedZones = new ArrayList<Zone>();
+
 
     public ZoneXMLReader(Scenario scenario)
     {
@@ -33,6 +35,12 @@ public class ZoneXMLReader
     public Map<Id, Zone> getZones()
     {
         return zones;
+    }
+
+
+    public List<Zone> getZoneFileOrder()
+    {
+        return fileOrderedZones;
     }
 
 
@@ -62,6 +70,7 @@ public class ZoneXMLReader
         currentZone = new Zone(id);
 
         zones.put(id, currentZone);
+        fileOrderedZones.add(currentZone);
     }
 
 

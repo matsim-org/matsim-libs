@@ -23,6 +23,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
+import playground.michalm.visualization.*;
 import playground.michalm.vrp.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
@@ -72,7 +73,7 @@ public class OfflineDVRPLauncher
             // vrpDynamicFileName = "A102_scen.txt";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-            // cfgFileName = dirName + "config-verB.xml";
+            // cfgFileName = dirName + "config-verBB.xml";
             // vrpDirName = dirName + "dvrp\\";
             // vrpStaticFileName = "C101.txt";
             // vrpDynamicFileName = "C101_scen.txt";
@@ -83,9 +84,9 @@ public class OfflineDVRPLauncher
             // vrpStaticFileName = "C102.txt";
             // vrpDynamicFileName = "C102_scen.txt";
 
-            vrpArcTimesFileName = vrpDirName + "arc_times.txt";
-            vrpArcCostsFileName = vrpDirName + "arc_costs.txt";
-            vrpArcPathsFileName = vrpDirName + "arc_paths.txt";
+            vrpArcTimesFileName = vrpDirName + "arc_times.txt.gz";
+            vrpArcCostsFileName = vrpDirName + "arc_costs.txt.gz";
+            vrpArcPathsFileName = vrpDirName + "arc_paths.txt.gz";
             algParamsFileName = "algorithm.txt";
         }
         else if (args.length == 9) {
@@ -187,7 +188,9 @@ public class OfflineDVRPLauncher
         simulator.simulate();
 
         if (VRP_OUT_FILES) {
-            new Routes2QGIS(data.getVrpData().schedules, data, vrpOutDirName + "\\route_").write();
+            List<Schedule> schedules = data.getVrpData().getSchedules();
+            
+            new Routes2QGIS(schedules, data, vrpOutDirName + "\\route_").write();
 
             //PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName + );
 
@@ -195,7 +198,7 @@ public class OfflineDVRPLauncher
             PopulationFactory pf = popul.getFactory();
 
             // generate output plans (plans.xml)
-            for (Schedule s : data.getVrpData().schedules) {
+            for (Schedule s : schedules) {
                 Person person = pf.createPerson(scenario.createId("vrpDriver_" + s.getId()));
 
                 VRPSchedulePlan plan = new VRPSchedulePlan(new PersonImpl(scenario.createId(Integer

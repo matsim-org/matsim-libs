@@ -24,7 +24,7 @@ public class CombinePlansWithVRPSchedulePlans
         if (args.length == 1 && args[0].equals("test")) {// for testing
             dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
             networkFileName = dirName + "network.xml";
-            plansFileName = dirName + "\\output\\config-verB\\output_plans.xml.gz";
+            plansFileName = dirName + "output\\config-verB\\output_plans.xml.gz";
             vrpDirName = dirName + "dvrp\\";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";

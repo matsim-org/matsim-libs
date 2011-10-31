@@ -32,13 +32,15 @@ public class DemandGenerator
 
     private Uniform uniform = new Uniform(new MersenneTwister(new Date()));
 
-    private Scenario scenario;
+    Scenario scenario;
     private PopulationFactory pf;
 
-    private Map<Id, Zone> zones = new TreeMap<Id, Zone>();
+    Map<Id, Zone> zones;
+    List<Zone> fileOrderedZones;
 
 
-    public DemandGenerator(String networkFileName, String zonesXMLFileName, String zonesShpFileName)
+    public DemandGenerator(String networkFileName, String zonesXMLFileName, String zonesShpFileName,
+            String idField)
         throws IOException, SAXException, ParserConfigurationException
 
     {
@@ -50,9 +52,10 @@ public class DemandGenerator
         ZoneXMLReader xmlReader = new ZoneXMLReader(scenario);
         xmlReader.parse(zonesXMLFileName);
         zones = xmlReader.getZones();
+        fileOrderedZones = xmlReader.getZoneFileOrder();
 
         ZoneShpReader shpReader = new ZoneShpReader(scenario, zones);
-        shpReader.readZones(zonesShpFileName);
+        shpReader.readZones(zonesShpFileName, idField);
     }
 
 
@@ -195,7 +198,7 @@ public class DemandGenerator
     }
 
 
-    private Activity createActivity(Plan plan, String actType, Coord coord)
+    Activity createActivity(Plan plan, String actType, Coord coord)
     {
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
         Link link = network.getNearestLink(coord);
@@ -212,7 +215,7 @@ public class DemandGenerator
     }
 
 
-    private Coord getRandomCoordInZone(Zone zone)
+    Coord getRandomCoordInZone(Zone zone)
     {
         Feature ft = zone.getZonePolygon();
 
@@ -234,11 +237,11 @@ public class DemandGenerator
         return scenario.createCoord(p.getX(), p.getY());
     }
 
-
+    
     private int id = 0;
 
 
-    private Plan createPlan()
+    Plan createPlan()
     {
         Person person = pf.createPerson(scenario.createId(Integer.toString(id++)));
         scenario.getPopulation().addPerson(person);
@@ -258,6 +261,7 @@ public class DemandGenerator
         String zonesXMLFileName;
         String zonesShpFileName;
         String plansFileName;
+        String idField;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
          dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
@@ -265,6 +269,7 @@ public class DemandGenerator
          zonesXMLFileName = dirName + "zones1.xml";
          zonesShpFileName = dirName + "zones1.shp";
          plansFileName = dirName + "plans1.xml";
+         idField = "ID";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
             // networkFileName = dirName + "network2.xml";
@@ -284,12 +289,13 @@ public class DemandGenerator
 //            zonesShpFileName = dirName + "zone.shp";
 //            plansFileName = dirName + "plans.xml";
         }
-        else if (args.length == 5) {
+        else if (args.length == 6) {
             dirName = args[0];
             networkFileName = dirName + args[1];
             zonesXMLFileName = dirName + args[2];
             zonesShpFileName = dirName + args[3];
             plansFileName = dirName + args[4];
+            idField = args[5];
         }
         else {
             throw new IllegalArgumentException("Incorrect program arguments: "
@@ -297,7 +303,7 @@ public class DemandGenerator
         }
 
         DemandGenerator dg = new DemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName);
+                zonesShpFileName, idField);
         dg.generate();
         dg.write(plansFileName);
     }

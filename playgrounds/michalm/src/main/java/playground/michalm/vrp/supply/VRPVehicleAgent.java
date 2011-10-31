@@ -22,7 +22,7 @@ public class VRPVehicleAgent
 
         this.vrpVehicle = vrpVehicle;
 
-        vrpSchedulePlan = new VRPSchedulePlan(driver, vrpVehicle.schedule, data);
+        vrpSchedulePlan = new VRPSchedulePlan(driver, vrpVehicle.getSchedule(), data);
         driver.addPlan(vrpSchedulePlan);
     }
 

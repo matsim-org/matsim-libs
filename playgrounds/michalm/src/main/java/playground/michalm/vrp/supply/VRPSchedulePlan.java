@@ -1,32 +1,18 @@
 package playground.michalm.vrp.supply;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.RouteUtils;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.network.*;
+import org.matsim.core.population.*;
+import org.matsim.core.population.routes.*;
+import org.matsim.core.utils.misc.*;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
-import pl.poznan.put.vrp.dynamic.data.schedule.ServeTask;
-import pl.poznan.put.vrp.dynamic.data.schedule.Task;
-import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
-import playground.michalm.vrp.data.MATSimVRPData;
-import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.data.network.ShortestPath;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 
 
@@ -63,7 +49,7 @@ public class VRPSchedulePlan
 
     private void init()
     {
-        MATSimVertex depotVertex = (MATSimVertex)schedule.getVehicle().depot.vertex;
+        MATSimVertex depotVertex = (MATSimVertex)schedule.getVehicle().getDepot().getVertex();
 
         if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
             addActivity(depotVertex, -1, "RtU");
@@ -83,8 +69,8 @@ public class VRPSchedulePlan
 
                 case SERVE:
                     ServeTask st = (ServeTask)t;
-                    addActivity((MATSimVertex)st.getAtVertex(), st.getEndTime(),
-                            "" + st.getRequest().id);
+                    addActivity((MATSimVertex)st.getAtVertex(), st.getEndTime(), ""
+                            + st.getRequest().getId());
                     break;
 
                 case WAIT:
@@ -117,8 +103,8 @@ public class VRPSchedulePlan
         SPEntry entry = sp.getSPEntry(departTime);
         Id[] linkIds = entry.linkIds;
 
-        NetworkRoute netRoute = (NetworkRoute)((PopulationFactoryImpl) populFactory).createRoute(TransportMode.car,
-                fromLink.getId(), toLink.getId());
+        NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
+                TransportMode.car, fromLink.getId(), toLink.getId());
 
         if (linkIds.length > 0) {// means: fromLink != toLink
 

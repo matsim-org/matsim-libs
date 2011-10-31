@@ -1,4 +1,4 @@
-package playground.michalm.vrp;
+package playground.michalm.visualization;
 
 import java.util.*;
 
@@ -20,7 +20,7 @@ import com.vividsolutions.jts.geom.*;
 
 public class Routes2QGIS
 {
-    private Schedule[] schedules;
+    private List<Schedule> schedules;
     private String filename;
     private FeatureType featureType;
     private GeometryFactory geofac;
@@ -28,7 +28,7 @@ public class Routes2QGIS
     private Collection<Feature> features;
 
 
-    public Routes2QGIS(Schedule[] schedules, MATSimVRPData data, String filename)
+    public Routes2QGIS(List<Schedule> schedules, MATSimVRPData data, String filename)
     {
         this.schedules = schedules;
         this.data = data;
@@ -57,7 +57,7 @@ public class Routes2QGIS
                 if (ls != null) {
                     try {
                         Vehicle veh = s.getVehicle();
-                        features.add(featureType.create(new Object[] { ls, veh.id, veh.name,
+                        features.add(featureType.create(new Object[] { ls, veh.getId(), veh.getName(),
                                 s.getId(), drive.getScheduleIdx() }));
                     }
                     catch (IllegalAttributeException e) {

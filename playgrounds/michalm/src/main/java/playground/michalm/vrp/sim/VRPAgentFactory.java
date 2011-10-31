@@ -1,15 +1,10 @@
 package playground.michalm.vrp.sim;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
-import org.matsim.core.population.*;
 import org.matsim.ptproject.qsim.agents.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.supply.*;
 import playground.mzilske.withinday.*;

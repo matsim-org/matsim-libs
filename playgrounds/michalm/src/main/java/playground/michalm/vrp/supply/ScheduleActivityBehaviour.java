@@ -23,7 +23,7 @@ class ScheduleActivityBehaviour
             case PLANNED:
                 return schedule.getBeginTime() - 1;
             case UNPLANNED: // before schedule
-                return schedule.getVehicle().t1;
+                return schedule.getVehicle().getT1();
             case COMPLETED: // after schedule
                 return schedule.getBeginTime();//without "-1"
             default:

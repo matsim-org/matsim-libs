@@ -22,7 +22,7 @@ public class ZoneShpReader
     }
 
 
-    public void readZones(String file)
+    public void readZones(String file, String idField)
         throws IOException
     {
         FeatureSource fts = ShapeFileReader.readDataFile(file);
@@ -37,7 +37,7 @@ public class ZoneShpReader
 
         while (iter.hasNext()) {
             Feature ft = iter.next();
-            String id = ft.getAttribute("ID").toString();
+            String id = ft.getAttribute(idField).toString();
             Zone z = zones.get(scenario.createId(id));
             z.setZonePolygon(ft);
         }

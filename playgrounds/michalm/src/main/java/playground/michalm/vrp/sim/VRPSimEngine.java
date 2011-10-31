@@ -2,10 +2,6 @@ package playground.michalm.vrp.sim;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.*;
-import org.matsim.core.population.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.cvrp.data.*;
@@ -15,7 +11,6 @@ import pl.poznan.put.vrp.dynamic.monitoring.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
 
 
 public class VRPSimEngine
@@ -72,7 +67,7 @@ public class VRPSimEngine
     private void optimize()
     {
         optimizer.optimize(vrpData);
-        System.err.println("Simulation time = " + vrpData.time);
+        System.err.println("Simulation time = " + vrpData.getTime());
 
         // update: DVRPData -> MATSim ???
         // for each vehicle, starting from the current Request do update....
@@ -103,7 +98,7 @@ public class VRPSimEngine
 
         demandChanged = doDemandSimStep(time);// customer side
 
-        vrpData.time = (int)time + 1;// optimize for the next time step
+        vrpData.setTime((int)time + 1);// optimize for the next time step
 
         if (demandChanged || supplyChanged) {// reoptimize
             optimize();

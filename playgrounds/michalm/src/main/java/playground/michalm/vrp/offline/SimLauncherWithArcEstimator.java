@@ -38,7 +38,7 @@ public class SimLauncherWithArcEstimator
             // vrpStaticFileName = "A102.txt";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-            // cfgFileName = dirName + "config-verB.xml";
+            // cfgFileName = dirName + "config-verBB.xml";
             // vrpDirName = dirName + "dvrp\\";
             // vrpStaticFileName = "C101.txt";
 

@@ -1,50 +1,33 @@
 package playground.michalm.vrp.online;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.io.*;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.ptproject.qsim.QSim;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.config.*;
+import org.matsim.core.events.*;
+import org.matsim.core.network.*;
+import org.matsim.core.population.*;
+import org.matsim.core.population.routes.*;
+import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.*;
+import org.matsim.core.router.util.*;
+import org.matsim.core.scenario.*;
+import org.matsim.core.trafficmonitoring.*;
+import org.matsim.core.utils.misc.*;
+import org.matsim.population.algorithms.*;
+import org.matsim.ptproject.qsim.*;
 
-import pl.poznan.put.vrp.cvrp.data.AlgorithmParams;
-import pl.poznan.put.vrp.dynamic.customer.CustomerAction;
-import pl.poznan.put.vrp.dynamic.data.VRPData;
-import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import playground.michalm.vrp.data.MATSimVRPData;
-import playground.michalm.vrp.data.network.MATSimVertex;
-import playground.michalm.vrp.data.network.MATSimVertexImpl;
-import playground.michalm.vrp.data.network.ShortestPathsFinder;
-import playground.michalm.vrp.sim.VRPAgentFactory;
-import playground.michalm.vrp.sim.VRPDriverPerson;
-import playground.michalm.vrp.sim.VRPSimEngine;
+import pl.poznan.put.vrp.cvrp.data.*;
+import pl.poznan.put.vrp.dynamic.customer.*;
+import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.data.file.*;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.sim.*;
 
 
 public class SingleIterOnlineDVRPLauncher
@@ -247,14 +230,13 @@ public class SingleIterOnlineDVRPLauncher
     private static void createDriverPersons(Scenario scenario, VRPData vrpData)
     {
         Population population = scenario.getPopulation();
-        Vehicle[] vrpVehicles = vrpData.vehicles;
 
-        for (Vehicle vrpVeh : vrpVehicles) {
-            Id personId = scenario.createId("vrpDriver_" + vrpVeh.id);
+        for (Vehicle vrpVeh : vrpData.getVehicles()) {
+            Id personId = scenario.createId("vrpDriver_" + vrpVeh.getId());
             VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
 
             Plan dummyPlan = new PlanImpl(vrpDriver);
-            MATSimVertex vertex = (MATSimVertex)vrpVeh.depot.vertex;
+            MATSimVertex vertex = (MATSimVertex)vrpVeh.getDepot().getVertex();
             Activity dummyAct = new ActivityImpl("w", vertex.getCoord(), vertex.getLink().getId());
             dummyPlan.addActivity(dummyAct);
             vrpDriver.addPlan(dummyPlan);

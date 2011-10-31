@@ -22,6 +22,7 @@ class StayTaskActivityBehaviour
         return stayTask.getEndTime() - 1;
     }
 
+
     // void fireMonitoringEvent(METype type)
     // {
     // // MonitoringEvent monitoringEvent = new MonitoringEvent(type, (int)cause.getTime(),
@@ -35,14 +36,14 @@ class StayTaskActivityBehaviour
     // // eventsManager.processEvent(event);
     // // vrpSimEngine.notifyMonitoringListeners(monitoringEvent);
     // }
-    
-    
+
     static StayTaskActivityBehaviour createServeTaskActivityBehaviour(ServeTask serveTask)
     {
-        return new StayTaskActivityBehaviour("ServeTask" + serveTask.getRequest().id, serveTask);
+        return new StayTaskActivityBehaviour("ServeTask" + serveTask.getRequest().getId(),
+                serveTask);
     }
-    
-    
+
+
     static StayTaskActivityBehaviour createWaitTaskActivityBehaviour(WaitTask waitTask)
     {
         return new StayTaskActivityBehaviour("WaitTask", waitTask);

@@ -1,11 +1,8 @@
 package playground.michalm.vrp.supply;
 
-import java.util.*;
-
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.vrp.data.network.*;
 import playground.mzilske.withinday.*;
 
@@ -30,7 +27,7 @@ public class LightweightVRPVehicleAgent
     @Override
     public void doSimStep(World world)
     {
-        Schedule schedule = vrpVehicle.schedule;
+        Schedule schedule = vrpVehicle.getSchedule();
 
         if (firstSimStep) {
             firstSimStep = false;
