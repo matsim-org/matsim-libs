@@ -6,7 +6,7 @@ import freight.ShipperAgentTracker;
 import freight.ShipperImpl;
 import freight.api.ShipperAgentFactory;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 
 public class KarlsruheShipperAgentFactory implements ShipperAgentFactory{
 

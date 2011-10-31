@@ -8,8 +8,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.CarrierOffer;
+import org.matsim.contrib.freight.trade.CostMemory;
 import playground.mzilske.freight.events.TSPTotalCostHandler.TSPCostEvent;
 
 

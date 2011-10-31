@@ -2,11 +2,8 @@ package freight;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.TimeWindow;
-import org.matsim.contrib.freight.carrier.CarrierContract;
-import org.matsim.contrib.freight.carrier.CarrierOffer;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;

@@ -1,6 +1,6 @@
 package freight.offermaker;
 
-import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.carrier.Offer;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 

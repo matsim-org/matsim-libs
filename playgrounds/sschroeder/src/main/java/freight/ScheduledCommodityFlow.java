@@ -1,6 +1,6 @@
 package freight;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import playground.mzilske.freight.TSPOffer;
 
 import java.util.Collection;

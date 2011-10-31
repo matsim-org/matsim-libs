@@ -1,4 +1,4 @@
-package playground.mzilske.freight.events;
+package org.matsim.contrib.freight.events;
 
 import org.matsim.core.events.handler.EventHandler;
 

@@ -2,7 +2,7 @@ package playground.mzilske.freight.events;
 
 import java.util.Map;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.core.api.experimental.events.Event;
 
 public class ShipperTSPContractCanceledEvent implements Event{

@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Actor;
+import org.matsim.contrib.freight.carrier.Actor;
 
-public interface TransportServiceProvider extends Actor{
+public interface TransportServiceProvider extends Actor {
 
 	public abstract Collection<TSPContract> getContracts();
 

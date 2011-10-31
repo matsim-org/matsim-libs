@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import playground.mrieser.core.mobsim.api.PlanAgent;
 import playground.mrieser.core.mobsim.features.OTFVisFeature;
 import playground.mrieser.core.mobsim.features.StatusFeature;
 import playground.mrieser.core.mobsim.features.fastQueueNetworkFeature.FastQueueNetworkFeature;
@@ -45,7 +45,6 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
-import org.matsim.contrib.freight.carrier.CarrierAgentTracker;
 import playground.mzilske.freight.MarcelSimAgentSource;
 
 // This is rather a Builder than a factory... but the interface is named Factory, so well....
@@ -121,7 +120,7 @@ public class AnotherCity2000WMobsimFactory implements MobsimFactory {
 			planSim.addMobsimFeature(otfvisFeature);
 		}
 		
-		planSim.addAgentSource(new MarcelSimAgentSource(freightPlans));
+		planSim.addAgentSource(new MarcelSimAgentSource(freightAgentTracker));
 		return planSim;
 	}
 

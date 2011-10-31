@@ -1,6 +1,6 @@
 package city2000w.replanning;
 
-import org.matsim.contrib.freight.api.Actor;
+import org.matsim.contrib.freight.carrier.Actor;
 import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.ArrayList;

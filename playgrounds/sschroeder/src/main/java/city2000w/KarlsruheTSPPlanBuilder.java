@@ -1,15 +1,12 @@
 package city2000w;
 
-import org.matsim.contrib.freight.api.Offer;
-import org.matsim.contrib.freight.carrier.CarrierContract;
-import org.matsim.contrib.freight.carrier.CarrierOffer;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.Offer;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.trade.Service;
 import playground.mzilske.freight.*;
-import playground.mzilske.freight.events.CarrierOfferRejectEvent;
 import playground.mzilske.freight.events.OfferUtils;
-import playground.mzilske.freight.events.QueryCarrierOffersEvent;
-import playground.mzilske.freight.events.Service;
 
 import java.util.*;
 

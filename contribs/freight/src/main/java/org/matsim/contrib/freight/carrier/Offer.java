@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.api;
+package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 

@@ -2,7 +2,8 @@ package city2000w;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
+import org.matsim.contrib.freight.trade.CostMemory;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainLeg;

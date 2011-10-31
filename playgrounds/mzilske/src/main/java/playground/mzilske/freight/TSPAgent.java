@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.CarrierContract;
 import org.matsim.contrib.freight.carrier.CarrierOffer;
 import org.matsim.contrib.freight.carrier.Shipment;

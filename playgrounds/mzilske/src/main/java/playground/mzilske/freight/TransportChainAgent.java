@@ -1,6 +1,6 @@
 package playground.mzilske.freight;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.Shipment;
 
 

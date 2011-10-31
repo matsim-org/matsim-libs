@@ -1,9 +1,10 @@
-package playground.mzilske.freight.events;
+package org.matsim.contrib.freight.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
+import org.matsim.contrib.freight.trade.Service;
 import org.matsim.core.api.experimental.events.Event;
 
 public class CarrierOfferAcceptEvent implements Event{

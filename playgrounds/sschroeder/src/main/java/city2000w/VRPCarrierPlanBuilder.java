@@ -5,7 +5,7 @@ import freight.vrp.VRPSolverFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.*;
 
 import java.util.ArrayList;

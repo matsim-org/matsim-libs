@@ -4,16 +4,17 @@ import freight.offermaker.OfferSelectorImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.api.Offer;
-import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.Offer;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.trade.Service;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainTriple;
 import playground.mzilske.freight.events.OfferUtils;
-import playground.mzilske.freight.events.QueryCarrierOffersEvent;
-import playground.mzilske.freight.events.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,7 +136,7 @@ public class SimpleTSPPlanBuilder {
 	private CarrierOffer getBestOffer(TSPContract c, Id from, Id to, int size, TimeWindow pickupTW, TimeWindow deliveryTW,int legIndex) {
 		Collection<Offer> carrierOffers = new ArrayList<Offer>(); 
 		Service service = OfferUtils.createService(from, to, size, pickupTW, deliveryTW);
-		eventsManager.processEvent(new QueryCarrierOffersEvent(carrierOffers, service));	
+		eventsManager.processEvent(new QueryCarrierOffersEvent(carrierOffers, service));
 		CarrierOffer cheapestOffer = pickOffer(carrierOffers); 
 		return cheapestOffer;	
 	}

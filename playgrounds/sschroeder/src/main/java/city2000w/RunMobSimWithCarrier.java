@@ -1,7 +1,7 @@
 package city2000w;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.api.CarrierAgentFactory;
+import org.matsim.contrib.freight.mobsim.*;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -76,7 +76,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
+		NETWORK_FILENAME = "../playgrounds/sschroeder/input/grid.xml";
 	}
 
 	private void readNetwork(String networkFilename) {
@@ -85,7 +85,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	public void notifyStartup(StartupEvent event) {
 		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
-		new CarrierPlanReader(carrierImpls).read("../playgrounds/sschroeder/anotherInput/karlsruheCarrierPlans_after.xml");
+		new CarrierPlanReader(new Carriers(carrierImpls)).read("../playgrounds/sschroeder/input/carrierPlans.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);

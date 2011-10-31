@@ -1,13 +1,13 @@
 package freight;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.Actor;
+import org.matsim.contrib.freight.carrier.Actor;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 
-public class ShipperImpl implements Actor{
+public class ShipperImpl implements Actor {
 	private Id id;
 	
 	private ShipperPlan selectedPlan;

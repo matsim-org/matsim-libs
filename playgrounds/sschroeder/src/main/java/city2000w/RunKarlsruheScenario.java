@@ -6,9 +6,16 @@ package city2000w;
 import freight.TSPPlanReader;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.CarrierAgentFactory;
-import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
+import org.matsim.contrib.freight.mobsim.CarrierAgentFactory;
+import org.matsim.contrib.freight.carrier.Offer;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
+import org.matsim.contrib.freight.trade.Service;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
@@ -158,7 +165,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void readCarriers() {
 		Collection<Carrier> carriers = new ArrayList<Carrier>();
-		new CarrierPlanReader(carriers).read(CARRIERNPLAN_FILENAME);
+		new CarrierPlanReader(new Carriers(carriers)).read(CARRIERNPLAN_FILENAME);
 		this.carriers = new Carriers(carriers);
 	}
 

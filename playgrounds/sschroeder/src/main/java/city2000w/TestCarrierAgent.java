@@ -1,6 +1,6 @@
 package city2000w;
 
-import org.matsim.contrib.freight.carrier.CarrierAgent;
+import org.matsim.contrib.freight.mobsim.CarrierAgent;
 
 public class TestCarrierAgent {
 	

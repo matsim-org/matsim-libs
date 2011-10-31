@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.trade.CostMemory;
 
 public class CostMemoryImpl implements CostMemory {
 

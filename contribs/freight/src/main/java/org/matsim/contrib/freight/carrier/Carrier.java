@@ -4,8 +4,6 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Actor;
-
 public interface Carrier extends Actor{
 
 	public abstract Id getId();

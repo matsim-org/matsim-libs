@@ -5,13 +5,13 @@ package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.carrier.Offer;
 
 /**
  * @author stefan
  *
  */
-public class TSPOffer implements Offer{
+public class TSPOffer implements Offer {
 	
 	private Id tspId;
 	

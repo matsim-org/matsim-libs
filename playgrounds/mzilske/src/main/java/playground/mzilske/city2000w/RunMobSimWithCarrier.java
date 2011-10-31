@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.mobsim.SimpleCarrierAgentFactory;
+import org.matsim.contrib.freight.mobsim.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -18,33 +21,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import org.matsim.contrib.freight.api.CarrierAgentFactory;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierAgent;
-import org.matsim.contrib.freight.carrier.CarrierAgentImpl;
-import org.matsim.contrib.freight.carrier.CarrierAgentTracker;
-import org.matsim.contrib.freight.carrier.CarrierDriverAgentFactoryImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlanReader;
-
 
 public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, ScoringListener {
-	
-	static class SimpleCarrierAgentFactory implements CarrierAgentFactory {
 
-		private PlanAlgorithm router;
-		
-		public void setRouter(PlanAlgorithm router){
-			this.router = router;
-		}
-		
-		@Override
-		public CarrierAgent createAgent(CarrierAgentTracker tracker,Carrier carrier) {
-			CarrierAgentImpl agent = new CarrierAgentImpl(tracker, carrier, router,  new CarrierDriverAgentFactoryImpl());
-			return agent;
-		}
-		
-	}
-	private static Logger logger = Logger.getLogger(RunMobSimWithCarrier.class);
+    private static Logger logger = Logger.getLogger(RunMobSimWithCarrier.class);
 	
 	private static String NETWORK_FILENAME;
 	
@@ -88,13 +68,16 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	public void notifyStartup(StartupEvent event) {
 		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
-		new CarrierPlanReader(carrierImpls).read("../playgrounds/sschroeder/anotherInput/karlsruheCarrierPlans_after.xml");
+		new CarrierPlanReader(new Carriers(carrierImpls)).read("../playgrounds/sschroeder/anotherInput/karlsruheCarrierPlans_after.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
 		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
-		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
-		mobsimFactory.setUseOTFVis(true);
+		// City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker.createPlans());
+		// mobsimFactory.setUseOTFVis(true);
+
+        City2000WQSimFactory mobsimFactory = new City2000WQSimFactory(carrierAgentTracker);
+
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 	

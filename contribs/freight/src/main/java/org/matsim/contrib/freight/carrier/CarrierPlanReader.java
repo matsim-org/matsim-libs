@@ -14,7 +14,7 @@ import org.xml.sax.Attributes;
 
 
 
-public class CarrierPlanReader extends MatsimXmlParser{
+public class CarrierPlanReader extends MatsimXmlParser {
 
 	public static Logger logger = Logger.getLogger(CarrierPlanReader.class);
 	
@@ -66,14 +66,14 @@ public class CarrierPlanReader extends MatsimXmlParser{
 	
 	public CarrierPlan currentPlan = null;
 	
-	public Collection<Carrier> carriers;
-	
-	public CarrierPlanReader(Collection<Carrier> carriers) {
-		super();
-		this.carriers = carriers;
-	}
+	public Carriers carriers;
 
-	public void read(String filename){
+    public CarrierPlanReader(Carriers carriers) {
+        super();
+        this.carriers = carriers;
+    }
+
+    public void read(String filename){
 	
 		logger.info("read carrier plans");
 		this.setValidating(false);
@@ -181,7 +181,7 @@ public class CarrierPlanReader extends MatsimXmlParser{
 			
 		}
 		if(name.equals("carrier")){
-			carriers.add(currentCarrier);
+			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 		}
 		if(name.equals("tours")){
 			currentPlan = new CarrierPlan(scheduledTours);

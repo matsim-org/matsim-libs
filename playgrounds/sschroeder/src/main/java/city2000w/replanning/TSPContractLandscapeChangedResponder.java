@@ -1,9 +1,14 @@
 package city2000w.replanning;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.api.Contract;
-import org.matsim.contrib.freight.api.Offer;
+import org.matsim.contrib.freight.carrier.Contract;
+import org.matsim.contrib.freight.carrier.Offer;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
+import org.matsim.contrib.freight.trade.Service;
 import playground.mzilske.freight.*;
 import playground.mzilske.freight.TransportChain.ChainLeg;
 import playground.mzilske.freight.events.*;

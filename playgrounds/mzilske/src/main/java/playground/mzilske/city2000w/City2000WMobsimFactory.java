@@ -21,6 +21,7 @@ package playground.mzilske.city2000w;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -29,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
@@ -44,7 +46,6 @@ import playground.mrieser.core.mobsim.impl.LegHandler;
 import playground.mrieser.core.mobsim.impl.PlanMobsimImpl;
 import playground.mrieser.core.mobsim.impl.TeleportationHandler;
 import playground.mrieser.core.mobsim.network.api.VisNetwork;
-import org.matsim.contrib.freight.carrier.CarrierAgentTracker;
 import playground.mzilske.freight.MarcelSimAgentSource;
 import playground.mzilske.osm.JXMapOTFVisClient;
 
@@ -55,17 +56,12 @@ public class City2000WMobsimFactory implements MobsimFactory {
 	private boolean useOTFVis = false;
 	private String[] teleportedModes = null;
 
-	private CarrierAgentTracker freightAgentTracker;
-	
-	/**
-	 * @param nOfThreads use <code>0</code> if you do not want to use threads
-	 * @param freightAgentTracker 
-	 * @param controler 
-	 */
-	public City2000WMobsimFactory(final int nOfThreads, CarrierAgentTracker freightAgentTracker) {
-		this.nOfThreads = nOfThreads;
-		this.freightAgentTracker = freightAgentTracker;
-	}
+    private CarrierAgentTracker carrierAgentTracker;
+
+    public City2000WMobsimFactory(final int nOfThreads, CarrierAgentTracker carrierAgentTracker) {
+        this.carrierAgentTracker = carrierAgentTracker;
+        this.nOfThreads = nOfThreads;
+    }
 
 	public void setTeleportedModes(final String[] teleportedModes) {
 		this.teleportedModes = teleportedModes.clone();
@@ -108,11 +104,11 @@ public class City2000WMobsimFactory implements MobsimFactory {
 		planSim.addMobsimFeature(ah); // how should a user know ah is a simfeature, bug lh not?
 		planSim.addMobsimFeature(netFeature); // order of features is important!
 
-        Collection<Plan> freightPlans = freightAgentTracker.createPlans();
 
-		if (useOTFVis) {
+        MarcelSimAgentSource agentSource = new MarcelSimAgentSource(carrierAgentTracker);
+        if (useOTFVis) {
 			OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, eventsManager);
-			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap(freightPlans);
+			Map<Id, Plan> freightAgentPlans = createFreightAgentPlanMap(agentSource);
 			server.addAdditionalPlans(freightAgentPlans);
 			JXMapOTFVisClient.run(scenario.getConfig(), server);
 			// OTFClientLive.run(scenario.getConfig(), server);
@@ -121,14 +117,17 @@ public class City2000WMobsimFactory implements MobsimFactory {
 			planSim.addMobsimFeature(otfvisFeature);
 		}
 
-        planSim.addAgentSource(new MarcelSimAgentSource(freightPlans));
+
+        planSim.addAgentSource(agentSource);
 		return planSim;
 	}
 
-	private Map<Id, Plan> createFreightAgentPlanMap(Collection<Plan> freightPlans) {
+	private Map<Id, Plan> createFreightAgentPlanMap(MarcelSimAgentSource freightPlans) {
 		Map<Id, Plan> result = new HashMap<Id, Plan>();
-		for(Plan plan : freightPlans) {
-			result.put(plan.getPerson().getId(), plan);
+        List<PlanAgent> agents = freightPlans.getAgents();
+        for(PlanAgent planAgent : agents) {
+            Plan plan = planAgent.getPlan();
+            result.put(plan.getPerson().getId(), plan);
 		}
 		return result;
 	}

@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -45,6 +46,7 @@ import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
@@ -120,7 +122,6 @@ public class QSim implements VisMobsim, Netsim {
 
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
-	private AgentFactory agentFactory;
 	private final SimulationListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
@@ -129,8 +130,9 @@ public class QSim implements VisMobsim, Netsim {
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 	private final Map<Id, QVehicleImpl> vehicles = new HashMap<Id, QVehicleImpl>();
+    private List<AgentSource> agentSources = new ArrayList<AgentSource>();
 
-	// everything above this line is private and should remain private. pls
+    // everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
 	// ============================================================================================================================
 	// initialization:
@@ -155,7 +157,7 @@ public class QSim implements VisMobsim, Netsim {
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
 
 		// create the QNetwork ...
-		NetsimNetwork network = null;
+		NetsimNetwork network;
 		if (sc.getConfig().scenario().isUseLanes()) {
 			if (((ScenarioImpl) sc).getLaneDefinitions() == null) {
 				throw new IllegalStateException(
@@ -205,7 +207,8 @@ public class QSim implements VisMobsim, Netsim {
 		// set the agent factory. might be better to have this in the c'tor, but
 		// difficult to do as long
 		// as the transitEngine changes the AgentFactory. kai, feb'11
-		this.agentFactory = new DefaultAgentFactory(this);
+
+        this.addAgentSource(new PopulationAgentSource(sc.getPopulation(), new DefaultAgentFactory(this)));
 
 		// configuring transit (this changes the agent factory as a side
 		// effect).
@@ -277,8 +280,9 @@ public class QSim implements VisMobsim, Netsim {
 	public void setAgentFactory(final AgentFactory fac) {
 		// not final since WithindayQSim overrides (essentially: disables) it.
 		// kai, nov'10
-		if (!locked) {
-			this.agentFactory = fac;
+		if (!locked && this.agentSources.size() == 1) {
+            this.agentSources.clear();
+			this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac));
 		} else {
 			throw new RuntimeException(
 					"too late to set agent factory; aborting ...");
@@ -359,15 +363,9 @@ public class QSim implements VisMobsim, Netsim {
 	private static int vehWrnCnt = 0;
 
 	private void createAgents() {
-		if (this.scenario.getPopulation() == null) {
-			throw new RuntimeException(
-					"No valid Population found (plans == null)");
-		}
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			MobsimAgent agent = this.agentFactory
-					.createMobsimAgentFromPerson(p);
-			agents.add(agent);
-		}
+        for (AgentSource agentSource : agentSources) {
+            agents.addAll(agentSource.getAgents());
+        }
 	}
 
 	private void createTransitDrivers() {
@@ -381,8 +379,7 @@ public class QSim implements VisMobsim, Netsim {
 
 	private void parkVehicleOnInitialLink(MobsimAgent agent) {
 		QVehicle veh = ((MobsimDriverAgent) agent).getVehicle();
-		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(
-				((MobsimDriverAgent) agent).getCurrentLinkId());
+		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(agent.getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
 	}
 
@@ -909,5 +906,9 @@ public class QSim implements VisMobsim, Netsim {
 	public Map<Id, QVehicleImpl> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
+
+    public void addAgentSource(AgentSource agentSource) {
+        agentSources.add(agentSource);
+    }
 
 }

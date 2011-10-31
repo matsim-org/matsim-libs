@@ -1,21 +1,21 @@
-package playground.mzilske.freight.events;
+package org.matsim.contrib.freight.events;
 
 import java.util.Map;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.core.api.experimental.events.Event;
 
 
-public abstract class ContractCanceledEvent implements Event{
-
+public abstract class ContractAcceptEvent implements Event{
+	
 	private Contract contract;
 	
-	public ContractCanceledEvent(Contract contract) {
+	public ContractAcceptEvent(Contract contract) {
 		super();
 		this.contract = contract;
 	}
-
-	public Contract getContract() {
+	
+	public Contract getContract(){
 		return contract;
 	}
 
@@ -30,7 +30,5 @@ public abstract class ContractCanceledEvent implements Event{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	
 
 }

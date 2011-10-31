@@ -1,7 +1,7 @@
 package freight;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 import playground.mzilske.freight.TSPContract;
 import playground.mzilske.freight.TSPShipment;
 
@@ -129,7 +129,7 @@ public class ShipperAgentImpl implements ShipperAgent {
 	}
 
 	/* (non-Javadoc)
-	 * @see freight.ShipperAgent#informTSPContractAccept(org.matsim.contrib.freight.api.Contract)
+	 * @see freight.ShipperAgent#informTSPContractAccept(org.matsim.contrib.freight.carrier.Contract)
 	 */
 	@Override
 	public void informTSPContractAccept(Contract contract) {
@@ -138,7 +138,7 @@ public class ShipperAgentImpl implements ShipperAgent {
 	}
 
 	/* (non-Javadoc)
-	 * @see freight.ShipperAgent#informTSPContractCanceled(org.matsim.contrib.freight.api.Contract)
+	 * @see freight.ShipperAgent#informTSPContractCanceled(org.matsim.contrib.freight.carrier.Contract)
 	 */
 	@Override
 	public void informTSPContractCanceled(Contract contract) {

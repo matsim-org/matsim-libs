@@ -2,10 +2,11 @@ package playground.mzilske.freight.events;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.Contract;
-import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.Contract;
+import org.matsim.contrib.freight.carrier.Offer;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.trade.Service;
 import playground.mzilske.freight.ContractImpl;
-import org.matsim.contrib.freight.api.Offer;
 import org.matsim.contrib.freight.carrier.Shipment;
 
 public class OfferUtils {

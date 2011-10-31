@@ -10,6 +10,8 @@ import freight.vrp.RRPDTWSolverFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
@@ -200,7 +202,7 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 
 	private void readCarriers() {
 		Collection<Carrier> carriers = new ArrayList<Carrier>();
-		new CarrierPlanReader(carriers).read(CARRIERNPLAN_FILENAME);
+		new CarrierPlanReader(new Carriers(carriers)).read(CARRIERNPLAN_FILENAME);
 		this.carriers = new Carriers(carriers);
 	}
 

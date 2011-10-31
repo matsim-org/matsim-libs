@@ -29,31 +29,39 @@
 package playground.mzilske.freight;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import playground.mrieser.core.mobsim.api.AgentSource;
-import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.impl.DefaultPlanAgent;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class MarcelSimAgentSource implements AgentSource {
+/**
+ * Created by IntelliJ IDEA.
+ * User: zilske
+ * Date: 10/31/11
+ * Time: 5:59 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public class QSimAgentSource implements AgentSource {
 
-	private List<PlanAgent> agents = new ArrayList<PlanAgent>();
+    private Collection<Plan> plans;
 
-	private final double weight = 1;
+    private AgentFactory agentFactory;
 
-    public MarcelSimAgentSource(CarrierAgentTracker carrierAgentTracker) {
-        Collection<Plan> plans = carrierAgentTracker.createPlans();
-        for (Plan plan : plans) {
-            PlanAgent planAgent = new DefaultPlanAgent(plan, weight);
-            agents.add(planAgent);
-        }
+    public QSimAgentSource(Collection<Plan> plans, AgentFactory agentFactory) {
+        this.plans = plans;
+        this.agentFactory = agentFactory;
     }
 
     @Override
-    public List<PlanAgent> getAgents() {
+    public List<MobsimAgent> getAgents() {
+        List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+        for (Plan plan : plans) {
+            MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(plan.getPerson());
+            agents.add(agent);
+        }
         return agents;
     }
 

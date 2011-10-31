@@ -1,6 +1,6 @@
-package playground.mzilske.freight.events;
+package org.matsim.contrib.freight.events;
 
-import org.matsim.contrib.freight.api.Contract;
+import org.matsim.contrib.freight.carrier.Contract;
 
 public class TSPCarrierContractCanceledEvent extends ContractCanceledEvent{
 

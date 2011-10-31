@@ -1,10 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.api.TimeWindow;
 import org.matsim.core.basic.v01.IdImpl;
-
-import org.matsim.contrib.freight.api.Offer;
 
 public class CarrierUtils {
 	

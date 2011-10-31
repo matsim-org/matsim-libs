@@ -6,7 +6,7 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 
-import org.matsim.contrib.freight.api.TimeWindow;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.CarrierContract;
 import org.matsim.contrib.freight.carrier.CarrierOffer;
 
