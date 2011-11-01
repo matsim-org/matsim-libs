@@ -122,7 +122,7 @@ public class XYLineHistogramDataset extends AbstractIntervalXYDataset {
 		double value;
 
 		if (cumulative) {
-			value = (item / 2);
+			value = ((item + 1) / 2);
 			value /= (double) this.rawXValues.get(series).size();
 		}
 		else {
