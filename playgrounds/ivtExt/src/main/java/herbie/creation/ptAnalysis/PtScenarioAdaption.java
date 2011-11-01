@@ -46,6 +46,8 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
+import utils.Bins;
+
 public class PtScenarioAdaption {
 	
 	public static final double[] relHeadwayClasses = new double[]{
@@ -68,6 +70,9 @@ public class PtScenarioAdaption {
 	int vehicleNumber;
 	private Vehicle currentVehicle;
 	
+	private Bins old_hdwy_distrib;
+	private Bins new_hdwy_distrib;
+	private static double[] relevantInterval = new double[]{8.0, 9.0}; // relevant interval for headway in hours!
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -80,6 +85,7 @@ public class PtScenarioAdaption {
 		ptScenarioAdaption.initScenario();
 		ptScenarioAdaption.doubleHeadway();
 		ptScenarioAdaption.writeScenario();
+		ptScenarioAdaption.evaluateSchedule();
 	}
 
 	private void initConfig(String file) {
@@ -93,6 +99,9 @@ public class PtScenarioAdaption {
 		this.outpath = config.findParam("ptScenarioAdaption", "output");
 		this.transitScheduleFile = config.findParam("ptScenarioAdaption", "transitScheduleFile");
 		this.transitVehicleFile = config.findParam("ptScenarioAdaption", "transitVehicleFile");
+		
+		this.old_hdwy_distrib = new Bins(1, 60d, "Old Headway Distribution");
+		this.new_hdwy_distrib = new Bins(1, 60d, "New Headway Distribution");
 		
 		log.info("InitConfig ... done");
 	}
@@ -154,7 +163,8 @@ public class PtScenarioAdaption {
 				}
 				
 				this.removeDepartures((TransitRouteImpl) route);
-				this.copyNewDepartures(route);				
+				this.copyNewDepartures(route);
+				
 			}
 		}
 		this.removeVehicles();
@@ -179,11 +189,15 @@ public class PtScenarioAdaption {
 			
 			if(departuresTimes.lastKey() == depTime) {
 				addNewDepartures(depTime + currentInterval * 60 - getNewInterval() * 60);
+				
+				old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 			else {
 				
 				addNewDepartures((depTime));
 				currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
+				
+				old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 		}
 	}
@@ -238,10 +252,12 @@ public class PtScenarioAdaption {
 				
 				setNewDeparture();
 			}
+			new_hdwy_distrib.addVal(newInterval, 1d);
 		}
 		else
 		{	
 			copyExistingDepartures(upperThreshold);
+			new_hdwy_distrib.addVal(currentInterval, 1d);
 		}
 	}
 
@@ -274,6 +290,13 @@ public class PtScenarioAdaption {
 		vehicleNumber++;
 	}
 
+	private boolean courseIsInConsideration(double departureTime) {
+		
+		if(departureTime > relevantInterval[0] * 3600d 
+				&& departureTime < relevantInterval[1] * 3600d) return true;
+		return false;
+	}
+
 	private double getNewInterval() {
 		
 		if(relHeadwayClasses[0] > currentInterval) return currentInterval;
@@ -292,5 +315,10 @@ public class PtScenarioAdaption {
 		new VehicleWriterV1(this.scenario.getVehicles()).writeFile(this.outpath + "newTransitVehicles.xml.gz");
 		
 		log.info("Writing new network file ... done");
+	}
+	
+	private void evaluateSchedule() {
+		old_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "[#]");
+		new_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "[#]");
 	}
 }
