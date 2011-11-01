@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 
-public class Importer implements XYVxVyEventsHandler {
+public class Importer implements XYVxVyEventsHandler, Runnable {
 
 	private HashMap<String, Agent> agents = null; 
 	private HashMap<Integer, DataPoint> nodes = null;
@@ -46,6 +46,8 @@ public class Importer implements XYVxVyEventsHandler {
 	private Double[] timeStepsAsDoubleValues;
 	
 	private LinkedList<Double> timeSteps;
+	
+	private Thread readerThread;
 
 	public Importer(Controller controller)
 	{
@@ -53,10 +55,11 @@ public class Importer implements XYVxVyEventsHandler {
 		
 	}
 
-	public Importer(Controller controller, Scenario sc)
+	public Importer(Controller controller, Scenario sc, Thread readerThread)
 	{
 		
 		this.controller = controller;
+		this.readerThread = readerThread;
 		
 		Network network = sc.getNetwork();
 		
@@ -78,10 +81,10 @@ public class Importer implements XYVxVyEventsHandler {
 		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
 		{
 			//k++;
-			System.out.println("");
-			System.out.println("---------------------------------");
-			
-		    System.out.println(node.getKey() + "|" + node.getValue());
+//			System.out.println("");
+//			System.out.println("---------------------------------");
+//			
+//		    System.out.println(node.getKey() + "|" + node.getValue());
 		    
 		    //store current node in variable
 		    org.matsim.api.core.v01.network.Node currentNode;
@@ -116,7 +119,7 @@ public class Importer implements XYVxVyEventsHandler {
 //		    	
 //		    }
 		    
-		    System.out.println("OUT LINKS");
+//		    System.out.println("OUT LINKS");
 		    for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
 		    {
 				int from = Integer.valueOf(outLink.getValue().getFromNode().getId().toString());
@@ -403,6 +406,13 @@ public class Importer implements XYVxVyEventsHandler {
 			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
 			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getTime());
 		}
+		
+	}
+
+	@Override
+	public void run() {
+		System.out.println("importer: go go!");
+		// TODO Auto-generated method stub
 		
 	}
 

@@ -30,6 +30,7 @@ import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.controller.Console;
 import playground.wdoering.debugvisualization.controller.ConsoleImpl;
 import playground.wdoering.debugvisualization.controller.Controller;
+import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
 
 /**
  * Debug Visualization
@@ -60,14 +61,19 @@ public class DebugVisualization {
 		
 		
 		//argument syntax: DebugSim.java eventfile.xml networkfile.xml liveMode [=true / false / null||else(=false) ]
-		if (args.length > 0)
+		if ((args.length > 0) && (!args[0].equals("")))
 		{
 			//console.println("Initializing Debug Simulation.");
 			//Controller controller = new Controller(args[0], args[1], console, 3, true);
-			Controller controller = new Controller(e, sc, console);
+			
+			String eventFile = args[0];
 
 			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
-			reader.parse(args[0]);
+			
+			Thread readerThread = new Thread(new XYVxVyEventThread(reader,eventFile), "readerthread"); 
+			
+			Controller controller = new Controller(e, sc, console, readerThread);
+			
 
 		}
 		else

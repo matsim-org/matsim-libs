@@ -47,6 +47,8 @@ public class Controller {
 	private Double currentTime = Double.NaN;
 	private Scene currentScene;
 	private int traceTimeRange = 2;
+	private Thread readerThread;
+	private boolean paused = false;
 	
 	EventsManager eventsManager;
 	Scenario scenario;
@@ -144,14 +146,18 @@ public class Controller {
 		
 	}
 	
-	public Controller(EventsManager e, Scenario sc, Console console)
+	public Controller(EventsManager e, Scenario sc, Console console, Thread readerThread)
 	{
 
 		//assign console
 		this.console = console;
 		
+		this.readerThread = readerThread;
+		
 		//set to live mode
 		this.liveMode = true;
+		
+		//Thread importerThread = new Thread(new Importer(this,sc),"ha");
 		
 		
 		//assign scenario and eventsmanager
@@ -160,7 +166,7 @@ public class Controller {
 		
 		//import network data via network file and 
 		console.print("Importing network data...");
-		this.importer = new Importer(this, scenario);
+		this.importer = new Importer(this, scenario, readerThread);
 		nodes = importer.getNodes();
 		links = importer.getLinks();		
 		
@@ -185,6 +191,10 @@ public class Controller {
 		gui.setVisible(true);
 		
 		eventsManager.addHandler(this.importer);
+
+		this.readerThread.start();
+		
+		//eventsManager.
 		
 		// TODO Auto-generated constructor stub
 	}
@@ -203,7 +213,22 @@ public class Controller {
 
 	public void pause()
 	{
-		gui.pause();
+		if (!paused)
+		{
+			System.out.print("suspend..");
+			readerThread.suspend();
+			System.out.println(".done.");
+		}
+		else
+		{
+			System.out.print("resume..");
+			readerThread.resume();
+			System.out.println(".done.");
+			
+		}
+		
+		gui.pause();		
+		paused = !paused;
 		
 	}
 
