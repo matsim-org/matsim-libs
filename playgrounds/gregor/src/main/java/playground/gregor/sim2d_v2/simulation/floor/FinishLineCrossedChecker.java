@@ -103,7 +103,7 @@ public class FinishLineCrossedChecker {
 
 
 
-		LineString bisec = this.geofac.createLineString(new Coordinate[]{c1,c2});
+		Geometry bisec = this.geofac.createLineString(new Coordinate[]{c1,c2}).buffer(0.);
 
 		List<Coordinate> intersects = getIntersections(bisec);
 
@@ -132,7 +132,7 @@ public class FinishLineCrossedChecker {
 		return ret;
 	}
 
-	private List<Coordinate> getIntersections(LineString bisec) {
+	private List<Coordinate> getIntersections(Geometry bisec) {
 		List<Coordinate> ret = new ArrayList<Coordinate>();
 		for (Geometry geo : this.geos) {
 			Geometry itrs = geo.intersection(bisec);

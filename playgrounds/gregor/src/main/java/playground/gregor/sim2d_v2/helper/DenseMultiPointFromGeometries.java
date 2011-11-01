@@ -10,7 +10,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class DenseMultiPointFromGeometries {
 	private final GeometryFactory geofac = new GeometryFactory();
@@ -26,7 +28,11 @@ public class DenseMultiPointFromGeometries {
 				handleLineString((LineString)geo);
 			} else if (geo instanceof MultiLineString) {
 				handleMultiLineString((MultiLineString)geo);
-			} else {
+			} else if (geo instanceof MultiPolygon){
+				handleMultiPolygon((MultiPolygon)geo);
+			} else if (geo instanceof Polygon){
+				handlePolygon((Polygon) geo);
+			}else{
 				throw new RuntimeException("Unsupported geometry type:" + geo.getGeometryType());
 			}
 		}
@@ -39,6 +45,26 @@ public class DenseMultiPointFromGeometries {
 
 		ret = this.geofac.createMultiPoint(pointsA);
 		return ret;
+	}
+
+
+	private void handleMultiPolygon(MultiPolygon geo) {
+		for (int i = 0; i < geo.getNumGeometries(); i++) {
+			Geometry g = geo.getGeometryN(i);
+			handlePolygon((Polygon)g);
+		}
+
+	}
+
+
+	private void handlePolygon(Polygon g) {
+		LineString shell = g.getExteriorRing();
+		handleLineString(shell);
+		for (int i = 0; i < g.getNumInteriorRing(); i++)  {
+			LineString hole = g.getInteriorRingN(i);
+			handleLineString(hole);
+		}
+
 	}
 
 

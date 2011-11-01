@@ -56,7 +56,7 @@
 <module name="sim2d">
 	<param name ="staticEnvFieldFile" value="&INPUTBASE;/staticEnvDistances.xml.gz" />
 	<param name="lsShapeFile" value="&INPUTBASE;/testPaths.shp" />
-	<param name="floorShapeFile" value="&INPUTBASE;/testPaths.shp" />
+	<param name="floorShapeFile" value="&INPUTBASE;/testFloor.shp" />
 	<param name="eventsInterval" value="10" />
 </module>
 

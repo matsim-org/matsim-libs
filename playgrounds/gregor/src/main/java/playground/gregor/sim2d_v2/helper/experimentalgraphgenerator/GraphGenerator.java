@@ -65,19 +65,19 @@ public class GraphGenerator {
 		boundary = boundary.buffer(0.01);
 
 		Skeleton skeleton = new SkeletonExtractor().extractSkeleton(dia, boundary);
-		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeleton.shp");
-		skeleton.dumpIntersectingNodes("/Users/laemmel/tmp/vis/skeletonNodes.shp");
+		//		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeleton.shp");
+		//		skeleton.dumpIntersectingNodes("/Users/laemmel/tmp/vis/skeletonNodes.shp");
 
 		new SkeletonSimplifier().simplifySkeleton(skeleton,boundary);
-		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonSimpl.shp");
+		//		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonSimpl.shp");
 
 		new SkeletonLinksContraction().contractShortSkeletonLinks(skeleton, boundary);
-		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonContr.shp");
+		//		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonContr.shp");
 
 		new Puncher().punchSkeleton(skeleton, this.envelope);
 
 		new StubRemover().run(skeleton);
-		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonStubRM.shp");
+		//		skeleton.dumpLinks("/Users/laemmel/tmp/vis/skeletonStubRM.shp");
 
 		createNetwork(skeleton);
 

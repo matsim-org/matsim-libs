@@ -20,7 +20,7 @@
 package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 
@@ -38,6 +38,8 @@ public class Agent2D  {
 	private double vx;
 	private double vy;
 	private final MobsimDriverAgent pda;
+	private final Scenario sc;
+	private double currentDesiredVelocity;
 
 	public static final double AGENT_WEIGHT = 80;// * 1000;
 	public static final double AGENT_DIAMETER = 0.50;
@@ -46,10 +48,13 @@ public class Agent2D  {
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(MobsimDriverAgent pda) {
+	public Agent2D(MobsimDriverAgent pda, Scenario sc) {
+
 		this.pda = pda;
+		this.sc = sc;
 		// TODO think about this
-		this.desiredVelocity = 1.4; //+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+		this.desiredVelocity = 1.34; //+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+		this.currentDesiredVelocity = this.desiredVelocity;
 
 	}
 
@@ -80,7 +85,7 @@ public class Agent2D  {
 	 * @return
 	 */
 	public double getDesiredVelocity() {
-		return this.desiredVelocity;
+		return this.currentDesiredVelocity;
 	}
 
 	public void setCurrentVelocity(double vx, double vy) {
@@ -101,8 +106,10 @@ public class Agent2D  {
 		return AGENT_WEIGHT;
 	}
 
-	public void notifyMoveOverNode(Id newLinkId) {
+	public void notifyMoveOverNode(Id newLinkId, double time) {
 		this.pda.notifyMoveOverNode(newLinkId);
+		double sp = this.sc.getNetwork().getLinks().get(newLinkId).getFreespeed(time);
+		this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
 	}
 
 	public Id getId() {

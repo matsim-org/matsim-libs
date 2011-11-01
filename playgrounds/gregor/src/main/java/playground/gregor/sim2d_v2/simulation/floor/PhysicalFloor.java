@@ -262,7 +262,7 @@ public class PhysicalFloor implements Floor {
 				// the wrapped agent, not the wrapper)
 
 			} else {
-				agent.notifyMoveOverNode(id);
+				agent.notifyMoveOverNode(id,time);
 				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId());
 				this.em.processEvent(e2);
 			}
@@ -365,7 +365,7 @@ public class PhysicalFloor implements Floor {
 	 * @param agent
 	 */
 	public void agentDepart(MobsimDriverAgent pda) {
-		Agent2D agent = new Agent2D(pda);
+		Agent2D agent = new Agent2D(pda,this.scenario);
 		Activity act = (Activity) getPreviousPlanElement(pda);
 		if (act.getCoord() != null) {
 			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
