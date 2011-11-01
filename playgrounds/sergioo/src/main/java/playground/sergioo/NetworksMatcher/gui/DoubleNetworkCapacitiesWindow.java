@@ -71,14 +71,14 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 	}
 	public enum Tool {
 		APPLY_CAPACITY("Apply capacity",0,0,1,1,"applyCapacity"),
-		APPLY_CAPACITY_OPP("Apply capacity opposite",0,0,1,1,"applyCapacityOpp"),
-		APPLY_CAPACITY_PATH("Apply capacity to path",1,0,1,1,"applyCapacityPath"),
-		DELETE_CAPACITY("Delete capacity",2,0,1,1,"deleteCapacity"),
-		DELETE_CAPACITY_OPP("Delete capacity with opposite",3,0,1,1,"deleteCapacityOpp"),
-		UNDO("Undo",4,0,1,1,"undo"),
-		FIND_LINK("Find link",5,0,1,1,"findLink"),
-		FIND_NODE("Find node",6,0,1,1,"findNode"),
-		SAVE("Save",7,0,1,1,"save");
+		APPLY_CAPACITY_OPP("Apply capacity opposite",1,0,1,1,"applyCapacityOpp"),
+		APPLY_CAPACITY_PATH("Apply capacity to path",2,0,1,1,"applyCapacityPath"),
+		DELETE_CAPACITY("Delete capacity",3,0,1,1,"deleteCapacity"),
+		DELETE_CAPACITY_OPP("Delete capacity with opposite",4,0,1,1,"deleteCapacityOpp"),
+		UNDO("Undo",5,0,1,1,"undo"),
+		FIND_LINK("Find link",6,0,1,1,"findLink"),
+		FIND_NODE("Find node",7,0,1,1,"findNode"),
+		SAVE("Save",8,0,1,1,"save");
 		String caption;
 		int gx;int gy;
 		int sx;int sy;

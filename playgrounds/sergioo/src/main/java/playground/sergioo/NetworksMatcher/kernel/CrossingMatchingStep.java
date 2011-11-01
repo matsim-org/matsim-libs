@@ -51,7 +51,7 @@ public class CrossingMatchingStep extends MatchingStep {
 	
 	private static final double MAX_ANGLE_DIFFERENCE = Math.PI/3;
 	
-	private static final double MAX_LENGTH_FRACTION = 1.5;
+	private static final double MAX_LENGTH_FRACTION = 0.9;
 	
 	@SuppressWarnings("unchecked")
 	public static final Tuple<Id, Id>[] NEAR_NODES_LOW = new Tuple[] {
@@ -221,7 +221,7 @@ public class CrossingMatchingStep extends MatchingStep {
 			}*/
 		loadSimpleLinks();
 		applyCapacitiesSimples();
-		//JOptionPane.showMessageDialog(null,"Simples done!");
+		JOptionPane.showMessageDialog(null,"Simples done!");
 		TravelMinCost travelMinCost = new TravelMinCost() {
 			public double getLinkGeneralizedTravelCost(Link link, double time) {
 				return getLinkMinimumTravelCost(link);
@@ -239,12 +239,12 @@ public class CrossingMatchingStep extends MatchingStep {
 		preProcessData.run(networkB);
 		AStarLandmarks aStarLandmarks = new AStarLandmarks(networkB, preProcessData, timeFunction);
 		applyCapacitiesASimple(aStarLandmarks);
-		//JOptionPane.showMessageDialog(null,"SimplesA done!");
+		JOptionPane.showMessageDialog(null,"SimplesA done!");
 		preProcessData = new PreProcessLandmarks(travelMinCost);
 		preProcessData.run(networkA);
 		aStarLandmarks = new AStarLandmarks(networkA, preProcessData, timeFunction);
 		applyCapacitiesBSimple(aStarLandmarks);
-		//JOptionPane.showMessageDialog(null,"SimplesB done!");
+		JOptionPane.showMessageDialog(null,"SimplesB done!");
 		try {
 			PrintWriter writer = new PrintWriter(CAPACITIES_FILE);
 			for(Entry<Link, Tuple<Link,Double>> linkE:linksChanged.entrySet())
