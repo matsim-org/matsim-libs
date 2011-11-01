@@ -22,9 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -71,9 +69,6 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
-				
-		// If it is not a car Leg we don't replan it.
-//		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 		
 		/*
 		 * Create new Activity at the meeting point.
@@ -84,34 +79,44 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
 		meetingActivity.setEndTime(Double.POSITIVE_INFINITY);
-		
+
 		/*
 		 * If the Agent wants to perform the next Activity at the current Link we
 		 * cannot replace that Activity at the moment (Simulation logic...).
 		 * Therefore we set the Duration of the next Activity to 0 and add a new
-		 * Meeting Activity afterwithinDayAgent
+		 * Meeting Activity afterwards.
 		 */
 		// TODO: Check whether this is still true since we have resetCaches now...
-		if (withinDayAgent.getDestinationLinkId().equals(nextActivity.getLinkId())) {
-			nextActivity.setStartTime(this.time);
-			nextActivity.setEndTime(this.time);
-			
-			// Remove all legs and activities after the next activity.
-			int nextActivityIndex = executedPlan.getActLegIndex(nextActivity);
-			
-			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
-			}
-			
-			Leg newLeg = executedPlan.createAndAddLeg(TransportMode.car);
-			int position = executedPlan.getPlanElements().size() - 1; 
-			executedPlan.addActivity(meetingActivity);
-			
-			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
-		}
-		
-		else {			
+//		if (withinDayAgent.getCurrentLinkId().equals(nextActivity.getLinkId())) {
+//			nextActivity.setStartTime(this.time);
+//			nextActivity.setEndTime(this.time);
+//
+//			// Remove all legs and activities after the activity after the next activity.
+//			int nextActivityIndex = executedPlan.getActLegIndex(nextActivity);
+//			
+//			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
+//				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+//			}			
+//
+//			Leg currentLeg = (Leg) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex());
+//			executedPlan.createAndAddLeg(currentLeg.getMode());
+//			executedPlan.addActivity(meetingActivity);
+//						
+//			int position = executedPlan.getPlanElements().size() - 2;
+//			
+//			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+//		}
+//		else {			
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, meetingActivity);
+			
+			/*
+			 * If the agent has just departed from its home facility (currentLegIndex = 0), then
+			 * the simulation does not allow stops again at the same link (queue logic). Therefore
+			 * we increase the currentLegIndex by one which means that the agent will drive a loop
+			 * and then return to this link again.
+			 * TODO: remove this, if the queue logic is adapted...
+			 */
+			if (currentLinkIndex == 0) currentLinkIndex++;
 			
 			// new Route for current Leg
 			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
@@ -122,7 +127,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
 				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
 			}			
-		}
+//		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

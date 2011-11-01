@@ -23,10 +23,8 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
@@ -40,6 +38,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplanner;
+import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
@@ -49,10 +48,13 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	private static final String activityType = "meetHousehold";
 	
 	protected final HouseholdsUtils householdsUtils;
+	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	
-	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils) {
+	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario, HouseholdsUtils householdsUtils, 
+			ModeAvailabilityChecker modeAvailabilityChecker) {
 		super(id, scenario);
 		this.householdsUtils = householdsUtils;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
 	}
 	
 	@Override
@@ -82,13 +84,6 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		
 		double oldDepartureTime = withinDayAgent.getActivityEndTime();
 		
-		/*
-		 * Some kind of workaround. If a plan contains only a single activity, then
-		 * the oldDepartureTime is Time.UNDEFINED_TIME, which is Double.NEGATIVE_INFINITY,
-		 * but it should be Double.POSITIVE_INFINITY. Therefore we fix this.
-		 */
-//		if (oldDepartureTime == Time.UNDEFINED_TIME) oldDepartureTime = Double.POSITIVE_INFINITY;
-
 		/*
 		 * Check whether the agent is already at the meeting point.
 		 * If yes, remove activities that are scheduled at a later point in time.
@@ -120,11 +115,14 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			 * Create Leg from the current Activity to the Meeting Point
 			 */		
 			// identify the TransportMode
-			String transportMode = identifyTransportMode(currentActivityIndex, executedPlan);
+			String transportMode = modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan);
 			
 			Leg legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);
-						
-			// TODO: use a departure time function to determine the end time
+			
+			/*
+			 * TODO: use a departure time function to determine the end time
+			 * Probably move this to the identifier???
+			 */
 			double newEndTime = this.time;
 			currentActivity.setMaximumDuration(newEndTime - currentActivity.getStartTime());
 			currentActivity.setEndTime(newEndTime);
@@ -170,42 +168,5 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			return false;
 		}	
 	}
-
-	/*
-	 * By default we try to use a car. We can do this, if the previous or the next 
-	 * Leg are performed with a car.
-	 * The order is as following:
-	 * car is preferred to ride is preferred to pt is preferred to bike if preferred to walk 
-	 */
-	private String identifyTransportMode(int currentActivityIndex, Plan selectedPlan) {
-		
-		boolean hasCar = false;
-		boolean hasBike = false;
-		boolean hasPt = false;
-		boolean hasRide = false;
-		
-		if (currentActivityIndex > 0) {
-			Leg previousLeg = (Leg) selectedPlan.getPlanElements().get(currentActivityIndex - 1);
-			String transportMode = previousLeg.getMode();
-			if (transportMode.equals(TransportMode.car)) hasCar = true;
-			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
-			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
-		}
-		
-		if (currentActivityIndex + 1 < selectedPlan.getPlanElements().size()) {
-			Leg nextLeg = (Leg) selectedPlan.getPlanElements().get(currentActivityIndex + 1);
-			String transportMode = nextLeg.getMode();
-			if (transportMode.equals(TransportMode.car)) hasCar = true;
-			else if (transportMode.equals(TransportMode.bike)) hasBike = true;
-			else if (transportMode.equals(TransportMode.pt)) hasPt = true;
-			else if (transportMode.equals(TransportMode.ride)) hasRide = true;
-		}
-		
-		if (hasCar) return TransportMode.car;
-		else if (hasRide) return TransportMode.ride;
-		else if (hasPt) return TransportMode.pt;
-		else if (hasBike) return TransportMode.bike;
-		else return TransportMode.walk;
-	}	
+	
 }

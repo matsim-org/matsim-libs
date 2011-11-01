@@ -20,10 +20,10 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,12 +32,17 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
+
+import playground.christoph.evacuation.events.HouseholdJoinedEventImpl;
+import playground.christoph.evacuation.events.HouseholdSeparatedEventImpl;
 
 /**
  * Class that collects information on where the members of a household are located
@@ -52,21 +57,32 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 
 	static final Logger log = Logger.getLogger(HouseholdsUtils.class);
 	
-	private Scenario scenario;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
 	private Map<Id, HouseholdInfo> householdInfoMap;		// <householdId, HouseholdInfo>
 	private Map<Id, HouseholdInfo> personHouseholdInfoMap;	// <personId, HouseholdInfo> - just performance tuning...
 	private Map<Id, Id> personLocationMap;					// <personId, facilityId>
 
+	/*
+	 * Relocate households if the have meet at home but their home location is not secure
+	 */
+//	private Queue<Id> householdsToRelocate;
+	
 	/* time since last "info" */
 	private int infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 	
-	public HouseholdsUtils(Scenario scenario) {
+	public HouseholdsUtils(final Scenario scenario, final EventsManager eventsManager) {
 		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 		
 		this.reset(0);
 	}
 
+	public Map<Id, HouseholdInfo> getHouseholdInfoMap() {
+		return Collections.unmodifiableMap(this.householdInfoMap);
+	}
+	
 	public Id getMeetingPointId(Id personId) {
 		return personHouseholdInfoMap.get(personId).getMeetingPointId();
 	}
@@ -77,7 +93,7 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		
 		// reset members at meeting point counter
 		householdInfo.resetMembersAtMeetingPoint();
-		for (Id personId : householdInfo.household.getMemberIds()) {
+		for (Id personId : householdInfo.getHousehold().getMemberIds()) {
 			if (personLocationMap.get(personId).equals(facilityId)) {
 				householdInfo.addPersonAtMeetingpoint(personId);
 			}
@@ -88,6 +104,13 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		return householdInfoMap.get(householdId).allMembersAtMeetingPoint();
 	}
 	
+	public Map<Id, HouseholdInfo> getJoinedHouseholds() {
+		Map<Id, HouseholdInfo> unitedHouseholds = new TreeMap<Id, HouseholdInfo>();
+		for (HouseholdInfo householdInfo : this.householdInfoMap.values()) {
+			if (householdInfo.allMembersAtMeetingPoint()) unitedHouseholds.put(householdInfo.getHousehold().getId(), householdInfo);
+		}
+		return unitedHouseholds;
+	}
 
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
@@ -114,9 +137,9 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		
 		for (HouseholdInfo householdInfo : householdInfoMap.values()) {
 			if(!householdInfo.allMembersAtMeetingPoint()) {
-				log.info("household: " + householdInfo.household.getId());
-				log.info("meeting point: " + householdInfo.meetingPointId);
-				for (Id id : householdInfo.household.getMemberIds()) {
+				log.info("household: " + householdInfo.getHousehold().getId());
+				log.info("meeting point: " + householdInfo.getMeetingPointId());
+				for (Id id : householdInfo.getHousehold().getMemberIds()) {
 					log.info("member: " + id + ", position: " + this.personLocationMap.get(id));
 				}
 				log.info("");
@@ -159,47 +182,24 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 			householdInfo.addPersonAtMeetingpoint(event.getPersonId());
 		}
 		personLocationMap.put(event.getPersonId(), event.getFacilityId());
+		
+		if (householdInfo.allMembersAtMeetingPoint()) {
+			Event joinedEvent = new HouseholdJoinedEventImpl(event.getTime(), householdInfo.getHousehold().getId(), event.getLinkId(), event.getFacilityId(), event.getActType());
+			eventsManager.processEvent(joinedEvent);
+		}
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		HouseholdInfo householdInfo = personHouseholdInfoMap.get(event.getPersonId());
+		
+		if (householdInfo.allMembersAtMeetingPoint()) {
+			Event separatedEvent = new HouseholdSeparatedEventImpl(event.getTime(), householdInfo.getHousehold().getId(), event.getLinkId(), event.getFacilityId(), event.getActType());
+			eventsManager.processEvent(separatedEvent);
+		}
+		
 		householdInfo.removePersonAtMeetingPoint(event.getPersonId());
 		personLocationMap.remove(event.getPersonId());
 	}
-	
-	private static class HouseholdInfo {
-		private final Household household;
-		private final Set<Id> membersAtMeetingPoint;
-		private Id meetingPointId;
-		
-		public HouseholdInfo(Household household) {
-			this.household = household;
-			membersAtMeetingPoint = new HashSet<Id>();
-		}
-		
-		public boolean addPersonAtMeetingpoint(Id id) {
-			return membersAtMeetingPoint.add(id);
-		}
-		
-		public boolean removePersonAtMeetingPoint(Id id) {
-			return membersAtMeetingPoint.remove(id);
-		}
-		
-		public void resetMembersAtMeetingPoint() {
-			this.membersAtMeetingPoint.clear();
-		}
-		
-		public void setMeetingPointId(Id id) {
-			this.meetingPointId = id;
-		}
-		
-		public Id getMeetingPointId() {
-			return this.meetingPointId;
-		}
-		
-		public boolean allMembersAtMeetingPoint() {
-			return household.getMemberIds().size() == membersAtMeetingPoint.size();
-		}
-	}
+
 }

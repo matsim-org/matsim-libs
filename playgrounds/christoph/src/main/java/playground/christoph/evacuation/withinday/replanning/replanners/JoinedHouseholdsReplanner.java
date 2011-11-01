@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CurrentActivityToMeetingPointReplanner.java
+ * UnitedHouseholdsReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,36 +20,21 @@
 
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
-import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
-import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner {
 
-public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuringActivityReplannerFactory {
-
-	private final Scenario scenario;
-	private final HouseholdsUtils householdsUtils; 
-	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	
-	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, AgentCounterI agentCounter, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, 
-			HouseholdsUtils householdsUtils, ModeAvailabilityChecker modeAvailabilityChecker) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
-		this.scenario = scenario;
-		this.householdsUtils = householdsUtils;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;
+	public JoinedHouseholdsReplanner(Id id, Scenario scenario) {
+		super(id, scenario);
 	}
 
 	@Override
-	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario, 
-				householdsUtils, modeAvailabilityChecker);
-		super.initNewInstance(replanner);
-		return replanner;
+	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
