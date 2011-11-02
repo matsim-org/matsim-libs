@@ -81,7 +81,7 @@ public class CliquesConstructorImpl implements CliquesConstructor {
 			throw new IllegalArgumentException("argument population must be the scenario one");
 		}
 
-		CliqueInformation cliqueInfo = new CliqueInformation();
+		CliqueInformation cliqueInfo = new CliqueInformation( individualPopulation );
 		PopulationActuator populationActuator = new PopulationActuator( scenario );
 
 		for (Mating mating : matings) {
@@ -99,6 +99,16 @@ class CliqueInformation {
 	// links persons ids with clique composition, with possibility of doublettes
 	private final Map<Id, List<Id>> cliques = new HashMap<Id, List<Id>>();
 	private final List<List<Id>> registeredCliques = new ArrayList<List<Id>>();
+
+	public CliqueInformation(
+			final Population pop) {
+		for (Id id : pop.getPersons().keySet()) {
+			List<Id> clique = new ArrayList<Id>(1);
+			clique.add( id );
+			cliques.put(id, clique);
+			registeredCliques.add( clique );
+		}
+	}
 
 	public void mate(final Mating mating) {
 		Id driver = mating.getDriver().getDecisionMaker().getPersonId();
@@ -123,12 +133,12 @@ class CliqueInformation {
 	private List<Id> getMates(final Id person) {
 		List<Id> mates = cliques.get(person);
 
-		if (mates == null) {
-			mates = new ArrayList<Id>();
-			mates.add(person);
-			cliques.put(person, mates);
-			registeredCliques.add(mates);
-		}
+		//if (mates == null) {
+		//	mates = new ArrayList<Id>();
+		//	mates.add(person);
+		//	cliques.put(person, mates);
+		//	registeredCliques.add(mates);
+		//}
 
 		return mates;
 	}
@@ -193,8 +203,8 @@ class PopulationActuator {
 			getPlanActuator( passenger.getDecisionMaker().getPersonId() );
 		List<PlanElement> elements = passengerActuator.getPlan().getPlanElements();
 		int indexInPassengerPlan = passenger.getIndexInPlan();
-		Id origin = ((Activity) elements.get(indexInPassengerPlan - 1)).getLinkId();
-		Id destination = ((Activity) elements.get(indexInPassengerPlan + 1)).getLinkId();
+		Activity origin = (Activity) elements.get(indexInPassengerPlan - 1);
+		Activity destination = (Activity) elements.get(indexInPassengerPlan + 1);
 
 		getPlanActuator(driver.getDecisionMaker().getPersonId()).addJointTrip(
 				driver.getIndexInPlan(),
@@ -247,15 +257,15 @@ class PlanActuator {
 	public void addJointTrip(
 			final int indexInPlan,
 			final long jointTripNumber,
-			final Id originLink,
-			final Id destinationLink,
+			final Activity origin,
+			final Activity destination,
 			final TripRequest.Type tripType) {
 		this.planElements[indexInPlan] =
 			new SharedRide(
 					jointTripNumber,
 					tripType,
-					originLink,
-					destinationLink);
+					origin,
+					destination);
 	}
 
 	public Plan getPlan() {
@@ -286,18 +296,20 @@ class PlanActuator {
 
 				ActivityImpl pickUp = new ActivityImpl(
 							sharedRide.puName,
-							sharedRide.origin);
+							sharedRide.origin.getCoord(),
+							sharedRide.origin.getLinkId());
 				ActivityImpl dropOff =  new ActivityImpl(
 							JointActingTypes.DROP_OFF,
-							sharedRide.destination);
+							sharedRide.destination.getCoord(),
+							sharedRide.destination.getLinkId());
 
 				if ( !(facilitiesFactory == null) ) {
 					pickUp.setFacilityId(
 							facilitiesFactory.getPickUpDropOffFacility(
-								sharedRide.origin));
+								sharedRide.origin.getLinkId()));
 					dropOff.setFacilityId(
 							facilitiesFactory.getPickUpDropOffFacility(
-								sharedRide.destination));
+								sharedRide.destination.getLinkId()));
 				}
 
 				newPlanElements.add( new LegImpl(interMode) );
@@ -322,18 +334,18 @@ class PlanActuator {
 	private static class SharedRide implements PlanElement {
 		public final String puName;
 		public final TripRequest.Type type;
-		public final Id origin;
-		public final Id destination;
+		public final Activity origin;
+		public final Activity destination;
 
 		public SharedRide(
 				final long puNumber,
 				final TripRequest.Type type,
-				final Id originLinkId,
-				final Id destinationLinkId) {
+				final Activity origin,
+				final Activity destination) {
 			this.puName = JointActingTypes.PICK_UP_BEGIN + JointActingTypes.PICK_UP_SPLIT_EXPR + puNumber;
 			this.type = type;
-			this.origin = originLinkId;
-			this.destination = destinationLinkId;
+			this.origin = origin;
+			this.destination = destination;
 		}
 	}
 }

@@ -21,6 +21,7 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
@@ -56,11 +57,17 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 		attributes.put( ReducedSPModel.A_IS_MALE , agent.getSex().matches("m.*") );
 		// idealy, only General Abonnements should be counted.
 		// but in the population, the only card type available is "unknown"...
-		attributes.put( ReducedSPModel.A_HAS_PT_ABO , agent.getTravelcards().size() > 0 );
+		attributes.put( ReducedSPModel.A_HAS_PT_ABO , hasPtAbo( agent ) );
 		attributes.put( ReducedSPModel.A_SPEAKS_GERMAN , true );
 		attributes.put( ReducedSPModel.A_IS_CAR_ALWAYS_AVAIL , agent.getCarAvail().equals("always") );
 
 		return new DecisionMakerImpl( agent.getId() , attributes );
+	}
+
+	private boolean hasPtAbo( final PersonImpl agent ) {
+		Set cards = agent.getTravelcards();
+
+		return (cards == null) ? false : (cards.size() > 0);
 	}
 
 	private void checkEligible(final PersonImpl agent) throws UnelectableAgentException {

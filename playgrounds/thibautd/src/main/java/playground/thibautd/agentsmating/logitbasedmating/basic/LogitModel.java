@@ -27,6 +27,7 @@ import java.util.Random;
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
+import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
 
 /**
  * Abstract class to define easily a logit model.
@@ -44,6 +45,7 @@ public abstract class LogitModel implements ChoiceModel {
 	public LogitModel( final double scale ) {
 		this.scale = scale;
 	}
+
 	@Override
 	public Alternative performChoice(
 			final DecisionMaker decisionMaker,
@@ -59,7 +61,12 @@ public abstract class LogitModel implements ChoiceModel {
 
 		for (Map.Entry<Alternative, Double> alt : probs.entrySet()) {
 			cumul += alt.getValue();
-			if (choice <= cumul) return alt.getKey();
+			if (choice <= cumul) {
+				//if (alt.getKey() instanceof TripRequest) {
+				//	System.out.println( ((TripRequest) alt.getKey()).getTripType() );
+				//}
+				return alt.getKey();
+			}
 		}
 
 		throw new RuntimeException( "choice procedure failed!" );

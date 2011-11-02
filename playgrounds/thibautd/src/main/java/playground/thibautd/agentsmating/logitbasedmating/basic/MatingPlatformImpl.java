@@ -93,6 +93,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 
 		while (remainingFlowToAffect > 0) {
 			List<Graph.Edge> augmentingPath = shortestSTPath();
+			if (augmentingPath == null) break; //no further progress possible
 			int augmentation =
 				Collections.min( augmentingPath , comparator ).getResidualCapacity();
 			augmentation = Math.min( augmentation , remainingFlowToAffect );
@@ -140,6 +141,8 @@ public class MatingPlatformImpl extends MatingPlatform {
 		List<Graph.Edge> stPath = new ArrayList<Graph.Edge>();
 
 		Graph.Edge currentEdge = incomingEdges.get( sink );
+		if (currentEdge == null) return null; // no s-t path exists
+		stPath.add( currentEdge );
 
 		while (currentEdge.getStart() != source) {
 			currentEdge = incomingEdges.get( currentEdge.getStart() );
@@ -266,6 +269,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 						driver.getRequest());
 
 				cost = - driverGain - passengerGain;
+				//System.out.println("cost initilised to "+cost);
 
 				updateTrackingLists();
 				//create retro edge
@@ -349,12 +353,15 @@ public class MatingPlatformImpl extends MatingPlatform {
 			}
 
 			public void augment(final int deltaFlow) {
-				if (realEdge != null) realEdge.augment(flow);
+				if (realEdge != null) realEdge.augment(-flow);
 
 				int newFlow = flow + deltaFlow; 
 
 				if (newFlow > capacity) {
 					throw new IllegalArgumentException("flow exceeds capacity");
+				}
+				if (newFlow < 0) {
+					throw new IllegalArgumentException("flow is negative");
 				}
 
 				flow = newFlow;
@@ -369,7 +376,9 @@ public class MatingPlatformImpl extends MatingPlatform {
 			}
 
 			public boolean isSelectedMating() {
-				return realEdge == null && getFlow() > 0;
+				return realEdge == null // is a real edge (not residual)
+					&& (start != source && end != sink) // is not a "fake" transportation edge
+					&& getFlow() > 0; //the flow is positive, ie is selected
 			}
 		}
 
@@ -476,14 +485,12 @@ public class MatingPlatformImpl extends MatingPlatform {
 
 			@Override
 			public Activity getOrigin() {
-				// TODO Auto-generated method stub
-				return null;
+				return request.getOrigin();
 			}
 
 			@Override
 			public Activity getDestination() {
-				// TODO Auto-generated method stub
-				return null;
+				return request.getDestination();
 			}
 		}
 	}
@@ -497,56 +504,4 @@ public class MatingPlatformImpl extends MatingPlatform {
 			return o1.getResidualCapacity() - o2.getResidualCapacity();
 		}
 	}
-
-	///**
-	// * Detemines matings with the following assumptions:
-	// *
-	// * <ul>
-	// * <li> candiates to car-pooling are presented several possible mates, one after the other
-	// * <li> they choose to accept or not a mate independently from the ones they were presented before
-	// * or will be presented after.
-	// *
-	// */
-	//@Override
-	//public List<Mating> getMatings() {
-	//	List<Mating> matings = new ArrayList<Mating>();
-	//	List<TripRequest> minority, majority;
-
-	//	if (driverRequests.size() > passengerRequests.size()) {
-	//		majority = driverRequests;
-	//		minority = passengerRequests;
-	//	}
-	//	else {
-	//		minority = driverRequests;
-	//		majority = passengerRequests;
-	//	}
-
-	//	for (TripRequest request : minority) {
-	//		List<TripRequest> proposals = proposer.proposeMateList(request, majority);
-	//		DecisionMaker person = request.getDecisionMaker();
-
-	//		proposalsLoop:
-	//		for (TripRequest proposal : proposals) {
-	//			List<Alternative> choiceSet = new ArrayList<Alternative>();
-	//			choiceSet.addAll(request.getAlternatives());
-	//			choiceSet.add( proposer.changePerspective(proposal, request) );
-
-	//			if (model.performChoice(person, choiceSet) == proposal) {
-	//				DecisionMaker mate = proposal.getDecisionMaker();
-	//				choiceSet.clear();
-	//				choiceSet.addAll(proposal.getAlternatives());
-	//				choiceSet.add( proposal );
-
-	//				if (model.performChoice(mate, choiceSet) == proposal) {
-	//					matings.add( new MatingImpl( request, proposal ) );
-	//					majority.remove( proposal );
-	//					break proposalsLoop;
-	//				}
-	//			}
-	//		}
-	//	}
-
-	//	return matings;
-	//}
-
 }

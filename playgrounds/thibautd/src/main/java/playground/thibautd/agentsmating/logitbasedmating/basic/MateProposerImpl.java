@@ -32,6 +32,11 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.MateProposer;
 import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
 
 /**
+ * Default implementation of a {@link MateProposer}.
+ * Given a driver request, it returns all the passengers who are "reachable"
+ * with a maximum early departure and latter arrival, for both driver and passenger,
+ * given a bee-fly travel time estimate.
+ *
  * @author thibautd
  */
 public class MateProposerImpl implements MateProposer {
@@ -41,11 +46,13 @@ public class MateProposerImpl implements MateProposer {
 	private static final double TIME_WINDOW_DRIVER = 15 * 60;
 	private static final double TIME_WINDOW_PASSENGER = 30 * 60;
 
+
 	private final Network network;
 
 	// QuadTree has to be constructed for each list: keeping the
 	// list corresponding to the current QuadTree allows not to
-	// have to reconstruct it.
+	// have to reconstruct it when the same list of possible mates is
+	// passed again.
 	private List<? extends TripRequest> currentMateList = null;
 	private QuadTree< ? extends Wrapper<? extends TripRequest> > originQT = null;
 
@@ -152,10 +159,10 @@ public class MateProposerImpl implements MateProposer {
 			if (passengerLattestArrival > driverEarliestDeparture &&
 					passengerEarliestDeparture < driverLattestArrival) {
 				double pickUpTravelTime = CoordUtils.calcDistance(
-						trip.origin, passengerWrapper.origin) * BEE_FLY_SPEED;
+						trip.origin, passengerWrapper.origin) / BEE_FLY_SPEED;
 				double dropOffTravelTime = CoordUtils.calcDistance(
-						trip.destination, passengerWrapper.destination) * BEE_FLY_SPEED;
-				double jointTravelTime = passengerWrapper.distance * BEE_FLY_SPEED;
+						trip.destination, passengerWrapper.destination) / BEE_FLY_SPEED;
+				double jointTravelTime = passengerWrapper.distance / BEE_FLY_SPEED;
 
 				double earliestPossibleArrivalTimeAtPassenger =
 					Math.max( passengerEarliestDeparture , driverEarliestDeparture + pickUpTravelTime )
@@ -164,6 +171,7 @@ public class MateProposerImpl implements MateProposer {
 					Math.min( passengerLattestArrival , driverLattestArrival - dropOffTravelTime );
 
 				if (earliestPossibleArrivalTimeAtPassenger < lattestAcceptableArrivalTimeAtPassenger) {
+				//if (true) {
 					proposals.add( passengerWrapper.request );
 				}
 			}

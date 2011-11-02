@@ -47,7 +47,8 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  */
 public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 	private static final double CAR_COST_PER_M = 0; // CHF/m
-	private static final double SURPLUS_DRIVER = 15 * 60;
+	//private static final double SURPLUS_DRIVER = 15 * 60;
+	private static final double SURPLUS_DRIVER = 1;
 
 	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 	private final Network network;
@@ -76,6 +77,12 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		Activity destination = (Activity) plan.getPlanElements().get( indexOfLeg + 1 );
 		Leg leg = (Leg) plan.getPlanElements().get( indexOfLeg );
 		double departureTime = origin.getEndTime();
+		
+		if (departureTime < 0) {
+			throw new RuntimeException("cannot handle negative time, got departure time "+
+					departureTime+" secs for agent "+decisionMaker.getPersonId());
+		}
+
 		double arrivalTime = departureTime + leg.getTravelTime();
 
 		double carTravelTime, ptTravelTime;
