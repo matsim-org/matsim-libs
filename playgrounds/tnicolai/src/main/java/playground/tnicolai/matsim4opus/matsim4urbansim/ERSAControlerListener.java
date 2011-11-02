@@ -309,7 +309,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			Node nearestNode = network.getNearestNode( jobClusterArray[ i ].getCoordinate() );
 			assert ( nearestNode != null );
 			// add nearest node to job object
-			jobClusterArray[ i ].addNearestNode( nearestNode );
+			jobClusterArray[ i ].setNearestNode( nearestNode );
 		}
 		log.info("... done!");
 	}
