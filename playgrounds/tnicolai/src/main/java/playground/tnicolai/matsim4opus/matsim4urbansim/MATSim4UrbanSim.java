@@ -103,7 +103,7 @@ public class MATSim4UrbanSim {
 	void runMATSim(){
 		log.info("Starting MATSim from Urbansim");	
 
-		// checking for if this is only a test run
+		// checking for if this is only a test run.MATSim
 		// a test run only validates the xml config file by initializing the xml config via the xsd.
 		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.IS_TEST_RUN).equalsIgnoreCase(Constants.TRUE)){
 			log.info("TestRun was successful...");
@@ -113,8 +113,8 @@ public class MATSim4UrbanSim {
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();
-		cleanNetwork(network);
 		modifyNetwork(network);
+		cleanNetwork(network);
 		
 		// get the data from urbansim (parcels and persons)
 		ReadFromUrbansimParcelModel readFromUrbansim = new ReadFromUrbansimParcelModel( Integer.parseInt( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ) );
@@ -305,7 +305,7 @@ public class MATSim4UrbanSim {
 	/**
 	 * Saving UrbanSim and MATSim results for current run in a backup directory ...
 	 */
-	private void saveRunOutputs() {
+	void saveRunOutputs() {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
 		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
@@ -340,7 +340,7 @@ public class MATSim4UrbanSim {
 	 * Removes UrbanSim output files for MATSim, since they are 
 	 * saved by performing saveRunOutputs() in a previous step.
 	 */
-	private void cleanUrbanSimOutput(){
+	void cleanUrbanSimOutput(){
 		
 		log.info("Cleaning MATSim4Opus temp directory (" + Constants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
 		
