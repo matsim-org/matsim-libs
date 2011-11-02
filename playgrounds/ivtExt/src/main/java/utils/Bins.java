@@ -57,7 +57,7 @@ public class Bins {
 		this.bins = new double[this.numberOfBins];
 	}
 
-	public void plotBinnedDistribution(String path, String xLabel, String xUnit) {
+	public void plotBinnedDistribution(String path, String xLabel, String xUnit, String yLabel) {
 		String [] categories  = new String[this.numberOfBins];
 		for (int i = 0; i < this.numberOfBins; i++) {
 			categories[i] = Integer.toString(i);
@@ -79,7 +79,7 @@ public class Bins {
 		"[max = " + formatter.format(Utils.getMax(values)) + xUnit + "]";
 
 		BarChart chart =
-			new BarChart(desc, s , "#", categories);
+			new BarChart(desc, s , yLabel, categories);
 		chart.addSeries("Bin size", this.bins);
 		chart.saveAsPng(path + desc + ".png", 1600, 800);
 
