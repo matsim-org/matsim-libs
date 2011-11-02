@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.locationchoice.preprocess.plans.modifications;
+package playground.anhorni.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 
-public class Sampler {
+public class PlansRemoverById {
+	private final static Logger log = Logger.getLogger(PlansRemoverById.class);	
 
-	private final static Logger log = Logger.getLogger(Sampler.class);
-
-	public Population sample(Population plans) {
-		Population sampledPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+	public Population remove(Population plans, Id maxId) {
+		Population cleanedPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 
 		for (Person person : plans.getPersons().values()) {
-			double r = MatsimRandom.getRandom().nextDouble();
-
-			if (r > 0.9) {
-				sampledPopulation.addPerson(person);
+			if (person.getId().compareTo(maxId) < 0) {
+				cleanedPopulation.addPerson(person);
 			}
 		}
-		log.info("Population size after sampling: " + sampledPopulation.getPersons().size());
-		return sampledPopulation;
+		log.info("Population size after removal: " + cleanedPopulation.getPersons().size());
+		return cleanedPopulation;
 	}
-
 }
