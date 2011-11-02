@@ -29,4 +29,7 @@
       1000
     </income>    
   </household>
+  
+  <household id="25">
+  </household>
   </households>

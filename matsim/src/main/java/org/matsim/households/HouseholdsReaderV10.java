@@ -77,6 +77,9 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 			this.currentHhId = null;
 			this.currentVehicleIds = null;
 			this.currentincome = null;
+			this.currentmembers = null;
+			this.currentIncomePeriod = null;
+			this.currentincomeCurrency = null;
 		}
 		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
 			this.currentincome = this.builder.createIncome(Double.parseDouble(content.trim()), this.currentIncomePeriod);
@@ -98,9 +101,11 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			this.currentHhId = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.ID));
+			this.currentmembers = new ArrayList<Id>();
+			this.currentVehicleIds = new ArrayList<Id>();
 		}
 		else if (HouseholdsSchemaV10Names.MEMBERS.equalsIgnoreCase(name)) {
-			this.currentmembers = new ArrayList<Id>();
+//			this.currentmembers = new ArrayList<Id>();
 		}
 		else if (HouseholdsSchemaV10Names.PERSONID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));
@@ -111,7 +116,7 @@ public class HouseholdsReaderV10 extends MatsimXmlParser {
 			this.currentincomeCurrency = atts.getValue(HouseholdsSchemaV10Names.CURRENCY);
 		}
 		else if (HouseholdsSchemaV10Names.VEHICLES.equalsIgnoreCase(name)){
-			this.currentVehicleIds = new ArrayList<Id>();
+//			this.currentVehicleIds = new ArrayList<Id>();
 		}
 		else if (HouseholdsSchemaV10Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
 			Id id = new IdImpl(atts.getValue(HouseholdsSchemaV10Names.REFID));

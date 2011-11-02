@@ -41,6 +41,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 
   private final Id id23 = new IdImpl("23");
   private final Id id24 = new IdImpl("24");
+  private final Id id25 = new IdImpl("25");
   private final Id id42 = new IdImpl("42");
   private final Id id43 = new IdImpl("43");
   private final Id id44 = new IdImpl("44");
@@ -67,7 +68,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	}
 
 	private void checkContent(Households households) {
-		assertEquals(2, households.getHouseholds().size());
+		assertEquals(3, households.getHouseholds().size());
 		Household hh = households.getHouseholds().get(id23);
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
@@ -78,7 +79,6 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals(id23, hhmemberIds.get(0));
 		assertEquals(id42, hhmemberIds.get(1));
 		assertEquals(id43, hhmemberIds.get(2));
-
 
 		assertNotNull(hh.getVehicleIds());
 		List<Id> vehIds = new ArrayList<Id>();
@@ -94,6 +94,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals("eur", hh.getIncome().getCurrency());
 		assertEquals(50000.0d, hh.getIncome().getIncome(), EPSILON);
 
+		
 		hh = households.getHouseholds().get(id24);
 		assertNotNull(hh);
 		assertEquals(id24, hh.getId());
@@ -110,5 +111,16 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals(IncomePeriod.day, hh.getIncome().getIncomePeriod());
 		assertEquals("eur", hh.getIncome().getCurrency());
 		assertEquals(1000.0d, hh.getIncome().getIncome(), EPSILON);
+		
+		
+		hh = households.getHouseholds().get(id25);
+		assertNotNull(hh);
+		assertEquals(id25, hh.getId());
+		assertEquals(0, hh.getMemberIds().size());
+
+		assertNotNull(hh.getVehicleIds());
+		assertEquals(0, hh.getVehicleIds().size());
+
+		assertNull(hh.getIncome());
 	}
 }
