@@ -37,7 +37,7 @@ import org.matsim.core.api.internal.MatsimComparator;
  * Pre-processes a given network, gathering information which can be used by
  * {@link org.matsim.core.router.AStarLandmarks} when computing least-cost paths
  * between a start and an end node. Specifically, designates some
- * nodes in the network that act as landmarks and computes the distance
+ * nodes in the network that act as landmarks and computes the last-cost-path
  * from and to each node in the network to each of the landmarks.
  *
  * @author lnicolas
@@ -180,8 +180,8 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 
 	public class LandmarksData extends DeadEndData {
 
-		private double[] landmarkTravelTime1;
-		private double[] landmarkTravelTime2;
+		private final double[] landmarkTravelTime1;
+		private final double[] landmarkTravelTime2;
 
 		LandmarksData(final int landmarkCount) {
 			this.landmarkTravelTime2 = new double[landmarkCount];
