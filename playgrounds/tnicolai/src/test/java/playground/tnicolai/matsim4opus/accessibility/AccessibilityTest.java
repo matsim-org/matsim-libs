@@ -152,7 +152,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	/**
 	 * creating a test network
 	 */
-	private NetworkImpl createNetwork() {
+	NetworkImpl createNetwork() {
 		log.info("Creating road network ...");
 		
 		/*
@@ -238,7 +238,7 @@ public class AccessibilityTest extends MatsimTestCase{
 			Node nearestNode = network.getNearestNode( dummyJobClusterArray[ i ].getCoordinate() );
 			assert ( nearestNode != null );
 			// add nearest node to job object
-			dummyJobClusterArray[ i ].addNearestNode( nearestNode );
+			dummyJobClusterArray[ i ].setNearestNode( nearestNode );
 		}
 		
 		log.info("... done!");
@@ -455,7 +455,7 @@ public class AccessibilityTest extends MatsimTestCase{
 	 * @author thomas
 	 *
 	 */
-	class NetworkBoundary{
+	public class NetworkBoundary{
 		private double xmin = Double.MAX_VALUE;
 		private double xmax = Double.MIN_VALUE;
 		private double ymin = Double.MAX_VALUE;
