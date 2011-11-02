@@ -1,24 +1,14 @@
 package playground.gregor.sim2d_v2.simulation.floor.forces.reactive;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
 
 public class EnvironmentForceModuleII implements ForceModule {
 

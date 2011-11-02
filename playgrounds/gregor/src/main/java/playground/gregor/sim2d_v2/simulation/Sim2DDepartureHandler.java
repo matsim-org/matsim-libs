@@ -24,10 +24,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
-import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author laemmel

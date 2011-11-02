@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;

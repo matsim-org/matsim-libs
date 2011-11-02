@@ -31,7 +31,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
@@ -46,7 +45,6 @@ public class PathForceModule implements ForceModule {
 	private HashMap<Id, LinkInfo> linkGeos;
 
 	int redraws = 0;
-	private final double deltaT;
 
 	private static final double VIRTUAL_LENGTH = 1000;
 
@@ -64,7 +62,6 @@ public class PathForceModule implements ForceModule {
 	 */
 	public PathForceModule(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
-		this.deltaT = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d")).getTimeStepSize();
 
 	}
 
