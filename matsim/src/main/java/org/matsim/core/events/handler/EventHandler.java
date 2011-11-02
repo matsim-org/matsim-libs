@@ -21,8 +21,15 @@
 package org.matsim.core.events.handler;
 
 
+/**
+ * Design thoughts:<ul>
+ * <li> Is there a reason why this does not have "handleEvent"?  Would make some programming easier.  (But maybe 
+ * there is a structural counter-argument?)  kai, nov'11
+ * </ul>
+ *
+ */
 public interface EventHandler {
-	/** resets the handler to it's inital condition
+	/** resets the handler to it's initial condition
 	 *  
 	 * @param iteration the up-coming iteration from which up-coming events will be from.
 	 */
