@@ -25,16 +25,21 @@ package playground.tnicolai.matsim4opus.utils;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 
 
 /**
@@ -130,6 +135,46 @@ public class UtilityCollection {
 		plan.createAndAddActivity( Constants.ACT_HOME, homeCoord );
 		act = (ActivityImpl)plan.getLastActivity();
 		act.setFacilityId( homeId );
+	}
+	
+	/**
+	 * Determines the extend of an network file in means of minimum or maximum x y coordinates
+	 * @param network
+	 * @return NetworkExtend
+	 */
+	public static NetworkBoundary getNetworkBoundary(NetworkImpl network){
+		
+		double start = System.currentTimeMillis();
+		
+		double xmin = Double.MAX_VALUE;
+		double ymin = Double.MAX_VALUE;
+		double xmax = Double.MIN_VALUE;
+		double ymax = Double.MIN_VALUE;
+		
+		Iterator<Node> nodeItereator = network.getNodes().values().iterator();
+
+		while(nodeItereator.hasNext()){
+			
+			NodeImpl node = (NodeImpl)nodeItereator.next();
+			double xtmp = node.getCoord().getX();
+			double ytmp = node.getCoord().getY();
+			
+			xmin = Math.min(xmin, xtmp);
+			ymin = Math.min(ymin, ytmp);
+			xmax = Math.max(xmax, xtmp);
+			ymax = Math.max(ymax, ytmp);
+		}
+		
+		double stop = System.currentTimeMillis();
+		double time = (stop-start)/1000.;
+		
+		System.out.println("XMAX: " + xmax);
+		System.out.println("XMIN: " + xmin);
+		System.out.println("YMAX: " + ymax);
+		System.out.println("YMIN: " + ymin);	
+		System.out.println("Determining network extend with " + network.getNodes().size() + " nodes took " + time + " seconds");
+		
+		return new NetworkBoundary(xmin, xmax, ymin, ymax);
 	}
 	
 	/**
