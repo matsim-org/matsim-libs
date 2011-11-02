@@ -81,7 +81,8 @@ public class City2000WQSimFactory implements MobsimFactory {
 				sim.getTransitEngine().setUseUmlaeufe(true);
 				sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			}
-            sim.addAgentSource(new QSimAgentSource(carrierAgentTracker.createPlans(), new DefaultAgentFactory(sim)));
+            Collection<Plan> plans = carrierAgentTracker.createPlans();
+            sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim)));
 			return sim;
 		}
     }

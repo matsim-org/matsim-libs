@@ -82,6 +82,7 @@ public class CarrierAgentImpl implements CarrierAgent {
 			plan.addActivity(endActivity);
 			Id driverId = createDriverId();
 			Person driverPerson = createDriverPerson(driverId);
+            driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
 			route(plan);
 			plans.add(plan);

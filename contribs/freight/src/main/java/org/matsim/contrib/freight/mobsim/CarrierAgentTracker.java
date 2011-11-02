@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.Shipment;
 import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
@@ -25,7 +26,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEventHandler, ActivityStartEventHandler
 {
 
-    private Collection<Carrier> carriers;
+    private Carriers carriers;
 
     private Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 
@@ -35,7 +36,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
 
     private EventsManager eventsManager;
 
-    public CarrierAgentTracker(Collection<Carrier> carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
+    public CarrierAgentTracker(Carriers carriers, PlanAlgorithm router, Network network, CarrierAgentFactory carrierAgentFactory) {
         this.carriers = carriers;
         this.network = network;
         this.carrierAgentFactory = carrierAgentFactory;
@@ -87,7 +88,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
     }
 
     private void createCarrierAgents() {
-        for (Carrier carrier : carriers) {
+        for (Carrier carrier : carriers.getCarriers().values()) {
             CarrierAgent carrierAgent = carrierAgentFactory.createAgent(this,carrier);
             carrierAgents.add(carrierAgent);
         }
@@ -111,7 +112,7 @@ public class CarrierAgentTracker implements ActivityEndEventHandler, LinkEnterEv
     }
 
     public void calculateCosts() {
-        for(Carrier carrier : carriers){
+        for(Carrier carrier : carriers.getCarriers().values()){
             CarrierAgent agent = findCarrierAgent(carrier.getId());
             agent.calculateCosts();
         }

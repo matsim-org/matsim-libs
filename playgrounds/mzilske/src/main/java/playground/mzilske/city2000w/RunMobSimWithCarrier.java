@@ -8,6 +8,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.SimpleCarrierAgentFactory;
 import org.matsim.contrib.freight.mobsim.*;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -45,7 +46,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		config.global().setCoordinateSystem("EPSG:32632");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		config.addSimulationConfigGroup(new SimulationConfigGroup());
+		config.addQSimConfigGroup(new QSimConfigGroup());
 //		config.simulation().setEndTime(12*3600);
 		scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		readNetwork(NETWORK_FILENAME);
@@ -59,7 +60,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	private void init() {
 		logger.info("initialise model");
-		NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
+		NETWORK_FILENAME = "../playgrounds/sschroeder/input/grid.xml";
 	}
 
 	private void readNetwork(String networkFilename) {
@@ -67,12 +68,12 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
-		new CarrierPlanReader(new Carriers(carrierImpls)).read("../playgrounds/sschroeder/anotherInput/karlsruheCarrierPlans_after.xml");
+        Carriers carriers = new Carriers();
+        new CarrierPlanReader(carriers).read("../playgrounds/sschroeder/input/carrierPlans.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
-		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
+		carrierAgentTracker = new CarrierAgentTracker(carriers, router, scenario.getNetwork(), agentFactory);
 		// City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker.createPlans());
 		// mobsimFactory.setUseOTFVis(true);
 
