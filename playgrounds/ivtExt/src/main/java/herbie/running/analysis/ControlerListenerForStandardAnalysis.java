@@ -159,7 +159,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 		
 		for (String mode : treeMap.keySet()) {
 			Bins bin = treeMap.get(mode);
-			bin.plotBinnedDistribution(currentOutputPath, xLabel, xUnit);
+			bin.plotBinnedDistribution(currentOutputPath, xLabel, xUnit, "#");
 		}
 	}
 
