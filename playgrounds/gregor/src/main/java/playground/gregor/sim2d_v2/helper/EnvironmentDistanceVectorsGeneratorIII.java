@@ -14,8 +14,8 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesWriter;
-import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.simulation.floor.forces.EnvironmentDistances;
+import playground.gregor.sim2d_v2.simulation.floor.forces.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

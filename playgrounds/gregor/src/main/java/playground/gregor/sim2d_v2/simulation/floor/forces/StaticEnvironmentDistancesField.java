@@ -1,22 +1,23 @@
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor.forces;
 
 import org.matsim.core.utils.collections.QuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+@Deprecated
 public class StaticEnvironmentDistancesField {
-	
-	private QuadTree<EnvironmentDistances> quadTree;
-	private double resoltution;
-	private double maxSensingRange;
+
+	private final QuadTree<EnvironmentDistances> quadTree;
+	private final double resoltution;
+	private final double maxSensingRange;
 
 	public StaticEnvironmentDistancesField(QuadTree<EnvironmentDistances> quadTree,  double maxSensingRange, double  resolution) {
 		this.quadTree = quadTree;
 		this.resoltution = resolution;
 		this.maxSensingRange = maxSensingRange;
 	}
-	
-	
+
+
 
 	/**
 	 * The spatial resolution of the static environment distances field
@@ -25,7 +26,7 @@ public class StaticEnvironmentDistancesField {
 	public double getStaticEnvironmentDistancesFieldResolution() {
 		return this.resoltution;
 	}
-	
+
 	/**
 	 * The max sensing range for the environment. Objects outside the sensing range are ignored
 	 * @return max sensing range
@@ -33,7 +34,7 @@ public class StaticEnvironmentDistancesField {
 	public double getMaxSensingRange() {
 		return this.maxSensingRange;
 	}
-	
+
 	/**
 	 *
 	 * @param location

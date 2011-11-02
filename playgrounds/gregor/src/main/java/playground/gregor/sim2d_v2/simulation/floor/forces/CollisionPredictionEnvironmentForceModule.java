@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor.forces;
 
 import org.matsim.api.core.v01.Scenario;
 
@@ -8,6 +8,8 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.Floor;
 
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 

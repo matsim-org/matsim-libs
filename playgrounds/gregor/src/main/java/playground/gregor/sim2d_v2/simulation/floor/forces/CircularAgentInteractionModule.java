@@ -17,11 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor.forces;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 
 
 import com.vividsolutions.jts.geom.Envelope;

@@ -25,7 +25,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.simulation.floor.forces.StaticEnvironmentDistancesField;
 
 public class ScenarioLoader2DImpl  {
 

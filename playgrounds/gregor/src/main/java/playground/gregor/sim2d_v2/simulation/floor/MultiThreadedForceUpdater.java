@@ -3,6 +3,9 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
+import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
+
 public class MultiThreadedForceUpdater implements Runnable{
 	private final List<DynamicForceModule> dynamicForceModules;
 	private final List<ForceModule> forceModules;

@@ -49,6 +49,15 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v2.simulation.floor.forces.CircularAgentInteractionModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.CollisionPredictionAgentInteractionModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.CollisionPredictionEnvironmentForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.DrivingForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.EnvironmentForceModuleII;
+import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.PathForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

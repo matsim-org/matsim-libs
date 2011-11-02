@@ -26,8 +26,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.simulation.floor.forces.EnvironmentDistances;
+import playground.gregor.sim2d_v2.simulation.floor.forces.StaticEnvironmentDistancesField;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EnvironmentDistances.java
+ * ForceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,36 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor;
+package playground.gregor.sim2d_v2.simulation.floor.forces;
 
-import java.util.ArrayList;
-import java.util.List;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 
-import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
  * 
  */
-public class EnvironmentDistances {
+public interface ForceModule {
 
-	private final Coordinate location;
-	private final List<Coordinate> objects = new ArrayList<Coordinate>();
+	public void run(Agent2D agent);
 
-	public EnvironmentDistances(Coordinate location) {
-		this.location = location;
-	}
-
-	public void addEnvironmentDistanceLocation(Coordinate obj) {
-		this.objects.add(obj);
-	}
-
-	public Coordinate getLocation() {
-		return this.location;
-	}
-
-	public List<Coordinate> getObjects() {
-		return this.objects;
-	}
-
+	abstract void init();
 }

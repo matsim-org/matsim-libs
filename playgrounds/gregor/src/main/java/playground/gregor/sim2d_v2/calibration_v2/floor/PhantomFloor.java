@@ -19,10 +19,10 @@ import playground.gregor.sim2d_v2.calibration_v2.LLCalculator;
 import playground.gregor.sim2d_v2.calibration_v2.PhantomAgent2D;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.DynamicForceModule;
-import playground.gregor.sim2d_v2.simulation.floor.Force;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 
 public class PhantomFloor extends PhysicalFloor {
 

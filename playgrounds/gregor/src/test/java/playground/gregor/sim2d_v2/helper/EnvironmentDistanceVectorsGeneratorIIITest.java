@@ -11,7 +11,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.io.EnvironmentDistancesWriter;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.simulation.floor.forces.StaticEnvironmentDistancesField;
 
 public class EnvironmentDistanceVectorsGeneratorIIITest {
 
