@@ -55,6 +55,10 @@ public class Sim2DConfigGroup extends Module {
 
 	public static final String PHANTOM_POPULATION_EVENTS_FILE = "phantomPopulationEventsFile";
 
+	public static final String MAX_SENSING_RANGE = "maxSensingRange";
+
+	private double maxSensingRang = 5;
+
 	private int eventsInterval = 1;
 
 	private double timeStepSize = 1./25;
@@ -128,6 +132,14 @@ public class Sim2DConfigGroup extends Module {
 		return this.lambda;
 	}
 
+	public double getMaxSensingRange() {
+		return this.maxSensingRang;
+	}
+
+	public void setMaxSensingRange(double maxSensingRange) {
+		this.maxSensingRang = maxSensingRange;
+	}
+
 	@Override
 	public void addParam(final String key, final String value) {
 		if (STATIC_ENV_FIELD_FILE.equals(key)) {
@@ -154,12 +166,19 @@ public class Sim2DConfigGroup extends Module {
 			setEnableEnvironmentForceModule(value);
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)){
 			setEnablePathForceModule(value);
+		} else if (MAX_SENSING_RANGE.equals(key)) {
+			setMaxSensingRange(value);
 		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
 
+
+	private void setMaxSensingRange(String value) {
+		double range = Double.parseDouble(value);
+		setMaxSensingRange(range);
+	}
 
 	public void setPhantomPopulationEventsFile(String value) {
 		this.phantomPopulationEventsFile = value;
@@ -242,6 +261,8 @@ public class Sim2DConfigGroup extends Module {
 			return Boolean.toString(isEnableEnvironmentForceModule());
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnablePathForceModule());
+		} else if (MAX_SENSING_RANGE.equals(key)) {
+			return Double.toString(getMaxSensingRange());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -267,6 +288,7 @@ public class Sim2DConfigGroup extends Module {
 		map.put(ENABLE_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_ENVIRONMENT_FORCE_MODULE));
 		map.put(ENABLE_PATH_FORCE_MODULE, getValue(ENABLE_PATH_FORCE_MODULE));
 		map.put(PHANTOM_POPULATION_EVENTS_FILE, getValue(PHANTOM_POPULATION_EVENTS_FILE));
+		map.put(MAX_SENSING_RANGE, getValue(MAX_SENSING_RANGE));
 		return map;
 	}
 

@@ -21,7 +21,9 @@ package playground.gregor.multidestpeds.io;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,7 +87,7 @@ public class Mat2XYZAzimuthEvents {
 		createFinishLines(sc);
 
 
-		EventWriterXML writer = new EventWriterXML("/Users/laemmel/devel/dfg/events.xml");
+		EventWriterXML writer = new EventWriterXML("/Users/laemmel/devel/dfg/input/events.xml");
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(writer);
 		EventsFactory fac = manager.getFactory();
@@ -98,17 +100,25 @@ public class Mat2XYZAzimuthEvents {
 		PersonalizableTravelCost cost = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(fs,sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 
-
+		Set<Ped> excl = new HashSet<Ped>();
 
 		for (int i = 0; i < timeSteps.size(); i++) {
 			double time = timeSteps.get(i);
 			for (Ped ped : peds) {
+				if (excl.contains(ped)) {
+					continue;
+				}
 				if (time < ped.depart || time > ped.arrived) {
 					continue;
 				}
 				if (time == ped.depart) {
 
-					calculateRoute(time,ped,sc,dijkstra);
+					try {
+						calculateRoute(time,ped,sc,dijkstra);
+					} catch (Exception e) {
+						excl.add(ped);
+						continue;
+					}
 
 
 					ped.lastPos = ped.coords.get(time);
@@ -122,17 +132,16 @@ public class Mat2XYZAzimuthEvents {
 				XYVxVyEvent ev = new XYVxVyEventImpl(id, c, v.x, v.y, time);
 				manager.processEvent(ev);
 
-				if (checkForNextLink(ped,c)) {
+				ped.lastPos = c;
+				if (time == ped.arrived) {
+					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
+					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
+				} else if (checkForNextLink(ped,c)) {
 					manager.processEvent(fac.createLinkLeaveEvent(time, id, ped.path.links.get(ped.currLink).getId()));
 					ped.currLink++;
 					manager.processEvent(fac.createLinkEnterEvent(time, id, ped.path.links.get(ped.currLink).getId()));
 				}
 
-				ped.lastPos = c;
-				if (time == ped.arrived) {
-					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
-					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
-				}
 			}
 
 		}

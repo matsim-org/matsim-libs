@@ -17,8 +17,8 @@ public class LineStringsSnapper {
 	private static final double SNAP = 0.1;
 
 	public static void main(String[] args) {
-		String in = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/tmp.shp";
-		String out = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_transformed_closed.shp";
+		String in = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries.shp";
+		String out = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_closed.shp";
 
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(in);

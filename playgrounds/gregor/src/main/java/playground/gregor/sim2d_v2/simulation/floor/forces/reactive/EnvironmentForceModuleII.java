@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.simulation.floor.forces;
+package playground.gregor.sim2d_v2.simulation.floor.forces.reactive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
 import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
+import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -91,20 +93,6 @@ public class EnvironmentForceModuleII implements ForceModule {
 	 */
 	@Override
 	public void init() {
-		ShapeFileReader reader = this.sc.getScenarioElement(ShapeFileReader.class);
-		Envelope e = reader.getBounds();
-		this.quad = new QuadTree<Coordinate>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
-
-		List<Geometry> geos = new ArrayList<Geometry>();
-		for (Feature ft : reader.getFeatureSet()) {
-			Geometry geo = ft.getDefaultGeometry();
-			geos.add(geo);
-		}
-		DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
-		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
-		for (int i = 0; i < mp.getNumPoints(); i++) {
-			Point p = (Point) mp.getGeometryN(i);
-			this.quad.put(p.getX(), p.getY(), p.getCoordinate());
-		}
+		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getQuadTree();
 	}
 }

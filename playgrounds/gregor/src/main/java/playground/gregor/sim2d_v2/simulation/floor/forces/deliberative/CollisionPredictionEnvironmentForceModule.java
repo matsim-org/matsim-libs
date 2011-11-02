@@ -1,26 +1,42 @@
-package playground.gregor.sim2d_v2.simulation.floor.forces;
+package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
+import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 
 	private final Scenario sc;
-	private final StaticEnvironmentDistancesField sff;
 
 	private final double EventHorizonTime = 10;
 	private final GeometryFactory geofac = new GeometryFactory();
 	private final double Bi;
 	private final double Ai;
+	private QuadTree<Coordinate> quad;
+
+	private final double maxSensingRange;
 
 	/**
 	 * @param floor
@@ -28,10 +44,10 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	 */
 	public CollisionPredictionEnvironmentForceModule(Floor floor, Scenario scenario) {
 		this.sc = scenario;
-		this.sff = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
 		Sim2DConfigGroup conf = (Sim2DConfigGroup) scenario.getConfig().getModule("sim2d");
 		this.Bi = conf.getBi();
 		this.Ai = conf.getAi();
+		this.maxSensingRange = conf.getMaxSensingRange();
 	}
 
 	@Override
@@ -39,7 +55,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		EnvironmentDistances ed = this.sff.getEnvironmentDistances(agent.getPosition());
+		Collection<Coordinate> ed = this.quad.get(agent.getPosition().x, agent.getPosition().y, this.maxSensingRange);
 
 		double t_i = getTi(ed,agent);
 		if (t_i == Double.POSITIVE_INFINITY) {
@@ -48,7 +64,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 		double v_i = Math.sqrt(agent.getVx()*agent.getVx() + agent.getVy()*agent.getVy());
 		double stopDist = v_i/ t_i;
 
-		for (Coordinate c : ed.getObjects()) {
+		for (Coordinate c : ed) {
 			double dist = c.distance(agent.getPosition());
 			double term1 = this.Ai * stopDist * Math.exp(-dist/this.Bi);
 			Vector vecDPrime_ij_t_i = getDistVector(agent,c,t_i);
@@ -85,10 +101,10 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 		return v;
 	}
 
-	private double getTi(EnvironmentDistances ed, Agent2D agent) {
+	private double getTi(Collection<Coordinate> ed, Agent2D agent) {
 		double t_i = Double.POSITIVE_INFINITY;
 
-		for (Coordinate c : ed.getObjects()) {
+		for (Coordinate c : ed) {
 			double tmp = getTi(c,agent);
 			if (tmp < t_i) {
 				t_i = tmp;
@@ -125,8 +141,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 	@Override
 	public void init() {
-		// TODO Auto-generated method stub
-
+		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getQuadTree();
 	}
 
 	private static final class Vector {

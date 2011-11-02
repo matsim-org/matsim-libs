@@ -45,7 +45,7 @@ public class Importer {
 	private static final Scenario SC = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 
-	private static final File file = new File("/Users/laemmel/devel/dfg/data/gr90.mat");
+	private static final File file = new File("/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/joined/gr90.mat");
 
 	private final List<Ped> peds = new ArrayList<Ped>();
 

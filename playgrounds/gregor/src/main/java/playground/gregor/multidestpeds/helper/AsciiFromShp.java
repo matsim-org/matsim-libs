@@ -15,7 +15,8 @@ public class AsciiFromShp {
 
 
 	public static void main(String [] args) throws IOException {
-		String out = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_transformed_closed.shp";
+		String out = "/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/floor_plan/boundaries_closed_transformed.shp";
+		//		String out = "/Users/laemmel/tmp/hjsk.shp";
 		FeatureSource fs = ShapeFileReader.readDataFile(out);
 		Iterator it = fs.getFeatures().iterator();
 

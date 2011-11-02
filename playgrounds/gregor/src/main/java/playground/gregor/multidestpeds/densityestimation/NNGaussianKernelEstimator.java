@@ -18,8 +18,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
-import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
 
 /**
  * 
@@ -47,7 +45,7 @@ public class NNGaussianKernelEstimator implements XYVxVyEventsHandler{
 
 	double maxRho = 0;
 	private EventsManager eventsManger = null;
-	private StaticEnvironmentDistancesField sedf;
+	private QuadTree<Coordinate> quad;
 
 	/*package*/ NNGaussianKernelEstimator() {
 
@@ -148,11 +146,10 @@ public class NNGaussianKernelEstimator implements XYVxVyEventsHandler{
 				}
 			}
 
-			EnvironmentDistances dists = this.sedf.getEnvironmentDistances(c);
-			for (Coordinate tmp : dists.getObjects()) {
-				if (tmp.distance(c) < minDist) {
-					minDist = tmp.distance(c);
-				}
+
+			Coordinate tmp = this.quad.get(c.x, c.y);
+			if (tmp.distance(c) < minDist) {
+				minDist = tmp.distance(c);
 			}
 
 			info.dist = Math.max(minDist, this.minDist);
@@ -209,8 +206,8 @@ public class NNGaussianKernelEstimator implements XYVxVyEventsHandler{
 		this.eventsManger  = events;
 	}
 
-	/*package*/ void setStaticEnvironmentDistancesField(StaticEnvironmentDistancesField sedf) {
-		this.sedf = sedf;
+	/*package*/ void setStaticEnvironmentDistancesQuadtree(QuadTree<Coordinate> tree) {
+		this.quad = tree;
 	}
 
 	/*package*/ void setQueryCoordinates(List<Coordinate> coordinates) {

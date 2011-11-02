@@ -19,66 +19,87 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.scenario;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
+
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.io.EnvironmentDistancesReader;
-import playground.gregor.sim2d_v2.simulation.floor.forces.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
 
 public class ScenarioLoader2DImpl  {
-
-	private static final Logger log = Logger.getLogger(ScenarioLoader2DImpl.class);
-
-	private StaticEnvironmentDistancesField sff;
 
 	private final Scenario scenarioData;
 
 
-	private final Sim2DConfigGroup sim2DConfig;
+	private Sim2DConfigGroup sim2DConfig;
+
+
+	private final MyDataContainer c;
+
+
+	private final Config config;
 
 	public ScenarioLoader2DImpl(Scenario scenario) {
 		this.scenarioData = scenario;
-		MyDataContainer c = new MyDataContainer();
-		this.scenarioData.addScenarioElement(c);
-		this.sim2DConfig = (Sim2DConfigGroup) this.scenarioData.getConfig().getModule("sim2d");
+		this.config = scenario.getConfig();
+		this.c = new MyDataContainer();
+		this.scenarioData.addScenarioElement(this.c);
+
 	}
 
 	public void load2DScenario() {
-		loadStaticEnvironmentDistancesField();
+		initSim2DConfigGroup();
 		loadFloorShape();
+	}
+
+	private void initSim2DConfigGroup() {
+		Module module = this.config.getModule("sim2d");
+		Sim2DConfigGroup s = null;
+		if (module == null) {
+			s = new Sim2DConfigGroup();
+		} else {
+			s = new Sim2DConfigGroup(module);
+		}
+		this.config.getModules().put("sim2d", s);
+		this.sim2DConfig = (Sim2DConfigGroup) this.scenarioData.getConfig().getModule("sim2d");
 	}
 
 	private void loadFloorShape() {
 		String file = this.sim2DConfig.getFloorShapeFile();
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(file);
+
 		this.scenarioData.addScenarioElement(reader);
-	}
 
-	private void loadStaticEnvironmentDistancesField() {
 
-		if (this.sim2DConfig.getStaticEnvFieldFile() != null) {
-			log.warn("this mode is not longer supported!");
-		} else  {
-			loadStaticEnvironmentDistancesField(this.sim2DConfig.getStaticEnvFieldFile());
-			this.scenarioData.addScenarioElement(this.sff);
+		Envelope e = reader.getBounds();
+		QuadTree<Coordinate> quad = new QuadTree<Coordinate>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
+
+		List<Geometry> geos = new ArrayList<Geometry>();
+		for (Feature ft : reader.getFeatureSet()) {
+			Geometry geo = ft.getDefaultGeometry();
+			geos.add(geo);
 		}
-
-
-
-
-	}
-
-	private void loadStaticEnvironmentDistancesField(String staticEnvFieldFile) {
-
-
-		EnvironmentDistancesReader r = new EnvironmentDistancesReader();
-		r.setValidating(false);
-		r.parse(this.sim2DConfig.getStaticEnvFieldFile());
-		this.sff = r.getEnvDistField();
-
+		DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
+		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
+		for (int i = 0; i < mp.getNumPoints(); i++) {
+			Point p = (Point) mp.getGeometryN(i);
+			quad.put(p.getX(), p.getY(), p.getCoordinate());
+		}
+		this.c.setQuadTree(quad);
 	}
 
 }

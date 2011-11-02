@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.sim2d_v2.simulation.floor.forces;
+package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative;
 
 import java.util.HashMap;
 
@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

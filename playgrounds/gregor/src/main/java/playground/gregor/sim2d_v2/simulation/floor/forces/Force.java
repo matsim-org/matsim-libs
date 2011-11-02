@@ -48,11 +48,11 @@ public class Force {
 		this.fy = fy;
 	}
 
-	/* package */void incrementX(double incrfx) {
+	public void incrementX(double incrfx) {
 		this.fx += incrfx;
 	}
 
-	/* package */void incrementY(double incrfy) {
+	public void incrementY(double incrfy) {
 		this.fy += incrfy;
 	}
 

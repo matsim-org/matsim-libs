@@ -7,7 +7,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.scenario.MyDataContainer;
+
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -67,8 +68,7 @@ public class DensityEstimatorFactory {
 		ret.setMinDist(.300);
 		ret.setEventsManager(this.events);
 
-		StaticEnvironmentDistancesField sedf = this.sc.getScenarioElement(StaticEnvironmentDistancesField.class);
-		ret.setStaticEnvironmentDistancesField(sedf);
+		ret.setStaticEnvironmentDistancesQuadtree(this.sc.getScenarioElement(MyDataContainer.class).getQuadTree());
 
 
 		return ret;

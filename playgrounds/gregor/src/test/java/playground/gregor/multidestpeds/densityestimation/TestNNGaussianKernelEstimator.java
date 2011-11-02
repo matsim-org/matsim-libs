@@ -20,8 +20,7 @@ import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimat
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
 import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
-import playground.gregor.sim2d_v2.simulation.floor.EnvironmentDistances;
-import playground.gregor.sim2d_v2.simulation.floor.StaticEnvironmentDistancesField;
+import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 
 public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoordinateEventHandler{
 
@@ -64,9 +63,10 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
-		QuadTree<EnvironmentDistances> tree = createQuadTreeAndNetwork(sc);
-		StaticEnvironmentDistancesField sedf = new StaticEnvironmentDistancesField(tree, -1, -1);
-		sc.addScenarioElement(sedf);
+		QuadTree<Coordinate> tree = createQuadTreeAndNetwork(sc);
+		MyDataContainer cc = new MyDataContainer();
+		cc.setQuadTree(tree);
+		sc.addScenarioElement(cc);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		NNGaussianKernelEstimator est = new DensityEstimatorFactory(events, sc).createDensityEstimator();
@@ -113,7 +113,7 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		events.processEvent(dummy);
 	}
 
-	private QuadTree<EnvironmentDistances> createQuadTreeAndNetwork(Scenario sc) {
+	private QuadTree<Coordinate> createQuadTreeAndNetwork(Scenario sc) {
 		double minX = -3.5;
 		double minY = -6.5;
 		double maxX = 7.5;
@@ -126,14 +126,12 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		sc.getNetwork().addNode(n2);
 
 
-		QuadTree<EnvironmentDistances> ret = new QuadTree<EnvironmentDistances>(minX,minY,maxX,maxY);
+		QuadTree<Coordinate> ret = new QuadTree<Coordinate>(minX,minY,maxX,maxY);
 		double [] x = {0., .650, .650, 0., 3.620, 4.230, 4.230, 3.620, .900, 1.200, 3.000, 3.300, .900, 1.200, 3.000, 3.300};
 		double [] y = {0., 0., .660, .660, 0., 0., .600, .600, -4.110, -4.110, -4.110, -4.110, -5.000, -5.000, -5.000, -5.000};
 		for (int i = 0; i < x.length; i++) {
 			Coordinate c = new Coordinate(x[i],y[i]);
-			EnvironmentDistances e = new EnvironmentDistances(c);
-			e.addEnvironmentDistanceLocation(c);
-			ret.put(x[i], y[i], e);
+			ret.put(x[i], y[i], c);
 		}
 
 		return ret;

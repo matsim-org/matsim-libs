@@ -1,4 +1,4 @@
-package playground.gregor.sim2d_v2.simulation.floor.forces;
+package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative;
 
 import java.util.Collection;
 
@@ -14,6 +14,7 @@ import com.vividsolutions.jts.operation.distance.DistanceOp;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
 public class CollisionPredictionAgentInteractionModule implements
 DynamicForceModule {

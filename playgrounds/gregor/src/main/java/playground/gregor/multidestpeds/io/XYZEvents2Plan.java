@@ -132,7 +132,7 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 	}
 
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
-		String eventsFile = "/Users/laemmel/devel/dfg/events.xml";
+		String eventsFile = "/Users/laemmel/devel/dfg/input/events.xml";
 		String configFile = "/Users/laemmel/devel/dfg/config2d.xml";
 		Config c = ConfigUtils.loadConfig(configFile);
 		Scenario sc = ScenarioUtils.createScenario(c);
@@ -142,7 +142,7 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 		mgr.addHandler(planGen);
 		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(mgr);
 		reader.parse(eventsFile);
-		planGen.write("/Users/laemmel/devel/dfg/data/90gradPlans.xml");
+		planGen.write("/Users/laemmel/devel/dfg/input/plans.xml");
 	}
 
 	/**

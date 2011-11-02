@@ -42,7 +42,6 @@ import playground.gregor.sim2d_v2.trafficmonitoring.MSATravelTimeCalculatorFacto
 @Deprecated // should not be derived from Controler
 public class Controller2D extends Controler {
 
-	protected Sim2DConfigGroup sim2dConfig;
 
 	public Controller2D(String[] args) {
 		super(args[0]);
@@ -63,7 +62,6 @@ public class Controller2D extends Controler {
 	@Override
 	protected void loadData() {
 		super.loadData();
-		initSim2DConfigGroup();
 		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenarioData);
 		loader.load2DScenario();
 
@@ -78,20 +76,6 @@ public class Controller2D extends Controler {
 		return a;
 	}
 
-	/**
-	 * 
-	 */
-	private void initSim2DConfigGroup() {
-		Module module = this.config.getModule("sim2d");
-		Sim2DConfigGroup s = null;
-		if (module == null) {
-			s = new Sim2DConfigGroup();
-		} else {
-			s = new Sim2DConfigGroup(module);
-		}
-		this.sim2dConfig = s;
-		this.config.getModules().put("sim2d", s);
-	}
 
 	public static void main(String[] args) {
 
@@ -107,10 +91,6 @@ public class Controller2D extends Controler {
 		Controler controller = new Controller2D(sc);
 		controller.run();
 
-	}
-
-	public Sim2DConfigGroup getSim2dConfig() {
-		return this.sim2dConfig;
 	}
 
 }

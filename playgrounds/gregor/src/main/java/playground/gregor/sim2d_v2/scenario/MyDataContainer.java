@@ -1,20 +1,20 @@
 package playground.gregor.sim2d_v2.scenario;
 
-import java.util.HashMap;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.QuadTree;
 
-import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class MyDataContainer {
 
-	private final Map<Id, LineString> lsm = new HashMap<Id, LineString>();
+	private QuadTree<Coordinate> quad;
 
-
-	public Map<Id, LineString> getLineStringMap() {
-		return this.lsm;
+	public void setQuadTree(QuadTree<Coordinate> quad) {
+		this.quad = quad;
 	}
 
+	public QuadTree<Coordinate> getQuadTree() {
+		return this.quad;
+	}
 
 }
