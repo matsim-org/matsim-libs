@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.droeder.sketchPlanning;
 
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -29,7 +28,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.ptproject.qsim.QSim;
 
 import playground.droeder.DRPaths;
 import playground.droeder.Analysis.NetworkAnalysisHandler;
@@ -39,25 +37,38 @@ import playground.droeder.Analysis.NetworkAnalysisHandler;
  *
  */
 public class SketchPlanningControler{
-	private final static String CONFIGBASE = DRPaths.STUDIESSKETCH + "config_base.xml";
-	private final static String CONFIGBA17EXT = DRPaths.STUDIESSKETCH + "config_ba17ext.xml";
+	private final static String CONFIGDIR = "";
+	private final static String CONFIGBASE = CONFIGDIR + "config_base.xml";
+	private final static String CONFIGBA16EXT = CONFIGDIR + "config_ba16ext.xml";
+	private final static String CONFIGBA17EXT = CONFIGDIR + "config_ba16_17ext.xml";
+	private final static String CONFIGBA17_ST_EXT = CONFIGDIR + "config_ba16_17_storkower_ext.xml";
 	
 	public static void main(String[] args){
-//		Controler cBase;
-//		cBase = new Controler(CONFIGBASE);
-//		cBase.setCreateGraphs(true);
-//		cBase.setDumpDataAtEnd(true);
-//		cBase.setOverwriteFiles(true);
-////		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
-//		cBase.run();
-		
-		Controler cBa17ext;
-		cBa17ext = new Controler(CONFIGBA17EXT);
-		cBa17ext.setCreateGraphs(true);
-		cBa17ext.setDumpDataAtEnd(true);
-		cBa17ext.setOverwriteFiles(true);
+		Controler c;
+		c = new Controler(CONFIGBASE);
+		c.setCreateGraphs(true);
+		c.setDumpDataAtEnd(true);
+		c.setOverwriteFiles(true);
 //		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
-		cBa17ext.run();
+		c.run();
+		
+		c = new Controler(CONFIGBA17EXT);
+		c.setCreateGraphs(true);
+		c.setDumpDataAtEnd(true);
+		c.setOverwriteFiles(true);
+		c.run();
+
+		c = new Controler(CONFIGBA16EXT);
+		c.setCreateGraphs(true);
+		c.setDumpDataAtEnd(true);
+		c.setOverwriteFiles(true);
+		c.run();
+		
+		c = new Controler(CONFIGBA17_ST_EXT);
+		c.setCreateGraphs(true);
+		c.setDumpDataAtEnd(true);
+		c.setOverwriteFiles(true);
+		c.run();
 	}
 
 
