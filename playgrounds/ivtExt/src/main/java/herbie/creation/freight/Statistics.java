@@ -10,6 +10,6 @@ public class Statistics {
 	}
 	
 	public void writeDepartures(String outpath) {	
-		this.bins.plotBinnedDistribution(outpath, "", " h");
+		this.bins.plotBinnedDistribution(outpath, "", " h", "#");
 	}
 }
