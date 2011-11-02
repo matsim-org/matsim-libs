@@ -22,7 +22,7 @@ public class JobClusterObject {
 		this.nearestNode = null;
 	}
 	
-	public void addNearestNode(Node nearestNode){
+	public void setNearestNode(Node nearestNode){
 		this.nearestNode = nearestNode;
 	}
 	
