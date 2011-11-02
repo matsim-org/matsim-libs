@@ -65,11 +65,11 @@ public class DaShapeWriter {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, String>> attributes){
+	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes){
 		if(attributes == null){
 			initLineFeatureType("links", null);
 		}else{
-			for(SortedMap<String, String> m : attributes.values()){
+			for(SortedMap<String, Object> m : attributes.values()){
 				initLineFeatureType("links", m);
 				break;
 			}
@@ -83,11 +83,11 @@ public class DaShapeWriter {
 		write(createNodeFeatures(nodes), fileName);
 	}
 	
-	public static void writeDefaultPoints2Shape(String fileName, String name, Map<String, Coord> points, Map<String, SortedMap<String, String>> attributes){
+	public static void writeDefaultPoints2Shape(String fileName, String name, Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes){
 		if(attributes == null){
 			initPointFeatureType(name, null);
 		}else{
-			for (SortedMap<String, String> m : attributes.values()){
+			for (SortedMap<String, Object> m : attributes.values()){
 				initPointFeatureType(name, m);
 				break;
 			}
@@ -102,9 +102,9 @@ public class DaShapeWriter {
 	 * @param schedule
 	 * @param lines2write
 	 */
-	public static void writeTransitLines2Shape(String fileName, TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, String>> attributes){
+	public static void writeTransitLines2Shape(String fileName, TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes){
 		if(!(attributes == null) && (attributes.size() > 0)){
-			for(SortedMap<String, String> m : attributes.values()){
+			for(SortedMap<String, Object> m : attributes.values()){
 				initLineFeatureType("transitLines", m);
 				break;
 			}
@@ -127,8 +127,8 @@ public class DaShapeWriter {
 	}
 	
 	
-	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, String>> attributes){
-		for (SortedMap<String, String> m : attributes.values()){
+	public static void writePointDist2Shape (String fileName, Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes){
+		for (SortedMap<String, Object> m : attributes.values()){
 			initLineFeatureType("distance", m);
 			break;
 		}
@@ -141,12 +141,12 @@ public class DaShapeWriter {
 	 * @param lineStrings
 	 * @param attributes
 	 */
-	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, String>> attributes){
+	public static void writeDefaultLineString2Shape(String fileName, String name,  Map<String, SortedMap<Integer, Coord>> lineStrings, Map<String, SortedMap<String, Object>> attributes){
 		
 		if(attributes == null){
 			initLineFeatureType(name, null);
 		}else{
-			for (SortedMap<String, String> m : attributes.values()){
+			for (SortedMap<String, Object> m : attributes.values()){
 				initLineFeatureType(name, m);
 				break;
 			}
@@ -177,8 +177,8 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initLineFeatureType(String name, SortedMap<String, String> attributes) {
-		AttributeType [] attribs;
+	private static void initLineFeatureType(String name, SortedMap<String, Object> attributes) {
+		AttributeType[] attribs;
 		if(attributes == null){
 			attribs = new AttributeType[2];
 		}else{
@@ -190,8 +190,8 @@ public class DaShapeWriter {
 		Integer count = 2;
 		
 		if(!(attributes == null)){
-			for(String s : attributes.keySet()){
-				attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
+			for(Entry<String, Object> e: attributes.entrySet()){
+				attribs[count] = AttributeTypeFactory.newAttributeType(e.getKey(), e.getValue().getClass());
 				count++;
 			}
 		}
@@ -205,7 +205,7 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static void initPointFeatureType(String name, SortedMap<String, String> attributes){
+	private static void initPointFeatureType(String name, SortedMap<String, Object> attributes){
 		AttributeType [] attribs;
 		if(attributes == null){
 			attribs = new AttributeType[2];
@@ -217,8 +217,8 @@ public class DaShapeWriter {
 		Integer count = 2;
 		
 		if(!(attributes == null)){
-			for(String s : attributes.keySet()){
-				attribs[count] = AttributeTypeFactory.newAttributeType(s, String.class);
+			for(Entry<String, Object> e: attributes.entrySet()){
+				attribs[count] = AttributeTypeFactory.newAttributeType(e.getKey(), e.getValue().getClass());
 				count++;
 			}
 		}
@@ -232,7 +232,7 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static Collection<Feature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, String>> attributes){
+	private static Collection<Feature> createRouteFeatures(TransitSchedule schedule, Collection<Id> lines2write, Map<Id, SortedMap<String, Object>> attributes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -258,7 +258,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, String>> attributes) {
+	private static Collection<Feature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes) {
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -277,7 +277,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, String>> attributes){
+	private static Collection<Feature> createPointDistanceFeatures(Map<String, Tuple<Coord, Coord>> points, Map<String, SortedMap<String, Object>> attributes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -317,7 +317,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createDefaultPointFeature(Map<String, Coord> points, Map<String, SortedMap<String, String>> attributes){
+	private static Collection<Feature> createDefaultPointFeature(Map<String, Coord> points, Map<String, SortedMap<String, Object>> attributes){
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		
@@ -333,7 +333,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<Feature> createDefaultLineStringFeature(Map<String, SortedMap<Integer, Coord>> lineStrings,	Map<String, SortedMap<String, String>> attributes) {
+	private static Collection<Feature> createDefaultLineStringFeature(Map<String, SortedMap<Integer, Coord>> lineStrings,	Map<String, SortedMap<String, Object>> attributes) {
 		Collection<Feature> features = new ArrayList<Feature>();
 		Feature feature;
 		Coordinate[] coord;
@@ -365,9 +365,9 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, String> attributes) {
+	private static Feature getLineStringFeature(CoordinateArraySequence c, String name, SortedMap<String, Object> attributes) {
 		LineString s = geometryFactory.createLineString(c);
-		Object [] attribs ;
+		Object[] attribs ;
 		if(attributes == null){
 			attribs = new Object[2];
 		}else{
@@ -378,8 +378,8 @@ public class DaShapeWriter {
 		Integer count = 2;
 		
 		if(!(attributes == null)){
-			for(String str : attributes.values()){
-				attribs[count] = str;
+			for(Object o : attributes.values()){
+				attribs[count] = o;
 				count++;
 			}
 		}
@@ -391,7 +391,7 @@ public class DaShapeWriter {
 		}
 	}
 	
-	private static Feature getPointFeature(Coord coord, String id, SortedMap<String, String> attributes) {
+	private static Feature getPointFeature(Coord coord, String id, SortedMap<String, Object> attributes) {
 		Point p = geometryFactory.createPoint(MGC.coord2Coordinate(coord));
 		Object [] attribs ;
 		if(attributes == null){
@@ -404,8 +404,8 @@ public class DaShapeWriter {
 		Integer count = 2;
 		
 		if(!(attributes == null)){
-			for(String str : attributes.values()){
-				attribs[count] = str;
+			for(Object o : attributes.values()){
+				attribs[count] = o;
 				count++;
 			}
 		}

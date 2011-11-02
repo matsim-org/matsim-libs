@@ -21,7 +21,7 @@ public class TMC2009ToShape {
 	private String inFile;
 	private Messages messages;
 	private Map<String, SortedMap<Integer, Coord>> lineShapes;
-	private Map<String, SortedMap<String, String>> shapeAttribs;
+	private Map<String, SortedMap<String, Object>> shapeAttribs;
 	private Map<String, Coord> pointShapes;
 	
 	
@@ -36,7 +36,7 @@ public class TMC2009ToShape {
 
 	public TMC2009ToShape(String inFile){
 		this.inFile = inFile;
-		this.shapeAttribs = new HashMap<String, SortedMap<String,String>>();
+		this.shapeAttribs = new HashMap<String, SortedMap<String,Object>>();
 		this.lineShapes = new HashMap<String, SortedMap<Integer,Coord>>();
 		this.pointShapes = new HashMap<String, Coord>();
  	}
@@ -73,7 +73,7 @@ public class TMC2009ToShape {
 	
 	private void prepareDataForShape(){
 		SortedMap<Integer, Coord> tempCoords;
-		SortedMap<String, String> tempAttribs;
+		SortedMap<String, Object> tempAttribs;
 		
 		for(String[] m : this.messages.getMessages()){
 			tempCoords = new TreeMap<Integer, Coord>();
@@ -88,7 +88,7 @@ public class TMC2009ToShape {
 				this.lineShapes.put(m[0], tempCoords);
 			}
 			
-			tempAttribs = new TreeMap<String, String>();
+			tempAttribs = new TreeMap<String, Object>();
 			for(int ii = 1; ii < m.length - 1; ii++){
 				tempAttribs.put(this.messages.getKeys()[ii], m[ii]);
 			}

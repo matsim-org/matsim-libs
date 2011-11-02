@@ -35,7 +35,7 @@ public class StopsAndRoutes2Shape{
 	Collection<Id> hLines;
 	Collection<Id> vLines;
 	
-	Map<Id, SortedMap<String, String>> linkAttributes;
+	Map<Id, SortedMap<String, Object>> linkAttributes;
 	
 	Map<String, Tuple<Coord, Coord>> preMatched;
 	
@@ -144,11 +144,11 @@ public class StopsAndRoutes2Shape{
 //	}
 	
 	private void preProcessLinks(){
-		this.linkAttributes = new HashMap<Id, SortedMap<String,String>>();
-		SortedMap<String, String> attribs;
+		this.linkAttributes = new HashMap<Id, SortedMap<String, Object>>();
+		SortedMap<String, Object> attribs;
 		
 		for(Link l : vSc.getNetwork().getLinks().values()){
-			attribs = new TreeMap<String, String>();
+			attribs = new TreeMap<String, Object>();
 			attribs.put("modes", l.getAllowedModes().toString());
 			linkAttributes.put(l.getId(), attribs);
 		}

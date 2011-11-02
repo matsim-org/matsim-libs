@@ -378,7 +378,7 @@ public class GraphMatching2 {
 	private void nodes2Shp(Map<Id, Id> nodeIds, String outFile, String name){
 		Map<String, Coord> ref = new HashMap<String, Coord>();
 		
-		Map<String, SortedMap<String, String>> attrib = new HashMap<String, SortedMap<String,String>>();
+		Map<String, SortedMap<String, Object>> attrib = new HashMap<String, SortedMap<String,Object>>();
 		
 		MatchingNode refNode, matchNode;
 		int matched = 0;
@@ -389,7 +389,7 @@ public class GraphMatching2 {
 			ref.put("ref_" + String.valueOf(matched) + "_" + refNode.getId().toString(), refNode.getCoord());
 			ref.put("match_" + String.valueOf(matched) + "_" + matchNode.getId().toString(), matchNode.getCoord());
 			
-			SortedMap<String, String> temp = new TreeMap<String, String>();
+			SortedMap<String, Object> temp = new TreeMap<String, Object>();
 			temp.put("match_nr", String.valueOf(matched));
 			attrib.put("ref_" + String.valueOf(matched) + "_" + refNode.getId().toString(), temp);
 			attrib.put("match_" + String.valueOf(matched) + "_" + matchNode.getId().toString(), temp);
@@ -401,10 +401,10 @@ public class GraphMatching2 {
 	
 	private void edge2Shp(Map<Id, Id> edgeIds, String outFile, String name){
 		Map<String, SortedMap<Integer, Coord>> edges = new HashMap<String, SortedMap<Integer,Coord>>();
-		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
+		Map<String, SortedMap<String, Object>> attribs = new HashMap<String, SortedMap<String,Object>>();
 		
 		SortedMap<Integer, Coord> coords;
-		SortedMap<String, String> attribValues;
+		SortedMap<String, Object> attribValues;
 		
 		MatchingEdge ref, cand;
 		String refId, candId;
@@ -412,7 +412,7 @@ public class GraphMatching2 {
 		int matchNr = 0;
 		
 		for(Entry<Id, Id> e: edgeIds.entrySet()){
-			attribValues = new TreeMap<String, String>();
+			attribValues = new TreeMap<String, Object>();
 			attribValues.put("matchNr", String.valueOf(matchNr));
 
 			coords = new TreeMap<Integer, Coord>();

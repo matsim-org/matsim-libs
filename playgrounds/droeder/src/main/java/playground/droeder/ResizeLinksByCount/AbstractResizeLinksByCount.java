@@ -63,9 +63,9 @@ public abstract class AbstractResizeLinksByCount {
 	private Network newNet;
 
 	private Map<Id, Link> modifiedLinks2shp = null;
-	private Map<Id, SortedMap<String, String>> modAttributes = null;
+	private Map<Id, SortedMap<String, Object>> modAttributes = null;
 	private Map<Id, Link> unmodifiedLinks2shp = null;
-	private Map<Id, SortedMap<String, String>> unmodAttributes = null;
+	private Map<Id, SortedMap<String, Object>> unmodAttributes = null;
 	private Double scaleFactor = null;
 	private boolean countsMatched = false;
 	private Counts origCounts;
@@ -227,11 +227,11 @@ public abstract class AbstractResizeLinksByCount {
 	protected void addLink2shp(Id link){
 		if(this.modifiedLinks2shp == null){
 			this.modifiedLinks2shp = new HashMap<Id, Link>();
-			this.modAttributes = new HashMap<Id, SortedMap<String,String>>();
+			this.modAttributes = new HashMap<Id, SortedMap<String,Object>>();
 		}
 		this.modifiedLinks2shp .put(link, this.newNet.getLinks().get(link));
 		
-		SortedMap<String, String> attrib = new TreeMap<String, String>();
+		SortedMap<String, Object> attrib = new TreeMap<String, Object>();
 		attrib.put("oldCap", String.valueOf(this.oldNet.getLinks().get(link).getCapacity()));
 		attrib.put("newCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity()));
 		attrib.put("diffCap", String.valueOf(this.newNet.getLinks().get(link).getCapacity() - this.oldNet.getLinks().get(link).getCapacity()));		
@@ -251,13 +251,13 @@ public abstract class AbstractResizeLinksByCount {
 		//preprocess
 		if(!(this.modifiedLinks2shp==null)){
 			this.unmodifiedLinks2shp = new HashMap<Id, Link>();
-			this.unmodAttributes = new HashMap<Id, SortedMap<String,String>>();
+			this.unmodAttributes = new HashMap<Id, SortedMap<String,Object>>();
 			
 			for(Link l : this.newNet.getLinks().values()){
 				if(!this.modifiedLinks2shp.containsKey(l.getId())){
 					this.unmodifiedLinks2shp .put(l.getId(), l);
 					
-					SortedMap<String, String> attrib = new TreeMap<String, String>();
+					SortedMap<String, Object> attrib = new TreeMap<String, Object>();
 					attrib.put("Cap", String.valueOf(l.getCapacity()));
 					
 					this.unmodAttributes.put(l.getId(), attrib);

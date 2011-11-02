@@ -82,8 +82,8 @@ public class OSMTransitCheck {
 		// create shape with lineString for every route, based on the TransitRouteStopSequence
 		Map<String, SortedMap<Integer, Coord>> lsm = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer, Coord> ls;
-		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
-		SortedMap<String, String> values;
+		Map<String, SortedMap<String, Object>> attribs = new HashMap<String, SortedMap<String,Object>>();
+		SortedMap<String, Object> values;
 		
 		String id;
 		int cnt;
@@ -92,7 +92,7 @@ public class OSMTransitCheck {
 		for(TransitLine l : sc.getTransitSchedule().getTransitLines().values()){
 			for(TransitRoute r: l.getRoutes().values()){
 				first = true;
-				values= new TreeMap<String, String>();
+				values= new TreeMap<String, Object>();
 				values.put("route", l.getId().toString() + "_" + r.getId().toString());
 				cnt = 0;
 				for(TransitRouteStop s: r.getStops()){
@@ -117,14 +117,14 @@ public class OSMTransitCheck {
 		
 		// create shp with lineString for every link on every route, based on the linkSequence of the route
 		lsm = new HashMap<String, SortedMap<Integer,Coord>>();
-		attribs = new HashMap<String, SortedMap<String,String>>();
+		attribs = new HashMap<String, SortedMap<String,Object>>();
 		// create shp with lineString for the complete linkSequence on every route
 		Map<String, SortedMap<Integer, Coord>> complSequ = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer, Coord> lsSequ; 
 		
 		for(TransitLine l : sc.getTransitSchedule().getTransitLines().values()){
 			for(TransitRoute r : l.getRoutes().values()){
-				values = new TreeMap<String, String>();
+				values = new TreeMap<String, Object>();
 				values.put("line+route", l.getId().toString() + "_" + r.getId().toString());
 				lsSequ = new TreeMap<Integer, Coord>();
 				lsSequ.put(0, sc.getNetwork().getLinks().get(r.getRoute().getStartLinkId()).getToNode().getCoord());

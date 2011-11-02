@@ -129,7 +129,7 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 	
 	private void matchedStopsDist2Shape(){
 		Map<String, Tuple<Coord, Coord>> points = new HashMap<String, Tuple<Coord,Coord>>();
-		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
+		Map<String, SortedMap<String, Object>> attribs = new HashMap<String, SortedMap<String,Object>>();
 		
 		String name;
 		String wasPrematchedTo;
@@ -146,7 +146,7 @@ public class DaViSum2HafasMapper8 extends AbstractDaVisum2HafasMapper {
 				
 				points.put(name, new Tuple<Coord, Coord>(this.getVisumTransit().getFacilities().get(e.getKey()).getCoord(), 
 						this.getHafasTransit().getFacilities().get(e.getValue()).getCoord()));
-				SortedMap<String, String> tmp = new TreeMap<String, String>();
+				SortedMap<String, Object> tmp = new TreeMap<String, Object>();
 				tmp.put("prematched", wasPrematchedTo);
 				tmp.put("onLine", m.getKey().toString());
 				attribs.put(name, tmp);

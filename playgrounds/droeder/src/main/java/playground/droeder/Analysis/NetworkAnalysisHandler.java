@@ -50,28 +50,16 @@ import playground.droeder.gis.DaShapeWriter;
  */
 public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler{
 	
-	private Map<Id, Spider> spiders;
-	private LinkTravelTime linkStats;
-	private boolean spider;
+	private LinkStats linkStats;
 	private boolean linkStat;
 	private static final Logger log = Logger
-		.getLogger(NetworkAnalysisHandler.class);	
+		.getLogger(NetworkAnalysisHandler.class);
 	
-	public NetworkAnalysisHandler(Set<Id> linkIdsForSpider, boolean linkTravelTimes, int timeSliceSize){
-		if(linkIdsForSpider == null || linkIdsForSpider.size() == 0){
-			this.spider = false;
-		}else{
-			this.spider = true;
-			this.spiders = new HashMap<Id, Spider>();
-			for(Id id: linkIdsForSpider){
-				this.spiders.put(id, new Spider(id));
-			}
-		}
-		this.linkStat = linkTravelTimes;
+	public NetworkAnalysisHandler(boolean linkStats, int timeSliceSize, double usedScaleFactorSim){
+		this.linkStat = linkStats;
 		if(this.linkStat){
-			this.linkStats = new LinkTravelTime(timeSliceSize);
+			this.linkStats = new LinkStats(timeSliceSize, usedScaleFactorSim);
 		}
-		
 	}
 	
 	public void dumpCsv(String outDir){
@@ -94,7 +82,7 @@ public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveE
 			congestionWriter.append("total;");
 			congestionWriter.newLine();
 			// write values
-			for(Entry<Id, Map<Integer, Double>> e: this.linkStats.getTimeByLinkAndSlice().entrySet()){
+			for(Entry<Id, Map<Integer, Double>> e: this.linkStats.getAvTTimeByLinkAndSlice().entrySet()){
 				timeWriter.append(e.getKey() + ";");
 				congestionWriter.append(e.getKey() + ";");
 				double tt = 0, cnt = 0;
@@ -102,8 +90,8 @@ public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveE
 					if(e.getValue().containsKey(i)){
 						timeWriter.append((e.getValue().get(i)/agCnt.get(e.getKey()).get(i)) + ";");
 						tt+= (e.getValue().get(i)/agCnt.get(e.getKey()).get(i));
-						congestionWriter.append(agCnt.get(e.getKey()).get(i) + ";");
-						cnt+=agCnt.get(e.getKey()).get(i);
+						congestionWriter.append(agCnt.get(e.getKey()).get(i)+ ";");
+						cnt+= agCnt.get(e.getKey()).get(i);
 					}else{
 						timeWriter.append(";");
 						congestionWriter.append(";");
@@ -124,30 +112,32 @@ public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveE
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		
+	}
+	
+	public Map<Id, Map<Integer, Double>> getNumAgentsByLinkAndSlice(){
+		return this.linkStats.getNumAgentsByLinkAndSlice();
 	}
 	
 	public void dumpShp(String outDir, Network net){
-		Map<Id, SortedMap<String, String>> linkCongestion = new HashMap<Id, SortedMap<String,String>>();
+		Map<Id, SortedMap<String, Object>> linkCongestion = new HashMap<Id, SortedMap<String,Object>>();
 		Map<Id, Map<Integer, Double>> nrAg = linkStats.getNumAgentsByLinkAndSlice();
 		
 		for(Id id:  net.getLinks().keySet()){
-			SortedMap<String, String> temp = new TreeMap<String, String>();
+			SortedMap<String, Object> temp = new TreeMap<String, Object>();
 			Double abs = 0.;
 			for(int i = 0; i < linkStats.getLastTimeSlice(); i++){
 				if(nrAg.containsKey(id)){
 					if(nrAg.get(id).containsKey(i)){
-						temp.put(String.valueOf(i), String.valueOf(nrAg.get(id).get(i)));
+						temp.put(String.valueOf(i), nrAg.get(id).get(i));
 						abs += nrAg.get(id).get(i);
 					}else{
-						temp.put(String.valueOf(i), "0");
+						temp.put(String.valueOf(i), 0.);
 					}
 				}else{
-					temp.put(String.valueOf(i), "0");
+					temp.put(String.valueOf(i), 0.);
 				}
 			}
-			temp.put("absolut", String.valueOf(abs));
+			temp.put("absolut", abs);
 			linkCongestion.put(id, temp);
 		}
 		
@@ -179,12 +169,6 @@ public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveE
 	 */
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(spider){
-			for(Spider s: this.spiders.values()){
-				s.processEvent(event);
-			}
-		}
-
 		if(linkStat){
 			this.linkStats.processEvent(event);
 		}
@@ -202,46 +186,20 @@ public class NetworkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveE
 
 }
 
-class Spider{
-	private Id consideredLink;
-	private Set<Id> observedAgents;
-	private Map<Id, Double> linkCongestion = new HashMap<Id, Double>();
-	
-	
-	public Spider(Id forLink){
-		this.consideredLink = forLink;
-		this.observedAgents = new HashSet<Id>();
-	}
-	
-	public void processEvent(LinkEnterEvent e){
-		if(e.getLinkId().equals(this.consideredLink)){
-			this.observedAgents.add(e.getPersonId());
-		}
-		if(this.observedAgents.contains(e.getPersonId())){
-			if(!this.linkCongestion.containsKey(e.getLinkId())){
-				this.linkCongestion.put(e.getLinkId(), 0.0);
-			}
-			this.linkCongestion.put(e.getLinkId(), this.linkCongestion.get(e.getLinkId()) + 1);
-		}
-	}
-	
-	public Map<Id, Double> getCongestion(){
-		return this.linkCongestion;
-	}
-}
-
-class LinkTravelTime{
+class LinkStats{
 	Map<Id, Double> observedAgents; 
 	Map<Id, Map<Integer, Double>> absLinkTT;
 	HashMap<Id, Map<Integer, Double>> agentsPassedLink;
 	private int timeSliceSize;
 	private int lastSlice;
+	private double scaleFactor;
 	
-	public LinkTravelTime(int timeSliceSize){
+	public LinkStats(int timeSliceSize, double scaleFactor){
 		this.observedAgents = new HashMap<Id, Double>();
 		this.absLinkTT = new HashMap<Id, Map<Integer, Double>>();
 		this.agentsPassedLink = new HashMap<Id, Map<Integer, Double>>();
 		this.timeSliceSize = timeSliceSize;
+		this.scaleFactor = scaleFactor;
 	}
 	
 	public void processEvent(PersonEvent e){
@@ -249,7 +207,7 @@ class LinkTravelTime{
 			//observe if the agent passes the hole Link
 			this.observedAgents.put(e.getPersonId(), e.getTime());
 		}else if(e instanceof LinkLeaveEvent){
-			// register if the agent passes the hole link
+			// register if the agent passes the hole link and remove from observer
 			if(this.observedAgents.containsKey(e.getPersonId())){
 				this.addTime((LinkEvent) e);
 			}
@@ -272,22 +230,36 @@ class LinkTravelTime{
 			this.absLinkTT.get(e.getLinkId()).put(timeSlice, 0.);
 			this.agentsPassedLink.get(e.getLinkId()).put(timeSlice, 0.);
 		}
-		double tt = absLinkTT.get(e.getLinkId()).get(timeSlice) + (e.getTime() - this.observedAgents.get(e.getPersonId()));
-		double cnt = this.agentsPassedLink.get(e.getLinkId()).get(timeSlice) + 1;
+		double tt = absLinkTT.get(e.getLinkId()).get(timeSlice) + ((e.getTime() - this.observedAgents.get(e.getPersonId()))/ this.scaleFactor);
+		double cnt = this.agentsPassedLink.get(e.getLinkId()).get(timeSlice) + (1/this.scaleFactor);
 		this.absLinkTT.get(e.getLinkId()).put(timeSlice, tt);
 		this.agentsPassedLink.get(e.getLinkId()).put(timeSlice, cnt);
 		this.observedAgents.remove(e.getPersonId());
 	}
 	
-	public Map<Id, Map<Integer, Double>> getTimeByLinkAndSlice(){
+	public Map<Id, Map<Integer, Double>> getAbsTTimeByLinkAndSlice(){
 		return this.absLinkTT;
 	}
+	
+	public Map<Id, Map<Integer, Double>> getAvTTimeByLinkAndSlice(){
+		Map<Id, Map<Integer, Double>> temp = new HashMap<Id, Map<Integer, Double>>();
+		Map<Integer, Double> v;
+		for(Entry<Id, Map<Integer, Double>> e: this.absLinkTT.entrySet()){
+			v = new HashMap<Integer, Double>();
+			for(Entry<Integer, Double> ee: e.getValue().entrySet()){
+				v.put(ee.getKey(), ee.getValue()/this.agentsPassedLink.get(e.getKey()).get(ee.getKey()));
+			}
+			temp.put(e.getKey(), v);
+		}
+		return temp;
+	}
+	
 	
 	public HashMap<Id, Map<Integer, Double>> getNumAgentsByLinkAndSlice(){
 		return this.agentsPassedLink;
 	}
 	
 	public int getLastTimeSlice(){
-		return lastSlice;
+		return this.lastSlice;
 	}
 }

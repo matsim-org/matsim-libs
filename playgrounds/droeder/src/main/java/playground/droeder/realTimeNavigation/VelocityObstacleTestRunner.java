@@ -82,9 +82,9 @@ public class VelocityObstacleTestRunner {
 	private int cnt = 0;
 	private int nxtmsg = 1;
 	private HashMap<String, Coord> agentPosition;
-	private HashMap<String, SortedMap<String, String>> agentPositionAttrib;
+	private HashMap<String, SortedMap<String, Object>> agentPositionAttrib;
 	private HashMap<String, SortedMap<Integer, Coord>> vo;
-	private HashMap<String, SortedMap<String, String>> voAttrib;
+	private HashMap<String, SortedMap<String, Object>> voAttrib;
 	private HashMap<String, List<Coord>> agentWay;
 	private EventsManager manager;
 	private String dir;
@@ -298,7 +298,7 @@ public class VelocityObstacleTestRunner {
 		this.agentPosition.put(id, o.getCurrentPosition().getCoord());
 		this.agentWay.get(o.getId().toString()).add(o.getCurrentPosition().getCoord());
 		
-		this.agentPositionAttrib.put(id, new TreeMap<String, String>());
+		this.agentPositionAttrib.put(id, new TreeMap<String, Object>());
 		this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
 		this.agentPositionAttrib.get(id).put("step", String.valueOf(this.cnt + 1));
 		this.agentPositionAttrib.get(id).put("time", String.valueOf(this.time));
@@ -337,9 +337,9 @@ public class VelocityObstacleTestRunner {
 		if(first){
 			this.agentWay = new HashMap<String, List<Coord>>();
 			this.agentPosition = new HashMap<String, Coord>();
-			this.agentPositionAttrib = new HashMap<String, SortedMap<String, String>>();
+			this.agentPositionAttrib = new HashMap<String, SortedMap<String, Object>>();
 			this.vo = new HashMap<String, SortedMap<Integer, Coord>>();
-			this.voAttrib = new HashMap<String, SortedMap<String, String>>();
+			this.voAttrib = new HashMap<String, SortedMap<String, Object>>();
 			first = false;
 		}
 		// prepare objects
@@ -352,7 +352,7 @@ public class VelocityObstacleTestRunner {
 			id = o.getId().toString() + "_" + String.valueOf(cnt);
 			this.agentPosition.put(id, o.getCurrentPosition().getCoord());
 			
-			this.agentPositionAttrib.put(id, new TreeMap<String, String>());
+			this.agentPositionAttrib.put(id, new TreeMap<String, Object>());
 			this.agentPositionAttrib.get(id).put("agent", o.getId().toString());
 			this.agentPositionAttrib.get(id).put("step", String.valueOf(this.cnt));
 			this.agentPositionAttrib.get(id).put("time", String.valueOf(this.time));
@@ -371,7 +371,7 @@ public class VelocityObstacleTestRunner {
 					}
 					id = e.getKey().toString() + "_" + String.valueOf(cnt) + "_" + Integer.valueOf(i);
 					this.vo.put(id, coords);
-					this.voAttrib.put(id, new TreeMap<String, String>());
+					this.voAttrib.put(id, new TreeMap<String, Object>());
 					this.voAttrib.get(id).put("agent", e.getKey().toString());
 					this.voAttrib.get(id).put("step", String.valueOf(cnt));
 					this.voAttrib.get(id).put("time", String.valueOf(this.time));

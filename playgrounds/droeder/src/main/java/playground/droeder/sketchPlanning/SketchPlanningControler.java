@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.droeder.sketchPlanning;
 
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -28,6 +29,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.ptproject.qsim.QSim;
 
 import playground.droeder.DRPaths;
 import playground.droeder.Analysis.NetworkAnalysisHandler;
@@ -37,20 +39,25 @@ import playground.droeder.Analysis.NetworkAnalysisHandler;
  *
  */
 public class SketchPlanningControler{
-	private final static String CONFIG = DRPaths.STUDIESSKETCH + "config.xml";
+	private final static String CONFIGBASE = DRPaths.STUDIESSKETCH + "config_base.xml";
+	private final static String CONFIGBA17EXT = DRPaths.STUDIESSKETCH + "config_ba17ext.xml";
 	
 	public static void main(String[] args){
-		Controler c;
-		if(args.length > 0){
-			c = new Controler(args[0]);
-		}else{
-			c = new Controler(CONFIG);
-		}
-		c.setCreateGraphs(true);
-		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
-		c.run();
+//		Controler cBase;
+//		cBase = new Controler(CONFIGBASE);
+//		cBase.setCreateGraphs(true);
+//		cBase.setDumpDataAtEnd(true);
+//		cBase.setOverwriteFiles(true);
+////		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
+//		cBase.run();
+		
+		Controler cBa17ext;
+		cBa17ext = new Controler(CONFIGBA17EXT);
+		cBa17ext.setCreateGraphs(true);
+		cBa17ext.setDumpDataAtEnd(true);
+		cBa17ext.setOverwriteFiles(true);
+//		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
+		cBa17ext.run();
 	}
 
 
@@ -97,7 +104,7 @@ class MyListener  implements StartupListener, IterationEndsListener, IterationSt
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		netAna = new NetworkAnalysisHandler(null, true, 3600);
+		netAna = new NetworkAnalysisHandler(true, 3600, event.getControler().getConfig().getQSimConfigGroup().getFlowCapFactor());
 		event.getControler().getEvents().addHandler(netAna);
 	}
 }

@@ -97,13 +97,13 @@ public class OsmTransitLineBuilder {
 //		gm.unmatchedAfterPrematchingOut(outDir);
 		Map<String, SortedMap<Integer, Coord>> edgeMap = new HashMap<String, SortedMap<Integer,Coord>>();
 		SortedMap<Integer , Coord> edges;
-		Map<String, SortedMap<String, String>> attribs = new HashMap<String, SortedMap<String,String>>();
-		SortedMap<String, String> values;
+		Map<String, SortedMap<String, Object>> attribs = new HashMap<String, SortedMap<String, Object>>();
+		SortedMap<String, Object> values;
 		
 		MatchingEdge edge;
 		int match = 0;
 		for(Entry<Id, Id> e: gm.getPartlyMatchedEdges().entrySet()){
-			values = new TreeMap<String, String>();
+			values = new TreeMap<String, Object>();
 			values.put("matchNr", String.valueOf(match));
 			
 			edges = new TreeMap<Integer, Coord>();
