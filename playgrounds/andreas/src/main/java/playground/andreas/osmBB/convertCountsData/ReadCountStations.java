@@ -1,6 +1,5 @@
 package playground.andreas.osmBB.convertCountsData;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,13 +22,8 @@ public class ReadCountStations implements TabularFileHandler{
 		countStationsReader.tabFileParserConfig.setFileName(filename);
 		countStationsReader.tabFileParserConfig.setDelimiterTags(new String[] {";"}); // \t
 //		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
-		try {
-			new TabularFileParser().parse(countStationsReader.tabFileParserConfig, countStationsReader);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
-		return countStationsReader.list;
+        new TabularFileParser().parse(countStationsReader.tabFileParserConfig, countStationsReader);
+        return countStationsReader.list;
 	}
 	
 	public void startRow(String[] row) throws IllegalArgumentException {

@@ -99,30 +99,26 @@ public class CalculateAvgTravelTimesForTestVehicles {
 		tabFileParserConfig.setFileName(inputFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 
-		try {
-			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
+        new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
-				private static final int INFLOWTIME = 0;
-				private static final int TRAVELTIME = 1;
+            private static final int INFLOWTIME = 0;
+            private static final int TRAVELTIME = 1;
 
-				public void startRow(String[] row) {
-					first = false;
-					numColumns = row.length;
-					check(row);
-					addDepartureTime(row);
-				}
+            public void startRow(String[] row) {
+                first = false;
+                numColumns = row.length;
+                check(row);
+                addDepartureTime(row);
+            }
 
-				private void addDepartureTime(String[] row) {
-					Integer inflowTime = new Integer(row[INFLOWTIME]);
-					Integer travelTime = new Integer(row[TRAVELTIME]);
+            private void addDepartureTime(String[] row) {
+                Integer inflowTime = new Integer(row[INFLOWTIME]);
+                Integer travelTime = new Integer(row[TRAVELTIME]);
 
-					inflowTimes2TravelTimes.put(inflowTime, travelTime);
-				}
-			});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		System.out.println(inflowTimes2TravelTimes);
+                inflowTimes2TravelTimes.put(inflowTime, travelTime);
+            }
+        });
+        System.out.println(inflowTimes2TravelTimes);
 		System.out.println("=====");
 		return inflowTimes2TravelTimes;
 

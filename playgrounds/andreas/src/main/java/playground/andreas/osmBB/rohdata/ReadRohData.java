@@ -1,8 +1,6 @@
 package playground.andreas.osmBB.rohdata;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
@@ -33,24 +31,15 @@ private static final Logger log = Logger.getLogger(ReadRohData.class);
 //			this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
 			
 			countDataReader.tempList = new TreeMap<String, ArrayList<RohDataBox>>();
-			try {
-				new TabularFileParser().parse(countDataReader.tabFileParserConfig, countDataReader);
-				
-				String csName = filename.split("_")[1].split("\\.")[0];
-				
-				if(countDataReader.countId2DataBoxListMap.get(csName) == null){
-					countDataReader.countId2DataBoxListMap.put(csName, countDataReader.tempList);
-				}				
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				if(e instanceof FileNotFoundException){
-					log.info("File not found: " + filename);
-				} else {
-					e.printStackTrace();
-				}
-			}
-		}
+            new TabularFileParser().parse(countDataReader.tabFileParserConfig, countDataReader);
+
+            String csName = filename.split("_")[1].split("\\.")[0];
+
+            if(countDataReader.countId2DataBoxListMap.get(csName) == null){
+                countDataReader.countId2DataBoxListMap.put(csName, countDataReader.tempList);
+            }
+
+        }
 		
 		return countDataReader.countId2DataBoxListMap;
 	}

@@ -12,9 +12,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -128,74 +126,70 @@ public class PendlerMatrixReader {
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
 		tabFileParserConfig.setDelimiterTags(new String[] {","});
-		try {
-			new TabularFileParser().parse(tabFileParserConfig,
-					new TabularFileHandler() {
+        new TabularFileParser().parse(tabFileParserConfig,
+                new TabularFileHandler() {
 
-				@Override
-				public void startRow(String[] row) {
-					if (row[0].startsWith("#")) {
-						return;
-					}
-					Integer quelle = null ;
-					Integer ziel = 0;
-					// car market share for commuter work/education trips (taken from "Regionaler Nahverkehrsplan-Fortschreibung, MVV 2007)
-					double carMarketShare = 0.67;
-					// scale factor, since Pendlermatrix only considers "sozialversicherungspflichtige Arbeitnehmer" (taken from GuthEtAl2005)
-					double scaleFactor = 1.29;
+            @Override
+            public void startRow(String[] row) {
+                if (row[0].startsWith("#")) {
+                    return;
+                }
+                Integer quelle = null ;
+                Integer ziel = 0;
+                // car market share for commuter work/education trips (taken from "Regionaler Nahverkehrsplan-Fortschreibung, MVV 2007)
+                double carMarketShare = 0.67;
+                // scale factor, since Pendlermatrix only considers "sozialversicherungspflichtige Arbeitnehmer" (taken from GuthEtAl2005)
+                double scaleFactor = 1.29;
 
-					if (filename.equals(PV_EINPENDLERMATRIX)){
-						try {
-							quelle = Integer.parseInt(row[2]);
-							ziel = 9162 ;
-							
-							int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-							int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-							int educationPt = 0 ;
-							int workCar = (int) (carMarketShare * totalTrips);
-							int educationCar = 0 ;
-							String label = row[3] ;
-							if ( !label.contains("brige ") && !quelle.equals(ziel)) {
-								process(quelle, ziel, workPt, educationPt, workCar, educationCar);
-							} else {
-								System.out.println( " uebrige? : " + label ) ;
-							}
-						} catch ( Exception ee ) {
-							System.err.println("we are trying to read quelle: " + quelle ) ;
-							//						System.exit(-1) ;
-						}
-					}
-					else if (filename.equals(PV_AUSPENDLERMATRIX)){
-						try {
-							quelle = 9162;
-							ziel = Integer.parseInt(row[2]);
+                if (filename.equals(PV_EINPENDLERMATRIX)){
+                    try {
+                        quelle = Integer.parseInt(row[2]);
+                        ziel = 9162 ;
 
-							int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-							int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-							int educationPt = 0 ;
-							int workCar = (int) (carMarketShare * totalTrips);
-							int educationCar = 0 ;
-							String label = row[3] ;
-							if ( !label.contains("brige ") && !quelle.equals(ziel)) {
-								process(quelle, ziel, workPt, educationPt, workCar, educationCar);
-							} else {
-								System.out.println( " uebrige? : " + label ) ;
-							}
-						} catch ( Exception ee ) {
-							System.err.println("we are trying to read quelle: " + quelle ) ;
-							//						System.exit(-1) ;
-						}
-					}
-					else{
-						System.err.println("ATTENTION: check filename!") ;
-					}
-				}
+                        int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
+                        int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
+                        int educationPt = 0 ;
+                        int workCar = (int) (carMarketShare * totalTrips);
+                        int educationCar = 0 ;
+                        String label = row[3] ;
+                        if ( !label.contains("brige ") && !quelle.equals(ziel)) {
+                            process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+                        } else {
+                            System.out.println( " uebrige? : " + label ) ;
+                        }
+                    } catch ( Exception ee ) {
+                        System.err.println("we are trying to read quelle: " + quelle ) ;
+                        //						System.exit(-1) ;
+                    }
+                }
+                else if (filename.equals(PV_AUSPENDLERMATRIX)){
+                    try {
+                        quelle = 9162;
+                        ziel = Integer.parseInt(row[2]);
 
-			});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+                        int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
+                        int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
+                        int educationPt = 0 ;
+                        int workCar = (int) (carMarketShare * totalTrips);
+                        int educationCar = 0 ;
+                        String label = row[3] ;
+                        if ( !label.contains("brige ") && !quelle.equals(ziel)) {
+                            process(quelle, ziel, workPt, educationPt, workCar, educationCar);
+                        } else {
+                            System.out.println( " uebrige? : " + label ) ;
+                        }
+                    } catch ( Exception ee ) {
+                        System.err.println("we are trying to read quelle: " + quelle ) ;
+                        //						System.exit(-1) ;
+                    }
+                }
+                else{
+                    System.err.println("ATTENTION: check filename!") ;
+                }
+            }
+
+        });
+    }
 
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
 		Zone source = zones.get(quelle);

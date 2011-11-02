@@ -21,6 +21,7 @@
 package org.matsim.core.utils.io.tabularFileParser;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -68,6 +69,8 @@ public class TabularFileParser implements MatsimSomeReader {
      * <code>config</code>. All relevant rows of the file are split into
      * columns and then are passed to the <code>handler</code>.
      *
+     *
+     *
      * @param config
      *            defines in what way the file is to be pared <em>formally</em>
      * @param handler
@@ -81,7 +84,7 @@ public class TabularFileParser implements MatsimSomeReader {
      * @throws IOException
      */
     public void parse(TabularFileParserConfig config,
-            TabularFileHandler handler) throws IOException {
+            TabularFileHandler handler) {
         if (config == null)
             throw new NullPointerException(
                     "TabularFileParser requires a non-null configuration.");
@@ -93,8 +96,13 @@ public class TabularFileParser implements MatsimSomeReader {
 
         boolean started = (config.getStartRegex() == null);
         boolean ended = false;
-        
-        BufferedReader reader = new BufferedReader(new FileReader(config.getFile()));
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(config.getFile()));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         try {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
@@ -107,9 +115,14 @@ public class TabularFileParser implements MatsimSomeReader {
 	                started = isStart(line);
 	            }
 	        }
-	      // no catch-block, the exception is passed upwards, but still try to close the reader
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
-        	reader.close();
+            try {
+                reader.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

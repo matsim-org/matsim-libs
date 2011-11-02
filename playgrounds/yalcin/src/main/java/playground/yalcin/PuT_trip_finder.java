@@ -1,7 +1,5 @@
 package playground.yalcin;
 
-import java.io.IOException;
-
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
@@ -30,13 +28,9 @@ public class PuT_trip_finder {
 		PuTTripFinderHandlerDistance handler = new PuTTripFinderHandlerDistance(0.4,
 				"C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code/new/results21.txt");
 
-		try {
-			// this will read the file AND write out the looked up data
-			parser.parse(parserConfig, handler);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		handler.finish();
+        // this will read the file AND write out the looked up data
+        parser.parse(parserConfig, handler);
+        handler.finish();
 	}
 
 	/**

@@ -74,20 +74,16 @@ public class VisumRuns {
 		codesParserConfig.setDelimiterTags(new String[] { "\t" });
 		CodesTableReader codesHandler = new CodesTableReader();
 
-		try {
-			codesParser.parse(codesParserConfig, codesHandler);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+        codesParser.parse(codesParserConfig, codesHandler);
 
-		/* read text file with segments
-		 * expected format:
-		 * 0:PersonID  1:TripID  2:SegmentID
-		 * 3:XStartingPoint  4:YStartingPoint  5:ZStartingPoint  6:StartingDate  7:StartingTime
-		 * 8:XEndingPoint  9:YEndingPoint  10:ZEndingPoint  11:EndingDate  12:EndingTime
-		 * 13:Distance  14:TravelTime
-		 * 15:Probability_Walk  16:Probability_Bike  17:Probability_Car  18:Probability_UrbanPuT  19:Probability_Rail
-		 */
+        /* read text file with segments
+           * expected format:
+           * 0:PersonID  1:TripID  2:SegmentID
+           * 3:XStartingPoint  4:YStartingPoint  5:ZStartingPoint  6:StartingDate  7:StartingTime
+           * 8:XEndingPoint  9:YEndingPoint  10:ZEndingPoint  11:EndingDate  12:EndingTime
+           * 13:Distance  14:TravelTime
+           * 15:Probability_Walk  16:Probability_Bike  17:Probability_Car  18:Probability_UrbanPuT  19:Probability_Rail
+           */
 		final TabularFileParser parser = new TabularFileParser();
 		final TabularFileParserConfig parserConfig = new TabularFileParserConfig();
 		parserConfig.setFileName("C:\\Users\\yalcin\\Desktop\\Zurich\\Marcel_code\\new\\ZurichAfterDistanceFilterWithSegments.txt"); // yalcin
@@ -97,13 +93,9 @@ public class VisumRuns {
 //		SegmentsTableHandler handler = new SegmentsTableHandler(vNetwork, 0.6, codesHandler, "../mystudies/yalcin/results.txt"); // marcel
 		handler.setOnlyWriteCodedTrips(true);
 
-		try {
-			// this will read the file AND write out the looked up data
-			parser.parse(parserConfig, handler);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		handler.finish();
+        // this will read the file AND write out the looked up data
+        parser.parse(parserConfig, handler);
+        handler.finish();
 	}
 
 

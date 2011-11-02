@@ -20,7 +20,6 @@
 
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,12 +58,8 @@ public class LinkUtilityOffsetsReader implements TabularFileHandler {
 	}
 
 	public void parse() {
-		try {
-			new TabularFileParser().parse(parserConfig, this);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        new TabularFileParser().parse(parserConfig, this);
+    }
 
 	public static void main(String[] args) {
 		String linkUtilityOffsetFilename = "../integration-demandCalibration1.0.1/test/output/prepare/linkIdTimeBinX.log";

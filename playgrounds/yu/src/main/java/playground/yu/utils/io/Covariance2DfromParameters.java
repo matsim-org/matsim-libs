@@ -23,7 +23,6 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,13 +99,9 @@ public class Covariance2DfromParameters {
 
 		ParameterFileHandler fileHandler = new ParameterFileHandler();
 
-		try {
-			new TabularFileParser().parse(parserConfig, fileHandler);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        new TabularFileParser().parse(parserConfig, fileHandler);
 
-		iterations = fileHandler.getIterations();
+        iterations = fileHandler.getIterations();
 		travelingPts = fileHandler.getTravelingPts();
 		constantPts = fileHandler.getConstantPts();
 

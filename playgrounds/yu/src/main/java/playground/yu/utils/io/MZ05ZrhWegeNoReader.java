@@ -3,8 +3,6 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
-
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -149,12 +147,8 @@ public class MZ05ZrhWegeNoReader implements TabularFileHandler {
 
 		MZ05ZrhWegeNoReader mz05wr = new MZ05ZrhWegeNoReader(outputBase);
 
-		try {
-			new TabularFileParser().parse(tfpc, mz05wr);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        new TabularFileParser().parse(tfpc, mz05wr);
 
-		mz05wr.write();
+        mz05wr.write();
 	}
 }

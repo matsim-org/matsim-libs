@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.testroad;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,29 +127,25 @@ public class DemandCreatorFromCounts {
 		tabFileParserConfig.setFileName(inflowTimesFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 
-		try {
-			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
+        new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
-				private static final int INFLOWTIME = 0;
-				private static final int TRAVELTIME = 1;
+            private static final int INFLOWTIME = 0;
+            private static final int TRAVELTIME = 1;
 
-				public void startRow(String[] row) {
-					first = false;
-					numColumns = row.length;
-					check(row);
-					addDepartureTime(row);
-				}
+            public void startRow(String[] row) {
+                first = false;
+                numColumns = row.length;
+                check(row);
+                addDepartureTime(row);
+            }
 
-				private void addDepartureTime(String[] row) {
-					Integer inflowTime = new Integer(row[INFLOWTIME]);
-					Integer travelTime = new Integer(row[TRAVELTIME]);
-					inflowTimes.add(inflowTime);
-				}
-			});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return inflowTimes;
+            private void addDepartureTime(String[] row) {
+                Integer inflowTime = new Integer(row[INFLOWTIME]);
+                Integer travelTime = new Integer(row[TRAVELTIME]);
+                inflowTimes.add(inflowTime);
+            }
+        });
+        return inflowTimes;
 	}
 
 	private static void fuzzifyTimes(Population population) {
@@ -233,33 +228,29 @@ public class DemandCreatorFromCounts {
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		tabFileParserConfig.setCommentTags(new String[] {"#"});
 
-		try {
-			new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
+        new TabularFileParser().parse(tabFileParserConfig, new CheckingTabularFileHandler() {
 
-				private static final int ENDTIME = 0;
-				private static final int NUMBER = 20;
+            private static final int ENDTIME = 0;
+            private static final int NUMBER = 20;
 
-				public void startRow(String[] row) {
-					first = false;
-					numColumns = row.length;
-					check(row);
-					//					if(!row[0].startsWith("#")) {
-					addEndTimeNoOfVehicles(row);
-					//					} else {
-					// This is the header. Nothing to do.
-					//					}
-				}
+            public void startRow(String[] row) {
+                first = false;
+                numColumns = row.length;
+                check(row);
+                //					if(!row[0].startsWith("#")) {
+                addEndTimeNoOfVehicles(row);
+                //					} else {
+                // This is the header. Nothing to do.
+                //					}
+            }
 
-				private void addEndTimeNoOfVehicles(String[] row) {
-					Integer endTime = new Integer(row[ENDTIME]);
-					Double NoOfVehicles = new Double(row[NUMBER]);
-					EndTime2NoOfVehicles.put(endTime, NoOfVehicles);
-				}
-			});
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-		return EndTime2NoOfVehicles;
+            private void addEndTimeNoOfVehicles(String[] row) {
+                Integer endTime = new Integer(row[ENDTIME]);
+                Double NoOfVehicles = new Double(row[NUMBER]);
+                EndTime2NoOfVehicles.put(endTime, NoOfVehicles);
+            }
+        });
+        return EndTime2NoOfVehicles;
 	}
 
 	private static void writePlans(Population pop, int day) {

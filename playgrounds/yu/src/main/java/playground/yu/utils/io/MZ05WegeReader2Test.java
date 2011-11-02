@@ -3,7 +3,6 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -170,12 +169,8 @@ public class MZ05WegeReader2Test implements TabularFileHandler {
 
 		MZ05WegeReader2Test mz05wr = new MZ05WegeReader2Test(outputBase);
 
-		try {
-			new TabularFileParser().parse(tfpc, mz05wr);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        new TabularFileParser().parse(tfpc, mz05wr);
 
-		mz05wr.write();
+        mz05wr.write();
 	}
 }

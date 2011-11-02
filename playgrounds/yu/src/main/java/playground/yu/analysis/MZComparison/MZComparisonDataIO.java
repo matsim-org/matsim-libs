@@ -146,12 +146,8 @@ public class MZComparisonDataIO implements TabularFileHandler {
 		// tfpc.setCommentTags(new String[] { "Verkehrsmittel" });
 		tfpc.setDelimiterRegex("\t");
 		tfpc.setFileName(inputFilename);
-		try {
-			new TabularFileParser().parse(tfpc, this);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println(values);
+        new TabularFileParser().parse(tfpc, this);
+        System.out.println(values);
 	}
 
 	// -----------only for testing------------------------------

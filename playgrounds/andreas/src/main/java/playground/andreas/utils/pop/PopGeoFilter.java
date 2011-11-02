@@ -1,6 +1,5 @@
 package playground.andreas.utils.pop;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -178,13 +177,8 @@ public class PopGeoFilter extends NewPopulation implements TabularFileHandler {
 		this.tabFileParserConfig.setFileName(filename);
 		this.tabFileParserConfig.setDelimiterTags(new String[] {","}); // \t
 
-		try {
-			new TabularFileParser().parse(this.tabFileParserConfig, this);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        new TabularFileParser().parse(this.tabFileParserConfig, this);
+    }
 
 	public void startRow(String[] row) throws IllegalArgumentException {
 

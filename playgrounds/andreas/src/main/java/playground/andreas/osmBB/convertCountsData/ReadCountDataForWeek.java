@@ -1,8 +1,5 @@
 package playground.andreas.osmBB.convertCountsData;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -26,17 +23,8 @@ private static final Logger log = Logger.getLogger(ReadCountDataForWeek.class);
 //		this.tabFileParserConfig.setDelimiterTags(new String[] {"D"});
 		countDataReader.count = count;
 		countDataReader.startTag = startTag;
-		try {
-			new TabularFileParser().parse(countDataReader.tabFileParserConfig, countDataReader);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			if(e instanceof FileNotFoundException){
-				log.info("File not found: " + filename);
-			} else {
-				e.printStackTrace();
-			}
-		}
-	}
+        new TabularFileParser().parse(countDataReader.tabFileParserConfig, countDataReader);
+    }
 	
 	public void startRow(String[] row) throws IllegalArgumentException {
 		

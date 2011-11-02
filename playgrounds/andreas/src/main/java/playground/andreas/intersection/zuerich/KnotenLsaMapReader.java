@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.andreas.intersection.zuerich;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -47,12 +46,8 @@ public class KnotenLsaMapReader implements TabularFileHandler {
 		this.tabFileParserConfig.setDelimiterTags(new String[] {" ", "\t"}); // \t
 
 		this.knotenLsaMap = new LinkedHashMap<Integer, Integer>();
-		try {
-			new TabularFileParser().parse(this.tabFileParserConfig, this);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		log.info("Read " + this.knotenLsaMap.size() + " knoten lsa mappings!");
+        new TabularFileParser().parse(this.tabFileParserConfig, this);
+        log.info("Read " + this.knotenLsaMap.size() + " knoten lsa mappings!");
 		return this.knotenLsaMap;
 	}
 

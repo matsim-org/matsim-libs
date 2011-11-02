@@ -70,12 +70,8 @@ public class ReadFcdEvents implements TabularFileHandler {
 	}	
 
 	public void parse() {
-		try {
-			new TabularFileParser().parse(tabFileParserConfig, this);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+        new TabularFileParser().parse(tabFileParserConfig, this);
+    }
 	
 	@Override
 	public void startRow(String[] row) {

@@ -3,7 +3,6 @@
  */
 package playground.yu.utils.io;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -171,12 +170,8 @@ public class MZ05EtappenReader implements TabularFileHandler {
 
 		MZ05EtappenReader mz05er = new MZ05EtappenReader(outputBase);
 
-		try {
-			new TabularFileParser().parse(tfpc, mz05er);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        new TabularFileParser().parse(tfpc, mz05er);
 
-		mz05er.write();
+        mz05er.write();
 	}
 }

@@ -23,7 +23,6 @@
  */
 package playground.yu.counts;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -79,12 +78,8 @@ public class CountsWithUpdatedNetwork {
 		tfpc.setFileName(correlationFilename);
 
 		CorrelationTableReaer ctr = new CorrelationTableReaer();
-		try {
-			new TabularFileParser().parse(tfpc, ctr);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Set<Tuple<Id, Id>> correlations = ctr.getCorrelations();
+        new TabularFileParser().parse(tfpc, ctr);
+        Set<Tuple<Id, Id>> correlations = ctr.getCorrelations();
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(oldCountsFilename);
