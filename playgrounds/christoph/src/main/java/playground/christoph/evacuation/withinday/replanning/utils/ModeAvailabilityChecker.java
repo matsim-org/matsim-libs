@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -68,6 +69,18 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 		
 		this.carArrivals = new HashSet<Id>();
 		this.carCoords = new HashMap<Id, Coord>();
+	}
+	
+	/**
+	 * @param personId Id of the person to check
+	 * @param facilityId Id of the facility where the person performs an activity
+	 * @return true if the person has a car available within the pre-defined maxDistance, otherwise false
+	 */
+	public boolean isCarAvailable(Id personId, Id facilityId) {
+		
+		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		if (facility == null) return false;
+		else return this.isCarAvailable(personId, facility.getCoord());
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HouseholdInfo.java
+ * HouseholdSetMeetingPointEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,59 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.utils;
-
-import java.util.HashSet;
-import java.util.Set;
+package playground.christoph.evacuation.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.households.Household;
 
-public class HouseholdInfo {
-	private final Household household;
-	private final Set<Id> membersAtMeetingPoint;
-	private Id meetingPointId;	// facilityId
-	private boolean homeLocationIsSecure;
-	
-	public HouseholdInfo(Household household) {
-		this.household = household;
-		this.membersAtMeetingPoint = new HashSet<Id>();
-		this.homeLocationIsSecure = true;
-	}
-	
-	public Household getHousehold() {
-		return this.household;
-	}
-	
-	public boolean isHomeLocationSecure() {
-		return this.homeLocationIsSecure;
-	}
-	
-	/*package*/ void setHomeLocationIsSecure(boolean value) {
-		this.homeLocationIsSecure = value;
-	}
-	
-	/*package*/ boolean addPersonAtMeetingpoint(Id id) {
-		return membersAtMeetingPoint.add(id);
-	}
-	
-	/*package*/ boolean removePersonAtMeetingPoint(Id id) {
-		return membersAtMeetingPoint.remove(id);
-	}
-	
-	/*package*/ void resetMembersAtMeetingPoint() {
-		this.membersAtMeetingPoint.clear();
-	}
-	
-	/*package*/ void setMeetingPointId(Id id) {
-		this.meetingPointId = id;
-	}
-	
-	public Id getMeetingPointId() {
-		return this.meetingPointId;
-	}
-	
-	public boolean allMembersAtMeetingPoint() {
-		return household.getMemberIds().size() == membersAtMeetingPoint.size();
-	}
+/**
+ * @author cdobler
+ */
+public interface HouseholdMeetingPointEvent extends HouseholdEvent {
+
+	public Id getFacilityId();
 }

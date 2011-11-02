@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -49,9 +50,10 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -75,10 +77,6 @@ public class AddExitLinksToNetwork {
 	private Scenario scenario;
 	private Network network;
 	
-//	private double innerRadius = 20000.0;
-//	private double outerRadius = 21000.0;
-//	private double innerRadius = 10000.0;
-//	private double outerRadius = 11000.0;
 	private double innerRadius = EvacuationConfig.innerRadius;
 	private double outerRadius = EvacuationConfig.outerRadius;
 	private Coord center;
@@ -90,8 +88,8 @@ public class AddExitLinksToNetwork {
 	public static void main(String[] args) {
 		if (args.length != 2) return;
 		
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		Scenario scenario = sl.loadScenario();
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		AddExitLinksToNetwork addExitLinksToNetwork = new AddExitLinksToNetwork(scenario);
 		Map<Id, Node> exitNodes = addExitLinksToNetwork.getExitNodes();
@@ -145,8 +143,6 @@ public class AddExitLinksToNetwork {
 		this.scenario = scenario;
 		this.network = this.scenario.getNetwork();
 		
-//		this.center = this.scenario.createCoord(640050.0, 246256.0);	// Coordinates of KKW Goesgen
-//		this.center = network.getNodes().get(EvacuationConfig.centerNodeId).getCoord();	// Bellevue in the ivt-ch-cut Network
 		this.center = EvacuationConfig.centerCoord;	// Bellevue Coordinates
 	}
 	
@@ -171,7 +167,7 @@ public class AddExitLinksToNetwork {
 		int counter = 0;
 		for (Node node : getExitNodes().values()) {
 			counter++;
-			Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink" + counter), node.getId(), rescueNode.getId());
+			Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink" + counter), node, rescueNode);
 			rescueLink.setLength(10000);
 			rescueLink.setCapacity(1000000);
 			rescueLink.setFreespeed(1000000);			
@@ -183,6 +179,7 @@ public class AddExitLinksToNetwork {
 			allowedTransportModes.add(TransportMode.pt);
 			allowedTransportModes.add(TransportMode.ride);
 			allowedTransportModes.add(TransportMode.walk);
+			allowedTransportModes.add("evacuation");
 			rescueLink.setAllowedModes(allowedTransportModes);
 			network.addLink(rescueLink);
 		}
@@ -197,7 +194,7 @@ public class AddExitLinksToNetwork {
 		Node rescueNode2 = network.getFactory().createNode(scenario.createId("rescueNode2"), scenario.createCoord(1.0, 1.0));
 		network.addNode(rescueNode2);
 		
-		Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink"), rescueNode.getId(), rescueNode2.getId());
+		Link rescueLink = network.getFactory().createLink(scenario.createId("rescueLink"), rescueNode, rescueNode2);
 //		rescueLink.setLength(100000);
 //		rescueLink.setCapacity(Double.MAX_VALUE);
 //		rescueLink.setFreespeed(Double.MAX_VALUE);
@@ -210,6 +207,7 @@ public class AddExitLinksToNetwork {
 		allowedTransportModes.add(TransportMode.pt);
 		allowedTransportModes.add(TransportMode.ride);
 		allowedTransportModes.add(TransportMode.walk);
+		allowedTransportModes.add("evacuation");
 		rescueLink.setAllowedModes(allowedTransportModes);
 		network.addLink(rescueLink);
 		

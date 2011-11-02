@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HouseholdInfo.java
+ * HouseholdSetMeetingPointEventImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,59 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.utils;
+package playground.christoph.evacuation.events;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.households.Household;
 
-public class HouseholdInfo {
-	private final Household household;
-	private final Set<Id> membersAtMeetingPoint;
-	private Id meetingPointId;	// facilityId
-	private boolean homeLocationIsSecure;
+/**
+ * @author cdobler
+ */
+public class HouseholdSetMeetingPointEventImpl extends HouseholdEventImpl implements HouseholdSetMeetingPointEvent {
+
+	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_FACILITY = "facility";
+	public static final String EVENT_TYPE = "householdsetmeetingpoint";
 	
-	public HouseholdInfo(Household household) {
-		this.household = household;
-		this.membersAtMeetingPoint = new HashSet<Id>();
-		this.homeLocationIsSecure = true;
+	private final Id facilityId;
+	
+	public HouseholdSetMeetingPointEventImpl(final double time, final Id householdId, final Id facilityId) {
+		super(time, householdId);
+		this.facilityId = facilityId;
 	}
 	
-	public Household getHousehold() {
-		return this.household;
+	@Override
+	public Id getFacilityId() {
+		return this.facilityId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		
+		attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
+		return attr;
 	}
 	
-	public boolean isHomeLocationSecure() {
-		return this.homeLocationIsSecure;
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
-	
-	/*package*/ void setHomeLocationIsSecure(boolean value) {
-		this.homeLocationIsSecure = value;
-	}
-	
-	/*package*/ boolean addPersonAtMeetingpoint(Id id) {
-		return membersAtMeetingPoint.add(id);
-	}
-	
-	/*package*/ boolean removePersonAtMeetingPoint(Id id) {
-		return membersAtMeetingPoint.remove(id);
-	}
-	
-	/*package*/ void resetMembersAtMeetingPoint() {
-		this.membersAtMeetingPoint.clear();
-	}
-	
-	/*package*/ void setMeetingPointId(Id id) {
-		this.meetingPointId = id;
-	}
-	
-	public Id getMeetingPointId() {
-		return this.meetingPointId;
-	}
-	
-	public boolean allMembersAtMeetingPoint() {
-		return household.getMemberIds().size() == membersAtMeetingPoint.size();
-	}
+
 }

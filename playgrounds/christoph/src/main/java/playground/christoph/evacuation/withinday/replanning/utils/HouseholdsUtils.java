@@ -23,7 +23,6 @@ package playground.christoph.evacuation.withinday.replanning.utils;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +40,9 @@ import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 
+import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEventImpl;
 import playground.christoph.evacuation.events.HouseholdJoinedEventImpl;
+import playground.christoph.evacuation.events.HouseholdLeaveMeetingPointEventImpl;
 import playground.christoph.evacuation.events.HouseholdSeparatedEventImpl;
 
 /**
@@ -62,11 +63,6 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 	private Map<Id, HouseholdInfo> householdInfoMap;		// <householdId, HouseholdInfo>
 	private Map<Id, HouseholdInfo> personHouseholdInfoMap;	// <personId, HouseholdInfo> - just performance tuning...
 	private Map<Id, Id> personLocationMap;					// <personId, facilityId>
-
-	/*
-	 * Relocate households if the have meet at home but their home location is not secure
-	 */
-//	private Queue<Id> householdsToRelocate;
 	
 	/* time since last "info" */
 	private int infoTime = 0;
@@ -94,7 +90,7 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		// reset members at meeting point counter
 		householdInfo.resetMembersAtMeetingPoint();
 		for (Id personId : householdInfo.getHousehold().getMemberIds()) {
-			if (personLocationMap.get(personId).equals(facilityId)) {
+			if (facilityId.equals(personLocationMap.get(personId))) {
 				householdInfo.addPersonAtMeetingpoint(personId);
 			}
 		}
@@ -104,14 +100,6 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		return householdInfoMap.get(householdId).allMembersAtMeetingPoint();
 	}
 	
-	public Map<Id, HouseholdInfo> getJoinedHouseholds() {
-		Map<Id, HouseholdInfo> unitedHouseholds = new TreeMap<Id, HouseholdInfo>();
-		for (HouseholdInfo householdInfo : this.householdInfoMap.values()) {
-			if (householdInfo.allMembersAtMeetingPoint()) unitedHouseholds.put(householdInfo.getHousehold().getId(), householdInfo);
-		}
-		return unitedHouseholds;
-	}
-
 	@Override
 	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
 		
@@ -154,6 +142,10 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		personHouseholdInfoMap = new HashMap<Id, HouseholdInfo>();
 		
 		for(Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
+
+			// ignore households without members
+			if (household.getMemberIds().size() == 0) continue;
+				
 			Person person = scenario.getPopulation().getPersons().get(household.getMemberIds().get(0));
 			Activity firstActivity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 			
@@ -184,8 +176,16 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		personLocationMap.put(event.getPersonId(), event.getFacilityId());
 		
 		if (householdInfo.allMembersAtMeetingPoint()) {
-			Event joinedEvent = new HouseholdJoinedEventImpl(event.getTime(), householdInfo.getHousehold().getId(), event.getLinkId(), event.getFacilityId(), event.getActType());
+			double time = event.getTime();
+			Id householdId = householdInfo.getHousehold().getId();
+			Id linkId = event.getLinkId();
+			Id facilityId = event.getFacilityId();
+			
+			Event joinedEvent = new HouseholdJoinedEventImpl(time, householdId, linkId, facilityId, event.getActType());
 			eventsManager.processEvent(joinedEvent);
+			
+			Event enterEvent = new HouseholdEnterMeetingPointEventImpl(event.getTime(), householdId, facilityId);
+			eventsManager.processEvent(enterEvent);
 		}
 	}
 
@@ -194,8 +194,16 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		HouseholdInfo householdInfo = personHouseholdInfoMap.get(event.getPersonId());
 		
 		if (householdInfo.allMembersAtMeetingPoint()) {
-			Event separatedEvent = new HouseholdSeparatedEventImpl(event.getTime(), householdInfo.getHousehold().getId(), event.getLinkId(), event.getFacilityId(), event.getActType());
+			double time = event.getTime();
+			Id householdId = householdInfo.getHousehold().getId();
+			Id linkId = event.getLinkId();
+			Id facilityId = event.getFacilityId();
+			
+			Event separatedEvent = new HouseholdSeparatedEventImpl(time, householdId, linkId, facilityId, event.getActType());
 			eventsManager.processEvent(separatedEvent);
+			
+			Event leaveEvent = new HouseholdLeaveMeetingPointEventImpl(event.getTime(), householdId, facilityId);
+			eventsManager.processEvent(leaveEvent);
 		}
 		
 		householdInfo.removePersonAtMeetingPoint(event.getPersonId());

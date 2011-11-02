@@ -23,22 +23,30 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
+import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
 public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifierFactory {
 
-	private HouseholdsUtils householdUtils;
-	private SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
+	private final HouseholdsUtils householdUtils;
+	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
+	private final ModeAvailabilityChecker modeAvailabilityChecker;
+	private final PassengerEventsCreator passengerEventsCreator;
 	
-	public JoinedHouseholdsIdentifierFactory(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint) {
+	public JoinedHouseholdsIdentifierFactory(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
+			ModeAvailabilityChecker modeAvailabilityChecker, PassengerEventsCreator passengerEventsCreator) {
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.passengerEventsCreator = passengerEventsCreator;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(householdUtils, selectHouseholdMeetingPoint);
+		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(householdUtils, selectHouseholdMeetingPoint, 
+				modeAvailabilityChecker, passengerEventsCreator);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}

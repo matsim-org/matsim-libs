@@ -21,16 +21,22 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -39,36 +45,57 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
+import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEvent;
+import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEventImpl;
 import playground.christoph.evacuation.events.HouseholdJoinedEvent;
+import playground.christoph.evacuation.events.HouseholdLeaveMeetingPointEvent;
 import playground.christoph.evacuation.events.HouseholdSeparatedEvent;
+import playground.christoph.evacuation.events.HouseholdSetMeetingPointEvent;
+import playground.christoph.evacuation.events.handler.HouseholdEnterMeetingPointEventHandler;
 import playground.christoph.evacuation.events.handler.HouseholdJoinedEventHandler;
+import playground.christoph.evacuation.events.handler.HouseholdLeaveMeetingPointEventHandler;
 import playground.christoph.evacuation.events.handler.HouseholdSeparatedEventHandler;
+import playground.christoph.evacuation.events.handler.HouseholdSetMeetingPointEventHandler;
+import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdInfo;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
 /**
  *  Define which households will relocate to another (secure!) location
  *  at which time.
- *   
+ *  
+ *  Moreover it is decided which transport mode will be used for the evacuation.
+ *  If a car is available, it is used. Otherwise the people will walk.
+ *  
  *  @author cdobler
  */
 public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier implements 
-	HouseholdJoinedEventHandler, HouseholdSeparatedEventHandler, SimulationInitializedListener {
+	HouseholdJoinedEventHandler, HouseholdSeparatedEventHandler, HouseholdSetMeetingPointEventHandler,
+	HouseholdEnterMeetingPointEventHandler, HouseholdLeaveMeetingPointEventHandler,	SimulationInitializedListener {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
 	private final HouseholdsUtils householdUtils;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
+	private final ModeAvailabilityChecker modeAvailabilityChecker;
+	private final PassengerEventsCreator passengerEventsCreator;
 	private final Map<Id, PlanBasedWithinDayAgent> agentMapping;
+	private final Map<Id, String> transportModeMapping;
 	private final Set<Id> joinedHouseholds;
 	private final Queue<HouseholdDeparture> householdDepartures;
 	
-	public JoinedHouseholdsIdentifier(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint) {
+	public JoinedHouseholdsIdentifier(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
+			ModeAvailabilityChecker modeAvailabilityChecker, PassengerEventsCreator passengerEventsCreator) {
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
-		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.modeAvailabilityChecker = modeAvailabilityChecker;
+		this.passengerEventsCreator = passengerEventsCreator;
 		
+		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
 		this.householdDepartures = new PriorityBlockingQueue<HouseholdDeparture>(500, new DepartureTimeComparator());
 		this.joinedHouseholds = new HashSet<Id>();
 	}
@@ -78,13 +105,55 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		Set<PlanBasedWithinDayAgent> set = new HashSet<PlanBasedWithinDayAgent>();
 	
 		while (this.householdDepartures.peek() != null) {
+			
 			HouseholdDeparture householdDeparture = this.householdDepartures.peek();
 			if (householdDeparture.getDepartureTime() <= time) {
 				this.householdDepartures.poll();
-				Id householdId = householdDeparture.getHouseholdId();
-				HouseholdInfo householdInfo = householdUtils.getHouseholdInfoMap().get(householdId);
-				selectHouseholdMeetingPoint.selectRescueMeetingPoint(householdInfo);
 				
+				Id householdId = householdDeparture.getHouseholdId();
+				Id facilityId = householdDeparture.getFacilityId();
+				HouseholdInfo householdInfo = householdUtils.getHouseholdInfoMap().get(householdId);
+				selectHouseholdMeetingPoint.selectRescueMeetingPoint(householdId);
+				
+				if (householdId.toString().equals("4273642") || householdId.toString().equals("2843220")) {
+					log.info("blubb..." + householdInfo.allMembersAtMeetingPoint());
+				}
+				
+				Map<Id, String> transportModes = getTransportModes(householdInfo, facilityId);			
+				Id firstPersonWithCarId = null;
+				for (Entry<Id, String> entry : transportModes.entrySet()) {
+					if (entry.getValue().equals(TransportMode.car)) {
+						firstPersonWithCarId = entry.getKey();
+						break;
+					}
+				}
+				
+				/*
+				 *  If we found an agent with a car available this agent
+				 *  will be the driver (TransportMode.car), otherwise the
+				 *  agent will be a passenger (TransportMode.ride).
+				 *  TODO: add check for car capacity...
+				 */
+				if (firstPersonWithCarId != null) {
+					List<Id> passengers = new ArrayList<Id>();
+					for (Id agentId : householdInfo.getHousehold().getMemberIds()) {
+						if (agentId == firstPersonWithCarId) {
+							transportModeMapping.put(agentId, TransportMode.car);
+						} else {
+							transportModeMapping.put(agentId, PassengerEventsCreator.passengerTransportMode);
+							passengers.add(agentId);
+						}
+						passengerEventsCreator.addDriverPassengersSet(firstPersonWithCarId, passengers);
+					}
+				}
+				// all agents will walk
+				else {
+					for (Id agentId : householdInfo.getHousehold().getMemberIds()) {
+						transportModeMapping.put(agentId, TransportMode.walk);
+					}
+				}
+
+				// finally add agents to replanning set
 				for (Id agentId : householdInfo.getHousehold().getMemberIds()) {
 					set.add(agentMapping.get(agentId));
 				}
@@ -96,39 +165,137 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		return set;
 	}
 
+	/**
+	 * @return The mapping between an agent and the transportMode that should be used.
+	 */
+	public Map<Id, String> getTransportModeMapping() {
+		return this.transportModeMapping;
+	}
+	
+	private Map<Id, String> getTransportModes(HouseholdInfo householdInfo, Id facilityId) {
+		Map<Id, String> transportModes = new TreeMap<Id, String>();
+		
+		for (Id personId : householdInfo.getHousehold().getMemberIds()) {
+			if (modeAvailabilityChecker.isCarAvailable(personId, facilityId)) transportModes.put(personId, TransportMode.car);
+			else transportModes.put(personId, TransportMode.walk);
+		}
+				
+		return transportModes;
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		agentMapping.clear();
 		joinedHouseholds.clear();
 		householdDepartures.clear();
+		transportModeMapping.clear();
 	}
 
+
 	@Override
-	public void handleEvent(HouseholdSeparatedEvent event) {
+	public void handleEvent(HouseholdLeaveMeetingPointEvent event) {
 		joinedHouseholds.remove(event.getHouseholdId());
 		
 		/*
 		 * The household has been separated, therefore remove scheduled departure.
+		 * 
+		 * If the evacuation has started, households should leave their meeting point
+		 * before their scheduled departure. 
 		 */
-		if (householdDepartures.remove(new HouseholdDeparture(event.getHouseholdId(), 0.0))) {
-			log.warn("Household has been separated before scheduled departure. Id " + event.getHouseholdId());
+		if (householdDepartures.remove(new HouseholdDeparture(event.getHouseholdId(), null, 0.0)) && event.getTime() > EvacuationConfig.evacuationTime) {
+			log.warn("Household has left its meeting point before scheduled departure. Id " + event.getHouseholdId());
 		}
 	}
 
 	@Override
-	public void handleEvent(HouseholdJoinedEvent event) {
+	public void handleEvent(HouseholdEnterMeetingPointEvent event) {
 		joinedHouseholds.add(event.getHouseholdId());
 		
-		// TODO: use a function to estimate the departure time
-		HouseholdDeparture householdDeparture = new HouseholdDeparture(event.getHouseholdId(), event.getTime() + 600);
+		boolean secureFacility = selectHouseholdMeetingPoint.isFacilitySecure(event.getFacilityId());
+
+		/*
+		 * If the household is located in the secure area, we don't have to do
+		 * further replanning.
+		 * 
+		 * TODO: add a function to assume whether a household "feels" secure
+		 * (depending on the distance to the boarder of the evacuation area)
+		 */
+		if (secureFacility) return;
 		
-		// if there is an old entry: remove it first
-		householdDepartures.remove(householdDeparture);
-		householdDepartures.add(householdDeparture);
+		/*
+		 * The household has joined and is going to evacuate united.
+		 */
+		else {
+			/*
+			 * Schedule the household departure. If the evacuation has not started yet,
+			 * set the earliest possible departure time to the start of the evacuation.
+			 * We don't want the households to evacuate earlier...
+			 */
+			double time;
+			if (event.getTime() < EvacuationConfig.evacuationTime) {
+				time = EvacuationConfig.evacuationTime;
+			} else time = event.getTime();
+			
+			// TODO: use a function to estimate the departure time
+			HouseholdDeparture householdDeparture = new HouseholdDeparture(event.getHouseholdId(), event.getFacilityId(), time + 600);
+			
+			// if there is an old entry: remove it first
+			householdDepartures.remove(householdDeparture);
+			householdDepartures.add(householdDeparture);			
+		}
+	}
+
+	@Override
+	public void handleEvent(HouseholdSetMeetingPointEvent event) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void handleEvent(HouseholdSeparatedEvent event) {
+//		joinedHouseholds.remove(event.getHouseholdId());
+//		
+//		/*
+//		 * The household has been separated, therefore remove scheduled departure.
+//		 */
+//		if (householdDepartures.remove(new HouseholdDeparture(event.getHouseholdId(), null, 0.0))) {
+//			log.warn("Household has been separated before scheduled departure. Id " + event.getHouseholdId());
+//		}
+	}
+
+	@Override
+	public void handleEvent(HouseholdJoinedEvent event) {
+//		joinedHouseholds.add(event.getHouseholdId());
+//		
+//		boolean secureFacility = selectHouseholdMeetingPoint.isFacilitySecure(event.getFacilityId());
+//
+//		/*
+//		 * If the household is located in the secure area, we don't have to do
+//		 * further replanning.
+//		 * 
+//		 * TODO: add a function to assume whether a household "feels" secure
+//		 * (depending on the distance to the boarder of the evacuation area)
+//		 */
+//		if (secureFacility) return;
+//		
+//		/*
+//		 * The household has joined and is going to evacuate united.
+//		 */
+//		else {
+//			// TODO: use a function to estimate the departure time
+//			HouseholdDeparture householdDeparture = new HouseholdDeparture(event.getHouseholdId(), event.getFacilityId(), event.getTime() + 600);
+//			
+//			// if there is an old entry: remove it first
+//			householdDepartures.remove(householdDeparture);
+//			householdDepartures.add(householdDeparture);			
+//		}
 	}
 	
 	/*
 	 * Create a mapping between personIds and the agents in the mobsim.
+	 * 
+	 * Moreover ensure that the joinedHouseholds and householdDeparture
+	 * data structures are filled properly. When the simulation starts,
+	 * all households are joined at their home facility.
 	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
@@ -139,6 +306,25 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
 			agentMapping.put(withinDayAgent.getId(), withinDayAgent);				
 		}
+		
+		for (HouseholdInfo householdInfo : this.householdUtils.getHouseholdInfoMap().values()) {
+			
+			/*
+			 * We create a dummy event. 
+			 * By using the evacuation time as event time we schedule the evacuation 
+			 * of households that do not move until the evacuation starts. Otherwise they
+			 * would be ignored.
+			 */
+			double time = EvacuationConfig.evacuationTime;
+			Id householdId = householdInfo.getHousehold().getId();
+//			Id linkId = null;	// we don't need this in in the handleEvent method
+			Id facilityId = householdInfo.getMeetingPointId();
+//			String eventType = "home";
+//			HouseholdJoinedEvent event = new HouseholdJoinedEventImpl(time, householdId, linkId, facilityId, eventType);
+//			this.handleEvent(event);
+			HouseholdEnterMeetingPointEvent event = new HouseholdEnterMeetingPointEventImpl(time, householdId, facilityId);
+			this.handleEvent(event);
+		}
 	}
 	
 	/*
@@ -147,15 +333,21 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private static class HouseholdDeparture {
 		
 		private final Id householdId;
+		private final Id facilityId;
 		private final double departureTime;
 		
-		public HouseholdDeparture(Id householdId, double departureTime) {
+		public HouseholdDeparture(Id householdId, Id facilityId, double departureTime) {
 			this.householdId = householdId;
+			this.facilityId = facilityId;
 			this.departureTime = departureTime;
 		}
 		
 		public Id getHouseholdId() {
 			return this.householdId;
+		}
+		
+		public Id getFacilityId() {
+			return this.facilityId;
 		}
 		
 		public double getDepartureTime() {
@@ -165,7 +357,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		@Override
 		public boolean equals(Object o) {
 			if (o instanceof HouseholdDeparture) {
-				return ((HouseholdDeparture) o).equals(householdId);
+				return ((HouseholdDeparture) o).getHouseholdId().equals(householdId);
 			}
 			return false;
 		}

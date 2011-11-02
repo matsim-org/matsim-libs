@@ -23,9 +23,19 @@ package playground.christoph.evacuation.withinday.replanning.utils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.Time;
+
+import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEventImpl;
+import playground.christoph.evacuation.events.HouseholdLeaveMeetingPointEventImpl;
+import playground.christoph.evacuation.events.HouseholdSetMeetingPointEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -43,18 +53,22 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author cdobler
  */
-public class SelectHouseholdMeetingPoint implements SimulationInitializedListener {
+public class SelectHouseholdMeetingPoint implements SimulationInitializedListener, SimulationBeforeSimStepListener {
 
-	private Scenario scenario;
-	private HouseholdsUtils householdsUtils;
-	private Geometry affectedArea;
-		
-	private GeometryFactory factory;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
+	private final HouseholdsUtils householdsUtils;
+	private final Geometry affectedArea;
 	
-	public SelectHouseholdMeetingPoint(Scenario scenario, HouseholdsUtils householdsUtils, Geometry affectedArea) {
+	private final GeometryFactory factory;
+	private double time = Time.UNDEFINED_TIME;
+	
+	public SelectHouseholdMeetingPoint(Scenario scenario, EventsManager eventsManager, HouseholdsUtils householdsUtils, Geometry affectedArea) {
 		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 		this.householdsUtils = householdsUtils;
 		this.affectedArea = affectedArea;
+		
 		this.factory = new GeometryFactory();
 	}
 	
@@ -64,29 +78,69 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 		householdInfo.setHomeLocationIsSecure(isCoordinateSecure(homeFacilityCoord));
 	}
 	
-	/*
-	 * Decide where a household is going to meet. This can be either
-	 * the home location or an arbitrary other location if the home
-	 * location is not treated to be secure.
-	 */
-	public void selectMeetingPoint(HouseholdInfo householdInfo) {
-		// TODO
-	}
-	
-//	public void selectSecureMeetingPoint(HouseholdInfo householdInfo) {
-//		
+//	/*
+//	 * Decide where a household is going to meet. This can be either
+//	 * the home location or an arbitrary other location if the home
+//	 * location is not treated to be secure.
+//	 */
+//	public void selectMeetingPoint(HouseholdInfo householdInfo) {
+//		// TODO
 //	}
 
 	/*
 	 *  At the moment, there is only a single rescue facility.
 	 *  Instead, multiple *real* rescue facilities could be defined.
 	 */
-	public void selectRescueMeetingPoint(HouseholdInfo householdInfo) {
-		householdInfo.setMeetingPointId(scenario.createId("rescueFacility"));
+	public void selectRescueMeetingPoint(Id householdId) {
+		HouseholdInfo householdInfo = householdsUtils.getHouseholdInfoMap().get(householdId);
+		Id oldMeetingPointId = householdInfo.getMeetingPointId();
+		Id newMeetingPointId = scenario.createId("rescueFacility");
+
+		/*
+		 * If the meeting point is not changed we have nothing to do.
+		 */
+		if (oldMeetingPointId == newMeetingPointId) return;
+		
+		/*
+		 * If the household is currently joined at the old meeting point and
+		 * a new meeting point is set.
+		 */
+		if (householdInfo.allMembersAtMeetingPoint()) {
+			Event leaveEvent = new HouseholdLeaveMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+			eventsManager.processEvent(leaveEvent);	
+		}
+			
+		householdsUtils.setMeetingPoint(householdId, newMeetingPointId);
+		
+		/*
+		 * If the household is currently joined at the new meeting point.
+		 */
+		if (householdInfo.allMembersAtMeetingPoint()) {
+			Event enterEvent = new HouseholdEnterMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+			eventsManager.processEvent(enterEvent);	
+		}
+		
+		Event setEvent = new HouseholdSetMeetingPointEventImpl(this.time, householdId, newMeetingPointId);
+		eventsManager.processEvent(setEvent);
 	}
 	
-	/*
+	/**
+	 * Decides whether the given facility is located in the affected area.
+	 * @param id Id of a facility to be checked
+	 */
+	public boolean isFacilitySecure(Id facilityId) {
+		
+		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		if (facility == null) return false;
+		else {
+			Point point = factory.createPoint(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
+			return !affectedArea.contains(point);
+		}
+	}
+	
+	/**
 	 * Decides whether the given coordinate is located in the affected area.
+	 * @param coord Coordinate to be checked
 	 */
 	public boolean isCoordinateSecure(Coord coord) {
 		
@@ -103,12 +157,13 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 			setHomeFacilitySecurity(householdInfo);
 		}
 	}
+
+	/*
+	 * Get the actual simulation time.
+	 */
+	@Override
+	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		this.time = e.getSimulationTime();
+	}
 	
-//	@Override
-//	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-//		Map<Id, HouseholdInfo> joinedHouseholds = householdsUtils.getJoinedHouseholds();
-//		for (HouseholdInfo householdInfo : joinedHouseholds.values()) {
-//			householdInfo.isHomeLocationSecure();
-//		}
-//	}
 }

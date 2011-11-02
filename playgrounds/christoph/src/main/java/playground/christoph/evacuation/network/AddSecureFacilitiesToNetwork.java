@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -44,9 +45,10 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -74,9 +76,9 @@ public class AddSecureFacilitiesToNetwork {
 	 */
 	public static void main(String[] args) {
 		if (args.length != 2) return;
-		
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]);
-		Scenario scenario = sl.loadScenario();
+	
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		AddSecureFacilitiesToNetwork addSecureFacilitiesToNetwork = new AddSecureFacilitiesToNetwork(scenario);
 		Map<Id, Node> secureNodes = addSecureFacilitiesToNetwork.getSecureNodes();
