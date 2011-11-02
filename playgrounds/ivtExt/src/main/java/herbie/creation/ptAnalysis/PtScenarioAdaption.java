@@ -52,6 +52,7 @@ public class PtScenarioAdaption {
 	
 	public static final double[] relHeadwayClasses = new double[]{
 	    4, 7, 10, 15, 30, 60};  // in [minutes] and ascending order!!
+	private static double[] relevantBinInterval = new double[]{0.0, 61.0}; // relevant interval graphical output
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private String networkfilePath;
@@ -72,7 +73,6 @@ public class PtScenarioAdaption {
 	
 	private Bins old_hdwy_distrib;
 	private Bins new_hdwy_distrib;
-	private static double[] relevantInterval = new double[]{8.0, 9.0}; // relevant interval for headway in hours!
 	
 	public static void main(String[] args) {
 		if (args.length != 1) {
@@ -100,8 +100,8 @@ public class PtScenarioAdaption {
 		this.transitScheduleFile = config.findParam("ptScenarioAdaption", "transitScheduleFile");
 		this.transitVehicleFile = config.findParam("ptScenarioAdaption", "transitVehicleFile");
 		
-		this.old_hdwy_distrib = new Bins(1, 60d, "Old Headway Distribution");
-		this.new_hdwy_distrib = new Bins(1, 60d, "New Headway Distribution");
+		this.old_hdwy_distrib = new Bins(1, relevantBinInterval[1], "Old Headway Distribution");
+		this.new_hdwy_distrib = new Bins(1, relevantBinInterval[1], "New Headway Distribution");
 		
 		log.info("InitConfig ... done");
 	}
@@ -188,16 +188,16 @@ public class PtScenarioAdaption {
 			}
 			
 			if(departuresTimes.lastKey() == depTime) {
-				addNewDepartures(depTime + currentInterval * 60 - getNewInterval() * 60);
+				addNewDepartures(depTime + currentInterval * 60d - getNewInterval() * 60d);
 				
-				old_hdwy_distrib.addVal(currentInterval, 1d);
+				if(isElementOfRelevantInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 			else {
 				
 				addNewDepartures((depTime));
 				currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
 				
-				old_hdwy_distrib.addVal(currentInterval, 1d);
+				if(isElementOfRelevantInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 		}
 	}
@@ -252,12 +252,12 @@ public class PtScenarioAdaption {
 				
 				setNewDeparture();
 			}
-			new_hdwy_distrib.addVal(newInterval, 1d);
+			if(isElementOfRelevantInterval(newInterval)) new_hdwy_distrib.addVal(newInterval, 1d);
 		}
 		else
 		{	
 			copyExistingDepartures(upperThreshold);
-			new_hdwy_distrib.addVal(currentInterval, 1d);
+			if(isElementOfRelevantInterval(currentInterval)) new_hdwy_distrib.addVal(currentInterval, 1d);
 		}
 	}
 
@@ -290,10 +290,10 @@ public class PtScenarioAdaption {
 		vehicleNumber++;
 	}
 
-	private boolean courseIsInConsideration(double departureTime) {
+	private boolean isElementOfRelevantInterval(double headway) {
 		
-		if(departureTime > relevantInterval[0] * 3600d 
-				&& departureTime < relevantInterval[1] * 3600d) return true;
+		if(headway > relevantBinInterval[0] 
+				&& headway < relevantBinInterval[1]) return true;
 		return false;
 	}
 
