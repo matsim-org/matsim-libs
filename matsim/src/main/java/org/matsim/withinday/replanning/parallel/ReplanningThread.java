@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -65,7 +66,6 @@ public abstract class ReplanningThread extends Thread {
 	 * same Agent.
 	 */
 	protected Map<Id, List<ReplanningTask>> replanningTasks = new TreeMap<Id, List<ReplanningTask>>();
-//	protected LinkedList<ReplanningTask> replanningTasks = new LinkedList<ReplanningTask>();
 	protected WithinDayReplanner<AgentsToReplanIdentifier> withinDayReplanner;
 	
 	protected CyclicBarrier timeStepStartBarrier;
@@ -106,6 +106,11 @@ public abstract class ReplanningThread extends Thread {
 		this.replanningTasks.put(withinDayReplanner.getId(), new ArrayList<ReplanningTask>());
 	}
 	
+	public final void removeWithinDayReplanner(WithinDayReplanner<? extends AgentsToReplanIdentifier> withinDayReplanner) {
+		this.withinDayReplanners.remove(withinDayReplanner.getId());
+		this.replanningTasks.remove(withinDayReplanner.getId());
+	}
+	
 	/*
 	 * Typical Replanner Implementations should be able to use 
 	 * this method without any Changes.
@@ -141,7 +146,8 @@ public abstract class ReplanningThread extends Thread {
 					boolean replanningSuccessful = withinDayReplanner.doReplanning(withinDayAgent);
 					
 					if (!replanningSuccessful) {
-						log.error("Replanning was not successful!");
+						log.error("Replanning was not successful! Replanner " + withinDayReplanner.getClass().toString() + 
+								", time " + Time.writeTime(time) + ", agent " + withinDayAgent.getId());
 					}
 					else counter.incCounter();
 				}

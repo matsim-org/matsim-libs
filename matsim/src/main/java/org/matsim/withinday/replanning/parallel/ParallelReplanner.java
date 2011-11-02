@@ -20,9 +20,9 @@
 
 package org.matsim.withinday.replanning.parallel;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
@@ -48,7 +48,7 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
 	protected int numOfThreads = 1;	// use by default only one thread
-	protected List<T> originalReplanners = new ArrayList<T>();
+	protected Set<T> originalReplanners = new LinkedHashSet<T>();
 	protected ReplanningThread[] replanningThreads;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
@@ -136,8 +136,16 @@ public abstract class ParallelReplanner<T extends WithinDayReplanner<? extends A
 		}
 	}
 
-	public final List<T> getWithinDayReplanners() {
-		return Collections.unmodifiableList(this.originalReplanners);
+	public final void removeWithinDayReplanner(T replanner) {
+		this.originalReplanners.remove(replanner);
+		
+		for (ReplanningThread replanningThread : this.replanningThreads) {
+			replanningThread.removeWithinDayReplanner(replanner);
+		}
+	}
+	
+	public final Set<T> getWithinDayReplanners() {
+		return Collections.unmodifiableSet(this.originalReplanners);
 	}
 
 	public final void addReplanningTask(ReplanningTask replanningTask) {

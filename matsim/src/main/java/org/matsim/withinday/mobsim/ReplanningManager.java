@@ -20,6 +20,10 @@
 
 package org.matsim.withinday.mobsim;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -58,8 +62,18 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	private ParallelDuringActivityReplanner parallelDuringActivityReplanner;
 	private ParallelDuringLegReplanner parallelDuringLegReplanner;
 	
+	private Map<WithinDayDuringActivityReplanner, Double> activateDuringActivityReplanner;
+	private Map<WithinDayDuringActivityReplanner, Double> deactivateDuringActivityReplanner;
+	private Map<WithinDayDuringLegReplanner, Double> activateDuringLegReplanner;
+	private Map<WithinDayDuringLegReplanner, Double> deactivateDuringLegReplanner;
+	
 	public ReplanningManager(int numOfThreads) {
 		initializeReplanningModules(numOfThreads);
+		
+		this.activateDuringActivityReplanner = new TreeMap<WithinDayDuringActivityReplanner, Double>();
+		this.deactivateDuringActivityReplanner = new TreeMap<WithinDayDuringActivityReplanner, Double>();
+		this.activateDuringLegReplanner = new TreeMap<WithinDayDuringLegReplanner, Double>();
+		this.deactivateDuringLegReplanner = new TreeMap<WithinDayDuringLegReplanner, Double>();
 	}
 	
 	private void initializeReplanningModules(int numOfThreads) {
@@ -139,6 +153,28 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 		this.parallelDuringLegReplanner.addWithinDayReplanner(replanner);
 	}
 	
+	public void removeInitialReplanner(WithinDayInitialReplanner replanner) {
+		this.parallelInitialReplanner.removeWithinDayReplanner(replanner);
+	}
+
+	public void removeDuringActivityReplanner(WithinDayDuringActivityReplanner replanner) {
+		this.parallelDuringActivityReplanner.removeWithinDayReplanner(replanner);
+	}
+	
+	public void removeDuringLegReplanner(WithinDayDuringLegReplanner replanner) {
+		this.parallelDuringLegReplanner.removeWithinDayReplanner(replanner);
+	}
+	
+	public void addTimedDuringActivityReplanner(WithinDayDuringActivityReplanner replanner, double startReplanning, double endReplanning) {
+		this.activateDuringActivityReplanner.put(replanner, startReplanning);
+		this.deactivateDuringActivityReplanner.put(replanner, endReplanning);
+	}
+	
+	public void addTimedDuringLegReplanner(WithinDayDuringLegReplanner replanner, double startReplanning, double endReplanning) {
+		this.activateDuringLegReplanner.put(replanner, startReplanning);
+		this.deactivateDuringLegReplanner.put(replanner, endReplanning);
+	}
+	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		if (isInitialReplanning()) {
@@ -148,6 +184,20 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 
 	@Override
 	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
+		
+		for (Entry<WithinDayDuringActivityReplanner, Double> entry : activateDuringActivityReplanner.entrySet()) {
+			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringActivityReplanner.addWithinDayReplanner(entry.getKey());
+		}
+		for (Entry<WithinDayDuringActivityReplanner, Double> entry : deactivateDuringActivityReplanner.entrySet()) {
+			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringActivityReplanner.removeWithinDayReplanner(entry.getKey());
+		}
+		for (Entry<WithinDayDuringLegReplanner, Double> entry : activateDuringLegReplanner.entrySet()) {
+			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringLegReplanner.addWithinDayReplanner(entry.getKey());
+		}
+		for (Entry<WithinDayDuringLegReplanner, Double> entry : deactivateDuringLegReplanner.entrySet()) {
+			if (entry.getValue() == e.getSimulationTime()) this.parallelDuringLegReplanner.removeWithinDayReplanner(entry.getKey());
+		}
+		
 		if (isDuringActivityReplanning()) {
 			duringActivityReplanningModule.doReplanning(e.getSimulationTime());
 		}
