@@ -318,7 +318,7 @@ public class PtScenarioAdaption {
 	}
 	
 	private void evaluateSchedule() {
-		old_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "[#]");
-		new_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "[#]");
+		old_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "#", "Number of departures with same headway");
+		new_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "#", "Number of departures with same headway");
 	}
 }
