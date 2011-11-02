@@ -145,7 +145,7 @@ public class AnalyzeMicrocensus {
 				}
 			}
 		}	
-		this.zh_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");		
+		this.zh_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m", "#");		
 	}
 	
 	private void runAnalysisCH() {
@@ -186,12 +186,12 @@ public class AnalyzeMicrocensus {
 				}
 			}
 		}	
-		this.ch_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.ch_distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m");
-		this.ch_distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m");
+		this.ch_distanceDistribution.plotBinnedDistribution(this.outputFolder, "m", "m", "#");
+		this.ch_distanceDistributionHomeBased.plotBinnedDistribution(this.outputFolder, "m", "m", "#");
+		this.ch_distanceDistributionHomeBasedRoundTrip.plotBinnedDistribution(this.outputFolder, "m", "m", "#");
 		if (type.startsWith("s")) {
-			this.ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
-			this.ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m");
+			this.ch_shoppingDistanceDistributionHomeBasedRoundTripGrocery.plotBinnedDistribution(this.outputFolder, "m", "m", "#");
+			this.ch_shoppingDistanceDistributionHomeBasedRoundTripNonGrocery.plotBinnedDistribution(this.outputFolder, "m", "m", "#");
 		}		
 	}
 }
