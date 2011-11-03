@@ -31,12 +31,23 @@ import java.sql.Statement;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesImpl;
 
+import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
+import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreator;
+import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreatorDetailed;
 import playground.benjamin.emissions.dataTypes.VisumRoadTypes;
 
 public class EmissionTool {
@@ -83,61 +94,61 @@ public class EmissionTool {
 		
 		establishDatabaseConnection();
 		
-//		loadScenario();
-//		Network network = scenario.getNetwork();
-//		
-//		// create two event manager
-//		EventsManager eventsManager = EventsUtils.createEventsManager();
-//		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
-//		
-//		// read different hbefa tables
-//		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
-//		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
-//		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
-//		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
-//		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
-//		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
-//		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
-//		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
-//
-//		// read the vehicle file
-//		Vehicles vehicles = new VehiclesImpl();
-//		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-//		vehicleReader.readFile(vehicleFile);
-//
-//		// TODO: make the following homogeneous?!?
-//		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
-//		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
-//		
-//		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
-//				roadTypes,
-//				roadTypesTrafficSituations,
-//				hbefaWarmEmissionTableCreatorDetailed,
-//				hbefaAvgWarmEmissionTableCreator,
-//				hbefaAvgWarmEmissionTableCreatorHDV,
-//				emissionEventsManager);
-//		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
-//		// create the handler
-//		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
-//				vehicles,
-//				network,
-//				warmEmissionAnalysisModule);
-//		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
-//				network,
-//				hbefaAvgColdEmissionTableCreator,
-//				coldEmissionAnalysisModule,
-//				emissionEventsManager);
-//		// create the writer for emission events
-//		EventWriterXML emissionEventWriter = new EventWriterXML(outputFile);
-//		// add the handler
-//		eventsManager.addHandler(warmEmissionHandler);
-//		eventsManager.addHandler(coldEmissionHandler);
-//		emissionEventsManager.addHandler(emissionEventWriter);
-//		//create the reader and read the file
-//		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-//		matsimEventsReader.readFile(eventsFile);
-//		emissionEventWriter.closeFile();
-//		logger.info("Terminated. Output can be found in " + outputFile);
+		loadScenario();
+		Network network = scenario.getNetwork();
+		
+		// create two event manager
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
+		
+		// read different hbefa tables
+		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
+		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
+		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
+		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
+		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
+		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
+		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
+
+		// read the vehicle file
+		Vehicles vehicles = new VehiclesImpl();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+		vehicleReader.readFile(vehicleFile);
+
+		// TODO: make the following homogeneous?!?
+		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
+		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+		
+		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
+				roadTypes,
+				roadTypesTrafficSituations,
+				hbefaWarmEmissionTableCreatorDetailed,
+				hbefaAvgWarmEmissionTableCreator,
+				hbefaAvgWarmEmissionTableCreatorHDV,
+				emissionEventsManager);
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
+		// create the handler
+		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
+				vehicles,
+				network,
+				warmEmissionAnalysisModule);
+		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
+				network,
+				hbefaAvgColdEmissionTableCreator,
+				coldEmissionAnalysisModule,
+				emissionEventsManager);
+		// create the writer for emission events
+		EventWriterXML emissionEventWriter = new EventWriterXML(outputFile);
+		// add the handler
+		eventsManager.addHandler(warmEmissionHandler);
+		eventsManager.addHandler(coldEmissionHandler);
+		emissionEventsManager.addHandler(emissionEventWriter);
+		//create the reader and read the file
+		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+		matsimEventsReader.readFile(eventsFile);
+		emissionEventWriter.closeFile();
+		logger.info("Terminated. Output can be found in " + outputFile);
 	}
 
 	private String[][] createRoadTypesTafficSituation(
