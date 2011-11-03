@@ -27,11 +27,10 @@ import org.matsim.core.events.AgentDepartureEventImpl;
  *
  */
 public class PassengerTaxiRequestEvent extends AgentDepartureEventImpl {
-	// abusing the AgentDepartureEventImpl in order to avoid a new implementation (just laziness)
+	// abusing the AgentDepartureEventImpl in order to avoid a new implementation (laziness)
 
 	public PassengerTaxiRequestEvent(double time, Id agentId, Id linkId, String legMode) {
 		super(time, agentId, linkId, legMode);
-		// TODO Auto-generated constructor stub
 	}
 
 }

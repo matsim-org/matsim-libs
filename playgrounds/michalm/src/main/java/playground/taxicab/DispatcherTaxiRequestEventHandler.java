@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: michalm
+ * DispatcherTaxiRequestEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.taxicab ;
+package playground.taxicab;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.events.handler.EventHandler;
 
-public class EquilTest {
-
-	public static void main(String[] args){	
-		Config config = ConfigUtils.createConfig() ;
-		config.network().setInputFile("../../matsim/examples/equil/network.xml") ;
-		config.plans().setInputFile("../../matsim/examples/equil/plans-w-taxi.xml") ;
-		
-		config.controler().setMobsim("qsim") ;
-		config.addQSimConfigGroup(new QSimConfigGroup()) ;
-		
-		config.vspExperimental().setVspDefaultsCheckingLevel("abort") ;
-		config.vspExperimental().setUsingOpportunityCostOfTimeInPtRouting(true) ;
-		
-		final Controler controler = new Controler(config) ;
-		controler.setOverwriteFiles(true) ;
-		controler.addControlerListener(new MyControlerListener()) ;
-		controler.run();
-	}
+/**
+ * @author nagel
+ *
+ */
+public interface DispatcherTaxiRequestEventHandler extends EventHandler {
+	
+	void handleEvent( DispatcherTaxiRequestEvent ev ) ;
 
 }

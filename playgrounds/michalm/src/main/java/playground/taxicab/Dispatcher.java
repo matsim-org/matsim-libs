@@ -27,36 +27,25 @@ import org.matsim.core.events.handler.EventHandler;
  * @author nagel
  *
  */
-public class Dispatcher implements EventHandler {
+public class Dispatcher implements PassengerTaxiRequestEventHandler {
 
 	private EventsManager eventsManager;
 
-	/**
-	 * 
-	 */
 	public Dispatcher( EventsManager evm ) {
 		this.eventsManager = evm ;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
-	 */
 	@Override
 	public void reset(int iteration) {
-		// yyyy Auto-generated method stub
-		throw new UnsupportedOperationException();
 	}
-	
-	public void handleEvent( Event ev ) {
-		if ( ev instanceof PassengerTaxiRequestEvent ) {
-			// do something
 
-			// eventually recruit a taxi:
-			this.eventsManager.processEvent( new DispatcherTaxiRequestEvent(ev.getTime()) ) ;
-		}
-		
-//		else ignore the event
+	public void handleEvent( PassengerTaxiRequestEvent ev2 ) {
+		// do something
+		// ...
+		// eventually recruit a taxi:
+		this.eventsManager.processEvent( new DispatcherTaxiRequestEvent(
+				ev2.getTime(),ev2.getLinkId(), ev2.getPersonId()
+		) ) ;
 	}
-	
-
 }
+

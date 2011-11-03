@@ -56,10 +56,10 @@ public class QSimAgentSource implements AgentSource {
     }
 
     @Override
-    public List<MobsimAgent> getAgents() {
+    public List<MobsimAgent> insertAndGetAgents() {
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
         for (Plan plan : plans) {
-            MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(plan.getPerson());
+            MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(plan.getPerson());
             agents.add(agent);
         }
         return agents;

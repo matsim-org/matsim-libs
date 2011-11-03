@@ -19,26 +19,53 @@
 
 package playground.taxicab;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.EventImpl;
 
 /**
  * @author nagel
  *
  */
- class DispatcherTaxiRequestEvent extends EventImpl {
+class DispatcherTaxiRequestEvent extends EventImpl {
 
-	/**
-	 * @param time
-	 */
-	DispatcherTaxiRequestEvent(double time) {
+	public static final String EVENT_TYPE = "dispatcherTaxiRequestEvent" ;
+
+	public static final String ATTRIBUTE_LINK = "linkId" ;
+	public static final String ATTRIBUTE_PASSENGER = "passengerId" ; 
+
+	private Id linkId ;
+	private Id passengerId ;
+
+	DispatcherTaxiRequestEvent(double time, Id linkId, Id passengerId) {
+		// careful, linkId and agentId come in other sequence than in PassengerTaxiRequestEvent.  There is some logic
+		// in this; it is still not very safe.  NEED TYPED IDs!!
 		super(time);
-		// TODO Auto-generated constructor stub
+		this.linkId = linkId ;
+		this.passengerId = passengerId ;
 	}
 
 	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
+		attr.put(ATTRIBUTE_PASSENGER, this.passengerId.toString());
+		return attr;
+	}
+
+
+	@Override
 	public String getEventType() {
-		// yyyy Auto-generated method stub
-		return null;
+		return EVENT_TYPE ;
+	}
+
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	public Id getPassengerId() {
+		return passengerId;
 	}
 
 }

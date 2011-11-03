@@ -27,7 +27,7 @@ public class VRPAgentFactory
 
 
     @Override
-    public MobsimAgent createMobsimAgentFromPerson(Person p)
+    public MobsimAgent createMobsimAgentFromPersonAndInsert(Person p)
     {
         if (p instanceof VRPDriverPerson) {
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
@@ -43,7 +43,7 @@ public class VRPAgentFactory
         // else if ()// other possible agents
         // {}
         else {// default agents (according to DefaultAgentFactory)
-            return new PersonDriverAgentImpl(p, netsim);
+            return PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, netsim);
         }
     }
 }

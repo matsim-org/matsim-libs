@@ -24,8 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -34,7 +32,8 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * @author nagel
  *
  */
-public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements MobsimDriverAgent, AgentDepartureEventHandler {
+public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements MobsimDriverAgent, DispatcherTaxiRequestEventHandler {
+	// might be easier to just implement DriverAgent!  kai
 	
 	Netsim netsim ;
 	Scenario sc ;
@@ -76,18 +75,15 @@ public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements Mob
 		return nextLinkId ;
 	}
 
+
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		// should be a DispatherTaxiRequestEvent
-		
-		// yyyy Auto-generated method stub
-//		throw new UnsupportedOperationException() ;
+	public void handleEvent(DispatcherTaxiRequestEvent ev) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		// yyyy Auto-generated method stub
-//		throw new UnsupportedOperationException() ;
 	}
 
 }
