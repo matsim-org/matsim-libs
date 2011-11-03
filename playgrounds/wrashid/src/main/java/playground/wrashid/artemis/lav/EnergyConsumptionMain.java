@@ -23,7 +23,8 @@ public class EnergyConsumptionMain {
 		// the main scenario
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
-		final String eventsFileName = baseFolder + "ITERS/it.50/50.events.xml.gz";
+		//final String eventsFileName = baseFolder + "ITERS/it.50/50.events.xml.gz";
+		final String eventsFileName = "c:/tmp/input/output-events.xml.gz";
 
 		// small scenario for debugging:
 		// EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);

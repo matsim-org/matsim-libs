@@ -97,7 +97,10 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 	}
 
 	private boolean isRelevantForCharging(Id personId, String actType) {
-		return agentSocMapping.containsKey(personId) && actType.equalsIgnoreCase("home") && previousLegMode.get(personId).equalsIgnoreCase("car");
+		boolean containsKey = agentSocMapping.containsKey(personId);
+		boolean b = previousLegMode.get(personId)!=null && previousLegMode.get(personId).equalsIgnoreCase("car");
+		return containsKey && b;
+	// add this to filter home locations only: && actType.equalsIgnoreCase("home")
 	}
 
 	public void performLastChargingOfDay(){
@@ -109,7 +112,7 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		previousLegMode.put(event.getLinkId(), event.getLegMode());
+		previousLegMode.put(event.getPersonId(), event.getLegMode());
 	}
 
 }

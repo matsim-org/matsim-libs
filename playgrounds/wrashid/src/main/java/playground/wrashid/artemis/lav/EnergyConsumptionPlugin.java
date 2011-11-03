@@ -195,6 +195,8 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 
 		if (energyConsumptionOnLink < 0) {
 			vehicle.print();
+			System.out.println("speed: "+ link.getLength()/ timeSpendOnLink);
+			System.out.println("=============");
 			DebugLib.stopSystemAndReportInconsistency("energyConsumptionOnLink:" + energyConsumptionOnLink);
 		}
 

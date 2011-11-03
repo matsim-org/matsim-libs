@@ -10,6 +10,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -25,7 +26,7 @@ public class FilterAgents {
 	public static void main(String[] args) {
 		String inputEventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/ITERS/it.50/50.events.xml.gz";
 		
-		String outputEventsFile="c:/tmp/output-events.xml.gz";
+		String outputEventsFile="c:/tmp/output-events1.xml.gz";
 		
 		HashSet<Id> agentIds = new HashSet<Id>();
 		
@@ -85,6 +86,22 @@ public class FilterAgents {
 			this.keepAgentsInFilter = keepAgentsInFilter;
 		}
 
+		// this method is for the xml events writer, the methods below for the txt case
+		public void handleEvent(final Event event) {
+			Id personId = new IdImpl(event.toString().split("person=\"")[1].split("\"")[0]);
+
+			if (keepAgentsInFilter) {
+				if (filterPersonsSet.contains(personId)) {
+					super.handleEvent(event);
+				}
+			} else {
+				if (!filterPersonsSet.contains(personId)) {
+					super.handleEvent(event);
+				}
+			}
+		}
+		
+		
 		public void handleEvent(ActivityEndEvent event) {
 			Id personId = event.getPersonId();
 
