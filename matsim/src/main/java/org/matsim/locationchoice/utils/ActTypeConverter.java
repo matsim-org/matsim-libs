@@ -21,4 +21,24 @@ public class ActTypeConverter {
 		}
 		return fullType;
 	}
+	
+	public static String convert2MinimalType(String type) {
+		String minimalType = "tta";
+		if (type.startsWith("h")) {
+			minimalType = "h";
+		}
+		else if (type.startsWith("w")) {
+			minimalType = "w";
+		}
+		else if (type.startsWith("e")) {
+			minimalType = "e";
+		}
+		else if (type.startsWith("s")) {
+			minimalType = "s";
+		}
+		else if (type.startsWith("l")) { 
+			minimalType = "l";
+		}
+		return minimalType;
+	}
 }
