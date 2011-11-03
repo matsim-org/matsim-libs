@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 
@@ -43,6 +46,9 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.UnexistingAtt
  * @author thibautd
  */
 public class MatingPlatformImpl extends MatingPlatform {
+	private static final Log log =
+		LogFactory.getLog(MatingPlatformImpl.class);
+
 	private final MateProposer proposer;
 	private final ChoiceModel model;
 	private final Graph graph = new Graph();
@@ -86,12 +92,15 @@ public class MatingPlatformImpl extends MatingPlatform {
 	// graph manipulating methods
 	// /////////////////////////////////////////////////////////////////////////
 	private void successiveShortestPaths() {
+		log.info( "starting matching algorithm" );
 		initializeGraph();
 
 		int remainingFlowToAffect = graph.getCardinalSmallerSet();
 		ResidualCapacityComparator comparator = new ResidualCapacityComparator();
 
+		FlowCounter count = new FlowCounter( remainingFlowToAffect );
 		while (remainingFlowToAffect > 0) {
+			count.log( remainingFlowToAffect );
 			List<Graph.Edge> augmentingPath = shortestSTPath();
 			if (augmentingPath == null) break; //no further progress possible
 			int augmentation =
@@ -103,6 +112,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 				edge.augment( augmentation );
 			}
 		}
+		count.logFinalState( remainingFlowToAffect );
 	}
 
 	private void initializeGraph() {}
@@ -168,6 +178,11 @@ public class MatingPlatformImpl extends MatingPlatform {
 		private final Vertex source = new Vertex();
 		private final Vertex sink = new Vertex();
 
+		// log/debug counters
+		private int sxEdges = 0;
+		private int xtEdges = 0;
+		private int concreteEdges = 0;
+
 		// /////////////////////////////////////////////////////////////////////
 		// constructor
 		// /////////////////////////////////////////////////////////////////////
@@ -186,6 +201,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 			if (!stillModifiable) return;
 			stillModifiable = false;
 
+			log.info( "beginning of graph creation" );
 			try {
 				for (Vertex passenger : passengerVertices) {
 					List<Vertex> possibleDrivers = proposer.proposeMateList(
@@ -211,6 +227,14 @@ public class MatingPlatformImpl extends MatingPlatform {
 					throw new RuntimeException(e2);
 				}
 			}
+
+			log.info( "graph created" );
+			log.info( "graph has "+driverVertices.size()+" driver vertices" );
+			log.info( "graph has "+passengerVertices.size()+" passenger vertices" );
+			log.info( "graph has "+edges.size()+" edges in total (including s-x and x-t edges)" );
+			log.info( "graph has "+concreteEdges+" \"concrete\" edges" );
+			log.info( "graph has "+sxEdges+" s-x edges" );
+			log.info( "graph has "+xtEdges+" x-t edges" );
 		}
 
 		public int getCardinalSmallerSet() {
@@ -260,6 +284,9 @@ public class MatingPlatformImpl extends MatingPlatform {
 				start = driver;
 				end = passenger;
 
+				// update debug counter
+				concreteEdges++;
+
 				// cost calculation
 				double driverGain = computeGain(
 						driver.getRequest(),
@@ -281,7 +308,8 @@ public class MatingPlatformImpl extends MatingPlatform {
 				realEdge = retroEdge;
 				start = retroEdge.getEnd();
 				end = retroEdge.getStart();
-				cost = 0;
+				// cost linked to the one of the real edge in the getter
+				cost = Double.NaN;
 
 				updateTrackingLists();
 			}
@@ -295,10 +323,14 @@ public class MatingPlatformImpl extends MatingPlatform {
 				if (fromSource) {
 					start = source;
 					end = v;
+					// update the debug counter
+					sxEdges++;
 				}
 				else {
 					start = v;
 					end = sink;
+					// update the debug counter
+					xtEdges++;
 				}
 
 				cost = 0;
@@ -353,18 +385,21 @@ public class MatingPlatformImpl extends MatingPlatform {
 			}
 
 			public void augment(final int deltaFlow) {
-				if (realEdge != null) realEdge.augment(-flow);
-
-				int newFlow = flow + deltaFlow; 
-
-				if (newFlow > capacity) {
-					throw new IllegalArgumentException("flow exceeds capacity");
+				if (realEdge != null) {
+					realEdge.augment(-deltaFlow);
 				}
-				if (newFlow < 0) {
-					throw new IllegalArgumentException("flow is negative");
-				}
+				else {
+					int newFlow = flow + deltaFlow; 
 
-				flow = newFlow;
+					if (newFlow > capacity) {
+						throw new IllegalArgumentException("flow exceeds capacity");
+					}
+					if (newFlow < 0) {
+						throw new IllegalArgumentException("flow is negative");
+					}
+
+					flow = newFlow;
+				}
 			}
 
 			public Vertex getStart() {
@@ -504,4 +539,31 @@ public class MatingPlatformImpl extends MatingPlatform {
 			return o1.getResidualCapacity() - o2.getResidualCapacity();
 		}
 	}
+
+	private class FlowCounter {
+		private final int maxFlow;
+		private int next;
+		private int step = 1;
+
+		public FlowCounter( final int maxFlow ) {
+			this.maxFlow = maxFlow;
+			next = maxFlow;
+		}
+
+		public void log( final int remainingFlow ) {
+			if (remainingFlow <= next) {
+				log.info( "successive shortest paths algorithm: "+
+						"total demand "+maxFlow+
+						", still to affect "+remainingFlow );
+				next -= step;
+				step *= 2;
+			}
+		}
+
+		public void logFinalState( final int remainingFlow ) {
+			log.info( "successive shortest paths algorithm finished. "+
+					remainingFlow+" flow units left unaffected");
+		}
+	}
 }
+

@@ -119,28 +119,22 @@ class CliqueInformation {
 	}
 
 	public void mate(final Id mate1, final Id mate2) {
-		List<Id> mates1 = getMates(mate1);
-		List<Id> mates2 = getMates(mate2);
+
+		// first, associate the clique of the first mate to
+		// the second mate as well as all the members of its
+		// clique
+		List<Id> mates1 = cliques.get( mate1 );
+		List<Id> mates2 = cliques.remove( mate2 );
+		for ( Id mate : mates2 ) {
+			cliques.put( mate , mates1 );
+		}
 
 		// merge the cliques composition of mate1 and mate2
 		mates1.addAll(mates2);
+
 		// associate mate2 with the merged clique
-		cliques.put(mate2, mates1);
 		// remove the old mate2 clique from the memory
 		registeredCliques.remove(mates2);
-	}
-
-	private List<Id> getMates(final Id person) {
-		List<Id> mates = cliques.get(person);
-
-		//if (mates == null) {
-		//	mates = new ArrayList<Id>();
-		//	mates.add(person);
-		//	cliques.put(person, mates);
-		//	registeredCliques.add(mates);
-		//}
-
-		return mates;
 	}
 
 	public Map<Id, List<Id>> getCliques() {
@@ -260,6 +254,11 @@ class PlanActuator {
 			final Activity origin,
 			final Activity destination,
 			final TripRequest.Type tripType) {
+		if (this.planElements[indexInPlan] instanceof SharedRide) {
+			throw new IllegalArgumentException( "trying to put a shared at "+
+					"the location of a previously created shared ride" );
+		}
+
 		this.planElements[indexInPlan] =
 			new SharedRide(
 					jointTripNumber,
