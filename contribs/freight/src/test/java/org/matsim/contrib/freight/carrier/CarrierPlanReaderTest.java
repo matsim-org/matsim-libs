@@ -29,6 +29,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.junit.Test;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,13 +38,13 @@ import org.junit.Test;
  * Time: 11:46 AM
  * To change this template use File | Settings | File Templates.
  */
-public class CarrierPlanReaderTest {
+public class CarrierPlanReaderTest extends MatsimTestCase {
 
     @Test
-    public void carrierPlanReaderDoesSomething() {
+    public void testCarrierPlanReaderDoesSomething() {
         Carriers carriers = new Carriers();
         CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-        carrierPlanReader.read("/Users/zilske/Documents/IdeaProjects/playgrounds/sschroeder/input/carrierPlans.xml");
+        carrierPlanReader.read(getInputDirectory() + "carrierPlans.xml");
         junit.framework.Assert.assertEquals(2, carriers.getCarriers().size());
     }
 
