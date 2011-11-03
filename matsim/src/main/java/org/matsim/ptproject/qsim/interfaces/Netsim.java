@@ -19,6 +19,8 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
+import org.matsim.core.mobsim.framework.MobsimAgent;
+
 
 /**Mobsim could, at least in theory, also operate without a network (e.g. based on activities with
  * coordinates).  Netsim has a NetsimNetwork.
@@ -28,5 +30,17 @@ package org.matsim.ptproject.qsim.interfaces;
 public interface Netsim extends Mobsim {
 
 	NetsimNetwork getNetsimNetwork();
+	
+	/**Registering and unregistering agents on links for visualization (and maybe other purposes).  
+	 * 
+	 * Design decision: In theory, the links could also ask the central
+	 * "activities" or "agentTracker" data structures, but in practice this is too slow.  kai, aug'10
+	 * 
+	 * This needs the "getCurrentLinkId()" of the MobsimAgent filled with meaningful information.
+	 * 	 */
+	void registerAdditionalAgentOnLink( final MobsimAgent agent ) ;
+	void unregisterAdditionalAgentOnLink( final MobsimAgent agent ) ;
+
+
 	
 }
