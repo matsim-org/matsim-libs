@@ -29,8 +29,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -71,30 +74,27 @@ public class MyMobsimFactory implements MobsimFactory {
 		// add one taxi:
 		AgentSource taxiCabSource = new AgentSource() {
 			@Override
-			public List<MobsimAgent> insertAndGetAgents() {
+			public List<MobsimAgent> insertAgentsIntoMobsim() {
 				List<MobsimAgent> agents = new ArrayList<MobsimAgent>() ;
 				
-				Person dummyPerson = null ; // not sure if this is needed for anything?!?!  This is because TaxicabAgent
-				// is derived from PersonAgent, which is probably not necessary.
-				MobsimAgent taxiagent = new TaxicabAgent(dummyPerson,mobsim) ;
+				MobsimDriverAgent taxiagent = new TaxicabAgent(mobsim) ;
 				agents.add(taxiagent) ;
 				
-				Id startLinkId=null ;
-				for ( Link link : sc.getNetwork().getLinks().values() ) {
-					startLinkId = link.getId() ;
-					break ; // stupid way to get Id of first link.  Any better idea?
-				}
-
+				// the vehicle needs to be parked before agentDeparture!!
 				VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-				Vehicle vehicle = new VehicleImpl(new IdImpl("taxi"), defaultVehicleType);
-				QVehicle qvehicle = new QVehicleImpl(vehicle,1) ;
-				
-				mobsim.getNetsimNetwork().getNetsimLink(startLinkId).addDepartingVehicle(qvehicle) ;
-				// this may interfere with matsim standard logic to instantiate vehicles!?!?
-				
-				throw new RuntimeException("need to insert this agent somehow (and his vehicle)") ;
+				VehicleImpl vehicle = new VehicleImpl(new IdImpl("taxiVehicle"), defaultVehicleType);
+				QVehicle veh = new QVehicleImpl(vehicle);
+				veh.setDriver(taxiagent); // this line is currently only
+															// needed for OTFVis to show
+															// parked vehicles
+				taxiagent.setVehicle(veh);
 
-//				return agents ;
+
+				mobsim.parkVehicleOnInitialLink(taxiagent);
+				
+				mobsim.arrangeAgentDeparture(taxiagent) ;
+				
+				return agents ;
 			}
 		} ;
 		mobsim.addAgentSource(taxiCabSource) ;

@@ -23,30 +23,35 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author nagel
  *
  */
-public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements MobsimDriverAgent, DispatcherTaxiRequestEventHandler {
-	// might be easier to just implement DriverAgent!  kai
+public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEventHandler {
 	
 	Netsim netsim ;
 	Scenario sc ;
+	private Id currentLinkId;
+	private QVehicle vehicle;
+	private Id destinationLinkId;
+	private Id expectedPassengerId;
+	private Id currentPassengerId;
 
-	/**
-	 * @param p
-	 * @param simulation
-	 */
-	public TaxicabAgent(Person p, Netsim simulation) {
-		super(p, simulation);
-		// TODO Auto-generated constructor stub
+	public TaxicabAgent(Netsim simulation) {
 		netsim = simulation ;
 		sc = netsim.getScenario();
+		
+		// I want to get some random link id in order to initialize the position:
+		for ( Link link : sc.getNetwork().getLinks().values() ) {
+			currentLinkId = link.getId() ;
+		}
+		
 	}
 	
 	// figure out how this is inserted in matsim.  Look at "createAdditionaAgents"
@@ -78,12 +83,102 @@ public class TaxicabAgent extends ExperimentalBasicWithindayAgent implements Mob
 
 	@Override
 	public void handleEvent(DispatcherTaxiRequestEvent ev) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		this.destinationLinkId = ev.getLinkId();
+		this.expectedPassengerId = ev.getPassengerId() ;
 	}
 
 	@Override
 	public void reset(int iteration) {
 	}
+
+	@Override
+	public String getMode() {
+		return "car" ; // !!!!
+	}
+
+	@Override
+	public Id getCurrentLinkId() {
+		return this.currentLinkId ;
+	}
+
+	@Override
+	public Id getId() {
+		return new IdImpl("taxidriver") ;
+	}
+
+	@Override
+	public Id getPlannedVehicleId() {
+		return new IdImpl("defaultVehicleType") ;
+	}
+
+	@Override
+	public QVehicle getVehicle() {
+		return this.vehicle ;
+	}
+
+	@Override
+	public void notifyMoveOverNode(Id newLinkId) {
+		this.currentLinkId = newLinkId ;
+	}
+
+	@Override
+	public void setVehicle(QVehicle veh) {
+		this.vehicle = veh ;
+	}
+	
+	@Override
+	public Id getDestinationLinkId() {
+		return this.destinationLinkId ;
+	}
+	
+	@SuppressWarnings("null")
+	@Override
+	public void endLegAndAssumeControl(double now) {
+		// this should happen when the taxi "arrives" in order to pick up a passenger!
+		
+		// the car is "parked" before this method is called
+		
+		MobsimAgent passenger = 
+			this.netsim.getNetsimNetwork().getNetsimLink(this.currentLinkId).unregisterAdditionalAgentOnLink(this.expectedPassengerId) ;
+		this.expectedPassengerId = null ;
+		this.currentPassengerId = passenger.getId();
+		if ( passenger != null ) {
+			this.destinationLinkId = passenger.getDestinationLinkId() ;
+		}
+
+		netsim.arrangeAgentDeparture(this) ;
+		
+	}
+
+
+	// things that should never happen with the random taxicab agent:
+	
+	@Override
+	public void notifyTeleportToLink(Id linkId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public Double getExpectedTravelTime() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public double getActivityEndTime() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public void endActivityAndAssumeControl(double now) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
+
+
+
 
 }

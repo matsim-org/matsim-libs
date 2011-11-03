@@ -21,6 +21,7 @@ package playground.taxicab ;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.ConfigUtils;
 
@@ -31,11 +32,26 @@ public class EquilTest {
 		config.network().setInputFile("../../matsim/examples/equil/network.xml") ;
 		config.plans().setInputFile("../../matsim/examples/equil/plans-w-taxi.xml") ;
 		
-		config.controler().setMobsim("qsim") ;
-		config.addQSimConfigGroup(new QSimConfigGroup()) ;
-		
 		config.vspExperimental().setVspDefaultsCheckingLevel("abort") ;
 		config.vspExperimental().setUsingOpportunityCostOfTimeInPtRouting(true) ;
+		
+		config.controler().setMobsim("qsim") ;
+		config.addQSimConfigGroup(new QSimConfigGroup()) ;
+		config.getQSimConfigGroup().setEndTime(36.*3600.) ;
+		config.getQSimConfigGroup().setVehicleBehavior("teleport") ; 
+
+		{
+			ActivityParams actParams = new ActivityParams("w") ;
+			actParams.setTypicalDuration(8*3600.);
+			config.planCalcScore().addActivityParams(actParams) ;
+		}
+		{
+			ActivityParams actParams = new ActivityParams("h") ;
+			actParams.setTypicalDuration(16*3600.);
+			config.planCalcScore().addActivityParams(actParams) ;
+		}
+		
+		config.controler().setLastIteration(0) ;
 		
 		final Controler controler = new Controler(config) ;
 		controler.setOverwriteFiles(true) ;

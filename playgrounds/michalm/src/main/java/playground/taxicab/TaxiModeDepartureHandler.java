@@ -20,6 +20,7 @@
 
 package playground.taxicab;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -39,13 +40,17 @@ public class TaxiModeDepartureHandler implements DepartureHandler {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+
 		if ( agent.getMode().equals("taxi") ) {
+			Logger.getLogger(this.getClass()).warn("performing a taxi mode departure" ) ;
+
 			mobsim.getEventsManager().processEvent( 
-					new PassengerTaxiRequestEvent( now, agent.getId(), linkId, agent.getMode() )) ;
+					new PassengerTaxiRequestEvent( now, agent.getId(), linkId )) ;
 			
 			this.mobsim.registerAdditionalAgentOnLink(agent) ; 
 
 			
+			Logger.getLogger(this.getClass()).warn("done with taxi mode departure" ) ;
 			return true ;
 		} else {
 			return false ;
