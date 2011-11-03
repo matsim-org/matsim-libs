@@ -57,7 +57,6 @@ public class PlansSampler {
 
 		for (Person person : plans.getPersons().values()) {
 			double r = MatsimRandom.getRandom().nextDouble();
-
 			if (r <= sampleFraction) {
 				sampledPopulation.addPerson(person);
 			}

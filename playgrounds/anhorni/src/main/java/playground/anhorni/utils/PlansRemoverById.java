@@ -31,10 +31,12 @@ public class PlansRemoverById {
 	private final static Logger log = Logger.getLogger(PlansRemoverById.class);	
 
 	public Population remove(Population plans, Id maxId) {
+		
 		Population cleanedPopulation = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
-
+		log.info("Population size before removal: " + plans.getPersons().size());
 		for (Person person : plans.getPersons().values()) {
-			if (person.getId().compareTo(maxId) < 0) {
+			// compareTo correct?
+			if (Integer.parseInt(person.getId().toString()) < Integer.parseInt(maxId.toString())) {
 				cleanedPopulation.addPerson(person);
 			}
 		}

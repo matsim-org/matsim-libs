@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -35,6 +36,7 @@ import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.anhorni.utils.PlansRemoverById;
 import playground.anhorni.utils.PlansSampler;
+import playground.anhorni.utils.FacilitiesAdderAndModifier;
 
 
 public class ZHScenarioOnePercentNoBorderCrosser {
@@ -49,39 +51,48 @@ public class ZHScenarioOnePercentNoBorderCrosser {
 	}
 		
 	private void init(final String plansFilePath, final String networkFilePath) {
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);		
+		new MatsimNetworkReader(this.scenario).readFile(networkFilePath);		
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansFilePath);
 	}
 
-	public void run(String configFile, double sampleFraction) {
-		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(configFile);
-		this.scenario  = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.createConfig());
+	public void run(String configFile, double sampleFraction) {    	
+    	Config config = ConfigUtils.loadConfig(configFile);
+		this.scenario  = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		
 		this.init(config.getModule("plans").getValue("inputPlansFile"), 
 				config.getModule("network").getValue("inputNetworkFile"));
 		
 		this.outputFolder = config.getModule("controler").getValue("outputDirectory");
-		this.cleanPlans();
-		this.samplePlans(sampleFraction);		
+		this.removeBoderCrosser();
+		this.samplePlans(sampleFraction);	
+		this.addFacilities(config);
 		this.write();
 	}
 	
-	private void cleanPlans() {
+	private void removeBoderCrosser() {
+		log.info("Removing border crossers ...");
 		PlansRemoverById remover = new PlansRemoverById();
 		Population cleanedPop = remover.remove(this.scenario.getPopulation(), new IdImpl(1000000000));
 		this.scenario.setPopulation(cleanedPop);
 	}
 	
 	private void samplePlans(double sampleFraction) {
+		log.info("Agents before sampling :" + this.scenario.getPopulation().getPersons().size());
 		PlansSampler sampler = new PlansSampler();
 		Population sampledPop = sampler.sample(this.scenario.getPopulation(), sampleFraction);
 		this.scenario.setPopulation(sampledPop);
 	}
 	
+	private void addFacilities(Config config) {
+		FacilitiesAdderAndModifier adder = new FacilitiesAdderAndModifier();
+		adder.add(config, scenario);
+		
+	}
+	
 	private void write() {
 		new File(this.outputFolder).mkdirs();
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.outputFolder + "plans.xml.gz");
+		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(this.outputFolder + "facilities.xml.gz");
 	}
 }
