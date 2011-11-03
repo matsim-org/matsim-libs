@@ -29,10 +29,6 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.junit.Test;
-import sun.jvm.hotspot.utilities.Assert;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
