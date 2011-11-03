@@ -1064,7 +1064,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			this.normalVehicle = new QVehicleImpl(new VehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
-			PersonDriverAgentImpl nDriver = new PersonDriverAgentImpl(person, qsim);
+			PersonDriverAgentImpl nDriver = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, qsim);
 			this.normalVehicle.setDriver(nDriver);
 			nDriver.setVehicle(this.normalVehicle);
 			nDriver.endActivityAndAssumeControl(100);
@@ -1089,7 +1089,7 @@ public class TransitQueueNetworkTest extends TestCase {
 				plan2.addActivity(pb.createActivityFromLinkId("work", id2));
 				population.addPerson(person2);
 
-				PersonDriverAgentImpl nDriver2 = new PersonDriverAgentImpl(person2, qsim);
+				PersonDriverAgentImpl nDriver2 = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person2, qsim);
 				this.normalVehicle2.setDriver(nDriver2);
 				nDriver2.setVehicle(this.normalVehicle);
 			} else {

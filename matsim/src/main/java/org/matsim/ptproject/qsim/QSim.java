@@ -236,9 +236,9 @@ public class QSim implements VisMobsim, Netsim {
 		double time = this.simTimer.getTimeOfDay();
 		while (doContinue) {
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-			beforeSimStep();
+//			beforeSimStep();
 			doContinue = doSimStep(time);
-			afterSimStep();
+//			afterSimStep();
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (doContinue) {
 				time = this.simTimer.incrementTime();
@@ -262,19 +262,6 @@ public class QSim implements VisMobsim, Netsim {
 	// into the QSim. But I can't change into that direction because the
 	// TransitEngine changes the AgentFactory fairly
 	// late in the initialization sequence ...
-
-	// public final void setMultiModalSimEngine(MultiModalSimEngine
-	// multiModalEngine) {
-	// if ( !locked ) {
-	// this.multiModalEngine = multiModalEngine;
-	// } else {
-	// throw new
-	// RuntimeException("too late to set multiModalSimEngine; aborting ...") ;
-	// }
-	// }
-	// this is never used, and it is not clear to me how it should be used given
-	// the initialization sequence
-	// (in particular the departure handlers). kai, feb'11
 
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
@@ -364,7 +351,7 @@ public class QSim implements VisMobsim, Netsim {
 
 	private void createAgents() {
         for (AgentSource agentSource : agentSources) {
-            agents.addAll(agentSource.getAgents());
+            agents.addAll(agentSource.insertAndGetAgents());
         }
 	}
 
@@ -452,10 +439,10 @@ public class QSim implements VisMobsim, Netsim {
 		// if they are nowhere else referenced
 	}
 
-	protected void beforeSimStep() {
-		// left empty for inheritance; for experimentation only (for production
-		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
-	}
+//	protected void beforeSimStep() {
+//		// left empty for inheritance; for experimentation only (for production
+//		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
+//	}
 
 	/**
 	 * Do one step of the simulation run.
@@ -499,10 +486,10 @@ public class QSim implements VisMobsim, Netsim {
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
-	protected void afterSimStep() {
-		// left empty for inheritance; for experimentation only (for production
-		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
-	}
+//	protected void afterSimStep() {
+//		// left empty for inheritance; for experimentation only (for production
+//		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
+//	}
 
 	protected final void handleTeleportationArrivals() {
 		double now = this.getSimTimer().getTimeOfDay();
@@ -665,22 +652,10 @@ public class QSim implements VisMobsim, Netsim {
 	 * on a link or teleport it to its destination.
 	 * 
 	 * @param agent
-	 * @param link
-	 *            the link where the agent departs
 	 */
 	@Override
-	// unclear if this is "actEnd" or "departure"! kai, may'10
-	// depending on this, it is a "PersonAgent" or "DriverAgent". kai, may'10
-	// I think it is departure, but still a person agent. kai, aug'10
-	// Now a PlanAgent, which makes more sense (I think). kai, nov'10
-	// Since this is now by force a PlanAgent, one could replace
-	// arrangeAgentDeparture and
-	// scheduleActivityEnd by joint startPlanElement. kai, nov'10
-	// It is no longer a PlanAgent. :-) kai, jul'11
 	public final void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
-		// Leg leg = agent.getCurrentLeg();
-		// Route route = leg.getRoute();
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId();
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now,

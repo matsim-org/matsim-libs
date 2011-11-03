@@ -32,7 +32,7 @@ public final class ExperimentalBasicWithindayAgentFactory implements AgentFactor
 	}
 
 	@Override
-	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
+	public MobsimDriverAgent createMobsimAgentFromPersonAndInsert(final Person p) {
 		MobsimDriverAgent agent = new ExperimentalBasicWithindayAgent(p, this.simulation);
 		return agent;
 	}

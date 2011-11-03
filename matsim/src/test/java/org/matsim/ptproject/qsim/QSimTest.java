@@ -775,7 +775,7 @@ public class QSimTest {
 		qlink2.addParkedVehicle(vehicle2);
 
 		sim.getSimTimer().setTime(100.0);
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
+		PersonDriverAgentImpl agent = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, sim);
 		agent.endActivityAndAssumeControl(100.0);
 		sim.getSimTimer().setTime(101.0);
 		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer

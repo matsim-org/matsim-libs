@@ -24,10 +24,11 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
- * @author dgrether
+ * Design decisions:<ul>
+ * <li> Class is final since there is an interface.  Please use interface directly. kai, nov'11
+ * </ul>
  */
-@Deprecated // should be final, i.e. inheritance from this class is deprecated.  Please use the interface directly.  kai, oct'10
-public class DefaultAgentFactory implements AgentFactory {
+public final class DefaultAgentFactory implements AgentFactory {
 
 	protected final Netsim simulation;
 
@@ -36,8 +37,8 @@ public class DefaultAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverAgent agent = new PersonDriverAgentImpl(p, this.simulation);
+	public MobsimDriverAgent createMobsimAgentFromPersonAndInsert(final Person p) {
+		MobsimDriverAgent agent = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, this.simulation);
 		return agent;
 	}
 

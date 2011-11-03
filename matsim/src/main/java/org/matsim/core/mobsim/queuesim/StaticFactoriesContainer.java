@@ -24,7 +24,7 @@ public class StaticFactoriesContainer {
 	public static MobsimDriverAgent createQueuePersonAgent(Person p, QueueSimulation simulation) {
 //		return new QueuePersonAgent(p, simulation);
 //		return new DefaultPersonDriverAgent(p, simulation);
-		return new DefaultAgentFactory( simulation ).createMobsimAgentFromPerson( p ) ;
+		return new DefaultAgentFactory( simulation ).createMobsimAgentFromPersonAndInsert( p ) ;
 	}
 
 	public static MobsimTimerI createSimulationTimer(double stepSize) {

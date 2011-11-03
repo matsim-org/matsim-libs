@@ -81,8 +81,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	// ============================================================================================================================
 	// c'tor
 
-	public PersonDriverAgentImpl(final Person p, final Netsim simulation) {
-		// yyyy this should, in my opinion, be protected since there is an interface.  kai, oct'10
+	public static PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, Netsim simulation) {
+		return new PersonDriverAgentImpl(p, simulation);
+	}
+	protected PersonDriverAgentImpl(final Person p, final Netsim simulation) {
 
 		this.person = p;
 		this.simulation = simulation;
