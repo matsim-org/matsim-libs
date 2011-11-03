@@ -24,10 +24,12 @@ public class NetworkCapacitiesPainter extends NetworkPainter {
 	private boolean withSelected = true;
 	private double maxCapacity;
 	private double minCapacity;
+	private double maxChangeCapacityUp;
+	private double maxChangeCapacityDown;
 	private Map<Link, Tuple<Link,Double>> linksChanged;
 	private boolean isA;
 	private byte mode = 0;
-	private byte numModes = 2;
+	private byte numModes = 3;
 	
 	//Methods
 	public NetworkCapacitiesPainter(Network network, boolean isA, Map<Link, Tuple<Link,Double>> linksChanged) {
@@ -36,12 +38,20 @@ public class NetworkCapacitiesPainter extends NetworkPainter {
 		this.linksChanged = linksChanged;
 		maxCapacity = 0;
 		minCapacity = Double.MAX_VALUE;
-		for(Tuple<Link, Double> capacitiesL:linksChanged.values()) {
-			if(capacitiesL.getSecond()>maxCapacity)
-				maxCapacity = capacitiesL.getSecond();
-			if(capacitiesL.getSecond()<minCapacity)
-				minCapacity = capacitiesL.getSecond();
+		maxChangeCapacityUp = 0;
+		maxChangeCapacityDown = 0;
+		for(Entry<Link, Tuple<Link, Double>> capacitiesL:linksChanged.entrySet()) {
+			if(capacitiesL.getValue().getSecond()>maxCapacity)
+				maxCapacity = capacitiesL.getValue().getSecond();
+			if(capacitiesL.getValue().getSecond()<minCapacity)
+				minCapacity = capacitiesL.getValue().getSecond();
+			if(capacitiesL.getValue().getSecond()-capacitiesL.getKey().getCapacity()>maxChangeCapacityUp)
+				maxChangeCapacityUp = capacitiesL.getValue().getSecond()-capacitiesL.getKey().getCapacity();
+			if(capacitiesL.getValue().getSecond()-capacitiesL.getKey().getCapacity()<maxChangeCapacityDown)
+				maxChangeCapacityDown = capacitiesL.getValue().getSecond()-capacitiesL.getKey().getCapacity();
 		}
+		System.out.println(maxChangeCapacityUp+" "+maxChangeCapacityDown);
+		System.out.println(maxCapacity+" "+minCapacity);
 		if(isA)
 			mode = 1;
 	}
@@ -61,6 +71,13 @@ public class NetworkCapacitiesPainter extends NetworkPainter {
 						double fraction = 0.07+((link.getCapacity()-minCapacity)/(maxCapacity-minCapacity))*0.93;
 						paintLink(g2, layersPanel, link, new BasicStroke(2f), 1.5, new Color(255-(int)(fraction*255),(int)(fraction*255),0));
 					}
+				}
+				break;
+			case 2:
+				for(Entry<Link, Tuple<Link,Double>> linksE:linksChanged.entrySet()) {
+					Link link = isA?linksE.getValue().getFirst():linksE.getKey();
+					double fraction = 0.07+((linksE.getValue().getSecond()-link.getCapacity()-maxChangeCapacityDown)/(maxChangeCapacityUp-maxChangeCapacityDown))*0.93;
+					paintLink(g2, layersPanel, link, new BasicStroke(2f), 1.5, new Color(255-(int)(fraction*255),(int)(fraction*255),0));
 				}
 				break;
 			}

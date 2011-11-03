@@ -344,7 +344,7 @@ public class DoubleNetworkCapacitiesWindow extends LayersWindow implements Actio
 	}
 	@Override
 	public void dispose() {
-		int res = JOptionPane.showConfirmDialog(this, "Do you want you want to save the capacities?");
+		int res = JOptionPane.showConfirmDialog(this, "Do you want to save the capacities?");
 		if(res == JOptionPane.YES_OPTION)
 			save();
 		if(!(res == JOptionPane.CANCEL_OPTION)) {

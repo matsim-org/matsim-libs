@@ -28,7 +28,7 @@ public class TransitScheduleAfter24H {
 				for(Departure departure:transitRoute.getDepartures().values())
 					if(departure.getDepartureTime()<numSeconds) {
 						Departure newDeparture = transitScheduleFactory.createDeparture(new IdImpl(departure.getId().toString()+"_rep"), Time.MIDNIGHT+departure.getDepartureTime());
-						newDeparture.setVehicleId(departure.getVehicleId());
+						newDeparture.setVehicleId(new IdImpl(departure.getVehicleId().toString()+"_rep"));
 						newDepartures.add(newDeparture);
 					}
 				for(Departure departure:newDepartures)

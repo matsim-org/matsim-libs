@@ -404,8 +404,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 				else {
 					JOptionPane.showMessageDialog(this, "No, "+wrongLinks.size()+" links");
 					((NetworkNodesPanel)layersPanels.get(PanelIds.A)).setLinksLayer(wrongLinks);
-					/*centerCamera(wrongLinks.iterator().next().getCoord());
-					*/
+					centerCamera(wrongLinks.iterator().next().getCoord());
 				}
 			}
 			else
@@ -486,7 +485,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 	}
 	@Override
 	public void dispose() {
-		int res = JOptionPane.showConfirmDialog(this, "Do you want you want to save the matchings?");
+		int res = JOptionPane.showConfirmDialog(this, "Do you want to save the matchings?");
 		if(res == JOptionPane.YES_OPTION)
 			save();
 		if(!(res == JOptionPane.CANCEL_OPTION)) {

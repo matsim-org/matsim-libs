@@ -257,7 +257,7 @@ public class VehiclesDataProcessor {
 	public static void main(String[] args) {
 		try {
 			VehiclesDataProcessor vehiclesDataProcessor =  new VehiclesDataProcessor();
-			vehiclesDataProcessor.relateVehiclesToTransitSchedule("./data/currentSimulation/transitScheduleWV.xml", "./data/currentSimulation/vehiclesGood.xml", 1);
+			vehiclesDataProcessor.relateVehiclesToTransitSchedule("./data/currentSimulation/transitScheduleWVWAM.xml", "./data/currentSimulation/vehiclesGood25PercentSampleWAM.xml", 0.25);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
