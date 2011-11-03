@@ -23,8 +23,8 @@ package org.matsim.core.events.handler;
 
 /**
  * Design thoughts:<ul>
- * <li> Is there a reason why this does not have "handleEvent"?  Would make some programming easier.  (But maybe 
- * there is a structural counter-argument?)  kai, nov'11
+ * <li> This is deliberately without an handleEvent( Event ev ) so that derived interfaces and ultimately classes are not
+ * forced to implement a handler that deals with <i>all</i> events.  kai, with input from dominik, nov'11
  * </ul>
  *
  */
