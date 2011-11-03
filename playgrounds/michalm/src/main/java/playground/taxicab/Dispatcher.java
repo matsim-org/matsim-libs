@@ -19,9 +19,8 @@
 
 package playground.taxicab;
 
-import org.matsim.core.api.experimental.events.Event;
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author nagel
@@ -39,13 +38,13 @@ public class Dispatcher implements PassengerTaxiRequestEventHandler {
 	public void reset(int iteration) {
 	}
 
-	public void handleEvent( PassengerTaxiRequestEvent ev2 ) {
+	@Override
+	public void handleEvent( PassengerTaxiRequestEvent ev ) {
+		Logger.getLogger("").warn(" entering handleEvent ...") ;
 		// do something
 		// ...
 		// eventually recruit a taxi:
-		this.eventsManager.processEvent( new DispatcherTaxiRequestEvent(
-				ev2.getTime(),ev2.getLinkId(), ev2.getPersonId()
-		) ) ;
+		this.eventsManager.processEvent( new DispatcherTaxiRequestEvent( ev.getTime(),ev.getLinkId(), ev.getPersonId() ) ) ;
 	}
 }
 

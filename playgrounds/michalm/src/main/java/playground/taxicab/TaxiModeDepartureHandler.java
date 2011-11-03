@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
-import org.matsim.ptproject.qsim.interfaces.Mobsim;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * @author nagel
@@ -32,9 +32,9 @@ import org.matsim.ptproject.qsim.interfaces.Mobsim;
  */
 public class TaxiModeDepartureHandler implements DepartureHandler {
 	
-	private Mobsim mobsim ;
+	private Netsim mobsim ;
 
-	TaxiModeDepartureHandler( Mobsim mobsim ) {
+	TaxiModeDepartureHandler( Netsim mobsim ) {
 		this.mobsim = mobsim ;
 	}
 

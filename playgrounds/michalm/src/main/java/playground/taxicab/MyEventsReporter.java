@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: michalm
- * PassengerTaxiRequestEventHandler.java
+ * MyEventsReporter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,12 +20,31 @@
 
 package playground.taxicab;
 
-import org.matsim.core.events.handler.EventHandler;
+import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.PersonEvent;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
  * @author nagel
  *
  */
-public interface PassengerTaxiRequestEventHandler extends EventHandler {
-	public void handleEvent( PassengerTaxiRequestEvent event ) ;
+public class MyEventsReporter implements BasicEventHandler {
+
+	@Override
+	public void handleEvent(Event event) {
+		if ( event instanceof PersonEvent ) {
+			if ( ((PersonEvent)event).getPersonId().equals( new IdImpl("3") ) ) {
+				Logger.getLogger("").warn( event ) ;
+			}
+		}
+	}
+
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+
 }

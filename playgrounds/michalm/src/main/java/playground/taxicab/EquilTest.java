@@ -37,7 +37,7 @@ public class EquilTest {
 		
 		config.controler().setMobsim("qsim") ;
 		config.addQSimConfigGroup(new QSimConfigGroup()) ;
-		config.getQSimConfigGroup().setEndTime(36.*3600.) ;
+		config.getQSimConfigGroup().setEndTime(50000.) ;
 		config.getQSimConfigGroup().setVehicleBehavior("teleport") ; 
 
 		{

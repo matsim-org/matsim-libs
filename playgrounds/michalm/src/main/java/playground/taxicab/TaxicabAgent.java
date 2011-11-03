@@ -19,11 +19,14 @@
 
 package playground.taxicab;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -35,15 +38,22 @@ import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
  */
 public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEventHandler {
 	
-	Netsim netsim ;
-	Scenario sc ;
+	public static TaxicabAgent insertTaxicabAgent(Netsim simulation) {
+		return new TaxicabAgent(simulation);
+	}
+
+	private static Id NO_LINK = new IdImpl("nolink"); 
+	
+	private Netsim netsim ;
+	private Scenario sc ;
 	private Id currentLinkId;
 	private QVehicle vehicle;
-	private Id destinationLinkId;
+	private Id destinationLinkId = NO_LINK ; 
 	private Id expectedPassengerId;
-	private Id currentPassengerId;
+	private MobsimAgent currentPassenger ;
+	private double activityEndTime;
 
-	public TaxicabAgent(Netsim simulation) {
+	private TaxicabAgent(Netsim simulation) {
 		netsim = simulation ;
 		sc = netsim.getScenario();
 		
@@ -52,13 +62,16 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 			currentLinkId = link.getId() ;
 		}
 		
+		this.activityEndTime = 24000. ;
+		netsim.scheduleActivityEnd(this) ;
 	}
-	
-	// figure out how this is inserted in matsim.  Look at "createAdditionaAgents"
 	
 	@Override
 	public Id chooseNextLinkId() {
-		// where are we?
+		if ( this.getCurrentLinkId().equals( this.getDestinationLinkId() ) ) {
+			return null ;
+		}
+		
 		Link currentLink = sc.getNetwork().getLinks().get( this.getCurrentLinkId() ) ;
 		Node node = currentLink.getToNode() ;
 		
@@ -83,6 +96,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 	@Override
 	public void handleEvent(DispatcherTaxiRequestEvent ev) {
+		Logger.getLogger("").warn(" getting request for linkId: " + ev.getLinkId() ) ;
 		this.destinationLinkId = ev.getLinkId();
 		this.expectedPassengerId = ev.getPassengerId() ;
 	}
@@ -108,7 +122,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 	@Override
 	public Id getPlannedVehicleId() {
-		return new IdImpl("defaultVehicleType") ;
+		return new IdImpl("taxidriver") ;
 	}
 
 	@Override
@@ -134,20 +148,56 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	@SuppressWarnings("null")
 	@Override
 	public void endLegAndAssumeControl(double now) {
-		// this should happen when the taxi "arrives" in order to pick up a passenger!
 		
-		// the car is "parked" before this method is called
-		
-		MobsimAgent passenger = 
-			this.netsim.getNetsimNetwork().getNetsimLink(this.currentLinkId).unregisterAdditionalAgentOnLink(this.expectedPassengerId) ;
-		this.expectedPassengerId = null ;
-		this.currentPassengerId = passenger.getId();
-		if ( passenger != null ) {
-			this.destinationLinkId = passenger.getDestinationLinkId() ;
-		}
+		EventsManager events = this.netsim.getEventsManager() ;
+		EventsFactoryImpl evFac = (EventsFactoryImpl) events.getFactory() ;
 
-		netsim.arrangeAgentDeparture(this) ;
+		if ( this.expectedPassengerId!=null && this.currentPassenger==null ) {
+			// (= no passenger on board, but having a request)
+			
+			MobsimAgent passenger = 
+				this.netsim.getNetsimNetwork().getNetsimLink(this.currentLinkId).unregisterAdditionalAgentOnLink(this.expectedPassengerId) ;
+			this.expectedPassengerId = null ;
+			this.currentPassenger = passenger ;
+			if ( passenger != null ) {
+				this.destinationLinkId = passenger.getDestinationLinkId() ;
+			}
+
+			events.processEvent( evFac.createPersonEntersVehicleEvent(now, passenger.getId(), this.vehicle.getId(), this.getId() ) ) ;
+
+			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
+
+		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
+			// (= passenger on board, but having no request)
+			
+			events.processEvent( evFac.createPersonLeavesVehicleEvent(now, this.currentPassenger.getId(), this.vehicle.getId(), 
+					this.getId() ) ) ;
+			
+			this.currentPassenger.notifyTeleportToLink(this.currentLinkId) ;
+			this.currentPassenger.endLegAndAssumeControl(now) ;
+			this.currentPassenger = null ;
+			
+			this.destinationLinkId = NO_LINK ;
+			
+			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
 		
+		} else {
+			throw new RuntimeException("undefined state") ;
+		}
+		
+	}
+
+
+	@Override
+	public double getActivityEndTime() {
+		return this.activityEndTime ;
+	}
+
+	@Override
+	public void endActivityAndAssumeControl(double now) {
+		// this should, in theory, only happen at simulation start.
+
+		this.netsim.arrangeAgentDeparture(this) ;
 	}
 
 
@@ -164,19 +214,6 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
-
-	@Override
-	public double getActivityEndTime() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	public void endActivityAndAssumeControl(double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
 
 
 

@@ -54,14 +54,6 @@ import org.matsim.vehicles.VehicleTypeImpl;
 public class MyMobsimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 
-	private PersonalizableTravelCost travCostCalc;
-	private PersonalizableTravelTime travTimeCalc;
-
-	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
-		this.travCostCalc = travelCostCalculator ;
-		this.travTimeCalc = travelTimeCalculator ;
-	}
-
 	@Override
 	public Simulation createMobsim(final Scenario sc, EventsManager events) {
 
@@ -72,39 +64,26 @@ public class MyMobsimFactory implements MobsimFactory {
 		mobsim.addDepartureHandler(departureHandler) ;
 
 		// add one taxi:
-		AgentSource taxiCabSource = new AgentSource() {
+		AgentSource taxiDriverSource = new AgentSource() {
 			@Override
 			public List<MobsimAgent> insertAgentsIntoMobsim() {
 				List<MobsimAgent> agents = new ArrayList<MobsimAgent>() ;
 				
-				MobsimDriverAgent taxiagent = new TaxicabAgent(mobsim) ;
+				TaxicabAgent taxiagent = TaxicabAgent.insertTaxicabAgent(mobsim) ;
 				agents.add(taxiagent) ;
-				
-				// the vehicle needs to be parked before agentDeparture!!
-				VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-				VehicleImpl vehicle = new VehicleImpl(new IdImpl("taxiVehicle"), defaultVehicleType);
-				QVehicle veh = new QVehicleImpl(vehicle);
-				veh.setDriver(taxiagent); // this line is currently only
-															// needed for OTFVis to show
-															// parked vehicles
-				taxiagent.setVehicle(veh);
-
-
-				mobsim.parkVehicleOnInitialLink(taxiagent);
-				
-				mobsim.arrangeAgentDeparture(taxiagent) ;
+				mobsim.getEventsManager().addHandler(taxiagent) ;
 				
 				return agents ;
 			}
 		} ;
-		mobsim.addAgentSource(taxiCabSource) ;
+		mobsim.addAgentSource(taxiDriverSource) ;
 
 		// add the taxicab dispatcher:
 		Dispatcher dispatcher = new Dispatcher( mobsim.getEventsManager() ) ;
 		mobsim.getEventsManager().addHandler(dispatcher ) ;
 		
-		// commented out but we may need this later
-//		mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+		// I add this to have some specific reporting on the console.
+		mobsim.getEventsManager().addHandler( new MyEventsReporter() ) ;
 
 		return mobsim ;
 	}
