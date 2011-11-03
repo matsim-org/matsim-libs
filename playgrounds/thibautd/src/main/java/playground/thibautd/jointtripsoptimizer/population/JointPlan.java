@@ -136,7 +136,7 @@ public class JointPlan implements Plan {
 		// the same number in the same joint plan, the following legs are
 		// considered joint.
 		// This structure "accumulates" the legs to join during the construction,
-		// in order to be able to link all related genes.
+		// in order to be able to link all related legs.
 		Map<String, List<JointLeg>> toLink = new HashMap<String, List<JointLeg>>();
 		String actType;
 		String currentJointEpisodeId = null;
@@ -147,9 +147,7 @@ public class JointPlan implements Plan {
 		for (Map.Entry<Id, ? extends Plan> entry : plans.entrySet()) {
 			Id id = entry.getKey();
 			PlanImpl currentPlan = new PlanImpl(this.clique.getMembers().get(id));
-			//Plan currentImportedPlan = entry.getValue();
 
-			//for (PlanElement pe : currentImportedPlan.getPlanElements()) {
 			for (PlanElement pe : entry.getValue().getPlanElements()) {
 				if (pe instanceof Activity) {
 					//if (pe instanceof JointActivity) {
@@ -291,7 +289,7 @@ public class JointPlan implements Plan {
 		for (PlanElement pe : this.getPlanElements()) {
 			if (pe instanceof JointLeg) {
 				JointLeg leg = (JointLeg) pe;
-				leg.setJointPlan(this);
+				leg.setJointPlan( this );
 				JointLeg old = this.legsMap.put(leg.getId(), leg);
 
 				if (old != null) {
