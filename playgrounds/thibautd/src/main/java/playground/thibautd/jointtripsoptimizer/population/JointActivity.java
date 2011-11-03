@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 
 /**
- *
  * @author thibautd
  */
 public class JointActivity extends ActivityImpl implements Activity, JointActing {

@@ -197,19 +197,6 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		this.routeToCopy = true;
 	}
 
-	// impossible: super method is final!
-	//@Override
-	//public double getTravelTime() {
-	//	if (super.getTravelTime() == Time.UNDEFINED_TIME) {
-	//		try {
-	//			this.setTravelTime(this.getRoute().getTravelTime());
-	//		} catch (NullPointerException e) {
-	//			// this is normal before simulation: don't worry.
-	//		}
-	//	}
-	//	return super.getTravelTime();
-	//}
-
 	/*
 	 * =========================================================================
 	 * JointActing Methods
@@ -344,11 +331,6 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		return leg instanceof JointLeg &&
 			leg != null &&
 			this.legId.equals(((JointLeg) leg).legId);
-	}
-
-	@Override
-	public int hashCode() {
-		return this.legId.hashCode();
 	}
 
 	/*

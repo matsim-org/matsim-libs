@@ -20,42 +20,50 @@
 package playground.thibautd.jointtripsoptimizer.population;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Identifier for joint legs.
  * The idea behind the re-implementation of id types is allow easy check of the
  * identified object type.
- *
+ *  
  * @author thibautd
  */
 public class IdLeg implements Id {
 
-	private final IdImpl id;
+	private final long id;
 
-	public IdLeg(final long value) {
-		this.id = new IdImpl( value );
+	public IdLeg(long idValue) {
+		this.id = idValue;
 	}
 
+	public int compareTo(Id arg) {
+		try {
+			return (int) (this.id - ((IdLeg) arg).id);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("can only compare IdLeg with IdLeg instances");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Object#equals(Object)
+	 */
 	@Override
-	public boolean equals(final Object other) {
-		return id.equals(other);
+	public boolean equals(Object obj) {
+		try {
+			return this.id == ((IdLeg) obj).id;
+		} catch (ClassCastException e) {
+			return false;
+		}
 	}
 
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	@Override
-	public int compareTo(final Id other) {
-		return id.compareTo( other );
-	}
-
+	/**
+	 * {@inheritDoc}
+	 * @see Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return id.toString();
+		return String.valueOf(this.id);
 	}
-
 }
 

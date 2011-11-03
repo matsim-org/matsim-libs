@@ -20,7 +20,6 @@
 package playground.thibautd.jointtripsoptimizer.population;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Identifier for joint activities.
@@ -30,32 +29,40 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class IdActivity implements Id {
 
-	private final IdImpl id;
+	private final long id;
 
-	public IdActivity(final long value) {
-		this.id = new IdImpl( value );
+	public IdActivity(long idValue) {
+		this.id = idValue;
 	}
 
+	public int compareTo(Id arg) {
+		try {
+			return (int) (this.id - ((IdActivity) arg).id);
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException("can only compare IdActivity with IdActivity instances");
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Object#equals(Object)
+	 */
 	@Override
-	public boolean equals(final Object other) {
-		return (other instanceof IdActivity) && id.equals(other);
+	public boolean equals(Object obj) {
+		try {
+			return this.id == ((IdActivity) obj).id;
+		} catch (ClassCastException e) {
+			return false;
+		}
 	}
 
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	@Override
-	public int compareTo(final Id other) {
-		return id.compareTo( other );
-	}
-
+	/**
+	 * {@inheritDoc}
+	 * @see Object#toString()
+	 */
 	@Override
 	public String toString() {
-		return id.toString();
+		return String.valueOf(this.id);
 	}
-
-
 }
 
