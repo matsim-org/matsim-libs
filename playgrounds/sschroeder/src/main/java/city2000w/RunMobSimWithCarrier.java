@@ -84,12 +84,12 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 	}
 
 	public void notifyStartup(StartupEvent event) {
-		Collection<Carrier> carrierImpls = new ArrayList<Carrier>();
-		new CarrierPlanReader(new Carriers(carrierImpls)).read("../playgrounds/sschroeder/input/carrierPlans.xml");
+        Carriers carriers = new Carriers();
+        new CarrierPlanReader(carriers).read("../playgrounds/sschroeder/input/carrierPlans.xml");
 		PlanAlgorithm router = event.getControler().createRoutingAlgorithm();
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
-		carrierAgentTracker = new CarrierAgentTracker(carrierImpls, router, scenario.getNetwork(), agentFactory);
+		carrierAgentTracker = new CarrierAgentTracker(carriers, router, scenario.getNetwork(), agentFactory);
 		AnotherCity2000WMobsimFactory mobsimFactory = new AnotherCity2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);

@@ -85,7 +85,7 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 		
 		KarlsruheCarrierAgentFactory carrierAgentFactory = new KarlsruheCarrierAgentFactory(controler.createRoutingAlgorithm(), new CarrierDriverAgentFactoryImpl());
 		carrierAgentFactory.setNetwork(scenario.getNetwork());
-		carrierAgentTracker = new CarrierAgentTracker(carriers.getCarriers().values(), controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
+		carrierAgentTracker = new CarrierAgentTracker(carriers, controler.createRoutingAlgorithm(), scenario.getNetwork(), carrierAgentFactory);
 		
 		TSPAgentFactory tspAgentFactory = new KarlsruheTSPAgentFactory(new TransportChainAgentFactoryImpl());
 		tspAgentTracker = new TSPAgentTracker(transportServiceProviders.getTransportServiceProviders(),tspAgentFactory);
