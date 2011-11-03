@@ -23,6 +23,6 @@ import java.util.List;
 
 public interface AgentSource {
 
-    public List<MobsimAgent> insertAndGetAgents();
+    public List<MobsimAgent> insertAgentsIntoMobsim();
 
 }

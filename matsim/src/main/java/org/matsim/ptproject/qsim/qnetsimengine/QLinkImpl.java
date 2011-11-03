@@ -886,8 +886,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public void unregisterAdditionalAgentOnLink(MobsimAgent planAgent) {
-		this.additionalAgentsOnLink.remove(planAgent.getId());
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
+		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
 	@Override

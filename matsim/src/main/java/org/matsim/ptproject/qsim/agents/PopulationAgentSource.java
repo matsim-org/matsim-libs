@@ -38,7 +38,7 @@ public class PopulationAgentSource implements AgentSource {
     }
 
     @Override
-    public List<MobsimAgent> insertAndGetAgents() {
+    public List<MobsimAgent> insertAgentsIntoMobsim() {
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(p);

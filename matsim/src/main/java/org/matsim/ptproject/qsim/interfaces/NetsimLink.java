@@ -59,7 +59,7 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 	// while the visualization logic is link-based.  But it needs to be public as long as the network engine is a separate package. 
 	// kai, aug'10
 	public void registerAdditionalAgentOnLink(MobsimAgent planAgent);
-	public void unregisterAdditionalAgentOnLink(MobsimAgent planAgent);
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId);
 
 	
 	//	######################

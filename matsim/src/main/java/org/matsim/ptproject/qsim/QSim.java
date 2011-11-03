@@ -267,9 +267,15 @@ public class QSim implements VisMobsim, Netsim {
 	public void setAgentFactory(final AgentFactory fac) {
 		// not final since WithindayQSim overrides (essentially: disables) it.
 		// kai, nov'10
-		if (!locked && this.agentSources.size() == 1) {
-            this.agentSources.clear();
-			this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac));
+		if (!locked ) {
+			if ( this.agentSources.size() == 1) {
+				this.agentSources.clear();
+				this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac));
+			} else {
+				throw new RuntimeException("there is more than one AgentSource; cannot override the " +
+						"agent factory since the code " +
+						"would not know to which AgentSource this should refer to" ) ;
+			}
 		} else {
 			throw new RuntimeException(
 					"too late to set agent factory; aborting ...");
@@ -337,6 +343,8 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	private void createVehicles() {
+//		Logger.getLogger("").warn("entering createVehicles") ;
+
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl(
 				"defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
@@ -351,7 +359,7 @@ public class QSim implements VisMobsim, Netsim {
 
 	private void createAgents() {
         for (AgentSource agentSource : agentSources) {
-            agents.addAll(agentSource.insertAndGetAgents());
+            agents.addAll(agentSource.insertAgentsIntoMobsim());
         }
 	}
 
@@ -364,10 +372,12 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	private void parkVehicleOnInitialLink(MobsimAgent agent) {
+	public void parkVehicleOnInitialLink(MobsimAgent agent) {
+//		Logger.getLogger("").warn("entering parkVehicleOnInitialLink") ;
 		QVehicle veh = ((MobsimDriverAgent) agent).getVehicle();
 		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(agent.getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
+//		Logger.getLogger("").warn("adding vehId=" + veh.getId() + " on linkId=" + qlink.getLink().getId() + " for agId=" + agent.getId() ) ;
 	}
 
 	private void createAndAddDefaultVehicle(MobsimAgent agent,
@@ -386,6 +396,9 @@ public class QSim implements VisMobsim, Netsim {
 		((DriverAgent) agent).setVehicle(veh);
 		vehicles.put(veh.getId(), veh);
 	}
+
+	// ============================================================================================================================
+	// "cleanupSim":
 
 	/**
 	 * Close any files, etc.
@@ -611,7 +624,7 @@ public class QSim implements VisMobsim, Netsim {
 			Id linkId = agent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.unregisterAdditionalAgentOnLink(agent);
+			qLink.unregisterAdditionalAgentOnLink(agent.getId());
 			// }
 		}
 	}
@@ -627,7 +640,7 @@ public class QSim implements VisMobsim, Netsim {
 			Id linkId = planAgent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
-			qLink.unregisterAdditionalAgentOnLink(planAgent);
+			qLink.unregisterAdditionalAgentOnLink(planAgent.getId());
 		}
 	}
 
