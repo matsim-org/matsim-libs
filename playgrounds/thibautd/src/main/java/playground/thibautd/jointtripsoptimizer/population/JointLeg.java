@@ -333,6 +333,11 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 			this.legId.equals(((JointLeg) leg).legId);
 	}
 
+	@Override
+	public int hashCode() {
+		return this.legId.hashCode();
+	}
+
 	/*
 	 * =========================================================================
 	 * miscelaneous

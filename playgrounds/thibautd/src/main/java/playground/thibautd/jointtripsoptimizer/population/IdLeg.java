@@ -57,6 +57,11 @@ public class IdLeg implements Id {
 		}
 	}
 
+	@Override
+	public int hashCode() {
+		return (int) (id % Integer.MAX_VALUE);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @see Object#toString()
