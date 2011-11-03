@@ -18,7 +18,7 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.artemis.output.*;
 
-public class DumbCharger_Basic2020 implements ActivityStartEventHandler,ActivityEndEventHandler {
+public class DumbCharger_Basic2020 implements ActivityStartEventHandler,ActivityEndEventHandler, AgentArrivalEventHandler {
 
 	// TODO: also consider the garage parkings with higher chargings available
 	double chargingSpeedInWatt=3500;
@@ -29,6 +29,7 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 	private final HashMap<Id, VehicleTypeLAV> agentVehicleMapping;
 	private final EnergyConsumptionModelLAV_v1 energyConsumptionModel;
 	private ChargingLog chargingLog;
+	private HashMap<Id,String> previousLegMode;
 
 	public DumbCharger_Basic2020(HashMap<Id, VehicleSOC> agentSocMapping, HashMap<Id, VehicleTypeLAV> agentVehicleMapping, EnergyConsumptionModelLAV_v1 energyConsumptionModel) {
 		this.agentSocMapping = agentSocMapping;
@@ -43,6 +44,7 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 	public void reset(int iteration) {
 		actStartEvent=new HashMap<Id, ActivityStartEvent>();
 		endTimeOfFirstAct=new DoubleValueHashMap<Id>();
+		previousLegMode=new HashMap<Id, String>();
 	}
 
 	@Override
@@ -95,7 +97,7 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 	}
 
 	private boolean isRelevantForCharging(Id personId, String actType) {
-		return agentSocMapping.containsKey(personId) && actType.equalsIgnoreCase("home");
+		return agentSocMapping.containsKey(personId) && actType.equalsIgnoreCase("home") && previousLegMode.get(personId).equalsIgnoreCase("car");
 	}
 
 	public void performLastChargingOfDay(){
@@ -103,6 +105,11 @@ public class DumbCharger_Basic2020 implements ActivityStartEventHandler,Activity
 			Id personId = startEvent.getPersonId();
 			handleActEndEvent(endTimeOfFirstAct.get(personId),personId,startEvent.getActType(),startEvent.getLinkId());
 		}
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		previousLegMode.put(event.getLinkId(), event.getLegMode());
 	}
 
 }
