@@ -20,6 +20,7 @@
 package playground.thibautd.jointtripsoptimizer.population;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Identifier for joint legs.
@@ -30,40 +31,31 @@ import org.matsim.api.core.v01.Id;
  */
 public class IdLeg implements Id {
 
-	private final long id;
+	private final IdImpl id;
 
-	public IdLeg(long idValue) {
-		this.id = idValue;
+	public IdLeg(final long value) {
+		this.id = new IdImpl( value );
 	}
 
-	public int compareTo(Id arg) {
-		try {
-			return (int) (this.id - ((IdLeg) arg).id);
-		} catch (ClassCastException e) {
-			throw new IllegalArgumentException("can only compare IdLeg with IdLeg instances");
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @see Object#equals(Object)
-	 */
 	@Override
-	public boolean equals(Object obj) {
-		try {
-			return this.id == ((IdLeg) obj).id;
-		} catch (ClassCastException e) {
-			return false;
-		}
+	public boolean equals(final Object other) {
+		return id.equals(other);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @see Object#toString()
-	 */
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
+	public int compareTo(final Id other) {
+		return id.compareTo( other );
+	}
+
 	@Override
 	public String toString() {
-		return String.valueOf(this.id);
+		return id.toString();
 	}
+
 }
 

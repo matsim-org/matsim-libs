@@ -130,8 +130,6 @@ public class JointPlan implements Plan {
 			final boolean toSynchronize,
 			final ScoresAggregatorFactory aggregatorFactory) {
 		this.setAtIndividualLevel = addAtIndividualLevel;
-		PlanImpl currentPlan;
-		Plan currentImportedPlan;
 		this.clique = clique;
 
 		// in the plan file, pu activities are numbered. If two pick ups have
@@ -146,11 +144,13 @@ public class JointPlan implements Plan {
 		JointActivity currentActivity;
 
 		//TODO: check for consistency (referenced IDs, etc)
-		for (Id id: plans.keySet()) {
-			currentPlan = new PlanImpl(this.clique.getMembers().get(id));
-			currentImportedPlan = plans.get(id);
+		for (Map.Entry<Id, ? extends Plan> entry : plans.entrySet()) {
+			Id id = entry.getKey();
+			PlanImpl currentPlan = new PlanImpl(this.clique.getMembers().get(id));
+			//Plan currentImportedPlan = entry.getValue();
 
-			for (PlanElement pe : currentImportedPlan.getPlanElements()) {
+			//for (PlanElement pe : currentImportedPlan.getPlanElements()) {
+			for (PlanElement pe : entry.getValue().getPlanElements()) {
 				if (pe instanceof Activity) {
 					//if (pe instanceof JointActivity) {
 					//	currentActivity = (JointActivity) pe;
@@ -191,9 +191,14 @@ public class JointPlan implements Plan {
 					currentPlan.addLeg(currentLeg);
 				}
 			}
-			this.individualPlans.put(id, currentPlan);
 
-			currentPlan.setScore(currentImportedPlan.getScore());
+			if (this.individualPlans.put(id, currentPlan) != null) {
+				// normally impossible, as we iterate on a set, but we are
+				// never too sure...
+				throw new RuntimeException("id collision");
+			}
+
+			currentPlan.setScore(entry.getValue().getScore());
 
 			if (addAtIndividualLevel) {
 				this.clique.getMembers().get(id).addPlan(currentPlan);
@@ -218,7 +223,7 @@ public class JointPlan implements Plan {
 		this.individualPlanType = this.setIndividualPlanTypes();
 
 		if (toSynchronize) {
-			this.synchronize();
+			//this.synchronize();
 		}
 
 		this.aggregatorFactory = aggregatorFactory;
@@ -279,16 +284,17 @@ public class JointPlan implements Plan {
 	}
 
 	private void constructLegsMap() {
-		IdLeg currentLegId;
+		if (this.legsMap.size() > 0) {
+			throw new RuntimeException( "leg map not empty" );
+		}
 
-		this.legsMap.clear();
 		for (PlanElement pe : this.getPlanElements()) {
 			if (pe instanceof JointLeg) {
-				((JointLeg) pe).setJointPlan(this);
-				currentLegId = ((JointLeg) pe).getId();
-				if (!this.legsMap.keySet().contains(currentLegId)) {
-					this.legsMap.put(currentLegId, (JointLeg) pe);
-				} else {
+				JointLeg leg = (JointLeg) pe;
+				leg.setJointPlan(this);
+				JointLeg old = this.legsMap.put(leg.getId(), leg);
+
+				if (old != null) {
 					throw new IllegalArgumentException("duplicate id found during"
 							+" JointPlan construction");
 				}
@@ -484,12 +490,14 @@ public class JointPlan implements Plan {
 	 * Returns the a leg given its Id.
 	 * used to resolve links between joint legs.
 	 * for used in JointLeg only.
+	 *
+	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
 	 */
 	JointLeg getLegById(IdLeg legId) {
 		JointLeg leg = this.legsMap.get(legId);
 
 		if (leg == null) {
-			throw new RuntimeException("legs links could not be resolved");
+			throw new LinkedElementsResolutionException("legs links could not be resolved");
 		}
 
 		return leg;
@@ -636,6 +644,16 @@ public class JointPlan implements Plan {
 				sharedRide.setDepartureTime(
 						currentIndividualValues.now + pickUpDuration);
 			}
+		}
+	}
+
+	public static class LinkedElementsResolutionException extends RuntimeException {
+		public LinkedElementsResolutionException(final String msg) {
+			super(msg);
+		}
+
+		public LinkedElementsResolutionException(final String msg, final Throwable cause) {
+			super(msg, cause);
 		}
 	}
 }
