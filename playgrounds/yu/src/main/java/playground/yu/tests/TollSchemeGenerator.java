@@ -49,7 +49,7 @@ import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 
-import playground.dgrether.analysis.gis.ShapeFilePolygonWriter;
+import playground.yu.utils.qgis.ShapeFilePolygonWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
@@ -1279,8 +1279,8 @@ public class TollSchemeGenerator {
 	}
 
 	private void writeShapeFile(final NetworkImpl network, final Coord[] coords) {
-//		new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut
-//				+ "Network.shp");
+		// new ShapeFileNetworkWriter().writeNetwork(network, usedGisOut
+		// + "Network.shp");
 		new ShapeFilePolygonWriter().writePolygon(coords, usedGisOut
 				+ "MoutArea.shp");
 	}
@@ -1448,8 +1448,8 @@ public class TollSchemeGenerator {
 				/*
 				 * have to hack
 				 * 
-				 * NetworkImpl.getLinks() { return links;
-				 * // return Collections.unmodifiableMap(links);
+				 * NetworkImpl.getLinks() { return links; // return
+				 * Collections.unmodifiableMap(links);
 				 * 
 				 * }
 				 */
