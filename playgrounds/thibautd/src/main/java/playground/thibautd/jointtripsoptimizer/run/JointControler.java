@@ -22,6 +22,7 @@ package playground.thibautd.jointtripsoptimizer.run;
 import org.apache.log4j.Logger;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansScoring;
@@ -170,9 +171,13 @@ public class JointControler extends Controler {
 	@Override
 	protected void shutdown(final boolean unexpected) {
 		super.shutdown(unexpected);
-		PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
-		popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
-		//TODO: write
-		popWriter.write(this.getControlerIO().getOutputFilename(FILENAME_POPULATION));
+
+		ControlerIO io = getControlerIO();
+		if (io != null) {
+			PopulationWriter popWriter = new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges());
+			popWriter.setWriterHandler(new PopulationWithJointTripsWriterHandler(this.network,(this.getScenario()).getKnowledges()));
+
+			popWriter.write(io.getOutputFilename(FILENAME_POPULATION));
+		}
 	}
 }
