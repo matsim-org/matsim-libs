@@ -63,7 +63,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		}
 		
 		this.activityEndTime = 24000. ;
-		netsim.scheduleActivityEnd(this) ;
+		netsim.arrangeActivityStart(this) ;
 	}
 	
 	@Override

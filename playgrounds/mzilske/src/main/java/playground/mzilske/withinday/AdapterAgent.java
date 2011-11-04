@@ -88,7 +88,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 				public void startDoing(ActivityBehavior activityBehavior) {
 					AdapterAgent.this.activityBehavior = activityBehavior;
 					eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
-					simulation.scheduleActivityEnd(AdapterAgent.this);
+					simulation.arrangeActivityStart(AdapterAgent.this);
 				}
 				
 			};

@@ -158,7 +158,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 				TransitStopFacility stop = null ;
 				((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop.getId());
 				// after this, it needs to start something else, e.g.:
-				mobsim.scheduleActivityEnd(withindayAgent) ;
+				mobsim.arrangeActivityStart(withindayAgent) ;
 				// or
 				mobsim.arrangeAgentDeparture(withindayAgent) ;
 
