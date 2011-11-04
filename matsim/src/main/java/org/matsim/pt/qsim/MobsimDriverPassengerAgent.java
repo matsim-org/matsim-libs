@@ -29,6 +29,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
  *
  */
 public interface MobsimDriverPassengerAgent extends MobsimAgent, DriverAgent, PassengerAgent, MobsimDriverAgent, MobsimPassengerAgent {
-	// note: this needs the combined interfaces (currently: PersonDriverAgent) in addition to the atomistic interfaces
+	// note: this needs the combined interfaces (currently: MobsimDriverAgent) in addition to the atomistic interfaces
 	// because of "instanceof" conditions.  kai, nov'10
 }
