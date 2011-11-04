@@ -36,10 +36,10 @@ import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vehicles.VehiclesImpl;
 
 
 /**
@@ -77,7 +77,7 @@ public class VehicleGenerator {
 
 	@SuppressWarnings("static-access")
 	private Vehicles generateVehicles(Population population) {
-		Vehicles vehicles =  new VehiclesImpl();
+		Vehicles vehicles =  VehicleUtils.createVehiclesContainer();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
 
 		VehicleType vehicleType = vehicleFactory.createVehicleType(new IdImpl("Mercedes"));

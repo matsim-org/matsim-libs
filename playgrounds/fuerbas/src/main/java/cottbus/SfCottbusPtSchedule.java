@@ -50,11 +50,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vehicles.VehiclesFactoryImpl;
-import org.matsim.vehicles.VehiclesImpl;
 
 /**
  * @author fuerbas
@@ -92,7 +91,7 @@ public class SfCottbusPtSchedule {
 		this.schedule = this.schedulefactory.createTransitSchedule();
 		this.ptLinkList = new HashMap<Id, Id>(); //linkId und facilId
 		this.ptFacList = new ArrayList<Id>();
-		this.vehicles = new VehiclesImpl();
+		this.vehicles = VehicleUtils.createVehiclesContainer();
 		this.vehicles.getVehicleTypes().put(new IdImpl("tram_93pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("tram_93pax")));
 		this.vehicles.getVehicleTypes().put(new IdImpl("bus_90pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_90pax")));
 		this.vehicles.getVehicleTypes().put(new IdImpl("bus_64pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_64pax")));

@@ -53,9 +53,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 /**
  * @author Ihab
@@ -81,7 +81,7 @@ public class ScheduleVehiclesGenerator {
 	
 	TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	private TransitSchedule schedule = sf.createTransitSchedule();
-	Vehicles veh = new VehiclesImpl();
+	Vehicles veh = VehicleUtils.createVehiclesContainer();
 
 	public void createSchedule() throws IOException {
 			

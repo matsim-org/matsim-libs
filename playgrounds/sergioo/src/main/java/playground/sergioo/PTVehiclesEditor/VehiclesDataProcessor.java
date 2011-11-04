@@ -9,8 +9,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
@@ -21,15 +21,15 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import playground.sergioo.dataBase.DataBaseAdmin;
@@ -235,7 +235,7 @@ public class VehiclesDataProcessor {
 												vehicleType.setCapacity(vehicleCapacity);
 												result2 = dataBaseVehicles.executeQuery("SELECT * FROM pt_systems.Engines WHERE id="+result.getInt(7));
 												if(result2.next())
-													vehicleType.setEngineInformation( new EngineInformationImpl(FuelType.valueOf(result2.getString(2)), result2.getDouble(3)));
+													vehicleType.setEngineInformation( VehicleUtils.getFactory().createEngineInformation(FuelType.valueOf(result2.getString(2)), result2.getDouble(3)));
 												vehicleType.setDoorOperationMode(DoorOperationMode.valueOf(result.getString(8)));
 												vehicleType.setAccessTime(result.getDouble(10)/fraction);
 												vehicleType.setEgressTime(result.getDouble(11)/fraction);

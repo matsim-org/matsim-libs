@@ -41,9 +41,9 @@ import org.matsim.households.Income.IncomePeriod;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 import playground.mzilske.deteval.Case.Car;
 
@@ -85,7 +85,7 @@ public class GeneratePopulation {
 
 	private Households households = new HouseholdsImpl();
 
-	private Vehicles vehicles = new VehiclesImpl();
+	private Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 	private Map<Id, Person> persons = new HashMap<Id, Person>();
 

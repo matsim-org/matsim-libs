@@ -31,9 +31,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 public class SfTransitBuilder {
 
@@ -68,7 +68,7 @@ public class SfTransitBuilder {
 		TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = sf.createTransitSchedule();
 		
-		Vehicles veh = new VehiclesImpl();
+		Vehicles veh = VehicleUtils.createVehiclesContainer();
 				
 		Map<Id, List<Id>> linkListMap = new HashMap<Id, List<Id>>(); 
 		Map<Id, List<TransitRouteStop>> stopListMap = new HashMap<Id, List<TransitRouteStop>>();

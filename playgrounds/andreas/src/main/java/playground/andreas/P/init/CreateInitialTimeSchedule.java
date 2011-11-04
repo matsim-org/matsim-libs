@@ -52,10 +52,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vehicles.VehiclesImpl;
 
 @Deprecated
 public class CreateInitialTimeSchedule {
@@ -87,7 +87,7 @@ public class CreateInitialTimeSchedule {
 		this.net = sc.getNetwork();
 		
 		this.tS = CreateStops.createStops(this.net, gridDistance, minXY, maxXY);
-		this.veh = new VehiclesImpl();
+		this.veh = VehicleUtils.createVehiclesContainer();
 		this.numberOfAgents = numberOfAgents;
 	}
 

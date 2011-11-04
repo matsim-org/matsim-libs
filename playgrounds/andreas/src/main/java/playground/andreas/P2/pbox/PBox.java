@@ -42,9 +42,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.vehicles.VehiclesImpl;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.plan.PRouteProvider;
@@ -244,7 +244,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	 * @return Vehicles of paratranit
 	 */
 	public Vehicles getVehicles(){		
-		Vehicles vehicles = new VehiclesImpl();		
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("p"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();

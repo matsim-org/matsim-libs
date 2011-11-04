@@ -37,8 +37,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
@@ -102,7 +102,7 @@ public class EmissionTool {
 		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
 
 		// read the vehicle file
-		Vehicles vehicles = new VehiclesImpl();
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
 
