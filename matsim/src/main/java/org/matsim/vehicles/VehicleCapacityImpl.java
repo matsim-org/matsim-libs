@@ -29,6 +29,8 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	private Integer standingRoom = null;
 	private FreightCapacity freightCap = null;
 	
+	public VehicleCapacityImpl(){}
+	
 	@Override
 	public FreightCapacity getFreightCapacity() {
 		return freightCap;

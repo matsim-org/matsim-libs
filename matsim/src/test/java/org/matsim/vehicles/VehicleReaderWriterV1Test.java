@@ -41,7 +41,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
   private final Id id42_23 = new IdImpl(" 42  23"); //indeed this should be double blank in the middle but due to collapse this is only one blank
   
 	public void testBasicParser() {
-		Vehicles vehicles = new VehiclesImpl();
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		
@@ -55,7 +55,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 		
 		//read it
-		Vehicles vehicles = new VehiclesImpl();
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 		//write it
@@ -63,7 +63,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		writer.writeFile(outfileName);
 		assertTrue(new File(outfileName).exists()); 
 		//read it again
-		vehicles = new VehiclesImpl();
+		vehicles = VehicleUtils.createVehiclesContainer();
 		reader = new VehicleReaderV1(vehicles);
 		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
 		

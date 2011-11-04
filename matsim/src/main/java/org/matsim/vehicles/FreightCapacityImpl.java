@@ -21,11 +21,18 @@ package org.matsim.vehicles;
 
 
 /**
+ * deliberately non-public since there is an interface.  kai, nov'11
+ * 
  * @author dgrether
  */
-public class FreightCapacityImpl implements FreightCapacity {
+class FreightCapacityImpl implements FreightCapacity {
 
 	private double volume;
+	
+	/**
+	 * deliberately non-public since there is a factory.  kai, nov'11 
+	 */
+	FreightCapacityImpl(){}
 	
 	@Override
 	public void setVolume(double cubicMeters) {

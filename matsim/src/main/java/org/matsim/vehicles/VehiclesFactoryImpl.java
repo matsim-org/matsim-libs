@@ -23,12 +23,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
 /**
+ * deliberately non-public since there is an interface.  kai, nov'11
+ * 
  * @author dgrether
  */
-public class VehiclesFactoryImpl implements VehiclesFactory {
+class VehiclesFactoryImpl implements VehiclesFactory {
 
 
-	public VehiclesFactoryImpl() {
+	/**
+	 * deliberately non-public since there is a factory.  kai, nov'11
+	 */
+	VehiclesFactoryImpl() {
 	}
 
 	@Override

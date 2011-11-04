@@ -44,8 +44,8 @@ import org.matsim.lanes.LaneDefinitionsImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 
 /**
@@ -109,7 +109,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	protected void createVehicleContainer(){
-		this.vehicles = new VehiclesImpl();
+		this.vehicles = VehicleUtils.createVehiclesContainer();
 	}
 
 	protected void createHouseholdsContainer(){

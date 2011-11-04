@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * BasicVehiclesImpl
+ * project: matsim
+ * VehicleUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,48 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.vehicles;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-
-
 /**
- * @author dgrether
+ * @author nagel
  *
  */
-class VehiclesImpl implements Vehicles {
-	
-	private Map<Id, VehicleType> vehicleTypes;
-	private LinkedHashMap<Id, Vehicle> vehicles;
-	private VehiclesFactoryImpl builder;
+public class VehicleUtils {
 
-	/**
-	 * deliberately non-public since there is a factory.  kai, nov'11
-	 */
-	VehiclesImpl(){
-		this.vehicleTypes = new LinkedHashMap<Id, VehicleType>();
-		this.builder = new VehiclesFactoryImpl() ;
-		this.vehicles = new LinkedHashMap<Id, Vehicle>();
-	}
-	
-	
-	@Override
-	public VehiclesFactory getFactory() {
-		return this.builder;
+	public static VehiclesFactory getFactory() {
+		return new VehiclesFactoryImpl();
 	}
 
-	@Override
-	public Map<Id, Vehicle> getVehicles() {
-		return this.vehicles;
-	}
-
-
-	@Override
-	public Map<Id, VehicleType> getVehicleTypes() {
-		return this.vehicleTypes;
+	public static Vehicles createVehiclesContainer() {
+		return new VehiclesImpl();
 	}
 
 }
