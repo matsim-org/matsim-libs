@@ -236,9 +236,7 @@ public class QSim implements VisMobsim, Netsim {
 		double time = this.simTimer.getTimeOfDay();
 		while (doContinue) {
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
-//			beforeSimStep();
 			doContinue = doSimStep(time);
-//			afterSimStep();
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (doContinue) {
 				time = this.simTimer.incrementTime();
@@ -327,24 +325,17 @@ public class QSim implements VisMobsim, Netsim {
 			this.snapshotTime += this.snapshotPeriod;
 		}
 
-		this.changeEventsEngine = new NetworkChangeEventsEngine(this); // yyyy
-																		// do
-																		// much
-																		// earlier
-		if (this.changeEventsEngine != null) { // yyyy do earlier
+		this.changeEventsEngine = new NetworkChangeEventsEngine(this);
+		if (this.changeEventsEngine != null) {
 			this.changeEventsEngine.onPrepareSim();
 		}
 	}
 
 	protected void createAdditionalAgents() {
-
 		// Empty for inheritance. (only one test)
-
 	}
 
 	private void createVehicles() {
-//		Logger.getLogger("").warn("entering createVehicles") ;
-
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl(
 				"defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
@@ -372,12 +363,10 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	public void parkVehicleOnInitialLink(MobsimAgent agent) {
-//		Logger.getLogger("").warn("entering parkVehicleOnInitialLink") ;
+	private void parkVehicleOnInitialLink(MobsimAgent agent) {
 		QVehicle veh = ((MobsimDriverAgent) agent).getVehicle();
 		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(agent.getCurrentLinkId());
 		qlink.addParkedVehicle(veh);
-//		Logger.getLogger("").warn("adding vehId=" + veh.getId() + " on linkId=" + qlink.getLink().getId() + " for agId=" + agent.getId() ) ;
 	}
 
 	private void createAndAddDefaultVehicle(MobsimAgent agent,
@@ -452,11 +441,6 @@ public class QSim implements VisMobsim, Netsim {
 		// if they are nowhere else referenced
 	}
 
-//	protected void beforeSimStep() {
-//		// left empty for inheritance; for experimentation only (for production
-//		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
-//	}
-
 	/**
 	 * Do one step of the simulation run.
 	 * 
@@ -499,12 +483,7 @@ public class QSim implements VisMobsim, Netsim {
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
-//	protected void afterSimStep() {
-//		// left empty for inheritance; for experimentation only (for production
-//		// use MobsimListeners, or become a regular SimEngine). kai, oct'10
-//	}
-
-	protected final void handleTeleportationArrivals() {
+	private final void handleTeleportationArrivals() {
 		double now = this.getSimTimer().getTimeOfDay();
 		while (this.teleportationList.peek() != null) {
 			Tuple<Double, MobsimAgent> entry = this.teleportationList.peek();
@@ -529,7 +508,7 @@ public class QSim implements VisMobsim, Netsim {
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public final void scheduleActivityEnd(final MobsimAgent agent) {
+	public final void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 		registerAgentAtActivityLocation(agent);
 	}

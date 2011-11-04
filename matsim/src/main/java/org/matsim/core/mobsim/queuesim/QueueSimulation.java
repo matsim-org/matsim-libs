@@ -432,7 +432,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
 	@Override
-	public void scheduleActivityEnd(final MobsimAgent agent) {
+	public void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 

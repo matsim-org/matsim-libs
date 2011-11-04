@@ -23,8 +23,9 @@ package org.matsim.core.mobsim.framework;
 import org.matsim.api.core.v01.Id;
 
 /**
+ * This was separated out since there were some commonalities between "MobsimAgent" and "DriverAgent".
+ * 
  * @author nagel
- *
  */
 public interface NetworkAgent extends MobsimAgentMarkerInterface {
 	

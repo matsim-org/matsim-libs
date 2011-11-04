@@ -532,7 +532,7 @@ public class TransitQueueSimulationTest {
 			NetsimLink qlink = this.getNetsimNetwork().getNetsimLink(this.driver.getCurrentLeg().getRoute().getStartLinkId());
 			qlink.addParkedVehicle(veh);
 
-			this.scheduleActivityEnd(this.driver);
+			this.arrangeActivityStart(this.driver);
 			this.getAgentCounter().incLiving();
 		}
 	}

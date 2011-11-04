@@ -180,7 +180,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
 		// would not need to be exposed at all.  kai, may'10
 
-		this.qSim.scheduleActivityEnd(driver);
+		this.qSim.arrangeActivityStart(driver);
 		this.qSim.getAgentCounter().incLiving();
 		return driver;
 	}
@@ -204,7 +204,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
 					// would not need to be exposed at all.  kai, may'10
 					qlink.addParkedVehicle(veh);
-					this.qSim.scheduleActivityEnd(driver);
+					this.qSim.arrangeActivityStart(driver);
 					this.qSim.getAgentCounter().incLiving();
 					drivers.add(driver);
 				}

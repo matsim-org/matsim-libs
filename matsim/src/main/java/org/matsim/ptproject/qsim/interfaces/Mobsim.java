@@ -100,7 +100,7 @@ public interface Mobsim extends ObservableSimulation {
 	 * 
 	 * @param planAgent
 	 */
-	void scheduleActivityEnd(MobsimAgent planAgent);
+	void arrangeActivityStart(MobsimAgent planAgent);
 
 	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
 	 * 

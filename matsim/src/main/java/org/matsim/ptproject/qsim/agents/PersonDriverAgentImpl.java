@@ -98,7 +98,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			this.currentLinkId = firstAct.getLinkId();
 			if ((actEndTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 				this.activityEndTime = actEndTime ;
-				this.simulation.scheduleActivityEnd(this);
+				this.simulation.arrangeActivityStart(this);
 				this.simulation.getAgentCounter().incLiving();
 			}
 		}
@@ -153,7 +153,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.scheduleActivityEnd(this);
+				this.simulation.arrangeActivityStart(this);
 				return true ;
 			} else {
 				// this is the last activity
