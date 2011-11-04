@@ -25,15 +25,21 @@ public class SpatialGridFillOrder {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		network2SpatialGrid(createNetworkNr2());
+		network2SpatialGrid(createNetwork());
+	}
 
-		NetworkImpl network = createNetwork();
+	/**
+	 * @param network
+	 */
+	private static void network2SpatialGrid(NetworkImpl network) {
 		NetworkBoundary nb = UtilityCollection.getNetworkBoundary(network);
 		
 		double xmin = nb.getMinX();
 		double xmax = nb.getMaxX();
 		double ymin = nb.getMinY();
 		double ymax = nb.getMaxY();
-		int res = 300;
+		int res = 100;
 		int counter = 0;
 		GeometryFactory factory = new GeometryFactory();
 		
@@ -53,16 +59,16 @@ public class SpatialGridFillOrder {
 			io.addNode( node );			
 		}
 		// determine centroid and nearest node
-		for(double x = grid.getXmin(); x < grid.getXmax(); x += res){
-			for(double y = grid.getYmin(); y < grid.getYmax(); y += res){
+		for(double x = grid.getXmin(); x <= grid.getXmax(); x += res){
+			for(double y = grid.getYmin(); y <= grid.getYmax(); y += res){
 				
-				Coord centroid = new CoordImpl(x + (res/2) -1, y + (res/2) - 1);
+				Coord centroid = new CoordImpl(x + (res/2), y + (res/2));
 				Node nearestNode = network.getNearestNode( centroid );
 				
-				if(grid.getValue(factory.createPoint( new Coordinate(centroid.getX(), centroid.getY()))) == null)
-					grid.setValue(new Interpolation(), factory.createPoint(new Coordinate(centroid.getX(), centroid.getY())) );
+				if(grid.getValue(factory.createPoint( new Coordinate(x, y))) == null)
+					grid.setValue(new Interpolation(), factory.createPoint(new Coordinate(x, y)) );
 				
-				Interpolation io = grid.getValue(factory.createPoint(new Coordinate(centroid.getX(), centroid.getY())));
+				Interpolation io = grid.getValue(factory.createPoint(new Coordinate(x, y)));
 				io.setID(counter++);
 				io.setSquareCentroid(centroid, nearestNode);
 			}
@@ -102,7 +108,7 @@ public class SpatialGridFillOrder {
 		Node node4 = network.createAndAddNode(new IdImpl(4), scenario.createCoord(1000, 100));
 		Node node5 = network.createAndAddNode(new IdImpl(5), scenario.createCoord(1200, 100));
 		Node node6 = network.createAndAddNode(new IdImpl(6), scenario.createCoord(1200, -100));
-		Node node7 = network.createAndAddNode(new IdImpl(7), scenario.createCoord(1000, 100));
+		Node node7 = network.createAndAddNode(new IdImpl(7), scenario.createCoord(1000, -100));
 		
 		// add links (bi-directional)
 		network.createAndAddLink(new IdImpl(1), node1, node2, 1000, freespeed, capacity, numLanes);
@@ -119,6 +125,52 @@ public class SpatialGridFillOrder {
 		network.createAndAddLink(new IdImpl(12), node7, node6, 200, freespeed, capacity, numLanes);
 		network.createAndAddLink(new IdImpl(13), node7, node2, 100, freespeed, capacity, numLanes);
 		network.createAndAddLink(new IdImpl(14), node2, node7, 100, freespeed, capacity, numLanes);
+		
+		System.out.println("... done!");
+		return network;
+	}
+	
+	private static NetworkImpl createNetworkNr2() {
+		
+		/*
+		 * (2)		(5)			
+		 * 	|		 |			
+		 * 	|		 |		  	
+		 * (1)------(4)------(7)
+		 * 	|		 |	
+		 * 	|		 |	
+		 * (3)		(6)	
+		 */
+		double freespeed = 13.8888889;	// this is m/s and corresponds to 50km/h
+		double capacity = 500.;
+		double numLanes = 1.;
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		NetworkImpl network = scenario.getNetwork();
+		
+		// add nodes
+		Node node1 = network.createAndAddNode(new IdImpl(1), scenario.createCoord(0, 100));
+		Node node2 = network.createAndAddNode(new IdImpl(2), scenario.createCoord(0, 200));
+		Node node3 = network.createAndAddNode(new IdImpl(3), scenario.createCoord(0, 0));
+		Node node4 = network.createAndAddNode(new IdImpl(4), scenario.createCoord(100, 100));
+		Node node5 = network.createAndAddNode(new IdImpl(5), scenario.createCoord(100, 200));
+		Node node6 = network.createAndAddNode(new IdImpl(6), scenario.createCoord(100, 0));
+		Node node7 = network.createAndAddNode(new IdImpl(7), scenario.createCoord(200, 100));
+		
+		// add links (bi-directional)
+		network.createAndAddLink(new IdImpl(1), node1, node2, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(2), node2, node1, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(3), node1, node3, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(4), node3, node1, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(5), node1, node4, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(6), node4, node1, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(7), node4, node5, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(8), node5, node4, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(9), node4, node6, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(10), node6, node4, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(11), node4, node7, 100, freespeed, capacity, numLanes);
+		network.createAndAddLink(new IdImpl(12), node7, node4, 100, freespeed, capacity, numLanes);
 		
 		System.out.println("... done!");
 		return network;

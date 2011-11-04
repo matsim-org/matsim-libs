@@ -197,6 +197,7 @@ public class Constants {
 	
 	/** Spatial IDs and spatial conversion factors */
 	public static final int SRID_WASHINGTON_NORTH = 2926;// srid 2285 also worked, but was last updated in 2001 instead of 2007
+	public static final int SRID_SWIZERLAND = -1;
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	

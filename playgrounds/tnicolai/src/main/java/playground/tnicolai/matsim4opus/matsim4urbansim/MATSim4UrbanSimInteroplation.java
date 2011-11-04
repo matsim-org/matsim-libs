@@ -27,7 +27,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	
 	// resolution
 	private static int resolution = -1;
-	// job sample
+	// job sample (default 100%)
 	private static double jobSample = 1.;
 
 	/**
@@ -114,16 +114,16 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 			io.addNode( node );			
 		}
 		// determine centroid and nearest node
-		for(double x = grid.getXmin(); x < grid.getXmax(); x += grid.getResolution()){
-			for(double y = grid.getYmin(); y < grid.getYmax(); y += grid.getResolution()){
+		for(double x = grid.getXmin(); x <= grid.getXmax(); x += resolution){
+			for(double y = grid.getYmin(); y <= grid.getYmax(); y += resolution){
 				
-				Coord centroid = new CoordImpl(x + (grid.getResolution()/2) -1, y + (grid.getResolution()/2) - 1);
+				Coord centroid = new CoordImpl(x + (resolution/2), y + (resolution/2));
 				Node nearestNode = network.getNearestNode( centroid );
 				
-				if(grid.getValue(factory.createPoint( new Coordinate(centroid.getX(), centroid.getY()))) == null)
-					grid.setValue(new SquareLayer(), factory.createPoint(new Coordinate(centroid.getX(), centroid.getY())) );
+				if(grid.getValue(factory.createPoint( new Coordinate(x, y))) == null)
+					grid.setValue(new SquareLayer(), factory.createPoint(new Coordinate(x, y)) );
 				
-				SquareLayer io = grid.getValue(factory.createPoint(new Coordinate(centroid.getX(), centroid.getY())));
+				SquareLayer io = grid.getValue(factory.createPoint(new Coordinate(x, y)));
 				io.setSquareCentroid(centroid, nearestNode);
 			}
 		}		

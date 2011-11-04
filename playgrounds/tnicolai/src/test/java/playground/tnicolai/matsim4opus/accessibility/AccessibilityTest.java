@@ -178,7 +178,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		Node node4 = network.createAndAddNode(new IdImpl(4), this.scenario.createCoord(1000, 100));
 		Node node5 = network.createAndAddNode(new IdImpl(5), this.scenario.createCoord(1200, 100));
 		Node node6 = network.createAndAddNode(new IdImpl(6), this.scenario.createCoord(1200, -100));
-		Node node7 = network.createAndAddNode(new IdImpl(7), this.scenario.createCoord(1000, 100));
+		Node node7 = network.createAndAddNode(new IdImpl(7), this.scenario.createCoord(1000, -100));
 		
 		// add links (bi-directional)
 		network.createAndAddLink(new IdImpl(1), node1, node2, 1000, freespeed, capacity, numLanes);
