@@ -24,12 +24,12 @@ package org.matsim.vehicles;
  * 
  * @author dgrether
  */
-class EngineInformationImpl implements EngineInformation {
+public class EngineInformationImpl implements EngineInformation {
 
 	private FuelType fuelType;
 	private double gasConsumption;
 	
-	EngineInformationImpl(FuelType fueltype, double literPerMeter) {
+	public EngineInformationImpl(FuelType fueltype, double literPerMeter) {
 		this.setFuelType(fueltype);
 		this.setGasConsumption(literPerMeter);
 	}
