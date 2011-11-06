@@ -22,8 +22,11 @@ package org.matsim.ptproject.qsim.interfaces;
 import org.matsim.core.mobsim.framework.Steppable;
 
 /**
- * @author dgrether
- * @TODO rename QSimEngine to QSimNetworkEngine and this to QSimEngine
+ * Design thoughs:<ul>
+ * <li> This is an engine that is plugged into the Mobsim.  Thus the name.  Does not have to be a Mobsim itself.  kai, nov'11
+ * </ul>
+ * 
+ * @author dgrether, nagel
  */
 public interface MobsimEngine extends Steppable {
   /**
