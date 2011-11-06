@@ -47,8 +47,6 @@ public interface DriverAgent extends NetworkAgent {
 
 	/**
 	 * notifies the agent that it was moved over the node
-	 * @deprecated the argument list of this method should be sort out, suggestion add node id as parameter dg/kn jf oct. 2010
-	 * Probably also or better (new)linkId.  kai, jun'11
 	 */
 	@Deprecated
 	public void notifyMoveOverNode(Id newLinkId);
