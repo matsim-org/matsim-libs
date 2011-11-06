@@ -22,6 +22,11 @@ package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
 
+/**
+ * Design thoughts:<ul>
+ * <li> yyyy This should (also) extend from VehicleEvent.  I think this was also decided at Lenzen'11.  kai, nov'11
+ * </ul>
+ */
 public interface LinkEvent extends PersonEvent {
 
 	public Id getLinkId();
