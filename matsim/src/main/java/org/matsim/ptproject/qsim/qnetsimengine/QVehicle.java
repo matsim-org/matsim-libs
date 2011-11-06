@@ -42,12 +42,17 @@ public interface QVehicle extends Identifiable, VisVehicle, QItem {
 	 * <li> yy I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to 
 	 * figure out of a visualizer should make a vehicle "green" or "red".  But green or red should be related to 
 	 * vehicle speed, and the mobsim should figure that out, not the visualizer.  So something like "getCurrentSpeed" 
-	 * seems to be a more useful option. kai, nov'11 
+	 * seems to be a more useful option. kai, nov'11
+	 * <li> But also see comment under setLinkEnterTime().  kai, nov'11 
 	 * </ul>
 	 */
 	public double getLinkEnterTime();
 	
+	/**Design thoughts:<ul>
+	 * <li> This has to remain public as long as QVehicle/QVehicleImpl is both used by QueueSimulation and QSim.  At best,
+	 * we could say that there should also be a MobsimVehicle interface that is reduced.  kai, nov'11.
+	 * </ul>
+	 */
 	public void setLinkEnterTime(final double time);
-	// yy not sure if this needs to be publicly exposed
 
 }
