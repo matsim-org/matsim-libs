@@ -20,10 +20,20 @@
 
 package org.matsim.ptproject.qsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -52,21 +62,32 @@ import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.helpers.MobsimTimer;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.*;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
-
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * Implementation of a queue-based transport simulation. Lanes and SignalSystems
@@ -250,8 +271,6 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	// ============================================================================================================================
-	// "prepareSim":
-
 	// setters that should reasonably be called between constructor and
 	// "prepareSim" (triggered by "run"):
 
@@ -280,6 +299,7 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
+	// ============================================================================================================================
 	// prepareSim and related:
 
 	/**
@@ -336,12 +356,12 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	private void createVehicles() {
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl(
-				"defaultVehicleType"));
+		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(new IdImpl("defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
 			if (agent instanceof MobsimDriverAgent) {
 				createAndAddDefaultVehicle(agent, defaultVehicleType);
-				parkVehicleOnInitialLink(agent);
+				parkVehicleOnInitialLink(((MobsimDriverAgent) agent).getVehicle(), 
+						agent.getCurrentLinkId());
 			}
 		}
 	}
@@ -363,9 +383,13 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	private void parkVehicleOnInitialLink(MobsimAgent agent) {
-		QVehicle veh = ((MobsimDriverAgent) agent).getVehicle();
-		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(agent.getCurrentLinkId());
+	/**
+	 * Design thoughs:<ul>
+	 * <li> This method may become public so that plug-ins can insert vehicles.  kai, nov'11
+	 * </ul>
+	 */
+	private void parkVehicleOnInitialLink( QVehicle veh, Id linkId ) {
+		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 		qlink.addParkedVehicle(veh);
 	}
 
@@ -377,7 +401,7 @@ public class QSim implements VisMobsim, Netsim {
 			log.warn(Gbl.ONLYONCE);
 			vehWrnCnt++;
 		}
-		VehicleImpl vehicle = new VehicleImpl(agent.getId(), defaultVehicleType);
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), defaultVehicleType);
 		veh = new QVehicleImpl(vehicle);
 		veh.setDriver((MobsimDriverAgent) agent); // this line is currently only
 													// needed for OTFVis to show
@@ -470,11 +494,15 @@ public class QSim implements VisMobsim, Netsim {
 			this.multiModalEngine.doSimStep(time);
 		}
 
+		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.doSimStep(time);
 		}
 
+		// console printout:
 		this.printSimLog(time);
+		
+		// snapshots:
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
 			doSnapshot(time);
