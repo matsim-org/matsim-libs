@@ -1,26 +1,26 @@
-package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.geometries;
+package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle;
 
 
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class CCWPolygon {
 
-	private final Polygon geometry;
 	private final Coordinate[] ring;
-
-	private final GeometryFactory geofac = new GeometryFactory();
 	private final Coordinate[] reflectedRing;
 
 	public CCWPolygon(Coordinate [] coords, Coordinate refCoord) {
 		Coordinate [] ccw = getCCWRing(coords);
-
-		this.geometry = this.geofac.createPolygon(this.geofac.createLinearRing(ccw), null);
 		this.ring = ccw;
-
 		this.reflectedRing = getReflectedRing(ccw, refCoord);
+	}
+
+	public void translate(double dx, double dy) {
+		for (int i = 0; i < this.ring.length-1; i++) {
+			Coordinate c = this.ring[i];
+			c.x += dx;
+			c.y += dy;
+		}
 	}
 
 	private Coordinate[] getReflectedRing(Coordinate[] ccw, Coordinate refCoord) {
@@ -30,10 +30,6 @@ public class CCWPolygon {
 			ret[i]= new Coordinate(-(c.x - refCoord.x),-(c.y - refCoord.y));
 		}
 		return getCCWRing(ret);
-	}
-
-	public Polygon getCCWPolygon() {
-		return this.geometry;
 	}
 
 	public Coordinate [] getCCWRing() {

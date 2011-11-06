@@ -55,6 +55,7 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.Collision
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
 
@@ -109,6 +110,9 @@ public class PhysicalFloor implements Floor {
 	 */
 	public void init() {
 		calculateEnvelope();
+
+		//for testing!!
+		this.dynamicForceModules.add(new VelocityObstacleForce(this));
 
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -213,7 +217,9 @@ public class PhysicalFloor implements Floor {
 		double vy = f.getVy();
 
 
-		Coordinate newPos = new Coordinate(oldPos.x + f.getVx()* this.sim2DTimeStepSize, oldPos.y + f.getVy()* this.sim2DTimeStepSize, 0);
+		double dx = f.getVx()* this.sim2DTimeStepSize;
+		double dy = f.getVy()* this.sim2DTimeStepSize;
+		Coordinate newPos = new Coordinate(oldPos.x + dx, oldPos.y + dy, 0);
 
 		agent.setCurrentVelocity(vx,vy);
 
@@ -228,7 +234,7 @@ public class PhysicalFloor implements Floor {
 
 		}
 
-		agent.moveToPostion(newPos);
+		agent.translate(dx,dy);
 
 		if (this.emitXYZAzimuthEvents) {
 			XYVxVyEvent e = new XYVxVyEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);

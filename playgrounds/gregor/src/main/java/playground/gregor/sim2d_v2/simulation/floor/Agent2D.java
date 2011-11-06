@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -46,6 +47,8 @@ public class Agent2D  {
 	public static final double AGENT_WEIGHT = 80;// * 1000;
 	public static final double AGENT_DIAMETER = 0.50;
 
+	private CCWPolygon geometry;
+
 	/**
 	 * @param p
 	 * @param sim2d
@@ -58,6 +61,27 @@ public class Agent2D  {
 		this.desiredVelocity = 1.34; //+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
 		this.currentDesiredVelocity = this.desiredVelocity;
 
+		initGeometry();
+
+	}
+
+	private void initGeometry() {
+		//create agentGeometry
+		int numOfParts = 5;
+		double agentRadius = AGENT_DIAMETER / 2;
+
+		Coordinate[] c = new Coordinate[numOfParts + 1];
+		double angle = Math.PI * 2 / numOfParts;
+		for(int i = 0; i <numOfParts; i++){
+			c[i] = new Coordinate(agentRadius * Math.cos(angle * i), agentRadius * Math.sin(angle * i));
+		}
+		c[numOfParts] = c[0];
+		this.geometry = new CCWPolygon(c, new Coordinate(0,0));
+
+	}
+
+	public CCWPolygon getGeometry(){
+		return this.geometry;
 	}
 
 	/**
@@ -69,6 +93,7 @@ public class Agent2D  {
 
 	public void setPostion(Coordinate pos) {
 		this.currentPosition = pos;
+		this.geometry.translate(pos.x, pos.y);
 	}
 
 	public Force getForce() {
@@ -78,9 +103,17 @@ public class Agent2D  {
 	/**
 	 * @param newPos
 	 */
+	@Deprecated //use translate instead!
 	public void moveToPostion(Coordinate newPos) {
 		// TODO check for choose next link and so on ...
 		this.currentPosition.setCoordinate(newPos);
+	}
+
+	public void translate(double dx, double dy) {
+		this.currentPosition.x += dx;
+		this.currentPosition.y += dy;
+		this.geometry.translate(dx, dy);
+
 	}
 
 	/**
@@ -130,11 +163,6 @@ public class Agent2D  {
 		return this.pda.chooseNextLinkId();
 	}
 
-	// /**
-	// * @return
-	// */
-	// public double getWeight() {
-	// return this.agentWeight;
-	// }
+
 
 }
