@@ -442,17 +442,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		return this.activityEndTime;
 	}
 
-//	private void setDepartureTime(final double seconds) {
-//		this.activityDepartureTime = seconds;
-//	}
-
 	@Override
 	public final Id getCurrentLinkId() {
 		// note: the method is really only defined for DriverAgent!  kai, oct'10
 		return this.currentLinkId;
 	}
 
-//	@Override
 	protected Leg getCurrentLeg() {
 		// used by TransitAgent.  IMO, should go into same package so we can make this package-private.  kai, jun'11
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
@@ -493,15 +488,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		return ((NetworkRoute)route).getVehicleId() ;
 	}
 
-//	@Override
-//	public final Activity getCurrentActivity() {
-//		PlanElement currentPlanElement = this.getCurrentPlanElement();
-//		if (!(currentPlanElement instanceof Activity)) {
-//			return null;
-//		}
-//		return (Activity) currentPlanElement;
-//	}
-
 	@Override
 	public final Id getDestinationLinkId() {
 		return this.cachedDestinationLinkId;
@@ -516,16 +502,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	public final Id getId() {
 		return this.person.getId();
 	}
-
-	/*
-	 *  Might be merged with getExecutedPlan().
-	 *  Seems to be used only by getCurrentPlanElement() - trying to replace it with
-	 *  calls to getExecutedPlan().
-	 *  cdobler, feb'11
-	 */
-//	public final Plan getPlan() {
-//		return PopulationUtils.unmodifiablePlan( this.person.getSelectedPlan() ) ;
-//	}
 
 	@Override
 	public Plan getSelectedPlan() {
