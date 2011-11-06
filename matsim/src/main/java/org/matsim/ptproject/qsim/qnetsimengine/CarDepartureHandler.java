@@ -80,6 +80,8 @@ class CarDepartureHandler implements DepartureHandler {
 				vehicle = findVehicle(vehicleId);
 				teleportVehicleTo(vehicle, linkId);
 				qlink.letAgentDepartWithVehicle(agent, vehicle, now);
+				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
+				// logic.  kai, nov'11)
 			} else if (vehicleBehavior == VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG) {
 				// While we are waiting for our car
 				qlink.registerAdditionalAgentOnLink(agent);
@@ -91,6 +93,14 @@ class CarDepartureHandler implements DepartureHandler {
 		}
 	}
 
+	/**
+	 * Design thoughs:<ul>
+	 * <li> yyyyyy It is not completely clear what happens when the vehicle is used by someone else. kai, nov'11
+	 * <li> Seems to me that a parked vehicle is teleported. kai, nov'11
+	 * <li> yyyyyy Seems to me that a non-parked vehicle will end up with two references to it, with race conditions???? kai, nov11
+	 * <li> yyyyyy Note that the "linkId" parameter is not used for any physical action!!
+	 * </ul> 
+	 */
 	private void teleportVehicleTo(QVehicleImpl vehicle, Id linkId) {
 		if (vehicle.getCurrentLink() != null) {
 			if (cntTeleportVehicle < 9) {
