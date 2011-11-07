@@ -27,7 +27,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 public class PlansSampler {
 	private final static Logger log = Logger.getLogger(PlansSampler.class);	

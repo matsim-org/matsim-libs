@@ -23,7 +23,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.PtConstants;
 
 import playground.andreas.P2.helper.PConfigGroup;

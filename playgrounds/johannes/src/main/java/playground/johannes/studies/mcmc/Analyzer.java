@@ -22,9 +22,9 @@ package playground.johannes.studies.mcmc;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.johannes.sna.graph.analysis.GraphAnalyzer;
 import playground.johannes.socialnetworks.graph.analysis.AnalyzerTaskArray;

@@ -43,13 +43,13 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 public class BuildingsZHCreator {
@@ -98,7 +98,7 @@ public class BuildingsZHCreator {
 	 * network and have no capacities set.
 	 */
 	public BuildingsZHCreator() throws Exception {
-		config = ConfigUtils.createConfig();	
+		config = ConfigUtils.createConfig();
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	}
 	

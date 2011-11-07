@@ -20,8 +20,8 @@
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 class Main {
 
@@ -29,7 +29,7 @@ class Main {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig( "examples/tutorial/singleIteration.xml" ) ;
+			config = ConfigUtils.loadConfig("examples/tutorial/singleIteration.xml") ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}

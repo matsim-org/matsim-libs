@@ -27,11 +27,8 @@ import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import playground.dgrether.utils.DgConfigCleaner;
-
 
 
 public class DgConfigCleanerTest {

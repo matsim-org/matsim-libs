@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 
 public class MyControler1 {

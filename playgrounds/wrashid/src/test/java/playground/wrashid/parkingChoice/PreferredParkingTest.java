@@ -9,14 +9,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
-import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
-import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class PreferredParkingTest extends TestCase {

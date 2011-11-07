@@ -37,8 +37,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.OTFVis;
 
 import playground.mmoyo.utils.DataLoader;

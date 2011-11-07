@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.Feature;
-import org.geotools.feature.FeatureTypeFactory;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Scenario;
@@ -20,7 +19,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 

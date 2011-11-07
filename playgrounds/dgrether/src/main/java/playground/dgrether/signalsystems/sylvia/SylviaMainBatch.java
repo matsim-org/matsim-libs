@@ -30,10 +30,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;

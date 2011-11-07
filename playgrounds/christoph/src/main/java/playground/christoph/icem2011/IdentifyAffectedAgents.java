@@ -44,7 +44,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveEventHandler, 

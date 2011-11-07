@@ -11,7 +11,6 @@ import org.matsim.core.config.*;
 import org.matsim.core.network.*;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.*;
-import org.matsim.core.utils.misc.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
@@ -24,7 +23,6 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.visualization.*;
-import playground.michalm.vrp.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.supply.*;

@@ -28,20 +28,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.jfree.chart.plot.XYPlot;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 
-import playground.thibautd.analysis.joinabletripsidentifier.DataPloter;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;

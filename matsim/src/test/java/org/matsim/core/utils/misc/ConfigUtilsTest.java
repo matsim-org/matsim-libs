@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author mrieser

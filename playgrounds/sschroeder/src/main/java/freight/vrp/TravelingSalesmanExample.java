@@ -15,7 +15,7 @@ import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.matrices.Matrix;
 import vrp.api.Costs;
 import vrp.api.Node;

@@ -39,7 +39,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.droeder.Analysis.Trips.AbstractAnalysisTripSet;
 import playground.droeder.Analysis.Trips.travelTime.TTAnalysisTripSet;

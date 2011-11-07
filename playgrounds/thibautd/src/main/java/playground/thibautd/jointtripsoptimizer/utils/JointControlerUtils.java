@@ -26,7 +26,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.thibautd.jointtripsoptimizer.population.CliquesXmlReader;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsReader;

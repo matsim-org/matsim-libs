@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.controller;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.evacuation.config.EvacuationConfigGroup;
-import org.matsim.contrib.evacuation.socialcost.SocialCostCalculatorSingleLink;
 import org.matsim.contrib.evacuation.socialcost.SocialCostCalculatorSingleLinkII;
 import org.matsim.contrib.evacuation.travelcosts.PluggableTravelCostCalculator;
 import org.matsim.core.config.Config;
@@ -36,7 +35,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;

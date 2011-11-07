@@ -55,7 +55,7 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.vis.kml.KMZWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

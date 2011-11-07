@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.HomeLocationFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;

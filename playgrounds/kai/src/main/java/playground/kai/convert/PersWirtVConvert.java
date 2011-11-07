@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +51,7 @@ public class PersWirtVConvert {
 	
 	public static void main(String[] args) {
 		
-		Config config = org.matsim.core.utils.misc.ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig() ;
 		Scenario sc = org.matsim.core.scenario.ScenarioUtils.createScenario(config) ;
 		Population pop = sc.getPopulation() ;
 		

@@ -16,10 +16,9 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.yu.replanning.StrategyManagerWithRemoveOldestPlan;
 import playground.yu.replanning.StrategyManagerWithRemoveOldestPlan;
 
 /**

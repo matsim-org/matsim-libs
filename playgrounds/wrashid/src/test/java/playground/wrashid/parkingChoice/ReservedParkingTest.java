@@ -4,13 +4,11 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
-import org.matsim.api.core.v01.Coord;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;

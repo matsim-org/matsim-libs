@@ -3,9 +3,9 @@ package playground.wrashid.parkingChoice;
 import java.util.LinkedList;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -28,7 +28,7 @@ public class ParkingModuleTest extends TestCase {
 	
 	private double walkingDistanceFor3CarScenarioWithVariableParkingCapacity(int parkingCapacity) {
 		ParkingChoiceLib.isTestCaseRun=true;
-		Config config=ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+		Config config= ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure

@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -24,7 +25,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 
 import playground.yu.utils.charts.StackedBarChart;

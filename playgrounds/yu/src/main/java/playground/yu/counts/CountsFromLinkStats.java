@@ -1,3 +1,31 @@
+/*
+ *  *********************************************************************** *
+ *  * project: org.matsim.*
+ *  * ${file_name}
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  * copyright       : (C) ${year} by the members listed in the COPYING,        *
+ *  *                   LICENSE and WARRANTY file.                            *
+ *  * email           : info at matsim dot org                                *
+ *  *                                                                         *
+ *  * *********************************************************************** *
+ *  *                                                                         *
+ *  *   This program is free software; you can redistribute it and/or modify  *
+ *  *   it under the terms of the GNU General Public License as published by  *
+ *  *   the Free Software Foundation; either version 2 of the License, or     *
+ *  *   (at your option) any later version.                                   *
+ *  *   See also COPYING, LICENSE and WARRANTY file                           *
+ *  *                                                                         *
+ *  * ***********************************************************************
+ *
+ * ${filecomment}
+ * ${package_declaration}
+ *
+ * ${typecomment}
+ * ${type_declaration}
+ */
+
 package playground.yu.counts;
 
 import java.util.Collection;
@@ -5,9 +33,9 @@ import java.util.Map;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;

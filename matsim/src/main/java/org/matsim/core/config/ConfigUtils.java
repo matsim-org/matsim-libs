@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.utils.misc;
+package org.matsim.core.config;
 
 import java.io.File;
 

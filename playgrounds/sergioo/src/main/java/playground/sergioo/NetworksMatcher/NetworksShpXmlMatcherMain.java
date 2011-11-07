@@ -21,7 +21,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;

@@ -31,7 +31,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 

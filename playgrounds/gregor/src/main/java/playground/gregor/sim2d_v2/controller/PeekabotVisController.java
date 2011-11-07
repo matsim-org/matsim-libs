@@ -7,7 +7,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
 import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;

@@ -1,10 +1,7 @@
 package playground.andreas.utils.net;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -15,9 +12,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.run.NetworkCleaner;
-import org.xml.sax.SAXException;
 
 
 public class OSM2MATSim {

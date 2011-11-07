@@ -16,7 +16,6 @@ import org.matsim.core.router.costcalculators.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.trafficmonitoring.*;
-import org.matsim.core.utils.misc.*;
 import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.*;
 

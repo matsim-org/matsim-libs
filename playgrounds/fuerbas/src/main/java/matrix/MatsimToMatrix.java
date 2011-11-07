@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 import playground.johannes.sna.graph.matrix.AdjacencyMatrix;
 import playground.johannes.socialnetworks.graph.matrix.EdgeCostFunction;

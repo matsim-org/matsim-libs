@@ -20,25 +20,13 @@
 
 package playground.balmermi;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkAdaptLength;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
-
-import playground.balmermi.modules.NetworkDoubleLinks;
 
 public class CleanNetwork {
 

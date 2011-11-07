@@ -14,7 +14,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 public class MyEquilAdapter {
 	private static final Logger log = Logger.getLogger(MyEquilAdapter.class);

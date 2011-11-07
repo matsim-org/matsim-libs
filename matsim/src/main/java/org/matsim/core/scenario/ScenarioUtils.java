@@ -2,7 +2,6 @@ package org.matsim.core.scenario;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 
 /**
@@ -27,7 +26,7 @@ public class ScenarioUtils {
 	 *
 	 * @param config A {@link Config} object, must not be <code>null</code>
 	 *
-	 * @see ConfigUtils#createConfig()
+	 * @see org.matsim.core.config.ConfigUtils#createConfig()
 	 */
 	public static Scenario createScenario(final Config config) {
 		if (config == null) {

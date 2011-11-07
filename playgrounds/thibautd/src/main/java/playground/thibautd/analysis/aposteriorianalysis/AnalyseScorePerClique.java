@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 /**
  * runs an analysis of the score per clique size

@@ -21,15 +21,14 @@
 package org.matsim.testcases;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 @Ignore
 public class MatsimTestCase extends TestCase {

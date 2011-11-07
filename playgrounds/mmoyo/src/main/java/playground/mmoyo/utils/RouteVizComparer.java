@@ -21,14 +21,13 @@
 package playground.mmoyo.utils;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.run.OTFVis;
 
 public class RouteVizComparer {

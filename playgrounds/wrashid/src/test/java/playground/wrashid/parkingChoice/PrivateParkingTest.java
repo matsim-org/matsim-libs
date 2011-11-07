@@ -6,9 +6,9 @@ import junit.framework.TestCase;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
@@ -31,7 +31,7 @@ public class PrivateParkingTest extends TestCase {
 	
 	private double walkingDistanceFor3CarScenarioWithVariableParkingCapacity(int parkingCapacity) {
 		ParkingChoiceLib.isTestCaseRun=true;
-		Config config=ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
+		Config config= ConfigUtils.loadConfig("test/input/playground/wrashid/parkingChoice/chessConfig.xml");
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure

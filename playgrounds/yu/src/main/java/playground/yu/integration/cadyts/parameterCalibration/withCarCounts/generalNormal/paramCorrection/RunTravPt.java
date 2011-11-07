@@ -25,7 +25,7 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gene
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 
 /**
  * starts tests with different initial betaTravelingPt values.

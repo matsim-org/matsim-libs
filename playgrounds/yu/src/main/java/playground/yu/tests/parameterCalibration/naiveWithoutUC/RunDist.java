@@ -24,8 +24,8 @@
 package playground.yu.tests.parameterCalibration.naiveWithoutUC;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 /**
  * tries to observes log-likelihood values with different parameter

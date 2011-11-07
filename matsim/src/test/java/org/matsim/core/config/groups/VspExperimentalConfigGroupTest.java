@@ -21,7 +21,7 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class VspExperimentalConfigGroupTest extends MatsimTestCase {
@@ -30,7 +30,7 @@ public class VspExperimentalConfigGroupTest extends MatsimTestCase {
 
 	public void testVspConfigGroup() {
 		
-		VspExperimentalConfigGroup vspConfig = ConfigUtils.createConfig().vspExperimental() ; 
+		VspExperimentalConfigGroup vspConfig = ConfigUtils.createConfig().vspExperimental() ;
 			
 		vspConfig.setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.WARN) ;
 		// this should (just) produce warning messages:

@@ -6,6 +6,7 @@ import java.util.*;
 import javax.naming.*;
 import javax.xml.parsers.*;
 
+import org.matsim.core.config.ConfigUtils;
 import playground.michalm.demand.Zone.Act;
 import playground.michalm.demand.Zone.Group;
 
@@ -17,7 +18,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.utils.geometry.geotools.*;
-import org.matsim.core.utils.misc.*;
 import org.xml.sax.*;
 
 import cern.jet.random.*;

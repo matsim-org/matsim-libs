@@ -1,18 +1,17 @@
 package playground.demandde.pendlermatrix;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 import playground.mzilske.pipeline.PopulationReaderTask;
 import playground.mzilske.pipeline.PopulationWriterTask;
