@@ -35,7 +35,11 @@ import org.matsim.core.utils.collections.Tuple;
 
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
+import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
+import playground.johannes.coopsim.eval.ActivityEvaluator;
 import playground.johannes.coopsim.eval.EvalEngine;
+import playground.johannes.coopsim.eval.JointActivityEvaluator;
+import playground.johannes.coopsim.eval.LegEvaluator;
 import playground.johannes.coopsim.mental.MentalEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -232,6 +236,11 @@ public class SimEngine {
 			plans.add(v.getPerson().getPerson().getSelectedPlan());
 		}
 
+		ActivityEvaluator.startLogging();
+		LegEvaluator.startLogging();
+		JointActivityEvaluator.startLogging();
+		ActivityDurationEvaluator.startLogging();
+		
 		trajectoryBuilder.reset(iter);
 		physicalEngine.run(plans, eventsManager);
 

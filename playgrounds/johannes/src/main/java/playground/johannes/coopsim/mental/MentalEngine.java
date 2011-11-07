@@ -54,6 +54,8 @@ public class MentalEngine {
 	
 	private double piSum;
 	
+	private double totalPiSum;
+	
 	public MentalEngine(SocialGraph graph, ChoiceSelector choiceSelector, Choice2ModAdaptor adaptor, Random random) {
 		this.choiceSelector = choiceSelector;
 		this.random = random;
@@ -128,6 +130,7 @@ public class MentalEngine {
 		double pi = 1 / (1 + Math.exp(delta));
 
 		piSum += pi;
+		totalPiSum += pi;
 		/*
 		 * accept/reject
 		 */
@@ -170,5 +173,13 @@ public class MentalEngine {
 	public void clearStatistics() {
 		acceptedStates = 0;
 		piSum = 0;
+	}
+	
+	public double getTotalPiSum() {
+		return totalPiSum;
+	}
+	
+	public void cleatTotalPiSum() {
+		totalPiSum = 0;
 	}
 }

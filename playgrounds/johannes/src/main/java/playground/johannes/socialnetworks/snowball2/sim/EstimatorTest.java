@@ -61,6 +61,7 @@ import playground.johannes.sna.snowball.analysis.SimplePiEstimator;
 import playground.johannes.sna.snowball.sim.Sampler;
 import playground.johannes.sna.snowball.sim.SamplerListener;
 import playground.johannes.socialnetworks.snowball2.sim.deprecated.NormalizedEstimator;
+import playground.johannes.studies.snowball.SnowballSim;
 
 
 /**
@@ -616,7 +617,7 @@ public class EstimatorTest implements SamplerListener {
 	public static void main(String args[]) throws IOException {
 		final String MODULE_NAME = "estimatortest";
 		
-		Config config = Loader.loadConfig(args[0]);
+		Config config = SnowballSim.loadConfig(args[0]);
 		
 		SparseGraphMLReader reader = new SparseGraphMLReader();
 		Graph graph = reader.readGraph(config.getParam(MODULE_NAME, "graphfile"));

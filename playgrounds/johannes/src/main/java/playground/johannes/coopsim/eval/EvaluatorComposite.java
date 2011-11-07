@@ -41,8 +41,11 @@ public class EvaluatorComposite extends Composite<Evaluator> implements Evaluato
 		
 		if(Double.isInfinite(score))
 			logger.debug("Infinite score.");
-		else if (Double.isNaN(score))
-			throw new IllegalArgumentException("NaN is not a valid score.");
+		else if (Double.isNaN(score)) {
+			logger.warn("*** Score is NaN! Treating like negative infinity. ***");
+			return Double.NEGATIVE_INFINITY;
+		}
+//			throw new IllegalArgumentException("NaN is not a valid score.");
 		
 		return score;
 	}

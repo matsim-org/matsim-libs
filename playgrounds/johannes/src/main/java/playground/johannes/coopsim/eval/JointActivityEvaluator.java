@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Person;
 
 import playground.johannes.coopsim.pysical.Trajectory;
@@ -45,6 +46,10 @@ public class JointActivityEvaluator implements Evaluator {
 	
 	private final Map<Person, List<Person>> alters;
 	
+	private static boolean isLogging;
+	
+	private static DescriptiveStatistics stats;
+	
 	public JointActivityEvaluator(double beta, VisitorTracker tracker, SocialGraph graph) {
 		this.beta = beta;
 		this.tracker = tracker;
@@ -63,14 +68,29 @@ public class JointActivityEvaluator implements Evaluator {
 	
 	@Override
 	public double evaluate(Trajectory trajectory) {
+		double score = 0;
 		double time = 0;
-//		SocialVertex ego = vertices.get(trajectory.getPerson());
-		
-//		for(SocialVertex alter : ego.getNeighbours()) {
-//			time += tracker.timeOverlap(trajectory.getPerson(), alter.getPerson().getPerson());
-//		}
+
 		time = tracker.timeOverlap(trajectory.getPerson(), alters.get(trajectory.getPerson()));
-		return time * beta;
+		if(time >= 1)
+			score = Math.log(time) * beta;
+		else
+			score = 0;
+		
+		if(isLogging)
+			stats.addValue(score);
+		
+		return score;
+	}
+	
+	public static void startLogging() {
+		stats = new DescriptiveStatistics();
+		isLogging = true;
+	}
+	
+	public static DescriptiveStatistics stopLogging() {
+		isLogging = false;
+		return stats;
 	}
 
 }

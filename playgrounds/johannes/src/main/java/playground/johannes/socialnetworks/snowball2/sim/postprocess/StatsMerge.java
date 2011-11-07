@@ -128,7 +128,8 @@ public class StatsMerge {
 				/*
 				 * Open the stats.txt file.
 				 */
-				String path = String.format("%1$s/%2$s/statistics.txt", dumpDir.getAbsolutePath(), analyzerKey);
+//				String path = String.format("%1$s/%2$s/statistics.txt", dumpDir.getAbsolutePath(), analyzerKey);
+				String path = String.format("%1$s/%2$s/stats.txt", dumpDir.getAbsolutePath(), analyzerKey);
 				File file = new File(path);
 				if (file.exists()) {
 					BufferedReader reader = new BufferedReader(new FileReader(file));

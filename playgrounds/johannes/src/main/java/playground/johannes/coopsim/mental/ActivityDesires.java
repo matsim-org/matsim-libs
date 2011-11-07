@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointActivityScoring.java
+ * ActivityDesires.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,59 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.coopsim.eval;
+package playground.johannes.coopsim.mental;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scoring.interfaces.BasicScoring;
-
-import playground.johannes.coopsim.pysical.VisitorTracker;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-
+import org.matsim.population.Desires;
 
 /**
  * @author illenberger
  *
  */
-public class JointActivityScoring implements BasicScoring {
+public class ActivityDesires extends Desires {
 
-	private final SocialVertex ego;
+	private final Map<String, Double> startTimes;
 	
-	private final Set<Person> alters;
-	
-	private final VisitorTracker tracker;
-	
-	private final double beta;
-	
-	private double score;
-	
-	public JointActivityScoring(SocialVertex ego, VisitorTracker tracker, double beta) {
-		this.ego = ego;
-		this.tracker = tracker;
-		this.beta = beta;
-		
-		alters = new HashSet<Person>();
-		for(SocialVertex alter : ego.getNeighbours())
-			alters.add(alter.getPerson().getPerson());
+	public ActivityDesires() {
+		super(null);
+		startTimes = new HashMap<String, Double>();
 	}
 	
-	@Override
-	public void finish() {
-		double time = tracker.timeOverlap(ego.getPerson().getPerson(), alters);
-		if(time >= 1)
-			score = Math.log(time) * beta;
-		
+	public void putActivityStartTime(String type, Double time) {
+		startTimes.put(type, time);
 	}
-
-	@Override
-	public double getScore() {
-		return score;
-	}
-
-	@Override
-	public void reset() {
+	
+	public Double getActivityStartTime(String type) {
+		return startTimes.get(type);
 	}
 
 }

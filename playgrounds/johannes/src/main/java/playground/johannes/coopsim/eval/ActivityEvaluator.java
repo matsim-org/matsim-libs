@@ -21,10 +21,12 @@ package playground.johannes.coopsim.eval;
 
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.population.Desires;
 
+import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
@@ -43,11 +45,15 @@ public class ActivityEvaluator implements Evaluator {
 
 	private final double beta;
 
-	private final Map<Person, Desires> desires;
+	private final Map<Person, ActivityDesires> desires;
 
 	private final Map<String, Double> priorities;
 
-	public ActivityEvaluator(double beta, Map<Person, Desires> desires, Map<String, Double> priorities) {
+	private static boolean isLogging;
+	
+	private static DescriptiveStatistics stats;
+	
+	public ActivityEvaluator(double beta, Map<Person, ActivityDesires> desires, Map<String, Double> priorities) {
 		this.beta = beta;
 		this.desires = desires;
 		this.priorities = priorities;
@@ -61,11 +67,32 @@ public class ActivityEvaluator implements Evaluator {
 
 			if (act.getType().equals(IDLE)) {
 				score += IDLE_PENALTY;
-			} else if(!act.getType().equals(HOME)) {
+			} else {// if(!act.getType().equals(HOME)) {
 				double t = trajectory.getTransitions().get(i + 1) - trajectory.getTransitions().get(i);
 
-				double t_star = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
-
+				ActivityDesires desire = desires.get(trajectory.getPerson());
+				double t_star = desire.getActivityDuration(act.getType());
+				
+				if (act.getType().equals(HOME)) {
+					String lType = ((Activity) trajectory.getElements().get(2)).getType();
+					if (lType.equals(IDLE))
+						t_star = 14400; // arbitrary
+					else {
+						double t_start = desire.getActivityStartTime(lType);
+						double t_dur = desire.getActivityDuration(lType);
+								
+						if (i == 0) {
+							t_star = t_start;
+						} else if(i == 4) {
+							t_star = 86400 - (t_start + t_dur);
+						} else {
+							throw new RuntimeException("Not a starting or ending home activity!");
+						}
+						
+						t_star = Math.max(t_star, 1);
+					}
+				}
+				
 				double priority = getPriority(act.getType());
 
 				double t_zero = t_star * Math.exp(SCALE / (t_star * priority * beta));
@@ -76,6 +103,11 @@ public class ActivityEvaluator implements Evaluator {
 			}
 		}
 
+		
+		
+		if(isLogging)
+			stats.addValue(score);
+		
 		return score;
 	}
 
@@ -83,4 +115,13 @@ public class ActivityEvaluator implements Evaluator {
 		return priorities.get(type);
 	}
 
+	public static void startLogging() {
+		stats = new DescriptiveStatistics();
+		isLogging = true;
+	}
+	
+	public static DescriptiveStatistics stopLogging() {
+		isLogging = false;
+		return stats;
+	}
 }

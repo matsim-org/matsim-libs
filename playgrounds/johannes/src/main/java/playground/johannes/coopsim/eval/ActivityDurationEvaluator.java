@@ -21,10 +21,11 @@ package playground.johannes.coopsim.eval;
 
 import java.util.Map;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.population.Desires;
 
+import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
@@ -37,9 +38,13 @@ public class ActivityDurationEvaluator implements Evaluator {
 	
 	private final double beta;
 	
-	private final Map<Person, Desires> desires;
+	private final Map<Person, ActivityDesires> desires;
 	
-	public ActivityDurationEvaluator(double beta, Map<Person, Desires> desires) {
+	private static boolean isLogging;
+	
+	private static DescriptiveStatistics stats;
+	
+	public ActivityDurationEvaluator(double beta, Map<Person, ActivityDesires> desires) {
 		this.beta = beta;
 		this.desires = desires;
 	}
@@ -50,20 +55,32 @@ public class ActivityDurationEvaluator implements Evaluator {
 		for(int i = 0; i < trajectory.getElements().size(); i += 2) {
 			Activity act = (Activity)trajectory.getElements().get(i);
 			
-			if(!act.getType().equals(HOME)) {
+			if(!act.getType().equals(HOME) && !act.getType().equals("idle")) {
 				double duration = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
 				double desiredDuration = desires.get(trajectory.getPerson()).getActivityDuration(act.getType());
 				
 				double frac = duration / desiredDuration;
 				if(frac > 1) {
-					score -= Math.exp(beta * (frac - 1));
+					score -= beta * Math.exp(frac - 1);
 				} else if (frac < 1) {
-					score -= Math.exp(beta * (1/frac - 1));
+					score -= beta * Math.exp(1/frac - 1);
 				}
 			}
 		}
 		
+		if(isLogging)
+			stats.addValue(score);
+		
 		return score;
 	}
 
+	public static void startLogging() {
+		stats = new DescriptiveStatistics();
+		isLogging = true;
+	}
+	
+	public static DescriptiveStatistics stopLogging() {
+		isLogging = false;
+		return stats;
+	}
 }

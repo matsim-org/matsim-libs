@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+
 import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
@@ -28,6 +30,10 @@ import playground.johannes.coopsim.pysical.Trajectory;
 public class LegEvaluator implements Evaluator {
 
 	private final double beta;
+	
+	private static boolean isLogging;
+	
+	private static DescriptiveStatistics stats;
 	
 	public LegEvaluator(double beta) {
 		this.beta = beta;
@@ -40,7 +46,21 @@ public class LegEvaluator implements Evaluator {
 			double t = trajectory.getTransitions().get(i+1) - trajectory.getTransitions().get(i);
 			score += beta * t;
 		}
+		
+		if(isLogging)
+			stats.addValue(score);
+		
 		return score;
+	}
+
+	public static void startLogging() {
+		stats = new DescriptiveStatistics();
+		isLogging = true;
+	}
+	
+	public static DescriptiveStatistics stopLogging() {
+		isLogging = false;
+		return stats;
 	}
 
 }
