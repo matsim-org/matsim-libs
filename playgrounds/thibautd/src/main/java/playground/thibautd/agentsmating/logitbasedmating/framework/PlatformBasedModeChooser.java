@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.framework;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PersonImpl;
 
 /**
  * The core class of the logit-based matings framework.
@@ -45,15 +50,22 @@ import org.matsim.api.core.v01.population.Population;
  * @author thibautd
  */
 public class PlatformBasedModeChooser {
+	private static final Log log =
+		LogFactory.getLog(PlatformBasedModeChooser.class);
+
 	private MatingPlatform platform = null;
 	private ChoiceModel model = null;
 	private CliquesConstructor cliquesConstructor = null;
+	private ComprehensiveChoiceModel dayLevelChoiceModel =
+		new ComprehensiveChoiceModel();
 
 	private Population population = null;
 
 	private Map<Id, List<Id>> cliques = null;
 
 	private boolean isChanged = false;
+
+	private boolean useSubtourChoiceRestriction = true;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// public: getters and setters
@@ -115,6 +127,11 @@ public class PlatformBasedModeChooser {
 	 */
 	public void setChoiceModel(final ChoiceModel model) {
 		this.model = model;
+
+		if (dayLevelChoiceModel != null) {
+			dayLevelChoiceModel.setTripLevelChoiceModel( model );
+		}
+
 		isChanged = true;
 	}
 
@@ -126,6 +143,21 @@ public class PlatformBasedModeChooser {
 		isChanged = true;
 	}
 
+	public void setIsSubtourRestricted(final boolean isSubtourRestricted) {
+		if (isSubtourRestricted && dayLevelChoiceModel == null) {
+			dayLevelChoiceModel = new ComprehensiveChoiceModel();
+			dayLevelChoiceModel.setTripLevelChoiceModel( model );
+			isChanged = true;
+		}
+		else if (!isSubtourRestricted) {
+			dayLevelChoiceModel = null;
+			isChanged = true;
+		}
+	}
+
+	public boolean getIsSubtourrestricted() {
+		return dayLevelChoiceModel != null;
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// public: process data methods
@@ -133,6 +165,15 @@ public class PlatformBasedModeChooser {
 	public void process() {
 		if (!isChanged) return;
 		checkProcessingState();
+		boolean logRemoval = true;
+		boolean logPersonImpl = true;
+
+		if ( useSubtourChoiceRestriction ) {
+			log.info( "mode choice is made taking into account tour structure" );
+		}
+		else {
+			log.info( "mode choice is made at the trip level" );
+		}
 
 		for (Person person : population.getPersons().values()) {
 			DecisionMaker decisionMaker;
@@ -143,30 +184,30 @@ public class PlatformBasedModeChooser {
 				continue;
 			}
 
-			// TODO: check if other plans
 			Plan plan = person.getSelectedPlan();
-			List<PlanElement> planElements = plan.getPlanElements();
 
-			int count = 0;
-			for (PlanElement element : planElements) {
-				if (element instanceof Leg) {
-					List<Alternative> choiceSet = 
-						getChoiceSetFactory().createChoiceSet(
-								decisionMaker,
-								plan,
-								count);
-					Alternative choice = model.performChoice(decisionMaker, choiceSet);
+			if (person instanceof PersonImpl) {
+				((PersonImpl) person).removeUnselectedPlans();
 
-					if (choice instanceof TripRequest) {
-						platform.handleRequest((TripRequest) choice);	
-					}
-					else {
-						((Leg) element).setMode(choice.getMode());
-					}
+				if (logRemoval) {
+					log.warn( "Found at least one person with several plans: "+
+							"only selected plan is kept." );
+					logRemoval = false;
 				}
-
-				count++;
 			}
+			else if (logPersonImpl) {
+				log.warn( "Found at least one Person not beeing a PersonImpl "+
+						"instance. Unselected Plans will be kept, but not modified!" );
+				logPersonImpl = false;
+			}
+
+			if (useSubtourChoiceRestriction) {
+				performTourLevelChoice( decisionMaker , plan );
+			}
+			else {
+				performTripLevelChoice( decisionMaker , plan );
+			}
+
 		}
 
 		List<Mating> matings = platform.getMatings();
@@ -191,6 +232,52 @@ public class PlatformBasedModeChooser {
 				(cliquesConstructor == null) ||
 				(population == null) ) {
 			throw new IllegalStateException("Calling processing methods before all components are set.");
+		}
+	}
+
+	private void performTripLevelChoice(
+			final DecisionMaker decisionMaker,
+			final Plan plan) {
+		List<PlanElement> planElements = plan.getPlanElements();
+
+		int count = 0;
+		for (PlanElement element : planElements) {
+			if (element instanceof Leg) {
+				List<Alternative> choiceSet = 
+					getChoiceSetFactory().createChoiceSet(
+							decisionMaker,
+							plan,
+							count);
+				Alternative choice = model.performChoice(decisionMaker, choiceSet);
+
+				if (choice instanceof TripRequest) {
+					platform.handleRequest((TripRequest) choice);	
+				}
+				else {
+					((Leg) element).setMode(choice.getMode());
+				}
+			}
+
+			count++;
+		}
+	}
+
+	private void performTourLevelChoice(
+			final DecisionMaker decisionMaker,
+			final Plan plan) {
+		List<Alternative> choices = dayLevelChoiceModel.performChoice( decisionMaker , plan );
+
+		Iterator<PlanElement> planElements = plan.getPlanElements().iterator();
+		for ( Alternative choice : choices ) {
+			PlanElement element = planElements.next();
+			while ( !(element instanceof Leg) ) element = planElements.next();
+
+			if (choice instanceof TripRequest) {
+				platform.handleRequest((TripRequest) choice);	
+			}
+			else {
+				((Leg) element).setMode(choice.getMode());
+			}
 		}
 	}
 }
