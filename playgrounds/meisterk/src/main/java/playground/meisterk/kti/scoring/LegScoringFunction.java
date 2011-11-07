@@ -20,6 +20,8 @@
 
 package playground.meisterk.kti.scoring;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
@@ -27,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -60,6 +63,20 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private Plan plan;
 
+	/*
+	 * This is a workaround that became necessary after the switch to score events and
+	 * not plans (autumn '11, see e.g. EventsToScore, EventsToLegs). There, dummy legs
+	 * are created from the occurring events. However, this does not work for pt trips
+	 * because the scoring function needs some additional information which is not
+	 * provided in the events. Therefore, we get the route information for pt trips
+	 * still from the plan.
+	 * Please note that this will cause problems when using within-day replanning!
+	 *  
+	 * cdobler, Nov'11
+	 */
+	private List<Leg> legs;
+	private int legIndex;
+	
 	private final static Logger log = Logger.getLogger(LegScoringFunction.class);
 
 	public LegScoringFunction(Plan plan,
@@ -71,11 +88,17 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.plansCalcRouteConfigGroup = config.plansCalcRoute();
 		this.plan = plan;
+		
+		legs = new ArrayList<Leg>();
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) legs.add((Leg) planElement);
+		}
+		legIndex = 0;
 	}
 
 	@Override
 	protected double calcLegScore(double departureTime, double arrivalTime, Leg leg) {
-
+		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // traveltime in seconds
 
@@ -94,8 +117,13 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
 
-			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
-
+			/*
+			 * If its a pt route, we have to get the route from the plan because
+			 * EventsToLegs creates a GenericRoute and not a KtiPtRoute.
+			 */
+			KtiPtRoute ktiPtRoute = (KtiPtRoute) legs.get(legIndex).getRoute();
+//			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
+			
 			if (ktiPtRoute.getFromStop() != null) {
 
 //				String nanoMsg = "Scoring kti pt:\t";
@@ -154,7 +182,9 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 
 		}
-
+		
+		legIndex++;
+		
 		return tmpScore;
 	}
 
