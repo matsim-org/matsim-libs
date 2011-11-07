@@ -145,7 +145,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
 			
-			addNearestNodeToJobClusterArray( network );
+			// addNearestNodeToJobClusterArray( network ); // tnicolai: unnecessary step, since this is now done while gathering workplaces
 			
 			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
 		

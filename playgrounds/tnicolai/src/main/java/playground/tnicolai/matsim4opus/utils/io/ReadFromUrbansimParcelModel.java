@@ -18,6 +18,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -517,6 +518,8 @@ public class ReadFromUrbansimParcelModel {
 	}
 	
 	/**
+	 * @Deprecated: Use getAggregatedWorkplaces instead
+	 * 
 	 * Reads in the job table from urbansim and returns a HashMap with all jobs containing the following attributes:
 	 * - job ID
 	 * - parcel ID
@@ -528,6 +531,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param parcels
 	 * @return HashMap
 	 */
+	@Deprecated
 	public JobClusterObject[] readAndBuildJobsObject(final ActivityFacilitiesImpl parcels, double jobSample){
 		
 		// readJobs creates a hash map of job with key = job id
@@ -545,6 +549,7 @@ public class ReadFromUrbansimParcelModel {
 	 * 
 	 * @param jobObjectMap
 	 */
+	@Deprecated
 	public JobClusterObject[] aggregateJobsWithSameParcelID(List<JobsObject> jobSampleList) {
 		
 		log.info("Aggregating Job with identical parcel ID ...");
@@ -573,6 +578,56 @@ public class ReadFromUrbansimParcelModel {
 			jobClusterArray[i] = jobClusterIterator.next();
 		
 		log.info("Aggregated number of jobs from " + jobSampleList.size() + " to " + jobClusterArray.length);
+		
+		return jobClusterArray;
+	}
+	
+	/**
+	 * Aggregates jobs with same nearest node 
+	 * @param parcels
+	 * @param jobSample
+	 * @param network
+	 * @return
+	 */
+	public JobClusterObject[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network){
+		
+		// readJobs creates a hash map of job with key = job id
+		// this hash map includes jobs according to job sample size
+		List<JobsObject> jobSampleList = readJobs(parcels, jobSample);
+		assert( jobSampleList != null );
+		
+		log.info("Aggregating workplaces with identical nearest node ...");
+		Map<Id, JobClusterObject> jobClusterMap = new HashMap<Id, JobClusterObject>();
+		
+		ProgressBar bar = new ProgressBar( jobSampleList.size() );
+		
+		for(int i = 0; i < jobSampleList.size(); i++){
+			bar.update();
+			
+			JobsObject jo = jobSampleList.get( i );
+			assert( jo.getCoord() != null );
+			Node nearestNode = network.getNearestNode( jo.getCoord() );
+			assert( nearestNode != null );
+			
+			
+			if( jobClusterMap.containsKey( nearestNode.getId() ) ){
+				JobClusterObject jco = jobClusterMap.get( nearestNode.getId() );
+				jco.addJob( jo.getJobID() );
+			}
+			else
+				jobClusterMap.put( nearestNode.getId(), new JobClusterObject(jo.getJobID(),
+																		  jo.getZoneID(),
+																		  nearestNode.getCoord(),
+																		  nearestNode) );
+		}
+		
+		JobClusterObject jobClusterArray []  = new JobClusterObject[ jobClusterMap.size() ];
+		Iterator<JobClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
+
+		for(int i = 0; jobClusterIterator.hasNext(); i++)
+			jobClusterArray[i] = jobClusterIterator.next();
+		
+		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length);
 		
 		return jobClusterArray;
 	}
