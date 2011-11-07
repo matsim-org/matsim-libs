@@ -1,11 +1,15 @@
 package playground.tnicolai.matsim4opus.utils.helperObjects;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.Id;
 
 public class SquareLayer {
+	
+	private static Map<Id, AccessibilityNode> accessibilityNodeMap;
 
 	/** fields regarding square centroid (Layer1) */
 	private Coord squareCentroid = null;
@@ -29,5 +33,12 @@ public class SquareLayer {
 		if(this.squareInterpolationNodeList == null)
 			this.squareInterpolationNodeList = new ArrayList<Node>();
 		this.squareInterpolationNodeList.add( node );
+	}
+	
+	class AccessibilityNode{
+		
+		Node node = null;
+		double accessibilityValue = 0.;
+		
 	}
 }

@@ -73,12 +73,15 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		readUrbanSimData.readFacilities(parcels, zones);
-		
 		// set population in scenario
 		scenario.setPopulation( readUrbansimPersons(readUrbanSimData, parcels, network) );
 		
+		log.info("### DONE with demand generation from urbansim ###");
+		
+		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
+		JobClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
+		
 		SpatialGrid<SquareLayer> grid = initGrid(network);
-		JobClusterObject[] jobClusterArray = readUrbanSimData.readAndBuildJobsObject(parcels, jobSample);
 		
 //		runControler(zones, numberOfWorkplacesPerZone, parcels, readUrbanSimData);
 		
@@ -102,7 +105,8 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		GeometryFactory factory = new GeometryFactory();
 		Iterator<Node> nodeIterator = network.getNodes().values().iterator();
 		
-		// assign nodes to right square
+		// assigns all nodes that are located within the according square boundary
+		// this is only relevant for interpolation computations 
 		for(;nodeIterator.hasNext();){
 			Node node = nodeIterator.next();
 			Coord coord = node.getCoord();
@@ -111,11 +115,14 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				grid.setValue(new SquareLayer(), factory.createPoint( new Coordinate(coord.getX(), coord.getY())) );
 			
 			SquareLayer io = grid.getValue(factory.createPoint( new Coordinate(coord.getX(), coord.getY())));
-			io.addNode( node );			
+			io.addNode( node );
 		}
-		// determine centroid and nearest node
+		// determine square centroid and nearest node
+		int counter = 0;
 		for(double x = grid.getXmin(); x <= grid.getXmax(); x += resolution){
 			for(double y = grid.getYmin(); y <= grid.getYmax(); y += resolution){
+				
+				// tnicolai: too many start nodes to compute, try to compute each node only once.
 				
 				Coord centroid = new CoordImpl(x + (resolution/2), y + (resolution/2));
 				Node nearestNode = network.getNearestNode( centroid );
@@ -125,6 +132,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				
 				SquareLayer io = grid.getValue(factory.createPoint(new Coordinate(x, y)));
 				io.setSquareCentroid(centroid, nearestNode);
+				counter++;
 			}
 		}		
 		return grid;

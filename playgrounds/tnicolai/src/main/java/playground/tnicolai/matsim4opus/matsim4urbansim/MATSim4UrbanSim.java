@@ -129,7 +129,7 @@ public class MATSim4UrbanSim {
 		System.out.println("Population construction took: " + benchmark.getDurationInSeconds( pc ) + " seconds.");
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
 
-		log.info("### DONE with demand generation from urbansim ###") ;
+		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);

@@ -22,6 +22,14 @@ public class JobClusterObject {
 		this.nearestNode = null;
 	}
 	
+	public JobClusterObject(Id jobID, Id zoneId, Coord coordinate, Node nearestNode){
+		this.jobIdList = new ArrayList<Id>();
+		this.jobIdList.add( jobID );
+		this.zoneID = zoneId;
+		this.coordinate = coordinate;
+		this.nearestNode = nearestNode;
+	}
+	
 	public void setNearestNode(Node nearestNode){
 		this.nearestNode = nearestNode;
 	}
