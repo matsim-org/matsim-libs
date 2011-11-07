@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.utils.misc.ConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
