@@ -31,6 +31,12 @@ public interface ChoiceSetFactory extends MatsimFactory {
 	/**
 	 * Creates alternatives to choose from for the given leg.
 	 * Alternatives for car pooling MUST be TripRequest instances.
+	 *
+	 * @param decisionMaker the decision maker
+	 * @param plan the Plan concerned by the choice
+	 * @param indexOfLeg the index in the plan, for the leg to choose the mode for
+	 *
+	 * @return a list of possible alternatives. 
 	 */
 	public List<Alternative> createChoiceSet(DecisionMaker decisionMaker, Plan plan, int indexOfleg);
 }
