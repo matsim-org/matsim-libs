@@ -76,7 +76,7 @@ public class CliquesXmlReader extends MatsimXmlParser {
 	 */
 	private void constructCliques() {
 		Clique currentClique;
-		Map<Id, ? extends Person> populationMembers = population.getPersons();
+		Map<Id, ? extends Person> populationMembers = new HashMap<Id, Person>(population.getPersons());
 		int count = 0;
 		int next = 1;
 
@@ -95,7 +95,7 @@ public class CliquesXmlReader extends MatsimXmlParser {
 
 			for (String memberId: currentMembers) {
 				try {
-					currentClique.addMember(populationMembers.get(new IdImpl(memberId)));
+					currentClique.addMember(populationMembers.remove(new IdImpl(memberId)));
 				} catch (NullPointerException e) {
 					throw new RuntimeException("clique members and population members do not match");
 				}
@@ -103,6 +103,23 @@ public class CliquesXmlReader extends MatsimXmlParser {
 			// add the clique to the population.
 			currentClique.buildJointPlanFromIndividualPlans();
 			populationOfCliques.addClique(currentClique);
+		}
+
+		// test for unadded agents. If some exist, remove the from the population
+		// log a warning rather than throwing an exception, as this may be used to
+		// "filter" easily a population by clique size.
+		// The good behaviour depends on wether an internal reference or a copy of
+		// the members map is returned by the population. A testcase checks that the
+		// behaviour is not broken.
+		if (populationMembers.size() > 0) {
+			log.warn( populationMembers.size()+" agents were not found pertaining to any clique."+
+					" They are removed from the population." );
+			for (Id id : populationMembers.keySet() ) {
+				population.getPersons().remove( id );
+			}
+		}
+		else {
+			log.info( "All agents were succesfully assigned to one clique." );
 		}
 	}
 
