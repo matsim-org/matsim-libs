@@ -57,6 +57,7 @@ import playground.johannes.coopsim.analysis.PlansWriterTask;
 import playground.johannes.coopsim.analysis.ScoreTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.analysis.TransitionProbaAnalyzer;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.eval.ActivityDurationEvaluator;
 import playground.johannes.coopsim.eval.ActivityEvaluator;
@@ -64,6 +65,7 @@ import playground.johannes.coopsim.eval.EvalEngine;
 import playground.johannes.coopsim.eval.EvaluatorComposite;
 import playground.johannes.coopsim.eval.JointActivityEvaluator;
 import playground.johannes.coopsim.eval.LegEvaluator;
+import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.mental.MentalEngine;
 import playground.johannes.coopsim.mental.choice.ActTypeTimeSelector;
 import playground.johannes.coopsim.mental.choice.ActivityFacilitySelector;
@@ -114,7 +116,7 @@ public class Simulator {
 	
 	private static Config config;
 	
-	private static Map<Person, Desires> personDesires;
+	private static Map<Person, ActivityDesires> personDesires;
 	
 	public static void main(String[] args) throws IOException {
 		LoggerUtils.setDisallowVerbose(false);
@@ -202,7 +204,7 @@ public class Simulator {
 		 * initialize analyzer tasks
 		 */
 		TrajectoryAnalyzerTask.overwriteStratification(30, 1);
-		TrajectoryAnalyzerTask task = initAnalyzerTask(physical, eval);
+		TrajectoryAnalyzerTask task = initAnalyzerTask(physical, eval, mental, sampleInterval);
 //		((TrajectoryAnalyzerTaskComposite)task).addTask(durLogger);
 		simEngine.setAnalyzerTask(task, output);
 		
@@ -331,55 +333,61 @@ public class Simulator {
 		 */
 		ActTypeTimeSelector arrTimeSelector = new ActTypeTimeSelector();
 		choiceSelector.addComponent(arrTimeSelector);
-		// visit
-		AdditiveDistribution arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(3169.5, 41787.8, 274.3));
-		arrTimePDF.addComponent(new GaussDistribution(7619.2, 56968.2, 729.4));
-		arrTimeSelector.addSelector(ActivityType.visit.name(), new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
-		//culture
-		arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(3040, 36046, 404));
-		arrTimePDF.addComponent(new GaussDistribution(7687, 53845, 1144));
-		arrTimeSelector.addSelector(ActivityType.culture.name(), new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
-		//gastro
-		arrTimePDF = new AdditiveDistribution();
-		arrTimePDF.addComponent(new GaussDistribution(2023.9, 43138.4, 289.9));
-		arrTimePDF.addComponent(new GaussDistribution(13158.8, 59829.9, 811.3));
-		arrTimeSelector.addSelector(ActivityType.gastro.name(), new ArrivalTimeSelector(initTimes(arrTimePDF, 86400, random), random));
 		/*
 		 * initialize duration selector
 		 */
 		ActTypeTimeSelector durTimeSelector = new ActTypeTimeSelector();
 		choiceSelector.addComponent(durTimeSelector);
 		
-		personDesires = new HashMap<Person, Desires>();
+		personDesires = new HashMap<Person, ActivityDesires>();
 		//visit
+		AdditiveDistribution arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(3169.5, 41787.8, 274.3));
+		arrTimePDF.addComponent(new GaussDistribution(7619.2, 56968.2, 729.4));
+		Map<SocialVertex, Double> arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimeSelector.addSelector(ActivityType.visit.name(), new ArrivalTimeSelector(arrivals, random));
+		
 		LogNormalDistribution durPDF = new LogNormalDistribution(1.027, 9.743, 1455.990);
 		Map<SocialVertex, Double> durations = initTimes(durPDF, 13*3600, random);
 		durTimeSelector.addSelector(ActivityType.visit.name(), new DurationSelector(durations, random));
-		addDesire(durations, ActivityType.visit.name());
+		
+		addDesire(durations, arrivals, ActivityType.visit.name());
 		//culture
+		arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(3040, 36046, 404));
+		arrTimePDF.addComponent(new GaussDistribution(7687, 53845, 1144));
+		arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimeSelector.addSelector(ActivityType.culture.name(), new ArrivalTimeSelector(arrivals, random));
+		
 		durPDF = new LogNormalDistribution(0.5689, 9.0656, 764.2739);
 		durations = initTimes(durPDF, 14*3600, random);
 		durTimeSelector.addSelector(ActivityType.culture.name(), new DurationSelector(durations, random));
-		addDesire(durations, ActivityType.culture.name());
+		
+		addDesire(durations, arrivals, ActivityType.culture.name());
 		//gastro
+		arrTimePDF = new AdditiveDistribution();
+		arrTimePDF.addComponent(new GaussDistribution(2023.9, 43138.4, 289.9));
+		arrTimePDF.addComponent(new GaussDistribution(13158.8, 59829.9, 811.3));
+		arrivals = initTimes(arrTimePDF, 86400, random);
+		arrTimeSelector.addSelector(ActivityType.gastro.name(), new ArrivalTimeSelector(arrivals, random));
+		
 		durPDF = new LogNormalDistribution(0.6344, 8.7971, 885.4643);
 		durations = initTimes(durPDF, 8*3600, random);
 		durTimeSelector.addSelector(ActivityType.gastro.name(), new DurationSelector(durations, random));
-		addDesire(durations, ActivityType.gastro.name());
+		addDesire(durations, arrivals, ActivityType.gastro.name());
 		
 		return choiceSelector;
 	}
 	
-	private static void addDesire(Map<SocialVertex, Double> desire, String type) {
-		for(java.util.Map.Entry<SocialVertex, Double> entry : desire.entrySet()) {
-			Desires desires2 = personDesires.get(entry.getKey().getPerson().getPerson());
+	private static void addDesire(Map<SocialVertex, Double> durations, Map<SocialVertex, Double> arrivals, String type) {
+		for(java.util.Map.Entry<SocialVertex, Double> entry : durations.entrySet()) {
+			ActivityDesires desires2 = personDesires.get(entry.getKey().getPerson().getPerson());
 			if(desires2 == null) {
-				desires2 = new Desires(null);
+				desires2 = new ActivityDesires();
 				personDesires.put(entry.getKey().getPerson().getPerson(), desires2);
 			}
 			desires2.putActivityDuration(type, entry.getValue());
+			desires2.putActivityStartTime(type, arrivals.get(entry.getKey()));
 		}
 	}
 	
@@ -395,7 +403,7 @@ public class Simulator {
 		return map;
 	}
 	
-	private static TrajectoryAnalyzerTask initAnalyzerTask(PhysicalEngine physical, EvalEngine eval) {
+	private static TrajectoryAnalyzerTask initAnalyzerTask(PhysicalEngine physical, EvalEngine eval, MentalEngine mentalEngine, int logInterval) {
 		TrajectoryAnalyzerTaskComposite composite = new TrajectoryAnalyzerTaskComposite();
 		composite.addTask(new PlansWriterTask(network));
 		composite.addTask(new ArrivalTimeTask());
@@ -403,10 +411,11 @@ public class Simulator {
 		composite.addTask(new TripDistanceTask(facilities));
 //		composite.addTask(new TripDistanceAccessibilityTask(graph, facilities));
 		composite.addTask(new JointActivityTask(graph, physical.getVisitorTracker()));
-		composite.addTask(new ScoreTask(eval));
+		composite.addTask(new ScoreTask());
 		composite.addTask(new ActTypeShareTask());
 		composite.addTask(new InfiniteScoresTask());
 //		composite.addTask(new ActivityDurationPlanTask());
+		composite.addTask(new TransitionProbaAnalyzer(mentalEngine, logInterval));
 		
 		return composite;
 	}

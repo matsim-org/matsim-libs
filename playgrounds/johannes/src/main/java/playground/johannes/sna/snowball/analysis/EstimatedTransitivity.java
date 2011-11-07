@@ -25,10 +25,12 @@ import gnu.trove.TObjectDoubleIterator;
 import java.util.Collection;
 import java.util.Set;
 
+import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.Transitivity;
 import playground.johannes.sna.math.DescriptivePiStatistics;
 import playground.johannes.sna.math.DescriptivePiStatisticsFactory;
+import playground.johannes.sna.snowball.SampledGraph;
 import playground.johannes.sna.snowball.SampledVertex;
 
 
@@ -52,7 +54,7 @@ public class EstimatedTransitivity extends Transitivity {
 	private static int cachedSize;
 	
 	private static TObjectDoubleHashMap<SampledVertex> cachedValues;
-
+	
 	/**
 	 * Creates a new estimated transitivity object with <tt>piEstimator</tt> as
 	 * the pi-estimator and <tt>factor</tt> as the factor for creating new
@@ -115,24 +117,7 @@ public class EstimatedTransitivity extends Transitivity {
 				int n_edge = countAdjacentEdges(vertex);
 				
 				if (estimEdges) {
-					int n = vertex.getNeighbours().size();
-					int n_sampled = 0;
-					for (Vertex neighbor : vertex.getNeighbours()) {
-						if (((SampledVertex) neighbor).isSampled())
-							n_sampled++;
-					}
-
-					int n_notsampled = n - n_sampled;
-
-					double N_edge = n_sampled * n_notsampled + 0.5 * n_sampled * (n_sampled - 1);
-					double p_edge = 0;
-				
-					if (N_edge > 0)
-						p_edge = n_edge / N_edge;
-
-					double n_edge_estim = n_edge + n_notsampled * (n_notsampled - 1) * 0.5 * p_edge;
-					
-					c = 2 * n_edge_estim / (double) (k * (k - 1));
+					c = 2 * estimateAdjacentEdges(vertex, n_edge) / (double) (k * (k - 1));
 				} else {
 					c = 2 * n_edge / (double) (k * (k - 1));
 				}
@@ -147,6 +132,27 @@ public class EstimatedTransitivity extends Transitivity {
 		return (TObjectDoubleHashMap<V>) coefficients;
 	}
 
+	protected double estimateAdjacentEdges(SampledVertex vertex, int n_edge) {
+		int n = vertex.getNeighbours().size();
+		int n_sampled = 0;
+		for (Vertex neighbor : vertex.getNeighbours()) {
+			if (((SampledVertex) neighbor).isSampled())
+				n_sampled++;
+		}
+
+		int n_notsampled = n - n_sampled;
+
+		double N_edge = n_sampled * n_notsampled + 0.5 * n_sampled * (n_sampled - 1);
+		double p_edge = 0;
+	
+		if (N_edge > 0)
+			p_edge = n_edge / N_edge;
+
+		double n_edge_estim = n_edge + n_notsampled * (n_notsampled - 1) * 0.5 * p_edge;
+		
+		return n_edge_estim;
+	}
+	
 	/**
 	 * Returns a descriptive statistics object containing the estimated local
 	 * clustering coefficients of vertices sampled in or up to the next to last
@@ -175,4 +181,32 @@ public class EstimatedTransitivity extends Transitivity {
 		return stats;
 	}
 
+	@Override
+	public double globalClusteringCoefficient(Graph graph) {
+		double n_tripples = 0;
+		double n_triangles = 0;
+
+		SampledGraph sampledGraph = (SampledGraph) graph;
+		
+		for(SampledVertex v : sampledGraph.getVertices()) {
+			if(v.isSampled()) {
+				int k = v.getNeighbours().size();
+				if(k > 1) {
+					int n_2 = k*(k-1)/2;
+					double n_3 = countAdjacentEdges(v);
+					if(estimEdges)
+						n_3 = estimateAdjacentEdges(v, (int)n_3);
+					
+					double p = piEstimator.probability(v);
+					
+					n_tripples += n_2 * 1/p;
+					n_triangles += n_3 * 1/p; 
+				}
+				 
+			}
+		}
+		 
+		return n_triangles/n_tripples;
+	}
+	
 }
