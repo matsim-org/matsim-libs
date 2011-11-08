@@ -272,4 +272,8 @@ public class WarmEmissionAnalysisModule{
 		String[] array = string.split(splittZeichen);
 		return Integer.valueOf(array[1]);
 	}
+
+	public static int getVehInfoWarnCnt() {
+		return vehInfoWarnCnt;
+	}
 }
