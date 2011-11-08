@@ -4,20 +4,14 @@ package herbie.creation.ptAnalysis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -36,9 +30,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-
-import EDU.oswego.cs.dl.util.concurrent.Heap;
-
 import utils.Bins;
 
 public class QuickPlanAnalysisPt {
@@ -54,7 +45,6 @@ public class QuickPlanAnalysisPt {
 	private static double[] relevantBinInterval1_2h = new double[]{0.0, 2d  *60.0}; // relevant interval graphical output
 	private static double[] relevantBinInterval2_24h = new double[]{0.0, 3d  *60.0}; // relevant interval graphical output
 	private final static String SEPARATOR = "===";
-	private String configFile;
 	private ScenarioImpl scenario;
 	private PopulationImpl pop;
 	private TransitScheduleFactory transitFactory = null;
@@ -84,15 +74,13 @@ public class QuickPlanAnalysisPt {
 	}
 
 	private void readParams(String[] args) {
-		configFile = args[0] ;
 	}
 	
 	public void inizialize(){
 		
 		log.info("inizialize ... ");
 		
-		Config config = ConfigUtils.loadConfig(configFile);
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+    	this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
 		
