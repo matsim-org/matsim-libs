@@ -73,7 +73,7 @@ public class ControlerIO {
 	 *
 	 * @param filename
 	 *            the basename of the file to access
-	 * @return complete path and filename to a file, if set prefixed with the runId, in a iteration directory
+	 * @return complete path and filename to a file in a iteration directory. if rundId is set then it is prefixed with it
 	 */
 	public final String getIterationFilename(final int iteration, final String filename) {
 		StringBuilder s = new StringBuilder(getIterationPath(iteration));
