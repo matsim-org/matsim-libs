@@ -116,20 +116,25 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
 
 		} else if (TransportMode.pt.equals(leg.getMode())) {
-
 			/*
-			 * If its a pt route, we have to get the route from the plan because
-			 * EventsToLegs creates a GenericRoute and not a KtiPtRoute.
+			 * If its a pt route, we have to get the route from the agent's plan 
+			 * because EventsToLegs creates a GenericRoute and not a KtiPtRoute.
 			 */
-			KtiPtRoute ktiPtRoute = (KtiPtRoute) legs.get(legIndex).getRoute();
-//			KtiPtRoute ktiPtRoute = (KtiPtRoute) leg.getRoute();
+			leg = legs.get(legIndex);	// replace leg from events with leg from plan
+			Route route = leg.getRoute();
+			if (!(route instanceof KtiPtRoute)) {
+				if (route == null) log.error("Route in pt leg is not from type KtiPtRoute. It is null!");
+				else log.error("Route in pt leg is not from type KtiPtRoute. It is from type : " + route.getClass().toString());
+				throw new RuntimeException("Cannot calculate score for PT leg since it does not contain a KtiPtRoute!");
+			}
+			KtiPtRoute ktiPtRoute = (KtiPtRoute) route;
 			
 			if (ktiPtRoute.getFromStop() != null) {
 
 //				String nanoMsg = "Scoring kti pt:\t";
 
 //				long nanos = System.nanoTime();
-				dist = ((KtiPtRoute) leg.getRoute()).calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
+				dist = ktiPtRoute.calcAccessEgressDistance(((PlanImpl) this.plan).getPreviousActivity(leg), ((PlanImpl) this.plan).getNextActivity(leg));
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 
@@ -141,12 +146,12 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 				tmpScore += this.getWalkScore(dist, travelTime);
 
 //				nanos = System.nanoTime();
-				dist = ((KtiPtRoute) leg.getRoute()).calcInVehicleDistance();
+				dist = ktiPtRoute.calcInVehicleDistance();
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 
 //				nanos = System.nanoTime();
-				travelTime = ((KtiPtRoute) leg.getRoute()).getInVehicleTime();
+				travelTime = ktiPtRoute.getInVehicleTime();
 //				nanos = System.nanoTime() - nanos;
 //				nanoMsg += Long.toString(nanos) + "\t";
 
