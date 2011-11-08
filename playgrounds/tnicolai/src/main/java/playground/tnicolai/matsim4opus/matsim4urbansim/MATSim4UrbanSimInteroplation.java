@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -26,7 +27,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimInteroplation.class);
 	
 	// resolution
-	private static int resolution = -1;
+	private static int resolutionMeter = -1;
 	// job sample (default 100%)
 	private static double jobSample = 1.;
 
@@ -48,7 +49,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				
 				if(params[i].startsWith("resolution")){
 					String s[] = params[i].split("=");
-					this.resolution = Integer.parseInt(s[1]);
+					this.resolutionMeter = Integer.parseInt(s[1]);
 				}
 				else if(params[i].startsWith("jobsample")){
 					String s[] = params[i].split("=");
@@ -61,7 +62,8 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 
 	void runMATSim(){
 		
-		log.info("Starting MATSim from Urbansim");	
+		log.info("Starting MATSim from Urbansim");
+		int benchmarkID = this.benchmark.addMeasure("MATSim4UrbanSimInteroplation Run");
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		NetworkImpl network = scenario.getNetwork();
@@ -81,63 +83,26 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
 		JobClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
 		
-		SpatialGrid<SquareLayer> grid = initGrid(network);
+		// Running the controler
+		Controler controler = new Controler(scenario);
+		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
+		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
-//		runControler(zones, numberOfWorkplacesPerZone, parcels, readUrbanSimData);
+		controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionMeter, this.benchmark) );
+		controler.run();
+		// Controler done!
 		
 		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();
 		}
+		
+		this.benchmark.stoppMeasurement(benchmarkID);
+		log.info("MATSim4UrbanSimInteroplation Run took " + this.benchmark.getDurationInSeconds(benchmarkID) + "seconds ("+ this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes)");
+		// dumping benchmark results
+		benchmark.dumpResults(Constants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");
 	}
-	
-	/**
-	 * 
-	 * @param network
-	 * @return
-	 */
-	private SpatialGrid<SquareLayer> initGrid(final NetworkImpl network){
-		
-		NetworkBoundary nb = UtilityCollection.getNetworkBoundary(network);
-		SpatialGrid<SquareLayer> grid = new SpatialGrid<SquareLayer>(nb.getMinX(), nb.getMinY(), nb.getMaxX(), nb.getMaxY(), resolution);
-		
-		GeometryFactory factory = new GeometryFactory();
-		Iterator<Node> nodeIterator = network.getNodes().values().iterator();
-		
-		// assigns all nodes that are located within the according square boundary
-		// this is only relevant for interpolation computations 
-		for(;nodeIterator.hasNext();){
-			Node node = nodeIterator.next();
-			Coord coord = node.getCoord();
-			
-			if(grid.getValue(factory.createPoint( new Coordinate(coord.getX(), coord.getY()))) == null)
-				grid.setValue(new SquareLayer(), factory.createPoint( new Coordinate(coord.getX(), coord.getY())) );
-			
-			SquareLayer io = grid.getValue(factory.createPoint( new Coordinate(coord.getX(), coord.getY())));
-			io.addNode( node );
-		}
-		// determine square centroid and nearest node
-		int counter = 0;
-		for(double x = grid.getXmin(); x <= grid.getXmax(); x += resolution){
-			for(double y = grid.getYmin(); y <= grid.getYmax(); y += resolution){
-				
-				// tnicolai: too many start nodes to compute, try to compute each node only once.
-				
-				Coord centroid = new CoordImpl(x + (resolution/2), y + (resolution/2));
-				Node nearestNode = network.getNearestNode( centroid );
-				
-				if(grid.getValue(factory.createPoint( new Coordinate(x, y))) == null)
-					grid.setValue(new SquareLayer(), factory.createPoint(new Coordinate(x, y)) );
-				
-				SquareLayer io = grid.getValue(factory.createPoint(new Coordinate(x, y)));
-				io.setSquareCentroid(centroid, nearestNode);
-				counter++;
-			}
-		}		
-		return grid;
-	}
-
 	
 	/**
 	 * Entry point

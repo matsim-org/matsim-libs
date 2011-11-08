@@ -50,7 +50,7 @@ public class SpatialGridTableWriter {
 			}
 			writer.newLine();
 		}
-		
+		writer.flush();
 		writer.close();
 	}
 }

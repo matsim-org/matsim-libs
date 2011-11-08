@@ -17,7 +17,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
@@ -118,7 +117,7 @@ public class SpatialGridFillOrder {
 		 * 	|		 |	
 		 * (3)		(6)	
 		 */
-		double freespeed = 13.8888889;	// this is m/s and corresponds to 50km/h
+		double freespeed = 2.7;	// this is m/s and corresponds to 50km/h
 		double capacity = 500.;
 		double numLanes = 1.;
 		
@@ -160,6 +159,19 @@ public class SpatialGridFillOrder {
 		
 		System.out.println("Creating workplaces ...");
 		
+		/*
+		 * JJ 
+		 * (2)		(5)			
+		 * 	|		 |			
+		 * 	|		 |		JJJJJ 	
+		 * (1)------(4)------(7)
+		 * 	|		 |	
+		 * 	|		 |	
+		 * (3)		(6)	
+		 * 			
+		 * J = Jobs
+		 */
+		
 		ReadFromUrbansimParcelModel dummyUrbanSimPracelModel = new ReadFromUrbansimParcelModel(2000);
 		
 		// create dummy jobs
@@ -167,9 +179,8 @@ public class SpatialGridFillOrder {
 		Id parcelID1 = new IdImpl(1);
 		Id parcelID2 = new IdImpl(2);
 		List<JobsObject> dummyJobSampleList = new ArrayList<JobsObject>();
-		// 2 jobs at node 1
+		// 1 job at node 1
 		dummyJobSampleList.add( new JobsObject(new IdImpl(0), parcelID1, zoneID, new CoordImpl(0, 210)));
-		dummyJobSampleList.add( new JobsObject(new IdImpl(1), parcelID1, zoneID, new CoordImpl(0, 210)));
 		// 5 jobs at node 7
 		dummyJobSampleList.add( new JobsObject(new IdImpl(2), parcelID2, zoneID, new CoordImpl(200, 110)));
 		dummyJobSampleList.add( new JobsObject(new IdImpl(3), parcelID2, zoneID, new CoordImpl(200, 110)));
