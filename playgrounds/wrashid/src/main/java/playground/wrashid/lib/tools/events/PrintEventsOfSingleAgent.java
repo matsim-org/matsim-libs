@@ -23,21 +23,24 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
-public class FilterEventsOfSingleAgent {
+public class PrintEventsOfSingleAgent {
 
 	public static void main(String[] args) {
-		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
+		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/ITERS/it.50/50.events.xml.gz";
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("2791187"));
+		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("4580643"));
 		
 		events.addHandler(singleAgentEventsPrinter);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//reader.readFile(eventsFile);
 		
-		reader.readFile(eventsFile);
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+		reader.parse(eventsFile);
 		
 	}
 	
