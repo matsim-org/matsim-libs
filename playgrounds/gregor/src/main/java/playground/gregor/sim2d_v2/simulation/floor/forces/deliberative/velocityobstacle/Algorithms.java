@@ -4,12 +4,56 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class Algorithms {
 
+
+	/**
+	 * tests whether then polar angle of vector s0s1 is bigger than the polar angle of vector t0t1
+	 * @param s0
+	 * @param s1
+	 * @param t0
+	 * @param t1
+	 * @return
+	 */
+	public static int isAngleBigger(Coordinate s0, Coordinate s1, Coordinate t0, Coordinate t1) {
+		double x0 = s1.x - s0.x;
+		double y0 = s1.y - s0.y;
+		int q0 = getQuadrant(x0,y0);
+		double x1 = t1.x - t0.x;
+		double y1 = t1.y - t0.y;
+		int q1 = getQuadrant(x1,y1);
+		if (q0 != q1) {
+			return q0 > q1 ? 1 : -1;
+		}
+
+		if (y0/x0 == y1/x1) {
+			return 0;
+		}
+
+		return y0/x0 > y1/x1 ? 1 : -1;
+	}
+
+	private static int getQuadrant(double x1, double y1) {
+		if (x1 >= 0){
+			if (y1 >= 0) {
+				return 1;
+			} else {
+				return 4;
+			}
+		} else {
+			if (y1 >= 0) {
+				return 2;
+			} else {
+				return 3;
+			}
+		}
+	}
+
 	/**
 	 * calculates the polar angle for vector (c1,c2)
 	 * @param c1 first coordinate
 	 * @param c2 second coordinate
 	 * @return the polar angle
 	 */
+	@Deprecated //We don't need to now the actual angle, so it is much faster to use isAngleBigger(...) instead!!
 	public static double getPolarAngle(Coordinate c1, Coordinate c2) {
 		double x = c2.x - c1.x;
 		double y = c2.y - c1.y;
@@ -32,6 +76,26 @@ public class Algorithms {
 			return ret + 2*Math.PI;
 		}
 		return ret;
+	}
+
+	/**
+	 * translates all coordinates in the array by dx, dy
+	 * @param dx
+	 * @param dy
+	 * @param coords
+	 */
+	public static void translate(double dx, double dy, Coordinate [] coords) {
+		int last = coords.length -1;
+
+		for (int i = 0; i < last; i++) {
+			coords[i].x += dx;
+			coords[i].y += dy;
+		}
+		if (coords[0] != coords[last]){
+			coords[last].x += dx;
+			coords[last].y += dy;
+		}
+
 	}
 
 	/**

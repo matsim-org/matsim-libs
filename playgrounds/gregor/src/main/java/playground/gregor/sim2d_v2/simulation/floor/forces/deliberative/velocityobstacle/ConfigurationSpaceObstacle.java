@@ -33,12 +33,14 @@ public class ConfigurationSpaceObstacle {
 			} else if (j == w.length-1) {
 				i++;
 			} else {
-				double angleVi = Algorithms.getPolarAngle(v[i], v[i+1]);
-				double angleWi = Algorithms.getPolarAngle(w[j], w[j+1]);
+				//				double angleVi = Algorithms.getPolarAngle(v[i], v[i+1]);
+				//				double angleWi = Algorithms.getPolarAngle(w[j], w[j+1]);
 
-				if (angleVi < angleWi) {
+				int angleViBigger = Algorithms.isAngleBigger(v[i], v[i+1], w[j], w[j+1]);
+
+				if (angleViBigger < 0) {
 					i++;
-				} else if (angleVi > angleWi) {
+				} else if (angleViBigger > 0) {
 					j++;
 				} else {
 					i++;
@@ -47,34 +49,8 @@ public class ConfigurationSpaceObstacle {
 			}
 
 		}while (i < v.length && j < w.length);
-		//		do {
-		//
-		//			int ii = i < v.length ? i : i -v.length;
-		//			int jj = j < w.length ? j : j -w.length;
-		//
-		//			minkowskiCoords.add(new Coordinate(v[ii].x + w[jj].x, v[ii].y + w[jj].y));
-		//
-		//
-		//			int iii = i < v.length-1 ? i+1 : i - v.length +1;
-		//			int jjj = j < w.length-1 ? j+1 : j - w.length +1;
-		//			double angleVi = Algorithms.getPolarAngle(v[ii], v[iii]);
-		//			double angleWi = Algorithms.getPolarAngle(w[jj], w[jjj]);
-		//
-		//
-		//			if (angleVi < angleWi) {
-		//				i++;
-		//			} else if (angleVi > angleWi) {
-		//				j++;
-		//			} else {
-		//				i++;
-		//				j++;
-		//			}
-		//
-		//
-		//		}while (i < v.length || j < w.length);
-		//		minkowskiCoords.add(minkowskiCoords.get(0));
 
-		Coordinate[] a = minkowskiCoords.toArray(new Coordinate[0]);
+		Coordinate[] a = minkowskiCoords.toArray(new Coordinate[0]);//FIXME don't create an array here!! (it slows down the simulation (a bit))
 
 		return a;
 	}

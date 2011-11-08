@@ -21,6 +21,7 @@ package playground.gregor.sim2d_v2.helper.gisdebug;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.geotools.factory.FactoryRegistryException;
@@ -53,12 +54,20 @@ public class GisDebugger {
 
 	private static List<Geometry> geos = new ArrayList<Geometry>();
 
+	private static List<String> strs = new ArrayList<String>();
+
 	private static boolean init = false;
 
 	private static final GeometryFactory geofac = new GeometryFactory();
 
 	public static void addGeometry(Geometry geo) {
 		geos.add(geo);
+	}
+
+	public static void addGeometry(Geometry geo, String str) {
+		addGeometry(geo);
+		strs.add(str);
+
 	}
 
 	public static void dump(String file) {
@@ -68,29 +77,37 @@ public class GisDebugger {
 		}
 		Collection<Feature> fts = new  ArrayList<Feature>();
 		double d = 0;
+		Iterator<String> it = null;
+		if (strs.size() == geos.size()) {
+			it = strs.iterator();
+		}
 		for (Geometry geo : geos) {
+			String str = "";
+			if (it != null) {
+				str = it.next();
+			}
 			if (geo instanceof MultiPolygon) {
 				try {
-					fts.add(ft.create(new Object[] {geo,d,d++}));
+					fts.add(ft.create(new Object[] {geo,d++,str}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
 			} else if (geo instanceof Polygon) {
 				MultiPolygon mp = geofac.createMultiPolygon(new Polygon[]{(Polygon) geo});
 				try {
-					fts.add(ft.create(new Object[] {mp,d,d++}));
+					fts.add(ft.create(new Object[] {mp,d++,str}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
 			}else if (geo instanceof LineString) {
 				try {
-					fts.add(ftLine.create(new Object[] {geo,d,d++}));
+					fts.add(ftLine.create(new Object[] {geo,d++,str}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
 			} else if (geo instanceof Point) {
 				try {
-					fts.add(ftPoint.create(new Object[] {geo,d,d++}));
+					fts.add(ftPoint.create(new Object[] {geo,d++,str}));
 				} catch (IllegalAttributeException e) {
 					e.printStackTrace();
 				}
@@ -101,6 +118,7 @@ public class GisDebugger {
 		}
 		ShapeFileWriter.writeGeometries(fts, file);
 		geos.clear();
+		strs.clear();
 	}
 
 
@@ -118,7 +136,7 @@ public class GisDebugger {
 		AttributeType z = AttributeTypeFactory.newAttributeType(
 				"dblAvgZ", Double.class);
 		AttributeType t = AttributeTypeFactory.newAttributeType(
-				"dblAvgT", Double.class);
+				"name", String.class);
 
 		Exception ex;
 		try {

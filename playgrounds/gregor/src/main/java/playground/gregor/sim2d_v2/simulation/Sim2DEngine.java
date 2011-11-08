@@ -93,7 +93,7 @@ public class Sim2DEngine implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 
-		boolean emitEvents = true;
+		boolean emitEvents = false;
 		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents);
 		this.floor.init();
 	}
