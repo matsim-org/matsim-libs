@@ -22,8 +22,12 @@ package playground.benjamin.emissions;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -51,11 +55,18 @@ public class EmissionHandler {
 	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
 	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
-	private static String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
+//	private String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
+	private String hbefaHotFile = null ;
 	
 	private static EventWriterXML emissionEventWriter;
 	
-	public void installEmissionEventHandler(Network network, EventsManager eventsManager, String emissionEventOutputFile) {
+	public void installEmissionEventHandler(Scenario scenario, EventsManager eventsManager, String emissionEventOutputFile) {
+		Logger.getLogger(this.getClass()).info("entering installEmissionsEventHandler") ;
+		
+		Network network = scenario.getNetwork() ;
+		
+		hbefaHotFile = scenario.getConfig().vspExperimental().getEmissionFactorsFile() ;
+
 		
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
@@ -76,7 +87,7 @@ public class EmissionHandler {
 
 		// TODO: make the following homogeneous?!?
 		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
-		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile);
+		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile , roadTypes );
 		
 		// instantiate analysis modules
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
@@ -106,13 +117,17 @@ public class EmissionHandler {
 		// add the handler
 		eventsManager.addHandler(warmEmissionHandler);
 		eventsManager.addHandler(coldEmissionHandler);
+		
+		Logger.getLogger("").info("leaving installEmissionsEventHandler") ;
 	}
 
 	public EventWriterXML getEmissionEventWriter() {
 		return emissionEventWriter;
 	}
 
-	private String[][] createRoadTypesTafficSituation(String filename) {
+	private String[][] createRoadTypesTafficSituation(String filename, VisumRoadTypes[] roadTypes ) {
+		Logger.getLogger(this.getClass()).info("entering createRoadTypesTafficSituation ...") ;
+
 		String[][] roadTypesTrafficSituations = new String[100][4];
 		int[] counter = new int[100];
 		for(int i=0; i<100;i++)
@@ -124,16 +139,41 @@ public class EmissionHandler {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine="";
 			//Read File Line By Line
-			br.readLine();
+			strLine = br.readLine();
+			
+			FileWriter out = new FileWriter("/Users/nagel/kw/road_types_trafficSituation.txt") ;
+			out.write(strLine+"\n") ;
 	
 			while ((strLine = br.readLine()) != null){
 				//for all lines (whole text) we split the line to an array 
 				String[] array = strLine.split(";");
 				int roadtype=Integer.valueOf(array[0]);
 				int traficSitIndex = counter[roadtype]++;
-				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3];
+//				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3];
+				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[4];
+				
+//				final String str1 = roadTypes[roadtype].getVISUM_RT_NR() + ";";
+//				System.out.print(str1) ;
+//				final String str2 = roadTypes[roadtype].getVISUM_RT_NAME() + ";";
+//				System.out.print(str2) ;
+//
+//				final String str3 = roadTypes[roadtype].getHBEFA_RT_NR() + ";";
+//				System.out.print(str3) ;
+//				final String str4 = roadTypes[roadtype].getHBEFA_RT_NAME() + ";";
+//				System.out.print(str4) ;
+//
+////				for ( int ii=0 ; ii<array.length; ii++ ) {
+////					System.out.print(array[ii] + ";") ;
+////				} 
+//				final String str5 = array[3] + ";\n";
+//				System.out.print(str5) ;
+//				
+//				out.write(str1+str2+str3+str4+str5);
+				
 			}
 			in.close();
+			out.close();
+//			throw new RuntimeException("stopping here") ;
 			return roadTypesTrafficSituations;
 		}
 		catch (Exception e){
@@ -142,6 +182,8 @@ public class EmissionHandler {
 	}
 	
 	VisumRoadTypes[] createRoadTypes(String filename){
+		Logger.getLogger(this.getClass()).info("entering createRoadTypes ...") ;
+		
 		VisumRoadTypes[] roadTypes = new VisumRoadTypes[100];
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
@@ -152,13 +194,24 @@ public class EmissionHandler {
 			//Read File Line By Line
 			br.readLine();
 			while ((strLine = br.readLine()) != null){
+				if ( strLine.contains("\"")) {
+					throw new RuntimeException("cannot handle this character in parsing") ;
+				}
 	
 				//for all lines (whole text) we split the line to an array 
 				String[] array = strLine.split(",");
 				VisumRoadTypes obj = new VisumRoadTypes(Integer.parseInt(array[0]), array[2]);
+				obj.setVISUM_RT_NAME(array[1]) ;
+				if ( array.length >=4 ) {
+					obj.setHBEFA_RT_NAME(array[3]) ;
+				} else {
+					obj.setHBEFA_RT_NAME("no hbefa road type name in file") ;
+				}
 				roadTypes[obj.getVISUM_RT_NR()] = obj;
 			}
 			in.close();
+
+			Logger.getLogger(this.getClass()).info("leaving createRoadTypes ...") ;
 			return roadTypes;
 		}
 		catch (Exception e){

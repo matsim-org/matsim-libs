@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -121,6 +122,11 @@ public class RunEmissionToolOnline {
 	// plans
 		PlansConfigGroup pcg = controler.getConfig().plans();
 		pcg.setInputFile(plansFile);
+		
+		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
+		vcg.setEmissionFactorsFile("../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt") ;
+		vcg.setWritingOutputEvents(false) ;
+		
 		
 		controler.addControlerListener(new EmissionControlerListener());
 		controler.run();

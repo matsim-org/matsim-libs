@@ -20,7 +20,7 @@
 package playground.benjamin.emissions;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -51,6 +51,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		controler = event.getControler();
 		lastIteration = controler.getLastIteration();
 		emissionHandler = new EmissionHandler();
+		
+//		computeEmissions(0) ;
 	}
 
 	@Override
@@ -58,21 +60,29 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		Integer iteration = event.getIteration();
 		
 		if(lastIteration.equals(iteration)){
-			EventsManager eventsManager = controler.getEvents();
-			Network network = controler.getScenario().getNetwork();
-			
-			String outputPath = controler.getControlerIO().getIterationPath(iteration) + "/";
-			String runId = controler.getConfig().controler().getRunId();
-			
-			if(runId != null){
-				emissionEventOutputFile = outputPath + runId + "." + iteration + ".emission.events.xml.gz"; 
-			} else {
-				emissionEventOutputFile = outputPath + iteration + ".emission.events.xml.gz";
-			}
-			
-			emissionHandler.installEmissionEventHandler(network, eventsManager, emissionEventOutputFile);
+			computeEmissions(iteration);
 		}
 	}
+
+	private void computeEmissions(Integer iteration) {
+		Logger.getLogger(this.getClass()).info("entering computeEmissions ...") ;
+		
+		EventsManager eventsManager = controler.getEvents();
+		Scenario scenario = controler.getScenario() ;
+		
+		String outputPath = controler.getControlerIO().getIterationPath(iteration) + "/";
+		String runId = controler.getConfig().controler().getRunId();
+		
+		if(runId != null){
+			emissionEventOutputFile = outputPath + runId + "." + iteration + ".emission.events.xml.gz"; 
+		} else {
+			emissionEventOutputFile = outputPath + iteration + ".emission.events.xml.gz";
+		}
+		
+		emissionHandler.installEmissionEventHandler(scenario, eventsManager, emissionEventOutputFile);
+
+		Logger.getLogger(this.getClass()).info("leaving computeEmissions ...") ;
+}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {

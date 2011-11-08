@@ -68,12 +68,10 @@ public class RunEmissionToolOffline {
 		
 		loadScenario();
 		
-		Network network = scenario.getNetwork();
-		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		
 		EmissionHandler emissionHandler = new EmissionHandler();
-		emissionHandler.installEmissionEventHandler(network, eventsManager, emissionEventOutputFile);
+		emissionHandler.installEmissionEventHandler(scenario, eventsManager, emissionEventOutputFile);
 		
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
