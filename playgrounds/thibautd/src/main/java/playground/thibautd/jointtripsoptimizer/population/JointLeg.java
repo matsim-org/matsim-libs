@@ -132,8 +132,13 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		this.person = leg.getPerson();
 	}
 
-	private IdLeg createId() {
-		return new IdLeg(currentLegId++);
+	/**
+	 * creates an unexisting id.
+	 * The synchronized status ensures that if several threads create ids
+	 * simultaneously, no duplicate id can be created.
+	 */
+	private synchronized IdLeg createId() {
+		return new IdLeg( currentLegId++ );
 	}
 
 	/*
