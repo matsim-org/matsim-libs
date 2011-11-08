@@ -283,7 +283,7 @@ public class JointPlan implements Plan {
 
 	private void constructLegsMap() {
 		if (this.legsMap.size() > 0) {
-			throw new RuntimeException( "leg map not empty" );
+			throw new RuntimeException( "leg map not empty at initialisation" );
 		}
 
 		for (PlanElement pe : this.getPlanElements()) {
@@ -294,7 +294,13 @@ public class JointPlan implements Plan {
 
 				if (old != null) {
 					throw new IllegalArgumentException("duplicate id found during"
-							+" JointPlan construction");
+							+" JointPlan construction for clique "+clique.getId()+
+							": leg "+leg.getId()+
+							" for person "+leg.getPerson().getId()+
+							" with mode "+leg.getMode()+
+							" conflicts with leg "+old.getId()+
+							" for person "+old.getPerson().getId()+
+							" with mode "+old.getMode());
 				}
 			}
 		}
