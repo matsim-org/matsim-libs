@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
@@ -27,7 +28,6 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -43,31 +43,28 @@ import utils.Bins;
 
 public class QuickPlanAnalysisPt {
 	
-	private String PLANSFILE = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.0/herbie.0.plans.xml.gz";
+	private String PLANSFILE = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.150/herbie.150.plans.xml.gz";
 	private String NETWORKFILE = "P:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
 	private String transitScheduleFile = "P:/Projekte/matsim/data/switzerland/pt/zh/transitSchedule.networkOevModellZH.xml";
 	private String transitVehicleFile = "P:/Projekte/matsim/data/switzerland/pt/zh/vehicles.oevModellZH.xml";
-	private String outpath = "P:/Projekte/herbie/output/ptScenarioCreation/";
+	private String outpath = "P:/Projekte/herbie/output/ptScenarioCreation/ptPlanAnalysis/";
 	
+	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private static double[] relevantBinInterval_1h = new double[]{0.0, 70.0}; // relevant interval graphical output
 	private static double[] relevantBinInterval1_2h = new double[]{0.0, 2d  *60.0}; // relevant interval graphical output
 	private static double[] relevantBinInterval2_24h = new double[]{0.0, 3d  *60.0}; // relevant interval graphical output
 	private final static String SEPARATOR = "===";
 	private String configFile;
 	private ScenarioImpl scenario;
+	private PopulationImpl pop;
 	private TransitScheduleFactory transitFactory = null;
 	private ArrayList<Double> headways = new ArrayList<Double>();
 	
-	double[] distanceClasses = new double[]{
-		Double.MAX_VALUE, 100000
-		, 50000, 40000, 30000, 20000, 
-		10000, 5000, 4000, 3000, 2000, 
-		1000, 0.0};
-	private PopulationImpl pop;
 	private Bins hdwy_distrib_1h;
 	private Bins hdwy_distrib_2h;
 	private Bins hdwy_distrib_24h;
 	private Bins transportMode;
+	
 	private double totalTravelTime = 0d;
 	private double latestActivityEndTime;
 
@@ -92,7 +89,7 @@ public class QuickPlanAnalysisPt {
 	
 	public void inizialize(){
 		
-		final Logger log = Logger.getLogger(QuickPlanAnalysisPt.class);
+		log.info("inizialize ... ");
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
@@ -124,10 +121,14 @@ public class QuickPlanAnalysisPt {
 		this.hdwy_distrib_2h = new Bins(1, relevantBinInterval1_2h[1], "Headway Distrib 1h TravelTime 2h");
 		this.hdwy_distrib_24h = new Bins(1, relevantBinInterval2_24h[1], "Headway Distrib 2h TravelTime 24h");
 		this.transportMode = new Bins(1, 3, "Transport Mode");
+		
+		log.info("inizialize ... done");
 	}
 	
 	private void analysePlanFile() {
-//		System.out.println();
+		
+		log.info("analysePlanFile ... ");
+		
 		for(Person p : pop.getPersons().values()){
 			Plan plan = p.getSelectedPlan();
 			
@@ -192,6 +193,7 @@ public class QuickPlanAnalysisPt {
 				}
 			}
 		}
+		log.info("analysePlanFile ... done");
 	}
 	
 	private void addToTransportModeBin(String mode) {
@@ -290,6 +292,8 @@ public class QuickPlanAnalysisPt {
 	}
 	
 	private void printResults() {
+		log.info("printResults ... ");
+		
 		hdwy_distrib_1h.plotBinnedDistribution(outpath + "HeadwayDistribution lower 1h", "Headway", "#", "Number of departures with same headway");
 		
 		hdwy_distrib_2h.plotBinnedDistribution(outpath + "HeadwayDistribution between 1h and 2h", "Headway", "#", "Number of departures with same headway");
@@ -297,5 +301,7 @@ public class QuickPlanAnalysisPt {
 		hdwy_distrib_24h.plotBinnedDistribution(outpath + "HeadwayDistribution between 2h and 24h", "Headway", "#", "Number of departures with same headway");
 		
 		transportMode.plotBinnedDistribution(outpath + "TransportMode", "Bus  Tram  Train", "#", "Number of Trips");
+		
+		log.info("printResults ... done");
 	}
 }
