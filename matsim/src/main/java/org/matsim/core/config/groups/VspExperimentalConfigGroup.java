@@ -134,8 +134,18 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	private String vspDefaultsCheckingLevel = IGNORE ;
 
+	// ---
+	
+	private static final String EMISSION_FACTORS_FILE = "emissionFactorsFile" ;
+	private String emissionFactorsFile = null;
+	
+	// ---
 
-
+	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
+	private boolean writingOutputEvents = false ;
+	
+	// ---
+	
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -143,6 +153,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+		
+		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'" ) ;
+		
+		map.put(EMISSION_FACTORS_FILE, "file with hbefa dump") ;
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
@@ -209,6 +223,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 					"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
 		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
 			this.setVspDefaultsCheckingLevel(value) ;
+		} else if ( EMISSION_FACTORS_FILE.equals(key)) {
+			this.setEmissionFactorsFile(value) ;
+		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
+			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -235,6 +253,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(COLORING, getColoring() ) ;
 
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
+		
+		map.put( EMISSION_FACTORS_FILE,  this.getEmissionFactorsFile() ) ;
+		
+		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
 
 		return map;
 	}
@@ -347,6 +369,22 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	public String getVspDefaultsCheckingLevel() {
 		return this.vspDefaultsCheckingLevel;
+	}
+
+	public String getEmissionFactorsFile() {
+		return emissionFactorsFile;
+	}
+
+	public void setEmissionFactorsFile(String emissionFactorsFile) {
+		this.emissionFactorsFile = emissionFactorsFile;
+	}
+
+	public boolean isWritingOutputEvents() {
+		return this.writingOutputEvents ;
+	}
+
+	public void setWritingOutputEvents(boolean writingOutputEvents) {
+		this.writingOutputEvents = writingOutputEvents;
 	}
 
 }

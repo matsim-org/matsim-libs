@@ -532,6 +532,11 @@ public class Controler {
 				if (this.config.scenario().isUseLanes()){
 					new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 				}
+				if ( !unexpected && this.getConfig().vspExperimental().isWritingOutputEvents() ) {
+					File toFile = new File(this.controlerIO.getOutputFilename("output_events.xml.gz")) ;
+					File fromFile = new File( this.controlerIO.getIterationFilename(this.getLastIteration(), "events.xml.gz")) ;
+					IOUtils.copyFile( fromFile , toFile) ;
+				}
 			}
 			if (unexpected) {
 				log.info("S H U T D O W N   ---   unexpected shutdown request completed.");

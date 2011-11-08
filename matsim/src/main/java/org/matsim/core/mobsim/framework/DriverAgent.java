@@ -46,14 +46,23 @@ public interface DriverAgent extends NetworkAgent {
 	
 	public void setVehicle( final QVehicle veh ) ;
 	
-	@Deprecated // there is no reason why this should be needed from outside.  kai/mz, jun'11 
+	/**
+	 * Design thoughts:<ul>
+	 * <li> MZ states (in his AdapterAgent) that the DriverAgent should not have this reference.  
+	 * I am, in fact, not so sure (any more); maybe it is not so bad to have this.  Clearly, symmetric
+	 * connectors would be better.  kai, nov'11
+	 * </ul>
+	 */
 	public QVehicle getVehicle() ;
 	
 	public Id getPlannedVehicleId() ;
 	
 //	/**
 //	 * List of vehicles the DriverAgent has access to.  This could be vehicles she has the key for.  But it could also
-//	 * be a temporary access provided by some car sharing company.
+//	 * be a temporary access provided by some car sharing company.  Design thoughts:<ul>
+//	 * <li> Automagic vehicle generation, if switched on (!), could be done exactly for those DriverAgents who have
+//	 * this list empty. 
+//	 * </ul> 
 //	 */
 //	public List<QVehicle> getAccessibleVehicles() ;
 	

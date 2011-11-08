@@ -80,9 +80,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
@@ -236,9 +234,6 @@ public class QSim implements VisMobsim, Netsim {
 		if (sc.getConfig().scenario().isUseTransit()) {
 			this.transitEngine = new TransitQSimEngine(this);
 			this.addDepartureHandler(this.transitEngine);
-			// why is there not addition of pt to non teleported modes here?
-			// kai, jun'10
-			// done in TransitQSimEngine. kai, jun'10
 		}
 	}
 
@@ -291,7 +286,8 @@ public class QSim implements VisMobsim, Netsim {
 			} else {
 				throw new RuntimeException("there is more than one AgentSource; cannot override the " +
 						"agent factory since the code " +
-						"would not know to which AgentSource this should refer to" ) ;
+						"would not know to which AgentSource this should refer to.\nTry first changing the agentFactory " +
+						"and only then adding other agent sources." ) ;
 			}
 		} else {
 			throw new RuntimeException(
