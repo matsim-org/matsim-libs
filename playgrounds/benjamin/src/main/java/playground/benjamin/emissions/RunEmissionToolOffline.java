@@ -26,13 +26,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ConfigUtils;
 
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
@@ -84,6 +84,7 @@ public class RunEmissionToolOffline {
 		logger.info("Terminated. Output can be found in " + emissionEventOutputFile);
 	}
 
+	@SuppressWarnings("deprecation")
 	private void loadScenario() {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);

@@ -29,8 +29,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImpl;
 
 import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
 import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreator;
@@ -70,7 +70,7 @@ public class EmissionHandler {
 		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
 
 		// read the vehicle file
-		Vehicles vehicles = new VehiclesImpl();
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
 
