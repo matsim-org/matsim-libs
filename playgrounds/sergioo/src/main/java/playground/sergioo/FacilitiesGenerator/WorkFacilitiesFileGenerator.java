@@ -18,10 +18,23 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.OpeningTime;
+import org.matsim.core.facilities.OpeningTimeImpl;
+import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -36,18 +49,18 @@ import util.fitting.MatrixNDimensionsImpl;
 import util.fitting.ProportionFittingControl;
 import util.fitting.TotalFittingControl;
 
-public class SecondaryFacilitiesFileGenerator {
+public class WorkFacilitiesFileGenerator {
 
-	//Enumeration
+	//Enumerations
 	private enum URA_PLACE_TYPES {
 		EXEC_CONDOS("exec_condos",Double.POSITIVE_INFINITY),
 		FACTORY("factory",100),
 		FACTORY_VACANT_AREA("factory_vacant_area",Double.POSITIVE_INFINITY),
 		LANDED_PROPETY("landed_property",Double.POSITIVE_INFINITY),
-		OFFICE_FLOOR_AREA("office_floor_area",30),
+		OFFICE_FLOOR_AREA("office_floor_area",9),
 		OFFICE_VACANT_FLOOR_AREA("office_vacant_floor_area",Double.POSITIVE_INFINITY),
 		PRIVATE_APARTMENTS_CONDOS("private_apartments_condos",Double.POSITIVE_INFINITY),
-		SHOP_FLOOR_AREA("shop_floor_area",80),
+		SHOP_FLOOR_AREA("shop_floor_area",20),
 		SHOP_VACANT_FLOOR_AREA("shop_vacant_floor_area",Double.POSITIVE_INFINITY),
 		WAREHOUSE_FLOOR_AREA("warehouse_floor_area",200),
 		WAREHOUSE_VACANT_AREA("warehouse_vacant_area",Double.POSITIVE_INFINITY);
@@ -64,20 +77,23 @@ public class SecondaryFacilitiesFileGenerator {
 				return area/areaFactor;
 		}
 	}
-
-	private static final int NUM_FITTING_ITERATIONS = 50;
+	
+	//Constants
+	private static final int NUM_FITTING_ITERATIONS = 100;
 	private static final double MAX_NUM_POSITIONS_ONE_PLACE = 1000;
+	private static final String WORK_FACILITIES_FILE = "./data/currentSimulation/facilities/workFacilities2.xml";
 	
 	//Methods
-
 	public static void main(String[] args) {
 		try {
 			//writeActivityTypes();
 			//writePlaceTypes();
 			//crossActivityTypesPlaceTypes();
 			//writeRealEstatePlaceTypes();
+			//ActivityFacilities facilities = createEmptyFacilities();
 			//savePostalCodes();
 			assignActivityOptions();
+			inflateEZlink();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -93,7 +109,7 @@ public class SecondaryFacilitiesFileGenerator {
 		}
 	}
 	private static void assignActivityOptions() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("Secondary facilities Singapore");
+		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl("Work facilities Singapore");
 		BufferedReader reader = new BufferedReader(new FileReader("./data/facilities/postalCodes.txt"));
 		SortedMap<Integer, Integer> postalCodes = new TreeMap<Integer, Integer>();
 		String line = reader.readLine();
@@ -103,9 +119,32 @@ public class SecondaryFacilitiesFileGenerator {
 			line = reader.readLine();
 		}
 		reader.close();
-		Map<String,double[]> fractions = new HashMap<String, double[]>();
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		ResultSet resultFractions = dataBaseAuxiliar.executeQuery("SELECT name, ura_place_type_id, fraction FROM Sec_RealEstate_place_types, Sec_RealEstate_place_types_X_URA_place_types  WHERE id=realestate_place_type_id");
+		Map<String,ActitvityTime> times = new HashMap<String,ActitvityTime>();
+		ResultSet resultTypes = dataBaseAuxiliar.executeQuery("SELECT id,occupation FROM Activity_types");
+		while(resultTypes.next()) {
+			times.put(resultTypes.getString(2), new ActitvityTime());
+			ResultSet resultTimes = dataBaseAuxiliar.executeQuery("SELECT type,time FROM Activity_times WHERE activity_type_id="+resultTypes.getInt(1));
+			while(resultTimes.next()) {
+				Map<Integer,Integer> map = null;
+				if(resultTimes.getString(1).equals("start")) {
+					map = times.get(resultTypes.getString(2)).startTimes;
+					times.get(resultTypes.getString(2)).totalStarts ++; 
+				}
+				else {
+					map = times.get(resultTypes.getString(2)).endTimes;
+					times.get(resultTypes.getString(2)).totalEnds ++;
+				}
+				Integer freq = map.get(resultTimes.getInt(2));
+				if(freq==null)
+					map.put(resultTimes.getInt(2), 1);
+				else
+					map.put(resultTimes.getInt(2), freq+1);
+			}
+		}
+		resultTypes.close();
+		Map<String,double[]> fractions = new HashMap<String, double[]>();
+		ResultSet resultFractions = dataBaseAuxiliar.executeQuery("SELECT name, ura_place_type_id, fraction FROM RealEstate_place_types, RealEstate_place_types_X_URA_place_types  WHERE id=realestate_place_type_id");
 		while(resultFractions.next()) {
 			double[] fracs = fractions.get(resultFractions.getString(1).toLowerCase());
 			if(fracs==null)
@@ -123,16 +162,16 @@ public class SecondaryFacilitiesFileGenerator {
 		Iterator<Entry<Integer, Integer>> postalCodeEI = postalCodes.entrySet().iterator();
 		Entry<Integer, Integer> postalCodeE = postalCodeEI.next();
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealEstate.properties"));
-		for(int postalSector = 0; postalSector<100; postalSector++) {
+		for(int postalSector = 0; postalSector<100 && postalCodeEI.hasNext(); postalSector++) {
 			System.out.println(postalSector);
 			Map<URA_PLACE_TYPES, Double> areas = getPostalSectorAreas(postalSector);
-			Map<Id, String> facilitiesPostalSector = new HashMap<Id, String>();
-			while(postalCodeE.getKey()/10000<postalSector) {
-				ResultSet resultFacility = dataBaseBuildings.executeQuery("SELECT type FROM building_directory WHERE id_building_directory="+postalCodeE.getValue());
+			SortedMap<Integer, Tuple<String, Coord>> facilitiesPostalSector = new TreeMap<Integer, Tuple<String, Coord>>();
+			while(postalCodeE.getKey()/10000<(postalSector+1)) {
+				ResultSet resultFacility = dataBaseBuildings.executeQuery("SELECT type,longitude,latitude FROM building_directory WHERE id_building_directory="+postalCodeE.getValue());
 				if(resultFacility.next()) {
-					ResultSet resultType = dataBaseAuxiliar.executeQuery("SELECT * FROM Sec_RealEstate_place_types WHERE name='"+resultFacility.getString(1)+"'");
+					ResultSet resultType = dataBaseAuxiliar.executeQuery("SELECT * FROM RealEstate_place_types WHERE name='"+resultFacility.getString(1)+"'");
 					if(resultType.next())
-						facilitiesPostalSector.put(new IdImpl(postalCodeE.getValue()), resultFacility.getString(1).toLowerCase());
+						facilitiesPostalSector.put(postalCodeE.getKey(), new Tuple<String, Coord>(resultFacility.getString(1).toLowerCase(), new CoordImpl(resultFacility.getDouble(2), resultFacility.getDouble(3))));
 					resultType.close();
 				}
 				resultFacility.close();
@@ -149,14 +188,14 @@ public class SecondaryFacilitiesFileGenerator {
 			for(int i=0; i<controlConstants1.getDimensions()[0]; i++)
 				controlConstants1.setElement(new int[]{i}, URA_PLACE_TYPES.values()[i].getNumPositions(areas.get(URA_PLACE_TYPES.values()[i])));
 			fittingControls[0]=new TotalFittingControl(controlConstants1);
-			/*for(int i=0; i<dimensions[1]; i++) 
+			for(int i=0; i<dimensions[1]; i++) 
 				System.out.print(controlConstants1.getElement(new int[]{i})+" ");
 			System.out.println();
-			System.out.println();*/
+			System.out.println();
 			MatrixNDimensions<Double> controlConstants2=new MatrixNDimensionsImpl<Double>(new int[]{facilitiesPostalSector.size(), numURAPlaceTypes});
-			Iterator<String> facilitiesI = facilitiesPostalSector.values().iterator();
+			Iterator<Tuple<String, Coord>> facilitiesI = facilitiesPostalSector.values().iterator();
 			for(int i=0; i<controlConstants2.getDimensions()[0]; i++) {
-				String facilityType = facilitiesI.next();
+				String facilityType = facilitiesI.next().getFirst();
 				Set<Integer> zeroPositions = new HashSet<Integer>();
 				for(int j=0; j<controlConstants2.getDimensions()[1]; j++)
 					if(controlConstants1.getElement(new int[]{j})==0 && fractions.get(facilityType)[j]>0)
@@ -172,29 +211,199 @@ public class SecondaryFacilitiesFileGenerator {
 						controlConstants2.setElement(new int[]{i,j}, 0.0);
 			}
 			fittingControls[1]=new ProportionFittingControl(controlConstants2);
-			/*for(int i=0; i<dimensions[0]; i++) { 
+			Iterator<Integer> facilitiesPostalSectorIterator = facilitiesPostalSector.keySet().iterator();
+			for(int i=0; i<dimensions[0]; i++) { 
+				System.out.print(facilitiesPostalSectorIterator.next()+": ");
 				for(int j=0; j<dimensions[1]; j++)
 					System.out.print(controlConstants2.getElement(new int[]{i,j})+" ");
 				System.out.println();
 			}
 			System.out.println();
-			System.out.println();*/
+			System.out.println();
 			FittingData fittingData = new FittingData(dimensions, fittingControls);
 			MatrixNDimensions<Double> result=fittingData.run(NUM_FITTING_ITERATIONS);
-			for(int i=0; i<dimensions[0]; i++) { 
+			facilitiesPostalSectorIterator = facilitiesPostalSector.keySet().iterator();
+			for(int i=0; i<dimensions[0]; i++) {
+				System.out.print(facilitiesPostalSectorIterator.next()+": ");
 				for(int j=0; j<dimensions[1]; j++)
 					System.out.print(result.getElement(new int[]{i,j})+" ");
 				System.out.println();
 			}
-			Iterator<Entry<Id, String>> facilityI = facilitiesPostalSector.entrySet().iterator();
-			/*while(facilitiesI.hasNext()) {
-				Entry<Id, String> facility = facilityI.next();
-				
-				facility = facilities.createFacility(new IdImpl(facility.getKey()), coordinateTransformation.transform(center));
-			}*/
+			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+			Iterator<Entry<Integer, Tuple<String, Coord>>> facilityI = facilitiesPostalSector.entrySet().iterator();
+			int f=0;
+			while(facilityI.hasNext()) {
+				Entry<Integer, Tuple<String, Coord>> facilityE = facilityI.next();
+				ActivityFacilityImpl facility = facilities.createFacility(new IdImpl(facilityE.getKey()), coordinateTransformation.transform(facilityE.getValue().getSecond()));
+				ResultSet resultOccupations = dataBaseAuxiliar.executeQuery("SELECT occupation,quantity FROM Activity_types,Activity_types_X_Place_types,Place_types_X_RealEstate_place_types,RealEstate_place_types WHERE Activity_types.id=activity_type_id AND Activity_types_X_Place_types.place_type_id=Place_types_X_RealEstate_place_types.place_type_id AND realestate_place_type_id=RealEstate_place_types.id AND name='"+facilityE.getValue().getFirst()+"'");
+				Map<String,Integer> occupations = new HashMap<String, Integer>();
+				int totalQuantity=0;
+				while(resultOccupations.next())
+					if(!resultOccupations.getString(1).equals("null") && resultOccupations.getInt(2)!=0) {
+						if(occupations.get(resultOccupations.getString(1))==null)
+							occupations.put(resultOccupations.getString(1), resultOccupations.getInt(2));
+						else
+							occupations.put(resultOccupations.getString(1), occupations.get(resultOccupations.getString(1))+resultOccupations.getInt(2));
+						totalQuantity += resultOccupations.getInt(2);
+						if(!facility.getActivityOptions().containsKey(resultOccupations.getString(1))) {
+							facility.createActivityOption(resultOccupations.getString(1));
+							double random = Math.random()*times.get(resultOccupations.getString(1)).totalStarts;
+							double sum = 0;
+							for(Entry<Integer, Integer> timeS:times.get(resultOccupations.getString(1)).startTimes.entrySet()) {
+								sum += timeS.getValue();
+								if(random<sum) {
+									random = Math.random()*times.get(resultOccupations.getString(1)).totalEnds;
+									sum = 0;
+									for(Entry<Integer, Integer> timeE:times.get(resultOccupations.getString(1)).endTimes.entrySet()) {
+										sum += timeE.getValue();
+										if(random<sum)  {
+											double startTime = (timeS.getKey()/1800)*1800;
+											double endTime = (timeE.getKey()/1800)*1800;
+											if(startTime>endTime) {
+												double temp = endTime;
+												endTime = startTime;
+												startTime = temp;
+											}
+											else if(startTime==endTime)
+												endTime+=28800;
+											((ActivityOptionImpl)facility.getActivityOptions().get(resultOccupations.getString(1))).addOpeningTime(new OpeningTimeImpl(DayType.wkday, startTime, endTime));
+											break;
+										}
+									}
+									break;
+								}
+							}
+							facility.getActivityOptions().get(resultOccupations.getString(1)).setCapacity(0.0);
+						}
+					}
+				int total=0;
+				for(int t=0; t<dimensions[1]; t++)
+					total+=result.getElement(new int[]{f,t});
+				if(facility.getId().toString().equals("608784"))
+					System.out.println();
+				if(total>0) {
+					for(int o=0; o<total; o++) {
+						double random = Math.random()*totalQuantity;
+						double sum = 0;
+						for(Entry<String,Integer> occupation:occupations.entrySet()) {
+							sum += occupation.getValue();
+							if(random<sum) {
+								ActivityOption option = facility.getActivityOptions().get(occupation.getKey());
+								option.setCapacity(option.getCapacity()+1);
+								break;
+							}
+						}		
+					}
+					for(String occupation:occupations.keySet())
+						if(facility.getActivityOptions().get(occupation).getCapacity()==0)
+							facility.getActivityOptions().remove(occupation);
+				}
+				else
+					facilities.getFacilities().remove(facility.getId());
+				f++;
+			}
 		}
 		dataBaseAuxiliar.close();
 		dataBaseBuildings.close();
+		new FacilitiesWriter(facilities).write(WORK_FACILITIES_FILE);
+	}
+	public static void inflateEZlink() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+		DataBaseAdmin dataBasePostalCodes  = new DataBaseAdmin(new File("./data/facilities/DataBasePostalCodes.properties"));
+		Map<Coord, Integer> allZones = new HashMap<Coord, Integer>();
+		ResultSet resultZone = dataBasePostalCodes.executeQuery("SELECT Zone_ID,x_utm48n,y_utm48n FROM pcodes_440NewZones_xycoords");
+		while(resultZone.next())
+			allZones.put(new CoordImpl(resultZone.getDouble(2),resultZone.getDouble(3)), resultZone.getInt(1));
+		resultZone.close();
+		Map<Integer, Integer> allPostalCodes = new HashMap<Integer, Integer>();
+		resultZone = dataBasePostalCodes.executeQuery("SELECT ZIP,Zone_ID FROM pcodes_440NewZones_xycoords");
+		while(resultZone.next())
+			allPostalCodes.put(resultZone.getInt(1),resultZone.getInt(2));
+		resultZone.close();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new FacilitiesReaderMatsimV1((ScenarioImpl) scenario).readFile(WORK_FACILITIES_FILE);
+		ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		Map<Integer, Double> totalsEZLinkZones = new HashMap<Integer, Double>();
+		BufferedReader reader = new BufferedReader(new FileReader("./data/facilities/Workplaces_440Zones.csv"));
+		String line = reader.readLine();
+		while(line!=null) {
+			String[] parts = line.split(",");
+			totalsEZLinkZones.put(Integer.parseInt(parts[0]), Double.parseDouble(parts[1]));
+			line = reader.readLine();
+		}
+		reader.close();
+		Map<Integer, Double> capEZLinkZones = new HashMap<Integer, Double>();
+		for(Integer zone:totalsEZLinkZones.keySet())
+			capEZLinkZones.put(zone, 0.0);
+		for(ActivityFacility facility:facilities.getFacilities().values()) {
+			double capacity = 0;
+			int zone = getZone(allPostalCodes, allZones, facility.getCoord(), Integer.parseInt(facility.getId().toString()));
+			for(ActivityOption activityOption:facility.getActivityOptions().values())
+				capacity+=activityOption.getCapacity();
+			capEZLinkZones.put(zone, capEZLinkZones.get(zone)+capacity);
+		}
+		Set<Id> removeFacilities = new HashSet<Id>();
+		for(ActivityFacility facility:facilities.getFacilities().values()) {
+			int zone = getZone(allPostalCodes, allZones, facility.getCoord(), Integer.parseInt(facility.getId().toString()));
+			Set<String> removeOptions = new HashSet<String>();
+			for(Entry<String,ActivityOption> activityOption:facility.getActivityOptions().entrySet()) {
+				double capacity = (double)((int)(activityOption.getValue().getCapacity()*totalsEZLinkZones.get(zone)/capEZLinkZones.get(zone)));
+				if(capacity!=0)
+					activityOption.getValue().setCapacity(capacity);
+				else
+					removeOptions.add(activityOption.getKey());
+			}
+			for(String key:removeOptions)
+				facility.getActivityOptions().remove(key);
+			if(facility.getActivityOptions().size()==0)
+				removeFacilities.add(facility.getId());
+		}
+		for(Id key:removeFacilities)
+			facilities.getFacilities().remove(key);
+		dataBasePostalCodes.close();
+		new FacilitiesWriter(facilities).write(WORK_FACILITIES_FILE);
+		writeFacilitiesOnDatabase(facilities);
+	}
+	private static void writeFacilitiesOnDatabase(ActivityFacilitiesImpl facilities) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+		DataBaseAdmin dataBaseFacilities  = new DataBaseAdmin(new File("./data/facilities/DataBaseFacilities.properties"));
+		ResultSet numResult = dataBaseFacilities.executeQuery("SELECT COUNT(*) FROM Facilities");
+		numResult.next();
+		int facilityPos=numResult.getInt(1);
+		numResult.close();
+		for(ActivityFacility facility:facilities.getFacilities().values()) {
+			int idFacility;
+			ResultSet facilityResult = dataBaseFacilities.executeQuery("SELECT id FROM Facilities WHERE external_id ="+facility.getId().toString());
+			if(!facilityResult.next()) {
+				facilityPos++;
+				idFacility = facilityPos;
+				dataBaseFacilities.executeStatement("INSERT INTO Facilities (x,y,external_id) VALUES ("+facility.getCoord().getX()+","+facility.getCoord().getY()+","+facility.getId().toString()+")");
+			}
+			else
+				idFacility = facilityResult.getInt(1);
+			facilityResult.close();
+			for(ActivityOption option:facility.getActivityOptions().values()) {
+				ResultSet optionResult = dataBaseFacilities.executeQuery("SELECT capacity FROM Activity_options WHERE type='"+option.getType()+"' AND facility_id ="+idFacility);
+				if(!optionResult.next())
+					dataBaseFacilities.executeStatement("INSERT INTO Activity_options (type,facility_id,capacity) VALUES ('"+option.getType()+"',"+idFacility+","+option.getCapacity()+")");
+				else
+					dataBaseFacilities.executeStatement("UPDATE Activity_options SET capacity=capacity+"+optionResult.getDouble(1)+" WHERE type='"+option.getType()+"' AND facility_id ="+idFacility);
+				for(OpeningTime openingTime:option.getOpeningTimes(DayType.wkday))
+					dataBaseFacilities.executeStatement("INSERT INTO Opening_times (day_type,start_time,end_time,type,facility_id) VALUES ('"+DayType.wkday+"',"+openingTime.getStartTime()+","+openingTime.getEndTime()+",'"+option.getType()+"',"+idFacility+")");
+			}
+		}
+	}
+	private static Integer getZone(Map<Integer, Integer> allPostalCodes, Map<Coord, Integer> allZones, Coord coord, int zip) throws SQLException, NoConnectionException {
+		Integer zone = allPostalCodes.get(zip);
+		if(zone==null) {
+			double nearest = Double.MAX_VALUE;
+			for(Entry<Coord, Integer> postalCode: allZones.entrySet()) {
+				double distance = CoordUtils.calcDistance(postalCode.getKey(), coord);
+				if(distance<nearest) {
+					zone = postalCode.getValue();
+					nearest = distance;
+				}
+			}
+		}
+		return zone;
 	}
 	private static Map<URA_PLACE_TYPES, Double> getPostalSectorAreas(int postalSector) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAreas  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealis.properties"));
@@ -268,7 +477,7 @@ public class SecondaryFacilitiesFileGenerator {
 		dataBaseAreas.close();
 		return areas;
 	}
-	private static void createFakeFacilities(int postalSector, Map<Id, String> facilitiesPostalSector, Map<URA_PLACE_TYPES, Double> areas, Map<String, double[]> fractions) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static void createFakeFacilities(int postalSector, SortedMap<Integer, Tuple<String, Coord>> facilitiesPostalSector, Map<URA_PLACE_TYPES, Double> areas, Map<String, double[]> fractions) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBasePostalCodes  = new DataBaseAdmin(new File("./data/facilities/DataBasePostalCodes.properties"));
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		DataBaseAdmin dataBaseBuildings  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealEstate.properties"));
@@ -277,18 +486,18 @@ public class SecondaryFacilitiesFileGenerator {
 			double numPositions = uRAPlaceType.getNumPositions(areas.get(uRAPlaceType));
 			if(numPositions>0) {
 				double sumFractions = 0;
-				for(String facilityType:facilitiesPostalSector.values())
-					sumFractions+=fractions.get(facilityType)[uRAPlaceType.ordinal()];
+				for(Tuple<String, Coord> facilityType:facilitiesPostalSector.values())
+					sumFractions+=fractions.get(facilityType.getFirst())[uRAPlaceType.ordinal()];
 				if(sumFractions==0) {
 					for(int i=0; i<numPositions/MAX_NUM_POSITIONS_ONE_PLACE; i++) {
-						ResultSet resultPostalCodes = dataBasePostalCodes.executeQuery("SELECT zip FROM postal_codes WHERE zip>="+postalSector*10000+" AND zip<"+(postalSector+1)*10000 + " ORDER BY RAND()");
+						ResultSet resultPostalCodes = dataBasePostalCodes.executeQuery("SELECT zip,lng,lat FROM postal_codes WHERE zip>="+postalSector*10000+" AND zip<"+(postalSector+1)*10000 + " ORDER BY RAND()");
 						boolean fakeOneCreated = false;
 						while(resultPostalCodes.next() && !fakeOneCreated)
-							if(!dataBaseBuildings.executeQuery("SELECT * FROM building_directory WHERE post_code='"+resultPostalCodes.getInt(1)+"' or post_code='0"+resultPostalCodes.getInt(1)+"'").next() && !usedCodes.contains(resultPostalCodes.getInt(1))) {
+							if(!dataBaseBuildings.executeQuery("SELECT * FROM building_directory WHERE post_code='"+resultPostalCodes.getInt(1)+"' OR post_code='0"+resultPostalCodes.getInt(1)+"'").next() && !usedCodes.contains(resultPostalCodes.getInt(1))) {
 								usedCodes.add(resultPostalCodes.getInt(1));
 								ResultSet resultRandomType = dataBaseAuxiliar.executeQuery("SELECT name FROM RealEstate_place_types,RealEstate_place_types_X_URA_place_types WHERE id=realestate_place_type_id AND ura_place_type_id="+(uRAPlaceType.ordinal()+1)+" ORDER BY RAND() LIMIT 1");
 								resultRandomType.next();
-								facilitiesPostalSector.put(new IdImpl("new"+facilitiesPostalSector.size()), resultRandomType.getString(1).toLowerCase());
+								facilitiesPostalSector.put(resultPostalCodes.getInt(1), new Tuple<String,Coord>(resultRandomType.getString(1).toLowerCase(),new CoordImpl(resultPostalCodes.getDouble(2), resultPostalCodes.getDouble(3))));
 								fakeOneCreated=true;
 							}
 						if(fakeOneCreated==false)
@@ -320,7 +529,7 @@ public class SecondaryFacilitiesFileGenerator {
 				badPostalCode = true;
 			else
 				try {
-					postalCode = Integer.parseInt(resultFacilities.getString(4));
+					postalCode = Integer.parseInt(resultFacilities.getString(4).replaceAll("Singapore", "").trim());
 				} catch (Exception e) {
 					badPostalCode = true;
 				}
@@ -376,87 +585,82 @@ public class SecondaryFacilitiesFileGenerator {
 		dataBaseBuildings.close();
 		return facilities;
 	}
-
 	private static void writeActivityTypes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseHits  = new DataBaseAdmin(new File("./data/hits/DataBase.properties"));
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		ResultSet secondaries = dataBaseHits.executeQuery("SELECT DISTINCT t6_purpose FROM hits.hitsshort WHERE t6_purpose!='work' AND t6_purpose!='home' AND t6_purpose!='pickupdropof'"/*TODO*/);
+		ResultSet occupations = dataBaseHits.executeQuery("SELECT DISTINCT p6_occup FROM hits.hitsshort WHERE t6_purpose='work'");
 		int numActivityTypes = 0;
-		while(secondaries.next()) {
-			dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Activity_types (type) VALUES ('"+secondaries.getString(1)+"')");
+		while(occupations.next()) {
+			dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Activity_types (type,occupation) VALUES ('work','"+occupations.getString(1)+"')");
 			numActivityTypes++;
-			ResultSet startTimes = dataBaseHits.executeQuery("SELECT t4_endtime FROM hits.hitsshort WHERE t6_purpose='"+secondaries.getString(1)+"'");
+			ResultSet startTimes = dataBaseHits.executeQuery("SELECT t4_endtime FROM hits.hitsshort WHERE t6_purpose='work' AND p6_occup='"+occupations.getString(1)+"'");
 			while(startTimes.next()) {
 				int intTime = startTimes.getInt(1);
 				double time = (intTime%100)*60+(intTime/100)*3600;
-				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Activity_times VALUES ("+numActivityTypes+",'start',"+time+")");
+				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Activity_times VALUES ("+numActivityTypes+",'start',"+time+")");
 			}
 			startTimes.close();
-			ResultSet endTimes = dataBaseHits.executeQuery("SELECT t3_starttime FROM hits.hitsshort WHERE t6_purpose='home'");
+			ResultSet endTimes = dataBaseHits.executeQuery("SELECT t3_starttime FROM hits.hitsshort WHERE t6_purpose='home' AND p6_occup='"+occupations.getString(1)+"'");
 			while(endTimes.next()) {
 				int intTime = endTimes.getInt(1);
 				double time = (intTime%100)*60+(intTime/100)*3600;
-				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Activity_times VALUES ("+numActivityTypes+",'end',"+time+")");
+				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Activity_times VALUES ("+numActivityTypes+",'end',"+time+")");
 			}
 			endTimes.close();
 		}
-		secondaries.close();
+		occupations.close();
 		dataBaseAuxiliar.close();
 		dataBaseHits.close();
 	}
-	
 	private static void writePlaceTypes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseHits  = new DataBaseAdmin(new File("./data/hits/DataBase.properties"));
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		ResultSet placeTypes = dataBaseHits.executeQuery("SELECT DISTINCT t5_placetype FROM hits.hitsshort t6_purpose!='work' AND t6_purpose!='home' AND t6_purpose!='pickupdropof'"/*TODO*/);
+		ResultSet placeTypes = dataBaseHits.executeQuery("SELECT DISTINCT t5_placetype FROM hits.hitsshort WHERE t6_purpose='work'");
 		while(placeTypes.next()) {
-			dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Place_types (name) VALUES ('"+fixed(placeTypes.getString(1))+"')");
+			dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Place_types (name) VALUES ('"+fixed(placeTypes.getString(1))+"')");
 		}
 		placeTypes.close();
 		dataBaseAuxiliar.close();
 		dataBaseHits.close();
 	}
-	
 	private static void crossActivityTypesPlaceTypes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseHits  = new DataBaseAdmin(new File("./data/hits/DataBase.properties"));
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		ResultSet activitiesPlaces = dataBaseAuxiliar.executeQuery("SELECT Sec_Activity_types.type,Sec_Place_types.name,Sec_Activity_types.id,Sec_Place_types.id FROM facilities_auxiliar.Sec_Activity_types,facilities_auxiliar.Sec_Place_types");
+		ResultSet activitiesPlaces = dataBaseAuxiliar.executeQuery("SELECT Activity_types.occupation,Place_types.name,Activity_types.id,Place_types.id FROM facilities_auxiliar.Activity_types,facilities_auxiliar.Place_types");
 		while(activitiesPlaces.next()) {
-			ResultSet result = dataBaseHits.executeQuery("SELECT COUNT(*) FROM hits.hitsshort WHERE t6_purpose='"+activitiesPlaces.getString(1)+"' AND t5_placetype='"+fixed(activitiesPlaces.getString(2))+"'");
+			ResultSet result = dataBaseHits.executeQuery("SELECT COUNT(*) FROM hits.hitsshort WHERE t6_purpose='work' AND p6_occup='"+activitiesPlaces.getString(1)+"' AND t5_placetype='"+fixed(activitiesPlaces.getString(2))+"'");
 			if(result.next())
-				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Activity_types_X_Place_types VALUES ("+activitiesPlaces.getInt(3)+","+activitiesPlaces.getInt(4)+","+result.getInt(1)+")");
+				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Activity_types_X_Place_types VALUES ("+activitiesPlaces.getInt(3)+","+activitiesPlaces.getInt(4)+","+result.getInt(1)+")");
 			result.close();
 		}
 		activitiesPlaces.close();
 		dataBaseAuxiliar.close();
 		dataBaseHits.close();
 	}
-
 	private static void writeRealEstatePlaceTypes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAuxiliar  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		DataBaseAdmin dataBaseRealEstate  = new DataBaseAdmin(new File("./data/facilities/DataBaseRealEstate.properties"));
-		ResultSet places = dataBaseAuxiliar.executeQuery("SELECT id,name FROM facilities_auxiliar.Sec_Place_types");
+		ResultSet places = dataBaseAuxiliar.executeQuery("SELECT id,name FROM facilities_auxiliar.Place_types");
 		int numRealEstatePlaces = 0;
 		while(places.next()) {
 			ResultSet realEstatePlaces = dataBaseRealEstate.executeQuery("SELECT type FROM real_estate.BDType_X_HitsType WHERE hits_type='"+places.getString(2)+"'");
 			while(realEstatePlaces.next()) {
-				ResultSet realEstateId = dataBaseAuxiliar.executeQuery("SELECT id FROM facilities_auxiliar.Sec_RealEstate_place_types WHERE name='"+realEstatePlaces.getString(1)+"'");
+				ResultSet realEstateId = dataBaseAuxiliar.executeQuery("SELECT id FROM facilities_auxiliar.RealEstate_place_types WHERE name='"+realEstatePlaces.getString(1)+"'");
 				int idRealEstatePlace;
 				if(realEstateId.next())
 					idRealEstatePlace=realEstateId.getInt(1);
 				else {
-					dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_RealEstate_place_types (name) VALUES ('"+realEstatePlaces.getString(1)+"')");
+					dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.RealEstate_place_types (name) VALUES ('"+realEstatePlaces.getString(1)+"')");
 					numRealEstatePlaces++;
 					idRealEstatePlace = numRealEstatePlaces;
 				}
-				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Sec_Place_types_X_RealEstate_place_types VALUES ("+places.getInt(1)+","+idRealEstatePlace+")");
+				dataBaseAuxiliar.executeStatement("INSERT INTO facilities_auxiliar.Place_types_X_RealEstate_place_types VALUES ("+places.getInt(1)+","+idRealEstatePlace+")");
 			}
 		}
 		places.close();
 		dataBaseRealEstate.close();
 		dataBaseAuxiliar.close();
 	}
-	
 	private static String fixed(String varchar) {
 		return varchar.replaceAll("'", "''");
 	}

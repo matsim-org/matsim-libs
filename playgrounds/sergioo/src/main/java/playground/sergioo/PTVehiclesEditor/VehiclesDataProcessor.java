@@ -225,7 +225,7 @@ public class VehiclesDataProcessor {
 												vehicleType.setDescription(result.getString(2));
 												vehicleType.setWidth(result.getDouble(3));
 												vehicleType.setLength(result.getDouble(4));
-												vehicleType.setMaximumVelocity(result.getDouble(5));
+												vehicleType.setMaximumVelocity(result.getDouble(5)/3.6);
 												ResultSet result2 = dataBaseVehicles.executeQuery("SELECT * FROM pt_systems.Capacities WHERE id="+result.getInt(6));
 												VehicleCapacity vehicleCapacity = new VehicleCapacityImpl();
 												if(result2.next()) {

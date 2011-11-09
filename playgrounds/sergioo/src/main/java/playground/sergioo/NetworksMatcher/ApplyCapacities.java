@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.geotools.feature.Feature;
@@ -21,6 +22,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -29,11 +31,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow;
-import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
-import playground.sergioo.Visualizer2D.LayersWindow;
-
 import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 
 public class ApplyCapacities {
 
@@ -45,7 +45,16 @@ public class ApplyCapacities {
 
 	//Methods
 	
-	public static Network getNetworkFromShapeFileLength(String fileName) {
+	public static Network getNetworkFromShapeFileLength(String fileName) throws IOException {
+		Map<Integer,Double> freeSpeedsMap = new HashMap<Integer, Double>(); 
+		BufferedReader reader = new BufferedReader(new FileReader("./data/matching/freeSpeed/FreeSpeeds_X_Types.txt"));
+		String line = reader.readLine();
+		while(line!=null) {
+			String[] parts = line.split(":");
+			freeSpeedsMap.put(Integer.parseInt(parts[0]), Double.parseDouble(parts[1]));
+			line = reader.readLine();
+		}
+		reader.close();
 		ShapeFileReader shapeFileReader =  new ShapeFileReader();
 		Set<Feature> features = shapeFileReader.readFileAndInitialize(fileName);
 		Network network = NetworkImpl.createNetwork();
@@ -67,6 +76,7 @@ public class ApplyCapacities {
 				}
 				Link link = network.getFactory().createLink(new IdImpl(idFromNode+"-->"+idToNode), fromNode, toNode);
 				link.setCapacity((Double)feature.getAttribute("DATA2"));
+				link.setFreespeed(freeSpeedsMap.get((Integer)feature.getAttribute("VDF"))/3.6);
 				link.setNumberOfLanes((Double)feature.getAttribute("LANES"));
 				link.setLength((Double)feature.getAttribute("LENGTH"));
 				((LinkImpl)link).setOrigId(feature.getID());
@@ -94,9 +104,13 @@ public class ApplyCapacities {
 	}
 	
 	/**
-	 * @param args
+	 * @param args 0 
+	 *  0 - First network MATSim file ("./data/currentSimulation/singapore.xml")
+	 *  1 - Second network shape file ("C:/Users/sergioo/Documents/2011/Work/FCL Old/Operations/Data/RoadCapacities/emme_links.shp")
+	 *  2 - First network MATSim output file ("./data/currentSimulation/singapore2.xml")
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
 		matsimNetworkReader.readFile(args[0]);
@@ -107,14 +121,19 @@ public class ApplyCapacities {
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		CrossingMatchingStep.CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
 		Map<Link, Tuple<Link,Double>> result = loadCapacities(CrossingMatchingStep.CAPACITIES_FILE, networkLowResolution, networkHighResolution);
-		LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);
+		for(Entry<Link, Tuple<Link,Double>> entry:result.entrySet()) {
+			entry.getKey().setCapacity(entry.getValue().getFirst().getCapacity());
+			entry.getKey().setFreespeed(entry.getValue().getFirst().getFreespeed());
+		}
+		new NetworkWriter(networkHighResolution).write(args[2]);
+		/*LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 	}
 	
 }
