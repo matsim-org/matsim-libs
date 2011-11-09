@@ -28,18 +28,18 @@ import org.matsim.api.core.v01.Identifiable;
  * (activity, net, teleportation, ...).
  * After advancing the Plan, the agent would not return its control to the calling method, but insert itself directly into the 
  * Mobsim.</LI>
- * <li>DONE When trying around with object composition, we found that this does not work, since the PlanAgent delegate would only
+ * <li><strike>DONE When trying around with object composition, we found that this does not work, since the PlanAgent delegate would only
  * schedule the delegate back into the Mobsim.  Discussing a bit, we found that this is a problem in other places as well
  * (e.g. context switches in window-driven systems, where the calling method needs to know about the context switch).  The decision
  * was thus to modify the design such that control about the agent is always returned to the calling method.  This is, however,
- * not yet implemented (nov'10).</li>
- * <li>DONE I attempted this, but abandoned it eventually.  A major problem is that an agent that cannot insert him/herself into 
+ * not yet implemented (nov'10).</strike>
+ * <li><strike>DONE I attempted this, but abandoned it eventually.  A major problem is that an agent that cannot insert him/herself into 
  * the next process but returns to where it was called from somehow needs to pass to that location what he/she wants to do next.
  * Since we do not want to assume that every agent is a PlanAgent, using the full PlanAgent interface really is too strong.
  * This, however, indicates that one would need some "return code", e.g. something like
  * <pre>enum NextAction { StartActivity, StartLeg, ...} .</pre>
  * In the end, I considered this too much infrastructure, because if we have infrastructure, we can as well have a back pointer to
- * the "original agent" as part of the delegate.  kai, dec'10</li> 
+ * the "original agent" as part of the delegate.  kai, dec'10</strike>
  * </UL>
  * 
  * DONE Towards a concept for status pointers:<ul>
