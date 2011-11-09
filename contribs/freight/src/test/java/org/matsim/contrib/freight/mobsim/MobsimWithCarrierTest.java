@@ -26,43 +26,39 @@
  * ${type_declaration}
  */
 
-package playground.mzilske.freight;
+package org.matsim.contrib.freight.mobsim;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.matsim.contrib.freight.controler.RunMobSimWithCarrier;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.Controler;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
  * Created by IntelliJ IDEA.
  * User: zilske
- * Date: 10/31/11
- * Time: 5:59 PM
+ * Date: 11/9/11
+ * Time: 4:16 PM
  * To change this template use File | Settings | File Templates.
  */
-public class QSimAgentSource implements AgentSource {
+public class MobsimWithCarrierTest extends MatsimTestCase {
 
-    private Collection<Plan> plans;
+    private String NETWORK_FILENAME;
 
-    private AgentFactory agentFactory;
-
-    public QSimAgentSource(Collection<Plan> plans, AgentFactory agentFactory) {
-        this.plans = plans;
-        this.agentFactory = agentFactory;
-    }
-
-    @Override
-    public List<MobsimAgent> insertAgentsIntoMobsim() {
-        List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
-        for (Plan plan : plans) {
-            MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(plan.getPerson());
-            agents.add(agent);
-        }
-        return agents;
+    public void testMobsimWithCarrier() {
+        NETWORK_FILENAME = getInputDirectory() + "grid.xml";
+		Config config = new Config();
+		config.addCoreModules();
+		config.global().setCoordinateSystem("EPSG:32632");
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(0);
+        config.network().setInputFile(NETWORK_FILENAME);
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		Controler controler = new Controler(config);
+		controler.setCreateGraphs(false);
+		controler.addControlerListener(new RunMobSimWithCarrier(getInputDirectory() + "carrierPlans.xml"));
+		controler.setOverwriteFiles(true);
+		controler.run();
     }
 
 }
