@@ -30,45 +30,45 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.droeder.DRPaths;
-import playground.droeder.Analysis.NetworkAnalysisHandler;
+import playground.droeder.Analysis.handler.NetworkAnalysisHandler;
 
 /**
  * @author droeder
  *
  */
 public class SketchPlanningControler{
-	private final static String CONFIGDIR = "";
+	private final static String CONFIGDIR = "D:/VSP/svn/shared/studies-droeder/sketchPlanning/";
 	private final static String CONFIGBASE = CONFIGDIR + "config_base.xml";
-	private final static String CONFIGBA16EXT = CONFIGDIR + "config_ba16ext.xml";
-	private final static String CONFIGBA17EXT = CONFIGDIR + "config_ba16_17ext.xml";
-	private final static String CONFIGBA17_ST_EXT = CONFIGDIR + "config_ba16_17_storkower_ext.xml";
+	private final static String CONFIGBA16EXT = CONFIGDIR + "config_ba16.xml";
+	private final static String CONFIGBA17EXT = CONFIGDIR + "config_ba16_17.xml";
+	private final static String CONFIGBA17_ST_EXT = CONFIGDIR + "config_ba16_17_storkower.xml";
 	
 	public static void main(String[] args){
 		Controler c;
-		c = new Controler(CONFIGBASE);
-		c.setCreateGraphs(true);
-		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-//		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
-		c.run();
+//		c = new Controler(CONFIGBASE);
+//		c.setCreateGraphs(true);
+//		c.setDumpDataAtEnd(true);
+//		c.setOverwriteFiles(true);
+////		c.addControlerListener(new MyListener(c.getConfig().controler().getOutputDirectory()));
+//		c.run();
 		
-		c = new Controler(CONFIGBA17EXT);
-		c.setCreateGraphs(true);
-		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-		c.run();
-
-		c = new Controler(CONFIGBA16EXT);
-		c.setCreateGraphs(true);
-		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-		c.run();
-		
-		c = new Controler(CONFIGBA17_ST_EXT);
-		c.setCreateGraphs(true);
-		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-		c.run();
+//		c = new Controler(CONFIGBA17EXT);
+//		c.setCreateGraphs(true);
+//		c.setDumpDataAtEnd(true);
+//		c.setOverwriteFiles(true);
+//		c.run();
+//
+//		c = new Controler(CONFIGBA16EXT);
+//		c.setCreateGraphs(true);
+//		c.setDumpDataAtEnd(true);
+//		c.setOverwriteFiles(true);
+//		c.run();
+//		
+//		c = new Controler(CONFIGBA17_ST_EXT);
+//		c.setCreateGraphs(true);
+//		c.setDumpDataAtEnd(true);
+//		c.setOverwriteFiles(true);
+//		c.run();
 	}
 
 
@@ -77,8 +77,8 @@ public class SketchPlanningControler{
 class MyListener  implements StartupListener, IterationEndsListener, IterationStartsListener, ShutdownListener{
 	
 	private String outDir;
-	private int lastIter;
-	private NetworkAnalysisHandler netAna;
+//	private int lastIter;
+//	private NetworkAnalysisHandler netAna;
 
 	public MyListener(String outDir){
 		this.outDir = outDir;
@@ -89,9 +89,9 @@ class MyListener  implements StartupListener, IterationEndsListener, IterationSt
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		this.lastIter = event.getIteration();
-		this.netAna.dumpCsv(DRPaths.SKETCH + "Berlin/output/");
-		System.out.println(this.outDir);
+//		this.lastIter = event.getIteration();
+//		this.netAna.dumpCsv(DRPaths.SKETCH + "Berlin/output/");
+//		System.out.println(this.outDir);
 	}
 
 	/* (non-Javadoc)
@@ -115,7 +115,7 @@ class MyListener  implements StartupListener, IterationEndsListener, IterationSt
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		netAna = new NetworkAnalysisHandler(true, 3600, event.getControler().getConfig().getQSimConfigGroup().getFlowCapFactor());
-		event.getControler().getEvents().addHandler(netAna);
+//		netAna = new NetworkAnalysisHandler(true, 3600, event.getControler().getConfig().getQSimConfigGroup().getFlowCapFactor());
+//		event.getControler().getEvents().addHandler(netAna);
 	}
 }
