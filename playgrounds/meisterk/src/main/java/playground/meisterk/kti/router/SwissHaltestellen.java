@@ -23,7 +23,8 @@ package playground.meisterk.kti.router;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -38,6 +39,7 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class SwissHaltestellen {
 
+	private final Map<Id, SwissHaltestelle> haltestellenMap;
 	private final QuadTree<SwissHaltestelle> haltestellen;
 
 	private static final Logger log = Logger.getLogger(SwissHaltestellen.class);
@@ -46,6 +48,7 @@ public class SwissHaltestellen {
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(network);
 		this.haltestellen = new QuadTree<SwissHaltestelle>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
+		this.haltestellenMap = new HashMap<Id, SwissHaltestelle>();
 	}
 
 	public void readFile(final String filename) throws FileNotFoundException, IOException {
@@ -57,6 +60,7 @@ public class SwissHaltestellen {
 				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
 				SwissHaltestelle swissStop = new SwissHaltestelle(new IdImpl(parts[0]), coord);
 				this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
+				this.haltestellenMap.put(swissStop.getId(), swissStop);
 			} else {
 				log.warn("Could not parse line: " + line);
 			}
@@ -67,30 +71,16 @@ public class SwissHaltestellen {
 		return this.haltestellen.get(coord.getX(), coord.getY());
 	}
 	
-	/**
-	 * This method looks up an entry in a collection backed by a QuadTree. It is very slow, possibly because of
-	 * - searching by iteration over a collection, and
-	 * - comparing string Id's via equals() which is known to be a performance killer.
-	 * TODO consider using Ids of primitive type such as int
+	/** 
+	 * Switched from iterating over a Collection from a QuadTree to a Map lookup which is significant faster.
+	 * cdobler, Nov'11
 	 * 
 	 * @param id
 	 * @return
 	 */
 	public SwissHaltestelle getHaltestelle(Id id) {
 		
-		SwissHaltestelle swissStop = null;
-		
-		Iterator<SwissHaltestelle> it = haltestellen.values().iterator();
-		boolean notFound = true;
-		while (notFound && it.hasNext()) {
-			swissStop = it.next();
-			if (id.equals(swissStop.getId())) {
-				notFound = false;
-			}
-		}
-		
-		return swissStop;
-		
+		return this.haltestellenMap.get(id);
 	}
 	
 }
