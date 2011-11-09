@@ -24,6 +24,7 @@ public class DefineFlexibleActivities {
 		this.initFlexibleTypes(config);
 	}
 
+	// only used by TGSimple
 	public List<Activity> getFlexibleActivities(final Plan plan) {
 		List<Activity> flexibleActivities = new Vector<Activity>();
 		if (flexibleTypes.size() > 0) {

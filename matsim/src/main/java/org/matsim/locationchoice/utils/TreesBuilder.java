@@ -99,7 +99,7 @@ public class TreesBuilder {
 		TreeMap<String, TreeMap<Id, ActivityFacility>> trees = new TreeMap<String, TreeMap<Id, ActivityFacility>>();
 		// get all types of activities
 		for (ActivityFacility f : facilities.getFacilities().values()) {
-			Map<String, ? extends ActivityOption> activities = f.getActivityOptions();
+			Map<String, ? extends ActivityOption> facilityActOpts = f.getActivityOptions();
 
 			// do not add facility if it is not in region of interest ------------------------
 			if (regionalScenario && (CoordUtils.calcDistance(f.getCoord(), centerNode.getCoord()) > radius)) {
@@ -107,16 +107,17 @@ public class TreesBuilder {
 			}
 			// -------------------------------------------------------------------------------
 
-			Iterator<? extends ActivityOption> act_it = activities.values().iterator();
-			while (act_it.hasNext()) {
-				ActivityOption act = act_it.next();
+			Iterator<? extends ActivityOption> actOpt_it = facilityActOpts.values().iterator();
+			while (actOpt_it.hasNext()) {
+				ActivityOption actOpt = actOpt_it.next();
 
-				// do only add activities of flexibleTypes if flexibleTypes != null
-				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains(act.getType())) {
-					if (!trees.containsKey(act.getType())) {
-						trees.put(act.getType(), new TreeMap<Id, ActivityFacility>());
+				// if flexibleTypes is empty we add all types to trees as potentially all types can be relocated
+				// otherwise we add all types given by flexibleTypes
+				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains(actOpt.getType())) {
+					if (!trees.containsKey(actOpt.getType())) {
+						trees.put(actOpt.getType(), new TreeMap<Id, ActivityFacility>());
 					}
-					trees.get(act.getType()).put(f.getId(), f);
+					trees.get(actOpt.getType()).put(f.getId(), f);
 				}
 			}
 		}
