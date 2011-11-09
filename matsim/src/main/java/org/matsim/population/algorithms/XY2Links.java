@@ -89,8 +89,17 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 					if (act.getFacilityId() != null) {
 						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId()); 
 						if (facility != null) act.setLinkId(facility.getLinkId());
-						if (act.getLinkId() != null) continue;
+						if (act.getLinkId() != null) continue; // (*)
 					}
+				}
+				
+				if ( act.getLinkId() != null ) {
+					// there may be activities in a plan that have a link and others that have a coordinate.  
+					// Those that have a link do not need a new link.  In addition, they may not even have a 
+					// coordinate.  kai/dominik, nov'11
+					
+					// this could presumably be combined with (*).  kai/dominik, nov'11
+					continue ;
 				}
 
 				// If the linkId is still null get nearest link from the network
