@@ -49,11 +49,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 /**
  * @author fuerbas
@@ -91,17 +89,12 @@ public class SfCottbusPtSchedule {
 		this.schedule = this.schedulefactory.createTransitSchedule();
 		this.ptLinkList = new HashMap<Id, Id>(); //linkId und facilId
 		this.ptFacList = new ArrayList<Id>();
-		this.vehicles = VehicleUtils.createVehiclesContainer();
-		this.vehicles.getVehicleTypes().put(new IdImpl("tram_93pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("tram_93pax")));
-		this.vehicles.getVehicleTypes().put(new IdImpl("bus_90pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_90pax")));
-		this.vehicles.getVehicleTypes().put(new IdImpl("bus_64pax"), this.vehicles.getFactory().createVehicleType(new IdImpl("bus_64pax")));
-		this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax")).setCapacity(new VehicleCapacityImpl());
+		this.vehicles = this.createVehicles();
 	}
 	
 	public static void main(String[] args) throws Exception {
 
 		SfCottbusPtSchedule cottbus = new SfCottbusPtSchedule();
-		
 		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile(cottbus.NETWORK);
@@ -112,8 +105,6 @@ public class SfCottbusPtSchedule {
 				
 		cottbus.schedulefactory = new TransitScheduleFactoryImpl();
 		cottbus.schedule = cottbus.schedulefactory.createTransitSchedule();
-
-		
 		
 //		Linienliste einlesen, Linien als Strings speichern, über alle Linien gleiches Schema ausführen...
 		
@@ -148,34 +139,13 @@ public class SfCottbusPtSchedule {
 				br.close();
 				
 			List<TransitRouteStop> stopList = cottbus.createTransitStopFacilities(transitStopIdStrings, stopLinkString);
-			
-			
 
-			String lineroutes = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+"_links.csv";
-			BufferedReader br2 = new BufferedReader(new FileReader(lineroutes));
 			
-			List<String> routeLinks = new ArrayList<String>();
-			while(br2.ready()) {
-				routeLinks.add(br2.readLine().replaceAll("\"", ""));
-			}
-			br2.close();
+			String lineroutes = "E:\\Cottbus\\Cottbus_pt\\lines\\all\\"+lineName+"_links.csv";
+			List<String> routeLinks = cottbus.createRouteLinks(lineroutes);
 			
 			String[] routes = routeLinks.toArray(new String[routeLinks.size()]);
 			
-			for (String string : routeLinks) {
-				Id id = new IdImpl(string);
-				String[] allowedModesArray = cottbus.scenario.getNetwork().getLinks().get(id).getAllowedModes().toArray(new String[cottbus.scenario.getNetwork().getLinks().get(id).getAllowedModes().size()]);
-				Set<String> allowedModes = new TreeSet<String>();
-				for (int ii=0; ii<allowedModesArray.length; ii++) {
-					allowedModes.add(allowedModesArray[ii]);
-				}
-				if (!allowedModes.contains(cottbus.pt_mode)) {
-					allowedModes.add(cottbus.pt_mode);
-					cottbus.scenario.getNetwork().getLinks().get(id).setAllowedModes(allowedModes);
-				} 
-				else ;
-			}
-
 			NetworkRoute netRoute = cottbus.createNetworkRoute(routes);
 			
 			TransitRoute transRoute = cottbus.createTransitRoute(lineName, netRoute, stopList);
@@ -204,6 +174,60 @@ public class SfCottbusPtSchedule {
 	}
 	
 	
+
+	private List<String> createRouteLinks(String lineroutes) throws IOException {
+		List<String> routeLinks = new ArrayList<String>();
+		BufferedReader br2 = new BufferedReader(new FileReader(lineroutes));
+		
+		while(br2.ready()) {
+			routeLinks.add(br2.readLine().replaceAll("\"", ""));
+		}
+		br2.close();
+		
+		for (String string : routeLinks) {
+			Id id = new IdImpl(string);
+			String[] allowedModesArray = this.scenario.getNetwork().getLinks().get(id).getAllowedModes().toArray(new String[this.scenario.getNetwork().getLinks().get(id).getAllowedModes().size()]);
+			Set<String> allowedModes = new TreeSet<String>();
+			for (int ii=0; ii<allowedModesArray.length; ii++) {
+				allowedModes.add(allowedModesArray[ii]);
+			}
+			if (!allowedModes.contains(this.pt_mode)) {
+				allowedModes.add(this.pt_mode);
+				this.scenario.getNetwork().getLinks().get(id).setAllowedModes(allowedModes);
+			} 
+			else ;
+		}
+		
+		return null;
+	}
+
+	private Vehicles createVehicles() {
+		Vehicles veh = this.vehicles;
+		VehicleCapacity cap93 = veh.getFactory().createVehicleCapacity();
+		VehicleCapacity cap90 = veh.getFactory().createVehicleCapacity();
+		VehicleCapacity cap64 = veh.getFactory().createVehicleCapacity();
+		cap93.setSeats(52);
+		cap93.setStandingRoom(93);
+		cap90.setSeats(52);
+		cap90.setStandingRoom(90);
+		cap64.setSeats(35);
+		cap64.setStandingRoom(64);
+		Id tram_93pax = new IdImpl("tram_93pax");
+		Id bus_90pax = new IdImpl("bus_90pax");
+		Id bus_64pax = new IdImpl("bus_64pax");
+		veh.getVehicleTypes().put(tram_93pax, veh.getFactory().createVehicleType(tram_93pax));
+		veh.getVehicleTypes().put(bus_90pax, veh.getFactory().createVehicleType(bus_90pax));
+		veh.getVehicleTypes().put(bus_64pax, veh.getFactory().createVehicleType(bus_64pax));
+		veh.getVehicleTypes().get(tram_93pax).setCapacity(cap93);
+		veh.getVehicleTypes().get(bus_90pax).setCapacity(cap90);
+		veh.getVehicleTypes().get(bus_64pax).setCapacity(cap64);
+		veh.getVehicleTypes().get(tram_93pax).setLength(28.0);
+		veh.getVehicleTypes().get(bus_90pax).setLength(18.0);
+		veh.getVehicleTypes().get(bus_64pax).setLength(12.0);
+		return veh;
+	}
+	
+	
 	private String[] getLineNumbers(String inputfile) throws IOException {
 		BufferedReader linesReader = new BufferedReader(new FileReader(inputfile));
 		int ii=0;
@@ -229,9 +253,12 @@ public class SfCottbusPtSchedule {
 		double currentDep = firstDep;
 		while (currentDep <= lastDep) {
 			Departure dep = this.schedulefactory.createDeparture(new IdImpl(transitRoute.getId().toString()+"_"+currentDep), currentDep);
+			dep.setVehicleId(dep.getId());
 			transitRoute.addDeparture(dep);
 			currentDep+=frequency;
-			if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get("1")));
+			if (this.pt_mode.equals("pt")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get(new IdImpl("bus_90pax"))));
+			if (this.pt_mode.equals("tram")) this.vehicles.getVehicles().put(dep.getId(), this.vehicles.getFactory().createVehicle(dep.getId(), this.vehicles.getVehicleTypes().get(new IdImpl("tram_93pax"))));
+
 		}
 	}
 	
