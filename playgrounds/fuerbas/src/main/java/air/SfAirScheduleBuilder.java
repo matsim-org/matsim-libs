@@ -46,14 +46,12 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 	
 	
-
-	
-	@SuppressWarnings("unchecked")
-	public void filterEurope(String inputOsm, String inputOag, String outputOsm, String outputOag, String outputMissingAirports, String cityPairs) throws IOException, SAXException, ParserConfigurationException {
+	@SuppressWarnings("rawtypes")
+	public void filterEurope(String inputOsmFile, String inputOagFile, String outputOsmFile, String outputOagFile, String outputMissingAirportsFile, String cityPairsFile) throws IOException, SAXException, ParserConfigurationException {
 			
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84));
-		osmReader.parse(inputOsm);
+		osmReader.parse(inputOsmFile);
 		
 		int counter = 0;
 		
@@ -64,13 +62,13 @@ public class SfAirScheduleBuilder {
 				"JE","KZ","LI","LT","LU","LV","MC","MD","ME","MK","MT","NL","NO","PL","PT","RO","RS", 
 				"RU","SE","SI","SJ","SK","SM","TR","UA","VA" };
 		
-//		String[] euroCountries = {"DE"};		//GERMAN NETWORK
+//		String[] euroCountries = {"DE"};		//GERMAN NETWORK FILTER
 		
-		BufferedReader br = new BufferedReader(new FileReader(new File(inputOag)));
-		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOag)));
-		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputOsm)));
-		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(new File(outputMissingAirports)));
-		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairs)));
+		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
+		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
+		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputOsmFile)));
+		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(new File(outputMissingAirportsFile)));
+		BufferedWriter bwcityPairs = new BufferedWriter(new FileWriter(new File(cityPairsFile)));
 		Map<String, String> flights = new HashMap<String, String>();
 		int lines = 0;
 
@@ -82,7 +80,6 @@ public class SfAirScheduleBuilder {
 			
 		if (lines>0) {
 			
-
 			for (int jj=0; jj<81; jj++){
 				lineEntries[jj]=lineEntries[jj].replaceAll("\"", "");
 			}
@@ -90,17 +87,14 @@ public class SfAirScheduleBuilder {
 				String originCountry = lineEntries[6];
 				String destinationCountry = lineEntries[9];
 				boolean origin = false; boolean destination = false;
-
 			
 				for (int ii=0; ii<euroCountries.length; ii++) {
 					if (originCountry.equalsIgnoreCase(euroCountries[ii])) origin=true;
 					if (destinationCountry.equalsIgnoreCase(euroCountries[ii])) destination=true;
 				}
 			
-			
 				if (origin && destination) {
 													
-				
 				if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
 					
 						String hours = lineEntries[13].substring(0, 3);
@@ -129,13 +123,6 @@ public class SfAirScheduleBuilder {
 
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
-						
-						
-						//HIER LÖSCHEN
-//						if ((originAirport.equalsIgnoreCase("TXL") && destinationAirport.equalsIgnoreCase("ZRH"))
-//								|| (originAirport.equalsIgnoreCase("ZRH") && destinationAirport.equalsIgnoreCase("TXL"))) {
-//							
-							//LÖSCHEN ENDE
 						
 						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator) && seatsAvail>0 && !originAirport.equalsIgnoreCase(destinationAirport) &&
 												this.airportsInOsm.containsKey(originAirport) && this.airportsInOsm.containsKey(destinationAirport)
@@ -173,10 +160,7 @@ public class SfAirScheduleBuilder {
 			}
 		
 		
-//		} //HIER LÖSCHEN		
-		
 		lines++;
-		
 	
 		}
 		
@@ -202,7 +186,6 @@ public class SfAirScheduleBuilder {
 	        bwcityPairs.newLine();
 	    }
 	    
-    
 	    System.out.println("Anzahl der Airports: "+this.airportsInOag.size());
 	    System.out.println("Anzahl der City Pairs: "+this.routes.size());
 	    System.out.println("Anzahl der Flüge: "+counter);
