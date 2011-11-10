@@ -97,7 +97,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			roadType = Integer.parseInt(roadTypeString);
 		}
 		catch(NumberFormatException e){
-			logger.warn("Error: roadtype missing! Exception " + e);
+			logger.error("Roadtype missing in network information!");
+			throw new RuntimeException(e);
 		}
 		Double enterTime = 0.0;
 		Double travelTime = 0.0;

@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -55,6 +56,9 @@ public class RunEmissionToolOffline {
 	
 	private static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
+	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
+	
 	// =======================================================================================================		
 	private final Scenario scenario;
 
@@ -67,6 +71,8 @@ public class RunEmissionToolOffline {
 		
 		loadScenario();
 		
+		setInputFiles();
+		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		
 		EmissionHandler emissionHandler = new EmissionHandler();
@@ -77,8 +83,15 @@ public class RunEmissionToolOffline {
 		
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Vehicle-specific warm emission calculation was not possible in " + WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " cases.");
-		logger.info("Terminated. Output can be found in " + emissionEventOutputFile);
+		logger.info("Vehicle-specific warm emission calculation was not possible for "
+				+ WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " link leave events ("
+				+ WarmEmissionAnalysisModule.getPersonIdSet().size() + " vehicles).");
+		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+	}
+
+	private void setInputFiles() {
+		VspExperimentalConfigGroup vcg = scenario.getConfig().vspExperimental() ;
+		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
 	}
 
 	@SuppressWarnings("deprecation")

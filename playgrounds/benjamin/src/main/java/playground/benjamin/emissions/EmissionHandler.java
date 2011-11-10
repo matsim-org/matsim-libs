@@ -22,7 +22,6 @@ package playground.benjamin.emissions;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
@@ -50,9 +49,8 @@ public class EmissionHandler {
 	private final String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 	
 	private final String visum2hbefaRoadTypeFile = "../../detailedEval/emissions/hbefaForMatsim/road_types.txt";
-	private final String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/emissions/hbefaForMatsim/road_types_trafficSituation.txt";
+	private final String visum2hbefaRoadTypeTrafficSituationFile = "../../detailedEval/emissions/hbefaForMatsim/road_types_trafficSituation.txt";
 	
-//	private String warmEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_PC.txt";
 	private String warmEmissionFactorsFile = null ;
 	private final String coldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
 	private final String averageFleetEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
@@ -89,7 +87,22 @@ public class EmissionHandler {
 
 		// TODO: make the following homogeneous?!?
 		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
-		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTraffcSituationFile , roadTypes );
+		
+		for(int i=0; i<100; i++){
+			logger.info(roadTypes[i].getVISUM_RT_NR());
+			logger.info(roadTypes[i].getVISUM_RT_NAME());
+			logger.info(roadTypes[i].getHBEFA_RT_NR());
+			logger.info(roadTypes[i].getHBEFA_RT_NAME());
+		}
+		
+		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTrafficSituationFile, roadTypes);
+		
+		for(int i=0; i<100; i++){
+			logger.info(roadTypesTrafficSituations[i][0]);
+			logger.info(roadTypesTrafficSituations[i][1]);
+			logger.info(roadTypesTrafficSituations[i][2]);
+			logger.info(roadTypesTrafficSituations[i][3]);
+		}
 		
 		// instantiate analysis modules
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
@@ -143,8 +156,8 @@ public class EmissionHandler {
 			//Read File Line By Line
 			strLine = br.readLine();
 			
-			FileWriter out = new FileWriter("../../detailedEval/emissions/hbefaForMatsim/asdf.txt") ;
-			out.write(strLine+"\n") ;
+//			FileWriter out = new FileWriter("../../detailedEval/emissions/hbefaForMatsim/asdf.txt") ;
+//			out.write(strLine+"\n") ;
 	
 			while ((strLine = br.readLine()) != null){
 				//for all lines (whole text) we split the line to an array 
@@ -174,7 +187,7 @@ public class EmissionHandler {
 				
 			}
 			in.close();
-			out.close();
+//			out.close();
 //			throw new RuntimeException("stopping here") ;
 			
 			logger.info("leaving createRoadTypesTafficSituation ...") ;
@@ -192,20 +205,19 @@ public class EmissionHandler {
 		VisumRoadTypes[] roadTypes = new VisumRoadTypes[100];
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
-			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			//Read File Line By Line
+
 			br.readLine();
 			while ((strLine = br.readLine()) != null){
 				if ( strLine.contains("\"")) {
 					throw new RuntimeException("cannot handle this character in parsing") ;
 				}
 	
-				//for all lines (whole text) we split the line to an array 
+				//for all lines we split the line to an array 
 				String[] array = strLine.split(",");
-				VisumRoadTypes obj = new VisumRoadTypes(Integer.parseInt(array[0]), array[2]);
+				VisumRoadTypes obj = new VisumRoadTypes(Integer.parseInt(array[0]), Integer.parseInt(array[2]));
 				obj.setVISUM_RT_NAME(array[1]) ;
 				if ( array.length >=4 ) {
 					obj.setHBEFA_RT_NAME(array[3]) ;

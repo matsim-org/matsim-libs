@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FhEmissions.java
+ * HbefaTrafficSituations.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,38 +16,25 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- *                                                                         
  * *********************************************************************** */
 package playground.benjamin.emissions.dataTypes;
 
-public class VisumRoadTypes {
-
-	private final int VISUM_RT_NR;
-	private String VISUM_RT_NAME;
-	private final int HBEFA_RT_NR;
-	private String HBEFA_RT_NAME;
+/**
+ * @author benjamin
+ *
+ */
+public enum HbefaTrafficSituation {
 	
-	public VisumRoadTypes(int visumRtNr, int hbefaRtNr) {
-		this.VISUM_RT_NR = visumRtNr;
-		this.HBEFA_RT_NR = hbefaRtNr;
+	FREEFLOW(0), HEAVY(1), SATURATED(2), STOPANDGO(3);
+	
+	private Integer key;
+	
+	HbefaTrafficSituation(Integer key){
+		this.key = key;
+	}
+	
+	public Integer getNumber(){
+		return key;
 	}
 
-	public int getVISUM_RT_NR() {
-		return VISUM_RT_NR;
-	}
-	public String getVISUM_RT_NAME() {
-		return VISUM_RT_NAME;
-	}
-	public void setVISUM_RT_NAME(String visumRtName) {
-		VISUM_RT_NAME = visumRtName;
-	}
-	public int getHBEFA_RT_NR() {
-		return HBEFA_RT_NR;
-	}
-	public String getHBEFA_RT_NAME() {
-		return HBEFA_RT_NAME;
-	}
-	public void setHBEFA_RT_NAME(String hbefaRtName) {
-		HBEFA_RT_NAME = hbefaRtName;
-	}
 }
