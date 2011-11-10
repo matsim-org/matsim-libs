@@ -42,13 +42,14 @@ import org.matsim.core.controler.Controler;
  */
 public class RunEmissionToolOnline {
 	
-	static String baseDirectory = "../../detailedEval/emissions/testScenario/";
+	static String inputPath = "../../detailedEval/emissions/testScenario/input/";
+	static String networkFile = inputPath + "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 	
-	static String networkFile = baseDirectory + "input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
 	
-	static String plansFile = baseDirectory + "input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-	
-	static String outputDirectory = baseDirectory + "output/";
+	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
 	
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
@@ -62,14 +63,14 @@ public class RunEmissionToolOnline {
 		
 	// controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();
-		ccg.setOutputDirectory(outputDirectory);
+		ccg.setOutputDirectory(outputPath);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(1);
+		ccg.setLastIteration(0);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
 		ccg.setEventsFileFormats(set);
-		ccg.setRunId("321");
+//		ccg.setRunId("321");
 		
 	// qsimConfigGroup
 		QSimConfigGroup qcg = new QSimConfigGroup();
@@ -83,7 +84,6 @@ public class RunEmissionToolOnline {
 		
 	// planCalcScoreConfigGroup
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();
-		
 		Set<String> activities = new HashSet<String>();
 		activities.add("unknown");
 		activities.add("work");
@@ -123,13 +123,16 @@ public class RunEmissionToolOnline {
 		PlansConfigGroup pcg = controler.getConfig().plans();
 		pcg.setInputFile(plansFile);
 		
+	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
-		vcg.setEmissionFactorsFile("../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt") ;
+		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
+//		vcg.setEmissionFactorsColdFile("");
+//		vcg.setEmissionRoadTypeMatchingFile("");
+//		vcg.setEmissionVehicleFile("");
+	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
-		
 		
 		controler.addControlerListener(new EmissionControlerListener());
 		controler.run();
 	}
-
 }

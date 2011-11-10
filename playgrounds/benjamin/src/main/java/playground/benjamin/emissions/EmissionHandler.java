@@ -22,7 +22,6 @@ package playground.benjamin.emissions;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 
@@ -46,39 +45,39 @@ import playground.benjamin.emissions.dataTypes.VisumRoadTypes;
  *
  */
 public class EmissionHandler {
+	private static final Logger logger = Logger.getLogger(EmissionHandler.class);
 	
-	private static String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
+	private final String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 	
-	private static String visum2hbefaRoadTypeFile = "../../detailedEval/testRuns/input/inputEmissions/road_types.txt";
-	private static String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/testRuns/input/inputEmissions/road_types_trafficSituation.txt";
+	private final String visum2hbefaRoadTypeFile = "../../detailedEval/emissions/hbefaForMatsim/road_types.txt";
+	private final String visum2hbefaRoadTypeTraffcSituationFile = "../../detailedEval/emissions/hbefaForMatsim/road_types_trafficSituation.txt";
 	
-	private static String hbefaAverageFleetEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW.txt";
-	private static String hbefaAverageFleetHdvEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_emission_factors_urban_rural_MW_hdv.txt";
-	private static String hbefaColdEmissionFactorsFile = "../../detailedEval/testRuns/input/inputEmissions/hbefa_coldstart_emission_factors.txt";
-//	private String hbefaHotFile = "../../detailedEval/emissions/hbefa/EFA_HOT_SubSegm_PC.txt";
-	private String hbefaHotFile = null ;
+//	private String warmEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/EFA_HOT_SubSegm_PC.txt";
+	private String warmEmissionFactorsFile = null ;
+	private final String coldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
+	private final String averageFleetEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
+	private final String averageFleetHdvEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	
 	private static EventWriterXML emissionEventWriter;
 	
 	public void installEmissionEventHandler(Scenario scenario, EventsManager eventsManager, String emissionEventOutputFile) {
-		Logger.getLogger(this.getClass()).info("entering installEmissionsEventHandler") ;
+		logger.info("entering installEmissionsEventHandler") ;
 		
 		Network network = scenario.getNetwork() ;
 		
-		hbefaHotFile = scenario.getConfig().vspExperimental().getEmissionFactorsFile() ;
-
+		warmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsFile() ;
 		
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
 		// construct different hbefa tables
 		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(hbefaAverageFleetEmissionFactorsFile);
+		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(averageFleetEmissionFactorsFile);
 		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(hbefaAverageFleetHdvEmissionFactorsFile);
+		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(averageFleetHdvEmissionFactorsFile);
 		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
-		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(hbefaColdEmissionFactorsFile);
+		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(coldEmissionFactorsFile);
 		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
-		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(hbefaHotFile);
+		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(warmEmissionFactorsFile);
 
 		// read the vehicle file
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -118,7 +117,7 @@ public class EmissionHandler {
 		eventsManager.addHandler(warmEmissionHandler);
 		eventsManager.addHandler(coldEmissionHandler);
 		
-		Logger.getLogger("").info("leaving installEmissionsEventHandler") ;
+		logger.info("leaving installEmissionsEventHandler") ;
 	}
 
 	public EventWriterXML getEmissionEventWriter() {
@@ -126,7 +125,7 @@ public class EmissionHandler {
 	}
 
 	private String[][] createRoadTypesTafficSituation(String filename, VisumRoadTypes[] roadTypes ) {
-		Logger.getLogger(this.getClass()).info("entering createRoadTypesTafficSituation ...") ;
+		logger.info("entering createRoadTypesTafficSituation ...") ;
 
 		String[][] roadTypesTrafficSituations = new String[100][4];
 		int[] counter = new int[100];
@@ -141,7 +140,7 @@ public class EmissionHandler {
 			//Read File Line By Line
 			strLine = br.readLine();
 			
-			FileWriter out = new FileWriter("/Users/nagel/kw/road_types_trafficSituation.txt") ;
+			FileWriter out = new FileWriter("../../detailedEval/emissions/hbefaForMatsim/asdf.txt") ;
 			out.write(strLine+"\n") ;
 	
 			while ((strLine = br.readLine()) != null){
@@ -174,6 +173,9 @@ public class EmissionHandler {
 			in.close();
 			out.close();
 //			throw new RuntimeException("stopping here") ;
+			
+			logger.info("leaving createRoadTypesTafficSituation ...") ;
+
 			return roadTypesTrafficSituations;
 		}
 		catch (Exception e){
@@ -182,7 +184,7 @@ public class EmissionHandler {
 	}
 	
 	VisumRoadTypes[] createRoadTypes(String filename){
-		Logger.getLogger(this.getClass()).info("entering createRoadTypes ...") ;
+		logger.info("entering createRoadTypes ...") ;
 		
 		VisumRoadTypes[] roadTypes = new VisumRoadTypes[100];
 		try{
@@ -211,7 +213,7 @@ public class EmissionHandler {
 			}
 			in.close();
 
-			Logger.getLogger(this.getClass()).info("leaving createRoadTypes ...") ;
+			logger.info("leaving createRoadTypes ...") ;
 			return roadTypes;
 		}
 		catch (Exception e){

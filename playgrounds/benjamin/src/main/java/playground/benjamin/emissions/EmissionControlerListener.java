@@ -50,9 +50,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
 		lastIteration = controler.getLastIteration();
+		logger.info("emissions will be calculated for iteration " + lastIteration);
 		emissionHandler = new EmissionHandler();
-		
-//		computeEmissions(0) ;
 	}
 
 	@Override
@@ -65,23 +64,15 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	}
 
 	private void computeEmissions(Integer iteration) {
-		Logger.getLogger(this.getClass()).info("entering computeEmissions ...") ;
+		logger.info("entering computeEmissions ...") ;
 		
 		EventsManager eventsManager = controler.getEvents();
 		Scenario scenario = controler.getScenario() ;
-		
-		String outputPath = controler.getControlerIO().getIterationPath(iteration) + "/";
-		String runId = controler.getConfig().controler().getRunId();
-		
-		if(runId != null){
-			emissionEventOutputFile = outputPath + runId + "." + iteration + ".emission.events.xml.gz"; 
-		} else {
-			emissionEventOutputFile = outputPath + iteration + ".emission.events.xml.gz";
-		}
+		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 		
 		emissionHandler.installEmissionEventHandler(scenario, eventsManager, emissionEventOutputFile);
 
-		Logger.getLogger(this.getClass()).info("leaving computeEmissions ...") ;
+		logger.info("leaving computeEmissions ...") ;
 }
 
 	@Override
@@ -89,6 +80,6 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
 		logger.info("Vehicle-specific warm emission calculation was not possible in " + WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " cases.");
-		logger.info("Terminated. Output can be found in " + emissionEventOutputFile);
+		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 }
