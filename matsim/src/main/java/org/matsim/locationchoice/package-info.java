@@ -142,6 +142,25 @@
  * 		Default: null <br>
  * 		Description: specifies the location of the maps eps file (created during pre-processing)
  * 	</li>
+ *  <li><strong><font color="red">idExclusion</font></strong><br>
+ * 		Type and range: int > 0<br> 
+ * 		Default: max int <br>
+ * 		Description: exclude all agents from destination choice and analysis with id > analysisIdExclusion. (e.g., border crossers)
+ * 	</li>
+ * </ul>
+ * 
+ * * <h3>Analysis</h3>
+ * <ul>
+ * 	<li><strong><font color="red">analysisBoundary</font></strong><br>
+ * 		Type and range: double > 0.0<br> 
+ * 		Default: 200km <br>
+ * 		Description: boundary (radius) of analysis region (used for distance stats creation)
+ * 	</li>
+ * <li><strong><font color="red">analysisBinSize</font></strong><br>
+ * 		Type and range: double > 0.0<br> 
+ * 		Default: 20km <br>
+ * 		Description: steps (bin sizes) for analysis (used for distance stats creation)
+ * 	</li>
  * </ul>
  */
 package org.matsim.locationchoice;

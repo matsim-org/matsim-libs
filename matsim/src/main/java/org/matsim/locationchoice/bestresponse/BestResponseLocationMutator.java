@@ -75,7 +75,8 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	@Override
 	public void handlePlan(final Plan plan){
 		// if person is not in the analysis population
-		if (Integer.parseInt(plan.getPerson().getId().toString()) > 1000000000) return;
+		if (Integer.parseInt(plan.getPerson().getId().toString()) > 
+			Integer.parseInt(super.controler.getConfig().locationchoice().getIdExclusion())) return;
 				
 		Plan bestPlan = new PlanImpl(plan.getPerson());	
 		// make sure there is a valid plan in bestPlan

@@ -58,7 +58,7 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private static final String ANALYSIS_BOUNDARY = "analysisBoundary";
 	private static final String ANALYSIS_BINSIZE = "analysisBinSize";
-	private static final String ANALYSIS_IDEXCLUSION = "analysisIdExclusion";
+	private static final String IDEXCLUSION = "idExclusion";
 
 	//default values
 	private String restraintFcnFactor = "0.0";
@@ -88,7 +88,7 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private String analysisBoundary = "200000.0";
 	private String analysisBinSize = "20000.0";
-	private String analysisIdExclusion = Integer.toString(Integer.MAX_VALUE);
+	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -168,8 +168,8 @@ public class LocationChoiceConfigGroup extends Module {
 		if (ANALYSIS_BINSIZE.equals(key)) {
 			return getAnalysisBinSize();
 		}
-		if (ANALYSIS_IDEXCLUSION.equals(key)) {
-			return getAnalysisIdExclusion();
+		if (IDEXCLUSION.equals(key)) {
+			return getIdExclusion();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -325,12 +325,12 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setAnalysisBinSize(value);
 			}
-		} else if (ANALYSIS_IDEXCLUSION.equals(key)) {
+		} else if (IDEXCLUSION.equals(key)) {
 			if (value.length() == 0) {
 				log.warn("define the highest id to be included in analysis. Set to default value 'maxint' now");
 			}
 			else {
-				setAnalysisIdExclusion(value);
+				setIdExclusion(value);
 			}
 		} else
 		{
@@ -364,7 +364,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, MAXEPS_FILE);		
 		this.addParameterToMap(map, ANALYSIS_BOUNDARY);
 		this.addParameterToMap(map, ANALYSIS_BINSIZE);
-		this.addParameterToMap(map, ANALYSIS_IDEXCLUSION);
+		this.addParameterToMap(map, IDEXCLUSION);
 		
 		return map;
 	}
@@ -507,10 +507,10 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setAnalysisBinSize(String analysisBinSize) {
 		this.analysisBinSize = analysisBinSize;
 	}
-	public String getAnalysisIdExclusion() {
-		return this.analysisIdExclusion;
+	public String getIdExclusion() {
+		return this.idExclusion;
 	}
-	public void setAnalysisIdExclusion(String analysisIdExclusion) {
-		this.analysisIdExclusion = analysisIdExclusion;
+	public void setIdExclusion(String idExclusion) {
+		this.idExclusion = idExclusion;
 	}		
 }
