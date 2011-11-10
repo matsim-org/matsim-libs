@@ -57,16 +57,19 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private Network network;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
 			
 	public BestResponseLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon) {
+			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon,
+			ActTypeConverter actTypeConverter) {
 		super(network, controler, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
 		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 		this.scaleEpsilon = scaleEpsilon;
+		this.actTypeConverter = actTypeConverter;
 	}
 	
 	@Override
@@ -117,7 +120,8 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 										
 					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), 
 							this.network, this.controler.getConfig());
-					this.createChoiceSetCircle(center, maxRadius, ActTypeConverter.convert2FullType(((ActivityImpl)actToMove).getType()), cs);
+					this.createChoiceSetCircle(
+							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs);
 										
 					// **************************************************
 					// maybe repeat this a couple of times

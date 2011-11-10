@@ -23,13 +23,17 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private ObjectAttributes personsKValues;
 	private static final Logger log = Logger.getLogger(ComputeMaxEpsilons.class);
 	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
 		
 	public ComputeMaxEpsilons(ScenarioImpl scenario, String type, Config config, 
-			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon) {
+			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon,
+			ActTypeConverter actTypeConverter) {
 		super(config.global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.type = type;
-		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(ActTypeConverter.convert2FullType(type));
+		this.actTypeConverter = actTypeConverter;
+		this.typedFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType(
+				actTypeConverter.convertType(type));
 		if (this.typedFacilities.size() == 0) {
 			log.warn("There are no facilities for type : " + type);
 		}
@@ -43,6 +47,6 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.scenario.getActivityFacilities(), config, 
 				this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
-		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer, this.scaleEpsilon);
+		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer, this.scaleEpsilon, this.actTypeConverter);
 	}
 }

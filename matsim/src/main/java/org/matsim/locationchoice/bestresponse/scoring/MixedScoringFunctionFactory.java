@@ -29,6 +29,7 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -38,12 +39,15 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private ObjectAttributes personsKValues;
 	private Config config;
 	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
 
-	public MixedScoringFunctionFactory(Config config, Controler controler, ScaleEpsilon scaleEpsilon) {
+	public MixedScoringFunctionFactory(Config config, Controler controler, ScaleEpsilon scaleEpsilon,
+			ActTypeConverter actTypeConverter) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.config = config;
 		this.scaleEpsilon = scaleEpsilon;
+		this.actTypeConverter = actTypeConverter;
 		
 		this.createObjectAttributes(Long.parseLong(config.locationchoice().getRandomSeed()));
 	}
@@ -82,7 +86,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.config, this.scaleEpsilon);
+				seed, this.controler.getScenario(), this.config, this.scaleEpsilon, this.actTypeConverter);
 		computer.assignKValues();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();

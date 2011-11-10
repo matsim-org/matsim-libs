@@ -34,6 +34,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class EpsilonComputer implements PlanAlgorithm {
@@ -41,13 +42,15 @@ public class EpsilonComputer implements PlanAlgorithm {
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationChoiceScoring scorer;
 	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
 			
 	public EpsilonComputer(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
-			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon) {		
+			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
 		this.scaleEpsilon = scaleEpsilon;
+		this.actTypeConverter = actTypeConverter;
 	}
 		
 	@Override
@@ -57,7 +60,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 		boolean typeInPlan = false;
 		for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Activity) {
-				if (((Activity) pe).getType().startsWith(type)) typeInPlan = true;
+				if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(type)) typeInPlan = true;
 			}
 		}
 		double maxEpsilon = 0.0;

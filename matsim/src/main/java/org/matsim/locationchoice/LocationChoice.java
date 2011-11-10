@@ -43,6 +43,7 @@ import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
@@ -59,6 +60,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 	private DefineFlexibleActivities defineFlexibleActivities;
+	private ActTypeConverter actTypeConverter;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
@@ -98,6 +100,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		//only compute oa for best response module
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals("bestResponse")) {
+			this.createActivityTypeConverter();
 			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
 		}
@@ -107,10 +110,14 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		this.defineFlexibleActivities = new DefineFlexibleActivities(config);
 	}
 	
+	private void createActivityTypeConverter() {
+		this.actTypeConverter = this.defineFlexibleActivities.createActivityTypeConverter(); 		
+	}
+	
 	private void createEpsilonScaleFactors() {
 		this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
 	}
-	
+		
 	private void createObjectAttributes(long seed) {
 		this.personsMaxEpsUnscaled = new ObjectAttributes();
 		
@@ -132,7 +139,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.controler.getConfig(), this.scaleEpsilon);
+				seed, this.controler.getScenario(), this.controler.getConfig(), this.scaleEpsilon, this.actTypeConverter);
 		computer.run();
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 	}
@@ -189,7 +196,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 		else if (algorithm.equals("bestResponse")) {
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.network, this.controler,  
-					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, this.scaleEpsilon));
+					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
+					this.scaleEpsilon, this.actTypeConverter));
 		}
 		else if (algorithm.equals("localSearchRecursive")) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.network, this.controler,  

@@ -2,7 +2,20 @@ package org.matsim.locationchoice.utils;
 
 public class ActTypeConverter {
 	
-	public static String convert2FullType(String type) {
+	private boolean isV1;
+	
+	public ActTypeConverter(boolean isV1) {
+		this.isV1 = isV1;
+	}
+	
+	public String convertType(String actType) {
+		if (this.isV1) {
+			return this.convert2MinimalType(actType);
+		}
+		else return actType;
+	}
+	
+	public String convert2FullType(String type) {
 		String fullType = "tta";
 		if (type.startsWith("h")) {
 			fullType = "home";
@@ -22,7 +35,7 @@ public class ActTypeConverter {
 		return fullType;
 	}
 	
-	public static String convert2MinimalType(String type) {
+	public String convert2MinimalType(String type) {
 		String minimalType = "tta";
 		if (type.startsWith("h")) {
 			minimalType = "h";

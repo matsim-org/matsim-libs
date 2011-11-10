@@ -51,6 +51,19 @@ public class DefineFlexibleActivities {
 		}	
 		return scaleEpsilon;
 	}
+	
+	public ActTypeConverter createActivityTypeConverter() {
+		String types = this.dcconfig.getFlexibleTypes();
+		String[] tentries = types.split(",", -1);
+		
+		// check if demand = v1
+		if (tentries[0].length() == 1) {
+			return new ActTypeConverter(true);
+		}
+		else {
+			return new ActTypeConverter(false);
+		}
+	}
 
 	// only used by TGSimple
 	public List<Activity> getFlexibleActivities(final Plan plan) {

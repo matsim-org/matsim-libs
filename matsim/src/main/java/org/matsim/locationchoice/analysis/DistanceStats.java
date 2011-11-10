@@ -29,21 +29,23 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 
 
-public class DistanceStats implements IterationEndsListener {
-	
+public class DistanceStats implements IterationEndsListener {	
 	private Config config; 
 	private double analysisBoundary;
 	private Bins bins;
 	private String bestOrSelected = "selected";
 	private String type = null;
+	private ActTypeConverter actTypeConverter;
 	
-	public DistanceStats(Config config, String bestOrSelected, String type) {	
+	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter) {	
 		this.analysisBoundary = Double.parseDouble(config.locationchoice().getAnalysisBoundary()); 
 		this.config = config;
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
+		this.actTypeConverter = actTypeConverter;
 		this.bins = new Bins(Double.parseDouble(config.locationchoice().getAnalysisBinSize()),
 				analysisBoundary, type + "_distance");
 	}
@@ -74,7 +76,7 @@ public class DistanceStats implements IterationEndsListener {
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().startsWith(type)) {
+					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(type)) {
 						double distance = ((CoordImpl)((Activity) pe).getCoord()).calcDistance(
 								plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
 						this.bins.addVal(distance, 1.0);

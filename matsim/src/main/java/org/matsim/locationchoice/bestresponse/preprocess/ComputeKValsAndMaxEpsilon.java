@@ -7,6 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -22,13 +23,15 @@ public class ComputeKValsAndMaxEpsilon {
 	private ObjectAttributes personsMaxEpsUnscaled = new ObjectAttributes();
 	
 	private ScaleEpsilon scaleEpsilon;
+	private ActTypeConverter actTypeConverter;
 	
-	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, ScaleEpsilon scaleEpsilon) {
+	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 		this.scenario = scenario;
 		this.config = config;
 		this.scaleEpsilon = scaleEpsilon;
+		this.actTypeConverter = actTypeConverter;
 	}
 	
 	public void assignKValues() {				
@@ -61,7 +64,8 @@ public class ComputeKValsAndMaxEpsilon {
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
 			log.info("Computing max epsilon for activity type " + actType);
 			ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(
-					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
+					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, 
+					this.scaleEpsilon, this.actTypeConverter);
 			maxEpsilonComputer.prepareReplanning();
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
