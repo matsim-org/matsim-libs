@@ -52,6 +52,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		lastIteration = controler.getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		emissionHandler = new EmissionHandler();
+		emissionHandler.createLookupTables();
 	}
 
 	@Override

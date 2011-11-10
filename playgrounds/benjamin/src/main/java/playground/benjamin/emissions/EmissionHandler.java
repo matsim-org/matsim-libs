@@ -60,6 +60,10 @@ public class EmissionHandler {
 	
 	private static EventWriterXML emissionEventWriter;
 	
+	public void createLookupTables() {
+		
+	}
+
 	public void installEmissionEventHandler(Scenario scenario, EventsManager eventsManager, String emissionEventOutputFile) {
 		logger.info("entering installEmissionsEventHandler") ;
 		
@@ -69,7 +73,6 @@ public class EmissionHandler {
 		
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
-		// construct different hbefa tables
 		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
 		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(averageFleetEmissionFactorsFile);
 		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
@@ -78,7 +81,7 @@ public class EmissionHandler {
 		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(coldEmissionFactorsFile);
 		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
 		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(warmEmissionFactorsFile);
-
+		
 		// read the vehicle file
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
