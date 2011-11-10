@@ -46,19 +46,19 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.PlanUtils;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
+public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private ActivityFacilitiesImpl facilities;
 	private Network network;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 			
-	public LocationMutatorBestResponse(final Network network, Controler controler,
+	public BestResponseLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon) {

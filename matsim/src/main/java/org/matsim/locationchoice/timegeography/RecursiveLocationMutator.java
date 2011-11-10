@@ -42,7 +42,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
-public class LocationMutatorwChoiceSet extends LocationMutator {
+public class RecursiveLocationMutator extends LocationMutator {
 
 //	private static final Logger log = Logger.getLogger(LocationMutatorwChoiceSet.class);
 	protected int unsuccessfullLC = 0;
@@ -50,7 +50,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 
-	public LocationMutatorwChoiceSet(final Network network, Controler controler,
+	public RecursiveLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(network, controler, quad_trees, facilities_of_type, random);
@@ -59,7 +59,7 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 
-	public LocationMutatorwChoiceSet(final Network network, Controler controler, Random random) {
+	public RecursiveLocationMutator(final Network network, Controler controler, Random random) {
 		super(network, controler, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());

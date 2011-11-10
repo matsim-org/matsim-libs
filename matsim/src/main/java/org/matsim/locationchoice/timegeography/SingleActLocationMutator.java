@@ -45,12 +45,12 @@ import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
-public class LocationMutatorTGSimple extends LocationMutator {
+public class SingleActLocationMutator extends LocationMutator {
 
 	protected int unsuccessfullLC = 0;
 	private final DefineFlexibleActivities defineFlexibleActivities;
 
-	public LocationMutatorTGSimple(final Network network, Controler controler, 
+	public SingleActLocationMutator(final Network network, Controler controler, 
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 

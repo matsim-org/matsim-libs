@@ -37,12 +37,12 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
+import org.matsim.locationchoice.bestresponse.BestResponseLocationMutator;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.random.RandomLocationMutator;
-import org.matsim.locationchoice.timegeography.LocationMutatorTGSimple;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.SingleActLocationMutator;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
@@ -164,12 +164,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
 
 				if (algorithm.equals("localSearchSingleAct")) {
-					unsuccessfull += ((LocationMutatorTGSimple)plan_algo).getNumberOfUnsuccessfull();
-					((LocationMutatorTGSimple)plan_algo).resetUnsuccsessfull();
+					unsuccessfull += ((SingleActLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+					((SingleActLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
 				else if (algorithm.equals("localSearchRecursive")) {
-					unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
-					((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
+					unsuccessfull += ((RecursiveLocationMutator)plan_algo).getNumberOfUnsuccessfull();
+					((RecursiveLocationMutator)plan_algo).resetUnsuccsessfull();
 				}
 			}
 			log.info("Number of unsuccessfull LC in this iteration: "+ unsuccessfull);
@@ -188,15 +188,15 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		}
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 		else if (algorithm.equals("bestResponse")) {
-			this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  
+			this.planAlgoInstances.add(new BestResponseLocationMutator(this.network, this.controler,  
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, this.scaleEpsilon));
 		}
 		else if (algorithm.equals("localSearchRecursive")) {
-			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+			this.planAlgoInstances.add(new RecursiveLocationMutator(this.network, this.controler,  
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
 		else if (algorithm.equals("localSearchSingleAct")) {
-			this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, 
+			this.planAlgoInstances.add(new SingleActLocationMutator(this.network, this.controler, 
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
 		else {
