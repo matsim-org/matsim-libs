@@ -46,7 +46,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.PlanUtils;
 import org.matsim.locationchoice.utils.QuadTreeRing;

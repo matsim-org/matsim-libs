@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.locationchoice.Initializer;
+import org.matsim.locationchoice.timegeography.ManageSubchains;
 import org.matsim.testcases.MatsimTestCase;
 
 public class ManageSubchainsTest extends MatsimTestCase {

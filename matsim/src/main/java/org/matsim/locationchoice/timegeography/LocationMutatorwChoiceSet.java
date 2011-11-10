@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.locationchoice.constrained;
+package org.matsim.locationchoice.timegeography;
 
 import java.util.ArrayList;
 import java.util.Iterator;
