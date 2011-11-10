@@ -1,7 +1,8 @@
-package air;
+package air.run;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
+
 
 public class SfAirController {
 

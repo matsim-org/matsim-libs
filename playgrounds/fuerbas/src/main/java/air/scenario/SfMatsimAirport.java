@@ -1,4 +1,4 @@
-package air;
+package air.scenario;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,23 +11,21 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class SfMATSimAirportOld {
+public class SfMatsimAirport {
 	
-	private static final double runwayLength = 450.0;
-	private static final double taxiwayLength = 200.0;
+	private static final double runwayLength = 1500.0;
+	private static final double taxiwayLength = 500.0;
 	
 	public Coord coord;
 	public Id id;
 	
-	public SfMATSimAirportOld(Id id, Coord coord) {
+	public SfMatsimAirport(Id id, Coord coord) {
 		this.id=id;
 		this.coord=coord;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void createRunways(Network network) {
-		
-	
+			
 //		create Ids for nodes and links
 		
 		Id idApron = this.id;													//Id for apron link and central airport node
@@ -41,7 +39,7 @@ public class SfMATSimAirportOld {
 		
 		Coord coordApronEnd = new CoordImpl(this.coord.getX(), this.coord.getY()+taxiwayLength);			//shifting end of apron
 		Coord coordTaxiIn = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()-taxiwayLength);		//shifting taxiway
-		Coord coordTaxiOut = new CoordImpl(this.coord.getX()-taxiwayLength, this.coord.getY()+taxiwayLength);		//shifting taxiway
+		Coord coordTaxiOut = new CoordImpl(coordApronEnd.getX()-taxiwayLength, coordApronEnd.getY()+taxiwayLength);		//shifting taxiway
 		Coord coordRunwayInEnd = new CoordImpl(coordTaxiIn.getX()-runwayLength, coordTaxiIn.getY());		//shifting runway
 		Coord coordRunwayOutEnd = new CoordImpl(coordTaxiOut.getX()-runwayLength, coordTaxiOut.getY());		//shifting runway
 		
@@ -64,11 +62,11 @@ public class SfMATSimAirportOld {
 		network.addNode(nodeRunwayOut);
 		
 //		create links
-		Link linkApron = network.getFactory().createLink(idApron, idApron, idApronEnd);
-		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, idTaxiIn, idApron);
-		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, idApronEnd, idTaxiOut);
-		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, idRunwayIn, idTaxiIn);
-		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, idTaxiOut, idRunwayOut);
+		Link linkApron = network.getFactory().createLink(idApron, nodeAirport, nodeApron);
+		Link linkTaxiIn = network.getFactory().createLink(idTaxiIn, nodeTaxiIn, nodeAirport);
+		Link linkTaxiOut = network.getFactory().createLink(idTaxiOut, nodeApron, nodeTaxiOut);
+		Link linkRunwayIn = network.getFactory().createLink(idRunwayIn, nodeRunwayIn, nodeTaxiIn);
+		Link linkRunwayOut = network.getFactory().createLink(idRunwayOut, nodeTaxiOut, nodeRunwayOut);
 		
 //		set capacity, freespeed and modes
 		
@@ -81,26 +79,27 @@ public class SfMATSimAirportOld {
 		linkRunwayIn.setAllowedModes(allowedModes);
 		linkRunwayOut.setAllowedModes(allowedModes);
 		
-		linkApron.setFreespeed(30.0/3.6);
-		linkTaxiIn.setFreespeed(30.0/3.6);
-		linkTaxiOut.setFreespeed(30.0/3.6);
-		linkRunwayIn.setFreespeed(220.0/3.6);
-		linkRunwayOut.setFreespeed(250.0/3.6);
+//		c_storage != 1; c_storage = (length*n_lanes)/7.5
 		
 		linkApron.setCapacity(1.);
 		linkTaxiIn.setCapacity(1./60.);
-		linkTaxiIn.setNumberOfLanes(2.25);
-		linkTaxiOut.setCapacity(1.);
-		linkTaxiOut.setNumberOfLanes(2.25);
-		linkRunwayIn.setCapacity(1.);
+		linkTaxiIn.setNumberOfLanes(0.015);	
+		linkTaxiOut.setCapacity(1./60.);
+		linkRunwayIn.setCapacity(1./60.);			
 		linkRunwayOut.setCapacity(1./60.);
+		linkRunwayOut.setNumberOfLanes(0.005);
 		
 		linkApron.setLength(taxiwayLength);
 		linkTaxiIn.setLength(taxiwayLength);
 		linkTaxiOut.setLength(taxiwayLength);
 		linkRunwayIn.setLength(runwayLength);
 		linkRunwayOut.setLength(runwayLength);
-		
+			
+		linkApron.setFreespeed(20.0/3.6);
+		linkTaxiIn.setFreespeed(20.0/3.6);
+		linkTaxiOut.setFreespeed(20.0/3.6);
+		linkRunwayIn.setFreespeed(220.0/3.6);
+		linkRunwayOut.setFreespeed(250.0/3.6);		
 		
 //		add links to network
 				

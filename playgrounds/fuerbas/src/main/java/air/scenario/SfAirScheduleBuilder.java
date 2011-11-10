@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air;
+package air.scenario;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,6 +34,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.xml.sax.SAXException;
+
 
 /**
  * @author sfuerbas

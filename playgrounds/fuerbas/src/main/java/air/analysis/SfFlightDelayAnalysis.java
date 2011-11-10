@@ -1,4 +1,4 @@
-package air;
+package air.analysis;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

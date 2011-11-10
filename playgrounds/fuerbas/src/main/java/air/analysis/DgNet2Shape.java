@@ -1,4 +1,4 @@
-package air;
+package air.analysis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;

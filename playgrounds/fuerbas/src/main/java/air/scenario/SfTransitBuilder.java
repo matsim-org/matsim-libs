@@ -1,4 +1,4 @@
-package air;
+package air.scenario;
 
 import java.io.BufferedReader;
 import java.io.File;

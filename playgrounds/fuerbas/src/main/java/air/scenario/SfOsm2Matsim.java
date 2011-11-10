@@ -1,4 +1,4 @@
-package air;
+package air.scenario;
 
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 

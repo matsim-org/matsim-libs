@@ -1,4 +1,4 @@
-package air;
+package air.scenario;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -16,6 +16,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
 
 public class SfAirNetworkBuilder {
 
