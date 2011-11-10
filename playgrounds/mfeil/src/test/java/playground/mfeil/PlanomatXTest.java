@@ -31,7 +31,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -60,7 +60,7 @@ public class PlanomatXTest extends MatsimTestCase{
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
-		LocationMutatorwChoiceSet locator = new LocationMutatorwChoiceSet (this.scenario_input.getNetwork(), this.initializer.getControler(), new Random(4711));
+		RecursiveLocationMutator locator = new RecursiveLocationMutator (this.scenario_input.getNetwork(), this.initializer.getControler(), new Random(4711));
 		ActivityTypeFinder finder = new ActivityTypeFinder (this.initializer.getControler());
 
 		this.testee = new PlanomatX (this.initializer.getControler(), locator, tDepDelayCalc, finder);

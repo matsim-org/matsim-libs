@@ -44,7 +44,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
 import playground.mfeil.config.ScheduleRecyclingConfigGroup;
@@ -63,7 +63,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 	private  ArrayList<Plan> []						list;
 	private final AbstractMultithreadedModule 		schedulingModule,
 													assignmentModule;
-	private final LocationMutatorwChoiceSet 		locator;
+	private final RecursiveLocationMutator 		locator;
 	private final PlanScorer						scorer;
 	private final Controler							controler;
 	private OptimizedAgents 						agents;
@@ -98,7 +98,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
-		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, new Random(4711));
+		this.locator 				= new RecursiveLocationMutator(controler.getNetwork(), controler, new Random(4711));
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
 		this.init(network);

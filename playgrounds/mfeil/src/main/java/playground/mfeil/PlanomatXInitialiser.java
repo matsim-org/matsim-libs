@@ -23,7 +23,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -40,7 +40,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	private final NetworkImpl 							network;
 	private final Controler								controler;
-	private final LocationMutatorwChoiceSet 			locator;
+	private final RecursiveLocationMutator 			locator;
 	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
 	private final ActivityTypeFinder 					finder;
 	
@@ -59,7 +59,7 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	}
 	
 	public PlanomatXInitialiser (final ControlerMFeil controler, 
-			final LocationMutatorwChoiceSet locator, ActivityTypeFinder finder) {
+			final RecursiveLocationMutator locator, ActivityTypeFinder finder) {
 		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;

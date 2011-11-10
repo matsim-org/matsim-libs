@@ -31,7 +31,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 
 
 /**
@@ -40,7 +40,7 @@ import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
  * @author Matthias Feil
  *
  */
-public class LMwCSCustomized extends LocationMutatorwChoiceSet {
+public class LMwCSCustomized extends RecursiveLocationMutator {
 
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
 		super(network, controler, new Random(4711));

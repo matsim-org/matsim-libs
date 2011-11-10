@@ -41,7 +41,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.timegeography.ManageSubchains;
 import org.matsim.locationchoice.timegeography.SubChain;
 import org.matsim.planomat.Planomat;
@@ -68,7 +68,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	private final double 					WEIGHT_INC_NUMBER;
 	private final String					LC_MODE;
 	private final PlanAlgorithm				timer, finalTimer;
-	private final LocationMutatorwChoiceSet locator;
+	private final RecursiveLocationMutator locator;
 	private final PlansCalcRoute		 	router;
 	private final PlanScorer 				scorer;
 	private static final Logger 			log = Logger.getLogger(PlanomatX.class);
@@ -87,7 +87,7 @@ public class PlanomatX implements org.matsim.population.algorithms.PlanAlgorithm
 	//////////////////////////////////////////////////////////////////////
 
 
-	public PlanomatX (Controler controler, LocationMutatorwChoiceSet locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
+	public PlanomatX (Controler controler, RecursiveLocationMutator locator, DepartureDelayAverageCalculator tDepDelayCalc, ActivityTypeFinder finder){
 		this.router 				= new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		this.scorer					= new PlanScorer (controler.getScoringFunctionFactory());
 		this.controlerIO			= controler.getControlerIO();

@@ -60,7 +60,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.timegeography.ManageSubchains;
 import org.matsim.locationchoice.timegeography.SubChain;
 import org.matsim.population.algorithms.XY2Links;
@@ -87,7 +87,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected ArrayList<List<PlanElement>> actChains;
 	protected NetworkImpl network;
 	protected PlansCalcRoute router;
-	protected LocationMutatorwChoiceSet locator;
+	protected RecursiveLocationMutator locator;
 	protected MDSAM mdsam;
 	protected XY2Links linker;
 	protected Map<Id, List<Double>> sims; // indicates the similarity of a person's plans with all other plans
@@ -114,7 +114,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, new Random(4711));
+		this.locator = new RecursiveLocationMutator(controler.getNetwork(), controler, new Random(4711));
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.beta				= "yes";
 		this.gamma				= "no";

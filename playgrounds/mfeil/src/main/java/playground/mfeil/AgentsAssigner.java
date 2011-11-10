@@ -44,7 +44,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -66,7 +66,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 
 	protected final Controler					controler;
 	protected final PlanAlgorithm 				timer;
-	protected final LocationMutatorwChoiceSet 	locator;
+	protected final RecursiveLocationMutator 	locator;
 	protected final PlansCalcRoute				router;
 	protected final Network						network;
 	protected final ScheduleRecycling			module;
@@ -82,7 +82,7 @@ public class AgentsAssigner implements PlanAlgorithm{
 
 
 	public AgentsAssigner (Controler controler, DepartureDelayAverageCalculator 	tDepDelayCalc,
-			LocationMutatorwChoiceSet locator, PlanScorer scorer, ActivityTypeFinder finder, ScheduleRecycling recyclingModule,
+			RecursiveLocationMutator locator, PlanScorer scorer, ActivityTypeFinder finder, ScheduleRecycling recyclingModule,
 			DistanceCoefficients coefficients, LinkedList<String> nonassignedAgents){
 
 		this.controler				= controler;

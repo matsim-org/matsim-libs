@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -40,7 +40,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	
 	protected final NetworkImpl 						network;
 	protected final Controler							controler;
-	protected final LocationMutatorwChoiceSet 			locator;
+	protected final RecursiveLocationMutator 			locator;
 	protected final PlanScorer 							scorer;
 	protected final ScheduleRecycling					module;
 	protected LinkedList<String>						nonassignedAgents;
@@ -51,7 +51,7 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 		
 	public AgentsAssignmentInitialiser (final Controler controler, 
 			final DepartureDelayAverageCalculator 	tDepDelayCalc,
-			final LocationMutatorwChoiceSet locator,
+			final RecursiveLocationMutator locator,
 			final PlanScorer scorer,
 			final ActivityTypeFinder finder,
 			final ScheduleRecycling module, 
