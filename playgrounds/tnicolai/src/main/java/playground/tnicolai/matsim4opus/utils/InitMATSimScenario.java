@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -80,6 +81,7 @@ public class InitMATSimScenario {
 			initInputPlansFile(matsimParameter);
 			initControler(matsimParameter);
 			initPlanCalcScore(matsimParameter);
+			initSimulation();
 			initStrategy();
 			
 		}catch(Exception e){
@@ -276,6 +278,32 @@ public class InitMATSimScenario {
 		log.info("PlanCalcScore Activity_Type_0: " + actType0.getType() + " Typical Duration Activity_Type_0: " + actType0.getTypicalDuration() + 
 							  " Activity_Type_1: " + actType1.getType() + " Typical Duration Activity_Type_1: " + actType1.getTypicalDuration() + 
 							  " Opening Time Activity_Type_1: " + actType1.getOpeningTime() + " Latest Start Time Activity_Type_1: " + actType1.getLatestStartTime());
+	}
+	
+	/**
+	 * setting simulation
+	 */
+	private void initSimulation(){
+		log.info("Setting simulation to config...");
+		
+		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
+		
+		SimulationConfigGroup simulation = new SimulationConfigGroup();
+		
+		simulation.setFlowCapFactor( popSampling );		// tnicolai: implement flow capacity correction factor!!!
+		simulation.setStorageCapFactor( popSampling );	// tnicolai: implement flow capacity correction factor!!!
+		log.warn("This uses the population sampling rate (" + popSampling + ") also for flowCapFactor and storageCapFactor!");
+		log.warn("Needs to be soveld by an flow capacity correction factor (tnicolai nov'12)!");
+		
+		boolean removeStuckVehicles = false;
+		simulation.setRemoveStuckVehicles( removeStuckVehicles );
+		simulation.setStuckTime(10.);
+		
+		scenario.getConfig().addSimulationConfigGroup( simulation );
+		
+		log.info("... done!");
+		log.warn("Simulation FlowCapFactor: "+ scenario.getConfig().simulation().getFlowCapFactor() + " StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + 
+						   " RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") + " StuckTime: " + scenario.getConfig().simulation().getStuckTime());
 	}
 	
 	/**
