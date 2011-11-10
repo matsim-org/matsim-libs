@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 	@deprecated is integrated in SfAirScheduleBuilder
+ */
+@Deprecated
 public class SfOagFilter {
 
 	/** @author fuerbas

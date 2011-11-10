@@ -19,17 +19,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class SfAirNetworkBuilder {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-
-		SfAirNetworkBuilder builder = new SfAirNetworkBuilder();
-		builder.createNetwork();
-		
-	}
-	
 	public void createNetwork() throws IOException {
 		
 		int airportcounter = 0;
@@ -112,4 +101,16 @@ public class SfAirNetworkBuilder {
 		brRoutes.close();
 	}
 
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+
+		SfAirNetworkBuilder builder = new SfAirNetworkBuilder();
+		builder.createNetwork();
+		
+	}
+
+	
 }

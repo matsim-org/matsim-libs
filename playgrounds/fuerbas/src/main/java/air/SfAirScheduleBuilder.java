@@ -49,13 +49,13 @@ public class SfAirScheduleBuilder {
 
 	private final static String[] germanCountries = { "DE" };
 
-	private static final String airportsInOsmOutputFilename = "osmEuroAirports.txt";
+	public static final String airportsInOsmOutputFilename = "osmEuroAirports.txt";
 
-	private static final String oagEuroFlightsOutputFilename = "oagEuroFlights.txt";
+	public static final String oagEuroFlightsOutputFilename = "oagEuroFlights.txt";
 
-	private static final String missingAirportsOutputFilename = "missingAirports.txt";
+	public static final String missingAirportsOutputFilename = "missingAirports.txt";
 
-	private static final String cityPairsOutputFilename = "cityPairs.txt";
+	public static final String cityPairsOutputFilename = "cityPairs.txt";
 
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();

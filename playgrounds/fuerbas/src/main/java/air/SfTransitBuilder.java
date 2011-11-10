@@ -14,11 +14,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -36,23 +35,10 @@ import org.matsim.vehicles.Vehicles;
 
 public class SfTransitBuilder {
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-
-		SfTransitBuilder builder = new SfTransitBuilder();
-		builder.createSchedule("/home/soeren/workspace/oagEuroFlights.txt");
-		
-//			German domestic flights only
-//		builder.createSchedule("/home/soeren/workspace/oagGermanFlights.txt");
-		
-	}
 		
 	public void createSchedule(String inputOagData) throws IOException {
 		
-		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
 		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
 //		Germany only
@@ -167,5 +153,20 @@ public class SfTransitBuilder {
 			
 	}
 
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+
+		SfTransitBuilder builder = new SfTransitBuilder();
+		builder.createSchedule("/home/soeren/workspace/oagEuroFlights.txt");
+		
+//			German domestic flights only
+//		builder.createSchedule("/home/soeren/workspace/oagGermanFlights.txt");
+		
+	}
+
+	
 
 }
