@@ -37,7 +37,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
@@ -57,7 +56,6 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private final Controler controler;
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
-	private boolean constrained = false;
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 	private DefineFlexibleActivities defineFlexibleActivities;
@@ -65,7 +63,6 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
-	private Knowledges knowledges;
 
 	public LocationChoice(final Network network, Controler controler) {
 		super(controler.getConfig().global());
@@ -94,9 +91,6 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 
 	private void initLocal() {
-		if (this.controler.getConfig().locationchoice().getMode().equals("true")) {
-			this.constrained = true;
-		}
 		this.defineFlexibleActivities(this.controler.getConfig().locationchoice());
 		((NetworkImpl) this.network).connect();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
@@ -160,19 +154,20 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		Gbl.printMemoryUsage();
 
 		super.finishReplanning();
-		if (this.constrained) {
-
+		
+		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
+		
+		if (algorithm.equals("localSearchRecursive") || algorithm.equals("localSearchSingleAct")) {
 			int unsuccessfull = 0;
-
 			Iterator<PlanAlgorithm> planAlgo_it = this.planAlgoInstances.iterator();
 			while (planAlgo_it.hasNext()) {
 				PlanAlgorithm plan_algo = planAlgo_it.next();
 
-				if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
+				if (algorithm.equals("localSearchSingleAct")) {
 					unsuccessfull += ((LocationMutatorTGSimple)plan_algo).getNumberOfUnsuccessfull();
 					((LocationMutatorTGSimple)plan_algo).resetUnsuccsessfull();
 				}
-				else {
+				else if (algorithm.equals("localSearchRecursive")) {
 					unsuccessfull += ((LocationMutatorwChoiceSet)plan_algo).getNumberOfUnsuccessfull();
 					((LocationMutatorwChoiceSet)plan_algo).resetUnsuccsessfull();
 				}
@@ -188,7 +183,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		// this is the way location choice should be configured ...
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals("random")) {
-			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, 
 					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
@@ -222,14 +217,5 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 	public List<PlanAlgorithm> getPlanAlgoInstances() {
 		return planAlgoInstances;
-	}
-
-	// getters and setters needed exclusively for test cases
-	public boolean isConstrained() {
-		return constrained;
-	}
-
-	public void setConstrained(boolean constrained) {
-		this.constrained = constrained;
 	}
 }

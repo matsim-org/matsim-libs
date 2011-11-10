@@ -31,7 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
@@ -44,7 +43,7 @@ public class RandomLocationMutator extends LocationMutator {
 		super(network, controler, random);
 	}
 
-	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
+	public RandomLocationMutator(final Network network, Controler controler, 
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 		super(network, controler, quad_trees, facilities_of_type, random);

@@ -39,7 +39,6 @@ public class LocationChoiceTest extends MatsimTestCase {
 
 	public void testGetPlanAlgoInstance() {
 		LocationChoice locationchoice = initialize();
-		locationchoice.setConstrained(false);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
 	}
 
