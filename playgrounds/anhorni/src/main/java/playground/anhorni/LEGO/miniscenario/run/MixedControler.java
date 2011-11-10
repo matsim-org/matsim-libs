@@ -21,11 +21,11 @@
 package playground.anhorni.LEGO.miniscenario.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.locationchoice.analysis.DistanceStats;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 
-import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
 
 
 public class MixedControler extends Controler {
@@ -58,7 +58,7 @@ public class MixedControler extends Controler {
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
-		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "s"));
-		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "l"));
+		this.addControlerListener(new DistanceStats(this.config, "best", "s"));
+		this.addControlerListener(new DistanceStats(this.config, "best", "l"));
 	}    
 }

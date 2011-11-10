@@ -10,8 +10,8 @@ import java.util.Vector;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.locationchoice.analysis.Bins;
 
-import playground.anhorni.analysis.Bins;
 import playground.anhorni.utils.Utils;
 
 public class TripAnalyzer {

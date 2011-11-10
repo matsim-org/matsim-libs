@@ -32,6 +32,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.locationchoice.analysis.Bins;
 
 
 public class CalculatePlanTravelStatsDiscretionaryActs {
@@ -98,7 +99,7 @@ public class CalculatePlanTravelStatsDiscretionaryActs {
 				}
 			}
 		}
-		this.shopBins.plotBinnedDistribution(this.outPath + this.shopBins.interval + "_", "#", "m");
-		this.leisureBins.plotBinnedDistribution(this.outPath + this.leisureBins.interval + "_", "#", "m");
+		this.shopBins.plotBinnedDistribution(this.outPath + this.shopBins.getInterval() + "_", "#", "m");
+		this.leisureBins.plotBinnedDistribution(this.outPath + this.leisureBins.getInterval() + "_", "#", "m");
 	}
 }

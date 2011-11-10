@@ -31,9 +31,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.locationchoice.analysis.Bins;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
 
-import playground.anhorni.analysis.Bins;
 
 /**
  * Based on Balmers conversion of the MC to MATSim plans
