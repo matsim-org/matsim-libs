@@ -60,9 +60,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
-import org.matsim.locationchoice.constrained.ManageSubchains;
-import org.matsim.locationchoice.constrained.SubChain;
+import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.ManageSubchains;
+import org.matsim.locationchoice.timegeography.SubChain;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 

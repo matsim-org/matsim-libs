@@ -44,7 +44,7 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;

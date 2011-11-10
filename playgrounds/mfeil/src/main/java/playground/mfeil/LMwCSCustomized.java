@@ -31,7 +31,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
 
 
 /**

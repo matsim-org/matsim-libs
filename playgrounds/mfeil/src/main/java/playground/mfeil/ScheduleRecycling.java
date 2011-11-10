@@ -44,7 +44,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.knowledges.Knowledges;
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
+import org.matsim.locationchoice.timegeography.LocationMutatorwChoiceSet;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
 import playground.mfeil.config.ScheduleRecyclingConfigGroup;
