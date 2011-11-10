@@ -25,7 +25,7 @@ import org.matsim.locationchoice.analysis.DistanceStats;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.ActTypeConverter;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.PLOC.analysis.ShoppingCalculator;
@@ -67,7 +67,7 @@ public class SingleRunControler extends Controler {
     protected void setUp() {
       super.setUp();
       
-      DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.config.locationchoice());
+      ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
 	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 	  ActTypeConverter actTypeConverter = defineFlexibleActivities.createActivityTypeConverter();
             

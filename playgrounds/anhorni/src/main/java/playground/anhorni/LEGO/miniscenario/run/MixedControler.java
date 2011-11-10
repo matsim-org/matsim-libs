@@ -25,7 +25,7 @@ import org.matsim.locationchoice.analysis.DistanceStats;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.ActTypeConverter;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 
 public class MixedControler extends Controler {
 				
@@ -49,7 +49,7 @@ public class MixedControler extends Controler {
     	  this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
       //}
     	  
-    	DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.config.locationchoice());
+    	ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(this.config.locationchoice());
   		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
   		
   		ActTypeConverter actTypeConverter = defineFlexibleActivities.createActivityTypeConverter();

@@ -45,7 +45,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -53,7 +53,7 @@ import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeB
 public class LocationMutatorTGSimple extends LocationMutator {
 
 	protected int unsuccessfullLC = 0;
-	private final DefineFlexibleActivities defineFlexibleActivities;
+	private final ActivitiesHandler defineFlexibleActivities;
 	private final LeisureFacilityExtractor leisureFacilityExtractor;
 	private final QuadTreeRing<ActivityFacility> leisureQuadtree;
 
@@ -69,7 +69,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 
 		log.info("Using modified TGMutator");
 
-		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
 		this.leisureQuadtree = new FacilityQuadTreeBuilder().buildFacilityQuadTree("leisure",
 				(ActivityFacilitiesImpl)controler.getFacilities());
 		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);
