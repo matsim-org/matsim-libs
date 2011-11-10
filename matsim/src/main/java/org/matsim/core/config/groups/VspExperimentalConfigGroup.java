@@ -224,7 +224,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
 			this.setVspDefaultsCheckingLevel(value) ;
 		} else if ( EMISSION_FACTORS_FILE.equals(key)) {
-			this.setEmissionFactorsFile(value) ;
+			this.setEmissionFactorsWarmFile(value) ;
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
 			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
 		}
@@ -375,7 +375,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		return emissionFactorsFile;
 	}
 
-	public void setEmissionFactorsFile(String emissionFactorsFile) {
+	public void setEmissionFactorsWarmFile(String emissionFactorsFile) {
 		this.emissionFactorsFile = emissionFactorsFile;
 	}
 
