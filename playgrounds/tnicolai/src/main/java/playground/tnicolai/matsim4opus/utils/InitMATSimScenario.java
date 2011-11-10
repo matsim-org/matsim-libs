@@ -289,12 +289,12 @@ public class InitMATSimScenario {
 		SimulationConfigGroup simulation = new SimulationConfigGroup();
 		
 		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
-		double factor = popSampling * 1.1; //1.2;
+		double factor = popSampling * 1.0; //1.2;
 		if(factor > 1.)
 			factor = 1.;
-		
-		simulation.setFlowCapFactor( factor );		// tnicolai: implement flow capacity correction factor!!!
-		simulation.setStorageCapFactor( factor );	// tnicolai: implement flow capacity correction factor!!!
+		// tnicolai: implement flow capacity correction factor!!!
+		simulation.setFlowCapFactor( factor );	
+		simulation.setStorageCapFactor( factor );	
 		log.warn("This uses the population sampling rate (" + popSampling + ") times " +factor+ " for flowCapFactor and storageCapFactor!");
 		log.warn("Needs to be soveld by an flow capacity correction factor (tnicolai nov'12)!");
 		
@@ -338,23 +338,6 @@ public class InitMATSimScenario {
 						 " Strategy_2: " + changeExpBeta.getModuleName() + " Probability Strategy_2: " + changeExpBeta.getProbability() +
 						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
 	}
-	
-//	/**
-//	 * setting plans file
-//	 */
-//	private void initPopulation(ConfigType matsimParameter){
-//		// get the standard MATSim output directory
-//		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
-//		
-//		// check if available
-//		if(controlerCG.getOutputDirectory() != null){
-//			String popFile = controlerCG.getOutputDirectory() + Constants.OUTPUT_PLANS_FILE_GZ;
-//			if( (new File(popFile)).exists() )	
-//				scenario.getConfig().plans().setInputFile( popFile );	// set plans file from previous run -> this is mandatory for "WARM START"
-//		}
-//		else
-//			log.warn("No MATSim output directory found (=null). But it is mandatory for \"WARM START\". Threrefore \"WARM START\" can not be used!!!");		
-//	}
-	
+
 }
 
