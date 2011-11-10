@@ -212,7 +212,7 @@ public final class StrategyManagerConfigLoader {
 				} else {
 					strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 				}
-				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
+				strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 				strategy.addStrategyModule(new ReRoute(controler));
 				strategy.addStrategyModule(new TimeAllocationMutator(config));
 			} else {

@@ -37,67 +37,25 @@ public class DestinationChoiceScoring {
 	private Config config;
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
+	private ScaleEpsilon scaleEpsilon;
 		
 	public DestinationChoiceScoring(ActivityFacilities facilities , Config config, 
-			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues) {
+			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon) {
 		this.facilities = facilities;
 		this.config = config;
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
+		this.scaleEpsilon = scaleEpsilon;
 	}
 				
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act) {
-		if (!(act.getType().startsWith("s") || act.getType().startsWith("l"))) return 0.0;
 		double score = 0.0;
-
-// do not use distance scoring anymore
-//		if (distance) {
-//			score += this.getDistanceUtility(plan.getPerson(), act, 
-//					plan.getPreviousActivity(plan.getPreviousLeg(act)),
-//					plan.getNextActivity(plan.getNextLeg(act)));
-//		}
-		
-// always use epsilons now
-//		if (Double.parseDouble(config.findParam(LCEXP, "scoreElementEpsilons")) > 0.000001) {
-			double fVar = 1.0;
-			if (act.getType().startsWith("s")) {
-				fVar = Double.parseDouble(config.locationchoice().getScaleEpsShopping());
-			}
-			else if (act.getType().startsWith("l")){
-				fVar = Double.parseDouble(config.locationchoice().getScaleEpsLeisure());
-			}
-			else {
-				fVar = 1.0;
-			}
-			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));
-//		}		
+		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
+			double fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
+			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson()));	
+		}
 		return score;
 	}
-
-// do not use distance scoring anymore
-//	private double getDistanceUtility(PersonImpl person, ActivityImpl act, Activity actPre, Activity actPost) {
-//		
-//		double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
-//		
-//		double distance = ((CoordImpl)actPre.getCoord()).calcDistance(act.getCoord()) + 
-//		((CoordImpl)act.getCoord()).calcDistance(actPost.getCoord()) - distanceDirect;
-//		
-//		double beta = Double.parseDouble(this.config.locationchoice().getSearchSpaceBeta());
-//		
-//		double utilityDistanceObserved = 0.0;
-//		if (Boolean.parseBoolean(config.findParam(LCEXP, "linearDistanceUtility"))) {
-//			utilityDistanceObserved = beta * distance;
-//		}
-//		else {
-//			utilityDistanceObserved = (-2.0) * Math.log(1.0 + distance * beta * (-1.0));
-//		}
-//		double utilityDistanceUnobserved = 0.0;		
-//		if (Double.parseDouble(config.findParam(LCEXP, "varTastes")) > 0.000001) {
-//			utilityDistanceObserved = 0;
-//			utilityDistanceUnobserved = Double.parseDouble(person.getDesires().getDesc().split("_")[0]) * distance;
-//		}
-//		return utilityDistanceObserved + utilityDistanceUnobserved;
-//	}
 	
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person) {		
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);		

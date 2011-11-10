@@ -40,6 +40,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.bestresponse.LocationMutatorBestResponse;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.constrained.LocationMutatorTGSimple;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.random.RandomLocationMutator;
@@ -58,15 +59,15 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private boolean constrained = false;
 	private ObjectAttributes personsMaxEpsUnscaled;
+	private ScaleEpsilon scaleEpsilon;
+	private DefineFlexibleActivities defineFlexibleActivities;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private Knowledges knowledges;
 
-	public LocationChoice(
-			final Network network,
-			Controler controler, Knowledges kn) {
+	public LocationChoice(final Network network, Controler controler) {
 		super(controler.getConfig().global());
 		// TODO: why does this module need the control(l)er as argument?  Gets a bit awkward
 		// when you use it in demandmodelling where you don't really need a control(l)er.
@@ -87,7 +88,6 @@ public class LocationChoice extends AbstractMultithreadedModule {
 
 			anhorni: april09
 		 */
-		this.knowledges = kn;
 		this.network = network;
 		this.controler = controler;
 		initLocal();
@@ -97,14 +97,24 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		if (this.controler.getConfig().locationchoice().getMode().equals("true")) {
 			this.constrained = true;
 		}
+		this.defineFlexibleActivities(this.controler.getConfig().locationchoice());
 		((NetworkImpl) this.network).connect();
 		this.initTrees(this.controler.getFacilities(), this.controler.getConfig().locationchoice());
 		
 		//only compute oa for best response module
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
 		if (algorithm.equals("bestResponse")) {
+			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
 		}
+	}
+	
+	private void defineFlexibleActivities(LocationChoiceConfigGroup config) {
+		this.defineFlexibleActivities = new DefineFlexibleActivities(config);
+	}
+	
+	private void createEpsilonScaleFactors() {
+		this.scaleEpsilon = this.defineFlexibleActivities.createScaleEpsilon();
 	}
 	
 	private void createObjectAttributes(long seed) {
@@ -127,7 +137,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 	
 	private void computeAttributes(long seed) {
-		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed, this.controler.getScenario(), this.controler.getConfig());
+		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
+				seed, this.controler.getScenario(), this.controler.getConfig(), this.scaleEpsilon);
 		computer.run();
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
 	}
@@ -137,7 +148,6 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	 * Initialize the quadtrees of all available activity types
 	 */
 	private void initTrees(ActivityFacilities facilities, LocationChoiceConfigGroup config) {
-		DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, config);
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.network, config);
 		treesBuilder.createTrees(facilities);
@@ -177,48 +187,27 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {		
 		// this is the way location choice should be configured ...
 		String algorithm = this.controler.getConfig().locationchoice().getAlgorithm();
-		if (!algorithm.equals("null")) {
-			if (algorithm.equals("random")) {
-				this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-			}
-			// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
-			else if (algorithm.equals("bestResponse")) {
-				this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled));
-			}
-			else if (algorithm.equals("localSearchRecursive")) {
-				this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-			}
-			else if (algorithm.equals("localSearchSingleAct")) {
-				this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-			}
-			else {
-				log.error("Location choice configuration error: Please specify a location choice algorithm.");
-			}
+		if (algorithm.equals("random")) {
+			this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
+					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
 		}
-		// deprecated: to be compatible with earlier versions ... ------------------------------------------
-		else { 	
-			if (!this.constrained) {
-				this.planAlgoInstances.add(new RandomLocationMutator(this.network, this.controler, this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-			}
-			else {
-				// only moving one flexible activity
-				if (this.controler.getConfig().locationchoice().getSimpleTG().equals("true")) {
-					this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, this.knowledges,
-						this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-				}
-				else {
-					// computing new chain of flexible activity
-					this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  this.knowledges,
-							this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
-				}
-			}
-		} // deprecated: ------------------------------------------------------------------------------------------
-		
+		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
+		else if (algorithm.equals("bestResponse")) {
+			this.planAlgoInstances.add(new LocationMutatorBestResponse(this.network, this.controler,  
+					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, this.scaleEpsilon));
+		}
+		else if (algorithm.equals("localSearchRecursive")) {
+			this.planAlgoInstances.add(new LocationMutatorwChoiceSet(this.network, this.controler,  
+					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+		}
+		else if (algorithm.equals("localSearchSingleAct")) {
+			this.planAlgoInstances.add(new LocationMutatorTGSimple(this.network, this.controler, 
+					this.quadTreesOfType, this.facilitiesOfType, MatsimRandom.getLocalInstance()));
+		}
+		else {
+			log.error("Location choice configuration error: Please specify a location choice algorithm.");
+			System.exit(1);
+		}		
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 

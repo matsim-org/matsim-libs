@@ -32,7 +32,7 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		return new RandomLocationMutator(initializer.getControler().getNetwork(),
-				initializer.getControler(), (initializer.getControler().getScenario()).getKnowledges(), new Random(1111));
+				initializer.getControler(), new Random(1111));
 	}
 
 	/*

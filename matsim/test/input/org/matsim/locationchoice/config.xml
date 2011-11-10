@@ -29,6 +29,8 @@
 		<param name="recursionTravelSpeedChange" value="0.1"/>
 		<param name="recursionTravelSpeed" value="8.4333333333333333"/>  <!-- [m/s] MZ: 25.3 km/h + 20%  = 8.43 m/s -->
 		<param name="maxRecursions" value="10"/> <!-- positive integer, if 0 := universal choice set -->
+		<param name="flexible_types" value="s,l"/>
+		<param name="algorithm" value="random" />
 	</module>
 		
 	<module name="facilities" >
@@ -60,6 +62,10 @@
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
+		<param name="activityType_2"            value="s" /> <!-- shop -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="12:00:00" />
+		<param name="activityMinimalDuration_2" value="08:00:00" />
 	</module>
 	
 </config>

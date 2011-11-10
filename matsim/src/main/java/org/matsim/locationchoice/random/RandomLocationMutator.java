@@ -25,7 +25,6 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -41,14 +40,14 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
  */
 public class RandomLocationMutator extends LocationMutator {
 
-	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn, Random random) {
-		super(network, controler, kn, random);
+	public RandomLocationMutator(final Network network, Controler controler, Random random) {
+		super(network, controler, random);
 	}
 
 	public RandomLocationMutator(final Network network, Controler controler, Knowledges kn,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		super(network, controler, kn, quad_trees, facilities_of_type, random);
+		super(network, controler, quad_trees, facilities_of_type, random);
 	}
 
 
@@ -59,39 +58,10 @@ public class RandomLocationMutator extends LocationMutator {
 	 */
 	@Override
 	public void handlePlan(final Plan plan){
-		if (super.locationChoiceBasedOnKnowledge) {
-			//log.info("LC based on knowledge");
-			this.handlePlanBasedOnKnowldge(plan);
-		}
-		else {
-			//log.info("LC based on defined types");
-			//log.info(this.defineFlexibleActivities.getFlexibleTypes());
-			this.handlePlanForPreDefinedFlexibleTypes(plan);
-		}
+		this.handlePlanForPreDefinedFlexibleTypes(plan);
 		super.resetRoutes(plan);
 	}
 
-	private void handlePlanBasedOnKnowldge(final Plan plan) {
-
-		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
-
-		final List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
-
-			boolean	isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
-			boolean	movable = movablePrimaryActivities.contains(act);
-
-			// if home is accidentally not defined as primary
-			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
-				int length = this.facilitiesOfType.get(act.getType()).length;
-				// only one facility: do not need to do location choice
-				if (length > 1) {
-					this.setNewLocationForAct((ActivityImpl) act, length);
-				}
-			}
-		}
-	}
 
 	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
 		final List<?> actslegs = plan.getPlanElements();

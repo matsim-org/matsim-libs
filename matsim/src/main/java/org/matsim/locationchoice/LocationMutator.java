@@ -20,12 +20,10 @@
 
 package org.matsim.locationchoice;
 
-import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -35,7 +33,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
@@ -55,14 +52,12 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 
 	protected DefineFlexibleActivities defineFlexibleActivities;
 	protected boolean locationChoiceBasedOnKnowledge = true;
-	protected Knowledges knowledges = null;
 	protected final Random random;
 
 	// ----------------------------------------------------------
 
-	public LocationMutator(final Network network, final Controler controler, final Knowledges kn, Random random) {
-		this.knowledges = kn;
-		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+	public LocationMutator(final Network network, final Controler controler, Random random) {
+		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.config = controler.getConfig().locationchoice();
@@ -70,12 +65,11 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.initLocal(network, controler);
 	}
 
-	public LocationMutator(final Network network, final Controler controler, final Knowledges kn,
+	public LocationMutator(final Network network, final Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 
-		this.knowledges = kn;
-		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;
 		this.config = controler.getConfig().locationchoice();
@@ -131,9 +125,6 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 		this.controler = controler;
 	}
 
-	protected List<Activity>  defineMovablePrimaryActivities(final Plan plan) {
-		return this.defineFlexibleActivities.getMovablePrimaryActivities(plan);
-	}
 
 	protected void resetRoutes(final Plan plan) {
 		// loop over all <leg>s, remove route-information

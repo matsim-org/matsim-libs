@@ -28,26 +28,26 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class EpsilonComputer implements PlanAlgorithm {
 	private String type;
 	private TreeMap<Id, ActivityFacility> typedFacilities;
 	private DestinationChoiceScoring scorer;
-	private Config config;
+	private ScaleEpsilon scaleEpsilon;
 			
 	public EpsilonComputer(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
-			DestinationChoiceScoring scorer, Config config) {		
+			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
-		this.config = config;
+		this.scaleEpsilon = scaleEpsilon;
 	}
 		
 	@Override
@@ -68,13 +68,7 @@ public class EpsilonComputer implements PlanAlgorithm {
 				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act);
 				
 				// scale back epsilons
-				double scale = 1.0;
-				if (act.getType().startsWith("s")) {
-					scale = Double.parseDouble(config.locationchoice().getScaleEpsShopping());
-				}
-				else if (act.getType().startsWith("l")){
-					scale = Double.parseDouble(config.locationchoice().getScaleEpsLeisure());
-				}
+				double scale = this.scaleEpsilon.getEpsilonFactor(act.getType());
 				epsilon /= scale;
 				
 				if (epsilon > maxEpsilon) {

@@ -52,8 +52,7 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private static final String RANDOMSEED = "randomSeed";
 	private static final String EPSDISTR = "epsilonDistribution";
-	private static final String SCALE_EPS_SHOPPING = "scaleEpsShopping";
-	private static final String SCALE_EPS_LEISURE = "scaleEpsLeisure";
+	private static final String SCALE_EPS = "epsilonScaleFactors";
 	private static final String PROBCHOICESETSIZE = "probChoiceSetSize";
 	private static final String PROBCHOICEEXP = "probChoiceExponent";
 	
@@ -81,8 +80,7 @@ public class LocationChoiceConfigGroup extends Module {
 	
 	private String randomSeed = "221177";
 	private String epsilonDistribution = "gumbel";
-	private String scaleEpsShopping = "1.0";
-	private String scaleEpsLeisure = "1.0";
+	private String epsilonScaleFactors = "null";
 	private String probChoiceSetSize = "10";
 	private String probChoiceExponent ="3";
 	
@@ -150,11 +148,8 @@ public class LocationChoiceConfigGroup extends Module {
 		if (EPSDISTR.equals(key)) {
 			return getEpsilonDistribution();
 		}
-		if (SCALE_EPS_SHOPPING.equals(key)) {
-			return getScaleEpsShopping();
-		}
-		if (SCALE_EPS_LEISURE.equals(key)) {
-			return getScaleEpsLeisure();
+		if (SCALE_EPS.equals(key)) {
+			return getEpsilonScaleFactors();
 		}
 		if (PROBCHOICESETSIZE.equals(key)) {
 			return getProbChoiceSetSize();
@@ -292,19 +287,12 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setEpsilonDistribution(value);
 			}
-		} else if (SCALE_EPS_SHOPPING.equals(key)) {
+		} else if (SCALE_EPS.equals(key)) {
 			if (value.length() == 0) {
-				log.warn("set a scaling factor for shopping random error terms. Set to default value '1.0' now");
+				log.warn("set scaling factors for random error terms.");
 			}
 			else {
-				setScaleEpsShopping(value);
-			}
-		} else if (SCALE_EPS_LEISURE.equals(key)) {
-			if (value.length() == 0) {
-				log.warn("set a scaling factor for leisure random error terms. Set to default value '1.0' now");
-			}
-			else {
-				setScaleEpsLeisure(value);
+				setEpsilonScaleFactors(value);
 			}
 		} else if (PROBCHOICESETSIZE.equals(key)) {
 			if (value.length() == 0) {
@@ -369,8 +357,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, PLANSELECTOR);
 		this.addParameterToMap(map, RANDOMSEED);
 		this.addParameterToMap(map, EPSDISTR);
-		this.addParameterToMap(map, SCALE_EPS_SHOPPING);
-		this.addParameterToMap(map, SCALE_EPS_LEISURE);
+		this.addParameterToMap(map, SCALE_EPS);
 		this.addParameterToMap(map, PROBCHOICESETSIZE);
 		this.addParameterToMap(map, PROBCHOICEEXP);
 		this.addParameterToMap(map, PKVALS_FILE);
@@ -485,17 +472,11 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setEpsilonDistribution(String epsilonDistribution) {
 		this.epsilonDistribution = epsilonDistribution;
 	}
-	public String getScaleEpsShopping() {
-		return scaleEpsShopping;
+	public String getEpsilonScaleFactors() {
+		return this.epsilonScaleFactors;
 	}
-	public void setScaleEpsShopping(String scaleEpsShopping) {
-		this.scaleEpsShopping = scaleEpsShopping;
-	}
-	public String getScaleEpsLeisure() {
-		return scaleEpsLeisure;
-	}
-	public void setScaleEpsLeisure(String scaleEpsLeisure) {
-		this.scaleEpsLeisure = scaleEpsLeisure;
+	public void setEpsilonScaleFactors(String epsilonScaleFactors){
+		this.epsilonScaleFactors = epsilonScaleFactors;
 	}
 	public String getProbChoiceSetSize() {
 		return probChoiceSetSize;

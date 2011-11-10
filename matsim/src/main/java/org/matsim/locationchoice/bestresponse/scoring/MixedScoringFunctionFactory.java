@@ -37,11 +37,13 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	private ObjectAttributes facilitiesKValues;
 	private ObjectAttributes personsKValues;
 	private Config config;
+	private ScaleEpsilon scaleEpsilon;
 
-	public MixedScoringFunctionFactory(Config config, Controler controler) {
+	public MixedScoringFunctionFactory(Config config, Controler controler, ScaleEpsilon scaleEpsilon) {
 		super(config.planCalcScore(), controler.getNetwork());
 		this.controler = controler;
 		this.config = config;
+		this.scaleEpsilon = scaleEpsilon;
 		
 		this.createObjectAttributes(Long.parseLong(config.locationchoice().getRandomSeed()));
 	}
@@ -79,7 +81,8 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 	}
 	
 	private void computeAttributes(long seed) {
-		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(seed, this.controler.getScenario(), this.config);
+		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
+				seed, this.controler.getScenario(), this.config, this.scaleEpsilon);
 		computer.assignKValues();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
@@ -90,7 +93,7 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 		
 		MixedActivityScoringFunction scoringFunction = new MixedActivityScoringFunction((PlanImpl)plan, super.getParams(), 
 				this.controler.getFacilities(), this.controler.getFacilityPenalties(), this.controler.getConfig(),
-				this.facilitiesKValues, this.personsKValues);
+				this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
 		
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(super.getParams(), controler.getNetwork()));

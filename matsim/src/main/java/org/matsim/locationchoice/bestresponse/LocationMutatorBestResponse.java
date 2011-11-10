@@ -21,7 +21,6 @@
 package org.matsim.locationchoice.bestresponse;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -33,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -47,7 +45,7 @@ import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.knowledges.Knowledges;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.PlanUtils;
@@ -55,21 +53,20 @@ import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
-	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private ActivityFacilitiesImpl facilities;
 	private Network network;
 	private ObjectAttributes personsMaxEpsUnscaled;
+	private ScaleEpsilon scaleEpsilon;
 			
-	public LocationMutatorBestResponse(final Network network, Controler controler, Knowledges kn,
+	public LocationMutatorBestResponse(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
-			ObjectAttributes personsMaxEpsUnscaled) {
-		super(network, controler, kn, quad_trees, facilities_of_type, null);
+			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon) {
+		super(network, controler, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
 		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
-		
-		this.initFlexibleTypes(controler.getConfig().locationchoice());
+		this.scaleEpsilon = scaleEpsilon;
 	}
 	
 	@Override
@@ -88,17 +85,7 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		PlanUtils.copyPlanFields((PlanImpl)plan, (PlanImpl)bestPlan);
 		super.resetRoutes(plan);
 	}
-			
-	private void initFlexibleTypes(LocationChoiceConfigGroup config) {
-		String types = config.getFlexibleTypes();
-		if (!(types.equals("null") || types.equals(""))) {
-			String[] entries = types.split(",", -1);
-			for (int i = 0; i < entries.length; i++) {
-				this.flexibleTypes.add(entries[i].trim());
-			}
-		}
-	}
-	
+				
 	private void handleActivities(Plan plan, Plan bestPlan) {
 		int travelTimeApproximationLevel = Integer.parseInt(
 				this.controler.getConfig().locationchoice().getTravelTimeApproximationLevel());
@@ -112,8 +99,8 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 		for (PlanElement pe : plan.getPlanElements()) {
 			actlegIndex++;
 			if (pe instanceof Activity) {
-				if (actlegIndex > 0 && this.flexibleTypes.contains(
-						ActTypeConverter.convert2FullType(((ActivityImpl)plan.getPlanElements().get(actlegIndex)).getType()))) {
+				String actType = ((ActivityImpl)plan.getPlanElements().get(actlegIndex)).getType();
+				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
 					
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
 					final Activity actToMove = (Activity)pe;
@@ -196,14 +183,10 @@ public class LocationMutatorBestResponse extends LocationMutatorwChoiceSet {
 	private double getMaximumDistanceFromEpsilon(PersonImpl person, String type) {
 		double maxEpsilon = 0.0;
 		double scale = 1.0;
-		if (type.startsWith("s")) {
-			scale = Double.parseDouble(this.config.getScaleEpsShopping());
-			maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), "s");
-		}
-		else if (type.startsWith("l")) {
-			scale = Double.parseDouble(this.config.getScaleEpsLeisure());
-			maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), "l");
-		}
+		
+		this.scaleEpsilon.getEpsilonFactor(type);
+		maxEpsilon = (Double) this.personsMaxEpsUnscaled.getAttribute(person.getId().toString(), type);
+		
 		maxEpsilon *= scale;
 		
 		/* 

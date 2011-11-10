@@ -34,7 +34,7 @@ public class LocationMutatorwChoiceSetTest  extends MatsimTestCase {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
 		return new LocationMutatorwChoiceSet(initializer.getControler().getNetwork(),
-				initializer.getControler(), initializer.getControler().getScenario().getKnowledges(), new Random(4711));
+				initializer.getControler(), new Random(4711));
 	}
 
 	public void testConstructor() {

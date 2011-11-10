@@ -47,12 +47,13 @@ public class MixedActivityScoringFunction extends CharyparNagelOpenTimesScoringF
 	
 	public MixedActivityScoringFunction(Plan plan, CharyparNagelScoringParameters params, 
 			final ActivityFacilities facilities, final TreeMap<Id, FacilityPenalty> facilityPenalties,
-			Config config, ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues) {
+			Config config, ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues,ScaleEpsilon scaleEpsilon) {
 		//super(plan, params, facilityPenalties, facilities);
 		super(plan, params, facilities);
 		this.facilities = facilities;
 		this.config = config;
-		this.destinationChoiceScoring = new DestinationChoiceScoring(this.facilities, this.config, facilitiesKValues, personsKValues);
+		this.destinationChoiceScoring = new DestinationChoiceScoring(
+				this.facilities, this.config, facilitiesKValues, personsKValues, scaleEpsilon);
 	}
 	
 	@Override

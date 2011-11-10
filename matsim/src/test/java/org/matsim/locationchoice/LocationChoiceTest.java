@@ -19,7 +19,6 @@
 
 package org.matsim.locationchoice;
 
-import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -29,7 +28,7 @@ public class LocationChoiceTest extends MatsimTestCase {
 		Initializer initializer = new Initializer();
     initializer.init(this);
 		return new LocationChoice(initializer.getControler().getNetwork(),
-				initializer.getControler(), (initializer.getControler().getScenario()).getKnowledges());
+				initializer.getControler());
 	}
 
 	public void testConstructorandInitLocal() {
@@ -42,8 +41,6 @@ public class LocationChoiceTest extends MatsimTestCase {
 		LocationChoice locationchoice = initialize();
 		locationchoice.setConstrained(false);
 		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), RandomLocationMutator.class);
-		locationchoice.setConstrained(true);
-		assertEquals(locationchoice.getPlanAlgoInstance().getClass(), LocationMutatorwChoiceSet.class);
 	}
 
 	public void testFinish() {

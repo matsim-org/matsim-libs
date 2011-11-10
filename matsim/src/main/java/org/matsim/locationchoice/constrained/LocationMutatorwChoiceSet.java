@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
@@ -51,17 +50,17 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 	private double recursionTravelSpeed = 30.0;
 	protected int maxRecursions = 10;
 
-	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn,
+	public LocationMutatorwChoiceSet(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
-		super(network, controler, kn, quad_trees, facilities_of_type, random);
+		super(network, controler, quad_trees, facilities_of_type, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
 	}
 
-	public LocationMutatorwChoiceSet(final Network network, Controler controler, Knowledges kn, Random random) {
-		super(network, controler, kn, random);
+	public LocationMutatorwChoiceSet(final Network network, Controler controler, Random random) {
+		super(network, controler, random);
 		this.recursionTravelSpeedChange = Double.parseDouble(this.config.getRecursionTravelSpeedChange());
 		this.maxRecursions = Integer.parseInt(this.config.getMaxRecursions());
 		this.recursionTravelSpeed = Double.parseDouble(this.config.getRecursionTravelSpeed());
@@ -211,40 +210,8 @@ public class LocationMutatorwChoiceSet extends LocationMutator {
 		return manager.getSubChains();
 	}
 
-	private List<SubChain> calcActChainsBasedOnKnowledge(final Plan plan) {
-		ManageSubchains manager = new ManageSubchains();
-		List<Activity> movablePrimaryActivities = defineMovablePrimaryActivities(plan);
-
-		final List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final Activity act = (Activity)actslegs.get(j);
-
-			boolean isPrimary = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId());
-			boolean movable = movablePrimaryActivities.contains(act);
-
-			// if home is accidentally not defined as primary
-			if ((!isPrimary || movable) && !(act.getType().startsWith("h") || act.getType().startsWith("tta"))) { // found secondary activity
-				manager.secondaryActivityFound(act, (LegImpl)actslegs.get(j+1));
-			}
-			else {	// found primary activity
-				if (j == (actslegs.size()-1)) {
-					manager.primaryActivityFound(act, null);
-				}
-				else {
-					manager.primaryActivityFound(act, (LegImpl)actslegs.get(j+1));
-				}
-			}
-		}
-		return manager.getSubChains();
-	}
-
 	public List<SubChain> calcActChains(final Plan plan) {
-		if (super.locationChoiceBasedOnKnowledge) {
-			return this.calcActChainsBasedOnKnowledge(plan);
-		}
-		else {
-			return this.calcActChainsDefinedFixedTypes(plan);
-		}
+		return this.calcActChainsDefinedFixedTypes(plan);
 	}
 
 	public ArrayList<ActivityFacility>  computeChoiceSetCircle(Coord coordStart, Coord coordEnd,

@@ -41,7 +41,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.locationchoice.LocationMutator;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.locationchoice.utils.QuadTreeRing;
@@ -51,12 +50,12 @@ public class LocationMutatorTGSimple extends LocationMutator {
 	protected int unsuccessfullLC = 0;
 	private final DefineFlexibleActivities defineFlexibleActivities;
 
-	public LocationMutatorTGSimple(final Network network, Controler controler, Knowledges knowledges,
+	public LocationMutatorTGSimple(final Network network, Controler controler, 
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 
-		super(network, controler, knowledges, quad_trees, facilities_of_type, random);
-		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+		super(network, controler, quad_trees, facilities_of_type, random);
+		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
 	}
 
 	@Override
@@ -110,20 +109,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 
 	private List<Activity> getFlexibleActivities(final Plan plan) {
 		List<Activity> flexibleActivities;
-		if (!super.locationChoiceBasedOnKnowledge) {
-			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
-		}
-		else {
-			flexibleActivities = defineMovablePrimaryActivities(plan);
-			List<?> actslegs = plan.getPlanElements();
-			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);
-				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) &&
-						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
-					flexibleActivities.add(act);
-				}
-			}
-		}
+		flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		return flexibleActivities;
 	}
 

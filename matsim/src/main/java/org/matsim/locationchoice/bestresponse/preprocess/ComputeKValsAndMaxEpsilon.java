@@ -6,26 +6,29 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-public class ComputeKValsAndMaxEpsilon {
-	
+public class ComputeKValsAndMaxEpsilon {	
 	private final static Logger log = Logger.getLogger(ComputeKValsAndMaxEpsilon.class);
 	private ScenarioImpl scenario;	
 	private Config config;	
-	RandomFromVarDistr rnd;
+	private RandomFromVarDistr rnd;
 	
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
 	private ObjectAttributes personsMaxEpsUnscaled = new ObjectAttributes();
 	
-	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config) {
+	private ScaleEpsilon scaleEpsilon;
+	
+	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, ScaleEpsilon scaleEpsilon) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 		this.scenario = scenario;
 		this.config = config;
+		this.scaleEpsilon = scaleEpsilon;
 	}
 	
 	public void assignKValues() {				
@@ -55,20 +58,16 @@ public class ComputeKValsAndMaxEpsilon {
 		this.assignKValues(); 
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
-		ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(this.scenario, "s", config, this.facilitiesKValues, this.personsKValues);
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
-		
-		maxEpsilonComputer = new ComputeMaxEpsilons(this.scenario, "l", config, this.facilitiesKValues, this.personsKValues);
-		maxEpsilonComputer.prepareReplanning();
-		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			maxEpsilonComputer.handlePlan(p.getSelectedPlan());
-		}
-		maxEpsilonComputer.finishReplanning();
-		
+		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {
+			log.info("Computing max epsilon for activity type " + actType);
+			ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(
+					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
+			maxEpsilonComputer.prepareReplanning();
+			for (Person p : this.scenario.getPopulation().getPersons().values()) {
+				maxEpsilonComputer.handlePlan(p.getSelectedPlan());
+			}
+			maxEpsilonComputer.finishReplanning();
+		}		
 		this.writeMaxEps();
 	}
 	
