@@ -24,6 +24,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.analysis.DistanceStats;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -68,11 +69,12 @@ public class SingleRunControler extends Controler {
       
       DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.config.locationchoice());
 	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
+	  ActTypeConverter actTypeConverter = defineFlexibleActivities.createActivityTypeConverter();
             
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon);
+			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon, actTypeConverter);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
-		this.addControlerListener(new DistanceStats(this.config, "best", "s"));
+		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter));
 	}  
 }
