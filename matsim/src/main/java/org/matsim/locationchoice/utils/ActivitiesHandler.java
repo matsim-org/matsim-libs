@@ -10,12 +10,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 
-public class DefineFlexibleActivities {
+public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
-	private static final Logger log = Logger.getLogger(DefineFlexibleActivities.class);
+	private static final Logger log = Logger.getLogger(ActivitiesHandler.class);
 	private LocationChoiceConfigGroup dcconfig;
 
-	public DefineFlexibleActivities(final LocationChoiceConfigGroup dcconfig) {
+	public ActivitiesHandler(final LocationChoiceConfigGroup dcconfig) {
 		this.dcconfig = dcconfig;
 		this.initFlexibleTypes(dcconfig);
 	}

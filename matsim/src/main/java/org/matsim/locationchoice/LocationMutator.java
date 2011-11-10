@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -50,14 +50,14 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType;
 	protected final LocationChoiceConfigGroup config;
 
-	protected DefineFlexibleActivities defineFlexibleActivities;
+	protected ActivitiesHandler defineFlexibleActivities;
 	protected boolean locationChoiceBasedOnKnowledge = true;
 	protected final Random random;
 
 	// ----------------------------------------------------------
 
 	public LocationMutator(final Network network, final Controler controler, Random random) {
-		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
 		this.quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 		this.facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 		this.config = controler.getConfig().locationchoice();
@@ -69,7 +69,7 @@ public abstract class LocationMutator extends AbstractPersonAlgorithm implements
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 
-		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
 		this.quadTreesOfType = quad_trees;
 		this.facilitiesOfType = facilities_of_type;
 		this.config = controler.getConfig().locationchoice();

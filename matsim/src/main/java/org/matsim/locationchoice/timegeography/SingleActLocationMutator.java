@@ -42,20 +42,20 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.locationchoice.LocationMutator;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 
 public class SingleActLocationMutator extends LocationMutator {
 
 	protected int unsuccessfullLC = 0;
-	private final DefineFlexibleActivities defineFlexibleActivities;
+	private final ActivitiesHandler defineFlexibleActivities;
 
 	public SingleActLocationMutator(final Network network, Controler controler, 
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random) {
 
 		super(network, controler, quad_trees, facilities_of_type, random);
-		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new ActivitiesHandler(controler.getConfig().locationchoice());
 	}
 
 	@Override

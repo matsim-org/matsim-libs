@@ -44,7 +44,7 @@ import org.matsim.locationchoice.random.RandomLocationMutator;
 import org.matsim.locationchoice.timegeography.SingleActLocationMutator;
 import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.utils.ActTypeConverter;
-import org.matsim.locationchoice.utils.DefineFlexibleActivities;
+import org.matsim.locationchoice.utils.ActivitiesHandler;
 import org.matsim.locationchoice.utils.QuadTreeRing;
 import org.matsim.locationchoice.utils.TreesBuilder;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -59,7 +59,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
-	private DefineFlexibleActivities defineFlexibleActivities;
+	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
@@ -107,7 +107,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	}
 	
 	private void defineFlexibleActivities(LocationChoiceConfigGroup config) {
-		this.defineFlexibleActivities = new DefineFlexibleActivities(config);
+		this.defineFlexibleActivities = new ActivitiesHandler(config);
 	}
 	
 	private void createActivityTypeConverter() {
