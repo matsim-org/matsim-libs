@@ -11,20 +11,23 @@ public class JobClusterObject {
 	
 	private List<Id> jobIdList;
 	private Id zoneID;
+	private Id parcelID;
 	private Coord coordinate;
 	private Node nearestNode;
 	
-	public JobClusterObject(Id jobID, Id zoneId, Coord coordinate){
+	public JobClusterObject(Id jobID, Id parcelId, Id zoneId, Coord coordinate){
 		this.jobIdList = new ArrayList<Id>();
 		this.jobIdList.add( jobID );
+		this.parcelID = parcelId;
 		this.zoneID = zoneId;
 		this.coordinate = coordinate;
 		this.nearestNode = null;
 	}
 	
-	public JobClusterObject(Id jobID, Id zoneId, Coord coordinate, Node nearestNode){
+	public JobClusterObject(Id jobID, Id parcelId, Id zoneId, Coord coordinate, Node nearestNode){
 		this.jobIdList = new ArrayList<Id>();
 		this.jobIdList.add( jobID );
+		this.parcelID = parcelId;
 		this.zoneID = zoneId;
 		this.coordinate = coordinate;
 		this.nearestNode = nearestNode;
@@ -48,6 +51,10 @@ public class JobClusterObject {
 	
 	public List<Id> getJobIds(){
 		return this.jobIdList;
+	}
+	
+	public Id getParcelID(){
+		return this.parcelID;
 	}
 	
 	public Id getZoneID(){

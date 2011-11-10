@@ -28,6 +28,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
+import playground.tnicolai.matsim4opus.utils.io.AggregatedWorkplaceCSVWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -166,6 +167,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		catch(Exception e){ e.printStackTrace(); }
 		finally{
 			writeSpatialGridTables();
+			AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
 		}
 	}
 	

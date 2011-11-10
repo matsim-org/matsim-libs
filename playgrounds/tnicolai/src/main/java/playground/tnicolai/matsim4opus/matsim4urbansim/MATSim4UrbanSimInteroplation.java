@@ -1,25 +1,13 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
-import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 
@@ -49,11 +37,11 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				
 				if(params[i].startsWith("resolution")){
 					String s[] = params[i].split("=");
-					this.resolutionMeter = Integer.parseInt(s[1]);
+					MATSim4UrbanSimInteroplation.resolutionMeter = Integer.parseInt(s[1]);
 				}
 				else if(params[i].startsWith("jobsample")){
 					String s[] = params[i].split("=");
-					this.jobSample = Double.parseDouble(s[1]);
+					MATSim4UrbanSimInteroplation.jobSample = Double.parseDouble(s[1]);
 				}	
 			}
 		}

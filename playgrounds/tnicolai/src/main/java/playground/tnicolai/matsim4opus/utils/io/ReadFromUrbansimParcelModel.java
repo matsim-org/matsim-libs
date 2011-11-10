@@ -141,7 +141,7 @@ public class ReadFromUrbansimParcelModel {
 				}
 				pseudoZone.sumXCoordinate += coord.getX();
 				pseudoZone.sumYCoordinate += coord.getY() ;
-				pseudoZone.count ++ ; // tnicolai: wights from urbansim parcels for homes and workplaces
+				pseudoZone.count ++ ; // tnicolai: weights from urbansim parcels for homes and workplaces
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -567,6 +567,7 @@ public class ReadFromUrbansimParcelModel {
 			}
 			else
 				jobClusterMap.put( jo.getParcelID(), new JobClusterObject(jo.getJobID(),
+																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  jo.getCoord() ) );
 		}
@@ -616,6 +617,7 @@ public class ReadFromUrbansimParcelModel {
 			}
 			else
 				jobClusterMap.put( nearestNode.getId(), new JobClusterObject(jo.getJobID(),
+																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  nearestNode.getCoord(),
 																		  nearestNode) );

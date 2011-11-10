@@ -226,7 +226,6 @@ public class MATSim4UrbanSim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-//		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV2( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
 		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
 		
 		// tnicolai todo?: count number of cars per h on a link

@@ -295,7 +295,7 @@ public class InitMATSimScenario {
 		// tnicolai: implement flow capacity correction factor!!!
 		simulation.setFlowCapFactor( factor );	
 		simulation.setStorageCapFactor( factor );	
-		log.warn("This uses the population sampling rate (" + popSampling + ") times " +factor+ " for flowCapFactor and storageCapFactor!");
+		log.warn("This uses the population sampling rate (" + popSampling + ") for flowCapFactor and storageCapFactor!");
 		log.warn("Needs to be soveld by an flow capacity correction factor (tnicolai nov'12)!");
 		
 		boolean removeStuckVehicles = false;
