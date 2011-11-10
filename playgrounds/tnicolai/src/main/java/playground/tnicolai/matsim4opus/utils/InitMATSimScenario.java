@@ -286,13 +286,16 @@ public class InitMATSimScenario {
 	private void initSimulation(){
 		log.info("Setting simulation to config...");
 		
-		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
-		
 		SimulationConfigGroup simulation = new SimulationConfigGroup();
 		
-		simulation.setFlowCapFactor( popSampling );		// tnicolai: implement flow capacity correction factor!!!
-		simulation.setStorageCapFactor( popSampling );	// tnicolai: implement flow capacity correction factor!!!
-		log.warn("This uses the population sampling rate (" + popSampling + ") also for flowCapFactor and storageCapFactor!");
+		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
+		double factor = popSampling * 1.2;
+		if(factor > 1.)
+			factor = 1.;
+		
+		simulation.setFlowCapFactor( factor );		// tnicolai: implement flow capacity correction factor!!!
+		simulation.setStorageCapFactor( factor );	// tnicolai: implement flow capacity correction factor!!!
+		log.warn("This uses the population sampling rate times 1.2 (" + popSampling + ") for flowCapFactor and storageCapFactor!");
 		log.warn("Needs to be soveld by an flow capacity correction factor (tnicolai nov'12)!");
 		
 		boolean removeStuckVehicles = false;
