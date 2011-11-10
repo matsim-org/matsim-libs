@@ -386,13 +386,14 @@ public class CreateFreightTraffic {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		
+		ActTypeConverter actTypeConverter = new ActTypeConverter(false);
 		
 		for (Person p : ((PopulationImpl) sTmp.getPopulation()).getPersons().values()){
 			for (Plan plan : p.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						ActivityImpl act = (ActivityImpl)pe;
-						String v2Type = ActTypeConverter.convert2FullType(act.getType());
+						String v2Type = actTypeConverter.convert2FullType(act.getType());
 						
 						Id facilityID = act.getFacilityId();
 						ActivityFacility af = 
