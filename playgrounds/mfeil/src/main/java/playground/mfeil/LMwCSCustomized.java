@@ -43,7 +43,7 @@ import org.matsim.locationchoice.constrained.LocationMutatorwChoiceSet;
 public class LMwCSCustomized extends LocationMutatorwChoiceSet {
 
 	public LMwCSCustomized(final Network network, Controler controler, Knowledges kn) {
-		super(network, controler, kn, new Random(4711));
+		super(network, controler, new Random(4711));
 	}
 
 	@Override

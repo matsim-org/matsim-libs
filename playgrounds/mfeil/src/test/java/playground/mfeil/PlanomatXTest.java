@@ -60,7 +60,7 @@ public class PlanomatXTest extends MatsimTestCase{
 
 		DepartureDelayAverageCalculator tDepDelayCalc = new DepartureDelayAverageCalculator(this.scenario_input.getNetwork(), 900);
 
-		LocationMutatorwChoiceSet locator = new LocationMutatorwChoiceSet (this.scenario_input.getNetwork(), this.initializer.getControler(), this.initializer.getControler().getScenario().getKnowledges(), new Random(4711));
+		LocationMutatorwChoiceSet locator = new LocationMutatorwChoiceSet (this.scenario_input.getNetwork(), this.initializer.getControler(), new Random(4711));
 		ActivityTypeFinder finder = new ActivityTypeFinder (this.initializer.getControler());
 
 		this.testee = new PlanomatX (this.initializer.getControler(), locator, tDepDelayCalc, finder);

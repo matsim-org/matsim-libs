@@ -145,7 +145,7 @@ public class MyStrategyManagerConfigLoader {
 			strategy = new PlanStrategyImpl(new PathSizeLogitSelector(controler.getNetwork(), config.planCalcScore()));
 		} else if (name.equals("LocationChoice")) {
 			strategy = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
-			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler, (controler.getScenario()).getKnowledges()));
+			strategy.addStrategyModule(new LocationChoice(controler.getNetwork(), controler));
 			strategy.addStrategyModule(new ReRoute(controler));
 			strategy.addStrategyModule(new TimeAllocationMutator(config));
 			/* not really happy about the following line. Imagine what happens if everybody does

@@ -98,7 +98,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 
 		this.controler=controler;
 		this.knowledges 			= controler.getScenario().getKnowledges();
-		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, this.knowledges, new Random(4711));
+		this.locator 				= new LocationMutatorwChoiceSet(controler.getNetwork(), controler, new Random(4711));
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
 		this.init(network);

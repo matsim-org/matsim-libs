@@ -65,11 +65,11 @@ public class LocationMutatorTGSimple extends LocationMutator {
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type) {
 
-		super(network, controler, knowledges, quad_trees, facilities_of_type, new Random(4711));
+		super(network, controler, quad_trees, facilities_of_type, new Random(4711));
 
 		log.info("Using modified TGMutator");
 
-		this.defineFlexibleActivities = new DefineFlexibleActivities(this.knowledges, controler.getConfig().locationchoice());
+		this.defineFlexibleActivities = new DefineFlexibleActivities(controler.getConfig().locationchoice());
 		this.leisureQuadtree = new FacilityQuadTreeBuilder().buildFacilityQuadTree("leisure",
 				(ActivityFacilitiesImpl)controler.getFacilities());
 		leisureFacilityExtractor = new LeisureFacilityExtractor(this.leisureQuadtree);
@@ -129,20 +129,7 @@ public class LocationMutatorTGSimple extends LocationMutator {
 
 	private List<Activity> getFlexibleActivities(final PlanImpl plan) {
 		List<Activity> flexibleActivities = new ArrayList<Activity>();
-		if (!super.locationChoiceBasedOnKnowledge) {
-			flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
-		}
-		else {
-			flexibleActivities = defineMovablePrimaryActivities(plan);
-			List<?> actslegs = plan.getPlanElements();
-			for (int j = 0; j < actslegs.size(); j=j+2) {
-				final Activity act = (Activity)actslegs.get(j);
-				if (!this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId()).isPrimary(act.getType(), act.getFacilityId()) &&
-						!(act.getType().startsWith("h") || act.getType().startsWith("tta"))) {
-					flexibleActivities.add(act);
-				}
-			}
-		}
+		flexibleActivities = this.defineFlexibleActivities.getFlexibleActivities(plan);
 		return flexibleActivities;
 	}
 

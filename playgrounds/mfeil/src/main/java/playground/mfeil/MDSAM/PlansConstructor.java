@@ -114,7 +114,7 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.network = controler.getNetwork();
 		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
-		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, controler.getScenario().getKnowledges(), new Random(4711));
+		this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, new Random(4711));
 		this.linker = new XY2Links (this.controler.getNetwork());
 		this.beta				= "yes";
 		this.gamma				= "no";

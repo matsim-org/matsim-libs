@@ -22,6 +22,8 @@ package playground.anhorni.PLOC;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
+import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
+import org.matsim.locationchoice.utils.DefineFlexibleActivities;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.LEGO.miniscenario.run.analysis.CalculatePlanTravelStats;
@@ -63,9 +65,12 @@ public class SingleRunControler extends Controler {
     @Override
     protected void setUp() {
       super.setUp();
+      
+      DefineFlexibleActivities defineFlexibleActivities = new DefineFlexibleActivities(this.config.locationchoice());
+	  ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
             
       MixedScoringFunctionFactory mixedScoringFunctionFactory =
-			new MixedScoringFunctionFactory(this.config, this);
+			new MixedScoringFunctionFactory(this.config, this, scaleEpsilon);
   	
 		this.setScoringFunctionFactory(mixedScoringFunctionFactory);
 		this.addControlerListener(new CalculatePlanTravelStats(this.config, "best", "s"));
