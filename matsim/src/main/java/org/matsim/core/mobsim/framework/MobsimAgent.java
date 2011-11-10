@@ -48,10 +48,13 @@ import org.matsim.api.core.v01.Identifiable;
  * but we need a "current" here.
  * </li><li> So we could say getPrev and getNext.
  * </li><li> How do we insert and remove?  In ArrayList, the Iterator fails if there is insert/remove
- * outside of the iterator.  But here, we cannot move the iterator away from its current position.
+ * outside of the iterator.  But here, we cannot move the iterator away from its current position.</br>
+ * One could use Java's ListIterator interface to allow insert and remove. dg Nov 2011
  * </li>
+ * <li>
  * Some useful version is currently implemented, experimentally, into the experimental version of the WithinDayAgent.  If
  * necessary, disscuss there.  kai, dec'10
+ * </li>
  * </ul>
  * In terms of design, the assumption is that the plan remains unchanged in the mobsim, at least from the
  * perspective of the iterations: plan = genotype, execution = phenotype.  Therefore, <i>already Christoph's implementation
