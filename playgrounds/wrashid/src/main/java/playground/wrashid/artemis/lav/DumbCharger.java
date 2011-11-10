@@ -43,8 +43,6 @@ import playground.wrashid.artemis.output.*;
  */
 public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
 
-	// TODO: also consider the garage parkings with higher chargings available
-	double chargingSpeedInWatt = 3500;
 	private HashMap<Id, String> firstActTypeDuringParking;
 	private HashMap<Id, Id> carParkedAtLink;
 
