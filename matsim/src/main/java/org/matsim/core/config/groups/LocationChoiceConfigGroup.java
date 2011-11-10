@@ -55,6 +55,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String PKVALS_FILE = "pkValuesFile";
 	private static final String FKVALS_FILE = "fkValuesFile";
 	private static final String MAXEPS_FILE = "maxEpsFile";
+	
+	private static final String ANALYSIS_BOUNDARY = "analysisBoundary";
+	private static final String ANALYSIS_BINSIZE = "analysisBinSize";
+	private static final String ANALYSIS_IDEXCLUSION = "analysisIdExclusion";
 
 	//default values
 	private String restraintFcnFactor = "0.0";
@@ -81,6 +85,10 @@ public class LocationChoiceConfigGroup extends Module {
 	private String pkValuesFile = "null";
 	private String fkValuesFile = "null";
 	private String maxEpsFile = "null";
+	
+	private String analysisBoundary = "200000.0";
+	private String analysisBinSize = "20000.0";
+	private String analysisIdExclusion = Integer.toString(Integer.MAX_VALUE);
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -154,9 +162,18 @@ public class LocationChoiceConfigGroup extends Module {
 		if (MAXEPS_FILE.equals(key)) {
 			return getMaxEpsFile();
 		}
+		if (ANALYSIS_BOUNDARY.equals(key)) {
+			return getAnalysisBoundary();
+		}
+		if (ANALYSIS_BINSIZE.equals(key)) {
+			return getAnalysisBinSize();
+		}
+		if (ANALYSIS_IDEXCLUSION.equals(key)) {
+			return getAnalysisIdExclusion();
+		}
 		throw new IllegalArgumentException(key);
 	}
-
+	
 	@Override
 	public void addParam(final String key, final String value) {
 		if (RESTR_FCN_FACTOR.equals(key)) {
@@ -294,14 +311,33 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setMaxEpsFile(value);
 			}
-		}
-		else
+		} else if (ANALYSIS_BOUNDARY.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define an analysis region. Set to default value '200km' now");
+			}
+			else {
+				setAnalysisBoundary(value);
+			}
+		} else if (ANALYSIS_BINSIZE.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define an analysis bin size. Set to default value '20km' now");
+			}
+			else {
+				setAnalysisBinSize(value);
+			}
+		} else if (ANALYSIS_IDEXCLUSION.equals(key)) {
+			if (value.length() == 0) {
+				log.warn("define the highest id to be included in analysis. Set to default value 'maxint' now");
+			}
+			else {
+				setAnalysisIdExclusion(value);
+			}
+		} else
 		{
 			throw new IllegalArgumentException(key);
 		}
 	}
-	
-	
+		
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
@@ -325,7 +361,11 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, PROBCHOICEEXP);
 		this.addParameterToMap(map, PKVALS_FILE);
 		this.addParameterToMap(map, FKVALS_FILE);
-		this.addParameterToMap(map, MAXEPS_FILE);
+		this.addParameterToMap(map, MAXEPS_FILE);		
+		this.addParameterToMap(map, ANALYSIS_BOUNDARY);
+		this.addParameterToMap(map, ANALYSIS_BINSIZE);
+		this.addParameterToMap(map, ANALYSIS_IDEXCLUSION);
+		
 		return map;
 	}
 
@@ -455,4 +495,22 @@ public class LocationChoiceConfigGroup extends Module {
 	public void setMaxEpsFile(String maxEpsFile) {
 		this.maxEpsFile = maxEpsFile;
 	}
+	public String getAnalysisBoundary() {
+		return this.analysisBoundary;
+	}
+	public void setAnalysisBoundary(String analysisBoundary) {
+		this.analysisBoundary = analysisBoundary;
+	}
+	public String getAnalysisBinSize() {
+		return this.analysisBinSize;
+	}
+	public void setAnalysisBinSize(String analysisBinSize) {
+		this.analysisBinSize = analysisBinSize;
+	}
+	public String getAnalysisIdExclusion() {
+		return this.analysisIdExclusion;
+	}
+	public void setAnalysisIdExclusion(String analysisIdExclusion) {
+		this.analysisIdExclusion = analysisIdExclusion;
+	}		
 }
