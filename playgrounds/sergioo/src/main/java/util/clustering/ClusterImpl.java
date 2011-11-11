@@ -11,7 +11,7 @@ public class ClusterImpl<T> implements Cluster<T> {
 
 	
 	//Attributes
-	private Set<PointND<T>> points;
+	protected Set<PointND<T>> points;
 	
 	//Constructors
 	public ClusterImpl() {
@@ -42,20 +42,7 @@ public class ClusterImpl<T> implements Cluster<T> {
 	}
 	@Override
 	public PointND<T> getMean() {
-		if(points.size()==0)
-			return null;
-		else
-			try {
-				PointND<Double> mean = new PointNDImpl<Double>(points.iterator().next().getDimension(), 0.0);
-				for(PointND<T> point:points)
-					for(int i=0; i<mean.getDimension(); i++)
-						mean.setElement(i, mean.getElement(i)+(Double)point.getElement(i));
-				for(int i=0; i<mean.getDimension(); i++)
-					mean.setElement(i, mean.getElement(i)/points.size());
-				return (PointND<T>) mean;
-			} catch(Exception e) {
-				return null;
-			}
+		return null;
 	}
 	@Override
 	public PointND<T> getMainPoint() {
@@ -74,6 +61,37 @@ public class ClusterImpl<T> implements Cluster<T> {
 	@Override
 	public boolean isInCluster(PointND<T> point) {
 		return points.contains(point);
+	}
+	
+	public static class Double extends ClusterImpl<java.lang.Double> {
+		
+		//Constructors
+		public Double() {
+			super();
+		}
+		public Double(PointND<java.lang.Double> point) {
+			super(point);
+		}
+		public Double(Set<PointND<java.lang.Double>> points) {
+			super(points);
+		}
+		
+		//Methods
+		@Override
+		public PointND<java.lang.Double> getMean() {
+			if(points.size()==0)
+				return null;
+			else {
+					PointND<java.lang.Double> mean = new PointNDImpl.Double(points.iterator().next().getDimension(), 0.0);
+					for(PointND<java.lang.Double> point:points)
+						for(int i=0; i<mean.getDimension(); i++)
+							mean.setElement(i, mean.getElement(i)+point.getElement(i));
+					for(int i=0; i<mean.getDimension(); i++)
+						mean.setElement(i, mean.getElement(i)/points.size());
+					return mean;
+			}
+		}
+		
 	}
 	
 }

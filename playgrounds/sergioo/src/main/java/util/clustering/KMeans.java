@@ -6,15 +6,15 @@ import java.util.Set;
 
 import util.algebra.PointND;
 
-public class KMeans implements ClusteringAlgorithm<Double> {
+public class KMeans<T> implements ClusteringAlgorithm<T> {
 
 	//Methods
 	@Override
-	public Map<Integer, Cluster<Double>> getClusters(int size, Set<PointND<Double>> points) {
-		Cluster<Double> all = new ClusterImpl<Double>(points);
-		Map<Integer, Cluster<Double>> clusters = new HashMap<Integer, Cluster<Double>>();
+	public Map<Integer, Cluster<T>> getClusters(int size, Set<PointND<T>> points) {
+		Cluster<T> all = new ClusterImpl<T>(points);
+		Map<Integer, Cluster<T>> clusters = new HashMap<Integer, Cluster<T>>();
 		for(int i=0; i<size; i++) {
-			PointND<Double> random = null;
+			PointND<T> random = null;
 			boolean free;
 			do {
 				free = true;
@@ -23,9 +23,9 @@ public class KMeans implements ClusteringAlgorithm<Double> {
 					if(clusters.get(j).isInCluster(random))
 						free = false;
 			} while(!free);
-			clusters.put(i, new ClusterImpl<Double>(random));
+			clusters.put(i, new ClusterImpl<T>(random));
 		}
-		for(PointND<Double> point:points) {
+		for(PointND<T> point:points) {
 			int nearestClusterKey = 0;
 			for(int i=0; i<size; i++)
 				if(clusters.get(i).getMean().getDistance(point)<clusters.get(nearestClusterKey).getMean().getDistance(point))
@@ -35,11 +35,11 @@ public class KMeans implements ClusteringAlgorithm<Double> {
 		boolean changes = true;
 		while(changes) {
 			changes = false;
-			Map<Integer, Cluster<Double>> newClusters = new HashMap<Integer, Cluster<Double>>();
+			Map<Integer, Cluster<T>> newClusters = new HashMap<Integer, Cluster<T>>();
 			for(int i=0; i<size; i++)
-				newClusters.put(i,new ClusterImpl<Double>());
+				newClusters.put(i,new ClusterImpl<T>());
 			for(Integer currentClusterKey: clusters.keySet())	
-				for(PointND<Double> point:clusters.get(currentClusterKey).getPoints()) {
+				for(PointND<T> point:clusters.get(currentClusterKey).getPoints()) {
 					int nearestClusterKey = 0;
 					for(int i=0; i<size; i++)
 						if(clusters.get(i).getMean().getDistance(point)<clusters.get(nearestClusterKey).getMean().getDistance(point))

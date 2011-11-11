@@ -3,11 +3,10 @@ package util.algebra;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PointNDImpl<T> implements PointND<T>{
+public abstract class PointNDImpl<T> implements PointND<T>{
 
 	//Attributes
-	private int dimension;
-	private List<T> elements;
+	protected List<T> elements;
 	
 	//Constructors
 	public PointNDImpl (int dimension) {
@@ -19,7 +18,6 @@ public class PointNDImpl<T> implements PointND<T>{
 			elements.add(initialElement);
 	}
 	public PointNDImpl (List<T> elements) {
-		dimension = elements.size();
 		this.elements = new ArrayList<T>();
 		for(T element:elements)
 			this.elements.add(element);
@@ -28,7 +26,7 @@ public class PointNDImpl<T> implements PointND<T>{
 	//Methods
 	@Override
 	public int getDimension() {
-		return dimension;
+		return elements.size();
 	}
 	@Override
 	public T getElement(int position) {
@@ -39,19 +37,37 @@ public class PointNDImpl<T> implements PointND<T>{
 		elements.set(position, element);
 	}
 	@Override
-	public double getDistance(PointND<T> other) {
-		if(elements.get(0).getClass()==Double.class && other.getElement(0).getClass()==Double.class) {
+	public abstract double getDistance(PointND<T> other);
+
+	@Override
+	public abstract PointND<T> clone();
+
+	public static class Double extends PointNDImpl<java.lang.Double> {
+		
+		//Constructors
+		public Double(int dimension) {
+			super(dimension);
+		}
+		public Double (int dimension, java.lang.Double initialElement) {
+			super(dimension, initialElement);
+		}
+		public Double (List<java.lang.Double> elements) {
+			super(elements);
+		}
+		
+		//Methods
+		@Override
+		public double getDistance(PointND<java.lang.Double> other)  {
 			double distance = 0;
 			for(int i=0; i<elements.size(); i++)
-				distance += Math.pow(((Double)elements.get(i))-((Double)other.getElement(i)),2);
+				distance += Math.pow(elements.get(i)-other.getElement(i),2);
 			return Math.sqrt(distance);
 		}
-		else
-			return 0;
+		@Override
+		public PointND<java.lang.Double> clone() {
+			return new PointNDImpl.Double(elements);
+		}
+		
 	}
-	@Override
-	public PointND<T> clone() {
-		return new PointNDImpl<T>(elements);
-	}
-
+	
 }
