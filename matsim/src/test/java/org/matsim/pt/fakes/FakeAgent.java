@@ -38,6 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 
@@ -153,7 +154,7 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 	}
 
 	@Override
-	public void setVehicle(final QVehicle veh) {
+	public void setVehicle(final MobsimVehicle veh) {
 	}
 
 	@Override

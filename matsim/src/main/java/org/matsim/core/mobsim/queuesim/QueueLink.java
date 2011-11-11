@@ -40,6 +40,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -273,7 +274,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		this.buffer.clear();
 	}
 
-	/* package */void addParkedVehicle(QVehicle vehicle) {
+	/* package */void addParkedVehicle(MobsimVehicle mvehicle) {
+		QVehicle vehicle = (QVehicle) mvehicle ; // when it gets here, it has to be a QVehicle.  kai, nov'11
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
 	}
@@ -286,7 +288,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
-	/* package */void addDepartingVehicle(QVehicle vehicle) {
+	/* package */void addDepartingVehicle(MobsimVehicle mvehicle) {
+		QVehicle vehicle = (QVehicle) mvehicle ; // cast ok: needs to have runtime type of QVehicle when it gets here.  kai, nov'11
 		this.waitingList.add(vehicle);
 		this.activateLink();
 	}
@@ -385,7 +388,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 	}
 
-	/* package */void processVehicleArrival(final double now, final QVehicle veh) {
+	/* package */void processVehicleArrival(final double now, final MobsimVehicle mveh) {
+		QVehicle veh = (QVehicle) mveh ; // cast ok: needs to have runtime type of QVehicle when this is called. kai, nov'11
 		// QueueSimulation.getEvents().processEvent(
 		// new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 		// this.getLink(), veh.getDriver().getCurrentLeg()));

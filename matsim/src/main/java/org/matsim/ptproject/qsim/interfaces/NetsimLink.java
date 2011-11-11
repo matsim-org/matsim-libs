@@ -82,7 +82,7 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 	 * <li> Seems to me that this should become non-public and the netsim engine should solve this. kai, nov'11
 	 * </ul>
 	 */
-	public void addParkedVehicle(QVehicle vehicle);
+	public void addParkedVehicle(MobsimVehicle vehicle);
 	// necessary (ini)
 
 	public QVehicle getVehicle(Id vehicleId);

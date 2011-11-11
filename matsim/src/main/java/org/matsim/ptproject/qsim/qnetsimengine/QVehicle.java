@@ -20,23 +20,22 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.vis.snapshotwriters.VisVehicle;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
+/**
+ * interface to the ``Q'' implementation of the MobsimVehicle.  This needs to be public since the ``Q'' version of the 
+ * vehicle is used by more than one package.  This interfaces should, however, not be used outside the relevant 
+ * netsimengines.  In particular, the information should not be used for visualization.  kai, nov'11
+ * 
+ * @author nagel
+ */
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
-public interface QVehicle extends Identifiable, VisVehicle, QItem {
+public abstract class QVehicle extends QItem implements MobsimVehicle {
 
-	public void setDriver(final MobsimDriverAgent driver);
-	// yy presumably, this should set DriverAgent
-	
-	public Link getCurrentLink();
-	
-	public void setCurrentLink(final Link link);
+	public abstract void setCurrentLink(final Link link);
 	// yy not sure if this needs to be publicly exposed
-	
-	public double getSizeInEquivalents();
 	
 	/**Design thoughts:<ul>
 	 * <li> yy I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to 
@@ -46,13 +45,13 @@ public interface QVehicle extends Identifiable, VisVehicle, QItem {
 	 * <li> But also see comment under setLinkEnterTime().  kai, nov'11 
 	 * </ul>
 	 */
-	public double getLinkEnterTime();
+	public abstract double getLinkEnterTime();
 	
 	/**Design thoughts:<ul>
 	 * <li> This has to remain public as long as QVehicle/QVehicleImpl is both used by QueueSimulation and QSim.  At best,
 	 * we could say that there should also be a MobsimVehicle interface that is reduced.  kai, nov'11.
 	 * </ul>
 	 */
-	public void setLinkEnterTime(final double time);
+	public abstract void setLinkEnterTime(final double time);
 
 }

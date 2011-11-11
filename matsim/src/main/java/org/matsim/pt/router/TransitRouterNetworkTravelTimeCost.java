@@ -57,15 +57,27 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCos
 		double cost;
 		if (((TransitRouterNetworkLink) link).route == null) {
 			// it's a transfer link (walk)
-//			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
+
+			//			cost = -getLinkTravelTime(link, time) * this.config.getEffectiveMarginalUtilityOfTravelTimeWalk_utl_s() + this.config.getUtilityOfLineSwitch_utl();
+			// (old specification)
+			
 			double transfertime = getLinkTravelTime(link, time);
 			double waittime = this.config.additionalTransferTime;
+			
+			// say that the effective walk time is the transfer time minus some "buffer"
 			double walktime = transfertime - waittime;
+			
+			// weigh the "buffer" not with the walk time disutility, but with the wait time disutility:
+			// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
+			// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
+			// be the same as the marginal opprotunity cost of time).  kai, nov'11
 			cost = -walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
 			       -waittime * this.config.getMarginalUtiltityOfWaiting_utl_s()
 			       - this.config.getUtilityOfLineSwitch_utl();
+			
 		} else {
-			cost = -getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+			cost = - getLinkTravelTime(link, time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			       - link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
 		}
 		return cost;
 	}
@@ -82,12 +94,19 @@ public class TransitRouterNetworkTravelTimeCost implements TravelTime, TravelCos
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		TransitRouteStop toStop = wrapped.toNode.stop;
 		if (wrapped.route != null) {
-			// agent stays on the same route, so use transit line travel time
+			// (agent stays on the same route, so use transit line travel time)
+			
+			// get the next departure time:
 			double bestDepartureTime = getNextDepartureTime(wrapped.route, fromStop, time);
 
+			// the travel time on the link is 
+			//   the time until the departure (``dpTime - now'')
+			//   + the travel time on the link (there.arrivalTime - here.departureTime)
+			// But quite often, we only have the departure time at the next stop.  Then we use that:
 			double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
 			double time2 = (bestDepartureTime - time) + (arrivalOffset - fromStop.getDepartureOffset());
 			if (time2 < 0) {
+				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
 				time2 += MIDNIGHT;
 			}
 			this.cachedTravelTime = time2;

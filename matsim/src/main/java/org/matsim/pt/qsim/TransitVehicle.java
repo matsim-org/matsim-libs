@@ -23,11 +23,11 @@ package org.matsim.pt.qsim;
 import java.util.Collection;
 
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
 
-public interface TransitVehicle extends QVehicle {
+public interface TransitVehicle extends MobsimVehicle {
 
 	/**
 	 * Adds a passenger to this vehicle.

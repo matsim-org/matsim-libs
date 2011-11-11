@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -292,9 +293,10 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void addParkedVehicle(QVehicle vehicle) {
-		this.parkedVehicles.put(vehicle.getId(), vehicle);
-		vehicle.setCurrentLink(this.link);
+	public void addParkedVehicle(MobsimVehicle vehicle) {
+		QVehicle qveh = (QVehicle) vehicle ; // cast ok: when it gets here, it needs to have a runtime type of QVehicle. kai, nov'11
+		this.parkedVehicles.put(qveh.getId(), qveh);
+		qveh.setCurrentLink(this.link);
 	}
 
 	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {

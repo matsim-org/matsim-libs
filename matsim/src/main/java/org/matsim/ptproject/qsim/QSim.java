@@ -66,6 +66,7 @@ import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
@@ -78,7 +79,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -148,7 +149,7 @@ public class QSim implements VisMobsim, Netsim {
 	private TransitQSimEngine transitEngine;
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
-	private final Map<Id, QVehicleImpl> vehicles = new HashMap<Id, QVehicleImpl>();
+	private final Map<Id, MobsimVehicle> vehicles = new HashMap<Id, MobsimVehicle>();
     private List<AgentSource> agentSources = new ArrayList<AgentSource>();
 
     // everything above this line is private and should remain private. pls
@@ -384,21 +385,21 @@ public class QSim implements VisMobsim, Netsim {
 	 * <li> This method may become public so that plug-ins can insert vehicles.  kai, nov'11
 	 * </ul>
 	 */
-	private void parkVehicleOnInitialLink( QVehicle veh, Id linkId ) {
+	private void parkVehicleOnInitialLink( MobsimVehicle veh, Id linkId ) {
 		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
 		qlink.addParkedVehicle(veh);
 	}
 
 	private void createAndAddDefaultVehicle(MobsimAgent agent,
 			VehicleType defaultVehicleType) {
-		QVehicleImpl veh = null;
+		MobsimVehicle veh = null;
 		if (vehWrnCnt < 1) {
 			log.warn("QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10");
 			log.warn(Gbl.ONLYONCE);
 			vehWrnCnt++;
 		}
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), defaultVehicleType);
-		veh = new QVehicleImpl(vehicle);
+		veh = QVehicleUtils.createMobsimVehicle(vehicle);
 		veh.setDriver((MobsimDriverAgent) agent); // this line is currently only
 													// needed for OTFVis to show
 													// parked vehicles
@@ -894,7 +895,7 @@ public class QSim implements VisMobsim, Netsim {
 		// changed this to unmodifiable in oct'10. kai
 	}
 
-	public Map<Id, QVehicleImpl> getVehicles() {
+	public Map<Id, MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
 

@@ -44,6 +44,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
@@ -59,7 +60,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
 	final Person person;
-	private QVehicle vehicle;
+	private MobsimVehicle vehicle;
 
 	Id cachedNextLinkId = null;
 
@@ -425,13 +426,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	}
 
 	@Override
-	public final void setVehicle(final QVehicle veh) {
+	public final void setVehicle(final MobsimVehicle veh) {
 		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		this.vehicle = veh;
 	}
 
 	@Override
-	public final QVehicle getVehicle() {
+	public final MobsimVehicle getVehicle() {
 		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		return this.vehicle;
 	}

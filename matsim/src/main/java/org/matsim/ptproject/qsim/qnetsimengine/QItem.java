@@ -6,10 +6,10 @@ package org.matsim.ptproject.qsim.qnetsimengine;
  * <p/>
  * @author nagel
  */
-public interface QItem {
+public abstract class QItem {
 
-	double getEarliestLinkExitTime();
+	public abstract double getEarliestLinkExitTime();
 
-	void setEarliestLinkExitTime(double earliestLinkEndTime);
+	public abstract void setEarliestLinkExitTime(double earliestLinkEndTime);
 
 }

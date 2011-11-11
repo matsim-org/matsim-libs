@@ -74,7 +74,7 @@ class CarDepartureHandler implements DepartureHandler {
 			vehicleId = agent.getId(); // backwards-compatibility
 		}
 		QLinkInternalI qlink = (QLinkInternalI) queueSimulation.getNetsimNetwork().getNetsimLink(linkId);
-		QVehicleImpl vehicle = (QVehicleImpl) qlink.removeParkedVehicle(vehicleId);
+		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT && agent instanceof PersonDriverAgentImpl) {
 				vehicle = findVehicle(vehicleId);
@@ -101,7 +101,7 @@ class CarDepartureHandler implements DepartureHandler {
 	 * <li> yyyyyy Note that the "linkId" parameter is not used for any physical action!!
 	 * </ul> 
 	 */
-	private void teleportVehicleTo(QVehicleImpl vehicle, Id linkId) {
+	private void teleportVehicleTo(QVehicle vehicle, Id linkId) {
 		if (vehicle.getCurrentLink() != null) {
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;
@@ -115,8 +115,8 @@ class CarDepartureHandler implements DepartureHandler {
 		}
 	}
 
-	private QVehicleImpl findVehicle(Id vehicleId) {
-		return queueSimulation.getVehicles().get(vehicleId);
+	private QVehicle findVehicle(Id vehicleId) {
+		return (QVehicle) queueSimulation.getVehicles().get(vehicleId); // cast ok: needs to be QVehicle when it gets here.  kai, nov'11
 	}
 
 }

@@ -52,6 +52,7 @@ import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
@@ -271,9 +272,10 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public void addParkedVehicle(QVehicle vehicle) {
-		this.parkedVehicles.put(vehicle.getId(), vehicle);
-		vehicle.setCurrentLink(this.link);
+	public void addParkedVehicle(MobsimVehicle vehicle) {
+		QVehicle qveh = (QVehicle) vehicle ; // cast ok: when it gets here, it needs to be a qvehicle to work.
+		this.parkedVehicles.put(qveh.getId(), qveh);
+		qveh.setCurrentLink(this.link);
 	}
 
 	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
@@ -958,7 +960,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		}
 	}
 
-	static class Hole implements QItem {
+	static class Hole extends QItem {
 		private double earliestLinkEndTime ;
 
 		@Override

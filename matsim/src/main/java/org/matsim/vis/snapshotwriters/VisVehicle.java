@@ -3,6 +3,7 @@
  */
 package org.matsim.vis.snapshotwriters;
 
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
@@ -10,7 +11,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public interface VisVehicle {
+public interface VisVehicle extends Identifiable {
 	
 	/**
 	 * @return the <code>Vehicle</code> that this simulation vehicle represents

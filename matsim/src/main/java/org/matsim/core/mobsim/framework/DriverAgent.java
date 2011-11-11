@@ -20,9 +20,8 @@
 
 package org.matsim.core.mobsim.framework;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
@@ -44,7 +43,7 @@ public interface DriverAgent extends NetworkAgent {
 	 */
 	public void notifyMoveOverNode(Id newLinkId);
 	
-	public void setVehicle( final QVehicle veh ) ;
+	public void setVehicle( final MobsimVehicle veh ) ;
 	
 	/**
 	 * Design thoughts:<ul>
@@ -53,7 +52,7 @@ public interface DriverAgent extends NetworkAgent {
 	 * connectors would be better.  kai, nov'11
 	 * </ul>
 	 */
-	public QVehicle getVehicle() ;
+	public MobsimVehicle getVehicle() ;
 	
 	public Id getPlannedVehicleId() ;
 	

@@ -423,6 +423,8 @@ public class Controler {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
+		
+		// the QSim reads the config by itself, and configures itself as a transit-enabled mobsim.  kai, nov'11
 	}
 
 	/**

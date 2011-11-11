@@ -22,10 +22,11 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.vehicles.Vehicle;
 
-public class QVehicleImpl implements QVehicle {
+public class QVehicleImpl extends QVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -40,11 +41,11 @@ public class QVehicleImpl implements QVehicle {
 	
 	private final Vehicle basicVehicle;
 
-	public QVehicleImpl(final Vehicle basicVehicle) {
+	QVehicleImpl(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 	
-	public QVehicleImpl(final Vehicle basicVehicle, final double sizeInEquivalents) {
+	protected QVehicleImpl(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;

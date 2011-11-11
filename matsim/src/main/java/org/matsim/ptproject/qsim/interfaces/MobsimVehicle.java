@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: matsim
- * NetworkAgent.java
+ * MobsimVehicle.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.ptproject.qsim.interfaces;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
- * This was separated out since there were some commonalities between "MobsimAgent" and "DriverAgent".
- * 
  * @author nagel
+ *
  */
-public interface NetworkAgent extends MobsimAgentMarkerInterface {
+public interface MobsimVehicle extends VisVehicle{
+	public Link getCurrentLink();
 	
-	public Id getCurrentLinkId();
+	public void setDriver(final MobsimDriverAgent driver);
+	// yy presumably, this should set DriverAgent
+	
+	public abstract double getSizeInEquivalents();
+	
 
-	/**
-	 * @return Id of destination link.  May be null (e.g. for cruising taxi drivers)
-	 */
-	public Id getDestinationLinkId();
+	
+
+	
 
 }

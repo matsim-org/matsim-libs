@@ -6,19 +6,19 @@ import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class StaticFactoriesContainer {
 
 	static QVehicle createQueueVehicle(Vehicle vehicle) {
 	//		return new QueueVehicle(basicVehicle);
-			return new QVehicleImpl(vehicle);
+			return (QVehicle) QVehicleUtils.createMobsimVehicle(vehicle);
 		}
 
 	static QVehicle createQueueVehicle(Vehicle vehicle, double sizeInEquivalents) {
 	//		return new QueueVehicle(basicVehicle, sizeInEquivalents);
-			return new QVehicleImpl(vehicle, sizeInEquivalents );
+			return (QVehicle) QVehicleUtils.createMobsimVehicle(vehicle, sizeInEquivalents);
 		}
 
 	public static MobsimDriverAgent createQueuePersonAgent(Person p, QueueSimulation simulation) {

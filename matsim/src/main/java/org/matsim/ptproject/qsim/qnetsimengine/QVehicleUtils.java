@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: matsim
- * NetworkAgent.java
+ * QVehicleUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +18,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * This was separated out since there were some commonalities between "MobsimAgent" and "DriverAgent".
- * 
  * @author nagel
+ *
  */
-public interface NetworkAgent extends MobsimAgentMarkerInterface {
-	
-	public Id getCurrentLinkId();
+public class QVehicleUtils {
 
 	/**
-	 * @return Id of destination link.  May be null (e.g. for cruising taxi drivers)
+	 * Mobsim factory that returns vehicles of type QVehicle.  Cannot fully hide the implementation since it is needed
+	 * both by QSim and by QueueSimulation. kai, nov'11
+	 * <p/>
+	 * Design thoughts:<ul>
+	 * <li> Should return MobsimVehicle instead of QVehicle.  kai, nov'11
+	 * </ul>
 	 */
-	public Id getDestinationLinkId();
+	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle, double sizeInEquivalents) {
+		return new QVehicleImpl(basicVehicle, sizeInEquivalents);
+	}
+
+	/**
+	 * Mobsim factory that returns vehicles of type QVehicle.  Cannot fully hide the implementation since it is needed
+	 * both by QSim and by QueueSimulation. kai, nov'11
+	 * <p/>
+	 * Design thoughts:<ul>
+	 * <li> See above.
+	 * </ul>
+	 */
+	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle) {
+		return new QVehicleImpl(basicVehicle);
+	}
 
 }

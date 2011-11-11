@@ -60,7 +60,7 @@ import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
@@ -1061,7 +1061,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			tDriver.setVehicle(this.transitVehicle);
 			tDriver.endActivityAndAssumeControl(100);
 
-			this.normalVehicle = new QVehicleImpl(new VehicleImpl(id2, vehicleType));
+			this.normalVehicle = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(id2, vehicleType));
 			this.qlink1.addParkedVehicle(this.normalVehicle);
 
 			PersonDriverAgentImpl nDriver = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, qsim);
@@ -1072,7 +1072,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			if (stop2 != null) {
 				/* we're testing two stops. Add another normal vehicle with 20 seconds delay,
 				 * that *could* overtake a transit vehicle at its second stop. */
-				this.normalVehicle2 = new QVehicleImpl(new VehicleImpl(id3, vehicleType));
+				this.normalVehicle2 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(id3, vehicleType));
 				this.qlink1.addParkedVehicle(this.normalVehicle2);
 
 				Person person2 = pb.createPerson(id3);
