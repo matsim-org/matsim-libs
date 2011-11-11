@@ -51,7 +51,9 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		controler = event.getControler();
 		lastIteration = controler.getLastIteration();
 		logger.info("emissions will be calculated for iteration " + lastIteration);
-		emissionHandler = new EmissionHandler();
+		
+		Scenario scenario = controler.getScenario() ;
+		emissionHandler = new EmissionHandler(scenario);
 		emissionHandler.createLookupTables();
 	}
 
@@ -68,10 +70,10 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		logger.info("entering computeEmissions ...") ;
 		
 		EventsManager eventsManager = controler.getEvents();
-		Scenario scenario = controler.getScenario() ;
+		
 		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 		
-		emissionHandler.installEmissionEventHandler(scenario, eventsManager, emissionEventOutputFile);
+		emissionHandler.installEmissionEventHandler(eventsManager, emissionEventOutputFile);
 
 		logger.info("leaving computeEmissions ...") ;
 }

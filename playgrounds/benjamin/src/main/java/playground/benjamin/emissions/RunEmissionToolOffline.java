@@ -57,7 +57,7 @@ public class RunEmissionToolOffline {
 	private static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	private static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-	private static String roadTypesTrafficSituationsFile = emissionInputPath + "road_types_trafficSituation.txt";
+	private static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
 	private static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
 	
 	// =======================================================================================================		
@@ -76,8 +76,9 @@ public class RunEmissionToolOffline {
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		
-		EmissionHandler emissionHandler = new EmissionHandler();
-		emissionHandler.installEmissionEventHandler(scenario, eventsManager, emissionEventOutputFile);
+		EmissionHandler emissionHandler = new EmissionHandler(scenario);
+		emissionHandler.createLookupTables();
+		emissionHandler.installEmissionEventHandler(eventsManager, emissionEventOutputFile);
 		
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);

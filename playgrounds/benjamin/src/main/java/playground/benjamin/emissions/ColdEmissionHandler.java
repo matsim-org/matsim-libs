@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -38,16 +37,12 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
-import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
-
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
 	private final Network network;
-	private final HbefaColdEmissionTableCreator hbefaColdTable;
 	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-	private final EventsManager emissionEventsManager;
 
 	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
 	private final Map<Id, Double> linkleave = new TreeMap<Id, Double>();
@@ -58,15 +53,9 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private final Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
 	private final Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
 
-	public ColdEmissionHandler(
-			final Network network,
-			HbefaColdEmissionTableCreator hbefaTable,
-			ColdEmissionAnalysisModule coldEmissionAnalysisModule,
-			EventsManager emissionEventsManager ){
+	public ColdEmissionHandler(Network network, ColdEmissionAnalysisModule coldEmissionAnalysisModule ){
 		this.network = network;
-		this.hbefaColdTable = hbefaTable;
 		this.coldEmissionAnalysisModule = coldEmissionAnalysisModule;
-		this.emissionEventsManager = emissionEventsManager;
 	}
 
 	@Override
@@ -119,9 +108,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 					personId,
 					startEngineTime,
 					parkingDuration,
-					accumulatedDistance,
-					this.hbefaColdTable,
-					this.emissionEventsManager);
+					accumulatedDistance);
 			this.accumulatedDistance.remove(personId);
 		}
 		else{

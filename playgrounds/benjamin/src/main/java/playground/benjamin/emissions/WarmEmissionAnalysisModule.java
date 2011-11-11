@@ -54,8 +54,9 @@ public class WarmEmissionAnalysisModule {
 	private final HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV;
 
 	private final EventsManager eventsManager;
+	
 	private static int vehInfoWarnCnt = 0;
-	private static int maxVehInfoWarnCnt = 3;
+	private static int maxVehInfoWarnCnt = 2;
 	private static Set<Id> personIdSet = new HashSet<Id>();
 
 	public WarmEmissionAnalysisModule(
@@ -63,12 +64,12 @@ public class WarmEmissionAnalysisModule {
 			HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed,
 			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator,
 			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV,
-			EventsManager eventsManager) {
+			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
 		this.hbefaWarmEmissionTableCreatorDetailed = hbefaWarmEmissionTableCreatorDetailed;
 		this.hbefaAvgWarmEmissionTableCreator = hbefaAvgWarmEmissionTableCreator;
 		this.hbefaAvgWarmEmissionTableCreatorHDV = hbefaAvgWarmEmissionTableCreatorHDV;
-		this.eventsManager = eventsManager;
+		this.eventsManager = emissionEventsManager;
 	}
 
 	public void calculateWarmEmissionsAndThrowEvent(Id linkId, Id personId,
@@ -105,7 +106,7 @@ public class WarmEmissionAnalysisModule {
 				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmTable());
 			}
 			
-			if (vehInfoWarnCnt < maxVehInfoWarnCnt) {
+			if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
 				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
 				if (vehInfoWarnCnt == maxVehInfoWarnCnt)
 					logger.warn(Gbl.FUTURE_SUPPRESSED);

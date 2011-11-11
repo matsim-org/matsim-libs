@@ -48,46 +48,61 @@ import playground.benjamin.emissions.dataTypes.RoadTypeTrafficSit;
 public class EmissionHandler {
 	private static final Logger logger = Logger.getLogger(EmissionHandler.class);
 	
-	private String roadTypesTrafficSituationsFile = null;
-	private String warmEmissionFactorsFile = null ;
+	private final Scenario scenario;
+	private static EventWriterXML emissionEventWriter;
+
+	private static String roadTypesTrafficSituationsFile = null;
+	private static String warmEmissionFactorsFile = null ;
+	
+	Map<Integer, RoadTypeTrafficSit> roadTypeMapping;
+	HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
+	
+	HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
+	
+	HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
+	HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
 
 	// TODO: include file name specification into vspExperimentalConfigGroup
-	private final String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
+	private static String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 	
-	private final String coldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
-	private final String averageFleetEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
-	private final String averageFleetHdvEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW_hdv.txt";
+	private static String coldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
+	private static String averageFleetEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
+	private static String averageFleetHdvEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW_hdv.txt";
 	
-	private static EventWriterXML emissionEventWriter;
-	
-	public void createLookupTables() {
-		
+	public EmissionHandler(Scenario scenario) {
+		this.scenario = scenario;
 	}
 
-	public void installEmissionEventHandler(Scenario scenario, EventsManager eventsManager, String emissionEventOutputFile) {
+	public void createLookupTables() {
+		logger.info("entering createLookupTables");
+		
+		getInputFiles();
+		
+		roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
+		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(warmEmissionFactorsFile);
+		
+		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(coldEmissionFactorsFile);
+
+		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(averageFleetEmissionFactorsFile);
+		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(averageFleetHdvEmissionFactorsFile);
+
+		logger.info("leaving createLookupTables");
+	}
+
+	private void getInputFiles() {
+		roadTypesTrafficSituationsFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
+		warmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsWarmFile() ;
+	}
+
+	public void installEmissionEventHandler(EventsManager eventsManager, String emissionEventOutputFile) {
 		logger.info("entering installEmissionsEventHandler") ;
 		
 		Network network = scenario.getNetwork() ;
-		
-		roadTypesTrafficSituationsFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
-		warmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsWarmFile() ;
-		
-		Map<Integer, RoadTypeTrafficSit> roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
+		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
-		
-		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
-		
-		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreator.makeHbefaWarmTable(averageFleetEmissionFactorsFile);
-		HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV = new HbefaWarmEmissionTableCreator();
-		hbefaAvgWarmEmissionTableCreatorHDV.makeHbefaWarmTable(averageFleetHdvEmissionFactorsFile);
-		HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator = new HbefaColdEmissionTableCreator();
-		hbefaAvgColdEmissionTableCreator.makeHbefaColdTable(coldEmissionFactorsFile);
-		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
-		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(warmEmissionFactorsFile);
 		
 		// instantiate analysis modules
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
@@ -96,7 +111,9 @@ public class EmissionHandler {
 				hbefaAvgWarmEmissionTableCreator,
 				hbefaAvgWarmEmissionTableCreatorHDV,
 				emissionEventsManager);
-		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule ();
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule (
+				hbefaAvgColdEmissionTableCreator,
+				emissionEventsManager);
 		
 		// create the different emission handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
@@ -105,9 +122,7 @@ public class EmissionHandler {
 				warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
 				network,
-				hbefaAvgColdEmissionTableCreator,
-				coldEmissionAnalysisModule,
-				emissionEventsManager);
+				coldEmissionAnalysisModule);
 		
 		// create the writer for emission events
 		emissionEventWriter = new EventWriterXML(emissionEventOutputFile);

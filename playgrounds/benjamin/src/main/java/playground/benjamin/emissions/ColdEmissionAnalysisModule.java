@@ -37,11 +37,20 @@ import playground.benjamin.emissions.events.ColdPollutant;
 
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
+	
+	private final EventsManager eventsManager;
+	private final HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator;
+
+	public ColdEmissionAnalysisModule(
+			HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator,
+			EventsManager emissionEventsManager) {
+		this.eventsManager = emissionEventsManager;
+		this.hbefaAvgColdEmissionTableCreator = hbefaAvgColdEmissionTableCreator;
+	}
 
 	public void calculateColdEmissions(Id coldEmissionEventLinkId, Id personId,
 			double startEngineTime, double parkingDuration,
-			double accumulatedDistance, HbefaColdEmissionTableCreator hbefaColdTable,
-			EventsManager emissionEventsManager) {
+			double accumulatedDistance) {
 
 		// TODO: CO2 not directly available for cold emissions; thus it could be
 		// calculated through fc as follows:
@@ -69,7 +78,7 @@ public class ColdEmissionAnalysisModule {
 		Double generatedEmissions = null;
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 
-		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry :	hbefaColdTable.getHbefaColdTable().entrySet()){
+		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry : hbefaAvgColdEmissionTableCreator.getHbefaColdTable().entrySet()){
 			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
 			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEF();
 			coldPollutant = entry.getKey();
@@ -77,6 +86,6 @@ public class ColdEmissionAnalysisModule {
 			coldEmissions.put(coldPollutant, generatedEmissions);
 		}
 		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
-		emissionEventsManager.processEvent(coldEmissionEvent);
+		eventsManager.processEvent(coldEmissionEvent);
 	}
 }
