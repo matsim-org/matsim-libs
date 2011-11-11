@@ -40,16 +40,17 @@ public class GUI extends JFrame {
 		super("Debug Visualization");
 		
 		this.controller = controller;
-		setSize(width, height + 48);
+		setSize(width, height + 64);
 		setLayout(new BorderLayout());
 		
 		//get toolbar and renderer (processing applet)
 		guiToolbar = new GUIToolbar(controller);
-		renderer = new P3DRenderer(controller.isLiveMode(), traceTimeRange, controller.console, width, height);
+		renderer = new P3DRenderer(controller, traceTimeRange, width, height);
 
 		//add elements to the jframe
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);
+	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

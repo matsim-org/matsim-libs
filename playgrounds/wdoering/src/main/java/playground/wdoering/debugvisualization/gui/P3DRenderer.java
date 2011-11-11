@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import playground.wdoering.debugvisualization.controller.Console;
+import playground.wdoering.debugvisualization.controller.Controller;
 
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
@@ -67,6 +68,7 @@ public class P3DRenderer extends PApplet
 	private LinkedList<Scene> scenes;
 
 	private ArrayList<int[]> colors;
+	private Controller controller;
 
 	public int getTraceTimeRange() {
 		return this.traceTimeRange;
@@ -86,11 +88,14 @@ public class P3DRenderer extends PApplet
 		this.paused = paused;
 	}
 
-	public P3DRenderer(boolean liveMode, int traceTimeRange, Console console, int width, int height)
+	public P3DRenderer(Controller controller, int traceTimeRange, int width, int height)
 	{
 		this.traceTimeRange = traceTimeRange;
-		this.liveMode = liveMode;
-		this.console = console;
+		
+		this.controller = controller;
+		
+		this.liveMode = controller.isLiveMode();
+		this.console = controller.console;
 
 		this.width = width;
 		this.height = height;
@@ -397,15 +402,19 @@ public class P3DRenderer extends PApplet
 					//console.println("----- + + + + ----- " + timeSteps.size() + "| agents:" + agents.toString());
 
 					//Iterate through all agents and display the current data point + traces
-					Iterator agentsIterator = this.agents.entrySet().iterator();
+					
+					HashMap<String, Agent> agentsCopy = (HashMap<String, Agent>) this.agents.clone();
+					
+					Iterator agentsIterator = agentsCopy.entrySet().iterator();
 					int agentCount = 0;
 
 					//While there are still agents in the agents array
 					while (agentsIterator.hasNext())
 					{
-
+						Map.Entry pairs = null;
 						//Get current agent
-						Map.Entry pairs = (Map.Entry) agentsIterator.next();
+						pairs = (Map.Entry) agentsIterator.next();
+						
 						Agent currentAgent = (Agent)pairs.getValue();
 						String currentAgentID = (String)pairs.getKey();
 
@@ -421,6 +430,7 @@ public class P3DRenderer extends PApplet
 							//								setAgentColors(agentCount+1);
 
 							agentColor = this.colors.get(agentCount);
+							strokeWeight(4);   // Thicker
 
 							//draw node trajectories if there is more then one datapoint for the current agent
 							if (dataPoints.size() > 1)
@@ -429,7 +439,7 @@ public class P3DRenderer extends PApplet
 								int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
 
 								//loop through the datapoints with the corresponding timesteps
-								for (int timeStep = 0; timeStep < traceDisplayCount-1; timeStep++)
+								for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
 								{
 
 									this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
@@ -463,6 +473,7 @@ public class P3DRenderer extends PApplet
 
 
 							}
+							noStroke();
 
 							DataPoint lastDataPoint = dataPoints.get(this.currentTime);
 							//console.println("current agent: " + currentAgent.get);
@@ -492,8 +503,14 @@ public class P3DRenderer extends PApplet
 								int halfAgentSize = (int) this.agentSize / 2;
 
 								if    ((this.mouseX < posX+halfAgentSize) && (this.mouseX > posX-halfAgentSize)
-										&& (this.mouseY < posY+halfAgentSize) && (this.mouseY > posY-halfAgentSize))
+									&& (this.mouseY < posY+halfAgentSize) && (this.mouseY > posY-halfAgentSize))
+								{
+									//controller.
+									
+									//controller.
+									
 									fill(255, 255, 255,255);
+								}
 								else
 									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
 
@@ -504,7 +521,9 @@ public class P3DRenderer extends PApplet
 
 							}
 							else
-								this.console.println("agent " + currentAgentID + " missing at " + this.currentTime + " (" + this.timeSteps.getLast() + ") :" + dataPoints.toString());
+							{
+								//this.console.println("agent " + currentAgentID + " missing at " + this.currentTime + " (" + this.timeSteps.getLast() + ") :" + dataPoints.toString());
+							}
 
 
 
@@ -512,6 +531,7 @@ public class P3DRenderer extends PApplet
 						}
 						agentCount++;
 					}
+					agentsCopy.clear();
 
 				}
 			}

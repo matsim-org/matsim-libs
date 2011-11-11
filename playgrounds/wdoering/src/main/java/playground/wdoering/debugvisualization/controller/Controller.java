@@ -17,6 +17,8 @@ import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
+import playground.wdoering.debugvisualization.model.XYVxVyAgent;
+import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
 import playground.wdoering.debugvisualization.gui.*;
 
 
@@ -31,7 +33,7 @@ import playground.wdoering.debugvisualization.gui.*;
  */
 public class Controller {
 
-	private static final long timeInterval = 40;
+	private static final long timeInterval = 20;
 	private static final int width = 600;
 	private static final int height = 600;
 
@@ -46,7 +48,7 @@ public class Controller {
 	private boolean liveMode;
 	private Double currentTime = Double.NaN;
 	private Scene currentScene;
-	private int traceTimeRange = 2;
+	private int traceTimeRange = 50;
 	private Thread readerThread;
 	private boolean paused = false;
 
@@ -55,6 +57,7 @@ public class Controller {
 
 	public Console console;
 	private Long oldTime = 0l;
+	private boolean isReadingData;
 
 	public boolean isLiveMode() {
 		return this.liveMode;
@@ -253,14 +256,20 @@ public class Controller {
 	 * this method is used to update agent events. it will transport new
 	 * agent data to the gui and update the scene. if a timechange occurs,
 	 * the whole scene is being redrawn.
+	 * @param f 
+	 * @param d 
 	 * 
 	 * @param String ID the agent ID
 	 * @param Double posX position X
 	 * @param Double posY position Y
 	 * @param Double time time
 	 */
-	public void updateAgentData(String ID, Double posX, Double posY, Double time)
+	
+	//			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getVX(), event.getVY(), event.getTime());
+	public void updateAgentData(String ID, Double posX, Double posY, double vX, double vY, Double time)
 	{
+		//Daten werden gelesen
+		isReadingData = true;
 
 		//@TODO: capsulate truncate old data function and maybe even more
 		//for a better readability
@@ -274,14 +283,14 @@ public class Controller {
 		{
 			//if (ID.equals("0")) console.println("NULL AGENT");
 			this.agents = new HashMap<String,Agent>();
-			this.agents.put(ID, new Agent());
+			this.agents.put(ID, new XYVxVyAgent());
 		}
 
 		//update agent list
 		Agent currentAgent = this.agents.get(ID);
 		if (currentAgent == null) currentAgent = new Agent();
 
-		DataPoint dataPoint = new DataPoint(time, posX, posY);
+		DataPoint dataPoint = new XYVxVyDataPoint(time, posX, posY, vX, vY);
 		this.console.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
 		currentAgent.addDataPoint(dataPoint);
 
@@ -306,7 +315,7 @@ public class Controller {
 
 				if (timeDiff<timeInterval)
 				{
-					System.out.println("sleeping for" + (timeInterval-timeDiff) + " ms");
+					//System.out.println("sleeping for" + (timeInterval-timeDiff) + " ms");
 					try {
 						Thread.sleep(timeInterval-timeDiff);
 					} catch (InterruptedException e) {
@@ -364,6 +373,8 @@ public class Controller {
 					//remove oldest timesteps from agents
 					if (this.agents != null)
 					{
+						//System.out.println(removedTimeStep + "<rts | c> " + currentTime + " | " + this.timeSteps.toString());
+
 						//iterate through all agents and delete oldest timestep
 						Iterator agentsIterator = this.agents.entrySet().iterator();
 						while (agentsIterator.hasNext())
@@ -389,8 +400,14 @@ public class Controller {
 
 		}
 
+		isReadingData = false;
 
 
+	}
+
+	public boolean isReadingAgentData()
+	{
+		return isReadingData;
 	}
 
 

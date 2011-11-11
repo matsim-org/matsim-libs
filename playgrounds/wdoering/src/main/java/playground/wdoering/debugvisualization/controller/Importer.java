@@ -403,8 +403,9 @@ public class Importer implements XYVxVyEventsHandler, Runnable {
 	{
 		if (controller!=null)
 		{
+			
 			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
-			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getTime());
+			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getVX(), event.getVY(), event.getTime());
 		}
 		
 	}

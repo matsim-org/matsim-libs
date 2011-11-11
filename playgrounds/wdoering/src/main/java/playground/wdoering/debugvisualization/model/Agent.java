@@ -22,7 +22,7 @@ public class Agent {
 
 	public void Agent ()	
 	{
-		
+		System.out.println("agent initialized");
 	}
 	
 	public void addDataPoint(DataPoint dataPoint)
