@@ -29,6 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
@@ -47,7 +48,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	private Netsim netsim ;
 	private Scenario sc ;
 	private Id currentLinkId;
-	private QVehicle vehicle;
+	private MobsimVehicle vehicle;
 	private Id destinationLinkId = NO_LINK ; 
 	private Id expectedPassengerId;
 	private MobsimAgent currentPassenger ;
@@ -126,7 +127,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	}
 
 	@Override
-	public QVehicle getVehicle() {
+	public MobsimVehicle getVehicle() {
 		return this.vehicle ;
 	}
 
@@ -136,7 +137,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	}
 
 	@Override
-	public void setVehicle(QVehicle veh) {
+	public void setVehicle(MobsimVehicle veh) {
 		this.vehicle = veh ;
 	}
 	

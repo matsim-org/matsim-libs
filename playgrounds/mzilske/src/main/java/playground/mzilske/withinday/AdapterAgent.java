@@ -15,7 +15,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.Mobsim;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
 public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBeforeSimStepListener {
 	
@@ -148,7 +148,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 
 	private double now;
 
-	private QVehicle veh;
+	private MobsimVehicle veh;
 	
 	private boolean firstTimeGetCurrentLinkId = true;
 
@@ -343,7 +343,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public void setVehicle(QVehicle veh) {
+	public void setVehicle(MobsimVehicle veh) {
 		// The Simulation tells me what vehicle I get to use. Don't know what I should do with that information.
 		// I need to remember it so I can give it back when getVehicle is called. mz
 		//
@@ -356,7 +356,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	}
 
 	@Override
-	public QVehicle getVehicle() {
+	public MobsimVehicle getVehicle() {
 		// The simulation asks me what vehicle I am using. This is silly. I am an agent! Nobody should use me as a data container.
 		// mz
 		//
