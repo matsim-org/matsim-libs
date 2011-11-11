@@ -176,7 +176,7 @@ public class MicroCensus {
 			String lic = p.getLicense();
 			//boolean has_work = false;
 			// work is defined by employement status rather than plan
-			// composition, as an employed persons may not work every day
+			// composition, as employed persons may not work every day
 			boolean has_work = p.isEmployed();
 			// education is defined in terms of presence or not of educationnal
 			// activities in the plan. 
@@ -185,12 +185,11 @@ public class MicroCensus {
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity a = (Activity) pe;
-					//if (a.getType().equals(WORK)) {
-					//	has_work = true;
-					//}
+					if (a.getType().equals(WORK) && !has_work) {
+						throw new RuntimeException( "found unemployed person with work activities" );
+					}
 					if (a.getType().equals(EDUC)) {
 						has_educ = true;
-						break;
 					}
 				}
 			}
