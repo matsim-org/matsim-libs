@@ -14,6 +14,7 @@ import playground.wdoering.debugvisualization.controller.Controller;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
+import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -42,7 +43,9 @@ public class P3DRenderer extends PApplet
 
 	private final int width;
 	private final int height;
-
+	
+	private int mode;
+	
 	private Double[] extremeValues;
 	private LinkedList<Double> timeSteps;
 	private boolean paused;
@@ -58,6 +61,11 @@ public class P3DRenderer extends PApplet
 	private double minPosY;
 	private double maxPosY;
 	private double currentTime;
+	
+	private int currentFrame = 1;
+	private Double avgRenderingTime = 1d;
+	
+	private Visualization visualization;
 
 	private boolean mousePressed = false;
 
@@ -69,6 +77,152 @@ public class P3DRenderer extends PApplet
 
 	private ArrayList<int[]> colors;
 	private Controller controller;
+	
+	
+
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int mode) {
+		this.mode = mode;
+	}
+
+	public HashMap<String, Agent> getAgents() {
+		return agents;
+	}
+
+	public void setAgents(HashMap<String, Agent> agents) {
+		this.agents = agents;
+	}
+
+	public HashMap<Integer, DataPoint> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(HashMap<Integer, DataPoint> nodes) {
+		this.nodes = nodes;
+	}
+
+	public HashMap<Integer, int[]> getLinks() {
+		return links;
+	}
+
+	public void setLinks(HashMap<Integer, int[]> links) {
+		this.links = links;
+	}
+
+	public LinkedList<Double> getTimeSteps() {
+		return timeSteps;
+	}
+
+	public void setTimeSteps(LinkedList<Double> timeSteps) {
+		this.timeSteps = timeSteps;
+	}
+
+	public float getFactorX() {
+		return factorX;
+	}
+
+	public void setFactorX(float factorX) {
+		this.factorX = factorX;
+	}
+
+	public float getFactorY() {
+		return factorY;
+	}
+
+	public void setFactorY(float factorY) {
+		this.factorY = factorY;
+	}
+
+	public double getMinPosX() {
+		return minPosX;
+	}
+
+	public void setMinPosX(double minPosX) {
+		this.minPosX = minPosX;
+	}
+
+	public double getMaxPosX() {
+		return maxPosX;
+	}
+
+	public void setMaxPosX(double maxPosX) {
+		this.maxPosX = maxPosX;
+	}
+
+	public double getMinPosY() {
+		return minPosY;
+	}
+
+	public void setMinPosY(double minPosY) {
+		this.minPosY = minPosY;
+	}
+
+	public double getMaxPosY() {
+		return maxPosY;
+	}
+
+	public void setMaxPosY(double maxPosY) {
+		this.maxPosY = maxPosY;
+	}
+
+	public double getCurrentTime() {
+		return currentTime;
+	}
+
+	public void setCurrentTime(double currentTime) {
+		this.currentTime = currentTime;
+	}
+
+	public boolean isMousePressed() {
+		return mousePressed;
+	}
+
+	public void setMousePressed(boolean mousePressed) {
+		this.mousePressed = mousePressed;
+	}
+
+	public ArrayList<int[]> getColors() {
+		return colors;
+	}
+
+	public void setColors(ArrayList<int[]> colors) {
+		this.colors = colors;
+	}
+
+	public Controller getController() {
+		return controller;
+	}
+
+	public void setController(Controller controller) {
+		this.controller = controller;
+	}
+
+	public float getAgentSize() {
+		return agentSize;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public Double[] getExtremeValues() {
+		return extremeValues;
+	}
+
+	public boolean isLiveMode() {
+		return liveMode;
+	}
+
+	public Console getConsole() {
+		return console;
+	}
 
 	public int getTraceTimeRange() {
 		return this.traceTimeRange;
@@ -88,8 +242,12 @@ public class P3DRenderer extends PApplet
 		this.paused = paused;
 	}
 
-	public P3DRenderer(Controller controller, int traceTimeRange, int width, int height)
+	public P3DRenderer(Controller controller, int traceTimeRange, int width, int height, int visualizationMode)
 	{
+		
+		if (visualizationMode == controller.VIS_XYVXVY)
+			this.mode = controller.VIS_XYVXVY;
+		
 		this.traceTimeRange = traceTimeRange;
 		
 		this.controller = controller;
@@ -315,12 +473,25 @@ public class P3DRenderer extends PApplet
 	@Override
 	public void draw()
 	{
+		
+		if (currentFrame<Integer.MAX_VALUE)
+			currentFrame++;
+		else
+			currentFrame=1;
 
+		
+		double timeMeas = System.currentTimeMillis();
 		background(33);
 		fill(0, 0, 0);
-
+		
+		//visualization.draw();
+		
+		
+		
+		
 		//FIRST
 
+		
 		//Draw Network
 		if ((this.nodes!=null) && (this.links!=null))
 		{
@@ -600,10 +771,13 @@ public class P3DRenderer extends PApplet
 							if (dataPoints.get(this.timeSteps.get(this.iInt)) != null)
 							{
 								//get the datapoint
-								DataPoint currentDataPoint = dataPoints.get((this.timeSteps.get(this.iInt)));
+								DataPoint currentDataPoint = (XYVxVyDataPoint)dataPoints.get((this.timeSteps.get(this.iInt)));
 
 								float posX;
 								float posY;
+								
+								if (currentDataPoint instanceof XYVxVyDataPoint)
+									System.out.println("halelujah");
 
 								//calculate tweened x/y position
 								if ((tweenCount<dataPoints.size()-2))
@@ -682,6 +856,13 @@ public class P3DRenderer extends PApplet
 			}
 
 		}
+		double timeMeasDiff= System.currentTimeMillis()-timeMeas;
+		
+		avgRenderingTime += timeMeasDiff;
+		
+		if (mousePressed)
+			System.out.println("rendering time: " + (avgRenderingTime/currentFrame));
+
 
 	}
 

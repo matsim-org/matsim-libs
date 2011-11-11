@@ -33,23 +33,29 @@ public class GUI extends JFrame {
 	
 	GUIMainFrame guiMainFrame;
 	GUIToolbar guiToolbar;
+	GUIInfo guiInfo;
 	P3DRenderer renderer;
+	
 
-	public GUI(Controller controller, int traceTimeRange, int width, int height) {
+	public GUI(Controller controller, int traceTimeRange, int width, int height, int visualizationMode) {
 		
 		super("Debug Visualization");
 		
 		this.controller = controller;
-		setSize(width, height + 64);
+		setSize(width+512, height + 64);
 		setLayout(new BorderLayout());
 		
 		//get toolbar and renderer (processing applet)
 		guiToolbar = new GUIToolbar(controller);
-		renderer = new P3DRenderer(controller, traceTimeRange, width, height);
-
+		renderer = new P3DRenderer(controller, traceTimeRange, width, height, visualizationMode);
+		guiInfo = new GUIInfo(controller);
+		
+		//guiInfo.disableUpdate(true);
+		
 		//add elements to the jframe
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);
+		add(guiInfo,BorderLayout.EAST);
 	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -141,6 +147,7 @@ public class GUI extends JFrame {
 	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
 	{
 		renderer.updateView(timeSteps, agents);
+		guiInfo.updateView(timeSteps, agents);
 		
 	}
 

@@ -47,10 +47,12 @@ public class Controller {
 	private LinkedList<Double> timeSteps = new LinkedList<Double>();
 	private boolean liveMode;
 	private Double currentTime = Double.NaN;
-	private Scene currentScene;
 	private int traceTimeRange = 50;
 	private Thread readerThread;
 	private boolean paused = false;
+	
+	public static final int VIS_XYVXVY = 0;
+	
 
 	EventsManager eventsManager;
 	Scenario scenario;
@@ -72,6 +74,15 @@ public class Controller {
 
 	}
 
+	/**
+	 * OLD Constructor /w XYVxVy Agent Data
+	 * 
+	 * @param eventFileName
+	 * @param networkFileName
+	 * @param console
+	 * @param traceTimeRange
+	 * @param liveMode
+	 */
 	public Controller(String eventFileName, String networkFileName, Console console, int traceTimeRange, boolean liveMode)
 	{
 
@@ -85,7 +96,7 @@ public class Controller {
 		this.importer = new Importer(this);
 		this.console = console;
 
-		this.gui = new GUI(this, traceTimeRange, width, height);
+		this.gui = new GUI(this, traceTimeRange, width, height, VIS_XYVXVY);
 
 		//read network file first
 		console.print("Importing network data...");
@@ -149,6 +160,15 @@ public class Controller {
 
 	}
 
+	/**
+	 * Constructor /w XYVxVy Agent Data
+	 * 
+	 * @param eventFileName
+	 * @param networkFileName
+	 * @param console
+	 * @param traceTimeRange
+	 * @param liveMode
+	 */	
 	public Controller(EventsManager e, Scenario sc, Console console, Thread readerThread)
 	{
 
@@ -184,7 +204,7 @@ public class Controller {
 		console.println("done.");
 
 		//set up gui and network
-		this.gui = new GUI(this, this.traceTimeRange, width, height);
+		this.gui = new GUI(this, this.traceTimeRange, width, height, VIS_XYVXVY);
 
 		//process final mandatory display data
 		this.timeSteps = new LinkedList<Double>();
@@ -287,13 +307,19 @@ public class Controller {
 		}
 
 		//update agent list
-		Agent currentAgent = this.agents.get(ID);
-		if (currentAgent == null) currentAgent = new Agent();
+		XYVxVyAgent currentAgent = (XYVxVyAgent)this.agents.get(ID);
+		if (currentAgent == null) currentAgent = new XYVxVyAgent();
+		
 
-		DataPoint dataPoint = new XYVxVyDataPoint(time, posX, posY, vX, vY);
+		XYVxVyDataPoint dataPoint = new XYVxVyDataPoint(time, posX, posY, vX, vY);
 		this.console.println("adding dp to agent " + ID + ":" + dataPoint.toString() + "|");
 		currentAgent.addDataPoint(dataPoint);
-
+		
+		//XYVxVyDataPoint returnedDataPoint = (XYVxVyDataPoint)currentAgent.getDataPoint(time);
+		
+		//System.out.println(returnedDataPoint.getPosX() + "<|"+returnedDataPoint.getvX() + "|" + returnedDataPoint.getvY());
+		//System.exit(0);
+		
 		this.agents.put(ID, currentAgent);
 
 		//on the first run the current time is not set yet
@@ -335,7 +361,7 @@ public class Controller {
 					{
 						//Get current agent
 						Map.Entry pairs = (Map.Entry) agentsIterator.next();
-						Agent agent = (Agent)pairs.getValue();
+						XYVxVyAgent agent = (XYVxVyAgent)pairs.getValue();
 
 						HashMap<Double,DataPoint> dataPoints = agent.getDataPoints();
 						Iterator dataPointIterator = dataPoints.entrySet().iterator();
@@ -381,7 +407,7 @@ public class Controller {
 						{
 							//Get current agent
 							Map.Entry pairs = (Map.Entry) agentsIterator.next();
-							Agent agent = (Agent)pairs.getValue();
+							Agent agent = (XYVxVyAgent)pairs.getValue();
 							agent.removeDataPoint(removedTimeStep);
 						}
 					}
@@ -391,6 +417,8 @@ public class Controller {
 
 				this.gui.updateExtremeValues(this.maxPosX, this.minPosX, this.maxPosY, this.minPosY);
 				this.gui.updateView(this.timeSteps, this.agents);
+				
+				
 
 				this.currentTime = time;
 				this.timeSteps.addLast(this.currentTime);

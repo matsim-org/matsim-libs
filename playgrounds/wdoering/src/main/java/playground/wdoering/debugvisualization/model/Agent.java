@@ -28,7 +28,7 @@ public class Agent {
 	public void addDataPoint(DataPoint dataPoint)
 	{
 		dataPoints.put(dataPoint.getTime(), dataPoint);
-	}
+	}	
 
 	public void addDataPoint(Double time, Double posX, Double posY)
 	{
