@@ -32,6 +32,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.ActTypeConverter;
@@ -43,14 +44,17 @@ public class EpsilonComputer implements PlanAlgorithm {
 	private DestinationChoiceScoring scorer;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
+	private DestinationSampler sampler;
 			
 	public EpsilonComputer(ScenarioImpl scenario, String type, TreeMap<Id, ActivityFacility> typedFacilities,
-			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {		
+			DestinationChoiceScoring scorer, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter,
+			DestinationSampler sampler) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
 		this.scorer = scorer;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
+		this.sampler = sampler;
 	}
 		
 	@Override
@@ -66,6 +70,9 @@ public class EpsilonComputer implements PlanAlgorithm {
 		double maxEpsilon = 0.0;
 		if (typeInPlan) {
 			for (Facility f : typedFacilities.values()) {
+				//check if facility is sampled
+				if (!this.sampler.sample(f.getId(), plan.getPerson().getId())) continue;
+				
 				ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
 				act.setFacilityId(f.getId());
 				double epsilon = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act);

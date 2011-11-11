@@ -88,6 +88,9 @@ public class MixedScoringFunctionFactory extends org.matsim.core.scoring.charypa
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
 				seed, this.controler.getScenario(), this.config, this.scaleEpsilon, this.actTypeConverter);
 		computer.assignKValues();
+		
+		
+		
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}

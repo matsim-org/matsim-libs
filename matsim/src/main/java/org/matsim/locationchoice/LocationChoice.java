@@ -38,6 +38,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.locationchoice.bestresponse.BestResponseLocationMutator;
+import org.matsim.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.locationchoice.bestresponse.preprocess.ComputeKValsAndMaxEpsilon;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.random.RandomLocationMutator;
@@ -58,9 +59,13 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private static final Logger log = Logger.getLogger(LocationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
+	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
+	private ObjectAttributes personsKValues = new ObjectAttributes();
+	
 	private ScaleEpsilon scaleEpsilon;
 	private ActivitiesHandler defineFlexibleActivities;
 	private ActTypeConverter actTypeConverter;
+	private DestinationSampler sampler;
 
 	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
 	// avoid costly call of .toArray() within handlePlan() (System.arraycopy()!)
@@ -103,6 +108,8 @@ public class LocationChoice extends AbstractMultithreadedModule {
 			this.createActivityTypeConverter();
 			this.createEpsilonScaleFactors();
 			this.createObjectAttributes(Long.parseLong(this.controler.getConfig().locationchoice().getRandomSeed()));
+			this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues,
+					this.controler.getConfig().locationchoice());
 		}
 	}
 	
@@ -139,9 +146,12 @@ public class LocationChoice extends AbstractMultithreadedModule {
 	
 	private void computeAttributes(long seed) {
 		ComputeKValsAndMaxEpsilon computer = new ComputeKValsAndMaxEpsilon(
-				seed, this.controler.getScenario(), this.controler.getConfig(), this.scaleEpsilon, this.actTypeConverter);
+				seed, this.controler.getScenario(), this.controler.getConfig(), 
+				this.scaleEpsilon, this.actTypeConverter);
 		computer.run();
 		this.personsMaxEpsUnscaled = computer.getPersonsMaxEpsUnscaled();
+		this.personsKValues = computer.getPersonsKValues();
+		this.facilitiesKValues = computer.getFacilitiesKValues();
 	}
 	
 
@@ -197,7 +207,7 @@ public class LocationChoice extends AbstractMultithreadedModule {
 		else if (algorithm.equals("bestResponse")) {
 			this.planAlgoInstances.add(new BestResponseLocationMutator(this.network, this.controler,  
 					this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-					this.scaleEpsilon, this.actTypeConverter));
+					this.scaleEpsilon, this.actTypeConverter, this.sampler));
 		}
 		else if (algorithm.equals("localSearchRecursive")) {
 			this.planAlgoInstances.add(new RecursiveLocationMutator(this.network, this.controler,  

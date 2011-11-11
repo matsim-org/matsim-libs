@@ -8,6 +8,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.locationchoice.bestresponse.scoring.DestinationChoiceScoring;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.ActTypeConverter;
@@ -24,10 +25,12 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(ComputeMaxEpsilons.class);
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
+	private DestinationSampler sampler;
 		
 	public ComputeMaxEpsilons(ScenarioImpl scenario, String type, Config config, 
 			ObjectAttributes facilitiesKValues, ObjectAttributes personsKValues, ScaleEpsilon scaleEpsilon,
-			ActTypeConverter actTypeConverter) {
+			ActTypeConverter actTypeConverter,
+			DestinationSampler sampler) {
 		super(config.global().getNumberOfThreads());
 		this.scenario = scenario;
 		this.type = type;
@@ -41,12 +44,14 @@ public class ComputeMaxEpsilons extends AbstractMultithreadedModule {
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
 		this.scaleEpsilon = scaleEpsilon;
+		this.sampler = sampler;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		DestinationChoiceScoring scorer = new DestinationChoiceScoring(this.scenario.getActivityFacilities(), config, 
 				this.facilitiesKValues, this.personsKValues, this.scaleEpsilon);
-		return new EpsilonComputer(this.scenario, this.type, typedFacilities, scorer, this.scaleEpsilon, this.actTypeConverter);
+		return new EpsilonComputer(
+				this.scenario, this.type, typedFacilities, scorer, this.scaleEpsilon, this.actTypeConverter, this.sampler);
 	}
 }

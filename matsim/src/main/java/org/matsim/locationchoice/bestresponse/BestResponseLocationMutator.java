@@ -58,18 +58,20 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
+	private DestinationSampler sampler;
 			
 	public BestResponseLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxEpsUnscaled, ScaleEpsilon scaleEpsilon,
-			ActTypeConverter actTypeConverter) {
+			ActTypeConverter actTypeConverter, DestinationSampler sampler) {
 		super(network, controler, quad_trees, facilities_of_type, null);
 		facilities = (ActivityFacilitiesImpl) super.controler.getFacilities();
 		this.network = network;
 		this.personsMaxEpsUnscaled = personsMaxEpsUnscaled;
 		this.scaleEpsilon = scaleEpsilon;
 		this.actTypeConverter = actTypeConverter;
+		this.sampler = sampler;
 	}
 	
 	@Override
@@ -122,7 +124,8 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 					ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, (PlansCalcRoute)this.controler.createRoutingAlgorithm(), 
 							this.network, this.controler.getConfig());
 					this.createChoiceSetCircle(
-							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs);
+							center, maxRadius, this.actTypeConverter.convertType(((ActivityImpl)actToMove).getType()), cs,
+							plan.getPerson().getId());
 										
 					// **************************************************
 					// maybe repeat this a couple of times
@@ -149,12 +152,14 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
    		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
-	public void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs) {
+	public void createChoiceSetCircle(Coord center, double radius, String type, ChoiceSet cs, Id personId) {
 		ArrayList<ActivityFacility> list = 
 			(ArrayList<ActivityFacility>) super.quadTreesOfType.get(type).get(center.getX(), center.getY(), radius);
-		
+	
 		for (ActivityFacility facility : list) {
-			cs.addDestination(facility.getId());
+			if (this.sampler.sample(facility.getId(), personId)) { 
+				cs.addDestination(facility.getId());
+			}
 		}
 	}
 	

@@ -6,6 +6,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.RandomFromVarDistr;
@@ -25,7 +26,10 @@ public class ComputeKValsAndMaxEpsilon {
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	
-	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {
+	private DestinationSampler sampler;
+	
+	public ComputeKValsAndMaxEpsilon(long seed, ScenarioImpl scenario, Config config, 
+			ScaleEpsilon scaleEpsilon, ActTypeConverter actTypeConverter) {
 		rnd = new RandomFromVarDistr();
 		rnd.setSeed(seed);
 		this.scenario = scenario;
@@ -37,6 +41,7 @@ public class ComputeKValsAndMaxEpsilon {
 	public void assignKValues() {				
 		this.assignKValuesPersons();
 		this.assignKValuesAlternatives();	
+		this.sampler = new DestinationSampler(this.personsKValues, this.facilitiesKValues, this.config.locationchoice());
 	}
 		
 	// does not matter which distribution is chosen here
@@ -65,7 +70,7 @@ public class ComputeKValsAndMaxEpsilon {
 			log.info("Computing max epsilon for activity type " + actType);
 			ComputeMaxEpsilons maxEpsilonComputer = new ComputeMaxEpsilons(
 					this.scenario, actType, config, this.facilitiesKValues, this.personsKValues, 
-					this.scaleEpsilon, this.actTypeConverter);
+					this.scaleEpsilon, this.actTypeConverter, this.sampler);
 			maxEpsilonComputer.prepareReplanning();
 			for (Person p : this.scenario.getPopulation().getPersons().values()) {
 				maxEpsilonComputer.handlePlan(p.getSelectedPlan());

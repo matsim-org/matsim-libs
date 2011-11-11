@@ -59,6 +59,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private static final String ANALYSIS_BOUNDARY = "analysisBoundary";
 	private static final String ANALYSIS_BINSIZE = "analysisBinSize";
 	private static final String IDEXCLUSION = "idExclusion";
+	
+	private static final String DESTINATIONSAMPLE_PCT = "destinationSamplePercent";
 
 	//default values
 	private String restraintFcnFactor = "0.0";
@@ -89,6 +91,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private String analysisBoundary = "200000.0";
 	private String analysisBinSize = "20000.0";
 	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
+	
+	private String destinationSamplePercent = "100.0";
 
 	private final static Logger log = Logger.getLogger(LocationChoiceConfigGroup.class);
 
@@ -170,6 +174,9 @@ public class LocationChoiceConfigGroup extends Module {
 		}
 		if (IDEXCLUSION.equals(key)) {
 			return getIdExclusion();
+		}
+		if (DESTINATIONSAMPLE_PCT.equals(key)) {
+			return getDestinationSamplePercent();
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -332,6 +339,10 @@ public class LocationChoiceConfigGroup extends Module {
 			else {
 				setIdExclusion(value);
 			}
+		} else if (DESTINATIONSAMPLE_PCT.equals(key)) {
+			if (value.length() > 0) {
+				this.setDestinationSamplePercent(value);
+			}
 		} else
 		{
 			throw new IllegalArgumentException(key);
@@ -365,7 +376,7 @@ public class LocationChoiceConfigGroup extends Module {
 		this.addParameterToMap(map, ANALYSIS_BOUNDARY);
 		this.addParameterToMap(map, ANALYSIS_BINSIZE);
 		this.addParameterToMap(map, IDEXCLUSION);
-		
+		this.addParameterToMap(map, DESTINATIONSAMPLE_PCT);
 		return map;
 	}
 
@@ -512,5 +523,11 @@ public class LocationChoiceConfigGroup extends Module {
 	}
 	public void setIdExclusion(String idExclusion) {
 		this.idExclusion = idExclusion;
-	}		
+	}
+	public String getDestinationSamplePercent() {
+		return destinationSamplePercent;
+	}
+	public void setDestinationSamplePercent(String destinationSamplePercent) {
+		this.destinationSamplePercent = destinationSamplePercent;
+	}	
 }
