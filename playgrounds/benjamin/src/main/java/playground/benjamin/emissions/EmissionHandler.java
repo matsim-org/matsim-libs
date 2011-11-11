@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +39,7 @@ import org.matsim.vehicles.Vehicles;
 import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
 import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreator;
 import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreatorDetailed;
-import playground.benjamin.emissions.dataTypes.VisumRoadTypes;
+import playground.benjamin.emissions.dataTypes.RoadTypeTrafficSit;
 
 /**
  * @author benjamin
@@ -46,12 +48,12 @@ import playground.benjamin.emissions.dataTypes.VisumRoadTypes;
 public class EmissionHandler {
 	private static final Logger logger = Logger.getLogger(EmissionHandler.class);
 	
+	private String roadTypesTrafficSituationsFile = null;
+	private String warmEmissionFactorsFile = null ;
+
+	// TODO: include file name specification into vspExperimentalConfigGroup
 	private final String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 	
-	private final String visum2hbefaRoadTypeFile = "../../detailedEval/emissions/hbefaForMatsim/road_types.txt";
-	private final String visum2hbefaRoadTypeTrafficSituationFile = "../../detailedEval/emissions/hbefaForMatsim/road_types_trafficSituation.txt";
-	
-	private String warmEmissionFactorsFile = null ;
 	private final String coldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
 	private final String averageFleetEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
 	private final String averageFleetHdvEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW_hdv.txt";
@@ -67,7 +69,14 @@ public class EmissionHandler {
 		
 		Network network = scenario.getNetwork() ;
 		
-		warmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsFile() ;
+		roadTypesTrafficSituationsFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
+		warmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsWarmFile() ;
+		
+		Map<Integer, RoadTypeTrafficSit> roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
+
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
+		vehicleReader.readFile(vehicleFile);
 		
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		
@@ -80,34 +89,9 @@ public class EmissionHandler {
 		HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed = new HbefaWarmEmissionTableCreatorDetailed();
 		hbefaWarmEmissionTableCreatorDetailed.makeHbefaWarmTableDetailed(warmEmissionFactorsFile);
 		
-		// read the vehicle file
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-		vehicleReader.readFile(vehicleFile);
-
-		// TODO: make the following homogeneous?!?
-		VisumRoadTypes[] roadTypes = createRoadTypes(visum2hbefaRoadTypeFile);
-		
-		for(int i=0; i<100; i++){
-			logger.info(roadTypes[i].getVISUM_RT_NR());
-			logger.info(roadTypes[i].getVISUM_RT_NAME());
-			logger.info(roadTypes[i].getHBEFA_RT_NR());
-			logger.info(roadTypes[i].getHBEFA_RT_NAME());
-		}
-		
-		String[][] roadTypesTrafficSituations = createRoadTypesTafficSituation(visum2hbefaRoadTypeTrafficSituationFile, roadTypes);
-		
-		for(int i=0; i<100; i++){
-			logger.info(roadTypesTrafficSituations[i][0]);
-			logger.info(roadTypesTrafficSituations[i][1]);
-			logger.info(roadTypesTrafficSituations[i][2]);
-			logger.info(roadTypesTrafficSituations[i][3]);
-		}
-		
 		// instantiate analysis modules
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
-				roadTypes,
-				roadTypesTrafficSituations,
+				roadTypeMapping,
 				hbefaWarmEmissionTableCreatorDetailed,
 				hbefaAvgWarmEmissionTableCreator,
 				hbefaAvgWarmEmissionTableCreatorHDV,
@@ -136,73 +120,10 @@ public class EmissionHandler {
 		logger.info("leaving installEmissionsEventHandler") ;
 	}
 
-	public EventWriterXML getEmissionEventWriter() {
-		return emissionEventWriter;
-	}
-
-	private String[][] createRoadTypesTafficSituation(String filename, VisumRoadTypes[] roadTypes ) {
-		logger.info("entering createRoadTypesTafficSituation ...") ;
-
-		String[][] roadTypesTrafficSituations = new String[100][4];
-		int[] counter = new int[100];
-		for(int i=0; i<100;i++)
-			counter[i]=0;
-		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			// Get the object of DataInputStream
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine="";
-			//Read File Line By Line
-			strLine = br.readLine();
-			
-//			FileWriter out = new FileWriter("../../detailedEval/emissions/hbefaForMatsim/asdf.txt") ;
-//			out.write(strLine+"\n") ;
-	
-			while ((strLine = br.readLine()) != null){
-				//for all lines (whole text) we split the line to an array 
-				String[] array = strLine.split(";");
-				int roadtype=Integer.valueOf(array[0]);
-				int traficSitIndex = counter[roadtype]++;
-//				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[3];
-				roadTypesTrafficSituations[roadtype][traficSitIndex] = array[4];
-				
-//				final String str1 = roadTypes[roadtype].getVISUM_RT_NR() + ";";
-//				System.out.print(str1) ;
-//				final String str2 = roadTypes[roadtype].getVISUM_RT_NAME() + ";";
-//				System.out.print(str2) ;
-//
-//				final String str3 = roadTypes[roadtype].getHBEFA_RT_NR() + ";";
-//				System.out.print(str3) ;
-//				final String str4 = roadTypes[roadtype].getHBEFA_RT_NAME() + ";";
-//				System.out.print(str4) ;
-//
-////				for ( int ii=0 ; ii<array.length; ii++ ) {
-////					System.out.print(array[ii] + ";") ;
-////				} 
-//				final String str5 = array[3] + ";\n";
-//				System.out.print(str5) ;
-//				
-//				out.write(str1+str2+str3+str4+str5);
-				
-			}
-			in.close();
-//			out.close();
-//			throw new RuntimeException("stopping here") ;
-			
-			logger.info("leaving createRoadTypesTafficSituation ...") ;
-
-			return roadTypesTrafficSituations;
-		}
-		catch (Exception e){
-			throw new RuntimeException(e);
-		}
-	}
-	
-	VisumRoadTypes[] createRoadTypes(String filename){
-		logger.info("entering createRoadTypes ...") ;
+	Map<Integer, RoadTypeTrafficSit> createRoadTypesTrafficSitMapping(String filename){
+		logger.info("entering createRoadTypesTrafficSitMapping ...") ;
 		
-		VisumRoadTypes[] roadTypes = new VisumRoadTypes[100];
+		Map<Integer, RoadTypeTrafficSit> roadTypeMapping = new HashMap<Integer, RoadTypeTrafficSit>();
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
 			DataInputStream in = new DataInputStream(fstream);
@@ -215,24 +136,32 @@ public class EmissionHandler {
 					throw new RuntimeException("cannot handle this character in parsing") ;
 				}
 	
-				//for all lines we split the line to an array 
-				String[] array = strLine.split(",");
-				VisumRoadTypes obj = new VisumRoadTypes(Integer.parseInt(array[0]), Integer.parseInt(array[2]));
-				obj.setVISUM_RT_NAME(array[1]) ;
-				if ( array.length >=4 ) {
-					obj.setHBEFA_RT_NAME(array[3]) ;
-				} else {
-					obj.setHBEFA_RT_NAME("no hbefa road type name in file") ;
-				}
-				roadTypes[obj.getVISUM_RT_NR()] = obj;
+				String[] inputArray = strLine.split(";");
+				
+				//required for mapping
+				Integer visumRtNr = Integer.parseInt(inputArray[0]);
+				Integer hbefaRtNr = Integer.parseInt(inputArray[2]);
+				String trafficSit = inputArray[4];
+				
+				RoadTypeTrafficSit roadTypeTrafficSit = new RoadTypeTrafficSit(hbefaRtNr, trafficSit);
+				
+				//optional for mapping
+				roadTypeTrafficSit.setVISUM_RT_NAME(inputArray[1]) ;
+				roadTypeTrafficSit.setHBEFA_RT_NAME(inputArray[3]) ;
+				
+				roadTypeMapping.put(visumRtNr, roadTypeTrafficSit);
 			}
 			in.close();
 
-			logger.info("leaving createRoadTypes ...") ;
-			return roadTypes;
+			logger.info("leaving createRoadTypesTrafficSitMapping ...") ;
+			return roadTypeMapping;
 		}
 		catch (Exception e){
 			throw new RuntimeException(e);
 		}
+	}
+
+	public EventWriterXML getEmissionEventWriter() {
+		return emissionEventWriter;
 	}
 }

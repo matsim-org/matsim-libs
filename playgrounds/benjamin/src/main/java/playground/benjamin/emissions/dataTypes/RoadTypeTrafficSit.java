@@ -20,21 +20,18 @@
  * *********************************************************************** */
 package playground.benjamin.emissions.dataTypes;
 
-public class VisumRoadTypes {
+public class RoadTypeTrafficSit {
 
-	private final int VISUM_RT_NR;
 	private String VISUM_RT_NAME;
 	private final int HBEFA_RT_NR;
 	private String HBEFA_RT_NAME;
+	private final String TRAFFIC_SITUATION;
 	
-	public VisumRoadTypes(int visumRtNr, int hbefaRtNr) {
-		this.VISUM_RT_NR = visumRtNr;
+	public RoadTypeTrafficSit(int hbefaRtNr, String trafficSit) {
 		this.HBEFA_RT_NR = hbefaRtNr;
+		this.TRAFFIC_SITUATION = trafficSit;
 	}
 
-	public int getVISUM_RT_NR() {
-		return VISUM_RT_NR;
-	}
 	public String getVISUM_RT_NAME() {
 		return VISUM_RT_NAME;
 	}
@@ -49,5 +46,8 @@ public class VisumRoadTypes {
 	}
 	public void setHBEFA_RT_NAME(String hbefaRtName) {
 		HBEFA_RT_NAME = hbefaRtName;
+	}
+	public String getTRAFFIC_SITUATION() {
+		return TRAFFIC_SITUATION;
 	}
 }

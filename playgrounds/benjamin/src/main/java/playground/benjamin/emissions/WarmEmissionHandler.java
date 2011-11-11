@@ -47,7 +47,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private final Vehicles vehicles;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	private static int linkLeaveWarnCnt = 0;
-	private static int maxLinkLeaveWarnCnt = 10;
+	private static int maxLinkLeaveWarnCnt = 3;
 
 	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
 	private final Map<Id, Double> agentarrival = new HashMap<Id, Double>();

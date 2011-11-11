@@ -56,8 +56,9 @@ public class RunEmissionToolOffline {
 	
 	private static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
-	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-	static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
+	private static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	private static String roadTypesTrafficSituationsFile = emissionInputPath + "road_types_trafficSituation.txt";
+	private static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
 	
 	// =======================================================================================================		
 	private final Scenario scenario;
@@ -91,6 +92,7 @@ public class RunEmissionToolOffline {
 
 	private void setInputFiles() {
 		VspExperimentalConfigGroup vcg = scenario.getConfig().vspExperimental() ;
+		vcg.setEmissionRoadTypeMappingFile(roadTypesTrafficSituationsFile);
 		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
 	}
 

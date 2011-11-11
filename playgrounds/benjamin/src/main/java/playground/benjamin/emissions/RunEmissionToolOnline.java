@@ -47,6 +47,7 @@ public class RunEmissionToolOnline {
 	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String roadTypesTrafficSituationsFile = emissionInputPath + "road_types_trafficSituation.txt";
 	static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
 	
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
@@ -125,9 +126,9 @@ public class RunEmissionToolOnline {
 		
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
+		vcg.setEmissionRoadTypeMappingFile(roadTypesTrafficSituationsFile);
 		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
 //		vcg.setEmissionFactorsColdFile("");
-//		vcg.setEmissionRoadTypeMatchingFile("");
 //		vcg.setEmissionVehicleFile("");
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
