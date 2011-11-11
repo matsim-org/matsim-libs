@@ -351,7 +351,8 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1.);
+		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.0/0.events.xml.gz", true, 1);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}
