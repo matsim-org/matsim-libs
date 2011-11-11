@@ -48,15 +48,12 @@ public class Algorithms {
 	}
 
 	/**
-	 * calculates the polar angle for vector (c1,c2)
-	 * @param c1 first coordinate
-	 * @param c2 second coordinate
+	 * calculates the polar angle for coordinate (x,y)
+	 * @param x
+	 * @param y
 	 * @return the polar angle
 	 */
-	@Deprecated //We don't need to now the actual angle, so it is much faster to use isAngleBigger(...) instead!!
-	public static double getPolarAngle(Coordinate c1, Coordinate c2) {
-		double x = c2.x - c1.x;
-		double y = c2.y - c1.y;
+	public static double getPolarAngle(double x, double y) {
 
 		double ret;
 		if (x > 0) {
@@ -231,4 +228,50 @@ public class Algorithms {
 	}
 
 
+	private static double getYSquareOfEllipse(double x, double a, double b) {
+		double ySquare = (1 - (x*x)/(a*a))*b*b;
+		return ySquare;
+	}
+
+	public static Coordinate[] getEllipse(double a, double b) {
+		//create agentGeometry
+		int numOfParts = 8;
+		Coordinate[] c = new Coordinate[numOfParts + 1];
+		double x = -a;
+		double incr = 4*a/numOfParts;
+		int pos=0;
+		while (x <= a) {
+			double ySqr = Algorithms.getYSquareOfEllipse(x,a,b);
+			double y = Math.sqrt(ySqr);
+			c[pos++] = new Coordinate(x,y);
+			x += incr;
+		}
+		x -= incr;
+		x -= incr;
+		while (x >= -a) {
+			double ySqr = Algorithms.getYSquareOfEllipse(x,a,b);
+			double y = -Math.sqrt(ySqr);
+			c[pos++] = new Coordinate(x,y);
+			x -= incr;
+		}
+		c[numOfParts] = c[0];
+		return c;
+	}
+
+	public static void rotate(double alpha, Coordinate [] ring) {
+		Coordinate refCoord = new Coordinate(0,0);
+		double cos = Math.cos(alpha);
+		double sin = Math.sin(alpha);
+		for (int i = 0; i < ring.length -1; i++) {
+			rotateCoordinate(ring[i],cos,sin, refCoord);
+		}
+	}
+
+	private static void rotateCoordinate(Coordinate coord, double cos, double sin,
+			Coordinate refCoord) {
+		double x = refCoord.x + (coord.x - refCoord.x) * cos - (coord.y - refCoord.y)*sin;
+		double y = refCoord.y + (coord.x - refCoord.x) * sin + (coord.y - refCoord.y)*cos;
+		coord.x = x;
+		coord.y = y;
+	}
 }

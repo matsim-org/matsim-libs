@@ -27,8 +27,8 @@ public class PathAndDrivingAcceleration {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =10;
-	private static final double Bpath = .5;
+	private static final double Apath =4;
+	private static final double Bpath = .4;
 
 
 
@@ -84,7 +84,7 @@ public class PathAndDrivingAcceleration {
 		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls);
 		double fpx = 0;
 		double fpy = 0;
-		if (pathDist > 0){
+		if (pathDist > Bpath){
 			double f = Apath * Math.exp(pathDist / Bpath);
 			Point orig = ls.getStartPoint();
 			Point dest = ls.getEndPoint();

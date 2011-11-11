@@ -11,7 +11,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 
-//import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
@@ -34,7 +33,9 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 	private final double deltaT = 1/25.;
 
-	private final double timeHorizont = 10;
+	private final double timeHorizont = 5;
+
+	private final double w_i = 1;
 
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
@@ -106,34 +107,106 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			//			GisDebugger.addGeometry(ranR,"VO");
 		}
 
-		Force f = agent.getForce();
-		f.reset();
+
+		//		f.reset();
 		double[] df = this.driver.getDesiredAccelerationForce(agent);
 		double dvx = agent.getVx()+(this.deltaT *df[0])/Agent2D.AGENT_WEIGHT; //desired velocity in the next time step
 		double dvy = agent.getVy()+(this.deltaT *df[1])/Agent2D.AGENT_WEIGHT;
 		Coordinate c0 = agent.getPosition();
 		Coordinate c1 = new Coordinate(c0.x+dvx,c0.y + dvy);
 
+		double ii = timeToCollision(VOs, c0, c1);
 		//		//DEBUG
 		//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
-		//		GisDebugger.addGeometry(lsdvA,"dvA");
-		//		Coordinate va = new Coordinate(c0.x+agent.getVx(),c0.y + agent.getVy());
-		//		LineString lsvA = geofac.createLineString(new Coordinate[]{c0,va});
-		//		GisDebugger.addGeometry(lsvA, "vA");
+		//		GisDebugger.addGeometry(lsdvA,"dvA: " + ii);
 
-		//		boolean intersects = intersetcsVo(VOs,c0,c1);
-		double ii = timeToCollision(VOs, c0, c1);
 		if (ii <= this.timeHorizont) {
-			f.setVx(0);
-			f.setVy(0);
-		} else {
-			f.incrementX(df[0]);
-			f.incrementY(df[1]);
+			chooseAlternativeAccelerationForce(ii,VOs,c0,df,agent.getVx(),agent.getVy());
 		}
+
+		Force f = agent.getForce();
+		f.incrementX(df[0]);
+		f.incrementY(df[1]);
 
 		//		GisDebugger.dump("/Users/laemmel/tmp/vis/minkowski.shp");
 
 	}
+
+	private void chooseAlternativeAccelerationForce(double ii,
+			List<VelocityObstacle> vOs, Coordinate c0, double[] df, double vx, double vy) {
+		double minPenalty = this.w_i/ii;
+		//		double deltaVx = this.deltaT*df[0]/Agent2D.AGENT_WEIGHT;
+		//		double deltaVy = this.deltaT*df[1]/Agent2D.AGENT_WEIGHT;
+
+		double fx = df[0];
+		double fy = df[1];
+
+		//90 degr. to the left
+		double nvx = -vy;
+		double nvy = vx;
+		Coordinate c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		double time = timeToCollision(vOs, c0, c1);
+		//		double diff = 2*deltaVx;
+		double diff = 0;
+		double penalty = this.w_i / time + diff;
+		if (penalty < minPenalty) {
+			minPenalty = penalty;
+			fx = (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+		}
+		//		//DEBUG
+		//		GeometryFactory geofac = new GeometryFactory();
+		//		LineString leftvA = geofac.createLineString(new Coordinate []{c0,c1});
+		//		GisDebugger.addGeometry(leftvA,"left va: " + time);
+
+		//90 degr. to the right
+		nvx = vy;
+		nvy = -vx;
+		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		time = timeToCollision(vOs, c0, c1);
+		//		diff = 2*deltaVy;
+		penalty = this.w_i / time + diff;
+		if (penalty < minPenalty) {
+			minPenalty = penalty;
+			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+		}
+		//		//DEBUG
+		//		LineString rightvA = geofac.createLineString(new Coordinate []{c0,c1});
+		//		GisDebugger.addGeometry(rightvA,"right va: " + time);
+
+		//		//accel
+		//		nvx = vx*1.1;
+		//		nvy = vy*1.1;
+		//		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		//		time = timeToCollision(vOs, c0, c1);
+		//		//		diff = 2*deltaVy;
+		//		penalty = this.w_i / time + diff;
+		//		if (penalty < minPenalty) {
+		//			minPenalty = penalty;
+		//			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/this.deltaT;
+		//			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/this.deltaT;
+		//		}
+
+		//deccel
+		nvx = vx*.8;
+		nvy = vy*.8;
+		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		time = timeToCollision(vOs, c0, c1);
+		//		diff = 2*deltaVy;
+		penalty = this.w_i / time + diff;
+		if (penalty < minPenalty) {
+			minPenalty = penalty;
+			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+		}
+
+		df[0] = (df[0]+fx)/2;
+		df[1] = (df[1]+fy)/2;
+
+
+	}
+
 
 	private double timeToCollision(List<VelocityObstacle> vOs, Coordinate c0,
 			Coordinate c1) {

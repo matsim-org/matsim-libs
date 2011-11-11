@@ -79,7 +79,7 @@ public class ConfigurationSpaceObstacle {
 		Coordinate c = new Coordinate(0,0);
 		CCWPolygon ccwp1 = new CCWPolygon(cs1,c);
 		CCWPolygon ccwp2 = new CCWPolygon(cs2,new Coordinate(0,0));
-		ccwp2.translate(1, 1);
+		ccwp2.translate(new Coordinate(1,1));
 
 		GisDebugger.addGeometry(geofac.createPolygon(geofac.createLinearRing(ccwp1.getCCWRing()), null));
 

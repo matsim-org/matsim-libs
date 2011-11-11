@@ -8,20 +8,27 @@ public class CCWPolygon {
 
 	private final Coordinate[] ring;
 	private final Coordinate[] reflectedRing;
+	private final Coordinate refCoord;
 
 	public CCWPolygon(Coordinate [] coords, Coordinate refCoord) {
 		Coordinate [] ccw = getCCWRing(coords);
 		this.ring = ccw;
 		this.reflectedRing = getReflectedRing(ccw, refCoord);
+		this.refCoord = refCoord;
 	}
 
-	public void translate(double dx, double dy) {
+	public void translate(Coordinate c) {
+		double dx = c.x - this.refCoord.x;
+		double dy = c.y - this.refCoord.y;
 		for (int i = 0; i < this.ring.length-1; i++) {
-			Coordinate c = this.ring[i];
-			c.x += dx;
-			c.y += dy;
+			Coordinate cc = this.ring[i];
+			cc.x += dx;
+			cc.y += dy;
 		}
+		this.refCoord.setCoordinate(c);
 	}
+
+
 
 	private Coordinate[] getReflectedRing(Coordinate[] ccw, Coordinate refCoord) {
 		Coordinate [] ret = new Coordinate[ccw.length];
@@ -103,5 +110,7 @@ public class CCWPolygon {
 		coords[j] = tmp;
 
 	}
+
+
 
 }

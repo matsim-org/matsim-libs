@@ -21,9 +21,12 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
 
@@ -44,10 +47,19 @@ public class Agent2D  {
 	private final Scenario sc;
 	private double currentDesiredVelocity;
 
+	private final double maxV = 2.;
+
 	public static final double AGENT_WEIGHT = 80;// * 1000;
 	public static final double AGENT_DIAMETER = 0.50;
 
 	private CCWPolygon geometry;
+	private final double a_min = .18;
+	private final double b_min = .2;
+	private final double b_max = .25;
+	private final double tau_a = .53;
+	private QuadTree<CCWPolygon> geometryQuad;
+	private double v;
+	private double alpha = 0;
 
 	/**
 	 * @param p
@@ -66,18 +78,28 @@ public class Agent2D  {
 	}
 
 	private void initGeometry() {
-		//create agentGeometry
-		int numOfParts = 5;
-		double agentRadius = AGENT_DIAMETER / 2;
 
-		Coordinate[] c = new Coordinate[numOfParts + 1];
-		double angle = Math.PI * 2 / numOfParts;
-		for(int i = 0; i <numOfParts; i++){
-			c[i] = new Coordinate(agentRadius * Math.cos(angle * i), agentRadius * Math.sin(angle * i));
+		//x dim velo
+		//y dim angle
+		this.geometryQuad = new QuadTree<CCWPolygon>(0,0,2,360);
+
+		for (double v = 0; v < this.maxV; v += this.maxV/24 ) {
+			double a = this.a_min + this.tau_a * v;
+			double b = this.b_max - (this.b_max - this.b_min)*v/this.desiredVelocity;
+			Coordinate[] c = Algorithms.getEllipse(a, b);
+			for (double angle = 0; angle < 360; angle += 15) {
+				Coordinate [] tmp = new Coordinate[c.length];
+				for (int i = 0; i < c.length-1; i++) {
+					tmp[i] = new Coordinate(c[i]);
+				}
+				tmp[c.length-1] = tmp[0];
+				double alpha = angle / 360. * 2 * Math.PI;
+				Algorithms.rotate(alpha, tmp);
+				CCWPolygon ccw = new CCWPolygon(tmp, new Coordinate(0,0));
+				this.geometryQuad.put(v, angle, ccw);
+			}
 		}
-		c[numOfParts] = c[0];
-		this.geometry = new CCWPolygon(c, new Coordinate(0,0));
-
+		this.geometry = this.geometryQuad.get(0, 0);
 	}
 
 	public CCWPolygon getGeometry(){
@@ -93,7 +115,7 @@ public class Agent2D  {
 
 	public void setPostion(Coordinate pos) {
 		this.currentPosition = pos;
-		this.geometry.translate(pos.x, pos.y);
+		this.geometry.translate(pos);
 	}
 
 	public Force getForce() {
@@ -109,12 +131,20 @@ public class Agent2D  {
 		this.currentPosition.setCoordinate(newPos);
 	}
 
-	public void translate(double dx, double dy) {
+	public void translate(double dx, double dy, double vx2, double vy2) {
 		this.currentPosition.x += dx;
 		this.currentPosition.y += dy;
-		this.geometry.translate(dx, dy);
+		setCurrentVelocity(vx2, vy2);
+		this.v = Math.sqrt(vx2*vx2+vy2*vy2);
+		if (vx2 != 0 || vy2 != 0) {
+			this.alpha = 360*Algorithms.getPolarAngle(this.vx, this.vy)/(2*Math.PI);
+		}
+		this.geometry = this.geometryQuad.get(this.v, this.alpha);
+		this.geometry.translate(this.currentPosition);
 
 	}
+
+
 
 	/**
 	 * @return
@@ -123,6 +153,7 @@ public class Agent2D  {
 		return this.currentDesiredVelocity;
 	}
 
+	@Deprecated //should be private
 	public void setCurrentVelocity(double vx, double vy) {
 		this.vx = vx;
 		this.vy = vy;

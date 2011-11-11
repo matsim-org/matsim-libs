@@ -221,7 +221,7 @@ public class PhysicalFloor implements Floor {
 		double dy = f.getVy()* this.sim2DTimeStepSize;
 		Coordinate newPos = new Coordinate(oldPos.x + dx, oldPos.y + dy, 0);
 
-		agent.setCurrentVelocity(vx,vy);
+		//		agent.setCurrentVelocity(vx,vy);
 
 		//			System.out.println("ID:" + agent.getId() + "  velocity:" + Math.sqrt(Math.pow(vx, 2)+Math.pow(vy, 2)) + "    vx:" + vx + "    vy:" + vy + "   " + newPos);
 
@@ -234,7 +234,7 @@ public class PhysicalFloor implements Floor {
 
 		}
 
-		agent.translate(dx,dy);
+		agent.translate(dx,dy,vx,vy);
 
 		if (this.emitXYZAzimuthEvents) {
 			XYVxVyEvent e = new XYVxVyEventImpl(agent.getId(), (Coordinate) agent.getPosition().clone(), agent.getVx(), agent.getVy(), time);
