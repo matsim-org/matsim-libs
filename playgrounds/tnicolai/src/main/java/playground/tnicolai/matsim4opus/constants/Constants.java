@@ -189,15 +189,20 @@ public class Constants {
 	
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
+	public static final String ERSA_PARCEL_ID = "parcel_id";
+	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
+	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
+	public static final String ERSA_NEARESTNODE_Y_COORD = "y_coord_nn";
 	public static final String ERSA_X_COORDNIATE = "x_coordinate";
 	public static final String ERSA_Y_COORDINATE = "y_coordinate";
 	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
 	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
 	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	public static final String ERSA_WORKPLACES_COUNT = "workplaces";
 	
 	/** Spatial IDs and spatial conversion factors */
 	public static final int SRID_WASHINGTON_NORTH = 2926;// srid 2285 also worked, but was last updated in 2001 instead of 2007
-	public static final int SRID_SWIZERLAND = -1;
+	public static final int SRID_SWITZERLAND = -1; // tnicolai: find id
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	

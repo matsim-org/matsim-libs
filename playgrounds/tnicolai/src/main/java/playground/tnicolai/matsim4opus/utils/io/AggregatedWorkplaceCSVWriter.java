@@ -3,9 +3,9 @@ package playground.tnicolai.matsim4opus.utils.io;
 import java.io.BufferedWriter;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.constants.Constants;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 
 public class AggregatedWorkplaceCSVWriter {
@@ -38,6 +38,8 @@ public class AggregatedWorkplaceCSVWriter {
 			bwAggregatedWP.close();
 			log.info("... done!");
 		}
-		catch(Exception e){ e.printStackTrace(); }
+		catch(Exception e){ 
+			e.printStackTrace(); 
+		}
 	}
 }
