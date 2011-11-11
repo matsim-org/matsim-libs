@@ -21,9 +21,9 @@ public class DestinationSampler {
 	public boolean sample(Id facilityId, Id personId) { 
 		if (Math.ceil(this.samplePercent) == 100) return true;
 		
-		int facilityValue = (int)Math.floor(1.0 / samplePercent * 
+		int facilityValue = (int)Math.floor(100.0 / samplePercent * 
 				(Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k"));
-		int personValue = (int)Math.floor(1.0 / samplePercent * 
+		int personValue = (int)Math.floor(100.0 / samplePercent * 
 				(Double) this.personsKValues.getAttribute(personId.toString(), "k"));
 		return (facilityValue == personValue);
 	}
