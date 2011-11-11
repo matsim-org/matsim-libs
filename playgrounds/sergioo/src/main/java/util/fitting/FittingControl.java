@@ -1,9 +1,11 @@
 package util.fitting;
 
+import util.algebra.MatrixND;
+
 public abstract class FittingControl {
 	
 	//Methods
-	public void iterate(MatrixNDimensions<Double> data, int dimension) {
+	public void iterate(MatrixND<Double> data, int dimension) {
 		int[] positionSize = new int[data.getNumDimensions()-1];
 		int j=0;
 		for(int i=0; i<data.getNumDimensions(); i++)
@@ -13,7 +15,7 @@ public abstract class FittingControl {
 			}
 		applyRules(data, 0, new int[positionSize.length], positionSize, dimension);
 	}
-	private void applyRules(MatrixNDimensions<Double> data, int dim, int[] position, int[] positionSize, int dimension) {
+	private void applyRules(MatrixND<Double> data, int dim, int[] position, int[] positionSize, int dimension) {
 		if(dim==positionSize.length)
 			applyRule(data, position, dimension);
 		else
@@ -32,6 +34,6 @@ public abstract class FittingControl {
 			}
 		return matrixPosition;
 	}
-	protected abstract void applyRule(MatrixNDimensions<Double> data, int[] position, int dimension);
+	protected abstract void applyRule(MatrixND<Double> data, int[] position, int dimension);
 
 }

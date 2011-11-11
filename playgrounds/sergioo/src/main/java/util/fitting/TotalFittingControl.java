@@ -1,17 +1,19 @@
 package util.fitting;
 
+import util.algebra.MatrixND;
+
 public class TotalFittingControl extends FittingControl{
 
-	private MatrixNDimensions<Double> controlConstants;
+	private MatrixND<Double> controlConstants;
 	
 	//Constructors
-	public TotalFittingControl(MatrixNDimensions<Double> controlConstants) {
+	public TotalFittingControl(MatrixND<Double> controlConstants) {
 		this.controlConstants = controlConstants;
 	}
 	
 	//Methods
 	@Override
-	protected void applyRule(MatrixNDimensions<Double> data, int[] position, int dimension) {
+	protected void applyRule(MatrixND<Double> data, int[] position, int dimension) {
 		int[] matrixPosition = getMatrixPosition(position, dimension);
 		double sum = 0;
 		for(int d=0; d<data.getDimensions()[dimension]; d++) {
