@@ -16,6 +16,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	
 	// resolution
 	private static int resolutionMeter = -1;
+	private static int resolutionFeet = -1;
 	// job sample (default 100%)
 	private static double jobSample = 1.;
 
@@ -29,7 +30,6 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	}
 	
 	private void initResolutionAndJobSample(){
-		
 		try{
 			String params[] = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.TEST_PARAMETER_PARAM).split(",");
 			
@@ -38,10 +38,14 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				if(params[i].startsWith("resolution")){
 					String s[] = params[i].split("=");
 					MATSim4UrbanSimInteroplation.resolutionMeter = Integer.parseInt(s[1]);
+					log.info("Detected resolution in meter: " + MATSim4UrbanSimInteroplation.resolutionMeter);
+					MATSim4UrbanSimInteroplation.resolutionFeet = (int)(MATSim4UrbanSimInteroplation.resolutionMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR);
+					log.info("Converted resolution into feet (used for goolge maps output): " + MATSim4UrbanSimInteroplation.resolutionFeet);
 				}
 				else if(params[i].startsWith("jobsample")){
 					String s[] = params[i].split("=");
 					MATSim4UrbanSimInteroplation.jobSample = Double.parseDouble(s[1]);
+					log.info("Detected job sample size: " + MATSim4UrbanSimInteroplation.jobSample);
 				}	
 			}
 		}
@@ -76,7 +80,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
-		controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionMeter, this.benchmark) );
+		controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
 		controler.run();
 		// Controler done!
 		

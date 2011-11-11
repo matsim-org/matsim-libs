@@ -39,7 +39,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.MyColorizer;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.gis.SpatialGridTableWriter;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
@@ -49,6 +48,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

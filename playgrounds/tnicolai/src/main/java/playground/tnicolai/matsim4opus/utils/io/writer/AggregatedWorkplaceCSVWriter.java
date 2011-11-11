@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.utils.io;
+package playground.tnicolai.matsim4opus.utils.io.writer;
 
 import java.io.BufferedWriter;
 

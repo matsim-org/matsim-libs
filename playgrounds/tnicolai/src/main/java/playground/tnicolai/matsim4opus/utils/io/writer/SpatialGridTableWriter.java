@@ -17,11 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.tnicolai.matsim4opus.gis;
+package playground.tnicolai.matsim4opus.utils.io.writer;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 
 /**
  * @author illenberger
