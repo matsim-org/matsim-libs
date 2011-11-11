@@ -31,6 +31,8 @@ public class ReducedModelParametersConfigGroup extends Module {
 
 	public static final String NAME = "ReducedSPModelParameters";
 
+	// parameters of the model: names
+	// -------------------------------------------------------------------------
 	public static final String ASC_CPD = "ascCpd";
 	public static final String ASC_CAR = "ascCar";
 	public static final String ASC_PT = "ascPt";
@@ -54,6 +56,8 @@ public class ReducedModelParametersConfigGroup extends Module {
 	public static final String BETA_CAR_AVAIL = "betaCarAvail";
 	public static final String BETA_MALE_CAR = "betaMaleCar";
 
+	// parameters of the model: values
+	// -------------------------------------------------------------------------
 	private double ascCpd = 0.201;
 	private double ascCar = -0.890;
 	private double ascPt = -6.25;
@@ -76,6 +80,26 @@ public class ReducedModelParametersConfigGroup extends Module {
 	private double betaWaitPt = -0.0939;
 	private double betaCarAvail = 0.708;
 	private double betaMaleCar = 0.355;
+
+	// cost estimation parameters: names
+	// -------------------------------------------------------------------------
+	private static final String CAR_COST_PER_M = "carCostPerM"; // CHF/m
+	// consider a driver usually drives 10 minutes more when he picks up a passenger 
+	private static final String SURPLUS_DRIVER = "timeSurplusCpDriver";
+	// cost of pt, when GA, Halbtax or nothing
+	private static final String GA_COST_PER_M = "gaCostPerM"; // 0.08 CHF/km
+	private static final String HT_COST_PER_M = "htCostPerM"; // 0.15 CHF/km
+	private static final String PT_COST_PER_M = "ptCostPerM"; // 0.28 CHF/km
+
+	// cost estimation parameters: values 
+	// -------------------------------------------------------------------------
+	private double carCostPerM = (1d / 10000d) * 1.50; // 1.50 CHF/L and 10L/100km
+	// consider a driver usually drives 10 minutes more when he picks up a passenger 
+	private double surplusDriver = 10 * 60;
+	// cost of pt, when GA, Halbtax or nothing
+	private double gaCostPerM = 0.08 / 1000d; // 0.08 CHF/km
+	private double htCostPerM = 0.15 / 1000d; // 0.15 CHF/km
+	private double ptCostPerM = 0.28 / 1000d; // 0.28 CHF/km
 
 	public ReducedModelParametersConfigGroup() {
 		super( NAME );
@@ -151,77 +175,26 @@ public class ReducedModelParametersConfigGroup extends Module {
 		else if (param_name.equals( BETA_MALE_CAR )) {
 			betaMaleCar = Double.parseDouble( value );
 		}
+		else if (param_name.equals( CAR_COST_PER_M )) {
+			setCarCostPerM( value );
+		}
+		else if (param_name.equals( SURPLUS_DRIVER )) {
+			setSurplusDriver( value );
+		}
+		else if (param_name.equals( GA_COST_PER_M )) {
+			setGaCostPerM( value );
+		}
+		else if (param_name.equals( HT_COST_PER_M )) {
+			setHtCostPerM( value );
+		}
+		else if (param_name.equals( PT_COST_PER_M )) {
+			setPtCostPerM( value );
+		}
 	}
 
 	@Override
 	public String getValue(final String param_name) {
-		if (param_name.equals( ASC_CPD )) {
-			return ""+ascCpd;
-		}
-		else if (param_name.equals( ASC_CAR )) {
-			return ""+ascCar;
-		}
-		else if (param_name.equals( ASC_PT )) {
-			return ""+ascPt;
-		}
-		else if (param_name.equals( BETA_ABO_PT )) {
-			return ""+betaAboPt;
-		}
-		else if (param_name.equals( BETA_LOG_AGE_PT )) {
-			return ""+betaLogAgePt;
-		}
-		else if (param_name.equals( BETA_WALK_CAR )) {
-			return ""+betaWalkCar;
-		}
-		else if (param_name.equals( BETA_WALK_CPD )) {
-			return ""+betaWalkCpd;
-		}
-		else if (param_name.equals( BETA_WALK_CPP )) {
-			return ""+betaWalkCpp;
-		}
-		else if (param_name.equals( BETA_WALK_PT )) {
-			return ""+betaWalkPt;
-		}
-		else if (param_name.equals( BETA_FEMALE_CP )) {
-			return ""+betaFemaleCp;
-		}
-		else if (param_name.equals( BETA_GERMAN_CP )) {
-			return ""+betaGermanCp;
-		}
-		else if (param_name.equals( BETA_PARK_CPD )) {
-			return ""+betaParkCpd;
-		}
-		else if (param_name.equals( BETA_PARK_CAR )) {
-			return ""+betaParkCar;
-		}
-		else if (param_name.equals( BETA_COST )) {
-			return ""+betaCost;
-		}
-		else if (param_name.equals( BETA_TT_CPD )) {
-			return ""+betaTtCpd;
-		}
-		else if (param_name.equals( BETA_TT_CPP )) {
-			return ""+betaTtCpp;
-		}
-		else if (param_name.equals( BETA_TT_CAR )) {
-			return ""+betaTtCar;
-		}
-		else if (param_name.equals( BETA_TT_PT )) {
-			return ""+betaTtPt;
-		}
-		else if (param_name.equals( BETA_TRANSFERS_PT )) {
-			return ""+betaTransfersPt;
-		}
-		else if (param_name.equals( BETA_WAIT_PT )) {
-			return ""+betaWaitPt;
-		}
-		else if (param_name.equals( BETA_CAR_AVAIL )) {
-			return ""+betaCarAvail;
-		}
-		else if (param_name.equals( BETA_MALE_CAR )) {
-			return ""+betaMaleCar;
-		}
-		return null;
+		return getParams().get( param_name );
 	}
 
 	@Override
@@ -250,6 +223,11 @@ public class ReducedModelParametersConfigGroup extends Module {
 		map.put( BETA_WAIT_PT , ""+betaWaitPt );
 		map.put( BETA_CAR_AVAIL , ""+betaCarAvail );
 		map.put( BETA_MALE_CAR , ""+betaMaleCar );
+		map.put( CAR_COST_PER_M, ""+carCostPerM );
+		map.put( SURPLUS_DRIVER, ""+surplusDriver );
+		map.put( GA_COST_PER_M, ""+gaCostPerM );
+		map.put( HT_COST_PER_M, ""+htCostPerM );
+		map.put( PT_COST_PER_M, ""+ptCostPerM );
 
 		return map;
 	}
@@ -320,6 +298,46 @@ public class ReducedModelParametersConfigGroup extends Module {
 	}
 	public double betaMaleCar() {
 		return betaMaleCar;
+	}
+
+	public double getCarCostPerM() {
+		return carCostPerM;
+	}
+
+	public void setCarCostPerM( final String value) {
+		this.carCostPerM = Double.parseDouble( value );
+	}
+
+	public double getSurplusDriver() {
+		return surplusDriver;
+	}
+
+	public void setSurplusDriver( final String value) {
+		this.surplusDriver = Double.parseDouble( value );
+	}
+
+	public double getGaCostPerM() {
+		return gaCostPerM;
+	}
+
+	public void setGaCostPerM( final String value ) {
+		this.gaCostPerM = Double.parseDouble( value );
+	}
+
+	public double getHtCostPerM() {
+		return htCostPerM;
+	}
+
+	public void setHtCostPerM( final String value ) {
+		this.htCostPerM = Double.parseDouble( value );
+	}
+
+	public double getPtCostPerM() {
+		return ptCostPerM;
+	}
+
+	public void setPtCostPerM( final String value ) {
+		this.ptCostPerM = Double.parseDouble( value );
 	}
 
 }

@@ -71,7 +71,7 @@ public class RunReducedSPModel {
 
 		ChoiceModel model = new ReducedSPModel(
 				configGroup,
-				scenario.getNetwork(),
+				scenario,
 				new SimpleLegTravelTimeEstimatorFactory(
 					PlanomatConfigGroup.SimLegInterpretation.CetinCompatible,
 					PlanomatConfigGroup.RoutingCapability.fixedRoute,

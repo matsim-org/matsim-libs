@@ -35,7 +35,7 @@ import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
  * @author thibautd
  */
 public class SimpleLegTravelTimeEstimatorFactory {
-	private final  PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
+	private final PlanomatConfigGroup.SimLegInterpretation simLegInterpretation;
 	private final PlanomatConfigGroup.RoutingCapability routingCapability;
 	private final PlansCalcRoute routingAlgorithm;
 	private final Network network;

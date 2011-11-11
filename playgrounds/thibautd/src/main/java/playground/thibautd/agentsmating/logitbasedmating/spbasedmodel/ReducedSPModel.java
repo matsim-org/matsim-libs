@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -44,24 +45,10 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
 public class ReducedSPModel extends LogitModel {
 	private static final double BEE_FLY_SPEED = 20d / 3.6d;
 
-	// model attributes names: alternative
-	public static final String A_TRAVEL_TIME = "travelTime";
-	public static final String A_COST = "cost";
-	public static final String A_WALKING_TIME = "walkingTime";
-	public static final String A_PARK_COST = "parkingCost";
-	public static final String A_WAITING_TIME = "waitingTime";
-	public static final String A_N_TRANSFERS = "nTransfers";
-
-	// model attributes names: decider
-	public static final String A_AGE = "age";
-	public static final String A_IS_MALE = "isMale";
-	public static final String A_SPEAKS_GERMAN = "speaksGerman";
-	public static final String A_HAS_PT_ABO = "hasPtAbo";
-	public static final String A_IS_CAR_ALWAYS_AVAIL = "carAvailability";
-
 	// factories
 	private final DecisionMakerFactory decisionMakerFactory = new ReducedSPModelDecisionMakerFactory();
 	private final ChoiceSetFactory choiceSetFactory; //new ReducedSPModelChoiceSetFactory();
+	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 
 	private final ReducedModelParametersConfigGroup params;
 
@@ -70,11 +57,13 @@ public class ReducedSPModel extends LogitModel {
 	// /////////////////////////////////////////////////////////////////////////
 	public ReducedSPModel(
 			final ReducedModelParametersConfigGroup parameters,
-			final Network network,
+			final Scenario scenario,
 			final SimpleLegTravelTimeEstimatorFactory estimatorFactory) {
 		this.params = parameters;
+		this.estimatorFactory = estimatorFactory;
 		choiceSetFactory = new ReducedSPModelChoiceSetFactory(
-				network,
+				parameters,
+				scenario,
 				estimatorFactory);
 	}
 
@@ -131,12 +120,12 @@ public class ReducedSPModel extends LogitModel {
 			final Alternative alternative) throws UnexistingAttributeException {
 		return
 			params.ascCar() +
-			params.betaTtCar() * alternative.getAttribute( A_TRAVEL_TIME ) +
-			params.betaCost() * alternative.getAttribute( A_COST ) +
-			params.betaWalkCar() * alternative.getAttribute( A_WALKING_TIME ) +
-			params.betaParkCar() * alternative.getAttribute( A_PARK_COST ) +
-			params.betaMaleCar() * decisionMaker.getAttribute( A_IS_MALE ) +
-			params.betaCarAvail() * decisionMaker.getAttribute( A_IS_CAR_ALWAYS_AVAIL );
+			params.betaTtCar() * alternative.getAttribute( ReducedModelConstants.A_TRAVEL_TIME ) +
+			params.betaCost() * alternative.getAttribute( ReducedModelConstants.A_COST ) +
+			params.betaWalkCar() * alternative.getAttribute( ReducedModelConstants.A_WALKING_TIME ) +
+			params.betaParkCar() * alternative.getAttribute( ReducedModelConstants.A_PARK_COST ) +
+			params.betaMaleCar() * decisionMaker.getAttribute( ReducedModelConstants.A_IS_MALE ) +
+			params.betaCarAvail() * decisionMaker.getAttribute( ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL );
 	}
 
 	private double ptUtility(
@@ -144,24 +133,24 @@ public class ReducedSPModel extends LogitModel {
 			final Alternative alternative) throws UnexistingAttributeException {
 		return
 			params.ascPt() +
-			params.betaTtPt() * alternative.getAttribute( A_TRAVEL_TIME ) +
-			params.betaCost() * alternative.getAttribute( A_COST ) +
-			params.betaWalkPt() * alternative.getAttribute( A_WALKING_TIME ) +
-			params.betaWaitPt() * alternative.getAttribute( A_WAITING_TIME ) +
-			params.betaAboPt() * decisionMaker.getAttribute( A_HAS_PT_ABO ) +
-			params.betaLogAgePt() * Math.log( decisionMaker.getAttribute( A_AGE ) ) +
-			params.betaTransfersPt() * alternative.getAttribute( A_N_TRANSFERS );
+			params.betaTtPt() * alternative.getAttribute( ReducedModelConstants.A_TRAVEL_TIME ) +
+			params.betaCost() * alternative.getAttribute( ReducedModelConstants.A_COST ) +
+			params.betaWalkPt() * alternative.getAttribute( ReducedModelConstants.A_WALKING_TIME ) +
+			params.betaWaitPt() * alternative.getAttribute( ReducedModelConstants.A_WAITING_TIME ) +
+			params.betaAboPt() * decisionMaker.getAttribute( ReducedModelConstants.A_HAS_PT_ABO ) +
+			params.betaLogAgePt() * Math.log( decisionMaker.getAttribute( ReducedModelConstants.A_AGE ) ) +
+			params.betaTransfersPt() * alternative.getAttribute( ReducedModelConstants.A_N_TRANSFERS );
 	}
 
 	private double cppUtility(
 			final DecisionMaker decisionMaker,
 			final Alternative alternative) throws UnexistingAttributeException {
 		return
-			params.betaTtCpp() * alternative.getAttribute( A_TRAVEL_TIME ) +
-			params.betaCost() * alternative.getAttribute( A_COST ) +
-			params.betaWalkCpp() * alternative.getAttribute( A_WALKING_TIME ) +
-			params.betaFemaleCp() * (1 - decisionMaker.getAttribute( A_IS_MALE )) +
-			params.betaGermanCp() * decisionMaker.getAttribute( A_SPEAKS_GERMAN );
+			params.betaTtCpp() * alternative.getAttribute( ReducedModelConstants.A_TRAVEL_TIME ) +
+			params.betaCost() * alternative.getAttribute( ReducedModelConstants.A_COST ) +
+			params.betaWalkCpp() * alternative.getAttribute( ReducedModelConstants.A_WALKING_TIME ) +
+			params.betaFemaleCp() * (1 - decisionMaker.getAttribute( ReducedModelConstants.A_IS_MALE )) +
+			params.betaGermanCp() * decisionMaker.getAttribute( ReducedModelConstants.A_SPEAKS_GERMAN );
 	}
 
 	private double cpdUtility(
@@ -169,12 +158,12 @@ public class ReducedSPModel extends LogitModel {
 			final Alternative alternative) throws UnexistingAttributeException {
 		return
 			params.ascCpd() +
-			params.betaTtCpd() * alternative.getAttribute( A_TRAVEL_TIME ) +
-			params.betaCost() * alternative.getAttribute( A_COST ) +
-			params.betaWalkCpd() * alternative.getAttribute( A_WALKING_TIME ) +
-			params.betaParkCpd() * alternative.getAttribute( A_PARK_COST ) +
-			params.betaFemaleCp() * (1 - decisionMaker.getAttribute( A_IS_MALE )) +
-			params.betaGermanCp() * decisionMaker.getAttribute( A_SPEAKS_GERMAN );
+			params.betaTtCpd() * alternative.getAttribute( ReducedModelConstants.A_TRAVEL_TIME ) +
+			params.betaCost() * alternative.getAttribute( ReducedModelConstants.A_COST ) +
+			params.betaWalkCpd() * alternative.getAttribute( ReducedModelConstants.A_WALKING_TIME ) +
+			params.betaParkCpd() * alternative.getAttribute( ReducedModelConstants.A_PARK_COST ) +
+			params.betaFemaleCp() * (1 - decisionMaker.getAttribute( ReducedModelConstants.A_IS_MALE )) +
+			params.betaGermanCp() * decisionMaker.getAttribute( ReducedModelConstants.A_SPEAKS_GERMAN );
 	}
 
 
@@ -202,7 +191,7 @@ public class ReducedSPModel extends LogitModel {
 					return perspective;
 
 				case DRIVER:
-					double ttEstimate = tripToConsider.getAttribute( A_TRAVEL_TIME );
+					double ttEstimate = tripToConsider.getAttribute( ReducedModelConstants.A_TRAVEL_TIME );
 					ttEstimate += CoordUtils.calcDistance(
 							tripToConsider.getOrigin().getCoord(),
 							perspective.getOrigin().getCoord());
@@ -211,7 +200,7 @@ public class ReducedSPModel extends LogitModel {
 							perspective.getDestination().getCoord());
 
 					Map<String , Object> attrs = new HashMap<String , Object>(perspective.getAttributes());
-					attrs.put( A_TRAVEL_TIME , ttEstimate );
+					attrs.put( ReducedModelConstants.A_TRAVEL_TIME , ttEstimate );
 
 					return new TripRequestImpl(
 							perspective.getMode(),

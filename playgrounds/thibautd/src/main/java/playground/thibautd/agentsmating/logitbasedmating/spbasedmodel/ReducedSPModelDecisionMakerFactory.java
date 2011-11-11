@@ -53,13 +53,13 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedSPModel.A_AGE , agent.getAge() );
-		attributes.put( ReducedSPModel.A_IS_MALE , agent.getSex().matches("m.*") );
+		attributes.put( ReducedModelConstants.A_AGE , agent.getAge() );
+		attributes.put( ReducedModelConstants.A_IS_MALE , agent.getSex().matches("m.*") );
 		// idealy, only General Abonnements should be counted.
 		// but in the population, the only card type available is "unknown"...
-		attributes.put( ReducedSPModel.A_HAS_PT_ABO , hasPtAbo( agent ) );
-		attributes.put( ReducedSPModel.A_SPEAKS_GERMAN , true );
-		attributes.put( ReducedSPModel.A_IS_CAR_ALWAYS_AVAIL , agent.getCarAvail().equals("always") );
+		attributes.put( ReducedModelConstants.A_HAS_PT_ABO , hasPtAbo( agent ) );
+		attributes.put( ReducedModelConstants.A_SPEAKS_GERMAN , true );
+		attributes.put( ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL , agent.getCarAvail().equals("always") );
 
 		return new DecisionMakerImpl( agent.getId() , attributes );
 	}

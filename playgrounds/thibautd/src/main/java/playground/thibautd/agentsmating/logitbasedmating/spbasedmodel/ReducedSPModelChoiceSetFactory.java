@@ -24,14 +24,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
@@ -46,20 +51,35 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  * @author thibautd
  */
 public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
-	private static final double CAR_COST_PER_M = 0; // CHF/m
-	//private static final double SURPLUS_DRIVER = 15 * 60;
-	private static final double SURPLUS_DRIVER = 1;
+	// private static final double CAR_COST_PER_M = 0.06 / 1000; // CHF/m
+	// // consider a driver usually drives 10 minutes more when he picks up a passenger 
+	// private static final double SURPLUS_DRIVER = 10 * 60;
+	// // cost of pt, when GA, Halbtax or nothing
+	// private static final double GA_COST_PER_M = 0.08 / 1000; // 0.08 CHF/km
+	// private static final double HT_COST_PER_M = 0.15 / 1000; // 0.15 CHF/km
+	// private static final double PT_COST_PER_M = 0.28 / 1000; // 0.28 CHF/km
 
 	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 	private final Network network;
+	private final Population population;
+	private final  ReducedModelParametersConfigGroup configGroup;
 
+	// /////////////////////////////////////////////////////////////////////////
+	// constructor
+	// /////////////////////////////////////////////////////////////////////////
 	public ReducedSPModelChoiceSetFactory(
-			final Network network,
+			final ReducedModelParametersConfigGroup configGroup,
+			final Scenario scenario,
 			final SimpleLegTravelTimeEstimatorFactory estimatorFactory) {
+		this.configGroup = configGroup;
 		this.estimatorFactory = estimatorFactory;
-		this.network = network;
+		this.network = scenario.getNetwork();
+		this.population = scenario.getPopulation();
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// interface
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public List<Alternative> createChoiceSet(
 			final DecisionMaker decisionMaker,
@@ -105,7 +125,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		distance = RouteUtils.calcDistance(
 				(NetworkRoute) leg.getRoute(),
 				network);
-		carTravelCost = distance * CAR_COST_PER_M;
+		carTravelCost = distance * configGroup.getCarCostPerM();
 		parkingCost = 0d;
 		walkingTime = 0d;
 		currentAlternative = createCarAlternative(
@@ -125,11 +145,14 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 				origin,
 				destination,
 				leg,
-				true); // modify back leg, to obtain route
+				true);
 		//distance = RouteUtils.calcDistance(
 		//		(NetworkRoute) leg.getRoute(),
 		//		network);
-		ptTravelCost = 0d;
+		distance = CoordUtils.calcDistance(
+				origin.getCoord(),
+				destination.getCoord() );
+		ptTravelCost = distance * getPtTravelCostPerM( decisionMaker );
 		walkingTime = 0d;
 		waitingTime = 0d;
 		currentAlternative = createPtAlternative(
@@ -145,7 +168,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		nonCpAlternatives = Collections.unmodifiableList( nonCpAlternatives );
 		// cpd
 		currentAlternative = createCpdAlternative(
-				carTravelTime + SURPLUS_DRIVER,
+				carTravelTime + configGroup.getSurplusDriver(),
 				carTravelCost / 2d,
 				parkingCost,
 				walkingTime);
@@ -175,6 +198,26 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		return allAlternatives;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// helpers
+	// /////////////////////////////////////////////////////////////////////////
+	private double getPtTravelCostPerM( final DecisionMaker decisionMaker ) {
+		Set<String> travelCards = 
+			((PersonImpl) population.getPersons().get(
+				decisionMaker.getPersonId())).getTravelcards();
+
+		if ( travelCards.contains( ReducedModelConstants.GA_ABO ) ) {
+			return configGroup.getGaCostPerM();
+		}
+		if ( travelCards.contains( ReducedModelConstants.HT_ABO ) ) {
+			return configGroup.getHtCostPerM();
+		}
+		return configGroup.getPtCostPerM();
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// actual creation methods
+	// /////////////////////////////////////////////////////////////////////////
 	private Alternative createCarAlternative(
 			final double travelTime,
 			final double travelCost,
@@ -182,10 +225,10 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			final double walkingTime) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedSPModel.A_TRAVEL_TIME , travelTime );
-		attributes.put( ReducedSPModel.A_COST , travelCost );
-		attributes.put( ReducedSPModel.A_PARK_COST , parkingCost );
-		attributes.put( ReducedSPModel.A_WALKING_TIME , walkingTime );
+		attributes.put( ReducedModelConstants.A_TRAVEL_TIME , travelTime );
+		attributes.put( ReducedModelConstants.A_COST , travelCost );
+		attributes.put( ReducedModelConstants.A_PARK_COST , parkingCost );
+		attributes.put( ReducedModelConstants.A_WALKING_TIME , walkingTime );
 
 		return new AlternativeImpl( TransportMode.car , attributes );
 	}
@@ -196,9 +239,9 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			final double walkingTime) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedSPModel.A_TRAVEL_TIME , travelTime );
-		attributes.put( ReducedSPModel.A_COST , travelCost );
-		attributes.put( ReducedSPModel.A_WALKING_TIME , walkingTime );
+		attributes.put( ReducedModelConstants.A_TRAVEL_TIME , travelTime );
+		attributes.put( ReducedModelConstants.A_COST , travelCost );
+		attributes.put( ReducedModelConstants.A_WALKING_TIME , walkingTime );
 
 		return new AlternativeImpl( TripRequestImpl.PASSENGER_MODE , attributes );
 	}
@@ -210,10 +253,10 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			final double walkingTime) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedSPModel.A_TRAVEL_TIME , travelTime );
-		attributes.put( ReducedSPModel.A_COST , travelCost );
-		attributes.put( ReducedSPModel.A_PARK_COST , parkingCost );
-		attributes.put( ReducedSPModel.A_WALKING_TIME , walkingTime );
+		attributes.put( ReducedModelConstants.A_TRAVEL_TIME , travelTime );
+		attributes.put( ReducedModelConstants.A_COST , travelCost );
+		attributes.put( ReducedModelConstants.A_PARK_COST , parkingCost );
+		attributes.put( ReducedModelConstants.A_WALKING_TIME , walkingTime );
 
 		return new AlternativeImpl( TripRequestImpl.DRIVER_MODE , attributes );
 	}
@@ -226,11 +269,11 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			final int nTransfers) {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedSPModel.A_TRAVEL_TIME , travelTime );
-		attributes.put( ReducedSPModel.A_COST , travelCost );
-		attributes.put( ReducedSPModel.A_WALKING_TIME , walkingTime );
-		attributes.put( ReducedSPModel.A_WAITING_TIME , waitingTime );
-		attributes.put( ReducedSPModel.A_N_TRANSFERS , nTransfers );
+		attributes.put( ReducedModelConstants.A_TRAVEL_TIME , travelTime );
+		attributes.put( ReducedModelConstants.A_COST , travelCost );
+		attributes.put( ReducedModelConstants.A_WALKING_TIME , walkingTime );
+		attributes.put( ReducedModelConstants.A_WAITING_TIME , waitingTime );
+		attributes.put( ReducedModelConstants.A_N_TRANSFERS , nTransfers );
 
 		return new AlternativeImpl( TransportMode.pt , attributes );
 	}
