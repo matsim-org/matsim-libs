@@ -16,8 +16,8 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.sergioo.dataBase.DataBaseAdmin;
-import playground.sergioo.dataBase.NoConnectionException;
+import util.dataBase.DataBaseAdmin;
+import util.dataBase.NoConnectionException;
 
 public class HomeFacilitiesGenerator {
 	

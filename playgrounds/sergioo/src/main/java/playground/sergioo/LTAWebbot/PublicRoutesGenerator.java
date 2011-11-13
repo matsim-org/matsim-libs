@@ -36,8 +36,8 @@ import org.xml.sax.SAXException;
 
 import playground.sergioo.AddressLocator.AddressLocator;
 import playground.sergioo.AddressLocator.BadAddressException;
-import playground.sergioo.dataBase.DataBaseAdmin;
-import playground.sergioo.dataBase.NoConnectionException;
+import util.dataBase.DataBaseAdmin;
+import util.dataBase.NoConnectionException;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;

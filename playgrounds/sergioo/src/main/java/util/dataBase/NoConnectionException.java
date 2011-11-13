@@ -1,4 +1,4 @@
-package playground.sergioo.dataBase;
+package util.dataBase;
 
 /**
  * @author Sergio Ordóñez

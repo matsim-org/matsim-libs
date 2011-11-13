@@ -40,16 +40,16 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.sergioo.dataBase.DataBaseAdmin;
-import playground.sergioo.dataBase.NoConnectionException;
 import util.algebra.MatrixND;
 import util.algebra.MatrixNDImpl;
+import util.dataBase.DataBaseAdmin;
+import util.dataBase.NoConnectionException;
 import util.fitting.FittingControl;
 import util.fitting.FittingData;
 import util.fitting.ProportionFittingControl;
 import util.fitting.TotalFittingControl;
 
-public class WorkFacilitiesFileGenerator {
+public class WorkFacilitiesGenerator {
 
 	//Enumerations
 	private enum URA_PLACE_TYPES {

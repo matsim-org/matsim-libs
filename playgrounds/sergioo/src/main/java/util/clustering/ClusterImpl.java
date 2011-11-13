@@ -42,11 +42,23 @@ public class ClusterImpl<T> implements Cluster<T> {
 	}
 	@Override
 	public PointND<T> getMean() {
+		if(points.iterator().next().getElement(0).getClass().isAssignableFrom(Number.class)) {
+			if(points.size()==0)
+				return null;
+			else {
+					PointND<java.lang.Double> mean = new PointNDImpl.Double(points.iterator().next().getDimension(), 0.0);
+					for(PointND<T> point:points)
+						for(int i=0; i<mean.getDimension(); i++)
+							mean.setElement(i, (java.lang.Double)mean.getElement(i)+(java.lang.Double)point.getElement(i));
+					for(int i=0; i<mean.getDimension(); i++)
+						mean.setElement(i, mean.getElement(i)/points.size());
+					return (PointND<T>) mean;
+			}
+		}
 		return null;
 	}
 	@Override
 	public PointND<T> getMainPoint() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override

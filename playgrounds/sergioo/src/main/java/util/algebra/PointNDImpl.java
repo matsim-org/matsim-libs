@@ -17,7 +17,7 @@ public abstract class PointNDImpl<T> implements PointND<T>{
 		for(int i=0; i<dimension; i++)
 			elements.add(initialElement);
 	}
-	public PointNDImpl (List<T> elements) {
+	public PointNDImpl (T[] elements) {
 		this.elements = new ArrayList<T>();
 		for(T element:elements)
 			this.elements.add(element);
@@ -51,7 +51,7 @@ public abstract class PointNDImpl<T> implements PointND<T>{
 		public Double (int dimension, java.lang.Double initialElement) {
 			super(dimension, initialElement);
 		}
-		public Double (List<java.lang.Double> elements) {
+		public Double (java.lang.Double[] elements) {
 			super(elements);
 		}
 		
@@ -65,7 +65,7 @@ public abstract class PointNDImpl<T> implements PointND<T>{
 		}
 		@Override
 		public PointND<java.lang.Double> clone() {
-			return new PointNDImpl.Double(elements);
+			return new PointNDImpl.Double((java.lang.Double[])elements.toArray());
 		}
 		
 	}
