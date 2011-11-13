@@ -3,10 +3,13 @@ package playground.michalm.vrp.online;
 import java.io.*;
 import java.util.*;
 
+import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.events.*;
 import org.matsim.core.network.*;
 import org.matsim.core.population.*;
@@ -18,22 +21,26 @@ import org.matsim.core.scenario.*;
 import org.matsim.core.trafficmonitoring.*;
 import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.*;
+import org.matsim.run.*;
+import org.matsim.vis.otfvis.*;
 
+import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.cvrp.data.*;
-import pl.poznan.put.vrp.dynamic.customer.*;
+import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.simulator.*;
+import playground.michalm.visualization.*;
 import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.file.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.sparsesp.*;
+import playground.michalm.vrp.demand.*;
 import playground.michalm.vrp.sim.*;
 
 
 public class SingleIterOnlineDVRPLauncher
 {
-    // means: all requests are known a priori (in advance/static)
-    private static boolean STATIC_MODE = false;// default: false
-
     // schedules/routes PNG files, routes SHP files
     private static boolean VRP_OUT_FILES = true;// default: true
 
@@ -42,58 +49,26 @@ public class SingleIterOnlineDVRPLauncher
         throws IOException
     {
         String dirName;
-        String cfgFileName;
-        String vrpDirName;
-        String vrpStaticFileName;
-        String vrpArcTimesFileName;
-        String vrpArcCostsFileName;
-        String vrpArcPathsFileName;
-        String vrpDynamicFileName;
+        String netFileName;
+        String plansFileName;
         String algParamsFileName;
+        boolean oftVis;
+
+        VRP_OUT_FILES = false;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            STATIC_MODE = false;
-            VRP_OUT_FILES = true;
-
-            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-            cfgFileName = dirName + "config-verB.xml";
-            vrpDirName = dirName + "dvrp\\";
-            vrpStaticFileName = "A101.txt";
-            vrpDynamicFileName = "A101_scen.txt";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
-            // cfgFileName = dirName + "config-verB.xml";
-            // vrpDirName = dirName + "dvrp\\";
-            // vrpStaticFileName = "A102.txt";
-            // vrpDynamicFileName = "A102_scen.txt";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-            // cfgFileName = dirName + "config-verB.xml";
-            // vrpDirName = dirName + "dvrp\\";
-            // vrpStaticFileName = "C101.txt";
-            // vrpDynamicFileName = "C101_scen.txt";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-            // cfgFileName = dirName + "config-verB.xml";
-            // vrpDirName = dirName + "dvrp\\";
-            // vrpStaticFileName = "C102.txt";
-            // vrpDynamicFileName = "C102_scen.txt";
-
-            vrpArcTimesFileName = vrpDirName + "arc_times.txt.gz";
-            vrpArcCostsFileName = vrpDirName + "arc_costs.txt.gz";
-            vrpArcPathsFileName = vrpDirName + "arc_paths.txt.gz";
-            algParamsFileName = "algorithm.txt";
+            dirName = "D:\\PP-rad\\taxi\\grid-net\\";
+            netFileName = dirName + "network.xml";
+            plansFileName = dirName + "plans.xml";
+            algParamsFileName = dirName + "algorithm.txt";
+            oftVis = true;
         }
-        else if (args.length == 9) {
+        else if (args.length == 5) {
             dirName = args[0];
-            cfgFileName = dirName + args[1];
-            vrpDirName = dirName + args[2];
-            vrpStaticFileName = args[3];
-            vrpArcTimesFileName = vrpDirName + args[4];
-            vrpArcCostsFileName = vrpDirName + args[5];
-            vrpArcPathsFileName = vrpDirName + args[6];
-            vrpDynamicFileName = args[7];
-            algParamsFileName = args[8];
+            netFileName = dirName + args[1];
+            plansFileName = dirName + args[2];
+            algParamsFileName = dirName + args[3];
+            oftVis = Boolean.parseBoolean(args[4]);
         }
         else {
             throw new IllegalArgumentException("Incorrect program arguments: "
@@ -101,63 +76,68 @@ public class SingleIterOnlineDVRPLauncher
         }
 
         // read MATSim data
-        Config config = ConfigUtils.loadConfig(cfgFileName);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        // Config config = ConfigUtils.loadConfig(cfgFileName);
+        // Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        Config config = ConfigUtils.createConfig();
+
+        Scenario scenario = ScenarioUtils.createScenario(config);
+
+        Network network = scenario.getNetwork();
+        new MatsimNetworkReader(scenario).readFile(netFileName);
+        new MatsimPopulationReader(scenario).readFile(plansFileName);
 
         preparePlansForPersons(scenario);
-        
+
         // init DVRP data
-        AlgorithmParams algParams = new AlgorithmParams(new File(vrpDirName + algParamsFileName));
+        AlgorithmParams algParams = new AlgorithmParams(new File(algParamsFileName));
 
-        VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                new MATSimVertexImpl.Builder(scenario));
-
-        Queue<CustomerAction> caQueue = null;
-
-        if (STATIC_MODE) {
-            caQueue = new PriorityQueue<CustomerAction>(1, CustomerAction.TIME_COMPARATOR);
-        }
-        else {
-            caQueue = LacknerReader.parseDynamicFile(vrpDirName, vrpDynamicFileName, vrpData);
-        }
-
+        VRPData vrpData = DataGenerator.generate(scenario);
         final MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
-        //create VRPDriverPersons and add them to the population
+        // create VRPDriverPersons and add them to the population
         createDriverPersons(scenario, vrpData);
-        
-        //read ShortestPaths from file
-        ShortestPathsFinder spf = new ShortestPathsFinder(data);
-        spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
-        spf.upadateVRPArcTimesAndCosts();
+
+        // read ShortestPaths from file
+        // FullShortestPathsFinder fspf = new FullShortestPathsFinder(data);
+        // fspf.findShortestPaths(new FreeSpeedTravelTimeCalculator(), new DijkstraFactory());
+        // fspf.upadateVRPArcTimesAndCosts();
+        // CHANGE THE ABOVE WITH THE SPARSE (LAZY) SP APPROACH:
+
+        SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
+        sspf.findShortestPaths(new FreeSpeedTravelTimeCalculator(), new DijkstraFactory());
+        sspf.upadateVRPArcTimesAndCosts();
 
         // to have TravelTimeCalculatorWithBuffer instead of TravelTimeCalculator use:
         // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
-        final String vrpOutDirName = vrpDirName + "\\output";
+        final String vrpOutDirName = "\\vrp_output";
         new File(vrpOutDirName).mkdir();
+
+        // QSim config group
+        QSimConfigGroup qSimConfig = new QSimConfigGroup();
+        qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+
+        config.addQSimConfigGroup(qSimConfig);
 
         EventsManager events = EventsUtils.createEventsManager();
         QSim sim = createMobsim(scenario, events, data, algParams, vrpOutDirName);
 
-        //OFTVis visualization
-        // ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler()
-        // .getOutputDirectory());
-        // OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(sim);
-        // sim.addFeature(queueSimulationFeature);
-        // queueSimulationFeature.setVisualizeTeleportedAgents(scenario.getConfig().otfVis()
-        // .isShowTeleportedAgents());
-        // sim.setControlerIO(controlerIO);
-        // sim.setIterationNumber(scenario.getConfig().controler().getLastIteration());
+        if (oftVis) { // OFTVis visualization
+            OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
+                    scenario, sim.getEventsManager(), sim);
+            OTFClientLive.run(scenario.getConfig(), server);
+        }
 
         sim.run();
 
-//        if (VRP_OUT_FILES) {
-//            new Routes2QGIS(data.getVrpData().routes, data, vrpOutDirName + "\\route_").write();
-//        }
+        if (VRP_OUT_FILES) {
+            new Routes2QGIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
+                    .write();
+        }
 
-//        ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-//        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
+        // ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
     }
 
 
@@ -166,32 +146,38 @@ public class SingleIterOnlineDVRPLauncher
     {
         QSim sim = new QSim(sc, eventsManager);
         sim.setAgentFactory(new VRPAgentFactory(sim, data));
-        
+
         VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, algParams);
         data.setVrpSimEngine(vrpSimEngine);
         sim.addMobsimEngine(vrpSimEngine);
-        
-        // The above is slighly confusing: 
+
+        // The above is slighly confusing:
         // (1) The VRPSimEngine adds "VRP" persons to the population (in onPrepareSim) ...
         // (2) ... which are then converted into VRP agents by the agent factory.
-        // One wonders if they really need to be added to the population, and if so, if this is the best way to do this.
+        // One wonders if they really need to be added to the population, and if so, if this is the
+        // best way to do this.
         // kai, jun'11
 
-//        if (VRP_OUT_FILES) {
-//            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
-//                public JFreeChart createChart(VRPData data)
-//                {
-//                    return RouteChartUtils.chartRoutesByStatus(data);
-//                }
-//            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
-//
-//            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
-//                public JFreeChart createChart(VRPData data)
-//                {
-//                    return ScheduleChartUtils.chartSchedule(data);
-//                }
-//            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
-//        }
+        // fixed the bug with creating agent before every iteration (in onPrepareSim())
+        // michal, jun'11
+
+        sim.addDepartureHandler(new TaxiModeDepartureHandler(vrpSimEngine, data));
+
+        if (VRP_OUT_FILES) {
+            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+                public JFreeChart createChart(VRPData data)
+                {
+                    return RouteChartUtils.chartRoutesByStatus(data);
+                }
+            }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
+
+            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+                public JFreeChart createChart(VRPData data)
+                {
+                    return ScheduleChartUtils.chartSchedule(data);
+                }
+            }, OutputType.PNG, vrpOutDirName + "\\schedules_", 1200, 800));
+        }
 
         return sim;
     }
@@ -208,30 +194,34 @@ public class SingleIterOnlineDVRPLauncher
         TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory
                 .createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
 
-        ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
-        
+        ModeRouteFactory routeFactory = ((PopulationFactoryImpl)scenario.getPopulation()
+                .getFactory()).getModeRouteFactory();
+
         final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
                 scenario.getNetwork(), travelCostCalculatorFactory.createTravelCostCalculator(
                         travelTimeCalculator, config.planCalcScore()), travelTimeCalculator,
                 leastCostPathCalculatorFactory, routeFactory);
 
+        routingAlgorithm.addLegHandler("taxi", new NetworkLegRouter(scenario.getNetwork(),
+                routingAlgorithm.getLeastCostPathCalculator(), routingAlgorithm.getRouteFactory()));
+
         ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 1,
                 new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
                     @Override
-										public AbstractPersonAlgorithm getPersonAlgorithm()
+                    public AbstractPersonAlgorithm getPersonAlgorithm()
                     {
                         return new PersonPrepareForSim(routingAlgorithm, network);
                     }
                 });
     }
-    
-    
+
+
     private static void createDriverPersons(Scenario scenario, VRPData vrpData)
     {
         Population population = scenario.getPopulation();
 
         for (Vehicle vrpVeh : vrpData.getVehicles()) {
-            Id personId = scenario.createId("vrpDriver_" + vrpVeh.getId());
+            Id personId = scenario.createId("v" + vrpVeh.getId());
             VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
 
             Plan dummyPlan = new PlanImpl(vrpDriver);
@@ -243,5 +233,4 @@ public class SingleIterOnlineDVRPLauncher
             population.addPerson(vrpDriver);
         }
     }
-
 }

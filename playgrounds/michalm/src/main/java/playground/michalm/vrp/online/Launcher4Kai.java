@@ -7,16 +7,15 @@ public class Launcher4Kai
 {
     public static void main(String[] args) throws IOException
     {
-        String[] arguments = new String[9];
-        arguments[0] = "../../maciejewski/input/test/single_iteration/";
-        arguments[1] = "config-verB.xml";
-        arguments[2] = "dvrp/";
-        arguments[3] = "A101.txt";
-        arguments[4] = "arc_times.txt.gz";
-        arguments[5] = "arc_costs.txt.gz";
-        arguments[6] = "arc_paths.txt.gz";
-        arguments[7] = "A101_scen.txt";
-        arguments[8] = "algorithm.txt";
+        String[] arguments = new String[5];
+        //PATHS
+        arguments[0] = "../../maciejewski/input/test/taxi_single_iteration/grid-net";
+        arguments[1] = "network.xml";
+        arguments[2] = "plans.xml";
+        arguments[3] = "algorithm.txt";//alg config
+        
+        //OFTVis on?
+        arguments[4] = "true";
 
         SingleIterOnlineDVRPLauncher.main(arguments);
     }

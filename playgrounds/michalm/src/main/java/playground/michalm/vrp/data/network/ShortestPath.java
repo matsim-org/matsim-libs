@@ -3,8 +3,17 @@ package playground.michalm.vrp.data.network;
 import org.matsim.api.core.v01.*;
 
 
-public class ShortestPath
+public interface ShortestPath
 {
+    //optimization
+    public static final SPEntry ZERO_PATH_ENTRY = new SPEntry(0, 0, new Id[0]);
+    
+    
+    // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
+    // by default: true (toLinks are included)
+    public final static boolean INCLUDE_TO_LINK = true;
+
+
     public static class SPEntry
     {
         public final int travelTime;
@@ -20,60 +29,6 @@ public class ShortestPath
         }
     }
 
-//    public static final ShortestPath NO_SHORTEST_PATH = new ShortestPath(0, 0, false);
 
-    private int timeInterval;
-    private int intervalCoutn;
-    private boolean cyclic;
-
-    SPEntry entries[];
-
-
-    public ShortestPath(int numIntervals, int timeInterval, boolean cyclic)
-    {
-        this.timeInterval = timeInterval;
-        this.intervalCoutn = numIntervals;
-        this.cyclic = cyclic;
-
-        entries = new SPEntry[numIntervals];
-    }
-
-
-    // public void setPath(int departTime, Path path, double toLinkTravelTime)
-    // {
-    // int idx = departTime / timeInterval;
-    // paths[idx] = path;
-    // travelTimes[idx] = (int) (path.travelTime + toLinkTravelTime);
-    // }
-    //
-
-    private int getIdx(int departTime)
-    {
-        int idx = (departTime / timeInterval);
-        return cyclic ? (idx % intervalCoutn) : idx;
-    }
-
-
-    public SPEntry getSPEntry(int departTime)
-    {
-        return entries[getIdx(departTime)];
-    }
-
-
-    public int getIntervalCount()
-    {
-        return intervalCoutn;
-    }
-
-
-    public int getTimeInterval()
-    {
-        return timeInterval;
-    }
-
-
-    public boolean isCyclic()
-    {
-        return cyclic;
-    }
+    SPEntry getSPEntry(int departTime);
 }

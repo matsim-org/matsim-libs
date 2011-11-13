@@ -7,7 +7,8 @@ import org.matsim.ptproject.qsim.interfaces.*;
 
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.supply.*;
-import playground.mzilske.withinday.*;
+import playground.michalm.withinday.*;
+import playground.michalm.withinday.*;
 
 
 public class VRPAgentFactory
@@ -33,7 +34,7 @@ public class VRPAgentFactory
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
 
             RealAgent vrpAgent = new LightweightVRPVehicleAgent(
-                    driverPerson.getVrpVehicle(), data.getShortestPaths());
+                    driverPerson.getVrpVehicle(), data.getVrpGraph().getShortestPaths(), netsim);
             
             AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), netsim, vrpAgent);
             netsim.addQueueSimulationListeners(adapterAgent);

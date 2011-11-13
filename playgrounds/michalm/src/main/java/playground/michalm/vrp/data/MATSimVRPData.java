@@ -13,8 +13,6 @@ public class MATSimVRPData
     private VRPData vrpData;
     private Scenario scenario;
 
-    private ShortestPath[][] shortestPaths;
-
     private VRPSimEngine vrpSimEngine;
 
     private String coordSystem;
@@ -46,19 +44,6 @@ public class MATSimVRPData
     }
 
 
-    // TODO This should go into DVRPGraph
-    public ShortestPath[][] getShortestPaths()
-    {
-        return shortestPaths;
-    }
-
-
-    public void setShortestPaths(ShortestPath[][] sPaths)
-    {
-        this.shortestPaths = sPaths;
-    }
-
-
     public String getCoordSystem()
     {
         return coordSystem;
@@ -74,5 +59,11 @@ public class MATSimVRPData
     public VRPSimEngine getVrpSimEngine()
     {
         return vrpSimEngine;
+    }
+    
+    
+    public MATSimVRPGraph getVrpGraph()
+    {
+        return (MATSimVRPGraph)vrpData.getVrpGraph();
     }
 }

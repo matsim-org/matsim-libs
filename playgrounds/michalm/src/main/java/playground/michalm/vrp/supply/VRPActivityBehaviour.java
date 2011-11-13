@@ -1,6 +1,6 @@
 package playground.michalm.vrp.supply;
 
-import playground.mzilske.withinday.*;
+import playground.michalm.withinday.*;
 
 
 abstract class VRPActivityBehaviour
@@ -20,17 +20,11 @@ abstract class VRPActivityBehaviour
     {
         if (world.getTime() >= getEndTime()) {
             world.stopActivity();
-            onFinish(world);
         }
     }
 
 
     abstract double getEndTime();
-
-
-    // just for overriding
-    void onFinish(ActivityWorld world)
-    {}
 
 
     @Override

@@ -5,6 +5,7 @@ import java.util.*;
 
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.fullsp.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.controler.*;
@@ -71,11 +72,11 @@ public class SimLauncherWithArcEstimator
 
         Scenario scenario = controler.getScenario();
         VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                new MATSimVertexImpl.Builder(scenario));
+                MATSimVertexImpl.createFromXYBuilder(scenario));
         MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
-        ShortestPathsFinder spf = new ShortestPathsFinder(data);
-        spf.findShortestPaths(controler);
+        FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
+        spf.findShortestPaths(controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
         spf.writeShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
     }
 }

@@ -20,7 +20,7 @@ import com.vividsolutions.jts.geom.*;
 
 public class Routes2QGIS
 {
-    private List<Schedule> schedules;
+    private List<Vehicle> vehicles;
     private String filename;
     private FeatureType featureType;
     private GeometryFactory geofac;
@@ -28,9 +28,9 @@ public class Routes2QGIS
     private Collection<Feature> features;
 
 
-    public Routes2QGIS(List<Schedule> schedules, MATSimVRPData data, String filename)
+    public Routes2QGIS(List<Vehicle> vehicles, MATSimVRPData data, String filename)
     {
-        this.schedules = schedules;
+        this.vehicles = vehicles;
         this.data = data;
         this.filename = filename;
 
@@ -41,8 +41,8 @@ public class Routes2QGIS
 
     public void write()
     {
-        for (Schedule s : schedules) {
-            Iterator<DriveTask> driveIter = Schedules.createDriveTaskIter(s);
+        for (Vehicle v : vehicles) {
+            Iterator<DriveTask> driveIter = Schedules.createDriveTaskIter(v.getSchedule());
 
             if (!driveIter.hasNext()) {
                 continue;
@@ -56,9 +56,8 @@ public class Routes2QGIS
 
                 if (ls != null) {
                     try {
-                        Vehicle veh = s.getVehicle();
-                        features.add(featureType.create(new Object[] { ls, veh.getId(), veh.getName(),
-                                s.getId(), drive.getScheduleIdx() }));
+                        features.add(featureType.create(new Object[] { ls, v.getId(), v.getName(),
+                                v.getId(), drive.getScheduleIdx() }));
                     }
                     catch (IllegalAttributeException e) {
                         e.printStackTrace();
@@ -66,14 +65,14 @@ public class Routes2QGIS
                 }
             }
 
-            ShapeFileWriter.writeGeometries(features, filename + s.getId() + ".shp");
+            ShapeFileWriter.writeGeometries(features, filename + v.getId() + ".shp");
         }
     }
 
 
     private LineString createLineString(DriveTask driveTask)
     {
-        SPEntry entry = data.getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
+        SPEntry entry = data.getVrpGraph().getShortestPaths()[driveTask.getFromVertex().getId()][driveTask
                 .getToVertex().getId()].getSPEntry(driveTask.getBeginTime());
 
         Id[] ids = entry.linkIds;

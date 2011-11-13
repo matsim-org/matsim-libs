@@ -74,19 +74,67 @@ public class MATSimVertexImpl
     }
 
 
-    public static class Builder
+    public static MATSimVertexBuilder createFromLinkIdBuilder(Network network)
+    {
+        return new MATSimVertexFromLinkIdBuilder(network);
+    }
+
+
+    public static VertexBuilder createFromXYBuilder(Scenario scenario)
+    {
+        return new MATSimVertexFromXYBuilder(scenario);
+    }
+
+
+    private static class MATSimVertexFromLinkIdBuilder
+        implements MATSimVertexBuilder
+    {
+        private static int ID = -1;
+
+        private Network network;
+
+        private Id linkId;
+
+
+        private MATSimVertexFromLinkIdBuilder(Network network)
+        {
+            this.network = network;
+        }
+
+
+        @Override
+        public MATSimVertexBuilder setLinkId(Id linkId)
+        {
+            this.linkId = linkId;
+            return this;
+        }
+
+
+        @Override
+        public MATSimVertex build()
+        {
+            ID++;
+            Link link = network.getLinks().get(linkId);
+
+            return new MATSimVertexImpl(ID, linkId.toString(), link.getCoord(), link);
+        }
+    }
+
+
+    private static class MATSimVertexFromXYBuilder
         implements VertexBuilder
     {
+        private static int ID = -1;
+
         private Scenario scenario;
         private NetworkImpl network;
 
-        private int id;
         private String name;
         private double x;
         private double y;
 
 
-        public Builder(Scenario scenario)
+        private MATSimVertexFromXYBuilder(Scenario scenario)
         {
             this.scenario = scenario;
             network = (NetworkImpl)scenario.getNetwork();
@@ -94,44 +142,42 @@ public class MATSimVertexImpl
 
 
         @Override
-        public void setId(int id)
-        {
-            this.id = id;
-        }
-
-
-        @Override
-        public void setName(String name)
+        public VertexBuilder setName(String name)
         {
             this.name = name;
+            return this;
         }
 
 
         @Override
-        public void setX(double x)
+        public VertexBuilder setX(double x)
         {
             this.x = x;
+            return this;
         }
 
 
         @Override
-        public void setY(double y)
+        public VertexBuilder setY(double y)
         {
             this.y = y;
+            return this;
         }
 
 
         @Override
-        public Vertex build()
+        public MATSimVertex build()
         {
+            ID++;
+
             Coord coord = scenario.createCoord(x, y);
             Link link = network.getNearestLink(coord);
 
             if (name == null) {
-                name = Integer.toString(id);
+                return new MATSimVertexImpl(ID++, Integer.toString(ID), coord, link);
             }
 
-            return new MATSimVertexImpl(id, name, coord, link);
+            return new MATSimVertexImpl(ID, name, coord, link);
         }
     }
 }

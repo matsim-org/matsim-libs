@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
-import playground.mzilske.withinday.*;
+import playground.michalm.withinday.*;
 
 import com.google.common.collect.*;
 
@@ -19,7 +19,7 @@ class VRPDrivingBehaviour
     private Iterator<Id> linkIdIter;
 
 
-    private VRPDrivingBehaviour(DriveTask driveTask, SPEntry entry)
+    public VRPDrivingBehaviour(DriveTask driveTask, SPEntry entry)
     {
         this.driveTask = driveTask;
         this.linkIdIter = Iterators.forArray(entry.linkIds);
@@ -36,25 +36,21 @@ class VRPDrivingBehaviour
             }
             else {
                 drivingWorld.park();
-                onFinish(drivingWorld);
             }
         }
     }
 
-
-    void onFinish(DrivingWorld world)
+    
+    @Override
+    public void drivingEnded(DrivingWorld drivingWorld)
     {
         // compare actual vs. planned arrival time:
-        int actualArrivalTime = (int)world.getTime();// I assume this is the current time!XXX
+        int actualArrivalTime = (int)drivingWorld.getTime();// I assume this is the current time!XXX
         int plannedArrivalTime = driveTask.getEndTime();
         int timeDiff = actualArrivalTime - plannedArrivalTime;
 
         // TODO if ANY difference in time - update vrpData; "Scheduler" would be very useful here
         // XXX [VRPSimEngine/Optimizer should be responsible for this]
-
-        // TODO update the agent's current Leg, i.e. travelTime, arrivalTime
-        // XXX [is it really necessary? I think - NOT! (at least not now...)] - ask MATSim
-        // developers!
 
         // if the difference is significant - consider reoptimization
         // BUT: reoptimization can be only done after each time step in VRPSimEngine

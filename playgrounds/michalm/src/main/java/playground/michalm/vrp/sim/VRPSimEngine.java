@@ -14,30 +14,26 @@ import playground.michalm.vrp.data.*;
 
 
 public class VRPSimEngine
-    implements MobsimEngine, Monitoring
+    implements MobsimEngine
 {
     private Netsim netsim;
 
-    private MATSimVRPData data;
     private VRPData vrpData;
 
     private AlgorithmParams algParams;
     private VRPOptimizer optimizer;
-
-    private SimulatedCustomerService customerService;// temporary solution
 
     private static final int MAX_TIME_DIFFERENCE = 180; // in seconds
     private boolean supplyChanged;// set to FALSE before each simStep
     private boolean demandChanged;
 
     // private VRPVehicleAgentMonitoring vrpVehAgentMonitoring;
-    private List<MonitoringListener> monitoringListeners = new ArrayList<MonitoringListener>();
+    private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
 
     public VRPSimEngine(Netsim netsim, MATSimVRPData data, AlgorithmParams algParams)
     {
         this.netsim = netsim;
-        this.data = data;
         this.algParams = algParams;
 
         vrpData = data.getVrpData();
@@ -54,12 +50,16 @@ public class VRPSimEngine
     @Override
     public void onPrepareSim()
     {
-        // vrpVehAgentMonitoring = new VRPVehicleAgentMonitoring(netsim.getEventsManager(),
-        // data.getIdToVehAgent(), this);
+        // Reset schedules
+        for (Vehicle v : vrpData.getVehicles()) {
+            v.resetSchedule();
+        }
 
-        customerService = new SimulatedCustomerService(vrpData);
+        // remove all existing requests
+        vrpData.getRequests().clear();
 
         optimizer = new VRPOptimizer(algParams);
+
         optimize();
     }
 
@@ -80,10 +80,12 @@ public class VRPSimEngine
     }
 
 
-    private boolean doDemandSimStep(double time)
+    public void taxiRequestSubmitted(Request request)
     {
-        // temporary
-        return customerService.updateData(vrpData);
+        System.err.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.err.println(request);
+        System.err.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        demandChanged = true;
     }
 
 
@@ -93,16 +95,15 @@ public class VRPSimEngine
     @Override
     public void doSimStep(double time)
     {
-        demandChanged = false;
-        supplyChanged = false;
-
-        demandChanged = doDemandSimStep(time);// customer side
-
         vrpData.setTime((int)time + 1);// optimize for the next time step
 
         if (demandChanged || supplyChanged) {// reoptimize
             optimize();
+            notifyOptimizerListeners(new OptimizerEvent((int)time, vrpData));
         }
+
+        demandChanged = false;
+        supplyChanged = false;
     }
 
 
@@ -122,23 +123,23 @@ public class VRPSimEngine
     }
 
 
-    void notifyMonitoringListeners(MonitoringEvent event)
+    private void notifyOptimizerListeners(OptimizerEvent event)
     {
-        for (MonitoringListener l : monitoringListeners) {
-            l.eventOccured(event);
+        for (OptimizerListener l : optimizerListeners) {
+            l.optimizationPerformed(event);
         }
     }
 
 
-    public void addListener(MonitoringListener listener)
+    public void addListener(OptimizerListener listener)
     {
-        monitoringListeners.add(listener);
+        optimizerListeners.add(listener);
     }
 
 
-    public void removeListener(MonitoringListener listener)
+    public void removeListener(OptimizerListener listener)
     {
-        monitoringListeners.remove(listener);
+        optimizerListeners.remove(listener);
     }
 
 }

@@ -5,11 +5,11 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.network.*;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.*;
 import org.matsim.core.utils.misc.*;
 
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
@@ -21,36 +21,30 @@ public class VRPSchedulePlan
 {
     private PopulationFactory populFactory;
     private Network network;
-    private NetworkFactoryImpl networkFactory;
     private ShortestPath[][] shortestPaths;
 
-    private Schedule schedule;
+    private Vehicle vehicle;
 
 
-    public VRPSchedulePlan(Person driver, Schedule schedule, MATSimVRPData data)
+    public VRPSchedulePlan(Person driver, Vehicle vehicle, MATSimVRPData data)
     {
         super(driver);
-        this.schedule = schedule;
+        this.vehicle = vehicle;
 
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
-        networkFactory = (NetworkFactoryImpl)network.getFactory();
-        shortestPaths = data.getShortestPaths();
+        shortestPaths = data.getVrpGraph().getShortestPaths();
 
         init();
     }
 
 
-    public Schedule getSchedule()
-    {
-        return schedule;
-    }
-
-
     private void init()
     {
-        MATSimVertex depotVertex = (MATSimVertex)schedule.getVehicle().getDepot().getVertex();
+        MATSimVertex depotVertex = (MATSimVertex)vehicle.getDepot().getVertex();
 
+        Schedule schedule = vehicle.getSchedule();
+        
         if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
             addActivity(depotVertex, -1, "RtU");
             return;
@@ -133,13 +127,6 @@ public class VRPSchedulePlan
         ((LegImpl)leg).setArrivalTime(arrivalTime);
 
         addLeg(leg);
-    }
-
-
-    // it is posssible only to update the future elements of the plan
-    public void updatePlan()
-    {
-
     }
 
 

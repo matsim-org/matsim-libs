@@ -15,16 +15,15 @@ import org.matsim.core.scenario.*;
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
-import pl.poznan.put.vrp.dynamic.customer.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.visualization.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.fullsp.*;
 import playground.michalm.vrp.supply.*;
 
 
@@ -115,20 +114,15 @@ public class OfflineDVRPLauncher
         // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
         VRPData vrpData = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                new MATSimVertexImpl.Builder(scenario));
+                MATSimVertexImpl.createFromXYBuilder(scenario));
 
-        Queue<CustomerAction> caQueue = null;
-
-        if (STATIC_MODE) {
-            caQueue = new PriorityQueue<CustomerAction>(1, CustomerAction.TIME_COMPARATOR);
-        }
-        else {
-            caQueue = LacknerReader.parseDynamicFile(vrpDirName, vrpDynamicFileName, vrpData);
+        if (!STATIC_MODE) {
+            LacknerReader.parseDynamicFile(vrpDirName, vrpDynamicFileName, vrpData);
         }
 
         MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
-        ShortestPathsFinder spf = new ShortestPathsFinder(data);
+        FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
 
         if (VRP_OUT_FILES) {
             spf.readShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
@@ -159,8 +153,7 @@ public class OfflineDVRPLauncher
         // ================================================== ABOVE: only for comparison reasons...
 
         // now can run the optimizer or simulated optimizer...
-        Simulator simulator = new Simulator(vrpData, vrpDirName, algParamsFileName, caQueue,
-                24 * 60 * 60);
+        Simulator simulator = new Simulator(vrpData, vrpDirName, algParamsFileName, 24 * 60 * 60);
 
         // simulator.addListener(new ConsoleSimulationListener());
 
@@ -168,14 +161,14 @@ public class OfflineDVRPLauncher
         new File(vrpOutDirName).mkdir();
 
         if (VRP_OUT_FILES) {
-            simulator.addListener(new ChartFileSimulationListener(new ChartCreator() {
+            simulator.addOptimizerListener(new ChartFileSimulationListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
-            simulator.addListener(new ChartFileSimulationListener(new ChartCreator() {
+            simulator.addOptimizerListener(new ChartFileSimulationListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
@@ -186,21 +179,22 @@ public class OfflineDVRPLauncher
         simulator.simulate();
 
         if (VRP_OUT_FILES) {
-            List<Schedule> schedules = data.getVrpData().getSchedules();
-            
-            new Routes2QGIS(schedules, data, vrpOutDirName + "\\route_").write();
+            List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
-            //PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName + );
+            new Routes2QGIS(vehicles, data, vrpOutDirName + "\\route_").write();
+
+            // PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName +
+            // );
 
             Population popul = scenario.getPopulation();
             PopulationFactory pf = popul.getFactory();
 
             // generate output plans (plans.xml)
-            for (Schedule s : schedules) {
-                Person person = pf.createPerson(scenario.createId("vrpDriver_" + s.getId()));
+            for (Vehicle v : vehicles) {
+                Person person = pf.createPerson(scenario.createId("vrpDriver_" + v.getId()));
 
                 VRPSchedulePlan plan = new VRPSchedulePlan(new PersonImpl(scenario.createId(Integer
-                        .toString(s.getId()))), s, data);
+                        .toString(v.getId()))), v, data);
 
                 person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);
@@ -233,10 +227,8 @@ public class OfflineDVRPLauncher
         // ================================================== ABOVE: only for comparison reasons...
 
         // TODO fix bug in Link Time Estimations ??
-        
+
         // ======combine population with vrpDrivers...
-        
-        
 
     }
 }

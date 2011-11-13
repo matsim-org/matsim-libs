@@ -1,45 +1,48 @@
 package playground.michalm.vrp.supply;
 
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 
 
 class ScheduleActivityBehaviour
     extends VRPActivityBehaviour
 {
-    private Schedule schedule;
+    private Vehicle vehicle;
 
 
-    private ScheduleActivityBehaviour(String activityType, Schedule schedule)
+    private ScheduleActivityBehaviour(String activityType, Vehicle vehicle)
     {
         super(activityType);
-        this.schedule = schedule;
+        this.vehicle = vehicle;
     }
 
 
     @Override
     double getEndTime()
     {
-        switch (schedule.getStatus()) {
+        Schedule s = vehicle.getSchedule();
+
+        switch (s.getStatus()) {
             case PLANNED:
-                return schedule.getBeginTime() - 1;
+                return s.getBeginTime() - 1;
             case UNPLANNED: // before schedule
-                return schedule.getVehicle().getT1();
+                return vehicle.getT1();
             case COMPLETED: // after schedule
-                return schedule.getBeginTime();//without "-1"
+                return s.getBeginTime();// without "-1"
             default:
                 throw new IllegalStateException();
         }
     }
 
 
-    static ScheduleActivityBehaviour createWaitingBeforeSchedule(final Schedule schedule)
+    static ScheduleActivityBehaviour createWaitingBeforeSchedule(final Vehicle vehicle)
     {
-        return new ScheduleActivityBehaviour("Before_" + schedule.getId(), schedule);
+        return new ScheduleActivityBehaviour("Before_" + vehicle.getId(), vehicle);
     }
 
 
-    static ScheduleActivityBehaviour createWaitingAfterSchedule(final Schedule schedule)
+    static ScheduleActivityBehaviour createWaitingAfterSchedule(final Vehicle vehicle)
     {
-        return new ScheduleActivityBehaviour("After_" + schedule.getId(), schedule);
+        return new ScheduleActivityBehaviour("After_" + vehicle.getId(), vehicle);
     }
 }

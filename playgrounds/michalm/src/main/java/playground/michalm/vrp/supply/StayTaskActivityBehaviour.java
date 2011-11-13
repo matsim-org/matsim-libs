@@ -9,7 +9,7 @@ class StayTaskActivityBehaviour
     private StayTask stayTask;
 
 
-    private StayTaskActivityBehaviour(String activityType, StayTask stayTask)
+    StayTaskActivityBehaviour(String activityType, StayTask stayTask)
     {
         super(activityType);
         this.stayTask = stayTask;

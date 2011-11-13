@@ -106,7 +106,7 @@ public class Localizables2QGIS<T extends Localizable>
         }
 
         VRPData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                new VertexImpl.Builder());
+                VertexImpl.getBuilder());
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 
         new Localizables2QGIS<Customer>(data.getCustomers(), outFileNameCust, coordSystem).write();
