@@ -111,7 +111,7 @@ public class SingleIterOnlineDVRPLauncher
         // to have TravelTimeCalculatorWithBuffer instead of TravelTimeCalculator use:
         // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 
-        final String vrpOutDirName = "\\vrp_output";
+        final String vrpOutDirName = dirName + "\\vrp_output";
         new File(vrpOutDirName).mkdir();
 
         // QSim config group
