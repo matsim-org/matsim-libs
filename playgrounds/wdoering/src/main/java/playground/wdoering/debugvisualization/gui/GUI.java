@@ -47,7 +47,7 @@ public class GUI extends JFrame {
 		
 		//get toolbar and renderer (processing applet)
 		guiToolbar = new GUIToolbar(controller);
-		renderer = new P3DRenderer(controller, traceTimeRange, width, height, visualizationMode);
+		renderer = new P3DRenderer(controller, traceTimeRange, width, (int)(height), visualizationMode);
 		guiInfo = new GUIInfo(controller);
 		
 		//guiInfo.disableUpdate(true);

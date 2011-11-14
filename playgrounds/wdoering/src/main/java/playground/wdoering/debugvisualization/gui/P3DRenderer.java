@@ -77,6 +77,14 @@ public class P3DRenderer extends PApplet
 
 	private ArrayList<int[]> colors;
 	private Controller controller;
+	private long oldTime;
+	private boolean mouseDragged;
+	private Point mouseDragBeginPosition = new Point(0,0);
+	
+	private Point panOffset = new Point(0,0);
+	private Point offset = new Point(0,0);
+	
+	private float zoomFactor = 10;
 	
 	
 
@@ -427,11 +435,16 @@ public class P3DRenderer extends PApplet
 
 	//not implemented yet
 	PImage b = loadImage("http://upload.wikimedia.org/wikipedia/commons/thumb/1/10/LaBelle_Blueprint.jpg/250px-LaBelle_Blueprint.jpg");
-	private long oldTime;
 
 	@Override
 	public void setup()
 	{
+		
+		 addMouseWheelListener(new java.awt.event.MouseWheelListener() { 
+			    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) { 
+			      mouseWheel(evt.getWheelRotation());
+			  }}); 		
+		
 		size(this.width, this.height, P3D);
 		frameRate(60);
 
@@ -450,19 +463,68 @@ public class P3DRenderer extends PApplet
 
 
 	}
+	
+	void mouseWheel(int delta)
+	{
+		
+		  if (delta>0)
+		  {
+			  if (zoomFactor>10)
+				  zoomFactor+=0.5f;
+			  else
+				  zoomFactor+=0.5f;
+			  
+			  
+		  }
+		  else
+		  {
+			  if (zoomFactor<=10)
+				  zoomFactor-=0.5f;
+			  else
+				  zoomFactor-=0.5f;
+		  }
+		  
+		  //offset.x = (int)(offset.x + (mouseX-width/2) * (zoomFactor/10.02f));
+		 // offset.y = (int)(offset.y + (mouseY-height/2) * (zoomFactor/10.02f));
+			  
+			  
+	}	
+	
+	@Override
+	public void mouseDragged()
+	{
+		if (!this.mouseDragged)
+		{
+			this.mouseDragBeginPosition = new Point(mouseX, mouseY);
+			this.mouseDragged = true;
+		}
+	}
 
 	@Override
 	public void mousePressed()
 	{
 		if(!this.mousePressed)
 			this.mousePressed = true;
+		
 	}
 
 	@Override
 	public void mouseReleased()
 	{
 		this.mousePressed = false;
+		this.mouseDragged = false;
+		
+		if ((panOffset.x!=0) || (panOffset.y!=0))
+		{
+				offset.x = panOffset.x = offset.x + mouseX - mouseDragBeginPosition.x;
+				offset.y = panOffset.y = offset.y + mouseY - mouseDragBeginPosition.y;
+				//offset.y = panOffset.y;
+				panOffset.x = panOffset.y = 0;
+		}
+		
 	}
+	
+	
 
 	/**
 	 * draw function. calculating proportions.
@@ -474,6 +536,22 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		
+		if (mouseDragged)
+		{
+			if ((mouseDragBeginPosition.x!=0) && (mouseDragBeginPosition.x!=0))
+			{
+				panOffset.x = mouseX - mouseDragBeginPosition.x;
+				panOffset.y = mouseY - mouseDragBeginPosition.y;
+				
+			}
+		}
+//		else
+//		{
+//			mouseDragBeginPosition = panOffset;			
+//		}
+		
+		
+		
 		if (currentFrame<Integer.MAX_VALUE)
 			currentFrame++;
 		else
@@ -483,6 +561,10 @@ public class P3DRenderer extends PApplet
 		double timeMeas = System.currentTimeMillis();
 		background(33);
 		fill(0, 0, 0);
+		
+		
+		
+		
 		
 		//visualization.draw();
 		
@@ -506,10 +588,10 @@ public class P3DRenderer extends PApplet
 				DataPoint ToDataPoint = this.nodes.get(fromTo[1]);
 
 				//draw a line (from - to - datapoint)
-				line((float)((fromDataPoint.getPosX()-this.minPosX)/this.factorX),
-						(float)((fromDataPoint.getPosY()-this.minPosY)/this.factorY),
-						(float)((ToDataPoint.getPosX()-this.minPosX)/this.factorX),
-						(float)((ToDataPoint.getPosY()-this.minPosY)/this.factorY));
+				line((float)((fromDataPoint.getPosX()-this.minPosX)/this.factorX*(this.zoomFactor/10f))+panOffset.x+offset.x,
+						(float)(height-((fromDataPoint.getPosY()-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y,
+						(float)((ToDataPoint.getPosX()-this.minPosX)/this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x,
+						(float)(height-((ToDataPoint.getPosY()-this.minPosY))/this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y);
 
 
 			}
@@ -632,10 +714,10 @@ public class P3DRenderer extends PApplet
 										this.console.println("@@@ fX:"+ this.factorX);
 
 										//draw line
-										line((float)((currentDataPoint.getPosX() - this.minPosX) / this.factorX),
-												(float)((currentDataPoint.getPosY() - this.minPosY) / this.factorY),
-												(float)((nextDataPoint.getPosX()    - this.minPosX) / this.factorX),
-												(float)((nextDataPoint.getPosY()    - this.minPosY) / this.factorY));
+										line((float)(((currentDataPoint.getPosX() - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
+												(float)((height-(currentDataPoint.getPosY() - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y),
+												(float)(((nextDataPoint.getPosX()    - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
+												(float)((height-(nextDataPoint.getPosY()    - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y));
 									}
 
 								}
@@ -657,9 +739,12 @@ public class P3DRenderer extends PApplet
 							if (lastDataPoint != null)
 							{
 								//draw agent
-
-								float posX = (float)((lastDataPoint.getPosX()-this.minPosX) / this.factorX);
-								float posY = (float)((lastDataPoint.getPosY()-this.minPosY) / this.factorY);
+								
+								//calculate relative position
+								float posX = (float)((lastDataPoint.getPosX()-this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x;
+								float posY = (float)(this.height-(((lastDataPoint.getPosY())-this.minPosY)) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y;
+								
+								
 								this.console.println("********* MINPOS X: "+ this.minPosX +" | FACT X: " + this.factorX + "***************");
 								this.console.println("********* MINPOS Y: "+ this.minPosY +" | FACT Y: " + this.factorY + "***************");
 								this.console.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
@@ -860,8 +945,8 @@ public class P3DRenderer extends PApplet
 		
 		avgRenderingTime += timeMeasDiff;
 		
-		if (mousePressed)
-			System.out.println("rendering time: " + (avgRenderingTime/currentFrame));
+//		if (mousePressed)
+//			System.out.println("rendering time: " + (avgRenderingTime/currentFrame));
 
 
 	}

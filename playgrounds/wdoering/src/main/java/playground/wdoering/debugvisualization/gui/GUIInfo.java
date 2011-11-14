@@ -36,7 +36,7 @@ public class GUIInfo extends JPanel {
 	private HashMap<String, Agent> agents;
 	private JPanel agentList = new JPanel(new GridLayout());
 	private JTable agentTable;
-	private String[] columnNames = { "ID", "X", "Y", "Vx", "Vy" };
+	private String[] columnNames = { "ID", "X", "Y", "Vx", "Vy", "V" };
 
 	private HashMap<String, Object[]> displayedAgents;
 	private boolean updateData = true;
@@ -86,7 +86,8 @@ public class GUIInfo extends JPanel {
 	}
 
 	public void updateView(LinkedList<Double> timeSteps,
-			HashMap<String, Agent> agents) {
+			HashMap<String, Agent> agents)
+	{
 		
 		if (updateData)
 		{
@@ -94,19 +95,24 @@ public class GUIInfo extends JPanel {
 			// update values
 			this.timeSteps = timeSteps;
 			this.agents = agents;
-			Iterator agentsIterator = agents.entrySet().iterator();
 			// While there are still agents in the agents array
 	
 			ArrayList<JPanel> agentPanels = new ArrayList<JPanel>();
 	
-			if ((agents != null) && (agents.size() > 0)) {
+			if ((agents != null) && (agents.size() > 0))
+			{
+				Iterator agentsIterator = agents.entrySet().iterator();
 	
 				String agentIDs = "";
 	
 				//tableModel = new DefaultTableModel(columnNames, 1);
+				
+				ArrayList<String> updateData = new ArrayList<String>();
 	
-				while (agentsIterator.hasNext()) {
+				while (agentsIterator.hasNext())
+				{
 	
+					
 					Map.Entry pairs = null;
 					// Get current agent
 					pairs = (Map.Entry) agentsIterator.next();
@@ -117,17 +123,47 @@ public class GUIInfo extends JPanel {
 					XYVxVyDataPoint dataPoint = (XYVxVyDataPoint) currentAgent
 							.getDataPoint(timeSteps.getLast());
 	
-					if (dataPoint != null) {
+					if (dataPoint != null)
+					{
+						
+						String posX = String.valueOf((Math.round(dataPoint.getPosX()*100d)/100d));
+						String posY = String.valueOf((Math.round(dataPoint.getPosY()*100d)/100d));
+						String vX = String.valueOf((Math.round(dataPoint.getvX()*100d)/100d));
+						String vY = String.valueOf((Math.round(dataPoint.getvY()*100d)/100d));
+						String v = String.valueOf((Math.round(Math.sqrt((dataPoint.getvY()
+								                                        *dataPoint.getvY())
+								                                        +(dataPoint.getvX()
+										                                 *dataPoint.getvX()))
+										                                 * 100d) / 100d));
 	
-						Object rowData[] = { currentAgentID,
-								dataPoint.getPosX().toString().substring(0, 7),
-								dataPoint.getPosY().toString().substring(0, 7),
-								dataPoint.getvX().toString().substring(0, 5),
-								dataPoint.getvY().toString().substring(0, 5) };
+						Object rowData[] = { currentAgentID, posX, posY, vX, vY, v};
+						
+						/*
+						Object displayedAgent[] = displayedAgents.get(currentAgentID);
+						
+						if (displayedAgent != null)
+						{
+							for (int j = 0; j < displayedAgent.length; j++)
+							{
+								if (rowData[j] != displayedAgent[j])
+								{
+									updateData.add(currentAgentID);
+									j = displayedAgent.length;
+								}
+							}
+							
+						}
+						else
+						{
+							//updateData.add(e)
+						}
 	
+						*/
 						displayedAgents.put(currentAgentID, rowData);
+						
 	
 					}
+				}
 	
 					/*
 					 * 
@@ -143,12 +179,12 @@ public class GUIInfo extends JPanel {
 					 * agentPanels.add(agentPanel);
 					 */
 	
-				}
+				
 	
 				Iterator displayedDataIterator = displayedAgents.entrySet()
 						.iterator();
 	
-				Object[][] data = new Object[displayedAgents.size()][5];
+				Object[][] data = new Object[displayedAgents.size()][7];
 				
 				int i = 0;
 				while (displayedDataIterator.hasNext())
@@ -159,7 +195,24 @@ public class GUIInfo extends JPanel {
 					for (int j = 0; j < rowData.length; j++)
 						data[i][j] = rowData[j];
 					
+					/*
+					int updateDataLineNumber = updateData.indexOf(String.valueOf(rowData[0]));
+					
+					if (updateDataLineNumber > -1)
+					{
+						for (int j = 0; j < rowData.length; j++)
+						{
+							tableModel.setValueAt(rowData[j], i, j);
+							
+						}
+						
+						
+					}
+					*/
+					
+					
 					i++;
+				}
 					
 //					for (int i = 0; i < tableModel.getRowCount(); i++) 
 //					{
@@ -175,11 +228,10 @@ public class GUIInfo extends JPanel {
 					// System.out.println(rowData.toString());
 	
 //					tableModel.addRow(rowData);
-				}
 				
-				//tableModel.setDataVector(data, columnNames);
+				tableModel.setDataVector(data, columnNames);
 				
-				//agentTable.setModel(tableModel);
+				agentTable.setModel(tableModel);
 	
 				/*
 				 * agentList = new JPanel(new GridLayout(agentPanels.size(), 0));
@@ -204,5 +256,8 @@ public class GUIInfo extends JPanel {
 		this.updateData = !b;
 
 	}
-
 }
+
+
+
+
