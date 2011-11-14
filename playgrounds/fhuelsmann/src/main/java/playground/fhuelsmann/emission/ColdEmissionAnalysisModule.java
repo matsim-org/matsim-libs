@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.benjamin.emissions.dataTypes.ColdPollutant;
 import playground.benjamin.emissions.events.ColdEmissionEventImpl;
-import playground.benjamin.emissions.events.ColdPollutant;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionFactor;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
 

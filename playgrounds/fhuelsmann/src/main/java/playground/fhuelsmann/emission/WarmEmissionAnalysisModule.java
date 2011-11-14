@@ -34,8 +34,8 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
+import playground.benjamin.emissions.dataTypes.WarmPollutant;
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.events.WarmPollutant;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactors;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactorsDetailed;
 import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
