@@ -38,20 +38,18 @@ import org.matsim.core.gbl.Gbl;
 import playground.benjamin.emissions.dataTypes.HbefaTrafficSituation;
 import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactors;
 import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactorsDetailed;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreator;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionTableCreatorDetailed;
-import playground.benjamin.emissions.dataTypes.RoadTypeTrafficSit;
+import playground.benjamin.emissions.dataTypes.HbefaRoadTypeTrafficSituation;
+import playground.benjamin.emissions.dataTypes.WarmPollutant;
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.events.WarmPollutant;
 
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final Map<Integer, RoadTypeTrafficSit> roadTypeMapping;
+	private final Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
 
-	private final HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed;
-	private final HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator;
-	private final HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV;
+	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
+	private final HbefaWarmEmissionFactors[][] avgHbefaWarmTable;
+	private final HbefaWarmEmissionFactors[][] avgHbefaWarmTableHDV;
 
 	private final EventsManager eventsManager;
 	
@@ -60,15 +58,15 @@ public class WarmEmissionAnalysisModule {
 	private static Set<Id> personIdSet = new HashSet<Id>();
 
 	public WarmEmissionAnalysisModule(
-			Map<Integer, RoadTypeTrafficSit> roadTypeMapping,
-			HbefaWarmEmissionTableCreatorDetailed hbefaWarmEmissionTableCreatorDetailed,
-			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreator,
-			HbefaWarmEmissionTableCreator hbefaAvgWarmEmissionTableCreatorHDV,
+			Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping,
+			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
+			HbefaWarmEmissionFactors[][] avgHbefaWarmTable,
+			HbefaWarmEmissionFactors[][] avgHbefaWarmTableHDV,
 			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
-		this.hbefaWarmEmissionTableCreatorDetailed = hbefaWarmEmissionTableCreatorDetailed;
-		this.hbefaAvgWarmEmissionTableCreator = hbefaAvgWarmEmissionTableCreator;
-		this.hbefaAvgWarmEmissionTableCreatorHDV = hbefaAvgWarmEmissionTableCreatorHDV;
+		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+		this.avgHbefaWarmTable = avgHbefaWarmTable;
+		this.avgHbefaWarmTableHDV = avgHbefaWarmTableHDV;
 		this.eventsManager = emissionEventsManager;
 	}
 
@@ -101,9 +99,9 @@ public class WarmEmissionAnalysisModule {
 			
 			// Non-HDV emissions; TODO: better filter?!?
 			if (!personId.toString().contains("gv_")) {
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreator.getHbefaWarmTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.avgHbefaWarmTable);
 			} else {
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.hbefaAvgWarmEmissionTableCreatorHDV.getHbefaWarmTable());
+				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.avgHbefaWarmTableHDV);
 			}
 			
 			if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
@@ -164,7 +162,7 @@ public class WarmEmissionAnalysisModule {
 
 			for (HbefaTrafficSituation trafficSit : HbefaTrafficSituation.values()) {
 				String key = makeKey(warmPollutant, roadType, ageFuelCcmArray[0], ageFuelCcmArray[1], ageFuelCcmArray[2], trafficSit);
-				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.hbefaWarmEmissionTableCreatorDetailed.getHbefaWarmTableDetailed().get(key);
+				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.detailedHbefaWarmTable.get(key);
 				if (hbefaWarmEmissionFactorsDetailed != null) {
 					double[] vAndEf = new double[2];
 					vAndEf[0] = hbefaWarmEmissionFactorsDetailed.getV();

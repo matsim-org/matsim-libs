@@ -30,22 +30,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.benjamin.emissions.dataTypes.ColdPollutant;
 import playground.benjamin.emissions.dataTypes.HbefaColdEmissionFactor;
-import playground.benjamin.emissions.dataTypes.HbefaColdEmissionTableCreator;
 import playground.benjamin.emissions.events.ColdEmissionEventImpl;
-import playground.benjamin.emissions.events.ColdPollutant;
 
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 	
 	private final EventsManager eventsManager;
-	private final HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator;
+	private final Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
 
 	public ColdEmissionAnalysisModule(
-			HbefaColdEmissionTableCreator hbefaAvgColdEmissionTableCreator,
+			Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable,
 			EventsManager emissionEventsManager) {
 		this.eventsManager = emissionEventsManager;
-		this.hbefaAvgColdEmissionTableCreator = hbefaAvgColdEmissionTableCreator;
+		this.avgHbefaColdTable = avgHbefaColdTable;
 	}
 
 	public void calculateColdEmissions(Id coldEmissionEventLinkId, Id personId,
@@ -78,7 +77,7 @@ public class ColdEmissionAnalysisModule {
 		Double generatedEmissions = null;
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 
-		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry : hbefaAvgColdEmissionTableCreator.getHbefaColdTable().entrySet()){
+		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry : avgHbefaColdTable.entrySet()){
 			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
 			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEF();
 			coldPollutant = entry.getKey();

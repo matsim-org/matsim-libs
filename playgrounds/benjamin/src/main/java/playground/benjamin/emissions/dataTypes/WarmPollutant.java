@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.benjamin.emissions.dataTypes;
 
 public enum WarmPollutant {
 	

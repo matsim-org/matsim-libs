@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.benjamin.emissions.test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +29,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+
+import playground.benjamin.emissions.dataTypes.ColdPollutant;
+import playground.benjamin.emissions.dataTypes.WarmPollutant;
+import playground.benjamin.emissions.events.ColdEmissionEventImpl;
+import playground.benjamin.emissions.events.WarmEmissionEventImpl;
 
 /**
  * @author benjamin

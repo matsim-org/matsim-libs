@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionTestAggregator.java
+ * FhEmissions.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,30 +16,38 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
+ *                                                                         
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.benjamin.emissions.dataTypes;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
+public class HbefaRoadTypeTrafficSituation {
 
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonWarmEventHandler;
+	private String VISUM_RT_NAME;
+	private final int HBEFA_RT_NR;
+	private String HBEFA_RT_NAME;
+	private final String TRAFFIC_SITUATION;
+	
+	public HbefaRoadTypeTrafficSituation(int hbefaRtNr, String trafficSit) {
+		this.HBEFA_RT_NR = hbefaRtNr;
+		this.TRAFFIC_SITUATION = trafficSit;
+	}
 
-/**
- * @author benjamin
- *
- */
-public class EmissionTestAggregator {
-
-	private static final String emissionFile = "../../runs-svn/testEvents.xml";
-
-	public static void main(String[] args) {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
-		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
-		eventsManager.addHandler(warmHandler);
-		eventsManager.addHandler(coldHandler);
-		emissionReader.parse(emissionFile);
+	public String getVISUM_RT_NAME() {
+		return VISUM_RT_NAME;
+	}
+	public void setVISUM_RT_NAME(String visumRtName) {
+		VISUM_RT_NAME = visumRtName;
+	}
+	public int getHBEFA_RT_NR() {
+		return HBEFA_RT_NR;
+	}
+	public String getHBEFA_RT_NAME() {
+		return HBEFA_RT_NAME;
+	}
+	public void setHBEFA_RT_NAME(String hbefaRtName) {
+		HBEFA_RT_NAME = hbefaRtName;
+	}
+	public String getTRAFFIC_SITUATION() {
+		return TRAFFIC_SITUATION;
 	}
 }

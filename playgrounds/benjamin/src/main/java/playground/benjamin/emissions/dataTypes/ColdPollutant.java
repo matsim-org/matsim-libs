@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FhEmissions.java
+ * EmissionEventHotImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,38 +16,31 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- *                                                                         
  * *********************************************************************** */
 package playground.benjamin.emissions.dataTypes;
 
-public class RoadTypeTrafficSit {
-
-	private String VISUM_RT_NAME;
-	private final int HBEFA_RT_NR;
-	private String HBEFA_RT_NAME;
-	private final String TRAFFIC_SITUATION;
+public enum ColdPollutant {
 	
-	public RoadTypeTrafficSit(int hbefaRtNr, String trafficSit) {
-		this.HBEFA_RT_NR = hbefaRtNr;
-		this.TRAFFIC_SITUATION = trafficSit;
+	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
+	CO("CO"), HC("HC");
+	
+	private String key;
+
+	ColdPollutant(String key) {
+		this.key = key;
 	}
 
-	public String getVISUM_RT_NAME() {
-		return VISUM_RT_NAME;
+	public String getText() {
+		return key;
 	}
-	public void setVISUM_RT_NAME(String visumRtName) {
-		VISUM_RT_NAME = visumRtName;
-	}
-	public int getHBEFA_RT_NR() {
-		return HBEFA_RT_NR;
-	}
-	public String getHBEFA_RT_NAME() {
-		return HBEFA_RT_NAME;
-	}
-	public void setHBEFA_RT_NAME(String hbefaRtName) {
-		HBEFA_RT_NAME = hbefaRtName;
-	}
-	public String getTRAFFIC_SITUATION() {
-		return TRAFFIC_SITUATION;
+	
+	public static ColdPollutant getValue(String key){
+		for(ColdPollutant cp : ColdPollutant.values()){
+			String cpString = cp.getText();
+			if(cpString.equals(key)){
+				return cp;
+			}
+		}
+		return null;
 	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHotImpl.java
+ * EmissionTestAggregator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.benjamin.emissions.test;
 
-public enum ColdPollutant {
-	
-	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),
-	CO("CO"), HC("HC");
-	
-	private String key;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
 
-	ColdPollutant(String key) {
-		this.key = key;
-	}
+import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonWarmEventHandler;
 
-	public String getText() {
-		return key;
-	}
-	
-	public static ColdPollutant getValue(String key){
-		for(ColdPollutant cp : ColdPollutant.values()){
-			String cpString = cp.getText();
-			if(cpString.equals(key)){
-				return cp;
-			}
-		}
-		return null;
+/**
+ * @author benjamin
+ *
+ */
+public class EmissionTestAggregator {
+
+	private static final String emissionFile = "../../runs-svn/testEvents.xml";
+
+	public static void main(String[] args) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		EmissionsPerPersonWarmEventHandler warmHandler = new EmissionsPerPersonWarmEventHandler();
+		EmissionsPerPersonColdEventHandler coldHandler = new EmissionsPerPersonColdEventHandler();
+		eventsManager.addHandler(warmHandler);
+		eventsManager.addHandler(coldHandler);
+		emissionReader.parse(emissionFile);
 	}
 }

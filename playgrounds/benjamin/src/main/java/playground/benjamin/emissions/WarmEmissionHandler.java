@@ -144,7 +144,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		else{
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
 				linkLeaveWarnCnt++;
-				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered." +
+				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
 						"Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt)
 					logger.warn(Gbl.FUTURE_SUPPRESSED);

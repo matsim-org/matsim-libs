@@ -33,6 +33,9 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import playground.benjamin.emissions.dataTypes.ColdPollutant;
+import playground.benjamin.emissions.dataTypes.WarmPollutant;
+
 /**
  * @author benjamin
  *

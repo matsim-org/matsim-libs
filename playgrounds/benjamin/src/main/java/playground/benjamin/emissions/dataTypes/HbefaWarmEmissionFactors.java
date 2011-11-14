@@ -21,7 +21,6 @@ package playground.benjamin.emissions.dataTypes;
 
 import java.util.HashMap;
 
-import playground.benjamin.emissions.events.WarmPollutant;
 
 public class HbefaWarmEmissionFactors {
 
