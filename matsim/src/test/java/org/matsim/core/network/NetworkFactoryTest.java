@@ -23,11 +23,13 @@ package org.matsim.core.network;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -36,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class NetworkFactoryTest extends MatsimTestCase {
 
 	public void testSetRouteFactory() {
-		PopulationFactoryImpl factory = new PopulationFactoryImpl(null);
+		PopulationFactoryImpl factory = new PopulationFactoryImpl(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 
 		// test default
 		Route carRoute = factory.createRoute(TransportMode.car, null, null);

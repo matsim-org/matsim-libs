@@ -22,12 +22,16 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
@@ -36,12 +40,22 @@ import org.matsim.core.population.routes.RouteFactory;
  */
 public class PopulationFactoryImpl implements PopulationFactory {
 
-//	private final Scenario scenario;
-	
-	private final ModeRouteFactory routeFactory = new ModeRouteFactory();
+	private final ModeRouteFactory routeFactory;
 
 	public PopulationFactoryImpl(final Scenario scenario) {
-//		this.scenario = scenario;
+		this.routeFactory = new ModeRouteFactory();
+
+		String networkRouteType = scenario.getConfig().plans().getNetworkRouteType();
+		RouteFactory factory = null;
+		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType)) {
+			factory = new CompressedNetworkRouteFactory(scenario.getNetwork());
+		} else {
+			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+		}
+		this.routeFactory.setRouteFactory(TransportMode.car, factory);
+		this.routeFactory.setRouteFactory(TransportMode.ride, factory);
 	}
 
 	@Override
@@ -77,7 +91,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	public Leg createLeg(final String legMode) {
 		return new LegImpl(legMode);
 	}
-	
+
 	/**
 	 * @param transportMode the transport mode the route should be for
 	 * @param startLink the link where the route starts
@@ -101,7 +115,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
 		this.routeFactory.setRouteFactory(transportMode, factory);
 	}
-	
+
 	public ModeRouteFactory getModeRouteFactory() {
 		return this.routeFactory;
 	}

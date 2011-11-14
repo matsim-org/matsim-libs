@@ -1,0 +1,75 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.core.population;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+
+/**
+ * @author mrieser / senozon
+ */
+public class PopulationFactoryImplTest {
+
+	@Test
+	public void testConstructor_DefaultNetworkRouteType() {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+
+		Id linkId = scenario.createId("1");
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
+	}
+
+	@Test
+	public void testConstructor_LinkNetworkRouteType() {
+		Config config = ConfigUtils.createConfig();
+		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.LinkNetworkRoute);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+
+		Id linkId = scenario.createId("1");
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
+	}
+
+	@Test
+	public void testConstructor_CompressedNetworkRouteType() {
+		Config config = ConfigUtils.createConfig();
+		config.plans().setNetworkRouteType(PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		PopulationFactoryImpl pf = new PopulationFactoryImpl(scenario);
+
+		Id linkId = scenario.createId("1");
+		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.car, linkId, linkId).getClass());
+		Assert.assertEquals(CompressedNetworkRouteImpl.class, pf.createRoute(TransportMode.ride, linkId, linkId).getClass());
+	}
+
+}

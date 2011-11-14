@@ -20,6 +20,7 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
@@ -30,9 +31,16 @@ public class PlansConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "plans";
 
-	private static final String INPUT_FILE= "inputPlansFile";
+	public abstract static class NetworkRouteType {
+		public static final String LinkNetworkRoute = "LinkNetworkRoute";
+		public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
+	}
+
+	private static final String INPUT_FILE = "inputPlansFile";
+	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
 
 	private String inputFile = null;
+	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 
 	public PlansConfigGroup() {
 		super(GROUP_NAME);
@@ -52,15 +60,25 @@ public class PlansConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		if (INPUT_FILE.equals(key)) {
 			setInputFile(value.replace('\\', '/'));
+		} else if (NETWORK_ROUTE_TYPE.equals(key)) {
+			setNetworkRouteType(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
 
 	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put(NETWORK_ROUTE_TYPE, "Defines how routes are stored in memory. Currently supported: " + NetworkRouteType.LinkNetworkRoute + ", " + NetworkRouteType.CompressedNetworkRoute + ".");
+		return comments;
+	}
+
+	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, INPUT_FILE);
+		map.put(NETWORK_ROUTE_TYPE, this.networkRouteType);
 		return map;
 	}
 
@@ -69,8 +87,17 @@ public class PlansConfigGroup extends Module {
 	public String getInputFile() {
 		return this.inputFile;
 	}
+
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
+	}
+
+	public String getNetworkRouteType() {
+		return this.networkRouteType;
+	}
+
+	public void setNetworkRouteType(final String routeType) {
+		this.networkRouteType = routeType;
 	}
 
 }
