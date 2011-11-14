@@ -21,14 +21,15 @@
 package vrp.algorithms.clarkeAndWright;
 
 import org.apache.log4j.Logger;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.Node;
-import vrp.api.SingleDepotVRP;
-import vrp.basics.OtherDepotActivity;
-import vrp.basics.Tour;
-import vrp.basics.TourActivity;
-import vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.api.Customer;
+import org.matsim.contrib.freight.vrp.api.Node;
+import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.basics.OtherDepotActivity;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+
 
 import java.util.*;
 

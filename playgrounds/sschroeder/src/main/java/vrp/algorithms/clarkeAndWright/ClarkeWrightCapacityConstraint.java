@@ -17,10 +17,11 @@
  ******************************************************************************/
 package vrp.algorithms.clarkeAndWright;
 
-import vrp.api.Constraints;
-import vrp.basics.Tour;
-import vrp.basics.TourActivity;
-import vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.api.Constraints;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.TourActivity;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+
 
 /**
  * 

@@ -1,9 +1,10 @@
 package freight.offermaker;
 
-import freight.vrp.Locations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.vrp.api.Locations;
+
 import playground.mzilske.freight.OfferMaker;
 
 import java.util.ArrayList;

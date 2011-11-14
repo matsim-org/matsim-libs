@@ -1,25 +1,25 @@
 package freight.offermaker;
 
-import freight.vrp.Locations;
-import freight.vrp.MatSim2VRPTransformation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.replanning.MatSim2VRPTransformation;
+import org.matsim.contrib.freight.vrp.algorithms.rr.api.ServiceProvider;
+import org.matsim.contrib.freight.vrp.algorithms.rr.basics.BestTourBuilder;
+import org.matsim.contrib.freight.vrp.algorithms.rr.basics.TourActivityStatusUpdaterImpl;
+import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.TWAndCapacityConstraint;
+import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.api.Customer;
+import org.matsim.contrib.freight.vrp.api.Locations;
+import org.matsim.contrib.freight.vrp.api.VRP;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 import org.matsim.core.basic.v01.IdImpl;
 import playground.mzilske.freight.OfferMaker;
-import vrp.algorithms.ruinAndRecreate.api.ServiceProvider;
-import vrp.algorithms.ruinAndRecreate.basics.BestTourBuilder;
-import vrp.algorithms.ruinAndRecreate.basics.TourActivityStatusUpdaterImpl;
-import vrp.algorithms.ruinAndRecreate.constraints.TWAndCapacityConstraint;
-import vrp.api.Costs;
-import vrp.api.Customer;
-import vrp.api.VRP;
-import vrp.basics.CrowFlyCosts;
-import vrp.basics.Tour;
-import vrp.basics.VrpUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,11 +53,11 @@ public class MarginalCostOM implements OfferMaker{
 		}
 
 		@Override
-		public vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer requestService(vrp.algorithms.ruinAndRecreate.basics.Shipment shipment, double bestKnownPrice) {
+		public org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer requestService(org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment shipment, double bestKnownPrice) {
 			Tour newTour = tourBuilder.addShipmentAndGetTour(tour, shipment, bestKnownPrice);
 			if(newTour != null){
 				double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
-				vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer offer = new vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer(this, marginalCosts);
+				org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer offer = new org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer(this, marginalCosts);
 				return offer;
 			}
 			else{
@@ -67,13 +67,13 @@ public class MarginalCostOM implements OfferMaker{
 
 		@Override
 		public void offerGranted(
-				vrp.algorithms.ruinAndRecreate.basics.Shipment shipment) {
+				org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment shipment) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void offerRejected(
-				vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer offer) {
+				org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer offer) {
 			throw new UnsupportedOperationException();
 			
 		}
@@ -120,7 +120,7 @@ public class MarginalCostOM implements OfferMaker{
 //			vrpTransformation.addEnRoutePickupAndDeliveryShipment(s);
 		}
 		for(ScheduledTour t : carrier.getSelectedPlan().getScheduledTours()){
-			vrp.basics.Tour tour = makeTour(t.getTour(),vrpTransformation);
+			org.matsim.contrib.freight.vrp.basics.Tour tour = makeTour(t.getTour(),vrpTransformation);
 			ServiceProviderImpl serviceProvider = new ServiceProviderImpl(tour, carrierVehicle.getCapacity());
 			tours.put(serviceProvider, tour);
 			if(isMorning(t)){
@@ -159,14 +159,14 @@ public class MarginalCostOM implements OfferMaker{
 //		vrpTransformation.addEnRoutePickupAndDeliveryShipment(requestedShipment);
 		CarrierOffer bestOffer = null;
 		ServiceProviderImpl bestServiceProvider = null;
-		vrp.algorithms.ruinAndRecreate.basics.Shipment shipment = VrpUtils.createShipment(vrpTransformation.getFromCustomer(requestedShipment), vrpTransformation.getToCustomer(requestedShipment));
+		org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment shipment = VrpUtils.createShipment(vrpTransformation.getFromCustomer(requestedShipment), vrpTransformation.getToCustomer(requestedShipment));
 		if(!serviceProviders.isEmpty()){
-			vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer cheapestOffer = null;
+			org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer cheapestOffer = null;
 			Tour bestTour = null;
 			if(isMorning(startPickup)){
 				for(ServiceProviderImpl sP : morningService){
 					double totalCostsBefore = sP.getCostsOfCurrentTour();
-					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
+					org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
 					double totalCostsAfter = sP.getCostsOfCurrentTour();
 					if(o != null){
 						if(cheapestOffer == null){
@@ -189,7 +189,7 @@ public class MarginalCostOM implements OfferMaker{
 			}
 			else{
 				for(ServiceProviderImpl sP : afternoonService){
-					vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
+					org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer o = sP.requestService(shipment,Double.MAX_VALUE);
 					if(o != null){
 						if(cheapestOffer == null){
 							cheapestOffer = o;
@@ -212,7 +212,7 @@ public class MarginalCostOM implements OfferMaker{
 		}
 		Tour roundTour = VrpUtils.createRoundTour(vrpTransformation.getCustomer(makeId("depot")), shipment.getFrom(), shipment.getTo());
 		ServiceProviderImpl sP = new ServiceProviderImpl(roundTour, carrierVehicle.getCapacity());
-		vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer o = new vrp.algorithms.ruinAndRecreate.RuinAndRecreate.Offer(sP,sP.getCostsOfCurrentTour());
+		org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer o = new org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer(sP,sP.getCostsOfCurrentTour());
 		CarrierOffer offer = new CarrierOffer();
 		offer.setId(carrier.getId());
 		offer.setPrice(sP.getCostsOfCurrentTour());

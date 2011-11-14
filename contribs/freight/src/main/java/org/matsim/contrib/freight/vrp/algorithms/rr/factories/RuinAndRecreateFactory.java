@@ -1,0 +1,27 @@
+package org.matsim.contrib.freight.vrp.algorithms.rr.factories;
+
+import java.util.Collection;
+
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
+import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinAndRecreateListener;
+import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+
+
+public interface RuinAndRecreateFactory {
+
+	/**
+	 * Standard ruin and recreate without time windows. This algo is configured according to Schrimpf et. al (2000).
+	 * @param vrp
+	 * @param initialTours
+	 * @param vehicleCapacity
+	 * @return
+	 */
+	public abstract RuinAndRecreate createAlgorithm(SingleDepotVRP vrp, Collection<Tour> initialTours, int vehicleCapacity);
+
+	public abstract void addRuinAndRecreateListener(RuinAndRecreateListener l);
+	
+	public abstract void setIterations(int iterations);
+	
+	public abstract void setWarmUp(int nOfWarmUpIterations);
+}

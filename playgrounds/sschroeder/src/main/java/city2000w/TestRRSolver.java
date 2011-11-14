@@ -3,6 +3,7 @@ package city2000w;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.replanning.VRPCarrierPlanBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
