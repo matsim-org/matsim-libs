@@ -59,7 +59,10 @@ public class BestResponseLocationMutator extends RecursiveLocationMutator {
 	private ScaleEpsilon scaleEpsilon;
 	private ActTypeConverter actTypeConverter;
 	private DestinationSampler sampler;
-			
+	
+	/* TODO: Use Singleton pattern or encapsulating object for the many constructor objects
+	 * Similar to Scenario object
+	 */
 	public BestResponseLocationMutator(final Network network, Controler controler,
 			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
