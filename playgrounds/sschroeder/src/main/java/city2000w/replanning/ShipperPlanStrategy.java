@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.freight.replanning.PlanStrategy;
+
 public class ShipperPlanStrategy implements PlanStrategy<ShipperImpl>{
 
 	private List<ShipperPlanStrategyModule> strategyModules = new ArrayList<ShipperPlanStrategyModule>();

@@ -21,13 +21,13 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourActivityStatusUpdater;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourBuilder;
 import org.matsim.contrib.freight.vrp.api.Constraints;
 import org.matsim.contrib.freight.vrp.api.Costs;
 import org.matsim.contrib.freight.vrp.api.Customer;
+import org.matsim.contrib.freight.vrp.api.Offer;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;

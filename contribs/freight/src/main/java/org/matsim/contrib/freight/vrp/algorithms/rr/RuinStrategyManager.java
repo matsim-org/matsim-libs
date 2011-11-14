@@ -33,7 +33,7 @@ import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
  *
  */
 
-public class RuinStrategyManager {
+class RuinStrategyManager {
 	
 	private List<RuinStrategy> strategies = new ArrayList<RuinStrategy>();
 	

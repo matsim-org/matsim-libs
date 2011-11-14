@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RecreationStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.ServiceProvider;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.ThresholdFunction;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgentFactory;
@@ -48,33 +47,6 @@ import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 public class RuinAndRecreate {
 	
-	public static class Offer {
-		
-		private ServiceProvider agent;
-		
-		private double cost;
-
-		public Offer(ServiceProvider agent, double cost) {
-			super();
-			this.agent = agent;
-			this.cost = cost;
-		}
-
-		public ServiceProvider getServiceProvider() {
-			return agent;
-		}
-
-		public double getPrice() {
-			return cost;
-		}
-		
-		@Override
-		public String toString() {
-			return "currentTour=" + agent + "; marginalInsertionCosts=" + cost;
-		}
-		
-	}
-
 	private static Logger logger = Logger.getLogger(RuinAndRecreate.class);
 	
 	private RuinStrategyManager ruinStrategyManager; 

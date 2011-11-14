@@ -1,11 +1,11 @@
-package city2000w.replanning;
+package org.matsim.contrib.freight.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.replanning.VRPCarrierPlanBuilder;
-import org.matsim.contrib.freight.replanning.VRPSolverFactory;
+import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
+import org.matsim.contrib.freight.vrp.VRPSolverFactory;
 
 public class CarrierContractLandscapeChangedResponder implements CarrierPlanStrategyModule{
 

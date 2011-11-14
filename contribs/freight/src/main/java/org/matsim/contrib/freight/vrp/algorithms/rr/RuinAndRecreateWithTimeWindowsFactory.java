@@ -1,11 +1,9 @@
-package org.matsim.contrib.freight.vrp.algorithms.rr.factories;
+package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinStrategyManager;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgentFactory;

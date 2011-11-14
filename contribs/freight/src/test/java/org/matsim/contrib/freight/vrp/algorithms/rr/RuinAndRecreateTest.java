@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityConstraint;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.api.*;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;

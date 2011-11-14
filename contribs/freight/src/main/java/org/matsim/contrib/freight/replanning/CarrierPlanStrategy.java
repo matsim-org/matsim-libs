@@ -1,15 +1,15 @@
-package city2000w.replanning;
-
-import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.carrier.Contract;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Shipment;
+package org.matsim.contrib.freight.replanning;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Contract;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Shipment;
 
 public class CarrierPlanStrategy implements PlanStrategy<Carrier>{
 	

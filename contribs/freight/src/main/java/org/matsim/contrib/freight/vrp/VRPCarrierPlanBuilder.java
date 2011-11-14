@@ -1,9 +1,8 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
@@ -16,8 +15,6 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 
 public class VRPCarrierPlanBuilder {
-
-	private static Logger logger = Logger.getLogger(VRPCarrierPlanBuilder.class);
 	
 	private CarrierCapabilities caps;
 	private Collection<CarrierContract> contracts;

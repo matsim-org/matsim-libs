@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 /**
  * RRSingleDepotVRPSolver solves standard problems with one depot, i.e. given a set of customers and shipments (depot2customer, customer2depot, 
@@ -20,7 +20,7 @@ import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.TourBuilder;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.RuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.api.Constraints;
 import org.matsim.contrib.freight.vrp.api.Costs;
 import org.matsim.contrib.freight.vrp.api.Customer;
@@ -128,11 +128,11 @@ public class ShipmentBasedSingleDepotVRPSolver implements VRPSolver{
 	public Collection<org.matsim.contrib.freight.carrier.Tour> solve() {
 		verify();
 		if(shipments.isEmpty()){
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		if(vehicleType == null){
 			logger.info("cannot do vehicle routing without vehicles");
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
 		RuinAndRecreate ruinAndRecreate = makeAlgorithm();
 		ruinAndRecreate.run();
@@ -210,17 +210,6 @@ public class ShipmentBasedSingleDepotVRPSolver implements VRPSolver{
 			tours.add(vehicleTour);
 		}
 		return tours;
-	}
-
-	private Collection<CarrierShipment> getShipments(org.matsim.contrib.freight.vrp.basics.Tour tour) {
-		Collection<CarrierShipment> carrierShipments = new ArrayList<CarrierShipment>();
-		for(TourActivity act : tour.getActivities()){
-			CarrierShipment shipment = getShipment(act.getCustomer());
-			if(shipment != null){
-				carrierShipments.add(shipment);
-			}
-		}
-		return carrierShipments;
 	}
 
 	private Id makeId(String id) {

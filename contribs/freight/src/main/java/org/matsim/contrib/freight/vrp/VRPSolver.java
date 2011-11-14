@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import java.util.Collection;
 

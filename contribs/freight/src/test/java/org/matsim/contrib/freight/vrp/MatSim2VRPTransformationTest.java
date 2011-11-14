@@ -1,9 +1,9 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import junit.framework.TestCase;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.replanning.MatSim2VRPTransformation;
+import org.matsim.contrib.freight.vrp.MatSim2VRPTransformation;
 import org.matsim.contrib.freight.vrp.api.Locations;
 import org.matsim.core.basic.v01.IdImpl;
 

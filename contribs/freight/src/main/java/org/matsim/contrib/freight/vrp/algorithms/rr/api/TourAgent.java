@@ -19,9 +19,9 @@ package org.matsim.contrib.freight.vrp.algorithms.rr.api;
 
 import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer;
 import org.matsim.contrib.freight.vrp.api.Constraints;
 import org.matsim.contrib.freight.vrp.api.Customer;
+import org.matsim.contrib.freight.vrp.api.Offer;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.TourActivity;
 

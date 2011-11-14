@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RecreationStrategy;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
 import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
+import org.matsim.contrib.freight.vrp.api.Offer;
 import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactory;

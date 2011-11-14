@@ -1,8 +1,7 @@
-package org.matsim.contrib.freight.vrp.algorithms.rr.factories;
+package org.matsim.contrib.freight.vrp.algorithms.rr;
 
 import java.util.Collection;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinAndRecreateListener;
 import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
 import org.matsim.contrib.freight.vrp.basics.Tour;

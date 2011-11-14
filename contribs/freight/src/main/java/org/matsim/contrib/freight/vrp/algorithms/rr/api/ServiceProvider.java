@@ -17,8 +17,8 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.api;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate.Offer;
 import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
+import org.matsim.contrib.freight.vrp.api.Offer;
 
 /**
  * 

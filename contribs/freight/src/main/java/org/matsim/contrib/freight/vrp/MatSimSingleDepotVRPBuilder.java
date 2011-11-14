@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierShipment;

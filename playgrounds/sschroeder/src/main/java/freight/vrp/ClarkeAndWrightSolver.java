@@ -2,8 +2,8 @@ package freight.vrp;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierContract;
-import org.matsim.contrib.freight.replanning.MatSim2VRPTransformation;
-import org.matsim.contrib.freight.replanning.VRPSolver;
+import org.matsim.contrib.freight.vrp.MatSim2VRPTransformation;
+import org.matsim.contrib.freight.vrp.VRPSolver;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 
 import java.util.Collection;

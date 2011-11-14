@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import junit.framework.TestCase;
 import org.matsim.api.core.v01.Coord;
@@ -13,11 +13,11 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.replanning.ShipmentBasedSingleDepotVRPSolver;
-import org.matsim.contrib.freight.replanning.VRPSolver;
-import org.matsim.contrib.freight.replanning.VRPSolverFactory;
+import org.matsim.contrib.freight.vrp.ShipmentBasedSingleDepotVRPSolver;
+import org.matsim.contrib.freight.vrp.VRPSolver;
+import org.matsim.contrib.freight.vrp.VRPSolverFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityConstraint;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;

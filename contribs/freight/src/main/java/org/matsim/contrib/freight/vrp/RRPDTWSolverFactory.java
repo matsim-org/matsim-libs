@@ -1,12 +1,12 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.vrp;
 
 import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateWithTimeWindowsFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.TimeAndCapacityPickupsDeliveriesSequenceConstraint;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.RuinAndRecreateWithTimeWindowsFactory;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 

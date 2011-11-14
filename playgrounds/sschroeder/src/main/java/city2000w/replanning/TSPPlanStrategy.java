@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.contrib.freight.replanning.PlanStrategy;
+
 public class TSPPlanStrategy implements PlanStrategy<TransportServiceProvider>{
 	
 	private List<TSPPlanStrategyModule> strategyModules = new ArrayList<TSPPlanStrategyModule>();
