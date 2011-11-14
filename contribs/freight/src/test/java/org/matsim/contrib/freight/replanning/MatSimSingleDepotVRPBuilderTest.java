@@ -1,4 +1,4 @@
-package freight.vrp;
+package org.matsim.contrib.freight.replanning;
 
 import junit.framework.TestCase;
 import org.matsim.api.core.v01.Coord;
