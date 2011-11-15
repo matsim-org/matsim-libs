@@ -1,51 +1,96 @@
 package playground.wrashid.parkingSearch.ca.matlabInfra;
 
-import org.matsim.api.core.v01.Coord;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class Network {
 
 	public static void main(String[] args) {
-		String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
-		
-		final String networkFileName = baseFolder + "output_network.xml.gz";
-		
-		NetworkImpl network = GeneralLib.readNetwork(networkFileName);
-		
-		for (Link link:network.getLinks().values()){
-			if (isInsideStudyArea(link.getFromNode().getCoord()) || isInsideStudyArea(link.getToNode().getCoord())){
-				//write out the link
-				
-				// remember the node, so that it can be written out later.
+		NetworkImpl network = Config.getNetwork();
+
+		LinkedList<Link> selectedLinks = new LinkedList();
+
+		for (Link link : network.getLinks().values()) {
+			if (Config.isInsideStudyArea(link.getFromNode().getCoord()) || Config.isInsideStudyArea(link.getToNode().getCoord())) {
+				selectedLinks.add(link);
 			}
-						
 		}
-		//file 2.
-		
-		
-		
-		
-		for (Node node:network.getNodes().values()){
-			System.out.println(node.getId());
-			
+
+		writeOutLinks(Config.getOutputFolder() + "links.xml", selectedLinks);
+
+		writeOutNodes(Config.getOutputFolder() +  "nodes.xml", getUniqueNodes(selectedLinks));
+
+	}
+
+	private static LinkedList<Node> getUniqueNodes(LinkedList<Link> selectedLinks) {
+		LinkedList<Node> selectedNodes = new LinkedList<Node>();
+
+		for (Link link : selectedLinks) {
+			if (!selectedNodes.contains(link.getFromNode())) {
+				selectedNodes.add(link.getFromNode());
+			}
+			if (!selectedNodes.contains(link.getToNode())) {
+				selectedNodes.add(link.getToNode());
+			}
 		}
-		//file 1.
-		
-		
-		
+
+		return selectedNodes;
 	}
-	
-	private static boolean isInsideStudyArea(Coord coord){
-		Coord studyAreaCenter= ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
-		double radiusInMetersOfStudyArea=1000;
-		
-		return GeneralLib.getDistance(coord, studyAreaCenter)<radiusInMetersOfStudyArea;
+
+	private static void writeOutNodes(String fileName, LinkedList<Node> selectedNodes) {
+		ArrayList<String> list = new ArrayList<String>();
+
+		list.add("<nodes>");
+
+		for (Node node : selectedNodes) {
+			StringBuffer stringBuffer = new StringBuffer();
+
+			stringBuffer.append("\t<node>\n");
+
+			stringBuffer.append("\t\t<id>" + node.getId() + "</id>\n");
+			stringBuffer.append("\t\t<x>" + node.getCoord().getX() + "</x>\n");
+			stringBuffer.append("\t\t<y>" + node.getCoord().getY() + "</y>\n");
+
+			stringBuffer.append("\t</node>\n");
+
+			list.add(stringBuffer.toString());
+		}
+
+		list.add("</nodes>\n");
+
+		GeneralLib.writeList(list, fileName);
 	}
-	
+
+	private static void writeOutLinks(String fileName, LinkedList<Link> selectedLinks) {
+		ArrayList<String> list = new ArrayList<String>();
+
+		list.add("<links>");
+
+		for (Link link : selectedLinks) {
+			StringBuffer stringBuffer = new StringBuffer();
+
+			stringBuffer.append("\t<link>\n");
+
+			stringBuffer.append("\t\t<id>" + link.getId() + "</id>\n");
+			stringBuffer.append("\t\t<fromNode>" + link.getFromNode().getId() + "</fromNode>\n");
+			stringBuffer.append("\t\t<toNode>" + link.getToNode().getId() + "</toNode>\n");
+
+			stringBuffer.append("\t</link>\n");
+
+			list.add(stringBuffer.toString());
+		}
+
+		list.add("</links>\n");
+
+		GeneralLib.writeList(list, fileName);
+
+	}
+
 }
