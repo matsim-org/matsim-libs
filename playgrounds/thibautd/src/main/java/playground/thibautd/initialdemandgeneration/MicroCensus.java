@@ -186,7 +186,8 @@ public class MicroCensus {
 				if (pe instanceof Activity) {
 					Activity a = (Activity) pe;
 					if (a.getType().equals(WORK) && !has_work) {
-						throw new RuntimeException( "found unemployed person with work activities" );
+						log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
+						has_work = true;
 					}
 					if (a.getType().equals(EDUC)) {
 						has_educ = true;
