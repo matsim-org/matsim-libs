@@ -18,7 +18,7 @@ class Route {
 	LinkedList<Link> links=new LinkedList<Link>();
 	
 	public void addLink(Link link){
-		if (!links.getLast().equals(link)){
+		if (links.size()==0 || !links.getLast().equals(link)){
 			links.add(link);
 		}
 	}
@@ -27,10 +27,11 @@ class Route {
 		StringBuffer stringBuffer = new StringBuffer();
 		
 		for (Link link:links){
-			stringBuffer.append(((LinkImpl)link).getToNode());
+			stringBuffer.append(((LinkImpl)link).getToNode().getId());
+			stringBuffer.append(" ");
 		}
 		
-		return stringBuffer.toString();
+		return stringBuffer.toString().trim();
 	}
 	
 }

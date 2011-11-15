@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.ca.matlabInfra;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -35,18 +36,24 @@ public class AgentGenerator {
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
-		
-		writeOutAgents(eventHandler.processedAgents, Config.getOutputFolder());
+
+		writeOutAgents(eventHandler.processedAgents, Config.getOutputFolder() + "population.xml");
 	}
 
 	private static void writeOutAgents(LinkedList<Agent> processedAgents, String fileName) {
-		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("<agents>");
+		for (Agent agent : processedAgents) {
+			list.add(agent.getXMLString(Config.getNetwork()));
+		}
+		list.add("</agents>");
+		GeneralLib.writeList(list, fileName);
 	}
 
 }
 
-class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandler,
-		AgentArrivalEventHandler, ActivityStartEventHandler {
+class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler,
+		ActivityStartEventHandler {
 
 	private final NetworkImpl network;
 	private HashMap<Id, Agent> agentsInStudyArea;
@@ -55,6 +62,7 @@ class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandl
 	MyEventHandler(NetworkImpl network) {
 		this.network = network;
 		agentsInStudyArea = new HashMap<Id, Agent>();
+		processedAgents = new LinkedList<Agent>();
 	}
 
 	@Override
@@ -72,9 +80,9 @@ class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandl
 			}
 
 			Agent agent = agentsInStudyArea.get(personId);
-			agent.routeTo=agent.tmpRoute.getNodeString(network);
-			agent.actStartTime=event.getTime();
-			
+			agent.routeTo = agent.tmpRoute;
+			agent.actStartTime = event.getTime();
+
 		}
 	}
 
@@ -83,23 +91,34 @@ class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandl
 		Id personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase("car") && Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {
-				DebugLib.stopSystemAndReportInconsistency("there is some conceptual problem in the prog...");
+
+				// this indicates an agent, which starts his trip with a car in
+				// the study area
+				// either he started the day there or he was beamed there with
+				// some other mode...
+
+				agentsInStudyArea.put(personId, new Agent(personId, event.getTime()));
+				Agent agent = agentsInStudyArea.get(personId);
+				
+				agent.actDur = Double.NEGATIVE_INFINITY;
+			} else {
+				// agent continues trip
+				
+				Agent agent = agentsInStudyArea.get(personId);
+
+				agent.actDur = GeneralLib.getIntervalDuration(agent.actStartTime, event.getTime());
+
+				agent.tmpRoute = new Route();
 			}
-			Agent agent = agentsInStudyArea.get(personId);
-			
-			agent.actDur=GeneralLib.getIntervalDuration(agent.actStartTime, event.getTime());
-			
-			agent.tmpRoute=new Route();
 		}
 	}
-
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id personId = event.getPersonId();
 		if (Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {
-				agentsInStudyArea.put(personId, new Agent(event.getTime()));
+				agentsInStudyArea.put(personId, new Agent(personId, event.getTime()));
 			}
 			Agent agent = agentsInStudyArea.get(personId);
 
@@ -109,8 +128,8 @@ class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandl
 			if (agentsInStudyArea.containsKey(personId)) {
 				Agent agent = agentsInStudyArea.get(personId);
 
-				agent.routeAway=agent.tmpRoute.getNodeString(network);
-				
+				agent.routeAway = agent.tmpRoute;
+
 				processedAgents.add(agent);
 				agentsInStudyArea.remove(personId);
 			}
@@ -122,9 +141,9 @@ class MyEventHandler implements LinkEnterEventHandler,  AgentDepartureEventHandl
 		Id personId = event.getPersonId();
 		if (agentsInStudyArea.containsKey(personId)) {
 			Agent agent = agentsInStudyArea.get(personId);
-			
-			if (agent.actType==null){
-				agent.actType=event.getActType();
+
+			if (agent.actType == null) {
+				agent.actType = event.getActType();
 			}
 		}
 	}
