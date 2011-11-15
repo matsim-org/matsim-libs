@@ -42,6 +42,7 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
@@ -155,6 +156,13 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			// else
 			else probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
 		}
+		
+		/*
+		 * Check whether the sum of all probabilities is 1.0
+		 */
+		double checkSum = 0.0;
+		for (Double value : probabilities.values()) checkSum += value;
+		assert Math.abs(checkSum - 1.0) < MatsimTestCase.EPSILON;
 		
 		double randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
 				

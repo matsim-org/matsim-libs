@@ -20,9 +20,11 @@
 
 package playground.christoph.controler;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -48,6 +50,7 @@ import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByPr
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
+import playground.christoph.router.AnalyzeTravelTimes;
 import playground.christoph.router.CostNavigationRouteFactory;
 import playground.christoph.router.CostNavigationTravelTimeLogger;
 import playground.christoph.router.NonLearningCostNavigationTravelTimeLogger;
@@ -80,10 +83,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
+	protected AnalyzeTravelTimes analyzeTravelTimes; 
 	protected SelectHandledAgentsByProbability selector;
-
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
-	
+		
 	protected LookupNetwork lookupNetwork;
 	protected LookupTravelTime lookupTravelTime;
 	protected int updateLookupTravelTimeInterval = 15;
@@ -168,17 +171,25 @@ public class CostNavigationRouteController extends WithinDayController implement
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		initReplanners((QSim)e.getQueueSimulation());
+		
+		this.selector.notifySimulationInitialized(e);
+		
+		Set<Id> replannedAgents = new HashSet<Id>();
+		for (PlanBasedWithinDayAgent agent : this.duringLegIdentifier.getHandledAgents()) replannedAgents.add(agent.getId());
+		this.analyzeTravelTimes = new AnalyzeTravelTimes(replannedAgents, scenarioData.getPopulation().getPersons().size());
+		this.getEvents().addHandler(analyzeTravelTimes);
 	}
 	
 	@Override
 	protected void runMobSim() {
 		
 		selector = new SelectHandledAgentsByProbability();
-		super.getFixedOrderSimulationListener().addSimulationListener(selector);
+//		super.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
 		super.runMobSim();
 		
 		printStatistics();
+		this.analyzeTravelTimes.printStatistics();
 	}
 
 	private void printStatistics() {
@@ -197,11 +208,14 @@ public class CostNavigationRouteController extends WithinDayController implement
 			notFollowedAndAccepted += costNavigationTravelTimeLogger.getNotFollowedAndAccepted(agent.getId());
 			notFollowedAndNotAccepted += costNavigationTravelTimeLogger.getNotFollowedAndNotAccepted(agent.getId());
 		}
-		log.info("Mean trust per person: " + sumTrust / handledAgents.size());
-		log.info("Mean followed and accepted choices per person: " + followedAndAccepted / handledAgents.size());
-		log.info("Mean followed and not accepted choices per person: " + followedAndNotAccepted / handledAgents.size());
-		log.info("Mean not followed and accepted choices per person: " + notFollowedAndAccepted / handledAgents.size());
-		log.info("Mean not followed and not accepted choices per person: " + notFollowedAndNotAccepted / handledAgents.size());
+		double totalObservations = followedAndAccepted + followedAndNotAccepted + notFollowedAndAccepted + notFollowedAndNotAccepted;
+		double overAllTrust = (followedAndAccepted + notFollowedAndAccepted) / totalObservations;
+		log.info("Mean total trust (over all observations): \t" + overAllTrust);
+		log.info("Mean trust per person (over all persons): \t" + sumTrust / handledAgents.size());
+		log.info("Mean followed and accepted choices per person: \t" + followedAndAccepted / handledAgents.size());
+		log.info("Mean followed and not accepted choices per person: \t" + followedAndNotAccepted / handledAgents.size());
+		log.info("Mean not followed and accepted choices per person: \t" + notFollowedAndAccepted / handledAgents.size());
+		log.info("Mean not followed and not accepted choices per person: \t" + notFollowedAndNotAccepted / handledAgents.size());
 	}
 	
 	/*

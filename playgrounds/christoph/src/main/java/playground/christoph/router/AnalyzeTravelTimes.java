@@ -1,0 +1,112 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AnalyzeTravelTimes.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.christoph.router;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+
+public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepartureEventHandler {
+
+	private static final Logger log = Logger.getLogger(AnalyzeTravelTimes.class);
+		
+	private final Set<Id> replannedPersons;
+	private final List<Double> replannedTrips;
+	private final List<Double> notReplannedTrips;
+	private final Map<Id, Double> activeTrips;
+	
+	private final int numPersons;
+	
+	public AnalyzeTravelTimes(Set<Id> replannedPersons, int populationSize) {
+		this.activeTrips = new HashMap<Id, Double>();
+		this.replannedPersons = replannedPersons;
+		this.replannedTrips = new ArrayList<Double>();
+		this.notReplannedTrips = new ArrayList<Double>();
+		
+		this.numPersons = populationSize;
+	}
+
+	public void handleEvent(AgentDepartureEvent event) {
+		activeTrips.put(event.getPersonId(), event.getTime());
+	}
+
+	public void handleEvent(AgentArrivalEvent event) {
+		double travelTime = event.getTime() - activeTrips.remove(event.getPersonId());
+		
+		if (replannedPersons.contains(event.getPersonId())) replannedTrips.add(travelTime);
+		else notReplannedTrips.add(travelTime);
+	}
+
+	public void reset(int iteration) {
+		activeTrips.clear();
+		replannedTrips.clear();
+		notReplannedTrips.clear();
+	}		
+	
+	public void printStatistics() {
+	
+		double totalMean = 0.0;
+		
+		double meanReplannedTrip = 0.0;
+		for (double d : this.replannedTrips) {
+			meanReplannedTrip += d;
+			totalMean += d;
+		}
+		meanReplannedTrip = meanReplannedTrip / this.replannedTrips.size();
+		
+		double meanNotReplannedTrip = 0.0;
+		for (double d : this.notReplannedTrips) {
+			meanNotReplannedTrip += d;
+			totalMean += d;
+		}
+		meanNotReplannedTrip = meanNotReplannedTrip / this.notReplannedTrips.size();
+		
+		int totalTrips = this.replannedTrips.size() + this.notReplannedTrips.size();
+		totalMean = totalMean / totalTrips;
+		
+		double tripsPerPerson = (double)totalTrips / (double)numPersons;
+		
+		log.info("");
+		log.info("number of Persons: \t" + numPersons);
+		log.info("number of Trips: \t" + totalTrips);
+		log.info("number of (probably) replanned Trips: \t" + this.replannedTrips.size());
+		log.info("number of not replanned Trips: \t" + this.notReplannedTrips.size());
+		log.info("");
+		log.info("mean replanned Trip length: \t" + meanReplannedTrip);
+		log.info("mean not replanned Trips length: \t" + meanNotReplannedTrip);
+		log.info("mean total Trips length: \t" + totalMean);
+		log.info("");
+		log.info("mean replanned daily Trip length: \t" + meanReplannedTrip * tripsPerPerson);
+		log.info("mean not replanned daily Trips length: \t" + meanNotReplannedTrip * tripsPerPerson);
+		log.info("mean total daily Trips length: \t" + totalMean * tripsPerPerson);
+		log.info("");
+	}
+
+}
