@@ -80,7 +80,7 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 			}
 
 			Agent agent = agentsInStudyArea.get(personId);
-			agent.routeTo = agent.tmpRoute;
+			agent.routeTo = agent.tmpRoute.getNodeString(network);
 			agent.actStartTime = event.getTime();
 
 		}
@@ -128,7 +128,7 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 			if (agentsInStudyArea.containsKey(personId)) {
 				Agent agent = agentsInStudyArea.get(personId);
 
-				agent.routeAway = agent.tmpRoute;
+				agent.routeAway = agent.tmpRoute.getNodeString(network);
 
 				processedAgents.add(agent);
 				agentsInStudyArea.remove(personId);

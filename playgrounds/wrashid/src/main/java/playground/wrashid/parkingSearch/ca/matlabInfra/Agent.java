@@ -9,10 +9,10 @@ public class Agent {
 
 	Id id;
 	double tripStartTime;
-	Route routeTo;
+	String routeTo;
 	String actType;
 	double actDur;
-	Route routeAway;
+	String routeAway;
 	
 	Route tmpRoute;
 	double actStartTime;
@@ -32,10 +32,10 @@ public class Agent {
 
 		stringBuffer.append("\t\t<id>" + id + "#" + rand.nextLong() + "</id>\n");
 		stringBuffer.append("\t\t<tripStartTime>" + tripStartTime + "</tripStartTime>\n");
-		stringBuffer.append("\t\t<route_to>" + routeTo==null?"":routeTo.getNodeString(network) + "</route_to>\n");
+		stringBuffer.append("\t\t<route_to>" + routeTo + "</route_to>\n");
 		stringBuffer.append("\t\t<actType>" + actType + "</actType>\n");
 		stringBuffer.append("\t\t<actDur>" + actDur + "</actDur>\n");
-		stringBuffer.append("\t\t<route_away>" + routeAway==null?"":routeAway.getNodeString(network) + "</route_away>\n");
+		stringBuffer.append("\t\t<route_away>" + routeAway + "</route_away>\n");
 		
 		stringBuffer.append("\t</agent>\n");
 		
