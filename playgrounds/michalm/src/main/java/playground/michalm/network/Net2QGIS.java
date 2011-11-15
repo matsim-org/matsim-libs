@@ -22,7 +22,7 @@ public class Net2QGIS
         String outFileNameN;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
+            dirName = "D:\\PP-rad\\taxi\\mielec\\";
             netFileName = dirName + "network.xml";
             outFileNameLs = dirName + "linksLs.shp";
             outFileNameP = dirName + "linksP.shp";

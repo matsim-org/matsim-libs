@@ -5,7 +5,6 @@ import java.util.*;
 
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.*;
@@ -25,10 +24,11 @@ import org.matsim.run.*;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
-import pl.poznan.put.vrp.cvrp.data.*;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.visualization.*;
 import playground.michalm.vrp.data.*;
@@ -51,23 +51,23 @@ public class SingleIterOnlineDVRPLauncher
         String dirName;
         String netFileName;
         String plansFileName;
-        String algParamsFileName;
+        String depotsFileName;
         boolean oftVis;
 
         VRP_OUT_FILES = false;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\grid-net\\";
+            dirName = "D:\\PP-rad\\taxi\\mielec\\";
             netFileName = dirName + "network.xml";
             plansFileName = dirName + "plans.xml";
-            algParamsFileName = dirName + "algorithm.txt";
+            depotsFileName = dirName + "depots.xml";
             oftVis = true;
         }
         else if (args.length == 5) {
             dirName = args[0];
             netFileName = dirName + args[1];
             plansFileName = dirName + args[2];
-            algParamsFileName = dirName + args[3];
+            depotsFileName = dirName + args[3];
             oftVis = Boolean.parseBoolean(args[4]);
         }
         else {
@@ -75,38 +75,32 @@ public class SingleIterOnlineDVRPLauncher
                     + Arrays.toString(args));
         }
 
-        // read MATSim data
-        // Config config = ConfigUtils.loadConfig(cfgFileName);
-        // Scenario scenario = ScenarioUtils.loadScenario(config);
-
         Config config = ConfigUtils.createConfig();
 
         Scenario scenario = ScenarioUtils.createScenario(config);
 
-        Network network = scenario.getNetwork();
         new MatsimNetworkReader(scenario).readFile(netFileName);
         new MatsimPopulationReader(scenario).readFile(plansFileName);
-
         preparePlansForPersons(scenario);
 
-        // init DVRP data
-        AlgorithmParams algParams = new AlgorithmParams(new File(algParamsFileName));
-
-        VRPData vrpData = DataGenerator.generate(scenario);
-        final MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
-
-        // create VRPDriverPersons and add them to the population
-        createDriverPersons(scenario, vrpData);
-
-        // read ShortestPaths from file
-        // FullShortestPathsFinder fspf = new FullShortestPathsFinder(data);
-        // fspf.findShortestPaths(new FreeSpeedTravelTimeCalculator(), new DijkstraFactory());
-        // fspf.upadateVRPArcTimesAndCosts();
-        // CHANGE THE ABOVE WITH THE SPARSE (LAZY) SP APPROACH:
+        MATSimVRPData data = MATSimVRPDataCreator.create(scenario);
+        new DepotReader(scenario, data).readFile(depotsFileName);
+        createDriverPersons(scenario, data.getVrpData());
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
         sspf.findShortestPaths(new FreeSpeedTravelTimeCalculator(), new DijkstraFactory());
         sspf.upadateVRPArcTimesAndCosts();
+
+        // init optimizer
+        // AlgorithmParams algParams = new AlgorithmParams(new File(algParamsFileName));
+        VRPOptimizerFactory optimizerFactory = new VRPOptimizerFactory() {
+
+            @Override
+            public VRPOptimizer create()
+            {
+                return new TaxiVRPOptimizer();
+            }
+        };
 
         // to have TravelTimeCalculatorWithBuffer instead of TravelTimeCalculator use:
         // controler.setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
@@ -117,11 +111,10 @@ public class SingleIterOnlineDVRPLauncher
         // QSim config group
         QSimConfigGroup qSimConfig = new QSimConfigGroup();
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-
         config.addQSimConfigGroup(qSimConfig);
 
         EventsManager events = EventsUtils.createEventsManager();
-        QSim sim = createMobsim(scenario, events, data, algParams, vrpOutDirName);
+        QSim sim = createMobsim(scenario, events, data, optimizerFactory, vrpOutDirName);
 
         if (oftVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
@@ -142,12 +135,12 @@ public class SingleIterOnlineDVRPLauncher
 
 
     private static QSim createMobsim(Scenario sc, EventsManager eventsManager, MATSimVRPData data,
-            AlgorithmParams algParams, String vrpOutDirName)
+            VRPOptimizerFactory optimizerFactory, String vrpOutDirName)
     {
         QSim sim = new QSim(sc, eventsManager);
         sim.setAgentFactory(new VRPAgentFactory(sim, data));
 
-        VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, algParams);
+        VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, optimizerFactory);
         data.setVrpSimEngine(vrpSimEngine);
         sim.addMobsimEngine(vrpSimEngine);
 
@@ -221,7 +214,7 @@ public class SingleIterOnlineDVRPLauncher
         Population population = scenario.getPopulation();
 
         for (Vehicle vrpVeh : vrpData.getVehicles()) {
-            Id personId = scenario.createId("v" + vrpVeh.getId());
+            Id personId = scenario.createId(vrpVeh.getName());
             VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
 
             Plan dummyPlan = new PlanImpl(vrpDriver);

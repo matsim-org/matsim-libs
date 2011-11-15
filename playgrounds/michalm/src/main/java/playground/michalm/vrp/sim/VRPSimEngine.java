@@ -4,12 +4,9 @@ import java.util.*;
 
 import org.matsim.ptproject.qsim.interfaces.*;
 
-import pl.poznan.put.vrp.cvrp.data.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.monitoring.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
-import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.vrp.data.*;
 
 
@@ -20,7 +17,7 @@ public class VRPSimEngine
 
     private VRPData vrpData;
 
-    private AlgorithmParams algParams;
+    private VRPOptimizerFactory optimizerFactory;
     private VRPOptimizer optimizer;
 
     private static final int MAX_TIME_DIFFERENCE = 180; // in seconds
@@ -31,10 +28,10 @@ public class VRPSimEngine
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
 
-    public VRPSimEngine(Netsim netsim, MATSimVRPData data, AlgorithmParams algParams)
+    public VRPSimEngine(Netsim netsim, MATSimVRPData data, VRPOptimizerFactory optimizerFactory)
     {
         this.netsim = netsim;
-        this.algParams = algParams;
+        this.optimizerFactory = optimizerFactory;
 
         vrpData = data.getVrpData();
     }
@@ -58,7 +55,7 @@ public class VRPSimEngine
         // remove all existing requests
         vrpData.getRequests().clear();
 
-        optimizer = new VRPOptimizer(algParams);
+        optimizer = optimizerFactory.create();
 
         optimize();
     }
@@ -82,9 +79,7 @@ public class VRPSimEngine
 
     public void taxiRequestSubmitted(Request request)
     {
-        System.err.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        System.err.println(request);
-        System.err.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        System.err.println("Req: " + request + " has been submitted");
         demandChanged = true;
     }
 

@@ -1,5 +1,7 @@
 package playground.michalm.vrp.demand;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
@@ -43,17 +45,22 @@ public class TaxiModeDepartureHandler
             Id toLinkId = agent.getDestinationLinkId();
             MATSimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
+            
+            List<Request> requests = data.getVrpData().getRequests();
+            
+            int id = requests.size();
+            
             // notify the DVRP Optimizer
             // agent -> customerId -> Customer
-            Customer customer = new TaxiCustomer(0, fromVertex, agent);// TODO
+            Customer customer = new TaxiCustomer(id, fromVertex, agent);// TODO
 
             int duration = 120; // approx. 120 s for entering the taxi
             int t0 = (int)now;
             int t1 = t0 + 3600; // hardcoded values!
-            Request request = new RequestImpl(0, customer, fromVertex, toVertex, 1, 1, duration,
+            Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
                     t0, t1, false);
 
-            data.getVrpData().getRequests().add(request);
+            requests.add(request);
             // call for a taxi -> means notify DVRPOptimizer
             vrpEngine.taxiRequestSubmitted(request);
 

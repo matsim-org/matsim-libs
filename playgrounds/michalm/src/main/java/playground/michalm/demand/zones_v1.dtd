@@ -9,7 +9,7 @@
 
 <!ELEMENT zones (zone)*>
 
-<!ELEMENT zone (groups, activities)>
+<!ELEMENT zone (groups, activities)?>
 
 <!ATTLIST zone
 	id	CDATA	#REQUIRED>

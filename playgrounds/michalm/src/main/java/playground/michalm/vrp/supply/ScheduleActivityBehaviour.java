@@ -28,7 +28,7 @@ class ScheduleActivityBehaviour
             case UNPLANNED: // before schedule
                 return vehicle.getT1();
             case COMPLETED: // after schedule
-                return s.getBeginTime();// without "-1"
+                return s.getEndTime();// without "-1"
             default:
                 throw new IllegalStateException();
         }

@@ -48,18 +48,28 @@ public class ODDemandGenerator
             for (int j = 0; j < zoneCount; j++) {
                 Zone dZone = fileOrderedZones.get(j);
 
-                int odFlow = odMatrix[i][j];
+                int odFlow = odMatrix[i][j] / 2;
 
                 for (int k = 0; k < 2 * odFlow; k++) {
                     // generatePlans for the OD pair
 
+                    if (!(k % 100 == 0 && i < 9 && j < 9)) {
+                        continue;
+                    }
+
+                    
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);
                     Activity act = createActivity(plan, "dummy", oCoord);
                     act.setEndTime(3600 * k / odFlow);
 
-                    plan.addLeg(pf.createLeg(TransportMode.car));
+                    if (k % 100 == 0 && i < 9 && j < 9) {
+                        plan.addLeg(pf.createLeg("taxi"));
+                    }
+                    else {
+                        plan.addLeg(pf.createLeg(TransportMode.car));
+                    }
 
                     Coord dCoord = getRandomCoordInZone(dZone);
                     act = createActivity(plan, "dummy", dCoord);
@@ -82,31 +92,13 @@ public class ODDemandGenerator
         String idField;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-dyplomy\\PLANY\\";
+            dirName = "D:\\PP-rad\\taxi\\mielec\\";
             networkFileName = dirName + "network.xml";
             zonesXMLFileName = dirName + "zones.xml";
-            zonesShpFileName = dirName + "zones_with_no_zone.SHP";
+            zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
             odMatrixFileName = dirName + "odMatrix.dat";
             plansFileName = dirName + "plans.xml";
             idField = "NO";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
-            // networkFileName = dirName + "network2.xml";
-            // zonesXMLFileName = dirName + "zones2.xml";
-            // zonesShpFileName = dirName + "zones2.shp";
-            // plansFileName = dirName + "plans2.xml";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\Paj\\";
-            // networkFileName = dirName + "network.xml";
-            // zonesXMLFileName = dirName + "zone.xml";
-            // zonesShpFileName = dirName + "zone.shp";
-            // plansFileName = dirName + "plans.xml";
-
-            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-            // networkFileName = dirName + "network2.xml";
-            // zonesXMLFileName = dirName + "zones2.xml";
-            // zonesShpFileName = dirName + "zone.shp";
-            // plansFileName = dirName + "plans.xml";
         }
         else if (args.length == 7) {
             dirName = args[0];

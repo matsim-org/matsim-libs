@@ -12,7 +12,7 @@ public class Launcher4Kai
         arguments[0] = "../../maciejewski/input/test/taxi_single_iteration/grid-net";
         arguments[1] = "network.xml";
         arguments[2] = "plans.xml";
-        arguments[3] = "algorithm.txt";//alg config
+        arguments[3] = "depots.xml";
         
         //OFTVis on?
         arguments[4] = "true";
