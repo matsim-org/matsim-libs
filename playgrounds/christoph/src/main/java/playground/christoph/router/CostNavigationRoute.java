@@ -42,10 +42,12 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 public class CostNavigationRoute extends WithinDayDuringLegReplanner {
+	
+	/* A constant for the exactness when comparing doubles. */
+	public static final double EPSILON = 1e-10;
 	
 	protected Network network;
 	protected CostNavigationTravelTimeLogger travelTimeLogger;
@@ -54,8 +56,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	protected TravelCostCalculatorFactory travelCostFactory;
 	protected PersonalizableTravelCost travelCost;
 	protected PersonalizableTravelTime travelTime;
-	
-	
+		
 	/*package*/ CostNavigationRoute(Id id, Scenario scenario, Network network, CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, 
 			TravelCostCalculatorFactory travelCostFactory, PersonalizableTravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
 		super(id, scenario);
@@ -162,7 +163,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		 */
 		double checkSum = 0.0;
 		for (Double value : probabilities.values()) checkSum += value;
-		assert Math.abs(checkSum - 1.0) < MatsimTestCase.EPSILON;
+		assert Math.abs(checkSum - 1.0) < EPSILON;
 		
 		double randomNumber = costNavigationTravelTimeLogger.getRandomNumber(personId);
 				
