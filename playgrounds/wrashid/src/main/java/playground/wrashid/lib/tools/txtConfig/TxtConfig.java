@@ -43,6 +43,11 @@ public class TxtConfig {
 		}
 	}
 
+	/**
+	 * returns null, if value does not exist.
+	 * @param key
+	 * @return
+	 */
 	public String getParameterValue(String key) {
 		return parameterValues.get(key);
 	}
