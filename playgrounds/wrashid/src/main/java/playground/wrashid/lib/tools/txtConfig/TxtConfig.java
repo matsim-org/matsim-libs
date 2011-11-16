@@ -2,6 +2,7 @@ package playground.wrashid.lib.tools.txtConfig;
 
 import java.util.HashMap;
 
+import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.StringMatrix;
 /**
@@ -52,6 +53,15 @@ public class TxtConfig {
 	 */
 	public String getParameterValue(String key) {
 		return parameterValues.get(key);
+	}
+
+	public int getIntParameter(String key) {
+		String parameterValue = getParameterValue(key);
+		if (parameterValue==null){
+			DebugLib.stopSystemAndReportInconsistency("key missing: " + key);
+		}
+		
+		return Integer.parseInt(parameterValue);
 	}
 
 }
