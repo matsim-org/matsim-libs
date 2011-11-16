@@ -206,11 +206,13 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			((PersonImpl) population.getPersons().get(
 				decisionMaker.getPersonId())).getTravelcards();
 
-		if ( travelCards.contains( ReducedModelConstants.GA_ABO ) ) {
-			return configGroup.getGaCostPerM();
-		}
-		if ( travelCards.contains( ReducedModelConstants.HT_ABO ) ) {
-			return configGroup.getHtCostPerM();
+		if ( travelCards != null) {
+			if ( travelCards.contains( ReducedModelConstants.GA_ABO ) ) {
+				return configGroup.getGaCostPerM();
+			}
+			if ( travelCards.contains( ReducedModelConstants.HT_ABO ) ) {
+				return configGroup.getHtCostPerM();
+			}
 		}
 		return configGroup.getPtCostPerM();
 	}
