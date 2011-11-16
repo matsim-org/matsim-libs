@@ -152,6 +152,10 @@ public class EnergyConsumptionRegressionModel {
 				DebugLib.emptyFunctionForSettingBreakPoint();
 			}
 			
+			if (energyConsumptionInJoulePerMeter>1000){
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
+			
 			return energyConsumptionInJoulePerMeter;
 		}
 	}

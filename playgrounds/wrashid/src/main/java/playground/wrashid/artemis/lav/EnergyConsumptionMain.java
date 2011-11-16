@@ -37,7 +37,7 @@ public class EnergyConsumptionMain {
 		final String plansFileName = baseFolder + "output_plans.xml.gz";
 		final String facilitiesFileName = baseFolder + "output_facilities.xml.gz";
 
-		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/9. nov. 2011/zurich_fleet_2010.txt";
+		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2050_high";
 
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
