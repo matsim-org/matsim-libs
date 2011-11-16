@@ -134,10 +134,11 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 
 	/**
 	 * creates an unexisting id.
-	 * The synchronized status ensures that if several threads create ids
-	 * simultaneously, no duplicate id can be created.
+	 *
+	 * the method is static and synchronized, so that simultaneous
+	 * creation of Ids in different threads is safe.
 	 */
-	private synchronized IdLeg createId() {
+	private static synchronized IdLeg createId() {
 		return new IdLeg( currentLegId++ );
 	}
 
