@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -107,10 +108,24 @@ public class Mz2000ActivityChainsExtractor {
 }
 
 /**
+ * used to indicate that the activity chain is inconsistent, and should not be
+ * retained.
+ */
+class UnconsistentMzRecordException extends Exception {
+	private static final long serialVersionUID = 1L;
+	public UnconsistentMzRecordException(final String msg) {
+		super( msg );
+	}
+}
+
+/**
  * general remarks on the fields:
  * interview number used as a person id
  */
 class MzPopulation {
+	private static final Logger log =
+		Logger.getLogger(MzPopulation.class);
+
 	private final Map<Id, MzPerson> persons = new HashMap<Id, MzPerson>();
 
 	public Scenario getScenario() {
@@ -119,10 +134,19 @@ class MzPopulation {
 
 		Population population = scen.getPopulation();
 
+		Person matsimPerson;
 		for (MzPerson person : persons.values()) {
-			population.addPerson( person.getPerson() );
+			try {
+				matsimPerson = person.getPerson();
+			} catch (UnconsistentMzRecordException e) {
+				// entry is inconsistent: inform user and pass to the next
+				// log.info( "got unconsistent entry: "+e.getMessage() );
+				continue;
+			}
+			population.addPerson( matsimPerson );
 		}
 
+		MzPerson.printStatistcs();
 		return scen;
 	}
 
@@ -161,6 +185,7 @@ class MzPerson implements Identifiable {
 
 	// /////////////////////////////////////////////////////////////////////////
 	// static fields
+	private static final Statistics stats = new Statistics();
 	private static boolean structureIsKnown = false;
 
 	private static final String EMPLOYED_NAME = "F50003";
@@ -200,7 +225,7 @@ class MzPerson implements Identifiable {
 	private final Map<Id, MzWeg> wege = new HashMap<Id, MzWeg>();
 
 	// /////////////////////////////////////////////////////////////////////////
-	// structure extraction
+	// static methods
 	public static void notifyStructure(final String headLine) {
 		String[] names = headLine.split("\t");
 
@@ -231,6 +256,10 @@ class MzPerson implements Identifiable {
 		structureIsKnown = true;
 	}
 
+	public static void printStatistcs() {
+		stats.printStats();
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
@@ -238,13 +267,25 @@ class MzPerson implements Identifiable {
 		if (!structureIsKnown) throw new IllegalStateException( "structure of file unknown" );
 		String[] lineArray = line.split("\t");
 
-		this.employed = booleanField( lineArray[ employedIndex ] );
-		this.id = new IdImpl( lineArray[ idIndex ].trim() );
-		this.dayOfWeek = dayOfWeek( lineArray[ dayOfWeekIndex ] );
-		this.license = booleanField( lineArray[ licenceIndex ] );
-		this.age = Integer.parseInt( lineArray[ ageIndex ] );
-		this.weight = Double.parseDouble( lineArray[ weightIndex ] );
-		this.gender = gender( lineArray[ genderIndex] );
+		try {
+			this.employed = booleanField( lineArray[ employedIndex ] );
+			this.id = new IdImpl( lineArray[ idIndex ].trim() );
+			this.dayOfWeek = dayOfWeek( lineArray[ dayOfWeekIndex ] );
+			this.age = Integer.parseInt( lineArray[ ageIndex ] );
+			this.license = licence( age , lineArray[ licenceIndex ] );
+			this.weight = Double.parseDouble( lineArray[ weightIndex ] );
+			this.gender = gender( lineArray[ genderIndex] );
+		} catch (Exception e) {
+			throw new RuntimeException(
+					"problem while parsing line"+Arrays.toString(lineArray),
+					e);
+		}
+	}
+
+	private Boolean licence(final int age, final String value) {
+		// for children, no value
+		if ( age < 18 ) return false;
+		return booleanField( value );
 	}
 
 	private Boolean booleanField( final String value ) {
@@ -276,10 +317,13 @@ class MzPerson implements Identifiable {
 		return id;
 	}
 
-	public Person getPerson() {
+	/**
+	 * @throws UnconsistentMzRecordException if the resulting plan contains
+	 * inconsistencies.
+	 */
+	public Person getPerson() throws UnconsistentMzRecordException {
+		stats.totalPersonsProcessed();
 		PersonImpl person = new PersonImpl( id );
-
-		setPersonAttributes( person );
 
 		PlanImpl plan = person.createAndAddPlan( true );
 		List< MzWeg > trips = new ArrayList< MzWeg >( wege.values() );
@@ -299,45 +343,78 @@ class MzPerson implements Identifiable {
 		MzAdress homeAdress = trips.size() > 0 ?
 			trips.get( 0 ).getDepartureAdress() :
 			null;
+		MzAdress currentActivityAdress = homeAdress;
+		double currentTime = 0;
 
 		// TODO: check O/D consistency (departure from previous arrival).
 		for (MzWeg weg : trips) {
 			// do not include round trips
-			if ( weg.getArrivalAdress().equals( weg.getDepartureAdress() ) ) continue;
+			if ( weg.getArrivalAdress().equals( weg.getDepartureAdress() ) ) {
+				// log.info( "round trip for agent "+id );
+				stats.roundTrip();
+				// continue;
+				throw new UnconsistentMzRecordException( "round trip" );
+			}
 			
+			if (!weg.getDepartureAdress().equals( currentActivityAdress )) {
+				stats.addressInconsistency();
+				throw new UnconsistentMzRecordException( "adress inconsistency" );
+			}
+			if (weg.getDepartureTime() < currentTime) {
+				stats.timeSequenceInconsistency();
+				throw new UnconsistentMzRecordException( "time inconsistency : departure before previous arrival" );
+			}
+			if (Math.abs( weg.getArrivalTime() - weg.getDepartureTime()
+						- weg.getDuration() ) > 1E-7 ) {
+				stats.tripDurationInconsistency();
+				throw new UnconsistentMzRecordException( "time inconsistency : arrival - departure is not duration" );
+			}
+
+			currentActivityAdress = weg.getArrivalAdress();
+			currentTime = weg.getArrivalTime();
 			currentAct.setEndTime( weg.getDepartureTime() );
 
-			String actType = null;
-			switch (weg.getPurpose()) {
-				case work:
-					actType = WORK;
-					break;
-				case leisure:
-					actType = LEISURE;
-					break;
-				case educ:
-					actType = EDUC;
-					break;
-				case shop:
-					actType = SHOP;
-					break;
-				case service:
-					log.warn( "got a service trip not round. setting activity type as leisure." );
-			}
+			//String actType = null;
+			//switch ( weg.getPurpose() ) {
+			//	case work:
+			//		actType = WORK;
+			//		break;
+			//	case service:
+			//		log.warn( "got a service trip not round. setting activity type as leisure." );
+			//	case leisure:
+			//		actType = LEISURE;
+			//		break;
+			//	case educ:
+			//		actType = EDUC;
+			//		break;
+			//	case shop:
+			//		actType = SHOP;
+			//		break;
+			//	case unknown:
+			//		actType = "";
+			//		break;
+			//	default:
+			//		throw new RuntimeException( "unknown value "+weg.getPurpose() );
+			//}
+			String actType = ""+weg.getPurpose();
 
 			Leg leg = weg.getLeg();
 			plan.addLeg( leg );
 			
 			if ( weg.getArrivalAdress().equals( homeAdress ) ) {
+			// if (false) {
 				currentAct = plan.createAndAddActivity( HOME );
 			}
 			else {
 				currentAct = plan.createAndAddActivity( actType );
 			}
 
-			currentAct.setStartTime( leg.getDepartureTime() );
+			currentAct.setStartTime( leg.getDepartureTime() + leg.getTravelTime() );
 		}
 
+		setPersonAttributes( person );
+
+		stats.totallyProcessedPerson();
 		return person;
 	}
 
@@ -370,10 +447,73 @@ class MzPerson implements Identifiable {
 
 		enclosingWeg.addEtappe( etappe );
 	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// statistics tracking: helper class
+	// /////////////////////////////////////////////////////////////////////////
+	// TODO: "externalize"
+	private static class Statistics {
+		private int addressInconsistencies = 0;
+		private int timeSequenceInconsistencies = 0;
+		private int tripDurationInconsistencies = 0;
+		private int totalPersonsProcessed = 0;
+		private int totallyProcessedPersons = 0;
+		private int roundTrips = 0;
+
+		public void roundTrip() {
+			roundTrips++;
+		}
+
+		public void addressInconsistency() {
+			addressInconsistencies++;
+		}
+
+		public void timeSequenceInconsistency() {
+			timeSequenceInconsistencies++;
+		}
+
+		public void tripDurationInconsistency() {
+			tripDurationInconsistencies++;
+		}
+
+		public void totalPersonsProcessed() {
+			totalPersonsProcessed++;
+		}
+
+		public void totallyProcessedPerson() {
+			totallyProcessedPersons++;
+		}
+
+		public void printStats() {
+			log.info( "-----------> statistics on the processing:" );
+			log.info( "round trips (ignored): "+roundTrips );
+			log.info( "adress inconsistencies: "+addressInconsistencies );
+			log.info( "time sequence inconsistencies: "+timeSequenceInconsistencies );
+			log.info( "trip duration inconsistencies: "+tripDurationInconsistencies );
+			log.info( "total number of persons: "+totalPersonsProcessed );
+			log.info( "number of persons retained: "+totallyProcessedPersons );
+			MzAdress.printStatistics();
+			log.info( "<----------- end of statistics on the processing" );
+		}
+	}
 }
 
 class MzWeg implements Identifiable {
-	public enum Purpose {work, educ, leisure, shop, transitInteraction, service}; 
+	/**
+	 * reproduces (almost) all the possible answers of the MZ (exception: two kind
+	 * of "work" purpose, ie professional activity and work, are merged).
+	 */
+	public enum Purpose {
+		work,
+		educ,
+		leisure,
+		shop,
+		transitTransfer,
+		useService,
+		servePassengerRide,
+		accompany,
+		unknown}; 
+
 	// /////////////////////////////////////////////////////////////////////////
 	// static fields
 	private static boolean structureIsKnown = false;
@@ -519,18 +659,17 @@ class MzWeg implements Identifiable {
 		int i = Integer.parseInt( value.trim() );
 
 		switch ( i ) {
-			case 0: return Purpose.transitInteraction;
+			case 0: return Purpose.transitTransfer;
 			case 1: // Arbeit
 			case 4: // Geschäftliche Tätigkeit
 					return Purpose.work;
 			case 2: return Purpose.educ;
 			case 3: return Purpose.shop;
-			case 5: // Dienstfahrt
-			case 6: // Serviceweg
-			case 8: // Begleitweg
-					return Purpose.service;
+			case 5: return Purpose.useService; // Dienstfahrt
+			case 6: return Purpose.servePassengerRide;// Serviceweg
+			case 8: return Purpose.accompany; // Begleitweg
 			case 9: // no answer
-			default: return null; // or fail with custom exception?
+			default: return Purpose.unknown; // or fail with custom exception?
 		}
 	}
 
@@ -560,6 +699,14 @@ class MzWeg implements Identifiable {
 
 	public double getDepartureTime() {
 		return departureTime;
+	}
+
+	public double getArrivalTime() {
+		return arrivalTime;
+	}
+
+	public double getDuration() {
+		return duration;
 	}
 
 	public Leg getLeg() {
@@ -675,24 +822,29 @@ class MzEtappe implements Identifiable {
 		int i = Integer.parseInt( value );
 
 		switch (i) {
-			case 1: return TransportMode.walk;
-			case 2: return TransportMode.bike;
-			case 3: // all motorised private vehicles (including
-			case 4: // as passenger) are considered as "car".
-			case 5: // this is done mainly becaus this will be optimised
-			case 6: // anyway.
-			case 23:
-			case 7: return TransportMode.car;
-			case 8:
-			case 9:
-			case 10:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 15:
-			case 16:
-			case 17: return TransportMode.pt;
+			case 1: // Zu Fuss
+				return TransportMode.walk;
+			case 2: // Velo
+				return TransportMode.bike;
+			case 6: // Auto als Fahrer
+				return TransportMode.car;
+			case 7: // Auto als Mitfahrer
+				return TransportMode.ride;
+			case 8: // Bahn
+			case 9: // Postauto
+			case 10: // Bus
+			case 11: // Tram
+			case 12: // Taxi
+			case 13: // Reisecar
+			case 14: // Lastwagen
+			case 15: // Schiff
+			case 16: // Flugzeug
+			case 17: // Zahnradbahn, Seilbahn, Standseilbahn, Sessellift, Skilift
+				return TransportMode.pt;
+			case 23: // Kleinmotorrad
+			case 3: // Mofa (Motorfahrrad)
+			case 4: // Motorrad als Fahrer
+			case 5: // Motorrad als Mitfahrer
 			default: return "unknown";
 		}
 	}
@@ -728,7 +880,13 @@ class MzEtappe implements Identifiable {
 }
 
 class MzAdress {
+	private static final Logger log =
+		Logger.getLogger(MzAdress.class);
+
 	private final String adress;
+	
+	private static int nCreatedAdresses = 0;
+	private static int nCreatedFullAdresses = 0;
 
 	private MzAdress(
 			final String ortCode,
@@ -737,6 +895,18 @@ class MzAdress {
 		this.adress = (street.toLowerCase().trim()+
 				" "+streetNr.toLowerCase().trim()+
 				" "+ortCode.trim()).trim();
+
+		nCreatedAdresses++;
+		if (!adress.equals( ortCode.trim() )) nCreatedFullAdresses++;
+	}
+
+	public static void printStatistics() {
+		log.info( "number of created adresses: "+nCreatedAdresses );
+		log.info( "number of created full adresses: "+nCreatedFullAdresses );
+		log.info( "=> proportion of adresses only consisting in ZIP Code: "+
+				(100 * ( ((double) nCreatedAdresses - (double) nCreatedFullAdresses)
+						 / (double) nCreatedAdresses ))+
+				"%");
 	}
 
 	@Override
@@ -750,7 +920,6 @@ class MzAdress {
 			((MzAdress) other).adress.equals( adress );
 	}
 
-	// in prevision for the possible need of pooling
 	static MzAdress createAdress(
 			final String ortCode,
 			final String street,
