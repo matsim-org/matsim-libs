@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
+
 
 import com.vividsolutions.jts.algorithm.NonRobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,12 +39,14 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 	private final double w_i = 1;
 
+	private final double tau = 0.5;
+
 	//Laemmel constant
 	private static final double neighborhoodSensingRange = 5;
 
-	public VelocityObstacleForce(PhysicalFloor floor) {
+	public VelocityObstacleForce(PhysicalFloor floor, Scenario sc) {
 		this.floor = floor;
-		this.driver = new PathAndDrivingAcceleration(floor);
+		this.driver = new PathAndDrivingAcceleration(floor,sc);
 	}
 
 
@@ -151,8 +155,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		double penalty = this.w_i / time + diff;
 		if (penalty < minPenalty) {
 			minPenalty = penalty;
-			fx = (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
-			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+			fx = (nvx - vx)*Agent2D.AGENT_WEIGHT/this.tau ;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/this.tau;
 		}
 		//		//DEBUG
 		//		GeometryFactory geofac = new GeometryFactory();
@@ -168,8 +172,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		penalty = this.w_i / time + diff;
 		if (penalty < minPenalty) {
 			minPenalty = penalty;
-			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
-			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/this.tau;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/this.tau;
 		}
 		//		//DEBUG
 		//		LineString rightvA = geofac.createLineString(new Coordinate []{c0,c1});
@@ -188,17 +192,31 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/this.deltaT;
 		//		}
 
-		//deccel
-		nvx = vx*.8;
-		nvy = vy*.8;
+		//break
+		nvx = 0;
+		nvy = 0;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		//		diff = 2*deltaVy;
 		penalty = this.w_i / time + diff;
 		if (penalty < minPenalty) {
 			minPenalty = penalty;
-			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/.5;
-			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/.5;
+			fx =  (nvx - vx)*Agent2D.AGENT_WEIGHT/this.tau;
+			fy = (nvy - vy)*Agent2D.AGENT_WEIGHT/this.tau;
+		}
+
+
+		//keep current
+		nvx = vx;
+		nvy = vy;
+		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		time = timeToCollision(vOs, c0, c1);
+		//		diff = 2*deltaVy;
+		penalty = this.w_i / time + diff;
+		if (penalty < minPenalty) {
+			minPenalty = penalty;
+			fx = df[0];
+			fy = df[1];
 		}
 
 		df[0] = (df[0]+fx)/2;

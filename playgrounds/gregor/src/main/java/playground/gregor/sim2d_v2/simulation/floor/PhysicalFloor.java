@@ -112,7 +112,7 @@ public class PhysicalFloor implements Floor {
 		calculateEnvelope();
 
 		//for testing!!
-		//		this.dynamicForceModules.add(new VelocityObstacleForce(this));
+		this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
 
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){

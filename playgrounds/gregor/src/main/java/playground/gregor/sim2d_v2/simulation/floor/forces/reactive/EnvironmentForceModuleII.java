@@ -62,9 +62,10 @@ public class EnvironmentForceModuleII implements ForceModule {
 		double tanX = tanDvx * -dx;
 		double tanY = tanDvy * dy;
 
-		double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
-		double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
-
+		//		double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
+		//		double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
+		double xc = (k*g)* dx;
+		double yc = (k*g)* dy;
 		fx += xc;
 		fy += yc;
 

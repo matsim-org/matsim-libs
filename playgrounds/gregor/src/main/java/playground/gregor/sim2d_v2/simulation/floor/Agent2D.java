@@ -50,7 +50,7 @@ public class Agent2D  {
 	private final double maxV = 2.;
 
 	public static final double AGENT_WEIGHT = 80;// * 1000;
-	public static final double AGENT_DIAMETER = 0.50;
+	public static final double AGENT_DIAMETER = 0.25;
 
 	private CCWPolygon geometry;
 	private final double a_min = .18;

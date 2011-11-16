@@ -12,6 +12,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+
 
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -127,8 +129,12 @@ public class FinishLineCrossedChecker {
 			}
 		}
 
-		LineString ret = this.geofac.createLineString(new Coordinate[]{cc1,cc2});
-
+		LineString ret;
+		if ( Algorithms.isLeftOfLine(cc1, a, cc2) > 0) {
+			ret = this.geofac.createLineString(new Coordinate[]{cc1,cc2});
+		} else {
+			ret = this.geofac.createLineString(new Coordinate[]{cc2,cc1});
+		}
 		return ret;
 	}
 
@@ -169,7 +175,6 @@ public class FinishLineCrossedChecker {
 		c2.y += to.y;
 		LineString ls = this.geofac.createLineString(new Coordinate[] { c1, c2 });
 
-
 		return ls;
 	}
 
@@ -181,8 +186,15 @@ public class FinishLineCrossedChecker {
 		} else {
 			ls = this.finishLines.get(currentLinkId).finishLines.get(nextLinkId);
 		}
-		LineString trajectory = this.geofac.createLineString(new Coordinate[]{oldPos,newPos});
-		return trajectory.crosses(ls);
+
+		//isLeftOfLine is about 50x faster than crosses so we test crosses only if we are left of the finish line
+		// where the end point of the trajectory is left of the finish line if crosses returns true
+		if (Algorithms.isLeftOfLine(newPos, ls.getCoordinateN(0), ls.getCoordinateN(1)) > 0) {
+			LineString trajectory = this.geofac.createLineString(new Coordinate[]{oldPos,newPos});
+			return trajectory.crosses(ls);
+		}
+
+		return false;
 	}
 
 	private static final class FinishLines {

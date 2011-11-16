@@ -72,12 +72,12 @@ public class Sim2DConfigGroup extends Module {
 	private String phantomPopulationEventsFile;
 
 	private boolean enableCircularAgentInteractionModule = false;
-	private boolean enableCollisionPredictionAgentInteractionModule = true;
+	private boolean enableCollisionPredictionAgentInteractionModule = false;
 
 
 
 	private boolean enableCollisionPredictionEnvironmentForceModule = false;
-	private boolean enableDrivingForceModule = true;
+	private boolean enableDrivingForceModule = false;
 
 
 	private boolean enableEnvironmentForceModule = true;
