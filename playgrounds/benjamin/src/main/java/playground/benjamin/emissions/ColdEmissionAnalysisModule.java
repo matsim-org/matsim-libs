@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import playground.benjamin.emissions.dataTypes.ColdPollutant;
-import playground.benjamin.emissions.dataTypes.HbefaColdEmissionFactor;
 import playground.benjamin.emissions.events.ColdEmissionEventImpl;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
 
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);

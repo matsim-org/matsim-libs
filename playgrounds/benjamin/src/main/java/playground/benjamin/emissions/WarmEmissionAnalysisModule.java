@@ -35,12 +35,13 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
-import playground.benjamin.emissions.dataTypes.HbefaTrafficSituation;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactors;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactorsDetailed;
-import playground.benjamin.emissions.dataTypes.HbefaRoadTypeTrafficSituation;
-import playground.benjamin.emissions.dataTypes.WarmPollutant;
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
+import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
+import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
+import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
+import playground.benjamin.emissions.types.HbefaTrafficSituation;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
@@ -48,8 +49,7 @@ public class WarmEmissionAnalysisModule {
 	private final Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
 
 	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
-	private final HbefaWarmEmissionFactors[][] avgHbefaWarmTable;
-	private final HbefaWarmEmissionFactors[][] avgHbefaWarmTableHDV;
+	private final Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
 
 	private final EventsManager eventsManager;
 	
@@ -60,13 +60,11 @@ public class WarmEmissionAnalysisModule {
 	public WarmEmissionAnalysisModule(
 			Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping,
 			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
-			HbefaWarmEmissionFactors[][] avgHbefaWarmTable,
-			HbefaWarmEmissionFactors[][] avgHbefaWarmTableHDV,
+			Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable,
 			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
 		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
-		this.avgHbefaWarmTableHDV = avgHbefaWarmTableHDV;
 		this.eventsManager = emissionEventsManager;
 	}
 
@@ -95,14 +93,8 @@ public class WarmEmissionAnalysisModule {
 		if (relevantInformation != null) {
 			warmEmissions = calculateDetailedEmissions(relevantInformation,	travelTime, linkLength);
 		} else {// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
-			int hbefaRoadType = this.roadTypeMapping.get(roadType).getHBEFA_RT_NR();
 			
-			// Non-HDV emissions; TODO: better filter?!?
-			if (!personId.toString().contains("gv_")) {
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.avgHbefaWarmTable);
-			} else {
-				warmEmissions = calculateAverageEmissions(hbefaRoadType, travelTime, linkLength, this.avgHbefaWarmTableHDV);
-			}
+			warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
 			
 			if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
 				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
@@ -185,9 +177,9 @@ public class WarmEmissionAnalysisModule {
 		String[] ageFuelCcmArray = ageFuelCcm.split(";");
 		String[] result = new String[3];
 	
-		int year = splitAndConvert(ageFuelCcmArray[0], ":");
-		int fuelType = splitAndConvert(ageFuelCcmArray[1], ":");
-		int cubicCap = splitAndConvert(ageFuelCcmArray[2], ":");
+		int year = splitAndReduce(ageFuelCcmArray[0], ":");
+		int fuelType = splitAndReduce(ageFuelCcmArray[1], ":");
+		int cubicCap = splitAndReduce(ageFuelCcmArray[2], ":");
 
 		if (year < 1993 && fuelType == 1)
 			result[0] = "PC-P-Euro-0";
@@ -236,7 +228,7 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	private String makeKey(WarmPollutant warmPollutant, int roadType, String emConcept, String technology, String sizeClass, HbefaTrafficSituation trafficSit){
-		String trafficSituation = this.roadTypeMapping.get(roadType).getTRAFFIC_SITUATION();
+		String trafficSituation = this.roadTypeMapping.get(roadType).getTRAFFIC_SITUATION_MAPPING().get(trafficSit);
 		
 		return "PC[3.1]"
 				+ ";"
@@ -262,26 +254,44 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer
-	private int splitAndConvert(String string, String splitSign) {
+	private int splitAndReduce(String string, String splitSign) {
 		String[] array = string.split(splitSign);
 		return Integer.valueOf(array[1]);
 	}
 
-	private Map<WarmPollutant, Double> calculateAverageEmissions(int hbefaRoadType, double travelTime, double linkLength, HbefaWarmEmissionFactors[][] HbefaTable) {
+	private Map<WarmPollutant, Double> calculateAverageEmissions(Id personId, double travelTime, int roadType, double linkLength) {
 		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
+		int hbefaRoadType = this.roadTypeMapping.get(roadType).getHBEFA_RT_NR();
+		
 		if (hbefaRoadType == 0) {
 			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
 				avgEmissionsOfEvent.put(warmPollutant, null);
 			}
 		} else {
-			double freeFlowSpeed = HbefaTable[hbefaRoadType][0].getVelocity();
-			double stopGoSpeed = HbefaTable[hbefaRoadType][3].getVelocity();
+			
+			HbefaAvgWarmEmissionFactorsKey keyFreeFlow = new HbefaAvgWarmEmissionFactorsKey();
+			HbefaAvgWarmEmissionFactorsKey keyStopAndGo = new HbefaAvgWarmEmissionFactorsKey();
+			//TODO: better filter for passenger cars vs. HDVs
+			if(personId.toString().contains("gv_")){
+				keyFreeFlow.setHbefaVehicleCategory("HDV");
+				keyStopAndGo.setHbefaVehicleCategory("HDV");
+			} else{
+				keyFreeFlow.setHbefaVehicleCategory("pass. car");
+				keyStopAndGo.setHbefaVehicleCategory("pass. car");
+			}
+			keyFreeFlow.setHbefaRoadCategory(hbefaRoadType);
+			keyStopAndGo.setHbefaRoadCategory(hbefaRoadType);
+			keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+			keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+			
+			double freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+			double stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
 			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
 				Double generatedEmissions;
-				Double efFreeFlow = HbefaTable[hbefaRoadType][0].getEf(warmPollutant);
+				Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor(warmPollutant);				
 				
 				if (averageSpeed < stopGoSpeed) {
 					generatedEmissions = linkLength / 1000 * efFreeFlow;
@@ -289,7 +299,7 @@ public class WarmEmissionAnalysisModule {
 					Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
 					Double stopGoFraction = stopGoSpeed * stopGoTime;
 					Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
-					Double efStopGo = HbefaTable[hbefaRoadType][3].getEf(warmPollutant);
+					Double efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor(warmPollutant);
 
 					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
 				}

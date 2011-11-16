@@ -37,11 +37,14 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.emissions.dataTypes.ColdPollutant;
-import playground.benjamin.emissions.dataTypes.HbefaColdEmissionFactor;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactors;
-import playground.benjamin.emissions.dataTypes.HbefaWarmEmissionFactorsDetailed;
-import playground.benjamin.emissions.dataTypes.HbefaRoadTypeTrafficSituation;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
+import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
+import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
+import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
+import playground.benjamin.emissions.types.HbefaTrafficSituation;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
@@ -53,24 +56,25 @@ public class EmissionHandler {
 	private final Scenario scenario;
 	private static EventWriterXML emissionEventWriter;
 
-	private static String roadTypesTrafficSituationsFile = null;
-	private static String detailedWarmEmissionFactorsFile = null ;
+	//===
+	private static String roadTypesTrafficSituationsFile;
 	
+	private static String detailedWarmEmissionFactorsFile;
+	
+	private static String averageFleetColdEmissionFactorsFile;
+	private static String averageFleetWarmEmissionFactorsFile;
+	
+	//===
 	Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
 
 	private Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 	
-	private HbefaWarmEmissionFactors[][] avgHbefaWarmTable;
-	private HbefaWarmEmissionFactors[][] avgHbefaWarmTableHDV;
+	private Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
 	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
 
-	// TODO: include file name specification into vspExperimentalConfigGroup
-	private static String vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
-	
-	private static String averageFleetcoldEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
-	private static String averageFleetwarmEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
-	private static String averageFleetwarmEmissionFactorsFileHDV = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW_hdv.txt";
-	
+	//===
+	private String vehicleFile;
+
 	public EmissionHandler(Scenario scenario) {
 		this.scenario = scenario;
 	}
@@ -80,13 +84,18 @@ public class EmissionHandler {
 		
 		getInputFiles();
 		
+		//=== TODO: include file name specification into vspExperimentalConfigGroup in getInputFiles();
+		averageFleetColdEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
+		averageFleetWarmEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
+		//===
+		
+		//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the emission factors tables...
 		roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
 
 		detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 
-		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetwarmEmissionFactorsFile);
-		avgHbefaWarmTableHDV = createAvgHbefaWarmTable(averageFleetwarmEmissionFactorsFileHDV);
-		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetcoldEmissionFactorsFile);
+		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 
 		logger.info("leaving createLookupTables");
 	}
@@ -102,6 +111,7 @@ public class EmissionHandler {
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
+		vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
 		vehicleReader.readFile(vehicleFile);
@@ -111,7 +121,6 @@ public class EmissionHandler {
 				roadTypeMapping,
 				detailedHbefaWarmTable,
 				avgHbefaWarmTable,
-				avgHbefaWarmTableHDV,
 				emissionEventsManager);
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule (
 				avgHbefaColdTable,
@@ -146,32 +155,33 @@ public class EmissionHandler {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
-			// Read and forget header line
-			br.readLine();
+			br.readLine(); // Read and forget header line
 			while ((strLine = br.readLine()) != null){
 				if ( strLine.contains("\"")) {
 					throw new RuntimeException("cannot handle this character in parsing") ;
 				}
 	
 				String[] inputArray = strLine.split(";");
+				Map<HbefaTrafficSituation, String> trafficSitMapping = new HashMap<HbefaTrafficSituation, String>();
 				
 				//required for mapping
 				Integer visumRtNr = Integer.parseInt(inputArray[0]);
 				Integer hbefaRtNr = Integer.parseInt(inputArray[2]);
-				String trafficSit = inputArray[4];
+				trafficSitMapping.put(HbefaTrafficSituation.FREEFLOW, inputArray[3]);
+				trafficSitMapping.put(HbefaTrafficSituation.HEAVY, inputArray[4]);
+				trafficSitMapping.put(HbefaTrafficSituation.SATURATED, inputArray[5]);
+				trafficSitMapping.put(HbefaTrafficSituation.STOPANDGO, inputArray[6]);
 				
-				HbefaRoadTypeTrafficSituation hbefaRoadTypeTrafficSituation = new HbefaRoadTypeTrafficSituation(hbefaRtNr, trafficSit);
+				HbefaRoadTypeTrafficSituation hbefaRoadTypeTrafficSituation = new HbefaRoadTypeTrafficSituation(hbefaRtNr, trafficSitMapping);
 				
 				//optional for mapping
 				hbefaRoadTypeTrafficSituation.setVISUM_RT_NAME(inputArray[1]) ;
-				hbefaRoadTypeTrafficSituation.setHBEFA_RT_NAME(inputArray[3]) ;
 				
 				roadTypeMapping.put(visumRtNr, hbefaRoadTypeTrafficSituation);
 			}
 			in.close();
-
+			
 			logger.info("leaving createRoadTypesTrafficSitMapping ...") ;
 			return roadTypeMapping;
 		} catch (Exception e){
@@ -179,41 +189,36 @@ public class EmissionHandler {
 		}
 	}
 	
-	private static HbefaWarmEmissionFactors[][] createAvgHbefaWarmTable(String filename){
+	private static Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		HbefaWarmEmissionFactors [] [] avgHbefaWarmTable = new HbefaWarmEmissionFactors [59][4];
+		Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable = new HashMap<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors>();
+		
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
-			int place = 0;
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
-			// Read and forget header line
-			br.readLine();
-			while ((strLine = br.readLine()) != null)   {
+			br.readLine();// Read and forget header line
+			while ((strLine = br.readLine()) != null) {
 
 				String[] array = strLine.split(";");
-				HbefaWarmEmissionFactors row = new HbefaWarmEmissionFactors(
-						Integer.parseInt(array[1])      //Road_Category
-						,array[2], 					    //IDTS
-						Double.parseDouble(array[4]),   //S (speed)
-						Double.parseDouble(array[5]),   //RPA
-						Double.parseDouble(array[6]),   //%stop
-						Double.parseDouble(array[7]),   //mKr
-						Double.parseDouble(array[8]),   //EF_Nox
-						Double.parseDouble(array[9]),   //EF_CO2(rep.)
-						Double.parseDouble(array[10]),  //EF_CO2(total)
-						Double.parseDouble(array[11]),  //NO2
-						Double.parseDouble(array[12])); //PM
-
-				int rowNumber = Integer.parseInt(array[1]);
-
-				avgHbefaWarmTable [rowNumber] [place] = row;
-
-				place++;
-				if (place==4) place =0;
+				
+				HbefaAvgWarmEmissionFactorsKey key = new HbefaAvgWarmEmissionFactorsKey();
+				key.setHbefaVehicleCategory(array[0]);
+				key.setHbefaRoadCategory(Integer.parseInt(array[1]));
+				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[3]));
+				
+				HbefaAvgWarmEmissionFactors value = new HbefaAvgWarmEmissionFactors();
+				value.setSpeed(Double.parseDouble(array[4]));
+				value.setEmissionFactor(WarmPollutant.FC, Double.parseDouble(array[7]));
+				value.setEmissionFactor(WarmPollutant.NOX, Double.parseDouble(array[8]));
+				value.setEmissionFactor(WarmPollutant.CO2_TOTAL, Double.parseDouble(array[10]));
+				value.setEmissionFactor(WarmPollutant.NO2, Double.parseDouble(array[11]));
+				value.setEmissionFactor(WarmPollutant.PM, Double.parseDouble(array[12]));
+				
+				avgHbefaWarmTable.put(key, value);
 			}
 			in.close();
 			
@@ -224,6 +229,19 @@ public class EmissionHandler {
 		}
 	}
 	
+	private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
+		HbefaTrafficSituation hbefaTrafficSituation = null;
+		if(string.contains("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
+		else if(string.contains("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
+		else if(string.contains("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
+		else if(string.contains("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
+		else {
+			logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			throw new RuntimeException();
+		}
+		return hbefaTrafficSituation;
+	}
+
 	private static Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
 		logger.info("leaving createAvgHbefaColdTable ...");
 		
@@ -235,8 +253,7 @@ public class EmissionHandler {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
-			// Read and forget header line
-			br.readLine();
+			br.readLine();// Read and forget header line
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
 				HbefaColdEmissionFactor coldEmissionFactor = new HbefaColdEmissionFactor(
