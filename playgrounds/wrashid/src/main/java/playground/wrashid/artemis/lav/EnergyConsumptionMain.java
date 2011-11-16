@@ -56,7 +56,7 @@ public class EnergyConsumptionMain {
 		events.addHandler(energyConsumptionPlugin);
 
 		DumbCharger dumbCharger = new DumbCharger(agentSocMapping, agentVehicleMapping,
-				energyConsumptionModel,1);
+				energyConsumptionModel,config.getIntParameter("chargingScenarioNumber"));
 		events.addHandler(dumbCharger);
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();

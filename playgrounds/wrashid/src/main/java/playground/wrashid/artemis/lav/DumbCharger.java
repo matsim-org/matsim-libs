@@ -58,7 +58,7 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 	private ChargingPowerInterface chargingPowerInterface;
 
 	public DumbCharger(HashMap<Id, VehicleSOC> agentSocMapping, HashMap<Id, VehicleTypeLAV> agentVehicleMapping,
-			EnergyConsumptionModelLAV_v1 energyConsumptionModel, int scenarioNumber) {
+			EnergyConsumptionModelLAV_v1 energyConsumptionModel, int chargingScenarioNumber) {
 		this.agentSocMapping = agentSocMapping;
 		this.agentVehicleMapping = agentVehicleMapping;
 		this.energyConsumptionModel = energyConsumptionModel;
@@ -66,12 +66,16 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 		this.firstCarDepartureTimeOfDay = new DoubleValueHashMap<Id>();
 		this.carParkedAtLink = new HashMap<Id, Id>();
 
-		if (scenarioNumber == 1) {
+		if (chargingScenarioNumber == 0) {
+			chargingPowerInterface = new NoCharging();
+		} else 	if (chargingScenarioNumber == 1) {
 			chargingPowerInterface = new CharingPowerScenario1();
-		} else if (scenarioNumber == 2) {
+		} else if (chargingScenarioNumber == 2) {
 			chargingPowerInterface = new CharingPowerScenario2();
-		} else if (scenarioNumber == 3) {
+		} else if (chargingScenarioNumber == 3) {
 			chargingPowerInterface = new CharingPowerScenario3();
+		} else if (chargingScenarioNumber == 4) {
+			chargingPowerInterface = new CharingPowerScenario4();
 		} else {
 			DebugLib.stopSystemAndReportInconsistency("scenario not defined...");
 		}
@@ -198,6 +202,7 @@ interface ChargingPowerInterface {
 	public double getChargingPowerInWatt(String actLocationType);
 }
 
+//charging only at home, with 3500W
 class CharingPowerScenario1 implements ChargingPowerInterface {
 
 	HashMap<String, Double> chargingLocationFilter;
@@ -216,7 +221,7 @@ class CharingPowerScenario1 implements ChargingPowerInterface {
 
 	@Override
 	public double getChargingPowerInWatt(String actLocationType) {
-		// charging only at home, with 3500W
+		
 
 		Double power = this.chargingLocationFilter.get(actLocationType);
 
@@ -231,20 +236,19 @@ class CharingPowerScenario1 implements ChargingPowerInterface {
 
 }
 
+//charging at home with 3500W
+// charging at work with 11000W
 class CharingPowerScenario2 extends CharingPowerScenario1 {
 
 	public CharingPowerScenario2() {
 		super();
-
-		// charging at home with 3500W
-		// charging at work with 11000W
 		this.chargingLocationFilter = new HashMap<String, Double>();
 		chargingLocationFilter.put("home", 3500.0);
 		chargingLocationFilter.put("work", 11000.0);
 	}
 }
 
-// charging everywhere with 11000W
+// charging everywhere with 3500W
 class CharingPowerScenario3 implements ChargingPowerInterface {
 
 	@Override
@@ -254,7 +258,39 @@ class CharingPowerScenario3 implements ChargingPowerInterface {
 
 	@Override
 	public double getChargingPowerInWatt(String actLocationType) {
-		return 11000;
+		return 3500;
+	}
+}
+
+//charging at home with 3500W, elsewhere with 11kW
+class CharingPowerScenario4 implements ChargingPowerInterface {
+
+	@Override
+	public boolean isCharingPossibleAtLocation(String actLocationType) {
+		return true;
 	}
 
+	@Override
+	public double getChargingPowerInWatt(String actLocationType) {
+		if (actLocationType.equalsIgnoreCase("home")){
+			return 3500;
+		} else {
+			return 11000;
+		}
+	}
+}
+
+// no charging
+class NoCharging implements ChargingPowerInterface {
+
+	@Override
+	public boolean isCharingPossibleAtLocation(String actLocationType) {
+		return false;
+	}
+
+	@Override
+	public double getChargingPowerInWatt(String actLocationType) {
+		DebugLib.stopSystemAndReportInconsistency(" no charging possible in this scenario");
+		return 0.0;
+	}
 }
