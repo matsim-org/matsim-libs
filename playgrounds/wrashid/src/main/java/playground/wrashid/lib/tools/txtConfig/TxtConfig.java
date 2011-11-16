@@ -13,7 +13,7 @@ public class TxtConfig {
 		parameterValues=new HashMap<String, String>();
 		StringMatrix stringMatrix = GeneralLib.readStringMatrix(fileName, "\t");
 		
-		for (int i=1;i<stringMatrix.getNumberOfRows();i++){
+		for (int i=0;i<stringMatrix.getNumberOfRows();i++){
 			parameterValues.put(stringMatrix.getString(i, 0), stringMatrix.getString(i, 1));
 		}
 	}
