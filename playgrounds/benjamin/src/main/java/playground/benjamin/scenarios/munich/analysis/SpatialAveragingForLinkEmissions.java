@@ -56,9 +56,9 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.emissions.dataTypes.ColdPollutant;
-import playground.benjamin.emissions.dataTypes.WarmPollutant;
 import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;

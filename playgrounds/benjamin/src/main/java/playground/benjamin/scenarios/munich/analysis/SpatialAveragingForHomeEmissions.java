@@ -53,7 +53,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.emissions.dataTypes.WarmPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
 import com.vividsolutions.jts.geom.Point;

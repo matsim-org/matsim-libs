@@ -31,9 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 
-import playground.benjamin.emissions.dataTypes.ColdPollutant;
-import playground.benjamin.emissions.dataTypes.WarmPollutant;
 import playground.benjamin.emissions.events.EmissionEventsReader;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
