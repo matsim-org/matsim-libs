@@ -41,14 +41,28 @@ public class TxtConfig {
 
 		for (int i = 0; i < stringMatrix.getNumberOfRows(); i++) {
 			parameterValues.put(stringMatrix.getString(i, 0), stringMatrix.getString(i, 1));
-		}
-
+		}	
+		
 		preprocessReservedKeyWords();
 
 		processSubstituions();
 		processSubstituions(); // allow 2 levels of substitutions
 
+		executeCommands();
 	}
+	
+	
+
+	private void executeCommands() {
+		for (String key : parameterValues.keySet()) {
+			String value = parameterValues.get(key);
+			if (key.equalsIgnoreCase("!mkdir")){
+				new File(value).mkdir();
+			}
+		}
+	}
+
+
 
 	private void preprocessReservedKeyWords() {
 		for (String key : parameterValues.keySet()) {
