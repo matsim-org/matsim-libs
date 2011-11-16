@@ -14,17 +14,20 @@ import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 
 public class EnergyConsumptionMain {
 
 	public static void main(String[] args) {
+		TxtConfig config=new TxtConfig(args[0]);
+		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		// the main scenario
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
 		//String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
-		final String eventsFileName = baseFolder + "ITERS/it.50/50.events.xml.gz";
+		final String baseFolder = config.getParameterValue("baseFolder");
+		final String eventsFileName =baseFolder + config.getParameterValue("eventsFileName");
 		//final String eventsFileName = "c:/tmp/input/output-events.xml.gz";
 
 		// small scenario for debugging:
@@ -33,17 +36,17 @@ public class EnergyConsumptionMain {
 		// final String eventsFileName = baseFolder +
 		// "ITERS/it.50/50.events.txt.gz";
 
-		final String networkFileName = baseFolder + "output_network.xml.gz";
-		final String plansFileName = baseFolder + "output_plans.xml.gz";
-		final String facilitiesFileName = baseFolder + "output_facilities.xml.gz";
+		final String networkFileName = config.getParameterValue("networkFileName");
+		final String plansFileName =  config.getParameterValue("plansFileName");
+		final String facilitiesFileName = config.getParameterValue("facilitiesFileName");
 
-		String fleetCompositionFileName = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2050_high";
+		String fleetCompositionFileName = config.getParameterValue("fleetCompositionFileName");
 
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
 				scenario, fleetCompositionFileName);
 
-		String energyConsumptionModelFile = "C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update 27. okt 2011/regModel_rev5_2010.dat";
+		String energyConsumptionModelFile = config.getParameterValue("energyConsumptionModelFile");
 		EnergyConsumptionModelLAV_v1 energyConsumptionModel = new EnergyConsumptionModelLAV_v1(energyConsumptionModelFile);
 
 		HashMap<Id, VehicleSOC> agentSocMapping = initializeSOCs(agentVehicleMapping, energyConsumptionModel);
@@ -67,16 +70,18 @@ public class EnergyConsumptionMain {
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		dumbCharger.performLastChargingOfDay();
 
-		energyConsumptionPlugin.writeOutputLog("c:/tmp/energyConsumptionLogPerLink.txt");
-		dumbCharger.writeChargingLog("c:/tmp/chargingLog.txt");
+		String outputFileEnergyConsumptionLogPerLink = config.getParameterValue("outputFileEnergyConsumptionLogPerLink");
+		energyConsumptionPlugin.writeOutputLog(outputFileEnergyConsumptionLogPerLink);
+		String outputFileChargingLog = config.getParameterValue("outputFileChargingLog");
+		dumbCharger.writeChargingLog(outputFileChargingLog);
 
 		reportIfEVRanOutOfElectricity(agentSocMapping);
 
-		String outputFileForParkingTimesAndLegEnergyConsumption = "c:/tmp/parkingTimesAndLegEnergyConsumption.txt";
+		String outputFileForParkingTimesAndLegEnergyConsumption = config.getParameterValue("outputFileForParkingTimesAndLegEnergyConsumption");
 		writeParkingTimesAndEnergyConsumptionToFile(parkingTimesPlugin, energyConsumptionPlugin,
 				outputFileForParkingTimesAndLegEnergyConsumption);
 
-		String outputFileAgentVehicleMapping = "c:/tmp/agentVehicleMapping.txt";
+		String outputFileAgentVehicleMapping = config.getParameterValue("outputFileAgentVehicleMapping");
 		writeAgentVehicleMappingToFile(agentVehicleMapping, outputFileAgentVehicleMapping);
 	}
 

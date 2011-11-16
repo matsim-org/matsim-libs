@@ -4,3 +4,8 @@ networkFileName	#baseFolder#output_network.xml.gz
 plansFileName	#baseFolder#output_plans.xml.gz
 facilitiesFileName	#baseFolder#output_facilities.xml.gz
 fleetCompositionFileName	C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/updated data 22. Aug. 2011/2050_high
+energyConsumptionModelFile	C:/data/My Dropbox/ETH/Projekte/ARTEMIS/simulationen aug 2011/update 27. okt 2011/regModel_rev5_2010.dat
+outputFileEnergyConsumptionLogPerLink	c:/tmp/energyConsumptionLogPerLink.txt
+outputFileChargingLog	c:/tmp/chargingLog.txt
+outputFileForParkingTimesAndLegEnergyConsumption	c:/tmp/parkingTimesAndLegEnergyConsumption.txt
+outputFileAgentVehicleMapping	c:/tmp/agentVehicleMapping.txt
