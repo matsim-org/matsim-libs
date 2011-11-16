@@ -24,11 +24,11 @@ import java.lang.Override;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.LogitModel;
 import playground.thibautd.agentsmating.logitbasedmating.basic.TripRequestImpl;
@@ -197,17 +197,39 @@ public class ReducedSPModel extends LogitModel {
 
 				case DRIVER:
 					double ttEstimate = tripToConsider.getAttribute( ReducedModelConstants.A_TRAVEL_TIME );
-					ttEstimate += leastCostAlgo.calcLeastCostPath(
+					double tCostEstimate =  tripToConsider.getAttribute( ReducedModelConstants.A_COST );
+
+					// access to pick up
+					LeastCostPathCalculator.Path path =
+						leastCostAlgo.calcLeastCostPath(
 							network.getLinks().get( perspective.getOrigin().getLinkId() ).getFromNode(),
 							network.getLinks().get( tripToConsider.getOrigin().getLinkId() ).getFromNode(),
-							perspective.getDepartureTime()).travelTime;
-					ttEstimate += leastCostAlgo.calcLeastCostPath(
+							perspective.getDepartureTime());
+					ttEstimate += path.travelTime;
+
+					double dist = 0;
+					for (Link link : path.links) {
+						dist += link.getLength();
+					}
+					tCostEstimate += dist * params.getCarCostPerM();
+
+					// egres from drop off
+					path =
+						leastCostAlgo.calcLeastCostPath(
 							network.getLinks().get( tripToConsider.getDestination().getLinkId() ).getFromNode(),
 							network.getLinks().get( perspective.getDestination().getLinkId() ).getFromNode(),
-							perspective.getDepartureTime() + ttEstimate ).travelTime;
+							perspective.getDepartureTime() + ttEstimate );
+					ttEstimate += path.travelTime;
+
+					dist = 0;
+					for (Link link : path.links) {
+						dist += link.getLength();
+					}
+					tCostEstimate += dist * params.getCarCostPerM();
 
 					Map<String , Object> attrs = new HashMap<String , Object>(perspective.getAttributes());
 					attrs.put( ReducedModelConstants.A_TRAVEL_TIME , ttEstimate );
+					attrs.put( ReducedModelConstants.A_COST , tCostEstimate );
 
 					return new TripRequestImpl(
 							perspective.getMode(),
