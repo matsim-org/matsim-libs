@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.EventImpl;
 
-import playground.benjamin.emissions.dataTypes.WarmPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
