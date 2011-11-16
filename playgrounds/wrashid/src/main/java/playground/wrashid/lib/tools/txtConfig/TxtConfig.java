@@ -9,6 +9,8 @@ import playground.wrashid.lib.obj.StringMatrix;
  * 
  * keys can be used in other keys in the form of #key# and will be substituted, up to level 2.
  * 
+ * This means, that even if a variable contains another substitution variable, which contains another
+ * variable to be substitued, that still should work.
  * 
  * 
  * @author wrashid
@@ -27,7 +29,7 @@ public class TxtConfig {
 		}
 
 		processSubstituions();
-		processSubstituions(); // allow several levels of substitutions
+		processSubstituions(); // allow 2 levels of substitutions
 	}
 
 	private void processSubstituions() {

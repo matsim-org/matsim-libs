@@ -26,8 +26,7 @@ public class EnergyConsumptionMain {
 		// the main scenario
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		//String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/";
-		final String baseFolder = config.getParameterValue("baseFolder");
-		final String eventsFileName =baseFolder + config.getParameterValue("eventsFileName");
+		final String eventsFileName = config.getParameterValue("eventsFileName");
 		//final String eventsFileName = "c:/tmp/input/output-events.xml.gz";
 
 		// small scenario for debugging:
