@@ -5,4 +5,4 @@ a	A
 c	#b#C
 b	#a#B
 d	#c#D
-fleetCompositionFileName	C:/ktiRun22/output/
+outputDirectory	@parentDirectory@/output/

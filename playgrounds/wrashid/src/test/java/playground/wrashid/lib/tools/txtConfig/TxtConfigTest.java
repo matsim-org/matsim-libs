@@ -20,6 +20,10 @@ public class TxtConfigTest {
     	Assert.assertEquals("ABC",config.getParameterValue("c"));
     	Assert.assertEquals("ABCD",config.getParameterValue("d"));
     	Assert.assertEquals("ABCDE",config.getParameterValue("e"));
+    	
+    	String parameterValue = config.getParameterValue("outputDirectory");
+		Assert.assertEquals("test/input/playground/wrashid/lib/tools/txtConfig/TxtConfigTest/basicTests/output/",parameterValue);
+    	
     }
 	
 }
