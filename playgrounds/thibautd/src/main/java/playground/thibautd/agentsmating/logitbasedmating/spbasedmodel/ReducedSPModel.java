@@ -27,6 +27,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.LogitModel;
@@ -48,9 +49,11 @@ public class ReducedSPModel extends LogitModel {
 	// factories
 	private final DecisionMakerFactory decisionMakerFactory = new ReducedSPModelDecisionMakerFactory();
 	private final ChoiceSetFactory choiceSetFactory; //new ReducedSPModelChoiceSetFactory();
-	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 
+	private final LeastCostPathCalculator leastCostAlgo;
 	private final ReducedModelParametersConfigGroup params;
+
+	private final Network network;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor
@@ -58,9 +61,11 @@ public class ReducedSPModel extends LogitModel {
 	public ReducedSPModel(
 			final ReducedModelParametersConfigGroup parameters,
 			final Scenario scenario,
-			final SimpleLegTravelTimeEstimatorFactory estimatorFactory) {
+			final SimpleLegTravelTimeEstimatorFactory estimatorFactory,
+			final LeastCostPathCalculator leastCostAlgo) {
 		this.params = parameters;
-		this.estimatorFactory = estimatorFactory;
+		this.network = scenario.getNetwork();
+		this.leastCostAlgo = leastCostAlgo;
 		choiceSetFactory = new ReducedSPModelChoiceSetFactory(
 				parameters,
 				scenario,
@@ -192,12 +197,14 @@ public class ReducedSPModel extends LogitModel {
 
 				case DRIVER:
 					double ttEstimate = tripToConsider.getAttribute( ReducedModelConstants.A_TRAVEL_TIME );
-					ttEstimate += CoordUtils.calcDistance(
-							tripToConsider.getOrigin().getCoord(),
-							perspective.getOrigin().getCoord());
-					ttEstimate += CoordUtils.calcDistance(
-							tripToConsider.getDestination().getCoord(),
-							perspective.getDestination().getCoord());
+					ttEstimate += leastCostAlgo.calcLeastCostPath(
+							network.getLinks().get( perspective.getOrigin().getLinkId() ).getFromNode(),
+							network.getLinks().get( tripToConsider.getOrigin().getLinkId() ).getFromNode(),
+							perspective.getDepartureTime()).travelTime;
+					ttEstimate += leastCostAlgo.calcLeastCostPath(
+							network.getLinks().get( tripToConsider.getDestination().getLinkId() ).getFromNode(),
+							network.getLinks().get( perspective.getDestination().getLinkId() ).getFromNode(),
+							perspective.getDepartureTime() + ttEstimate ).travelTime;
 
 					Map<String , Object> attrs = new HashMap<String , Object>(perspective.getAttributes());
 					attrs.put( ReducedModelConstants.A_TRAVEL_TIME , ttEstimate );

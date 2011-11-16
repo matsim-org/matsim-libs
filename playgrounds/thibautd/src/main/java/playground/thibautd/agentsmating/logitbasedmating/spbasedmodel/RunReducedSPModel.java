@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
+import java.io.File;
+import java.io.IOException;
+
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +42,8 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.CollectLogMessagesAppender;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedModeChooserFactory;
@@ -53,6 +60,8 @@ public class RunReducedSPModel {
 	public static void main(final String[] args) {
 		String configFileName = args[0];
 		String outputPath = args[1];
+
+		initOut( outputPath );
 
 		Config config = new Config();
 		ReducedModelParametersConfigGroup configGroup =
@@ -80,7 +89,14 @@ public class RunReducedSPModel {
 					controler.getTravelTimeCalculator(),
 					new DepartureDelayAverageCalculator(
 								scenario.getNetwork(),
-								controler.getConfig().travelTimeCalculator().getTraveltimeBinSize())));
+								controler.getConfig().travelTimeCalculator().getTraveltimeBinSize())),
+				controler.getLeastCostPathCalculatorFactory().createPathCalculator(
+					scenario.getNetwork(),
+					controler.getTravelCostCalculatorFactory().createTravelCostCalculator(
+						controler.getTravelTimeCalculator(),
+						config.planCalcScore()),
+					controler.getTravelTimeCalculator())
+					);
 
 		PlatformBasedModeChooser modeChooser =
 			(new PlatformBasedModeChooserFactory()).createModeChooser(
@@ -130,5 +146,31 @@ public class RunReducedSPModel {
 			}
 		}
 	}
+
+	private static void initOut( String outputDir ) {
+		try {
+			// create directory if does not exist
+			if (!outputDir.endsWith("/")) {
+				outputDir += "/";
+			}
+			File outputDirFile = new File(outputDir);
+			if (!outputDirFile.exists()) {
+				outputDirFile.mkdirs();
+			}
+
+			// init logFile
+			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
+			Logger.getRootLogger().addAppender(appender);
+
+			IOUtils.initOutputDirLogging(
+				outputDir,
+				appender.getLogEvents());
+		} catch (IOException e) {
+			// do NOT continue without proper logging!
+			throw new RuntimeException("error while creating log file",e);
+		}
+	}
+
+
 }
 
