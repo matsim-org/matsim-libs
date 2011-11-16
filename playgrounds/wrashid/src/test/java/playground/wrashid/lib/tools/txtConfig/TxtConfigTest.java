@@ -14,7 +14,8 @@ public class TxtConfigTest {
     	TxtConfig config=new TxtConfig(configFile);
     	
     	Assert.assertEquals("H:/data/ktiRun22/output/",config.getParameterValue("baseFolder"));
-    	Assert.assertEquals("H:/data/ktiRun22/output/ITERS/it.50/50.events.xml.gz",config.getParameterValue("eventsFileName"));
+    	Assert.assertEquals("H:/data/ktiRun22/output/ITERS/it.50/50.events.xml.gz",config.getParameterValue("eventsFile"));
+    	
     	Assert.assertEquals("AB",config.getParameterValue("b"));
     	Assert.assertEquals("ABC",config.getParameterValue("c"));
     	Assert.assertEquals("ABCD",config.getParameterValue("d"));
