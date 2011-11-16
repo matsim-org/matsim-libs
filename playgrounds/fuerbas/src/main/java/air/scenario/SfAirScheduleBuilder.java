@@ -31,10 +31,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.xml.sax.SAXException;
-
 
 /**
  * @author sfuerbas
@@ -42,21 +42,23 @@ import org.xml.sax.SAXException;
  */
 public class SfAirScheduleBuilder {
 
-	private final static String[] euroCountries = { "AD", "AL", "AM", "AT", "AX", "AZ", "BA", "BE",
+	private static final Logger log = Logger.getLogger(SfAirScheduleBuilder.class);
+
+	public final static String[] EURO_COUNTRIES = { "AD", "AL", "AM", "AT", "AX", "AZ", "BA", "BE",
 			"BG", "BY", "CH", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FO", "FR", "GB", "GI", "GE",
 			"GG", "GR", "HR", "HU", "IE", "IM", "IS", "IT", "JE", "KZ", "LI", "LT", "LU", "LV", "MC",
 			"MD", "ME", "MK", "MT", "NL", "NO", "PL", "PT", "RO", "RS", "RU", "SE", "SI", "SJ", "SK",
 			"SM", "TR", "UA", "VA" };
 
-	private final static String[] germanCountries = { "DE" };
+	public final static String[] GERMAN_COUNTRIES = { "DE" };
 
-	public static final String airportsInOsmOutputFilename = "osmEuroAirports.txt";
+	public static final String AIRPORTS_FROM_OSM_OUTPUT_FILE = "osm_airports.txt";
 
-	public static final String oagEuroFlightsOutputFilename = "oagEuroFlights.txt";
+	public static final String OAG_FLIGHTS_OUTPUT_FILENAME = "oag_flights.txt";
 
-	public static final String missingAirportsOutputFilename = "missingAirports.txt";
+	private static final String missingAirportsOutputFilename = "missing_airports.txt";
 
-	public static final String cityPairsOutputFilename = "cityPairs.txt";
+	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
 
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
@@ -64,10 +66,15 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 
+	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException {
+		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null);
+	}
+
+	
 	@SuppressWarnings("rawtypes")
 	public void filter(String inputOsmFile, String inputOagFile, String outputDirectory,
 			String[] countries) throws IOException, SAXException, ParserConfigurationException {
-		String outputOagFile = outputDirectory + oagEuroFlightsOutputFilename;
+		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
 				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -99,12 +106,17 @@ public class SfAirScheduleBuilder {
 				String destinationCountry = lineEntries[9];
 				boolean origin = false;
 				boolean destination = false;
-
-				for (int ii = 0; ii < countries.length; ii++) {
-					if (originCountry.equalsIgnoreCase(countries[ii]))
-						origin = true;
-					if (destinationCountry.equalsIgnoreCase(countries[ii]))
-						destination = true;
+				if (countries != null) {
+					for (int ii = 0; ii < countries.length; ii++) {
+						if (originCountry.equalsIgnoreCase(countries[ii]))
+							origin = true;
+						if (destinationCountry.equalsIgnoreCase(countries[ii]))
+							destination = true;
+					}
+				}
+				else {
+					origin = true;
+					destination = true;
 				}
 
 				if (origin && destination) {
@@ -160,7 +172,7 @@ public class SfAirScheduleBuilder {
 							this.cityPairDistance.put(route, flightDistance);
 
 							if ((flightDistance * 1000 / duration) <= 40.)
-								System.out.println("too low speed :" + flightDesignator);
+								log.debug("too low speed :" + flightDesignator);
 
 							bwOag.write(route + "\t" + // TransitRoute
 									route + "_" + carrier + "\t" + // TransitLine
@@ -190,9 +202,9 @@ public class SfAirScheduleBuilder {
 
 		// produce some more output
 
-		String outputOsmFile = outputDirectory + airportsInOsmOutputFilename;
+		String outputOsmFile = outputDirectory + AIRPORTS_FROM_OSM_OUTPUT_FILE;
 		String outputMissingAirportsFile = outputDirectory + missingAirportsOutputFilename;
-		String cityPairsFile = outputDirectory + cityPairsOutputFilename;
+		String cityPairsFile = outputDirectory + CITY_PAIRS_OUTPUT_FILENAME;
 
 		BufferedWriter bwOsm = new BufferedWriter(new FileWriter(new File(outputOsmFile)));
 		BufferedWriter bwMissing = new BufferedWriter(new FileWriter(
@@ -224,10 +236,10 @@ public class SfAirScheduleBuilder {
 			bwcityPairs.newLine();
 		}
 
-		System.out.println("Anzahl der Airports: " + this.airportsInOag.size());
-		System.out.println("Anzahl der City Pairs: " + this.routes.size());
-		System.out.println("Anzahl der Flüge: " + counter);
-		System.out.println("Anzahl der fehlenden Airport: " + this.missingAirports.size());
+		log.info("Anzahl der Airports: " + this.airportsInOag.size());
+		log.info("Anzahl der City Pairs: " + this.routes.size());
+		log.info("Anzahl der Flüge: " + counter);
+		log.info("Anzahl der fehlenden Airport: " + this.missingAirports.size());
 
 		bwOsm.flush();
 		bwOsm.close();
@@ -367,17 +379,22 @@ public class SfAirScheduleBuilder {
 
 		SfAirScheduleBuilder builder = new SfAirScheduleBuilder();
 
-		String osmFile = "/media/data/europe.osm";
-		String oagFile = "/media/data/work/repos/" + "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
-		String outputDirectory = "/media/data/work/repos/" + "shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
+		String osmFile = "/home/dgrether/shared-svn/projects/throughFlightData/osm_daten/2010-12-28_aeroway_nodes.osm";
+		String oagFile = "/media/data/work/repos/"
+				+ "shared-svn/projects/throughFlightData/oag_rohdaten/OAGSEP09.CSV";
+		String outputDirectory = "/media/data/work/repos/"
+				+ "shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
 
-		builder.filter(osmFile, oagFile, outputDirectory, euroCountries);
+		builder.filter(osmFile, oagFile, outputDirectory, EURO_COUNTRIES);
 
 		// GERMAN AIR TRAFFIC ONLY BELOW
 
-		outputDirectory = "/media/data/work/repos/" + "shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
-		builder.filter(osmFile, oagFile, outputDirectory, germanCountries);
+		outputDirectory = "/media/data/work/repos/"
+				+ "shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
+		builder = new SfAirScheduleBuilder();
+		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES);
 
 	}
+
 
 }

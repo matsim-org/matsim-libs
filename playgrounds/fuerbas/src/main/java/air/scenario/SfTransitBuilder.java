@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,20 +36,28 @@ import org.matsim.vehicles.Vehicles;
 
 public class SfTransitBuilder {
 
+	private static final Logger log = Logger.getLogger(SfTransitBuilder.class);
+
+	public static final String FLIGHT_TRANSIT_SCHEDULE = "flight_transit_schedule.xml";
 		
-	public void createSchedule(String inputOagData) throws IOException {
-		
+	public static final String FLIGHT_TRANSIT_VEHICLES = "flight_transit_vehicles.xml";
+	
+	private Scenario loadScenario(String inputNetworkFile){
 		Scenario scen = ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 		Config config = scen.getConfig();
-		config.network().setInputFile("/home/soeren/workspace/euroAirNetwork.xml");
-//		Germany only
-//		config.network().setInputFile("/home/soeren/workspace/germanAirNetwork.xml");
+		config.network().setInputFile(inputNetworkFile);
 		ScenarioUtils.loadScenario(scen);		
+		return scen;
+	}
+	
+	
+	public void createSchedule(String inputOagFlights, String inputNetworkFile, String outputDirectory) throws IOException {
+		Scenario scen = this.loadScenario(inputNetworkFile);
 		Network network = scen.getNetwork();
 		scen.getConfig().scenario().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
 		
-		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagData)));
+		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFlights)));
 		
 		TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = sf.createTransitSchedule();
@@ -141,32 +150,11 @@ public class SfTransitBuilder {
 		}
 		
 		TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
-		scheduleWriter.write("/home/soeren/workspace/euroFlightSchedule.xml");
-//		Germany only		
-//		scheduleWriter.write("/home/soeren/workspace/germanFlightSchedule.xml");
-
+		scheduleWriter.write(outputDirectory + FLIGHT_TRANSIT_SCHEDULE);
 		
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(veh);
-		vehicleWriter.writeFile("/home/soeren/workspace/euroFlightVehicles.xml");
-//		Germany only
-//		vehicleWriter.writeFile("/home/soeren/workspace/GermanFlightVehicles.xml");
-			
-	}
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-
-		SfTransitBuilder builder = new SfTransitBuilder();
-		builder.createSchedule("/home/soeren/workspace/oagEuroFlights.txt");
+		vehicleWriter.writeFile(outputDirectory + FLIGHT_TRANSIT_VEHICLES);
 		
-//			German domestic flights only
-//		builder.createSchedule("/home/soeren/workspace/oagGermanFlights.txt");
-		
+		log.info("Created transit schedule and vehicles.");
 	}
-
-	
-
 }

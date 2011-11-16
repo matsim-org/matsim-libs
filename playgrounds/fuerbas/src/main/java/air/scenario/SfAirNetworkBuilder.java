@@ -20,12 +20,12 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class SfAirNetworkBuilder {
 
-	public void createNetwork() throws IOException {
-		
+	public static final String NETWORK_FILENAME = "air_network.xml";
+
+	public void createNetwork(String osmAirports, String cityPairs, String networkOutputFilename) throws IOException {
 		int airportcounter = 0;
 		int linkcounter = 0;
 		
-		String output = "/home/soeren/workspace/euroAirNetwork";
 //		String output = "/home/soeren/workspace/germanAirNetwork";
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.add("pt");
@@ -34,8 +34,8 @@ public class SfAirNetworkBuilder {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(1.0);		//capacity period set to one second to allow storage capacity = 1 for runway with runway length of 450 meters and 1/60 flow capacity
 		
-		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmEuroAirports.txt")));
-		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairs.txt")));
+		BufferedReader brAirports = new BufferedReader(new FileReader(new File(osmAirports)));
+		BufferedReader brRoutes = new BufferedReader(new FileReader(new File(cityPairs)));
 		
 //		BufferedReader brAirports = new BufferedReader(new FileReader(new File("/home/soeren/workspace/osmGermanAirports.txt")));
 //		BufferedReader brRoutes = new BufferedReader(new FileReader(new File("/home/soeren/workspace/cityPairsGermany.txt")));
@@ -92,8 +92,8 @@ public class SfAirNetworkBuilder {
 			
 		}
 			
-		new NetworkWriter(network).write(output + ".xml");
-		System.out.println("Done! Unprocessed MATSim Network saved as " + output + ".xml");
+		new NetworkWriter(network).write(networkOutputFilename);
+		System.out.println("Done! Unprocessed MATSim Network saved as " + networkOutputFilename);
 		
 		System.out.println("Anzahl Flughäfen: "+airportcounter);
 		System.out.println("Anzahl Links: "+linkcounter);
@@ -107,10 +107,13 @@ public class SfAirNetworkBuilder {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-
+		String baseDirectory = "/home/dgrether/shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
+				
+		String output = baseDirectory + NETWORK_FILENAME;
+		String osmAirports = baseDirectory + SfAirScheduleBuilder.AIRPORTS_FROM_OSM_OUTPUT_FILE;
+		String cityPairs = baseDirectory + SfAirScheduleBuilder.CITY_PAIRS_OUTPUT_FILENAME;
 		SfAirNetworkBuilder builder = new SfAirNetworkBuilder();
-		builder.createNetwork();
-		
+		builder.createNetwork(osmAirports, cityPairs, output);
 	}
 
 	
