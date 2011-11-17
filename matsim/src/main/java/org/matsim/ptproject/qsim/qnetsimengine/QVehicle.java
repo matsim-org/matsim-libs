@@ -38,18 +38,23 @@ public abstract class QVehicle extends QItem implements MobsimVehicle {
 	// yy not sure if this needs to be publicly exposed
 	
 	/**Design thoughts:<ul>
-	 * <li> yy I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to 
+	 * <li> I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to 
 	 * figure out of a visualizer should make a vehicle "green" or "red".  But green or red should be related to 
 	 * vehicle speed, and the mobsim should figure that out, not the visualizer.  So something like "getCurrentSpeed" 
 	 * seems to be a more useful option. kai, nov'11
-	 * <li> But also see comment under setLinkEnterTime().  kai, nov'11 
+	 * <li> The problem is not only the speed, but also the positioning of the vehicle in the "asQueue" plotting method.
+	 * (Although, when thinking about it: Should be possible to obtain same result by using "getEarliestLinkExitTime()".
+	 * But I am not sure if that would really be a conceptual improvement ... linkEnterTime is, after all, a much more
+	 * "physical" quantity.)  kai, nov'11
+	 * <li> Also see comment under setLinkEnterTime().  kai, nov'11 
 	 * </ul>
 	 */
 	public abstract double getLinkEnterTime();
 	
 	/**Design thoughts:<ul>
 	 * <li> This has to remain public as long as QVehicle/QVehicleImpl is both used by QueueSimulation and QSim.  At best,
-	 * we could say that there should also be a MobsimVehicle interface that is reduced.  kai, nov'11.
+	 * we could say that there should also be a MobsimVehicle interface that does not expose this.  kai, nov'11.
+	 * (This is there now.  kai, nov'11)
 	 * </ul>
 	 */
 	public abstract void setLinkEnterTime(final double time);
