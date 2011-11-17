@@ -35,14 +35,20 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class ExtractActivityChainsFromMz2000 {
 	/**
-	 * usage: ExtractActivityChainsFromMz2000 zpFile wgFile etFile outDir
+	 * usage: ExtractActivityChainsFromMz2000 zpFile wgFile etFile outDir startDay endDay
 	 */
 	public static void main(final String[] args) {
 		initOut( args[ 3 ] );
 		Mz2000ActivityChainsExtractor extractor = new Mz2000ActivityChainsExtractor();
-		Scenario scen = extractor.run( args[ 0 ] , args[ 1 ] , args[ 2 ] );
+		Scenario scen = extractor.run(
+				args[ 0 ],
+				args[ 1 ],
+				args[ 2 ],
+				args[ 4 ],
+				args[ 5 ]);
 		(new PopulationWriter(scen.getPopulation(),
-							  scen.getNetwork())).write( args[ 3 ] + "/actchains.xml.gz" );
+							  scen.getNetwork())).write(
+						  args[ 3 ] + "/actchains-dow-"+args[ 4 ]+"-"+args[ 5 ]+".xml.gz" );
 	}
 
 	private static void initOut( String outputDir ) {

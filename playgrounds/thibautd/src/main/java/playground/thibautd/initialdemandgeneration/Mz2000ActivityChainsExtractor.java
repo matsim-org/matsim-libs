@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
@@ -51,6 +52,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -88,7 +90,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  * moreover, if trips from home to home exist, they are removed.
  * Attributes of the plans are set in the following way: score corresponds to the
- * weight in the MZ, plan type to the day of week (from 1=Monday to 7=Sunday)
+ * weight in the MZ
  *
  * @author thibautd
  */
@@ -96,8 +98,18 @@ public class Mz2000ActivityChainsExtractor {
 	public Scenario run(
 			final String zpFile,
 			final String wgFile,
-			final String etFile) {
-		MzPopulation population = new MzPopulation();
+			final String etFile,
+			final String start,
+			final String end) {
+		return run(zpFile, wgFile, etFile, new Interval(start, end));
+	}
+
+	public Scenario run(
+			final String zpFile,
+			final String wgFile,
+			final String etFile,
+			final Interval interval) {
+		MzPopulation population = new MzPopulation( interval );
 
 		try {
 			// ////// add person info ///////
@@ -141,6 +153,22 @@ public class Mz2000ActivityChainsExtractor {
 
 		return population.getScenario();
 	}
+
+	public static class Interval {
+		private final int start;
+		private final int end;
+
+		public Interval(
+				final String dayStart,
+				final String dayEnd) {
+			this.start = Integer.parseInt( dayStart );
+			this.end = Integer.parseInt( dayEnd );
+		}
+
+		public boolean contains(final int day) {
+			return day >= start && day <= end;
+		}
+	}
 }
 
 /**
@@ -162,7 +190,12 @@ class MzPopulation {
 	private static final Logger log =
 		Logger.getLogger(MzPopulation.class);
 
+	private final Mz2000ActivityChainsExtractor.Interval interval;
 	private final Map<Id, MzPerson> persons = new HashMap<Id, MzPerson>();
+
+	public MzPopulation(final Mz2000ActivityChainsExtractor.Interval interval) {
+		this.interval = interval;
+	}
 
 	public Scenario getScenario() {
 		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.createScenario(
@@ -172,6 +205,7 @@ class MzPopulation {
 
 		Person matsimPerson;
 		for (MzPerson person : persons.values()) {
+			if (!interval.contains( person.getDayOfWeek() )) continue;
 			try {
 				matsimPerson = person.getPerson();
 			} catch (UnhandledMzRecordException e) {
@@ -220,6 +254,7 @@ class MzPerson implements Identifiable {
 	private static final String LEISURE = "l";
 
 	private static final double SHORT_DURATION = 10 * 60;
+	private static final Coord COORD = new CoordImpl(0, 0);
 
 	// /////////////////////////////////////////////////////////////////////////
 	// static fields
@@ -355,6 +390,10 @@ class MzPerson implements Identifiable {
 		return id;
 	}
 
+	public int getDayOfWeek() {
+		return dayOfWeek;
+	}
+
 	/**
 	 * @throws UnhandledMzRecordException if the resulting plan contains
 	 * inconsistencies.
@@ -379,7 +418,7 @@ class MzPerson implements Identifiable {
 				} );
 
 		// create plan
-		Activity currentAct = plan.createAndAddActivity( HOME );
+		Activity currentAct = plan.createAndAddActivity( HOME , COORD );
 		MzAdress homeAdress = trips.size() > 0 ?
 			trips.get( 0 ).getDepartureAdress() :
 			null;
@@ -491,11 +530,11 @@ class MzPerson implements Identifiable {
 			if (weg.getPurpose().equals( lastPurpose ) &&
 					weg.getArrivalAdress().equals( homeAdress ) &&
 					!lastActivityWasHome) {
-				currentAct = plan.createAndAddActivity( HOME );
+				currentAct = plan.createAndAddActivity( HOME , COORD );
 				lastActivityWasHome = true;
 			}
 			else {
-				currentAct = plan.createAndAddActivity( actType );
+				currentAct = plan.createAndAddActivity( actType , COORD);
 				lastActivityWasHome = false;
 			}
 
@@ -519,14 +558,14 @@ class MzPerson implements Identifiable {
 	private void setPersonAttributes( final PersonImpl person ) {
 		person.setAge( age );
 		person.setEmployed( employed );
-		person.setLicence( license.toString() );
+		person.setLicence( license ? "yes" : "no" );
 		person.setSex( gender );
 
 		// score corresponds to the weight
 		person.getSelectedPlan().setScore( weight );
 
 		// day of week in the plan type
-		((PlanImpl) person.getSelectedPlan()).setType( ""+dayOfWeek );
+		// ((PlanImpl) person.getSelectedPlan()).setType( ""+dayOfWeek );
 	}
 
 	private void removeRoundTrips( final PersonImpl person ) {
