@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.benjamin.emissions.types;
 
+/**
+ * @author benjamin
+ *
+ */
 public enum WarmPollutant {
 	
 	FC("FC"), NOX("NOx"), NO2("NO2"), PM("PM"),

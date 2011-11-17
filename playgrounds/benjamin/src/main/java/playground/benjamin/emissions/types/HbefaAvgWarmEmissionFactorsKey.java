@@ -56,8 +56,8 @@ public class HbefaAvgWarmEmissionFactorsKey{
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 	
-	// need to implement the "equals" method in order to be able to construct an "equal" key
-	// later on (e.g. from data available in the simulation)
+	/* need to implement the "equals" method in order to be able to construct an "equal" key
+	 later on (e.g. from data available in the simulation)*/
 	@Override
 	public boolean equals(Object obj) {
 	        if(this == obj) {

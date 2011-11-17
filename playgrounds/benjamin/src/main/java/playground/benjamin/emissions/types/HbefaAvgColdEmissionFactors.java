@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.benjamin.emissions.types;
 
-public class HbefaColdEmissionFactor {
+/**
+ * @author benjamin
+ *
+ */
+public class HbefaAvgColdEmissionFactors {
 
 	private final String vehCat ;
 	private final String component;
@@ -59,7 +63,7 @@ public class HbefaColdEmissionFactor {
 //		this.coldEF = coldEF;
 //	}
 
-	public HbefaColdEmissionFactor(
+	public HbefaAvgColdEmissionFactors(
 			String vehCat, 
 			String component,
 			String parkingTime,

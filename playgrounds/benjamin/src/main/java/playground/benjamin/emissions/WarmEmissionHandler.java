@@ -39,7 +39,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-
+/**
+ * @author benjamin
+ *
+ */
 public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 

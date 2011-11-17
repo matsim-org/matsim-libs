@@ -37,6 +37,10 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
+/**
+ * @author benjamin
+ *
+ */
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);

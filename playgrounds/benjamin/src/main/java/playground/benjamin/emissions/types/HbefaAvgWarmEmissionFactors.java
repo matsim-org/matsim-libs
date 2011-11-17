@@ -22,7 +22,10 @@ package playground.benjamin.emissions.types;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * @author benjamin
+ *
+ */
 public class HbefaAvgWarmEmissionFactors {
 
 	private double speed;

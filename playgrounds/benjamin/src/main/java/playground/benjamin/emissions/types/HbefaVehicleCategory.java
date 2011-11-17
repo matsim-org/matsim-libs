@@ -25,15 +25,8 @@ package playground.benjamin.emissions.types;
  */
 public enum HbefaVehicleCategory {
 
-	PASSENGER_CAR("pass. car"), HEAVY_DUTY_VEHICLE("HDV");
+	PASSENGER_CAR, HEAVY_DUTY_VEHICLE;
 	
-	private String key;
-	
-	private HbefaVehicleCategory(String key) {
-		this.key = key;
-	}
-	
-	public String getText(){
-		return key;
+	private HbefaVehicleCategory() {
 	}
 }

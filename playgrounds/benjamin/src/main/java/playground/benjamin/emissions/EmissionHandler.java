@@ -38,9 +38,9 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
-import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
 import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
@@ -68,7 +68,7 @@ public class EmissionHandler {
 	Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
 	
 	private Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
-	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
+	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>> avgHbefaColdTable;
 
 	private Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 	//===
@@ -83,7 +83,7 @@ public class EmissionHandler {
 		
 		getInputFiles();
 		
-		//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the detailed emission factors table...
+		//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the emission factors tables...
 		roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
@@ -254,11 +254,11 @@ public class EmissionHandler {
 		return hbefaTrafficSituation;
 	}
 
-	private static Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
+	private static Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
-		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable =
-			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>>();
+		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>> avgHbefaColdTable =
+			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>>();
 		try{
 			FileInputStream fstream = new FileInputStream(filename);
 			DataInputStream in = new DataInputStream(fstream);
@@ -268,7 +268,7 @@ public class EmissionHandler {
 			br.readLine();// Read and forget header line
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
-				HbefaColdEmissionFactor coldEmissionFactor = new HbefaColdEmissionFactor(
+				HbefaAvgColdEmissionFactors coldEmissionFactor = new HbefaAvgColdEmissionFactors(
 						array[0], //vehCat
 						array[1], //component
 						array[2], //parkingTime
@@ -283,15 +283,15 @@ public class EmissionHandler {
 						avgHbefaColdTable.get(coldPollutant).get(distance).put(parkingTime, coldEmissionFactor);
 					}
 					else{
-						Map<Integer, HbefaColdEmissionFactor> tempParkingTime = new TreeMap<Integer, HbefaColdEmissionFactor>();
+						Map<Integer, HbefaAvgColdEmissionFactors> tempParkingTime = new TreeMap<Integer, HbefaAvgColdEmissionFactors>();
 						tempParkingTime.put(parkingTime, coldEmissionFactor);
 						avgHbefaColdTable.get(coldPollutant).put(distance, tempParkingTime);	  
 					}
 				}
 				else{
-					Map<Integer,HbefaColdEmissionFactor> tempParkingTime =	new TreeMap<Integer, HbefaColdEmissionFactor>();
+					Map<Integer,HbefaAvgColdEmissionFactors> tempParkingTime =	new TreeMap<Integer, HbefaAvgColdEmissionFactors>();
 					tempParkingTime.put(parkingTime, coldEmissionFactor);
-					Map<Integer, Map<Integer, HbefaColdEmissionFactor>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaColdEmissionFactor>>();
+					Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>();
 					tempDistance.put(parkingTime, tempParkingTime);
 					avgHbefaColdTable.put(coldPollutant, tempDistance);				
 				}

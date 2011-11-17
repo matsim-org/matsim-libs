@@ -22,6 +22,10 @@ package playground.benjamin.emissions.types;
 
 import java.util.Map;
 
+/**
+ * @author benjamin
+ *
+ */
 public class HbefaRoadTypeTrafficSituation {
 
 	private String VISUM_RT_NAME;

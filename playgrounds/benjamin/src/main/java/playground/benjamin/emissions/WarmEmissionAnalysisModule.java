@@ -44,6 +44,10 @@ import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
 import playground.benjamin.emissions.types.WarmPollutant;
 
+/**
+ * @author benjamin
+ *
+ */
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
