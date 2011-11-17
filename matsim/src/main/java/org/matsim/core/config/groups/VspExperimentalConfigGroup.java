@@ -145,6 +145,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
 	private String averageFleetColdEmissionFactorsFile = null;
 	
+	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
+	private boolean isUsingDetailedEmissionCalculation = false;
 	
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
@@ -154,8 +156,6 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
 	private boolean writingOutputEvents = false ;
 
-
-	
 	// ---
 	
 	public VspExperimentalConfigGroup() {
@@ -173,6 +173,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average warm emission factors");
 		
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average cold emission factors");
+		
+		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed warm emission factors file must be provided!");
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA detailed warm emission factors") ;
 
@@ -247,6 +249,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			this.setAverageWarmEmissionFactorsFile(value);
 		} else if ( EMISSION_FACTORS_COLD_FILE_AVERAGE.equals(key)){
 			this.setAverageColdEmissionFactorsFile(value);
+		} else if ( USING_DETAILED_EMISSION_CALCULATION.equals(key)){
+			this.setIsUsingDetailedEmissionCalculation(Boolean.parseBoolean(value));
 		} else if ( EMISSION_FACTORS_WARM_FILE_DETAILED.equals(key)) {
 			this.setDetailedWarmEmissionFactorsFile(value) ;
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
@@ -283,6 +287,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
 		
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, this.getAverageColdEmissionFactorsFile());
+		
+		map.put(USING_DETAILED_EMISSION_CALCULATION, Boolean.toString( this.isUsingDetailedEmissionCalculation));
 		
 		map.put( EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile() ) ;
 		
@@ -423,6 +429,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	public String getAverageColdEmissionFactorsFile() {
 		return this.averageFleetColdEmissionFactorsFile;
+	}
+
+	public boolean isUsingDetailedEmissionCalculation(){
+		return this.isUsingDetailedEmissionCalculation;
+	}
+	
+	public void setIsUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
+		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
 
 	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
