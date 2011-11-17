@@ -18,9 +18,10 @@ public class PrintAllActTypesInPlan {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String inputPlansFile="K:/Projekte/herbie/output/demandCreation/plans.xml.gz";
-		String inputNetworkFile="K:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
-		String inputFacilities="K:/Projekte/herbie/output/demandCreation/facilitiesWFreight.xml.gz";
+		String base="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
+		String inputPlansFile= base +"output_plans.xml.gz";
+		String inputNetworkFile=base+"output_network.xml.gz";
+		String inputFacilities=base+"output_facilities.xml.gz";
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 		
