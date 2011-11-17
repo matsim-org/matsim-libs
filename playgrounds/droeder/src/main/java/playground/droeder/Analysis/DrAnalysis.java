@@ -103,7 +103,7 @@ public class DrAnalysis {
 		String events = getFileDir(this.EVENTS);
 		EventsManager manager = EventsUtils.createEventsManager();
 		
-		CalcLegTimes calcLegTimesKai = new CalcLegTimes(this.sc.getPopulation());
+		CalcLegTimes calcLegTimesKai = new CalcLegTimes(this.sc);
 		manager.addHandler(calcLegTimesKai);
 
 		org.matsim.analysis.CalcLegTimes calcLegTimes = new org.matsim.analysis.CalcLegTimes();

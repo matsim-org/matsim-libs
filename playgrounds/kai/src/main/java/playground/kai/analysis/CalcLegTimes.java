@@ -29,6 +29,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -38,10 +40,10 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author mrieser
@@ -57,6 +59,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	
 	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
 	
+	private Scenario scenario = null ;
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
@@ -73,13 +76,18 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	
 	// container that contains the sum (to write averages):
 	private final Map<StatType,Map<String,Double>> sumsContainer = new TreeMap<StatType,Map<String,Double>>() ;
-	
+
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 //	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
+	
+	public CalcLegTimes(final Scenario scenario) {
+		this(scenario.getPopulation()) ;
+		this.scenario = scenario ;
+	}
 
-	public CalcLegTimes(final Population population) {
-		this.population = population;
+	CalcLegTimes(final Population population) {
+		this.population = population ;
 		
 		for ( StatType type : StatType.values() ) {
 
@@ -128,6 +136,8 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		}
 	}
 
+	private static int noCoordCnt;
+	
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
@@ -170,8 +180,15 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
 						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
 					} else {
-						log.warn("activity coordinate not known; using `1.' for the distance") ;
-						item = 1. ;
+						if ( noCoordCnt < 1 ) {
+							noCoordCnt ++ ;
+							log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n"
+									+ Gbl.ONLYONCE ) ;
+						}
+
+						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
+						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
+						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
 					}
 				} else {
 					throw new RuntimeException("`item' for statistics type not defined") ;

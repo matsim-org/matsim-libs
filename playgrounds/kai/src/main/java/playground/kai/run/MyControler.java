@@ -16,7 +16,7 @@ class MyControlerListener implements StartupListener, AfterMobsimListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.calcLegTimes = new playground.kai.analysis.CalcLegTimes( event.getControler().getPopulation() ) ;
+		this.calcLegTimes = new playground.kai.analysis.CalcLegTimes( event.getControler().getScenario() ) ;
 		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
 
 	}
