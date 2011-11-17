@@ -8,10 +8,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.gis.ShapeFileReader;
+
+import com.vividsolutions.jts.geom.LineString;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.model.Agent;
@@ -42,6 +46,7 @@ public class Controller {
 	private HashMap<String,Agent> agents;
 	private HashMap<Integer,DataPoint> nodes;
 	private HashMap<Integer,int[]> links;
+	//private HashMap<Integer,LineString> walls;
 	private Double[] extremeValues;
 	private Double maxPosX, minPosX, maxPosY, minPosY;
 	private LinkedList<Double> timeSteps = new LinkedList<Double>();
@@ -52,6 +57,7 @@ public class Controller {
 	private boolean paused = false;
 	
 	public static final int VIS_XYVXVY = 0;
+	
 	
 
 	EventsManager eventsManager;
@@ -436,6 +442,33 @@ public class Controller {
 	public boolean isReadingAgentData()
 	{
 		return isReadingData;
+	}
+
+	public void updateAgentLink(String ID, String linkID)
+	{
+		isReadingData = true;
+	
+		//on the first run in live mode the agents hashmap is still empty
+		if (this.agents == null)
+			this.agents = new HashMap<String,Agent>();
+
+		//update agent
+		XYVxVyAgent updateAgent = (XYVxVyAgent)this.agents.get(ID);
+		
+		//create new if not available yet
+		if (updateAgent == null)
+			updateAgent = new XYVxVyAgent();
+		
+		//set current link id
+		updateAgent.setCurrentLinkID(linkID);
+		
+		//update agent in hashmap
+		agents.put(ID, updateAgent);
+		
+		//update view
+		this.gui.updateView(this.timeSteps, this.agents);
+		
+		isReadingData = false;
 	}
 
 

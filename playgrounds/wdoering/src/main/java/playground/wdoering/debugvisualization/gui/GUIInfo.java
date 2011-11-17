@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -36,7 +37,7 @@ public class GUIInfo extends JPanel {
 	private HashMap<String, Agent> agents;
 	private JPanel agentList = new JPanel(new GridLayout());
 	private JTable agentTable;
-	private String[] columnNames = { "ID", "X", "Y", "Vx", "Vy", "V" };
+	private String[] columnNames = { "ID", "X", "Y", "Vx", "Vy", "V" , " current Link "};
 
 	private HashMap<String, Object[]> displayedAgents;
 	private boolean updateData = true;
@@ -116,7 +117,7 @@ public class GUIInfo extends JPanel {
 					Map.Entry pairs = null;
 					// Get current agent
 					pairs = (Map.Entry) agentsIterator.next();
-					Agent currentAgent = (XYVxVyAgent) pairs.getValue();
+					XYVxVyAgent currentAgent = (XYVxVyAgent) pairs.getValue();
 					String currentAgentID = (String) pairs.getKey();
 					agentIDs = agentIDs + " | " + currentAgentID;
 	
@@ -135,8 +136,10 @@ public class GUIInfo extends JPanel {
 								                                        +(dataPoint.getvX()
 										                                 *dataPoint.getvX()))
 										                                 * 100d) / 100d));
+						
+						String currentLinkID = currentAgent.getCurrentLinkID();
 	
-						Object rowData[] = { currentAgentID, posX, posY, vX, vY, v};
+						Object rowData[] = { currentAgentID, posX, posY, vX, vY, v, currentLinkID};
 						
 						/*
 						Object displayedAgent[] = displayedAgents.get(currentAgentID);
@@ -231,7 +234,19 @@ public class GUIInfo extends JPanel {
 				
 				tableModel.setDataVector(data, columnNames);
 				
-				agentTable.setModel(tableModel);
+//				try {
+//					SwingUtilities.invokeLater(new Runnable() {
+//						public void run() {
+//							
+							agentTable.setModel(tableModel);
+//						}
+//						});
+//					
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//				}
+				
+				
 	
 				/*
 				 * agentList = new JPanel(new GridLayout(agentPanels.size(), 0));

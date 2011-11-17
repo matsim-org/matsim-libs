@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -17,22 +18,30 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 
+import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPoint;
 
-public class Importer implements XYVxVyEventsHandler, Runnable {
+
+public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Runnable {
 
 	private HashMap<String, Agent> agents = null; 
 	private HashMap<Integer, DataPoint> nodes = null;
@@ -48,12 +57,17 @@ public class Importer implements XYVxVyEventsHandler, Runnable {
 	private LinkedList<Double> timeSteps;
 	
 	private Thread readerThread;
+	
+	private ShapeFileReader shapeFileReader;
+	
 
 	public Importer(Controller controller)
 	{
 		this.controller = controller;
 		
 	}
+	
+	
 
 	public Importer(Controller controller, Scenario sc, Thread readerThread)
 	{
@@ -253,6 +267,34 @@ public class Importer implements XYVxVyEventsHandler, Runnable {
 		}
 	}
 
+	public void readShapeFile(String shapeFileString)
+	{
+//		ShapeFileReader shapeFileReader = new ShapeFileReader();
+//		
+//		shapeFileReader.readFileAndInitialize(shapeFileString);
+//		
+//		List<Geometry> geos = new ArrayList<Geometry>();
+//		for (Feature ft : shapeFileReader.getFeatureSet())
+//		{
+//			Geometry geo = ft.getDefaultGeometry();
+//			geos.add(geo);
+//		}
+		
+		System.out.println("shape file reader not implemented yet");
+		
+		/*
+		 * DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
+		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
+		for (int i = 0; i < mp.getNumPoints(); i++) {
+			Point p = (Point) mp.getGeometryN(i);
+			quad.put(p.getX(), p.getY(), p.getCoordinate());
+		}
+		this.c.setQuadTree(quad);
+		 */
+		
+		
+	}
+	
 	public HashMap<String, Agent> importAgentData()
 	{
 
@@ -414,6 +456,15 @@ public class Importer implements XYVxVyEventsHandler, Runnable {
 	public void run() {
 		System.out.println("importer: go go!");
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event)
+	{
+		if (controller!=null)
+			controller.updateAgentLink(event.getPersonId().toString(), event.getLinkId().toString());
+		
 		
 	}
 
