@@ -25,18 +25,18 @@ package playground.benjamin.emissions.types;
  */
 public class HbefaAvgWarmEmissionFactorsKey{
 	
-	private String hbefaVehicleCategory;
+	private HbefaVehicleCategory hbefaVehicleCategory;
 	private int hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	
 	public HbefaAvgWarmEmissionFactorsKey(){
 	}
 
-	public String getHbefaVehicleCategory() {
+	public HbefaVehicleCategory getHbefaVehicleCategory() {
 		return hbefaVehicleCategory;
 	}
 
-	public void setHbefaVehicleCategory(String hbefaVehicleCategory) {
+	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 

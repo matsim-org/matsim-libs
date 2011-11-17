@@ -40,6 +40,7 @@ import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
 import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
+import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
 import playground.benjamin.emissions.types.WarmPollutant;
 
@@ -272,13 +273,13 @@ public class WarmEmissionAnalysisModule {
 			
 			HbefaAvgWarmEmissionFactorsKey keyFreeFlow = new HbefaAvgWarmEmissionFactorsKey();
 			HbefaAvgWarmEmissionFactorsKey keyStopAndGo = new HbefaAvgWarmEmissionFactorsKey();
-			//TODO: better filter for passenger cars vs. HDVs
+			//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
 			if(personId.toString().contains("gv_")){
-				keyFreeFlow.setHbefaVehicleCategory("HDV");
-				keyStopAndGo.setHbefaVehicleCategory("HDV");
+				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_DUTY_VEHICLE);
+				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_DUTY_VEHICLE);
 			} else{
-				keyFreeFlow.setHbefaVehicleCategory("pass. car");
-				keyStopAndGo.setHbefaVehicleCategory("pass. car");
+				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 			}
 			keyFreeFlow.setHbefaRoadCategory(hbefaRoadType);
 			keyStopAndGo.setHbefaRoadCategory(hbefaRoadType);

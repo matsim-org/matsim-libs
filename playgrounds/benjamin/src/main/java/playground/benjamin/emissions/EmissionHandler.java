@@ -43,6 +43,7 @@ import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
 import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
 import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
+import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
 import playground.benjamin.emissions.types.WarmPollutant;
 
@@ -59,19 +60,17 @@ public class EmissionHandler {
 	//===
 	private static String roadTypesTrafficSituationsFile;
 	
-	private static String detailedWarmEmissionFactorsFile;
-	
 	private static String averageFleetColdEmissionFactorsFile;
 	private static String averageFleetWarmEmissionFactorsFile;
-	
+
+	private static String detailedWarmEmissionFactorsFile;
 	//===
 	Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
-
-	private Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 	
 	private Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
 	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
 
+	private Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 	//===
 	private String vehicleFile;
 
@@ -84,25 +83,26 @@ public class EmissionHandler {
 		
 		getInputFiles();
 		
-		//=== TODO: include file name specification into vspExperimentalConfigGroup in getInputFiles();
-		averageFleetColdEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_coldstart_emission_factors.txt";
-		averageFleetWarmEmissionFactorsFile = "../../detailedEval/emissions/hbefaForMatsim/hbefa_emission_factors_urban_rural_MW.txt";
-		//===
-		
-		//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the emission factors tables...
+		//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the detailed emission factors table...
 		roadTypeMapping = createRoadTypesTrafficSitMapping(roadTypesTrafficSituationsFile);
 
-		detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
-
-		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+
+		detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 
 		logger.info("leaving createLookupTables");
 	}
 
 	private void getInputFiles() {
+		
 		roadTypesTrafficSituationsFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
-		detailedWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getEmissionFactorsWarmFile() ;
+
+		//TODO: create flag indicating which type of emission modelling should be performed...
+		averageFleetWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageWarmEmissionFactorsFile();
+		averageFleetColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageColdEmissionFactorsFile();
+		
+		detailedWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedWarmEmissionFactorsFile() ;
 	}
 
 	public void installEmissionEventHandler(EventsManager eventsManager, String emissionEventOutputFile) {
@@ -111,6 +111,7 @@ public class EmissionHandler {
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
+		//TODO: Vehicles should be read in vspExperimentalConfigGroup
 		vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
@@ -206,7 +207,7 @@ public class EmissionHandler {
 				String[] array = strLine.split(";");
 				
 				HbefaAvgWarmEmissionFactorsKey key = new HbefaAvgWarmEmissionFactorsKey();
-				key.setHbefaVehicleCategory(array[0]);
+				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[0]));
 				key.setHbefaRoadCategory(Integer.parseInt(array[1]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[3]));
 				
@@ -229,6 +230,17 @@ public class EmissionHandler {
 		}
 	}
 	
+	private static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+		HbefaVehicleCategory hbefaVehicleCategory = null;
+		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
+		else if(string.contains("HDV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_DUTY_VEHICLE;
+		else{
+			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			throw new RuntimeException();
+		}
+		return hbefaVehicleCategory;
+	}
+
 	private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
 		HbefaTrafficSituation hbefaTrafficSituation = null;
 		if(string.contains("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
@@ -243,7 +255,7 @@ public class EmissionHandler {
 	}
 
 	private static Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
-		logger.info("leaving createAvgHbefaColdTable ...");
+		logger.info("entering createAvgHbefaColdTable ...");
 		
 		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable =
 			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>>();

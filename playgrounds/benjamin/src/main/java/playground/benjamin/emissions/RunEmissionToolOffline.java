@@ -37,31 +37,35 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-//	private final static String runNumber = "985";
-//	private final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-//	private static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
-//	private static final Integer lastIteration = getLastIteration(configFile);
+//	final static String runNumber = "985";
+//	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+//	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+//	static final Integer lastIteration = getLastIteration(configFile);
 //	
-//	private static String eventsFile = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration + ".events.xml.gz";
+//	static String eventsFile = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration + ".events.xml.gz";
 //	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
 
-//	private static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
-//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
+//	static String netFile = runDirectory + "output_network.xml.gz";
 	
-//	private static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
-//	private static String netFile = runDirectory + "output_network.xml.gz";
+//	static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
+//	static String netFile = runDirectory + "output_network.xml.gz";
 	
-	private static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
-	private static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
+	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
+	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
 	
-	private static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
+	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
-	private static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-	private static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
-	private static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
+	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
+	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
+	
+	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
+	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
+	
+	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
 	
 	// =======================================================================================================		
-	private final Scenario scenario;
+	final Scenario scenario;
 
 	public RunEmissionToolOffline(){
 		Config config = ConfigUtils.createConfig();
@@ -94,7 +98,11 @@ public class RunEmissionToolOffline {
 	private void setInputFiles() {
 		VspExperimentalConfigGroup vcg = scenario.getConfig().vspExperimental() ;
 		vcg.setEmissionRoadTypeMappingFile(roadTypesTrafficSituationsFile);
-		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
+		
+		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+		
+		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	}
 
 	@SuppressWarnings("deprecation")

@@ -48,7 +48,11 @@ public class RunEmissionToolOnline {
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
-	static String warmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_PC.txt";
+	
+	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
+	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
+	
+	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
 	
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
 	
@@ -127,9 +131,11 @@ public class RunEmissionToolOnline {
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setEmissionRoadTypeMappingFile(roadTypesTrafficSituationsFile);
-		vcg.setEmissionFactorsWarmFile(warmEmissionFactorsFile) ;
-//		vcg.setEmissionFactorsColdFile("");
-//		vcg.setEmissionVehicleFile("");
+		
+		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
+		
+		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
