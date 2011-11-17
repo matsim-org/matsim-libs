@@ -244,7 +244,8 @@ class CharingPowerScenario2 extends CharingPowerScenario1 {
 		super();
 		this.chargingLocationFilter = new HashMap<String, Double>();
 		chargingLocationFilter.put("home", 3500.0);
-		chargingLocationFilter.put("work", 11000.0);
+		chargingLocationFilter.put("work_sector3", 11000.0);
+		chargingLocationFilter.put("work_sector2", 11000.0);
 	}
 }
 
