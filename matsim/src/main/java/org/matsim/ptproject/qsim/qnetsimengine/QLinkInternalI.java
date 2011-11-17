@@ -28,7 +28,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
-public abstract class QLinkInternalI extends VisLane implements NetsimLink {
+abstract class QLinkInternalI extends VisLane implements NetsimLink {
 	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
 
 	// for Customizable
@@ -36,7 +36,7 @@ public abstract class QLinkInternalI extends VisLane implements NetsimLink {
 
 	abstract void setQSimEngine(NetsimEngine qsimEngine);
 
-	protected abstract boolean moveLink(double now);
+	abstract boolean moveLink(double now);
 
 	abstract boolean hasSpace();
 
