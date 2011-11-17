@@ -31,7 +31,7 @@ public class QVehicleImpl extends QVehicle {
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
 
-	private MobsimDriverAgent driver = null;
+	private DriverAgent driver = null;
 
 	private final Id id;
 	
@@ -83,11 +83,15 @@ public class QVehicleImpl extends QVehicle {
 
 	@Override
 	public MobsimDriverAgent getDriver() {
-		return this.driver;
+		if ( this.driver instanceof MobsimDriverAgent ) {
+			return (MobsimDriverAgent) this.driver; 
+		} else {
+			throw new RuntimeException( "error (downstream methods need to be made to accept DriverAgent)") ;
+		}
 	}
 
 	@Override
-	public void setDriver(final MobsimDriverAgent driver) {
+	public void setDriver(final DriverAgent driver) {
 		this.driver = driver;
 	}
 

@@ -78,7 +78,6 @@ import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -319,7 +318,7 @@ public class QSim implements VisMobsim, Netsim {
 		}
 
 		createAgents();
-		createVehicles();
+		createDefaultVehiclesForMobsimAgents();
 		createTransitDrivers();
 		createAdditionalAgents();
 
@@ -352,13 +351,29 @@ public class QSim implements VisMobsim, Netsim {
 		// Empty for inheritance. (only one test)
 	}
 
-	private void createVehicles() {
+	private static int noPlannedVehicleCnt = 0 ;
+	private void createDefaultVehiclesForMobsimAgents() {
 		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(new IdImpl("defaultVehicleType"));
 		for (MobsimAgent agent : agents) {
 			if (agent instanceof MobsimDriverAgent) {
-				createAndAddDefaultVehicle(agent, defaultVehicleType);
-				parkVehicleOnInitialLink(((MobsimDriverAgent) agent).getVehicle(), 
-						agent.getCurrentLinkId());
+				DriverAgent drAgent = (DriverAgent) agent ;
+				if ( drAgent.getPlannedVehicleId()==null ) {
+					// not sure if it is fully specified how this happens.  Not having a vehicle in the route 
+					// presumably is one option.  But having a vehicle in the route may not change this since the
+					// parser will not parse it (imo).  kai, nov'11
+					if ( noPlannedVehicleCnt < 10 ) {
+						noPlannedVehicleCnt++ ;
+						log.warn("plannedVehicleId==null in agent with id: " + agent.getId() + ".  At this point, I cannot check" +
+								" if this is intended, or if the information was somewhere but did not get here.  \nMake sure" +
+								" that you get what you want. kai, nov'11 ") ;
+						if (noPlannedVehicleCnt==10) {
+							log.warn(Gbl.FUTURE_SUPPRESSED) ;
+						}
+					}
+					
+					MobsimVehicle veh = createAndAddDefaultVehicle( drAgent, defaultVehicleType);
+					parkVehicleOnInitialLink( veh, agent.getCurrentLinkId());
+				}
 			}
 		}
 	}
@@ -381,7 +396,7 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	/**
-	 * Design thoughs:<ul>
+	 * Design thoughts:<ul>
 	 * <li> This method may become public so that plug-ins can insert vehicles.  kai, nov'11
 	 * </ul>
 	 */
@@ -390,7 +405,7 @@ public class QSim implements VisMobsim, Netsim {
 		qlink.addParkedVehicle(veh);
 	}
 
-	private void createAndAddDefaultVehicle(MobsimAgent agent,
+	private MobsimVehicle createAndAddDefaultVehicle(DriverAgent agent,
 			VehicleType defaultVehicleType) {
 		MobsimVehicle veh = null;
 		if (vehWrnCnt < 1) {
@@ -400,11 +415,18 @@ public class QSim implements VisMobsim, Netsim {
 		}
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), defaultVehicleType);
 		veh = QVehicleUtils.createMobsimVehicle(vehicle);
-		veh.setDriver((MobsimDriverAgent) agent); // this line is currently only
-													// needed for OTFVis to show
-													// parked vehicles
-		((DriverAgent) agent).setVehicle(veh);
+
+		veh.setDriver(agent);
+		// yyyyyy This was, when it was written, needed for OTFVis to show parked vehicles.  Physically, it does not make sense;
+		// driver and vehicle should be connected when the driver _enters_ the vehicle (i.e. at departure).  Can't say if, in 
+		// the meantime, it was started to also use this for something else.  kai, nov'11
+		
+		agent.setVehicle(veh);
+		// yyyyyy Physically, it does not make sense;
+		// driver and vehicle should be connected when the driver _enters_ the vehicle (i.e. at departure).  kai, nov'11
+
 		vehicles.put(veh.getId(), veh);
+		return veh ;
 	}
 
 	// ============================================================================================================================

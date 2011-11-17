@@ -21,7 +21,7 @@
 package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
@@ -31,7 +31,7 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
 public interface MobsimVehicle extends VisVehicle{
 	public Link getCurrentLink();
 	
-	public void setDriver(final MobsimDriverAgent driver);
+	public void setDriver(final DriverAgent driver);
 	// yy presumably, this should set DriverAgent
 	
 	public abstract double getSizeInEquivalents();

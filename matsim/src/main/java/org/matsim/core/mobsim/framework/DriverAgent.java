@@ -21,14 +21,14 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author nagel
  *
  */
-public interface DriverAgent extends NetworkAgent {
+public interface DriverAgent extends NetworkAgent, Identifiable {
 
 	/**
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
@@ -38,7 +38,8 @@ public interface DriverAgent extends NetworkAgent {
 	/**
 	 * notifies the agent that it was moved over the node.  Design thoughts:<ul>
 	 * <li> I find it difficult to see how one should do without this.  Somehow the mobsim needs to tell the 
-	 * driver where she is. At best, the mobsim could tell the vehicle, which tells the agent.  kai, nov'11
+	 * driver where she is. The mobsim could tell the vehicle, which tells the agent.  The DriverAgent would still 
+	 * need this method. kai, nov'11
 	 * </ul>
 	 */
 	public void notifyMoveOverNode(Id newLinkId);
@@ -56,14 +57,6 @@ public interface DriverAgent extends NetworkAgent {
 	
 	public Id getPlannedVehicleId() ;
 	
-//	/**
-//	 * List of vehicles the DriverAgent has access to.  This could be vehicles she has the key for.  But it could also
-//	 * be a temporary access provided by some car sharing company.  Design thoughts:<ul>
-//	 * <li> Automagic vehicle generation, if switched on (!), could be done exactly for those DriverAgents who have
-//	 * this list empty. 
-//	 * </ul> 
-//	 */
-//	public List<QVehicle> getAccessibleVehicles() ;
 	
 
 	

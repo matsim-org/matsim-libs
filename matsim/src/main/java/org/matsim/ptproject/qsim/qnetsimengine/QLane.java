@@ -196,9 +196,9 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		return this.laneData.getId();
 	}
 
-	public Lane getLane(){
-		return this.laneData;
-	}
+//	public Lane getLane(){
+//		return this.laneData;
+//	}
 
 	private void calculateFlowCapacity(final double time) {
 		this.simulatedFlowCapacity = ((LinkImpl)this.queueLink.getLink()).getFlowCapacity(time);
@@ -502,7 +502,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 				b.append("Person Id: ");
 				b.append(veh.getDriver().getId());
 				b.append(" is on Lane Id ");
-				b.append(this.getLane().getId());
+				b.append(this.getLaneData().getId());
 				b.append(" on Link Id ");
 				b.append(this.queueLink.getLink().getId());
 				b.append(" and wants to go on to Link Id ");
@@ -781,7 +781,7 @@ public final class QLane extends VisLane implements SignalizeableItem {
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
 			//the offset of this lane
-			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLane().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
+			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
 			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
 					QLane.this.length, offset,
 					QLane.this.visualizerLane*3);
