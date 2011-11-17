@@ -359,7 +359,7 @@ final class AgentSnapshotInfoBuilder {
 	 * @param linkLength
 	 * @param qBufferItem TODO
 	 */
-	protected void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+	private void addVehiclePositionsEquil(final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, double offset, Integer laneNumber, 
 			double linkLength, VisLane qBufferItem)
 	{
