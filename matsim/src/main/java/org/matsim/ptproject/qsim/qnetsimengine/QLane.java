@@ -61,6 +61,11 @@ import org.matsim.vis.snapshotwriters.VisData;
  * A QueueLane has no own active state and only offers isActive() for a
  * stateless check for activation, a QueueLink is active as long as at least one
  * of its QueueLanes is active.
+ * <p/>
+ * Design thoughts:<ul>
+ * <li> This class has some package-private methods that are private in QLinkImpl.  This is because QLane is accessed from
+ * QLinkLanesImpl whereas in QLinkImpl everything is in one class.  kai, nov'11
+ * </ul>
  *
  *
  * @author dgrether based on prior QueueLink implementations of
@@ -273,6 +278,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	}
 
 
+	@Override
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
@@ -443,7 +449,8 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	 * @param now current time step
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
-	 boolean moveLane(final double now) {
+	 @Override
+	boolean moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -609,6 +616,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
+	@Override
 	double getSimulatedFlowCapacity() {
 		return this.simulatedFlowCapacity;
 	}
@@ -630,6 +638,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
 	 *         the whole link), than there is space for vehicles.
 	 */
+	@Override
 	boolean hasSpace() {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
@@ -647,6 +656,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 		return this.storageCapacity;
 	}
 
+	@Override
 	void clearVehicles() {
 		double now = this.getQLink().getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
 

@@ -245,7 +245,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		Collections.sort(this.queueLanes, QLinkLanesImpl.fromLinkEndComparator);
 	}
 
-	public List<QLane> getToNodeQueueLanes() {
+	List<QLane> getToNodeQueueLanes() {
 		return this.toNodeQueueLanes;
 	}
 
@@ -299,7 +299,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		qveh.setCurrentLink(this.link);
 	}
 
-	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
+	/*package*/ @Override
+	QVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
@@ -315,7 +316,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	protected boolean moveLink(double now) {
+	boolean moveLink(double now) {
 		boolean activeLane = false;
 		boolean otherLaneActive = false;
 		boolean activeWaitBuffer = false;
@@ -436,6 +437,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * because it is only called by one testcase
 	 * @return
 	 */
+	@Override
 	int vehOnLinkCount() {
 		int count = 0;
 		for (QLane ql : this.queueLanes){
@@ -462,7 +464,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	public double getSimulatedFlowCapacity() {
+	@Override
+	double getSimulatedFlowCapacity() {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
 
@@ -497,11 +500,12 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.visdata;
 	}
 
-	public QLane getOriginalLane(){
+	QLane getOriginalLane(){
 		return this.originalLane;
 	}
 
 	@Override
+	@Deprecated // imo, should not be exposed (implementation detail).  kai, nov'11
 	public LinkedList<QVehicle> getVehQueue() {
 		LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
 		for (QLane l : this.getToNodeQueueLanes()){
@@ -548,6 +552,26 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
 		return agentsInActivities.remove(mobsimAgentId);
 	}
+	
+	@Override
+	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
+		vehicle.setDriver(agent);
+		//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
+		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
+			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
+
+			agent.endLegAndAssumeControl(now);
+			this.addParkedVehicle(vehicle);
+		} else {
+			this.addDepartingVehicle(vehicle);
+		}
+	}
+
+
+	// The following contains a number of methods that are defined in the upstream interfaces but not needed here. 
+	// In principle, one would need two separate interfaces, one for the "QLane" and one for the "QLink".  They would be
+	// combined into the QLinkImpl, whereas for QLane and QLinkLanesImpl they would be separate.  Can't do this with
+	// abstract classes (no multiple inheritance), but we need to use them because we do not want _public_ interfaces here.
 
 
 	@Override
@@ -573,10 +597,6 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
-
-	/**
-	 * this method is there so that QLane and QLink can be addressed via the same syntax
-	 */
 	@Override
 	QLinkInternalI getQLink() {
 		throw new UnsupportedOperationException() ;
@@ -607,17 +627,16 @@ public class QLinkLanesImpl extends QLinkInternalI {
 
 
 	@Override
-	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
-		vehicle.setDriver(agent);
-		//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
-			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
+	boolean moveLane(double now) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
 
-			agent.endLegAndAssumeControl(now);
-			this.addParkedVehicle(vehicle);
-		} else {
-			this.addDepartingVehicle(vehicle);
-		}
+
+	@Override
+	void calculateCapacities() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 

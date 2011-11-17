@@ -187,6 +187,10 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
+	/* 
+	 * yyyyyy There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
+	 * it is intended this way.  kai, nov'11
+	 */
 	@Override
 	 void activateLink() {
 		if (!this.active) {
@@ -278,7 +282,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		qveh.setCurrentLink(this.link);
 	}
 
-	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
+	/*package*/ @Override
+	QVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
@@ -308,7 +313,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param now current time step
 	 * @return
 	 */
-	 boolean moveLane(final double now) {
+	 @Override
+	boolean moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -334,7 +340,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param now
 	 *          The current time.
 	 */
-	 void moveLaneToBuffer(final double now) {
+	 private void moveLaneToBuffer(final double now) {
 		QVehicleImpl veh;
 
 		this.moveTransitToQueue(now);
@@ -622,6 +628,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		calculateStorageCapacity(now);
 	}
 
+	@Override
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
@@ -793,6 +800,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		this.qsimEngine = (QSimEngineInternalI) qsimEngine;
 	}
 
+	@Override
 	int vehOnLinkCount() {
 		// called by one test case
 		return this.vehQueue.size();
@@ -817,6 +825,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
+	@Override
 	double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}

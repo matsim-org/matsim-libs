@@ -51,5 +51,18 @@ abstract class QBufferItem extends VisLane {
 	abstract boolean hasSpace();
 	
 	abstract void clearVehicles();
+	
+	abstract boolean moveLane(double now) ;
+	
+	/**
+	 * only used in tests. kai, nov'11
+	 */
+	abstract double getSimulatedFlowCapacity() ;
+	
+	abstract void calculateCapacities() ;
+	
+	abstract int vehOnLinkCount() ;
+
+
 
 }

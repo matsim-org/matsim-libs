@@ -7,9 +7,11 @@ package org.matsim.ptproject.qsim.qnetsimengine;
  * @author nagel
  */
 public abstract class QItem {
-
+	
+	@Deprecated // "public" is deprecated
 	public abstract double getEarliestLinkExitTime();
 
+	@Deprecated // "public" is deprecated
 	public abstract void setEarliestLinkExitTime(double earliestLinkEndTime);
 
 }

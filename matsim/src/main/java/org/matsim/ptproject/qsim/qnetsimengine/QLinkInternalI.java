@@ -31,9 +31,6 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
 
-	// for Customizable
-	private Map<String, Object> customAttributes = new HashMap<String, Object>();
-
 	abstract void setQSimEngine(NetsimEngine qsimEngine);
 
 	abstract boolean moveLink(double now);
@@ -47,17 +44,28 @@ abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 
 	abstract QSimEngineInternalI getQSimEngine() ;
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		return customAttributes;
-	}
-
+	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now);
+	
+	/**
+     * Design thoughts:<ul>
+     * <li> This method could also be private (never called from outside the class). kai, nov'11
+     * </ul>
+	 */
+	abstract QVehicle getParkedVehicle( Id id ) ;
+	
 	/**
 	 * modifying the return type ...
 	 */
 	@Override
 	public abstract QSim getMobsim() ;
 
-	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now);
+	
+	// joint implementation for Customizable
+	private Map<String, Object> customAttributes = new HashMap<String, Object>();
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		return customAttributes;
+	}
 
 }

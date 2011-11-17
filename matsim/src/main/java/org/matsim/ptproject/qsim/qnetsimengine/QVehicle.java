@@ -25,15 +25,21 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
 /**
- * interface to the ``Q'' implementation of the MobsimVehicle.  This needs to be public since the ``Q'' version of the 
+ * interface to the ``Q'' implementation of the MobsimVehicle.  
+ * <p/>
+ * Design thoughts:<ul>
+ * <li> This needs to be public since the ``Q'' version of the 
  * vehicle is used by more than one package.  This interfaces should, however, not be used outside the relevant 
  * netsimengines.  In particular, the information should not be used for visualization.  kai, nov'11
+ * <li> Might be possible to make all methods in this hierarchy protected and just inherit to a QueueVehicle.  kai, nov'11
+ * </ul>
  * 
  * @author nagel
  */
 @Deprecated // only makes sense for "queue" mobsims.  Should go somewhere else (I think).  kai, oct'10
 public abstract class QVehicle extends QItem implements MobsimVehicle {
 
+	@Deprecated // "public" is deprecated
 	public abstract void setCurrentLink(final Link link);
 	// yy not sure if this needs to be publicly exposed
 	
@@ -46,6 +52,7 @@ public abstract class QVehicle extends QItem implements MobsimVehicle {
 	 * (Although, when thinking about it: Should be possible to obtain same result by using "getEarliestLinkExitTime()".
 	 * But I am not sure if that would really be a conceptual improvement ... linkEnterTime is, after all, a much more
 	 * "physical" quantity.)  kai, nov'11
+	 * <li> But maybe it should then go into MobsimVehicle?  kai, nov'11
 	 * <li> Also see comment under setLinkEnterTime().  kai, nov'11 
 	 * </ul>
 	 */
@@ -57,6 +64,7 @@ public abstract class QVehicle extends QItem implements MobsimVehicle {
 	 * (This is there now.  kai, nov'11)
 	 * </ul>
 	 */
+	@Deprecated // "public" is deprecated
 	public abstract void setLinkEnterTime(final double time);
 
 }
