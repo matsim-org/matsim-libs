@@ -28,7 +28,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
-abstract class QLinkInternalI extends VisLane implements NetsimLink {
+abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
 
 	// for Customizable
@@ -50,9 +50,6 @@ abstract class QLinkInternalI extends VisLane implements NetsimLink {
 	abstract void addFromIntersection(final QVehicle veh);
 
 	abstract QSimEngineInternalI getQSimEngine() ;
-
-//	@Deprecated // not needed here (I think)
-//	public abstract LinkedList<QVehicle> getVehQueue() ;
 
 	@Override
 	public Map<String, Object> getCustomAttributes() {

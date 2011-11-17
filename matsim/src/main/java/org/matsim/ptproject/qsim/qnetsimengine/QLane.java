@@ -67,7 +67,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends VisLane implements SignalizeableItem {
+public final class QLane extends QBufferItem implements SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
  * @author dgrether
  *
  */
-abstract class QBufferItem implements QSimFunctionalInterface {
+abstract class QBufferItem extends VisLane {
 	/**
 	 * equivalent to a Buffer.isEmpty() operation
 	 */

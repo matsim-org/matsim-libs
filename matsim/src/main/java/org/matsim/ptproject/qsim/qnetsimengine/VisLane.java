@@ -24,7 +24,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
  * @author nagel
  *
  */
-abstract class VisLane extends QBufferItem {
+abstract class VisLane {
 	
 	abstract QLinkInternalI getQLink() ;
 	
