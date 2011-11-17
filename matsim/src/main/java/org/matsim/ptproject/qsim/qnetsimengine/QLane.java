@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
@@ -67,7 +68,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QBufferItem implements SignalizeableItem {
+public final class QLane extends QBufferItem implements SignalizeableItem, Identifiable {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -299,7 +300,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		this.thisTimeStepGreen = b;
 	}
 
-	public boolean addTransitToBuffer(final double now, final QVehicle veh) {
+	 boolean addTransitToBuffer(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			while (true) {
@@ -442,7 +443,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 	 * @param now current time step
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
-	protected boolean moveLane(final double now) {
+	 boolean moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -559,7 +560,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		veh.setEarliestLinkExitTime(departureTime);
 	}
 
-	protected void addToBuffer(final QVehicle veh, final double now) {
+	 void addToBuffer(final QVehicle veh, final double now) {
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
 		}
@@ -579,7 +580,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
-	protected boolean hasBufferSpace() {
+	 boolean hasBufferSpace() {
 		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
 				|| (this.buffercap_accumulate >= 1.0)));
 	}
@@ -633,7 +634,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	protected int vehOnLinkCount() {
+	 int vehOnLinkCount() {
 		return this.vehQueue.size();
 	}
 
@@ -692,26 +693,26 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 
 
 
-	protected boolean isFireLaneEvents() {
+	 boolean isFireLaneEvents() {
 		return this.fireLaneEvents;
 	}
 
-	protected void setFireLaneEvents(final boolean fireLaneEvents) {
+	 void setFireLaneEvents(final boolean fireLaneEvents) {
 		this.fireLaneEvents = fireLaneEvents;
 	}
 
-	protected void addToLane(final QLane lane) {
+	 void addToLane(final QLane lane) {
 		if (this.toLanes == null) {
 			this.toLanes = new LinkedList<QLane>();
 		}
 		this.toLanes.add(lane);
 	}
 
-	protected List<QLane> getToLanes(){
+	 List<QLane> getToLanes(){
 		return this.toLanes;
 	}
 
-	protected void addDestinationLink(final Id linkId) {
+	 void addDestinationLink(final Id linkId) {
 		this.destinationLinkIds.add(linkId);
 	}
 
@@ -746,7 +747,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem {
 		return true; //the lane is not signalized and thus always green
 	}
 
-	protected Lane getLaneData() {
+	 Lane getLaneData() {
 		return this.laneData;
 	}
 
