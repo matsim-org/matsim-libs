@@ -42,7 +42,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.counts.Volume;
 
-import playground.benjamin.dataprepare.Links2ShapeWriter;
+import playground.benjamin.utils.Links2ShapeWriter;
 
 
 /**

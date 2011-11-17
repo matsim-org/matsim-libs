@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.benjamin.dataprepare.CheckingTabularFileHandler;
+import playground.benjamin.utils.CheckingTabularFileHandler;
 
 /**
  * @author benjamin

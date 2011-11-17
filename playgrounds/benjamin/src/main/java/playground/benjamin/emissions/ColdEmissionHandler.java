@@ -116,7 +116,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			this.accumulatedDistance.remove(personId);
 		}
 		else{
-			// emissions to calculate...
+			// no emissions to calculate...
 		}
 	}
 

@@ -37,8 +37,8 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.households.Income;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.dataprepare.IncomeStats;
 import playground.benjamin.scenarios.zurich.IncomeCalculatorKantonZurich;
+import playground.benjamin.utils.IncomeStats;
 
 
 /**

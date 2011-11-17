@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.dataprepare;
+package playground.benjamin.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

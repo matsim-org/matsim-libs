@@ -20,9 +20,8 @@
 package playground.benjamin.emissions;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -152,9 +152,7 @@ public class EmissionHandler {
 		
 		Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping = new HashMap<Integer, HbefaRoadTypeTrafficSituation>();
 		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine;
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
 			br.readLine(); // Read and forget header line
@@ -181,59 +179,61 @@ public class EmissionHandler {
 				
 				roadTypeMapping.put(visumRtNr, hbefaRoadTypeTrafficSituation);
 			}
-			in.close();
 			
-			logger.info("leaving createRoadTypesTrafficSitMapping ...") ;
-			return roadTypeMapping;
-		} catch (Exception e){
-			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		logger.info("leaving createRoadTypesTrafficSitMapping ...") ;
+		return roadTypeMapping;
 	}
 	
+	//TODO: check direct output from HBEFA and adjust parser...
 	private static Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
 		Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable = new HashMap<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors>();
 		
 		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			String strLine;
-			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
-			br.readLine();// Read and forget header line
+			BufferedReader br = IOUtils.getBufferedReader(filename);
+			
+			String strLine = br.readLine();
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			
 			while ((strLine = br.readLine()) != null) {
 
 				String[] array = strLine.split(";");
 				
 				HbefaAvgWarmEmissionFactorsKey key = new HbefaAvgWarmEmissionFactorsKey();
-				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[0]));
-				key.setHbefaRoadCategory(Integer.parseInt(array[1]));
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[3]));
+				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+				key.setHbefaRoadCategory(Integer.parseInt(array[indexFromKey.get("Road_Category")]));
+				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TS")]));
 				
 				HbefaAvgWarmEmissionFactors value = new HbefaAvgWarmEmissionFactors();
-				value.setSpeed(Double.parseDouble(array[4]));
-				value.setEmissionFactor(WarmPollutant.FC, Double.parseDouble(array[7]));
-				value.setEmissionFactor(WarmPollutant.NOX, Double.parseDouble(array[8]));
-				value.setEmissionFactor(WarmPollutant.CO2_TOTAL, Double.parseDouble(array[10]));
-				value.setEmissionFactor(WarmPollutant.NO2, Double.parseDouble(array[11]));
-				value.setEmissionFactor(WarmPollutant.PM, Double.parseDouble(array[12]));
+				value.setSpeed(Double.parseDouble(array[indexFromKey.get("S (speed)")]));
+				value.setEmissionFactor(WarmPollutant.FC, Double.parseDouble(array[indexFromKey.get("mKr")]));
+				value.setEmissionFactor(WarmPollutant.NOX, Double.parseDouble(array[indexFromKey.get("EF_Nox")]));
+				value.setEmissionFactor(WarmPollutant.CO2_TOTAL, Double.parseDouble(array[indexFromKey.get("EF_CO2(total)")]));
+				value.setEmissionFactor(WarmPollutant.NO2, Double.parseDouble(array[indexFromKey.get("EF_NO2")]));
+				value.setEmissionFactor(WarmPollutant.PM, Double.parseDouble(array[indexFromKey.get("EF_PM")]));
 				
 				avgHbefaWarmTable.put(key, value);
 			}
-			in.close();
 			
-			logger.info("leaving createAvgHbefaWarmTable ...");
-			return avgHbefaWarmTable;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		logger.info("leaving createAvgHbefaWarmTable ...");
+		return avgHbefaWarmTable;
 	}
 	
 	private static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		else if(string.contains("HDV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_DUTY_VEHICLE;
+		else if(string.contains("HDV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else{
 			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
@@ -260,9 +260,7 @@ public class EmissionHandler {
 		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>> avgHbefaColdTable =
 			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>>();
 		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine;
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
 			br.readLine();// Read and forget header line
@@ -296,13 +294,14 @@ public class EmissionHandler {
 					avgHbefaColdTable.put(coldPollutant, tempDistance);				
 				}
 			}
-			in.close();
 			
-			logger.info("leaving createAvgHbefaColdTable ...");
-			return avgHbefaColdTable;
-		} catch(Exception e){
-			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		logger.info("leaving createAvgHbefaColdTable ...");
+		return avgHbefaColdTable;
 	}
 	
 	private static Map<String, HbefaWarmEmissionFactorsDetailed> createDetailedHbefaWarmTable(String filename){
@@ -310,9 +309,7 @@ public class EmissionHandler {
 
 		Map<String, HbefaWarmEmissionFactorsDetailed> hbefaWarmTableDetailed = new HashMap<String, HbefaWarmEmissionFactorsDetailed>() ;
 		try{
-			FileInputStream fstream = new FileInputStream(filename);
-			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine;
 			// TODO: test for header line! See e.g. ReadFromUrbansimParcelModel.java by kai
 			// Read and forget header line
@@ -335,13 +332,14 @@ public class EmissionHandler {
 
 				hbefaWarmTableDetailed.put(key, new HbefaWarmEmissionFactorsDetailed(value));
 			}
-			in.close();
 			
-			logger.info("entering createDetailedHbefaWarmTable ...");
-			return hbefaWarmTableDetailed;
-		} catch(Exception e ){
-			throw new RuntimeException(e);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		logger.info("entering createDetailedHbefaWarmTable ...");
+		return hbefaWarmTableDetailed;
 	}
 	
 	private static String[] split(String hbefa, String symbol) {
@@ -360,6 +358,16 @@ public class EmissionHandler {
 		result[index++] = part;
 		return result;
 	}		
+
+	private static Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {
+		String[] keys = strLine.split(fieldSeparator) ;
+
+		Map<String, Integer> indexFromKey = new HashMap<String, Integer>() ;
+		for ( int ii = 0; ii < keys.length; ii++ ) {
+			indexFromKey.put(keys[ii], ii ) ;
+		}
+		return indexFromKey ;
+	}
 
 	public EventWriterXML getEmissionEventWriter() {
 		return emissionEventWriter;

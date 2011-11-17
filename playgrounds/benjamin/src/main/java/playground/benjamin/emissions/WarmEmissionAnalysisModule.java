@@ -279,8 +279,8 @@ public class WarmEmissionAnalysisModule {
 			HbefaAvgWarmEmissionFactorsKey keyStopAndGo = new HbefaAvgWarmEmissionFactorsKey();
 			//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
 			if(personId.toString().contains("gv_")){
-				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_DUTY_VEHICLE);
-				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_DUTY_VEHICLE);
+				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
 			} else{
 				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);

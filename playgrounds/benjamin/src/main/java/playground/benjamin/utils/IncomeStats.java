@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.dataprepare;
+package playground.benjamin.utils;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

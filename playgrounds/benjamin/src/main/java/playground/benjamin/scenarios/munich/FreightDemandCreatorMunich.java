@@ -55,7 +55,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.benjamin.BkPaths;
-import playground.benjamin.dataprepare.CheckingTabularFileHandler;
+import playground.benjamin.utils.CheckingTabularFileHandler;
 
 /**
  * @author benjamin

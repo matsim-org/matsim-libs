@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.dataprepare;
+package playground.benjamin.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

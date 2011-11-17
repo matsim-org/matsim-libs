@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.dataprepare;
+package playground.benjamin.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;

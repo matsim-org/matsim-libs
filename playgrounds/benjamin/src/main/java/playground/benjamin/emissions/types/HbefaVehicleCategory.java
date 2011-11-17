@@ -25,7 +25,7 @@ package playground.benjamin.emissions.types;
  */
 public enum HbefaVehicleCategory {
 
-	PASSENGER_CAR, HEAVY_DUTY_VEHICLE;
+	PASSENGER_CAR, HEAVY_GOODS_VEHICLE;
 	
 	private HbefaVehicleCategory() {
 	}
