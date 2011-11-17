@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,7 +47,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -54,6 +55,41 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
+ * Extracts activity chains from the MZ 2000. Activities do not exist in the MZ
+ * as such, and must be deduced from the trip purpose. Moreover, contrary to the
+ * MZ 2005, the MZ 2000 do not provide coordinates, and for most of departure/arrivals,
+ * the precision is at the ZIP-code level. This implies that the home activities
+ * detection has to be based on cruder hypothesis than for the MZ 2005 (where
+ * simple coordinates comparison is fine)
+ *
+ * Thus, the following assumptions are used:
+ * <ul>
+ * <li> the first activity of the day is a home activity
+ * <li> if there exists a sequence of trips of same purpose, and that the localisation
+ * information does not allow to determine whether trips are return from home or
+ * move toward a new activity of same type, a "shuttle" structure is assumed (h-act-h-act-...)
+ * <li> if there exists a trip with "serve passenger" or "transit transfer" purpose, and the target activity is short,
+ * the consecutive trips are merged ( pick-up/drop-off are considered as part of a same leg).
+ * The case where several "serve passenger" purpose are consecutive is not handled.
+ * Serve passenger activities include types "Begleitweg" and "Serviceweg". The
+ * difference is not clear, but it seems that "Begleitwege" are the trips corresponding
+ * to joint activities rather than pick-up/drop-off (more long activity durations).
+ * </ul>
+ *
+ * The following type of chains are removed:
+ * <ul>
+ * <li> the chains finishing on a non-home activity
+ * <li> the chains with unknown activity types
+ * <li> the plans with adress inconsistency (departure location do not corresponds
+ * to the last arrival location)
+ * <li> the chains with inconsistent time sequence or trip durations (ie duration is
+ * different from the time elapsed between departure and arrival).
+ * </ul>
+ *
+ * moreover, if trips from home to home exist, they are removed.
+ * Attributes of the plans are set in the following way: score corresponds to the
+ * weight in the MZ, plan type to the day of week (from 1=Monday to 7=Sunday)
+ *
  * @author thibautd
  */
 public class Mz2000ActivityChainsExtractor {
@@ -111,9 +147,9 @@ public class Mz2000ActivityChainsExtractor {
  * used to indicate that the activity chain is inconsistent, and should not be
  * retained.
  */
-class UnconsistentMzRecordException extends Exception {
+class UnhandledMzRecordException extends Exception {
 	private static final long serialVersionUID = 1L;
-	public UnconsistentMzRecordException(final String msg) {
+	public UnhandledMzRecordException(final String msg) {
 		super( msg );
 	}
 }
@@ -138,7 +174,7 @@ class MzPopulation {
 		for (MzPerson person : persons.values()) {
 			try {
 				matsimPerson = person.getPerson();
-			} catch (UnconsistentMzRecordException e) {
+			} catch (UnhandledMzRecordException e) {
 				// entry is inconsistent: inform user and pass to the next
 				// log.info( "got unconsistent entry: "+e.getMessage() );
 				continue;
@@ -182,6 +218,8 @@ class MzPerson implements Identifiable {
 	private static final String SHOP = "s";
 	private static final String WORK = "w";
 	private static final String LEISURE = "l";
+
+	private static final double SHORT_DURATION = 10 * 60;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// static fields
@@ -318,10 +356,12 @@ class MzPerson implements Identifiable {
 	}
 
 	/**
-	 * @throws UnconsistentMzRecordException if the resulting plan contains
+	 * @throws UnhandledMzRecordException if the resulting plan contains
 	 * inconsistencies.
 	 */
-	public Person getPerson() throws UnconsistentMzRecordException {
+	public Person getPerson() throws UnhandledMzRecordException {
+		// TODO: rearrange and separate in *a lot* of little methods: awfully
+		// messy and unreadable!
 		stats.totalPersonsProcessed();
 		PersonImpl person = new PersonImpl( id );
 
@@ -344,75 +384,133 @@ class MzPerson implements Identifiable {
 			trips.get( 0 ).getDepartureAdress() :
 			null;
 		MzAdress currentActivityAdress = homeAdress;
+		MzWeg.Purpose lastPurpose = null;
+		boolean lastActivityWasHome = true;
 		double currentTime = 0;
+		double sharedDeparture = Double.NaN;
 
 		// TODO: check O/D consistency (departure from previous arrival).
 		for (MzWeg weg : trips) {
 			// do not include round trips
-			if ( weg.getArrivalAdress().equals( weg.getDepartureAdress() ) ) {
-				// log.info( "round trip for agent "+id );
-				stats.roundTrip();
-				// continue;
-				throw new UnconsistentMzRecordException( "round trip" );
-			}
+			// pb: location not precise enough to do this.
+			// if ( weg.getArrivalAdress().equals( weg.getDepartureAdress() ) ) {
+			// 	// // log.info( "round trip for agent "+id );
+			// 	stats.roundTrip();
+			// 	continue;
+			// 	// throw new UnhandledMzRecordException( "round trip" );
+			// }
 			
 			if (!weg.getDepartureAdress().equals( currentActivityAdress )) {
 				stats.addressInconsistency();
-				throw new UnconsistentMzRecordException( "adress inconsistency" );
+				throw new UnhandledMzRecordException( "adress inconsistency" );
 			}
 			if (weg.getDepartureTime() < currentTime) {
 				stats.timeSequenceInconsistency();
-				throw new UnconsistentMzRecordException( "time inconsistency : departure before previous arrival" );
+				throw new UnhandledMzRecordException( "time inconsistency : departure before previous arrival" );
 			}
 			if (Math.abs( weg.getArrivalTime() - weg.getDepartureTime()
 						- weg.getDuration() ) > 1E-7 ) {
 				stats.tripDurationInconsistency();
-				throw new UnconsistentMzRecordException( "time inconsistency : arrival - departure is not duration" );
+				throw new UnhandledMzRecordException( "time inconsistency : arrival - departure is not duration" );
 			}
 
-			currentActivityAdress = weg.getArrivalAdress();
-			currentTime = weg.getArrivalTime();
-			currentAct.setEndTime( weg.getDepartureTime() );
-
-			//String actType = null;
-			//switch ( weg.getPurpose() ) {
-			//	case work:
-			//		actType = WORK;
-			//		break;
-			//	case service:
-			//		log.warn( "got a service trip not round. setting activity type as leisure." );
-			//	case leisure:
-			//		actType = LEISURE;
-			//		break;
-			//	case educ:
-			//		actType = EDUC;
-			//		break;
-			//	case shop:
-			//		actType = SHOP;
-			//		break;
-			//	case unknown:
-			//		actType = "";
-			//		break;
-			//	default:
-			//		throw new RuntimeException( "unknown value "+weg.getPurpose() );
-			//}
-			String actType = ""+weg.getPurpose();
-
 			Leg leg = weg.getLeg();
+
+			currentActivityAdress = weg.getArrivalAdress();
+
+			// is this a "serve passenger" ride?
+			if (weg.getPurpose().equals( MzWeg.Purpose.servePassengerRide ) ||
+					weg.getPurpose().equals( MzWeg.Purpose.accompany ) ||
+					weg.getPurpose().equals( MzWeg.Purpose.transitTransfer )) {
+				if ( MzWeg.Purpose.servePassengerRide.equals( lastPurpose ) ||
+						MzWeg.Purpose.accompany.equals( lastPurpose ) ||
+						MzWeg.Purpose.transitTransfer.equals( lastPurpose )) {
+					// several serve passengers: just check that the in-ride activity
+					// is acceptable
+					if (weg.getDepartureTime() - currentTime > SHORT_DURATION) {
+						stats.longServePassengerAct();
+						throw new UnhandledMzRecordException( "cannot handle long serve passenger activities" );
+					}
+					currentTime = weg.getArrivalTime();
+					continue;
+				}
+				// just remember that we served a passenger
+				lastPurpose = MzWeg.Purpose.servePassengerRide;
+				sharedDeparture = weg.getDepartureTime();
+				currentTime = weg.getArrivalTime();
+				currentAct.setEndTime( weg.getDepartureTime() );
+				continue;
+			}
+			else if ( MzWeg.Purpose.servePassengerRide.equals( lastPurpose ) ||
+						MzWeg.Purpose.accompany.equals( lastPurpose ) ||
+						MzWeg.Purpose.transitTransfer.equals( lastPurpose )) {
+				if (weg.getDepartureTime() - currentTime > SHORT_DURATION) {
+					stats.longServePassengerAct();
+					throw new UnhandledMzRecordException( "cannot handle long serve passenger activities" );
+				}
+
+				leg.setDepartureTime( sharedDeparture );
+				leg.setTravelTime( leg.getTravelTime() + (weg.getDepartureTime() - sharedDeparture) );
+			}
+			else {
+				currentAct.setEndTime( weg.getDepartureTime() );
+			}
+
+			currentTime = weg.getArrivalTime();
+
+			String actType = "unknown";
+
+			switch (weg.getPurpose()) {
+				case work:
+					actType = WORK;
+					break;
+				case commercialActivity:
+				case shop:
+				case useService:
+					actType = SHOP;
+					break;
+				case educ:
+					actType = EDUC;
+					break;
+				case leisure:
+					actType = LEISURE;
+					break;
+				case servePassengerRide:
+				case accompany:
+				case transitTransfer:
+					throw new RuntimeException( "got serve passenger activities after they were supposed to be processed" );
+				case unknown:
+					stats.unhandledActivityType();
+					throw new UnhandledMzRecordException( "cannot handle activity type "+weg.getPurpose() );
+			}
+
 			plan.addLeg( leg );
 			
-			if ( weg.getArrivalAdress().equals( homeAdress ) ) {
+			//if ( weg.getArrivalAdress().equals( homeAdress ) ) {
 			// if (false) {
+			if (weg.getPurpose().equals( lastPurpose ) &&
+					weg.getArrivalAdress().equals( homeAdress ) &&
+					!lastActivityWasHome) {
 				currentAct = plan.createAndAddActivity( HOME );
+				lastActivityWasHome = true;
 			}
 			else {
 				currentAct = plan.createAndAddActivity( actType );
+				lastActivityWasHome = false;
 			}
 
+			lastPurpose = weg.getPurpose();
 			currentAct.setStartTime( leg.getDepartureTime() + leg.getTravelTime() );
 		}
 
+		if (!currentAct.getType().equals( HOME )) {
+			stats.nonHomeBased();
+			throw new UnhandledMzRecordException( "non home based plan" );
+		}
+
 		setPersonAttributes( person );
+
+		removeRoundTrips( person );
 
 		stats.totallyProcessedPerson();
 		return person;
@@ -429,6 +527,41 @@ class MzPerson implements Identifiable {
 
 		// day of week in the plan type
 		((PlanImpl) person.getSelectedPlan()).setType( ""+dayOfWeek );
+	}
+
+	private void removeRoundTrips( final PersonImpl person ) {
+		Activity lastAct = null;
+		List<PlanElement> newPlanElements = new ArrayList<PlanElement>();
+		List<PlanElement> pePlanInternal = person.getSelectedPlan().getPlanElements();
+		Iterator<PlanElement> iterator = pePlanInternal.iterator();
+
+		while (iterator.hasNext()) {
+			PlanElement pe = iterator.next();
+			
+			if (pe instanceof Activity) {
+				newPlanElements.add( pe );
+				lastAct = (Activity) pe;
+			}
+			else {
+				Activity destination = (Activity) iterator.next();
+
+				if ( !(destination.getType().equals( HOME ) &&
+							lastAct.getType().equals( HOME )) ) {
+					lastAct = destination;
+					newPlanElements.add( pe );
+					newPlanElements.add( destination );
+				}
+				else {
+					lastAct.setEndTime( destination.getEndTime() );
+					lastAct.setMaximumDuration( 
+							lastAct.getEndTime() - lastAct.getStartTime() );
+					stats.roundTrip();
+				}
+			}
+		}
+
+		pePlanInternal.clear();
+		pePlanInternal.addAll( newPlanElements );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -459,6 +592,22 @@ class MzPerson implements Identifiable {
 		private int totalPersonsProcessed = 0;
 		private int totallyProcessedPersons = 0;
 		private int roundTrips = 0;
+		private int unhandledActivityType = 0;
+		private int nonHomeBased = 0;
+		private int longServePassengerAct = 0;
+		private int numerousServePassengersLegs = 0;
+
+		public void numerousServePassengersLegs() {
+			numerousServePassengersLegs++;
+		}
+
+		public void longServePassengerAct() {
+			longServePassengerAct++;
+		}
+
+		public void nonHomeBased() {
+			nonHomeBased++;
+		}
 
 		public void roundTrip() {
 			roundTrips++;
@@ -484,12 +633,23 @@ class MzPerson implements Identifiable {
 			totallyProcessedPersons++;
 		}
 
+		public void unhandledActivityType() {
+			unhandledActivityType++;
+		}
+
 		public void printStats() {
-			log.info( "-----------> statistics on the processing:" );
-			log.info( "round trips (ignored): "+roundTrips );
+			log.info( "-----------> statistics on the processing." );
+			log.info( "beware: the counts count the reason for which plan construction was aborted" );
+			log.info( "Actual number of interviews of each type may  be bigger." );
+			log.info( "" );
+			log.info( "round trips: "+roundTrips );
 			log.info( "adress inconsistencies: "+addressInconsistencies );
 			log.info( "time sequence inconsistencies: "+timeSequenceInconsistencies );
 			log.info( "trip duration inconsistencies: "+tripDurationInconsistencies );
+			log.info( "plans with unhandled activity types: "+unhandledActivityType );
+			log.info( "plans with long serve passenger activities: "+longServePassengerAct );
+			// log.info( "plans with numerous serve passenger legs: "+numerousServePassengersLegs );
+			log.info( "non home based plans: "+nonHomeBased );
 			log.info( "total number of persons: "+totalPersonsProcessed );
 			log.info( "number of persons retained: "+totallyProcessedPersons );
 			MzAdress.printStatistics();
@@ -500,11 +660,11 @@ class MzPerson implements Identifiable {
 
 class MzWeg implements Identifiable {
 	/**
-	 * reproduces (almost) all the possible answers of the MZ (exception: two kind
-	 * of "work" purpose, ie professional activity and work, are merged).
+	 * reproduces all the possible answers of the MZ
 	 */
 	public enum Purpose {
 		work,
+		commercialActivity,
 		educ,
 		leisure,
 		shop,
@@ -659,17 +819,27 @@ class MzWeg implements Identifiable {
 		int i = Integer.parseInt( value.trim() );
 
 		switch ( i ) {
-			case 0: return Purpose.transitTransfer;
+			case 0: // Umsteigen / Verkehrsmittelwechsel
+				return Purpose.transitTransfer;
 			case 1: // Arbeit
-			case 4: // Geschäftliche Tätigkeit
-					return Purpose.work;
-			case 2: return Purpose.educ;
-			case 3: return Purpose.shop;
-			case 5: return Purpose.useService; // Dienstfahrt
-			case 6: return Purpose.servePassengerRide;// Serviceweg
-			case 8: return Purpose.accompany; // Begleitweg
-			case 9: // no answer
-			default: return Purpose.unknown; // or fail with custom exception?
+				return Purpose.work;
+			case 2: // Ausbildung
+				return Purpose.educ;
+			case 3: // Einkauf / Besorgungen
+				return Purpose.shop;
+			case 4: // Geschäftliche Tätigkkeit
+				return Purpose.commercialActivity;
+			case 5: // Dienstfahrt
+				return Purpose.useService;
+			case 6: // Freizeit
+				return Purpose.leisure;
+			case 7: // Serviceweg
+				return Purpose.servePassengerRide;
+			case 8: // Begleitweg
+				return Purpose.accompany;
+			case 9: // keine Angabe
+			default:
+				return Purpose.unknown;
 		}
 	}
 
