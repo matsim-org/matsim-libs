@@ -135,18 +135,25 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private String vspDefaultsCheckingLevel = IGNORE ;
 
 	// ---
+	
 	private static final String EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE = "emissionRoadTypesTrafficSituationsFile";
 	private String emissionRoadTypesTrafficSituationsFile = null;
+
+	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE = "averageFleetWarmEmissionFactorsFile";
+	private String averageFleetWarmEmissionFactorsFile = null;
 	
-	// ---
+	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
+	private String averageFleetColdEmissionFactorsFile = null;
 	
-	private static final String EMISSION_FACTORS_WARM_FILE = "emissionFactorsWarmFile" ;
-	private String emissionFactorsWarmFile = null;
+	
+	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
+	private String detailedWarmEmissionFactorsFile = null;
 	
 	// ---
 
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
 	private boolean writingOutputEvents = false ;
+
 
 	
 	// ---
@@ -163,7 +170,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		
 		map.put(EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE, "mapping from input road types to HBEFA road types and traffic situations");
 		
-		map.put(EMISSION_FACTORS_WARM_FILE, "file with HBEFA warm emission factors") ;
+		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average warm emission factors");
+		
+		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average cold emission factors");
+		
+		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA detailed warm emission factors") ;
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
@@ -232,8 +243,12 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			this.setVspDefaultsCheckingLevel(value) ;
 		} else if ( EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
-		} else if ( EMISSION_FACTORS_WARM_FILE.equals(key)) {
-			this.setEmissionFactorsWarmFile(value) ;
+		} else if ( EMISSION_FACTORS_WARM_FILE_AVERAGE.equals(key)){	
+			this.setAverageWarmEmissionFactorsFile(value);
+		} else if ( EMISSION_FACTORS_COLD_FILE_AVERAGE.equals(key)){
+			this.setAverageColdEmissionFactorsFile(value);
+		} else if ( EMISSION_FACTORS_WARM_FILE_DETAILED.equals(key)) {
+			this.setDetailedWarmEmissionFactorsFile(value) ;
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
 			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
 		}
@@ -265,7 +280,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		
 		map.put(EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE, this.getEmissionRoadTypeMappingFile());
 		
-		map.put( EMISSION_FACTORS_WARM_FILE,  this.getEmissionFactorsWarmFile() ) ;
+		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
+		
+		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, this.getAverageColdEmissionFactorsFile());
+		
+		map.put( EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile() ) ;
 		
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
 
@@ -390,12 +409,28 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		return this.emissionRoadTypesTrafficSituationsFile;
 	}
 
-	public void setEmissionFactorsWarmFile(String emissionFactorsWarmFile) {
-		this.emissionFactorsWarmFile = emissionFactorsWarmFile;
+	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
+		this.averageFleetWarmEmissionFactorsFile = averageFleetWarmEmissionFactorsFile;
 	}
 
-	public String getEmissionFactorsWarmFile() {
-		return emissionFactorsWarmFile;
+	public String getAverageWarmEmissionFactorsFile() {
+		return this.averageFleetWarmEmissionFactorsFile;
+	}
+
+	public void setAverageColdEmissionFactorsFile(String averageFleetColdEmissionFactorsFile) {
+		this.averageFleetColdEmissionFactorsFile = averageFleetColdEmissionFactorsFile;
+	}
+
+	public String getAverageColdEmissionFactorsFile() {
+		return this.averageFleetColdEmissionFactorsFile;
+	}
+
+	public void setDetailedWarmEmissionFactorsFile(String detailedWarmEmissionFactorsFile) {
+		this.detailedWarmEmissionFactorsFile = detailedWarmEmissionFactorsFile;
+	}
+
+	public String getDetailedWarmEmissionFactorsFile() {
+		return detailedWarmEmissionFactorsFile;
 	}
 
 	public boolean isWritingOutputEvents() {
