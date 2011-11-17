@@ -38,6 +38,8 @@ import org.matsim.core.utils.collections.Tuple;
 
 /**
  * based on the class of same name from balmermi
+ * differences are in the way employement is detected and in the ability to load
+ * an arbitrary number of population files.
  */
 public class MicroCensus {
 
@@ -59,13 +61,17 @@ public class MicroCensus {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MicroCensus(final String popFile) {
+	public MicroCensus(final List<String> popFiles) {
 		for (int i=0; i<groups.length; i++) { groups[i] = null; }
 
-		Scenario scen = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		(new MatsimPopulationReader( scen )).parse( popFile );
+		List<Population> populations = new ArrayList<Population>();
+		for (String popFile : popFiles) {
+			Scenario scen = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			(new MatsimPopulationReader( scen )).parse( popFile );
+			populations.add( scen.getPopulation() );
+		}
 
-		this.create( scen.getPopulation() );
+		this.create( populations );
 		MatsimRandom.getRandom().nextDouble();
 	}
 
@@ -162,55 +168,59 @@ public class MicroCensus {
 		return "e("+has_educ+");w("+has_work+");lic("+lic+");sex("+sex+");age("+age+")";
 	}
 
-	private final void create(final Population pop) {
+	private final void create(final List<Population> pops) {
+		// Consider the weights for different years in the same way (ie do not weight
+		// years)
 		double weight_sum = 0.0;
 
-		for (Person p : pop.getPersons().values()) {
-			weight_sum += p.getSelectedPlan().getScore().doubleValue();
-		}
+		for (Population pop : pops) {
+			for (Person p : pop.getPersons().values()) {
+				weight_sum += p.getSelectedPlan().getScore().doubleValue();
+			}
 
-		for (Person pp : pop.getPersons().values()) {
-			PersonImpl p = (PersonImpl) pp;
-			int age = p.getAge();
-			String sex = p.getSex();
-			String lic = p.getLicense();
-			//boolean has_work = false;
-			// work is defined by employement status rather than plan
-			// composition, as employed persons may not work every day
-			boolean has_work = p.isEmployed();
-			// education is defined in terms of presence or not of educationnal
-			// activities in the plan. 
-			boolean has_educ = false;
+			for (Person pp : pop.getPersons().values()) {
+				PersonImpl p = (PersonImpl) pp;
+				int age = p.getAge();
+				String sex = p.getSex();
+				String lic = p.getLicense();
+				//boolean has_work = false;
+				// work is defined by employement status rather than plan
+				// composition, as employed persons may not work every day
+				boolean has_work = p.isEmployed();
+				// education is defined in terms of presence or not of educationnal
+				// activities in the plan. 
+				boolean has_educ = false;
 
-			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof Activity) {
-					Activity a = (Activity) pe;
-					if (a.getType().equals(WORK) && !has_work) {
-						log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
-						has_work = true;
-					}
-					if (a.getType().equals(EDUC)) {
-						has_educ = true;
+				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity a = (Activity) pe;
+						if (a.getType().equals(WORK) && !has_work) {
+							log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
+							has_work = true;
+						}
+						if (a.getType().equals(EDUC)) {
+							has_educ = true;
+						}
 					}
 				}
+
+				int index = this.group2index(
+						age,
+						sex,
+						lic,
+						has_work,
+						has_educ);
+				Group g = groups[ index ];
+
+				if (g == null) {
+					g = new Group();
+					groups[ index ] = g;
+				}
+
+				g.addTuple(
+						p.getSelectedPlan().getScore().doubleValue() / weight_sum,
+						p);
 			}
-
-			int index = this.group2index(
-					age,
-					sex,
-					lic,
-					has_work,
-					has_educ);
-			Group g = groups[ index ];
-
-			if (g == null) {
-				g = new Group();
-				groups[ index ] = g;
-			}
-
-			g.addTuple(
-					p.getSelectedPlan().getScore().doubleValue() / weight_sum,
-					p);
 		}
 
 		for (int i=0; i<this.groups.length; i++) {

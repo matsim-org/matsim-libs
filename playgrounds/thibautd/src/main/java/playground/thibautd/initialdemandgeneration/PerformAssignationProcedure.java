@@ -22,6 +22,10 @@ package playground.thibautd.initialdemandgeneration;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Person;
@@ -41,7 +45,7 @@ import org.matsim.core.utils.io.IOUtils;
  *
  * it must have the following fields:
  * <ul>
- * <li> "mzPopulationFile": the path to the plans corresponding to mz act chains
+ * <li> "mzPopulationFile*": the path to the plans corresponding to mz act chains
  * <li> "dayOfWeek": "week", "saturday" or "sunday"
  * <li> "outputDir"
  * </ul>
@@ -50,7 +54,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class PerformAssignationProcedure {
 	public static final String CONF_GROUP = "assignation";
-	public static final String POP_FILE_FIELD = "mzPopulationFile";
+	public static final String POP_FILE_FIELD_REGEXP = "mzPopulationFile*";
 	public static final String DOW_FIELD = "dayOfWeek";
 	public static final String OUT_FIELD = "outputDir";
 
@@ -64,7 +68,15 @@ public class PerformAssignationProcedure {
 		// TODO: log, creation of output
 		initOut( outputDir );
 
-		MicroCensus mz = new MicroCensus( configGroup.getValue( POP_FILE_FIELD ) );
+		List<String> popFiles = new ArrayList<String>();
+
+		for (Map.Entry<String, String> entry : configGroup.getParams().entrySet()) {
+			if (entry.getKey().matches( POP_FILE_FIELD_REGEXP )) {
+				popFiles.add( entry.getValue() );
+			}
+		}
+
+		MicroCensus mz = new MicroCensus( popFiles );
 		PersonAssignActivityChains algo = new PersonAssignActivityChains(
 				getDay( configGroup ),
 				mz,
