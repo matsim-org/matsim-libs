@@ -52,6 +52,7 @@ public class RunEmissionToolOnline {
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
 	
+	static boolean isUsingDetailedEmissionCalculation = true;
 	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
 	
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
@@ -135,6 +136,7 @@ public class RunEmissionToolOnline {
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		
+		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.

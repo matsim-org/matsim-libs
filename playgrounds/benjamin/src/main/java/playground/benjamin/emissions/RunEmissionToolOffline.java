@@ -66,10 +66,12 @@ public class RunEmissionToolOffline {
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
 	
+	static boolean isUsingDetailedEmissionCalculation = true;
 	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
 	
 	// =======================================================================================================		
 	final Scenario scenario;
+
 
 	public RunEmissionToolOffline(){
 		Config config = ConfigUtils.createConfig();
@@ -93,7 +95,7 @@ public class RunEmissionToolOffline {
 		
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Vehicle-specific warm emission calculation was not possible for "
+		logger.info("Detailed warm emission calculation was not possible for "
 				+ WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " link leave events ("
 				+ WarmEmissionAnalysisModule.getPersonIdSet().size() + " vehicles).");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
@@ -106,6 +108,7 @@ public class RunEmissionToolOffline {
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 		
+		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	}
 

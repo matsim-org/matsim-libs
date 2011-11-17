@@ -53,8 +53,8 @@ public class WarmEmissionAnalysisModule {
 
 	private final Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
 
-	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 	private final Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
+	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
 
 	private final EventsManager eventsManager;
 	
@@ -64,12 +64,12 @@ public class WarmEmissionAnalysisModule {
 
 	public WarmEmissionAnalysisModule(
 			Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping,
-			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
 			Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable,
+			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
 			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
-		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
+		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
 	}
 
@@ -86,26 +86,29 @@ public class WarmEmissionAnalysisModule {
 			Integer roadType, Double linkLength, Double travelTime,
 			String ageFuelCcm) {
 
-		Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> relevantInformation;
-		
-		if (ageFuelCcm != null) {
-			relevantInformation = gatherRelevantInformation(roadType, ageFuelCcm);
-		} else {// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
-			relevantInformation = null;
-		}
-		
 		Map<WarmPollutant, Double> warmEmissions;
-		if (relevantInformation != null) {
-			warmEmissions = calculateDetailedEmissions(relevantInformation,	travelTime, linkLength);
-		} else {// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
-			
-			warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
-			
-			if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
-				logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
-				if (vehInfoWarnCnt == maxVehInfoWarnCnt)
-					logger.warn(Gbl.FUTURE_SUPPRESSED);
+
+		if(this.detailedHbefaWarmTable != null){
+			Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> relevantInformation;
+			if (ageFuelCcm != null)	relevantInformation = gatherRelevantInformation(roadType, ageFuelCcm);
+			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
+			else relevantInformation = null;
+
+			if (relevantInformation != null) warmEmissions = calculateDetailedEmissions(relevantInformation, travelTime, linkLength);
+			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
+			else {
+				warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
+
+				if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
+					logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
+					if (vehInfoWarnCnt == maxVehInfoWarnCnt)
+						logger.warn(Gbl.FUTURE_SUPPRESSED);
+				}
+				vehInfoWarnCnt++;
+				personIdSet.add(personId);
 			}
+		} else {
+			warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
 			vehInfoWarnCnt++;
 			personIdSet.add(personId);
 		}
@@ -168,7 +171,6 @@ public class WarmEmissionAnalysisModule {
 					trafficSit2VandEf.put(trafficSit, vAndEf);
 				} else {
 					logger.warn("For traffic situation " + trafficSit	+ " and pollutant " + warmPollutant + " no vehicle specific emission factor is found."
-								+ "\n"
 								+ " Continuing calculation with fleet average values instead.");
 					return null;
 				}
@@ -298,6 +300,7 @@ public class WarmEmissionAnalysisModule {
 				Double generatedEmissions;
 				Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor(warmPollutant);				
 				
+				//TODO: is this really the "right" way of doing this?!?
 				if (averageSpeed < stopGoSpeed) {
 					generatedEmissions = linkLength / 1000 * efFreeFlow;
 				} else {
