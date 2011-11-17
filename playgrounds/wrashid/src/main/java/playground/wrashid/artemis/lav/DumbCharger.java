@@ -202,6 +202,21 @@ interface ChargingPowerInterface {
 	public double getChargingPowerInWatt(String actLocationType);
 }
 
+//no charging
+class NoCharging implements ChargingPowerInterface {
+
+	@Override
+	public boolean isCharingPossibleAtLocation(String actLocationType) {
+		return false;
+	}
+
+	@Override
+	public double getChargingPowerInWatt(String actLocationType) {
+		DebugLib.stopSystemAndReportInconsistency(" no charging possible in this scenario");
+		return 0.0;
+	}
+}
+
 //charging only at home, with 3500W
 class CharingPowerScenario1 implements ChargingPowerInterface {
 
@@ -281,17 +296,4 @@ class CharingPowerScenario4 implements ChargingPowerInterface {
 	}
 }
 
-// no charging
-class NoCharging implements ChargingPowerInterface {
 
-	@Override
-	public boolean isCharingPossibleAtLocation(String actLocationType) {
-		return false;
-	}
-
-	@Override
-	public double getChargingPowerInWatt(String actLocationType) {
-		DebugLib.stopSystemAndReportInconsistency(" no charging possible in this scenario");
-		return 0.0;
-	}
-}
