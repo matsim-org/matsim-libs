@@ -47,5 +47,9 @@ abstract class QBufferItem extends VisLane {
 	abstract double getBufferLastMovedTime();
 
 	abstract boolean hasGreenForToLink(Id toLinkId);
+	
+	abstract boolean hasSpace();
+	
+	abstract void clearVehicles();
 
 }

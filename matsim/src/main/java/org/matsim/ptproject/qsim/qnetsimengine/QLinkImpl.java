@@ -175,7 +175,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	protected QLinkImpl(final Link link2, NetsimEngine engine, final QNode toNode) {
+	 QLinkImpl(final Link link2, NetsimEngine engine, final QNode toNode) {
 		this.link = link2;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
@@ -188,7 +188,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	protected void activateLink() {
+	 void activateLink() {
 		if (!this.active) {
 			this.qsimEngine.activateLink(this);
 			this.active = true;
@@ -242,7 +242,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	protected void clearVehicles() {
+	 void clearVehicles() {
 		this.parkedVehicles.clear();
 		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
 
@@ -295,7 +295,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	protected boolean moveLink(double now) {
+	 boolean moveLink(double now) {
 		// yyyy needs to be final
 		boolean ret = false;
 		ret = this.moveLane(now);
@@ -308,7 +308,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param now current time step
 	 * @return
 	 */
-	protected boolean moveLane(final double now) {
+	 boolean moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -334,7 +334,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param now
 	 *          The current time.
 	 */
-	protected void moveLaneToBuffer(final double now) {
+	 void moveLaneToBuffer(final double now) {
 		QVehicleImpl veh;
 
 		this.moveTransitToQueue(now);
@@ -779,7 +779,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	protected QSimEngineInternalI getQSimEngine(){
+	 QSimEngineInternalI getQSimEngine(){
 		return this.qsimEngine;
 	}
 

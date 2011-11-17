@@ -288,7 +288,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		this.waitingList.clear();
 
 		for (QLane lane : this.queueLanes){
-			lane.clearVehicles(now);
+			lane.clearVehicles();
 		}
 	}
 

@@ -647,7 +647,9 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 		return this.storageCapacity;
 	}
 
-	void clearVehicles(double now) {
+	void clearVehicles() {
+		double now = this.getQLink().getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+
 		for (QVehicle veh : this.vehQueue) {
 			this.getQLink().getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));

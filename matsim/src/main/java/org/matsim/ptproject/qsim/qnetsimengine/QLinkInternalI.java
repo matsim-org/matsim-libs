@@ -38,10 +38,6 @@ abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 
 	abstract boolean moveLink(double now);
 
-	abstract boolean hasSpace();
-
-	abstract void clearVehicles();
-
 	abstract QVehicle removeParkedVehicle(Id vehicleId);
 	// in contrast to "addParkedVehicle", this here does not need to be public since it is only used internally.  kai, aug'10
 
