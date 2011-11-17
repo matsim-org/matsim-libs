@@ -159,6 +159,9 @@ public class DemoController extends WithinDayController implements SimulationIni
 		 * Imho this should be performed in the recalcTimeVariantAttributes method
 		 * in the NetsimLink class.
 		 */
+		// Das könnte man so sehen.  Besprichst Du es mal mit den Autoren (Dominik & Gregor)?
+		// Aber: Ist die Rechnung denn richtig?  Müsste man nicht schauen, wie weit das Fahrzeug auf der Kante
+		// bereits ist?  Ansonsten eretzt man einfach einen Fehler durch einen anderen, oder?  kai, nov'11
 		for (NetworkChangeEvent networkChangeEvent : this.getNetwork().getNetworkChangeEvents()) {
 			if(networkChangeEvent.getStartTime() == e.getSimulationTime()) {
 				for (Link link : networkChangeEvent.getLinks()) {
