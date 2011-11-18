@@ -917,11 +917,11 @@ public class QSim implements VisMobsim, Netsim {
 		// changed this to unmodifiable in oct'10. kai
 	}
 
-	public Map<Id, MobsimVehicle> getVehicles() {
+	public final Map<Id, MobsimVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
 
-    public void addAgentSource(AgentSource agentSource) {
+    public final void addAgentSource(AgentSource agentSource) {
         agentSources.add(agentSource);
     }
 

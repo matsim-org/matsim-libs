@@ -293,7 +293,8 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public void addDepartingVehicle(QVehicle vehicle) {
+	public void addDepartingVehicle(MobsimVehicle mvehicle) {
+		QVehicle vehicle = (QVehicle) mvehicle ;
 		this.waitingList.add(vehicle);
 		vehicle.setCurrentLink(this.getLink());
 		this.activateLink();
@@ -752,15 +753,15 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public Collection<QVehicle> getAllVehicles() {
-		Collection<QVehicle> vehicles = this.getAllNonParkedVehicles();
+	public Collection<MobsimVehicle> getAllVehicles() {
+		Collection<MobsimVehicle> vehicles = this.getAllNonParkedVehicles();
 		vehicles.addAll(this.parkedVehicles.values());
 		return vehicles;
 	}
 
 	@Override
-	public Collection<QVehicle> getAllNonParkedVehicles(){
-		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
+	public Collection<MobsimVehicle> getAllNonParkedVehicles(){
+		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll(this.vehQueue);
@@ -813,7 +814,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	}
 
 	@Override
-	public QNode getToQueueNode() {
+	public QNode getToNetsimNode() {
 		return this.toQueueNode;
 	}
 
@@ -874,7 +875,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 		}
-		this.getToQueueNode().activateNode();
+		this.getToNetsimNode().activateNode();
 	}
 
 	@Override
@@ -922,7 +923,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 
 	@Override
 	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
-		if (!this.getToQueueNode().getNode().getOutLinks().containsKey(toLinkId)){
+		if (!this.getToNetsimNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + this.getLink().getId());
 		}
 		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);

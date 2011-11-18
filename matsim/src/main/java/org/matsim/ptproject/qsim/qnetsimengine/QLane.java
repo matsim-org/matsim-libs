@@ -581,7 +581,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 		}
-		this.queueLink.getToQueueNode().activateNode();
+		this.queueLink.getToNetsimNode().activateNode();
 	}
 
 	/**
@@ -771,7 +771,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 
 	@Override
 	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
-		if (!this.getQLink().getToQueueNode().getNode().getOutLinks().containsKey(toLinkId)){
+		if (!this.getQLink().getToNetsimNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.getQLink().getLink().getId());
 		}
 		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);

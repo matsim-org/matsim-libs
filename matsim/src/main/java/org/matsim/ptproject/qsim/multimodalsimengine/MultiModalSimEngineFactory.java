@@ -57,7 +57,7 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 		}
 		
 		for (NetsimLink link : network.getNetsimLinks().values()) {
-			QNode toNode = link.getToQueueNode();
+			QNode toNode = (QNode)link.getToNetsimNode();
 			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode);
 			link.getCustomAttributes().put(MultiModalQLinkExtension.class.getName(), extension);
 		}

@@ -43,9 +43,9 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.utils.EditRoutes;
 
 
@@ -94,7 +94,7 @@ public class MyWithinDayMobsimListener2 implements SimulationListener, Simulatio
 		
 		// find agents that are en-route (more interesting case)
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
-			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
+			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
 				if ( true ) { // some condition ...

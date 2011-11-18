@@ -85,21 +85,21 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 	public void addParkedVehicle(MobsimVehicle vehicle);
 	// necessary (ini)
 
-	public QVehicle getVehicle(Id vehicleId);
+	public MobsimVehicle getVehicle(Id vehicleId);
 	// not terribly efficient, but a possible method also for general mobsims
 
 	@Override
-	public Collection<QVehicle> getAllVehicles();
+	public Collection<MobsimVehicle> getAllVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
 
-	Collection<QVehicle> getAllNonParkedVehicles();
+	Collection<MobsimVehicle> getAllNonParkedVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
 
-	public QNode getToQueueNode();
+	public NetsimNode getToNetsimNode();
 	// I think this is essentially ok since you can't do that much with a QNode.  yyyy Should probably be called getMobsimNode, 
 	// though, and for that reason it should be behind an interface.
 
-	public void addDepartingVehicle(QVehicle vehicle);
+	public void addDepartingVehicle(MobsimVehicle vehicle);
 	// necessary (called from the "facilities"engine)
 
 //	void reinsertBus(QVehicle bus);

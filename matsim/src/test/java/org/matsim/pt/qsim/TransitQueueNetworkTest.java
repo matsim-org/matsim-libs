@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -45,7 +46,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -56,6 +56,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
@@ -90,7 +91,7 @@ public class TransitQueueNetworkTest extends TestCase {
     assertEquals(1, f.qlink1.getAllVehicles().size());
     assertEquals(1, f.qlink2.getAllVehicles().size());
 		f.simEngine.doSimStep(102);
-		Collection<QVehicle> allVehicles = f.qlink2.getAllVehicles();
+		Collection<MobsimVehicle> allVehicles = f.qlink2.getAllVehicles();
 		assertEquals(1, allVehicles.size());
 		assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new QVehicle[1])[0]); // first the normal vehicle
 

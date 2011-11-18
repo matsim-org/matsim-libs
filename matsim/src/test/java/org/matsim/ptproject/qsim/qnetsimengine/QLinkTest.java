@@ -67,7 +67,7 @@ public class QLinkTest extends MatsimTestCase {
 		// Extend the tests by checking the methods initFlowCapacity and
 		// recalcCapacity
 		assertEquals(f.link1, f.qlink1.getLink());
-		assertEquals(f.queueNetwork.getNetsimNode(new IdImpl("2")), f.qlink1.getToQueueNode());
+		assertEquals(f.queueNetwork.getNetsimNode(new IdImpl("2")), f.qlink1.getToNetsimNode());
 	}
 
 

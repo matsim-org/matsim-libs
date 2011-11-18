@@ -50,7 +50,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.*;
+import org.matsim.core.events.ActivityEndEventImpl;
+import org.matsim.core.events.ActivityStartEventImpl;
+import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.events.AgentArrivalEventImpl;
+import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.events.AgentWait2LinkEventImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.LinkEnterEventImpl;
+import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -70,10 +79,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -783,7 +792,7 @@ public class QSimTest {
 		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(102.0); // agent should be moved to qlink3
 
-		Collection<QVehicle> vehicles = qlink3.getAllVehicles();
+		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
 		Assert.assertEquals(1, vehicles.size());
 		Assert.assertEquals(id2, vehicles.toArray(new QVehicle[1])[0].getVehicle().getId());
 		// vehicle 1 should still stay on qlink2

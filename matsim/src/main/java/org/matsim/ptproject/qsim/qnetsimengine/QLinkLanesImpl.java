@@ -310,7 +310,8 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public void addDepartingVehicle(QVehicle vehicle) {
+	public void addDepartingVehicle(MobsimVehicle mvehicle) {
+		QVehicle vehicle = (QVehicle) mvehicle ;
 		this.waitingList.add(vehicle);
 		this.activateLink();
 	}
@@ -405,15 +406,15 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public final Collection<QVehicle> getAllVehicles() {
-		Collection<QVehicle> ret = getAllNonParkedVehicles() ;
+	public final Collection<MobsimVehicle> getAllVehicles() {
+		Collection<MobsimVehicle> ret = getAllNonParkedVehicles() ;
 		ret.addAll(this.parkedVehicles.values());
 		return ret ;
 	}
 
 	@Override
-	public final Collection<QVehicle> getAllNonParkedVehicles() {
-		Collection<QVehicle> ret = new ArrayList<QVehicle>(this.waitingList);
+	public final Collection<MobsimVehicle> getAllNonParkedVehicles() {
+		Collection<MobsimVehicle> ret = new ArrayList<MobsimVehicle>(this.waitingList);
 		for  (QLane lane : this.queueLanes){
 			ret.addAll(lane.getAllVehicles());
 		}
@@ -452,7 +453,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	public QNode getToQueueNode() {
+	public QNode getToNetsimNode() {
 		return this.toQueueNode;
 	}
 

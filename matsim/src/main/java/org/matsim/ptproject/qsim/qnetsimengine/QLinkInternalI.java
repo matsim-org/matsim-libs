@@ -67,5 +67,9 @@ abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 	public Map<String, Object> getCustomAttributes() {
 		return customAttributes;
 	}
+	
+	@Override
+	public abstract QNode getToNetsimNode() ;
+	// return type change 
 
 }
