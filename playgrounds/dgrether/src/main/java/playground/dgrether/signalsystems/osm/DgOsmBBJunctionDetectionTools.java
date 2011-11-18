@@ -55,8 +55,8 @@ import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
 import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
 
+import playground.dgrether.osm.NetworkSink;
 import playground.dgrether.osm.OSMEntityCollector;
-import playground.mzilske.osm.NetworkSink;
 import de.micromata.opengis.kml.v_2_2_0.ColorMode;
 import de.micromata.opengis.kml.v_2_2_0.Coordinate;
 import de.micromata.opengis.kml.v_2_2_0.Document;
@@ -142,7 +142,7 @@ public class DgOsmBBJunctionDetectionTools {
 	private Network createMatsimNetwork(String osmFile){
 		// get a Matsim Network
 		// read the file again as NetworkSink modifies the data and the Entities are read-only if a EntityTee is used
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkSink networkGenerator = createAndInitNetworkSink(sc, TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84));
 		TagFilter transitRelationsFilter = createTransitRelationsFilter();
 		TagFilter transitWaysFilter = createTransitWaysFilter();

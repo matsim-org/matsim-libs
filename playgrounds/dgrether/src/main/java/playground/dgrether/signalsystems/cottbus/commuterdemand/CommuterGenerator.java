@@ -65,7 +65,6 @@ public class CommuterGenerator {
 
 		
 		//write some test output
-		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(populationOutputFile);

@@ -49,7 +49,7 @@ public class DgCottbusFootballSubPopAnalysis {
 	 */
 	public static void main(String[] args) throws Exception {
 		
-		String runId = "1222";
+		String runId = "1251";
 		String runDirName = DgPaths.REPOS + "runs-svn/run" + runId;
 		
 		Map<Integer, Map<Integer, Double>> fbAvgTTMap = new HashMap<Integer, Map<Integer, Double>>();

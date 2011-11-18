@@ -64,7 +64,9 @@ public class DgMatsimPlans2Zones {
 	public static void main(String[] args) throws Exception {
 		//### bvg project demand 
 		String baseDir = DgPaths.REPOS + "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/";
-		String zonesFile = DgPaths.REPOS + "shared-svn/studies/countries/eu/nuts_10m_2006/data/NUTS_RG_10M_2006.shp";
+//		String zonesFile = DgPaths.REPOS + "shared-svn/studies/countries/eu/nuts_10m_2006/data/NUTS_RG_10M_2006.shp";
+		String zonesFile = "/media/data/work/lehre/alexander_spatzig/NeueBezirke/NeueBezirke_Test2.shp";
+		zonesFile = "/media/data/work/lehre/alexander_spatzig/DifferenzNUTS/DifferenzNUTS.shp";
 		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/scenario/plans.times.xml.gz";
 		CoordinateReferenceSystem popCrs = MGC.getCRS(TransformationFactory.DHDN_GK4);
 //		String popFile = DgPaths.REPOS +  "shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-1.0sample/scenario/plans.times.xml.gz";
@@ -72,15 +74,16 @@ public class DgMatsimPlans2Zones {
 		String wvIdPart = "wv";
 		boolean acceptAll = false;
 //		String outFile = baseDir +  "plans.times.0.1sample.lkw.od.nuts.rg.10m.2006.txt";
-		String outFile = baseDir +  "plans.times.0.1sample.wv.od.nuts.rg.10m.2006.txt";
+		String outFile = baseDir +  "plans.times.0.1sample.wv.od.nuts.rg.10m.2006.modified.txt";
+		outFile = "/media/data/work/lehre/alexander_spatzig/plans.times.0.1sample.wv.lkw.od.differenz.nuts.txt";
 //		String outFile = baseDir +  "plans.times.0.1sample.lkw.wv.od.nuts.rg.10m.2006.txt";
 		//### end bvg project demand 
 			
 		//### satellic project demand 
-		popFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_10pct.xml.gz";
-		popCrs = MGC.getCRS(TransformationFactory.WGS84);
-		acceptAll = true;
-		outFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb.gv.10pct.od.nuts.rg.10m.2006.txt";
+//		popFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb_gv_10pct.xml.gz";
+//		popCrs = MGC.getCRS(TransformationFactory.WGS84);
+//		acceptAll = true;
+//		outFile = DgPaths.REPOS +  "shared-svn/studies/countries/de/berlin_prognose_2025/bb.gv.10pct.od.nuts.rg.10m.2006.txt";
 	//### end satellic project demand 
 
 		
@@ -103,8 +106,8 @@ public class DgMatsimPlans2Zones {
 		Population pop = scenario.getPopulation();
 		for (Person person : pop.getPersons().values()){
 			if (acceptAll || 
-					//person.getId().toString().contains(lkwIdPart) ) {
-//|| 
+					person.getId().toString().contains(lkwIdPart) //){ 
+|| 
 					person.getId().toString().contains(wvIdPart)){
 				Activity act1 = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 				Activity act2 = (Activity) person.getSelectedPlan().getPlanElements().get(2);
@@ -121,7 +124,7 @@ public class DgMatsimPlans2Zones {
 				//NUTS_ID
 				String  fromId = (String) featureFrom.getAttribute("NUTS_ID");
 				String toId = (String) featureTo.getAttribute("NUTS_ID");
-				log.debug("found od pair: " + fromId + " to " + toId);
+//				log.debug("found od pair: " + fromId + " to " + toId);
 				if (! fromToMap.containsKey(fromId)){
 					fromToMap.put(fromId, new HashMap<String, Integer>());
 				}
