@@ -41,12 +41,12 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 //	// The useage outside the package seems in order to get to the qsim. Might make sense to provide this directly:
 //	// even with the parallel qsim, this is still a well-defined operation. kai, aug'10
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated // yyyyyy I would say that this should not be accessible since it exposes internal structure
-	// which should not be necessary outside.  kai, may'10
-	public LinkedList<QVehicle> getVehQueue();
+//	/**
+//	 * @deprecated
+//	 */
+//	@Deprecated // yyyyyy I would say that this should not be accessible since it exposes internal structure
+//	// which should not be necessary outside.  kai, may'10
+//	public LinkedList<QVehicle> getVehQueue();
 
 	
 	//	######################

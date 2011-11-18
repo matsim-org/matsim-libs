@@ -537,7 +537,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 			// add all departing transit vehicles at the front of the vehQueue
 			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
 			while (iter.hasPrevious()) {
-				getVehQueue().addFirst(iter.previous());
+				this.vehQueue.addFirst(iter.previous());
 			}
 		}
 	}
@@ -578,7 +578,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
 
 					if (!stop.getIsBlockingLane()) {
-						getVehQueue().poll(); // remove the bus from the queue
+						this.vehQueue.poll(); // remove the bus from the queue
 						transitVehicleStopQueue.add(veh); // and add it to the stop queue
 					}
 				}
@@ -847,11 +847,11 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 		return active;
 	}
 
-	@Override
-	@Deprecated // this really should not be exposed
-	public LinkedList<QVehicle> getVehQueue() {
-		return this.vehQueue;
-	}
+//	@Override
+//	@Deprecated // this really should not be exposed
+//	public LinkedList<QVehicle> getVehQueue() {
+//		return this.vehQueue;
+//	}
 
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil

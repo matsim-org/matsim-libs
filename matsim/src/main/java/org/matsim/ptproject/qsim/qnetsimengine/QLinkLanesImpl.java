@@ -505,15 +505,15 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return this.originalLane;
 	}
 
-	@Override
-	@Deprecated // imo, should not be exposed (implementation detail).  kai, nov'11
-	public LinkedList<QVehicle> getVehQueue() {
-		LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
-		for (QLane l : this.getToNodeQueueLanes()){
-			ll.addAll(l.getVehQueue());
-		}
-		return ll;
-	}
+//	@Override
+//	@Deprecated // imo, should not be exposed (implementation detail).  kai, nov'11
+//	public LinkedList<QVehicle> getVehQueue() {
+//		LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
+//		for (QLane l : this.getToNodeQueueLanes()){
+//			ll.addAll(l.getVehQueue());
+//		}
+//		return ll;
+//	}
 
 
 
