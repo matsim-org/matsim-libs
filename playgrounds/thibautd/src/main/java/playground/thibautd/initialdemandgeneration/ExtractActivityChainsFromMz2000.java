@@ -29,6 +29,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.thibautd.initialdemandgeneration.activitychainsextractor.MzActivityChainsExtractor;
+
 /**
  * executable class to extract activity chains from MZ2000
  * @author thibautd
@@ -39,7 +41,7 @@ public class ExtractActivityChainsFromMz2000 {
 	 */
 	public static void main(final String[] args) {
 		initOut( args[ 3 ] );
-		Mz2000ActivityChainsExtractor extractor = new Mz2000ActivityChainsExtractor();
+		MzActivityChainsExtractor extractor = new MzActivityChainsExtractor();
 		Scenario scen = extractor.run(
 				args[ 0 ],
 				args[ 1 ],
