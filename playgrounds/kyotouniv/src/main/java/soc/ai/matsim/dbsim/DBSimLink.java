@@ -627,7 +627,9 @@ public class DBSimLink {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + DBSimLink.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
-					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane);
+					position.setColorValueBetweenZeroAndOne(speed);
+					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -637,7 +639,9 @@ public class DBSimLink {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime() + DBSimLink.this.inverseSimulatedFlowCapacity + 2.0);
 					double speed = (time > cmp ? 0.0 : freespeed);
-					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane);
+					position.setColorValueBetweenZeroAndOne(speed);
+					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -652,7 +656,9 @@ public class DBSimLink {
 				double cellSize = Math.min(7.5, DBSimLink.this.getLink().getLength() / cnt);
 				double distFromFromNode = DBSimLink.this.getLink().getLength() - cellSize / 2.0;
 				for (DBSimVehicle veh : DBSimLink.this.waitingList) {
-					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), distFromFromNode, lane);
+					position.setColorValueBetweenZeroAndOne(0.0);
+					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -710,8 +716,9 @@ public class DBSimLink {
 				int cmp = (int) (veh.getEarliestLinkExitTime() + DBSimLink.this.inverseSimulatedFlowCapacity + 2.0);
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 
-				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd, lane, speed,
-						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, queueEnd, lane);
+				position.setColorValueBetweenZeroAndOne( speed ) ;
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -761,8 +768,9 @@ public class DBSimLink {
 					tmpLane = veh.getId().hashCode() ;
 				}
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink, lane, speed,
-						AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), link, distanceOnLink, lane);
+				position.setColorValueBetweenZeroAndOne( speed) ;
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
@@ -778,8 +786,10 @@ public class DBSimLink {
 				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link) + 1; // place them next to the link
 			for (DBSimVehicle veh : DBSimLink.this.waitingList) {
-				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), /*positionOnLink*/cellSize, lane, 0.0,
-						AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(this.linkScale, veh.getDriver().getPerson().getId(), DBSimLink.this.getLink(), /*positionOnLink*/cellSize, lane);
+				position.setColorValueBetweenZeroAndOne( 0.0) ;
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+
 				positions.add(position);
 			}
 			return lane;
