@@ -48,6 +48,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
+ * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
+ * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
+ * 
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
@@ -106,16 +109,12 @@ import org.matsim.vis.snapshotwriters.VisData;
  * of its QueueLanes is active.</li>
  * </ul>
  */
-public class QLinkLanesImpl extends QLinkInternalI {
+public class QLinkLanesImpl extends AbstractQLink {
 
 	final private static Logger log = Logger.getLogger(QLinkLanesImpl.class);
 
 	final private static QLane.FromLinkEndComparator fromLinkEndComparator = new QLane.FromLinkEndComparator();
 
-	/**
-	 * The Link instance containing the data
-	 */
-	private final Link link;
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -161,7 +160,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	 */
 	QLinkLanesImpl(final Link link2, NetsimEngine engine,
 			final QNode toNode, Map<Id, Lane> laneMap) {
-		this.link = link2;
+		super(link2) ;
 		this.toQueueNode = toNode;
 		this.qsimEngine = (QSimEngineImpl) engine;
 		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
@@ -554,20 +553,6 @@ public class QLinkLanesImpl extends QLinkInternalI {
 		return agentsInActivities.remove(mobsimAgentId);
 	}
 	
-	@Override
-	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
-		vehicle.setDriver(agent);
-		//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
-			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
-
-			agent.endLegAndAssumeControl(now);
-			this.addParkedVehicle(vehicle);
-		} else {
-			this.addDepartingVehicle(vehicle);
-		}
-	}
-
 
 	// The following contains a number of methods that are defined in the upstream interfaces but not needed here. 
 	// In principle, one would need two separate interfaces, one for the "QLane" and one for the "QLink".  They would be
@@ -599,7 +584,7 @@ public class QLinkLanesImpl extends QLinkInternalI {
 	}
 
 	@Override
-	QLinkInternalI getQLink() {
+	AbstractQLink getQLink() {
 		throw new UnsupportedOperationException() ;
 	}
 

@@ -47,8 +47,8 @@ public class QNode implements NetsimNode {
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
-	protected final QLinkInternalI[] inLinksArrayCache;
-	private final QLinkInternalI[] tempLinks;
+	protected final AbstractQLink[] inLinksArrayCache;
+	private final AbstractQLink[] tempLinks;
 
 	private boolean active = false;
 
@@ -70,8 +70,8 @@ public class QNode implements NetsimNode {
 		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
 		this.activator = this.simEngine;	// by default (single threaded QSim)
 		int nofInLinks = this.node.getInLinks().size();
-		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
-		this.tempLinks = new QLinkInternalI[nofInLinks];
+		this.inLinksArrayCache = new AbstractQLink[nofInLinks];
+		this.tempLinks = new AbstractQLink[nofInLinks];
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class QNode implements NetsimNode {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
-		for (QLinkInternalI link : this.inLinksArrayCache) {
+		for (AbstractQLink link : this.inLinksArrayCache) {
 			if (!link.bufferIsEmpty()) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
@@ -157,7 +157,7 @@ public class QNode implements NetsimNode {
 			double rndNum = random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
-				QLinkInternalI link = this.tempLinks[i];
+				AbstractQLink link = this.tempLinks[i];
 				if (link == null)
 					continue;
 				selCap += link.getLink().getCapacity(now);
@@ -173,7 +173,7 @@ public class QNode implements NetsimNode {
 		}
 	}
 
-  protected void clearLinkBuffer(final QLinkInternalI link, final double now){
+  protected void clearLinkBuffer(final AbstractQLink link, final double now){
   	if (link instanceof QLinkImpl){
       while (!link.bufferIsEmpty()) {
         QVehicle veh = link.getFirstFromBuffer();
@@ -214,7 +214,7 @@ public class QNode implements NetsimNode {
    * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
    * otherwise (e.g. in case where the next link is jammed)
    */
-  protected boolean moveVehicleOverNode(final QVehicle veh, final QBufferItem qbufferedItem, final double now) {
+  protected boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane qbufferedItem, final double now) {
     Id nextLinkId = veh.getDriver().chooseNextLinkId();
     Link currentLink = veh.getCurrentLink();
     if ((!qbufferedItem.hasGreenForToLink(nextLinkId))) {
@@ -224,7 +224,7 @@ public class QNode implements NetsimNode {
     }
     // veh has to move over node
     if (nextLinkId != null) {
-      QLinkInternalI nextQueueLink = this.simEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
+      AbstractQLink nextQueueLink = this.simEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
       Link nextLink = nextQueueLink.getLink();
       this.checkNextLinkSemantics(currentLink, nextLink, veh);
       if (nextQueueLink.hasSpace()) {

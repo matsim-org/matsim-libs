@@ -65,15 +65,15 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	 */
 	/*package*/ static boolean useNodeArray = false;
 
-	/*package*/  List<QLinkInternalI> allLinks = null;
+	/*package*/  List<AbstractQLink> allLinks = null;
 	/*package*/  List<QNode> allNodes = null;
 	/** This is the collection of links that have to be moved in the simulation */
-	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
+	/*package*/  List<AbstractQLink> simLinksList = new ArrayList<AbstractQLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	/*package*/  QNode[] simNodesArray = null;
 	/*package*/  List<QNode> simNodesList = null;
 	/** This is the collection of links that have to be activated in the current time step */
-	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
+	/*package*/  ArrayList<AbstractQLink> simActivateLinks = new ArrayList<AbstractQLink>();
 
 	/** This is the collection of nodes that have to be activated in the current time step */
 	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
@@ -119,7 +119,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 
 	@Override
 	public void onPrepareSim() {
-		this.allLinks = new ArrayList<QLinkInternalI>(this.getNetsimNetwork().getNetsimLinks().values());
+		this.allLinks = new ArrayList<AbstractQLink>(this.getNetsimNetwork().getNetsimLinks().values());
 		this.allNodes = new ArrayList<QNode>(this.getNetsimNetwork().getNetsimNodes().values());
 		if (useNodeArray) {
 			this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
@@ -153,7 +153,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QLinkInternalI link : this.allLinks) {
+		for (AbstractQLink link : this.allLinks) {
 			link.clearVehicles();
 		}
 	}
@@ -201,8 +201,8 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 
 	protected void moveLinks(final double time) {
 		reactivateLinks();
-		ListIterator<QLinkInternalI> simLinks = this.simLinksList.listIterator();
-		QLinkInternalI link;
+		ListIterator<AbstractQLink> simLinks = this.simLinksList.listIterator();
+		AbstractQLink link;
 		boolean isActive;
 
 		while (simLinks.hasNext()) {
@@ -215,7 +215,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	}
 
 	@Override
-	protected void activateLink(final QLinkInternalI link) {
+	protected void activateLink(final AbstractQLink link) {
 		if (!simulateAllLinks) {
 			this.simActivateLinks.add(link);
 		}
@@ -280,7 +280,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	}
 
 	@Override
-	public NetsimNetworkFactory<QNode, QLinkInternalI> getNetsimNetworkFactory() {
+	public NetsimNetworkFactory<QNode, AbstractQLink> getNetsimNetworkFactory() {
 		return new DefaultQNetworkFactory() ;
 	}
 

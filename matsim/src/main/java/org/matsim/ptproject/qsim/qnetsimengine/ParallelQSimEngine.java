@@ -58,7 +58,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 
 	private QNode[][] parallelNodesArrays;
 	private List<List<QNode>> parallelNodesLists;
-	private List<List<QLinkInternalI>> parallelSimLinksLists;
+	private List<List<AbstractQLink>> parallelSimLinksLists;
 
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
 	private CyclicBarrier startBarrier;
@@ -152,7 +152,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 	 * them as LinkActivators.
 	 */
 	@Override
-	protected synchronized void activateLink(final QLinkInternalI link) {
+	protected synchronized void activateLink(final AbstractQLink link) {
 		log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQSimEngine!");
 		super.activateLink(link);
 	}
@@ -279,10 +279,10 @@ class ParallelQSimEngine extends QSimEngineImpl {
 	 * Create the Lists of QueueLinks that are handled on parallel Threads.
 	 */
 	private void createLinkLists() {
-		this.parallelSimLinksLists = new ArrayList<List<QLinkInternalI>>();
+		this.parallelSimLinksLists = new ArrayList<List<AbstractQLink>>();
 
 		for (int i = 0; i < this.numOfThreads; i++) {
-			this.parallelSimLinksLists.add(new ArrayList<QLinkInternalI>());
+			this.parallelSimLinksLists.add(new ArrayList<AbstractQLink>());
 		}
 
 		/*
@@ -290,7 +290,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 		 */
 		if (simulateAllLinks) {
 			int roundRobin = 0;
-			for(QLinkInternalI link : allLinks) {
+			for(AbstractQLink link : allLinks) {
 				this.parallelSimLinksLists.get(roundRobin % this.numOfThreads).add(link);
 				roundRobin++;
 			}
@@ -313,7 +313,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						QLinkInternalI qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
+						AbstractQLink qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setQSimEngine(this.engines[thread]);
 					}
@@ -331,7 +331,7 @@ class ParallelQSimEngine extends QSimEngineImpl {
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						QLinkInternalI qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
+						AbstractQLink qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
 						qLink.setQSimEngine(this.engines[thread]);
 					}

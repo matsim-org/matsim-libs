@@ -23,13 +23,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
-abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
-	// yyyy this class needs to be public with some of the traffic signal code, but I do not understand why.  kai, aug'10
+/**
+ * 
+ * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
+ * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
+ * 
+ * 
+ * @author nagel
+ *
+ */
+abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
+	
+	// the question if variables that exist both in QLinkImpl and QLinkLanesImpl are pulled to here
+	// depends on the question if they are needed here (for methods that are pulled up).  kai, nov'11
+	
+	final Link link ;
+	
+	AbstractQLink(Link link) {
+		this.link = link ;
+	}
 
 	abstract void setQSimEngine(NetsimEngine qsimEngine);
 
@@ -44,8 +62,18 @@ abstract class QLinkInternalI extends QBufferItem implements NetsimLink {
 
 	abstract QSimEngineInternalI getQSimEngine() ;
 
-	abstract void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now);
-	
+	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
+		vehicle.setDriver(agent);
+		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
+			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
+
+			agent.endLegAndAssumeControl(now);
+			this.addParkedVehicle(vehicle);
+		} else {
+			this.addDepartingVehicle(vehicle);
+		}
+	}
+
 	/**
      * Design thoughts:<ul>
      * <li> This method could also be private (never called from outside the class). kai, nov'11

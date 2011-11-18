@@ -61,11 +61,14 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
+ * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
+ * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
+ * 
  * @author dstrippgen
  * @author dgrether
  * @author mrieser
  */
-public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
+public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
@@ -85,11 +88,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * in the vehQueue
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
-
-	/**
-	 * The Link instance containing the data
-	 */
-	private final Link link;
 
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
@@ -176,7 +174,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * @param toNode
 	 */
 	 QLinkImpl(final Link link2, NetsimEngine engine, final QNode toNode) {
-		this.link = link2;
+		 super(link2) ;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
@@ -442,21 +440,6 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 					return;
 				}
 			}
-		}
-	}
-
-	@Override
-	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
-		vehicle.setDriver(agent);
-		//		NetworkRoute route = (NetworkRoute) agent.getCurrentLeg().getRoute();
-		//		if ((route.getEndLinkId().equals(link.getId())) && (agent.chooseNextLinkId() == null)) {
-		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
-			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
-
-			agent.endLegAndAssumeControl(now);
-			this.addParkedVehicle(vehicle);
-		} else {
-			this.addDepartingVehicle(vehicle);
 		}
 	}
 
@@ -988,7 +971,7 @@ public class QLinkImpl extends QLinkInternalI implements SignalizeableItem {
 	 * this method is here so that aspects of QLane and QLink can be addressed via the same syntax.
 	 */
 	@Override
-	QLinkInternalI getQLink() {
+	AbstractQLink getQLink() {
 		return this;
 	}
 

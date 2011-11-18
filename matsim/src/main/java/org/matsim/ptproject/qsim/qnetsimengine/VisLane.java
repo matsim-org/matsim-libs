@@ -26,7 +26,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
  */
 abstract class VisLane {
 	
-	abstract QLinkInternalI getQLink() ;
+	abstract AbstractQLink getQLink() ;
 	
 	abstract double getInverseSimulatedFlowCapacity() ;
 	

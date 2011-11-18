@@ -46,13 +46,13 @@ import org.matsim.vis.snapshotwriters.VisNode;
 @Deprecated // please try to use the interfaces outside the package.  This will also make your code portable.  kai, oct'10
 public final class QNetwork implements VisNetwork, NetsimNetwork {
 
-	private final Map<Id, QLinkInternalI> links;
+	private final Map<Id, AbstractQLink> links;
 
 	private final Map<Id, QNode> nodes;
 
 	private final Network networkLayer;
 
-	private final NetsimNetworkFactory<QNode, QLinkInternalI> queueNetworkFactory;
+	private final NetsimNetworkFactory<QNode, AbstractQLink> queueNetworkFactory;
 
 //	private QSim qSim;
 	private QSimEngineImpl qSimEngine;
@@ -67,11 +67,11 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 	/**
 	 * This is deliberately package-private.  Please use the factory
 	 */
-	QNetwork(final QSim qs, final NetsimNetworkFactory<QNode, QLinkInternalI> factory ) {
+	QNetwork(final QSim qs, final NetsimNetworkFactory<QNode, AbstractQLink> factory ) {
 //		this.qSim = qs;
 		this.networkLayer = qs.getScenario().getNetwork();
 		this.queueNetworkFactory = factory;
-		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<Id, AbstractQLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 	}
 
@@ -97,7 +97,7 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id, QLinkInternalI> getNetsimLinks() {
+	public Map<Id, AbstractQLink> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
@@ -117,7 +117,7 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 	}
 
 	@Override
-	public QLinkInternalI getNetsimLink(final Id id) {
+	public AbstractQLink getNetsimLink(final Id id) {
 		return this.links.get(id);
 	}
 

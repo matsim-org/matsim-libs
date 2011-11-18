@@ -67,13 +67,16 @@ import org.matsim.vis.snapshotwriters.VisData;
  * QLinkLanesImpl whereas in QLinkImpl everything is in one class.  kai, nov'11
  * </ul>
  *
+ * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
+ * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
+ * 
  *
  * @author dgrether based on prior QueueLink implementations of
  * @author dstrippgen
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QBufferItem implements SignalizeableItem, Identifiable {
+public final class QLane extends AbstractQLane implements SignalizeableItem, Identifiable {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -127,7 +130,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
-	private final QLinkInternalI queueLink;
+	private final AbstractQLink queueLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
 	 * within a QueueLink.
@@ -176,7 +179,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
-		this.queueLink = (QLinkInternalI) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
+		this.queueLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
 	}
@@ -737,7 +740,7 @@ public final class QLane extends QBufferItem implements SignalizeableItem, Ident
 	}
 
 	@Override
-	public QLinkInternalI getQLink() {
+	public AbstractQLink getQLink() {
 		return this.queueLink;
 	}
 

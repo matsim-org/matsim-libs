@@ -31,10 +31,10 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 /**
  * @author dgrether
  */
-public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
 
 	@Override
-	public QLinkInternalI createNetsimLink(final Link link, final NetsimEngine simEngine, final QNode toQueueNode) {
+	public AbstractQLink createNetsimLink(final Link link, final NetsimEngine simEngine, final QNode toQueueNode) {
 		return new QLinkImpl(link, simEngine, toQueueNode);
 	}
 
@@ -46,7 +46,7 @@ public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode,
 		return new QNode(node, simEngine);
 	}
 
-	public static NetsimNetwork createQNetwork(QSim qs, NetsimNetworkFactory<QNode, QLinkInternalI> factory) {
+	public static NetsimNetwork createQNetwork(QSim qs, NetsimNetworkFactory<QNode, AbstractQLink> factory) {
 		return new QNetwork(qs, factory);
 	}
 

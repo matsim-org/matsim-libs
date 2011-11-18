@@ -26,10 +26,21 @@ import org.matsim.api.core.v01.Id;
  * Interface representing the buffer functionality common for all Queue-Logic Links and Lanes, i.e.
  * providing selected, decorated methods for Buffer access and additional methods needed for
  * the buffer logic implemented.
+ * <p/>
+ * Thoughts/comments:<ul>
+ * <li> There is the "lane" functionality (e.g. "addToLane", "popFirst"), and the "link" 
+ * functionality (e.g. "addToParking").  For the normal qsim, they are combined into
+ * the QLinkImpl.  For the qsim with lanes, those are split into QLane and QLinkLanesImpl.
+ * This has led to a lot of code replication, and some of the code has diverged 
+ * (QLinkImpl is more modern with respect to pt and with respect to vehicle conservation).
+ * kai, nov'11
+ * </ul>
+ * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
+ * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
+ * 
  * @author dgrether
- *
  */
-abstract class QBufferItem extends VisLane {
+abstract class AbstractQLane extends VisLane {
 	/**
 	 * equivalent to a Buffer.isEmpty() operation
 	 */
