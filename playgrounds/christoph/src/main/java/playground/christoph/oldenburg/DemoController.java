@@ -20,7 +20,7 @@
 
 package playground.christoph.oldenburg;
 
-import java.util.LinkedList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -43,6 +43,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -161,12 +162,25 @@ public class DemoController extends WithinDayController implements SimulationIni
 		 */
 		// Das könnte man so sehen.  Besprichst Du es mal mit den Autoren (Dominik & Gregor)?
 		// Aber: Ist die Rechnung denn richtig?  Müsste man nicht schauen, wie weit das Fahrzeug auf der Kante
-		// bereits ist?  Ansonsten eretzt man einfach einen Fehler durch einen anderen, oder?  kai, nov'11
+		// bereits ist?  Ansonsten ersetzt man einfach einen Fehler durch einen anderen, oder?  kai, nov'11
 		for (NetworkChangeEvent networkChangeEvent : this.getNetwork().getNetworkChangeEvents()) {
 			if(networkChangeEvent.getStartTime() == e.getSimulationTime()) {
 				for (Link link : networkChangeEvent.getLinks()) {
-					LinkedList<QVehicle> vehicles = ((QSim)e.getQueueSimulation()).getNetsimNetwork().getNetsimLink(link.getId()).getVehQueue();
-					for (QVehicle vehicle : vehicles) {
+
+//					LinkedList<QVehicle> vehicles = ((QSim)e.getQueueSimulation()).getNetsimNetwork().getNetsimLink(link.getId()).getVehQueue();
+					// (original)
+					
+					// replaced by:
+					Collection<MobsimVehicle> vehicles = 
+						((QSim)e.getQueueSimulation()).getNetsimNetwork().getNetsimLink(link.getId()).getAllNonParkedVehicles() ;
+					
+					// reason for this change: I always wanted to take getVehQueue out of the public interface since this is imo an
+					// implementation detail which should not be exposed.  As a side effect, this now returns MobsimVehicles
+					// instead of QVehicles.  As long as everything is plugged together correctly, it should still work ok.
+					// kai, nov'11
+					
+					for (MobsimVehicle mvehicle : vehicles) {
+						QVehicle vehicle = (QVehicle) mvehicle ;
 						double before = vehicle.getEarliestLinkExitTime();
 						vehicle.setEarliestLinkExitTime(e.getSimulationTime() + link.getLength() / link.getFreespeed(e.getSimulationTime()));
 						double after = vehicle.getEarliestLinkExitTime();
