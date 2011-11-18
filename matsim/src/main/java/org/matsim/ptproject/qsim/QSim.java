@@ -699,6 +699,19 @@ public class QSim implements VisMobsim, Netsim {
 		Id linkId = agent.getCurrentLinkId();
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now,
 				agent.getId(), linkId, mode));
+
+		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
+		// for a hike, or driving a bus).  kai, nov'11
+//		if ( linkId.equals(agent.getDestinationLinkId())) {
+//			// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
+//			// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
+//			// consistently implemented.  One could also decide to not have these departure/arrival events here
+//			// (we would still have actEnd/actStart events).  kai, nov'11
+//			events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
+//			agent.endLegAndAssumeControl(now) ;
+//			return ;
+//		}
+		
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
 		} else {
