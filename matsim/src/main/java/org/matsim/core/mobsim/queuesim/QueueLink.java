@@ -721,7 +721,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 					double speed = (time > cmp ? 0.0 : freespeed);
 					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh
 							.getDriver().getId(), QueueLink.this
-					.getLink(), distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+					.getLink(), distFromFromNode, lane);
+					position.setColorValueBetweenZeroAndOne( speed) ;
+					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -734,7 +736,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 					double speed = (time > cmp ? 0.0 : freespeed);
 					AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh
 							.getDriver().getId(), QueueLink.this
-					.getLink(), distFromFromNode, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+					.getLink(), distFromFromNode, lane);
+					position.setColorValueBetweenZeroAndOne(speed) ;
+					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
 					distFromFromNode -= cellSize;
 				}
@@ -826,7 +830,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				double speed = (now > cmp) ? 0.0 : link.getFreespeed(now);
 
 				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getId(), 
-						link, queueEnd, lane, speed, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						link, queueEnd, lane);
+				position.setColorValueBetweenZeroAndOne(speed);
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				queueEnd -= vehLen;
 			}
@@ -882,7 +888,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				int lane = 1 + (tmpLane % NetworkUtils.getNumberOfLanesAsInt(
 						Time.UNDEFINED_TIME, link));
 				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getId(),
-						link, distanceOnLink, lane, speedValueBetweenZeroAndOne, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+						link, distanceOnLink, lane);
+				position.setColorValueBetweenZeroAndOne( speedValueBetweenZeroAndOne ) ;
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 				positions.add(position);
 				lastDistance = distanceOnLink;
 			}
@@ -901,7 +909,10 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			for (QVehicle veh : QueueLink.this.waitingList) {
 				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getId(), 
 						QueueLink.this
-						.getLink(), /* positionOnLink */cellSize, lane, 0.0, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+						.getLink(), /* positionOnLink */cellSize, lane);
+				position.setColorValueBetweenZeroAndOne(0.0);
+				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+
 				positions.add(position);
 			}
 			return lane;

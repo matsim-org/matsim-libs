@@ -54,15 +54,18 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 	
-	private double linkScale = 0.8;
+	private static final double nodeOffsetMeter = 50.0;
 
 	private final transient VisNetwork network;
 
 	private final transient LaneDefinitions lanes;
 	
+	private Map<Id, java.lang.Double> linkScaleByLinkIdMap;
+	
 	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions laneDefinitions){
 		this.network = visNetwork;
 		this.lanes = laneDefinitions;
+		this.linkScaleByLinkIdMap = new HashMap<Id, java.lang.Double>();
 	}
 	
 	@Override
@@ -95,8 +98,12 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
 		Point2D.Double normalizedOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
 		
-		//scale the link (will be rewritten)
-		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, this.linkScale);
+		//first calculate the scale of the link based on the node offset, i.e. the link will be shortened at the beginning and the end 
+		double linkScale = (euclideanLinkLength - 2.0 * nodeOffsetMeter) / euclideanLinkLength;
+		this.linkScaleByLinkIdMap.put(visLink.getLink().getId(), linkScale);
+		
+		//scale the link 
+		Tuple<Double, Double> scaledLink = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
 		Point2D.Double scaledLinkEnd = scaledLink.getSecond();
 		Point2D.Double scaledLinkStart = scaledLink.getFirst();
 		
@@ -123,6 +130,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private void writeLaneData(ByteBuffer out, VisLink visLink, LanesToLinkAssignment l2l, Map<Id, java.lang.Double> linkLengthCorrectionFactorsByLinkId){
 		double linkLengthCorrectionFactor = linkLengthCorrectionFactorsByLinkId.get(visLink.getLink().getId());
+		double linkScale = this.linkScaleByLinkIdMap.get(visLink.getLink().getId());
 		//start to write the data
 		ByteBufferUtils.putString(out, l2l.getLinkId().toString());
 		int maxAlignment = 0;
@@ -132,10 +140,10 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		//write the lane data
 		for (Lane lane : l2l.getLanes().values()){
 			String id = lane.getId().toString();
-			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * this.linkScale * linkLengthCorrectionFactor;
+			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
 //			log.error("lane " + qLane.getId() + " starts at: " + startPoint);
 			QLane ql = this.getQLane(lane.getId(), (QLinkLanesImpl)visLink);
-			double endPoint = startPoint + (ql.getLength() *  this.linkScale * linkLengthCorrectionFactor);
+			double endPoint = startPoint + (ql.getLength() *  linkScale * linkLengthCorrectionFactor);
 			int alignment = lane.getAlignment();
 			ByteBufferUtils.putString(out, id);
 			out.putDouble(startPoint);

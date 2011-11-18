@@ -934,7 +934,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,
-					QLinkImpl.this.holes, QLinkImpl.this.getLink().getLength());
+					QLinkImpl.this.holes, QLinkImpl.this.getLink().getLength(), 0.0, null);
 
 			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
 

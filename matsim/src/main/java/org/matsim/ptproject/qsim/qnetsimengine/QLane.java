@@ -35,7 +35,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.LaneEnterEventImpl;
@@ -61,22 +60,14 @@ import org.matsim.vis.snapshotwriters.VisData;
  * A QueueLane has no own active state and only offers isActive() for a
  * stateless check for activation, a QueueLink is active as long as at least one
  * of its QueueLanes is active.
- * <p/>
- * Design thoughts:<ul>
- * <li> This class has some package-private methods that are private in QLinkImpl.  This is because QLane is accessed from
- * QLinkLanesImpl whereas in QLinkImpl everything is in one class.  kai, nov'11
- * </ul>
  *
- * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
- * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
- * 
  *
  * @author dgrether based on prior QueueLink implementations of
  * @author dstrippgen
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends AbstractQLane implements SignalizeableItem, Identifiable {
+public final class QLane extends AbstractQLane implements SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -137,7 +128,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem, Ide
 	 */
 	private List<QLane> toLanes = null;
 
-	/*package*/ VisData visdata = this.new VisDataImpl();
+	/*package*/ VisData visdata;
 
 	/**
 	 * This flag indicates whether the QueueLane is
@@ -182,6 +173,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem, Ide
 		this.queueLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isOriginalLane = isOriginalLane;
 		this.laneData = laneData;
+		this.visdata = new VisDataImpl();
 	}
 
 	/*package*/ void finishInitialization() {
@@ -646,7 +638,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem, Ide
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	 int vehOnLinkCount() {
+	 @Override
+	int vehOnLinkCount() {
 		return this.vehQueue.size();
 	}
 
@@ -792,14 +785,25 @@ public final class QLane extends AbstractQLane implements SignalizeableItem, Ide
 	 * @author dgrether
 	 */
 	class VisDataImpl implements VisData {
-
+		//TODO should be the same value as in OTFLaneWriter
+		private static final double nodeOffsetMeter = 50.0;
+		
+		private double visLaneLength;
+		private double visLinkLength;
+		private double linkScale;
+		VisDataImpl(){
+			this.linkScale = (QLane.this.queueLink.getLink().getLength() - 2.0 * nodeOffsetMeter) / QLane.this.queueLink.getLink().getLength();
+			this.visLaneLength = linkScale * QLane.this.length;
+			this.visLinkLength = linkScale * QLane.this.queueLink.getLink().getLength();
+		}
+		
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLane.this.queueLink.getQSimEngine().getAgentSnapshotInfoBuilder();
 			//the offset of this lane
-			double offset= QLane.this.queueLink.getLink().getLength() - QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();// QLane.this.queueLink.getLink().getLength() - QLane.this.getLength();
+			double offset= this.visLinkLength -  this.linkScale * QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();
 			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
-					QLane.this.length, offset,
+					this.visLaneLength, offset,
 					QLane.this.visualizerLane*3);
 
 			return positions;
@@ -830,5 +834,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem, Ide
 		return this.bufferStorageCapacity ;
 	}
 
-
 }
+
+
+

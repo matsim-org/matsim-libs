@@ -108,29 +108,21 @@ public class AgentSnapshotInfoFactory {
 		return staticCreateAgentSnapshotInfo( agentId, link, distanceOnLink, lane, 0 ) ;
 //		return new PositionInfo(agentId, link, distanceOnLink, lane);
 	}
-
+	
+  //used by qsim
 	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane, int cnt) {
-		return staticCreateAgentSnapshotInfo( 1.0, agentId, link, distanceOnLink, lane+2*cnt, 0., null ) ;
-//		return new PositionInfo(agentId, link, distanceOnLink, lane, cnt);
+		AgentSnapshotInfo position = staticCreateAgentSnapshotInfo( 1.0, agentId, link, distanceOnLink, lane+2*cnt);
+		position.setColorValueBetweenZeroAndOne(0.0);
+		return position;
 	}
 
 	@Deprecated // in my view, use creational method with shorter argument list (set colorValue, agentState separately).  kai, aug'10
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane, double colorValue,
-			AgentState agentState)
-	{
-		return staticCreateAgentSnapshotInfo( 1.0, agentId, link, distanceOnLink, lane, colorValue, agentState ) ;
-//		return new PositionInfo(agentId, link, distanceOnLink, lane, speed, agentState);
-	}
-
-	@Deprecated // in my view, use creational method with shorter argument list (set colorValue, agentState separately).  kai, aug'10
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(double linkScale, Id agentId, Link link, double distanceOnLink, int lane,
-			double colorValue, AgentState agentState)
+	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(double linkScale, Id agentId, Link link, 
+			double distanceOnLink, int lane)
 	{
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
 		defaultFactory.calculatePosition( info, link, linkScale, distanceOnLink, lane ) ;
-		info.setColorValueBetweenZeroAndOne( colorValue ) ;
-		info.setAgentState( agentState ) ;
 		return info ;
 //		return new PositionInfo(linkScale, agentId, link, distanceOnLink, lane, speed, agentState);
 	}

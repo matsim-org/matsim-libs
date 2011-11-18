@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
@@ -42,7 +44,9 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavi
  * @author dstrippgen
  */
 public class QSimEngineImpl extends QSimEngineInternalI {
-
+	
+	private static final Logger log = Logger.getLogger(QSimEngineImpl.class);
+	
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -89,7 +93,8 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	public QSimEngineImpl(final QSim sim, final Random random) {
 		this.random = random;
 		this.qsim = sim;
-		this.positionInfoBuilder = new AgentSnapshotInfoBuilder( sim.getScenario() );
+		
+		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
 		
 		// configuring the car departure hander (including the vehicle behavior)
@@ -114,6 +119,23 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
+		}
+	}
+	
+	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
+		String  snapshotStyle = scenario.getConfig().getQSimConfigGroup().getSnapshotStyle();
+		if ("queue".equalsIgnoreCase(snapshotStyle)){
+			return new QueueAgentSnapshotInfoBuilder(scenario);
+		}
+		else  if ("equiDist".equalsIgnoreCase(snapshotStyle)){
+			return new EquiDistAgentSnapshotInfoBuilder(scenario);
+		}
+		else if ("withHolesExperimental".equalsIgnoreCase(snapshotStyle)){
+			return new WholesAgentSnapshotInfoBuilder(scenario);
+		}
+		else {
+			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
+			return new EquiDistAgentSnapshotInfoBuilder(scenario);
 		}
 	}
 
