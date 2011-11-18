@@ -67,6 +67,7 @@ public class MicroCensus {
 
 		List<Population> populations = new ArrayList<Population>();
 		for (String popFile : popFiles) {
+			log.info( "loading activity chains from file "+popFile );
 			Scenario scen = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 			(new MatsimPopulationReader( scen )).parse( popFile );
 			populations.add( scen.getPopulation() );
@@ -179,8 +180,11 @@ public class MicroCensus {
 			for (Person p : pop.getPersons().values()) {
 				weight_sum += p.getSelectedPlan().getScore().doubleValue();
 			}
+		}
 
+		for (Population pop : pops) {
 			for (Person pp : pop.getPersons().values()) {
+				count.incCounter();
 				PersonImpl p = (PersonImpl) pp;
 				int age = p.getAge();
 				String sex = p.getSex();
