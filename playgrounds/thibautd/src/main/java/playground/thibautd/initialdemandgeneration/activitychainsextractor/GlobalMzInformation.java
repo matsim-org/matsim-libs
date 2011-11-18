@@ -46,7 +46,7 @@ public class GlobalMzInformation {
 			throw new IllegalStateException( "The year is already set" );
 		}
 		else if (year <= 0) {
-			throw new IllegalArgumentException( "Really? A swiss microcesus in "+(-year)+" B.C.?" );
+			throw new IllegalArgumentException( "Really? A swiss microcensus in "+(-year)+" B.C.?" );
 		}
 		else {
 			log.info( "setting MZ year to "+year );
@@ -59,7 +59,7 @@ public class GlobalMzInformation {
 	 */
 	public static int getMzYear() {
 		if (internalYear <= 0) {
-			throw new IllegalStateException( "The year not yet set" );
+			throw new IllegalStateException( "The year is not yet set" );
 		}
 		return internalYear;
 	}

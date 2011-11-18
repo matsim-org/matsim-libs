@@ -35,6 +35,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * based on the class of same name from balmermi
@@ -173,6 +174,7 @@ public class MicroCensus {
 		// years)
 		double weight_sum = 0.0;
 
+		Counter count = new Counter( "MicroCensus: import of activity chain #" );
 		for (Population pop : pops) {
 			for (Person p : pop.getPersons().values()) {
 				weight_sum += p.getSelectedPlan().getScore().doubleValue();
@@ -222,6 +224,7 @@ public class MicroCensus {
 						p);
 			}
 		}
+		count.printCounter();
 
 		for (int i=0; i<this.groups.length; i++) {
 			Group g = this.groups[i];
@@ -236,6 +239,8 @@ public class MicroCensus {
 				}
 			}
 		}
+
+		print();
 	}
 
 	//////////////////////////////////////////////////////////////////////
