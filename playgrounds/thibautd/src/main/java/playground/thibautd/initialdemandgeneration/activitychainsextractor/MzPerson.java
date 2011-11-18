@@ -42,6 +42,7 @@ class MzPerson implements Identifiable {
 
 
 	private static interface Consts2000 {
+		static final String EDUCATION_NAME = "F50004";
 		static final String EMPLOYED_NAME = "F50003";
 		static final String ID_NAME = "INTNR";
 		static final String DOW_NAME = "DAYSTTAG";
@@ -52,6 +53,7 @@ class MzPerson implements Identifiable {
 	}
 
 	private static interface Consts1994 {
+		static final String EDUCATION_NAME = "ZP04";
 		static final String EMPLOYED_NAME = "ZP03";
 		static final String PERSON_NAME = "PERSON";
 		static final String HH_NAME = "HAUSHALT";
@@ -63,6 +65,7 @@ class MzPerson implements Identifiable {
 	}
 
 	private static int employedIndex = -1;
+	private static int educationIndex = -1;
 	private static int personIndex = -1;
 	private static int hhIndex = -1;
 	private static int dayOfWeekIndex = -1;
@@ -74,6 +77,7 @@ class MzPerson implements Identifiable {
 	// /////////////////////////////////////////////////////////////////////////
 	// attributes
 	private final Boolean employed;
+	private final Boolean education;
 	private final Id id;
 	private final int dayOfWeek;
 	private final Boolean license;
@@ -95,6 +99,9 @@ class MzPerson implements Identifiable {
 				for (int i=0; i < names.length; i++) {
 					if (names[ i ].equals( Consts2000.EMPLOYED_NAME )) {
 						employedIndex = i;
+					}
+					if (names[ i ].equals( Consts2000.EDUCATION_NAME )) {
+						educationIndex = i;
 					}
 					else if (names[ i ].equals( Consts2000.ID_NAME )) {
 						personIndex  = i;
@@ -120,6 +127,9 @@ class MzPerson implements Identifiable {
 				for (int i=0; i < names.length; i++) {
 					if (names[ i ].equals( Consts1994.EMPLOYED_NAME )) {
 						employedIndex = i;
+					}
+					if (names[ i ].equals( Consts1994.EDUCATION_NAME )) {
+						educationIndex = i;
 					}
 					else if (names[ i ].equals( Consts1994.PERSON_NAME )) {
 						personIndex  = i;
@@ -179,6 +189,7 @@ class MzPerson implements Identifiable {
 			}
 
 			this.employed = booleanField( lineArray[ employedIndex ] );
+			this.education = booleanField( lineArray[ educationIndex ] );
 			this.dayOfWeek = dayOfWeek( lineArray[ dayOfWeekIndex ] );
 			this.age = Integer.parseInt( lineArray[ ageIndex ] );
 			this.license = licence( age , lineArray[ licenceIndex ] );
@@ -399,6 +410,10 @@ class MzPerson implements Identifiable {
 
 		// score corresponds to the weight
 		person.getSelectedPlan().setScore( weight );
+
+		if (education) {
+			person.createDesires( "education" ).putActivityDuration( EDUC , 1234 );
+		}
 
 		// day of week in the plan type
 		// ((PlanImpl) person.getSelectedPlan()).setType( ""+dayOfWeek );

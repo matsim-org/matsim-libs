@@ -99,7 +99,7 @@ public class MicroCensus {
 		private final void print() {
 			for (int i=0; i<list.size(); i++) {
 				Tuple<Double,Person> t = list.get(i);
-				System.out.println(i+": ("+t.getFirst()+","+t.getSecond().getId()+")");
+				log.info(i+": ("+t.getFirst()+","+t.getSecond().getId()+")");
 			}
 		}
 
@@ -117,6 +117,10 @@ public class MicroCensus {
 			}
 			Gbl.errorMsg("It should never reach this line!");
 			return null;
+		}
+
+		private int size() {
+			return list.size();
 		}
 	}
 
@@ -193,9 +197,8 @@ public class MicroCensus {
 				// work is defined by employement status rather than plan
 				// composition, as employed persons may not work every day
 				boolean has_work = p.isEmployed();
-				// education is defined in terms of presence or not of educationnal
-				// activities in the plan. 
-				boolean has_educ = false;
+				// education is defined by desires
+				boolean has_educ = p.getDesires() != null && p.getDesires().getActivityDuration( "e" ) > 0;
 
 				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 					if (pe instanceof Activity) {
@@ -287,11 +290,12 @@ public class MicroCensus {
 		for (int i=0; i<groups.length; i++) {
 			Group g = groups[i];
 			if (g != null) {
-				System.out.println("group["+i+"]: "+this.index2group(i,-1,null,null,false,false));
-				g.print();
+				log.info("group["+i+"]: "+this.index2group(i,-1,null,null,false,false)+": size "+g.size());
 			}
 			else {
-				System.out.println("group["+i+"]: empty");
+				try {
+					log.warn("group["+i+"]: "+this.index2group(i,-1,null,null,false,false)+": EMPTY!");
+				} catch (RuntimeException e) {}
 			}
 		}
 	}
