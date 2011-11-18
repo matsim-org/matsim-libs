@@ -35,22 +35,73 @@ import playground.thibautd.initialdemandgeneration.activitychainsextractor.MzAct
  * executable class to extract activity chains from MZ2000
  * @author thibautd
  */
-public class ExtractActivityChainsFromMz2000 {
+public class ExtractActivityChainsFromMz {
 	/**
-	 * usage: ExtractActivityChainsFromMz2000 zpFile wgFile etFile outDir startDay endDay
+	 * usage: ExtractActivityChainsFromMz2000 zpFile=* wgFile=* etFile=* outDir=* startDay=* endDay=* year=*
 	 */
 	public static void main(final String[] args) {
-		initOut( args[ 3 ] );
+		// default values, used if nothing given
+		String startDay = "1";
+		String endDay = "7";
+
+		String year = null;
+		String zpFile = null;
+		String wgFile = null;
+		String etFile = null;
+		String outDir = null;
+
+		for (String arg : args) {
+			String[] keyValue = arg.split("=");
+
+			if (keyValue[ 0 ].equals("zpFile")) {
+				zpFile = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("wgFile")) {
+				wgFile = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("etFile")) {
+				etFile = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("outDir")) {
+				outDir = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("startDay")) {
+				startDay = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("endDay")) {
+				endDay = keyValue[ 1 ];
+			}
+			if (keyValue[ 0 ].equals("year")) {
+				year = keyValue[ 1 ];
+			}
+		}
+
+		initOut( outDir );
 		MzActivityChainsExtractor extractor = new MzActivityChainsExtractor();
-		Scenario scen = extractor.run(
-				args[ 0 ],
-				args[ 1 ],
-				args[ 2 ],
-				args[ 4 ],
-				args[ 5 ]);
+
+		Scenario scen; 
+		if (year.equals( "2000" )) {
+			scen = extractor.run2000(
+					zpFile,
+					wgFile,
+					etFile,
+					startDay,
+					endDay);
+		}
+		else if (year.equals( "1994" )) {
+			scen = extractor.run1994(
+					zpFile,
+					wgFile,
+					startDay,
+					endDay);
+		}
+		else {
+			throw new IllegalArgumentException( "year "+year );
+		}
+
 		(new PopulationWriter(scen.getPopulation(),
 							  scen.getNetwork())).write(
-						  args[ 3 ] + "/actchains-dow-"+args[ 4 ]+"-"+args[ 5 ]+".xml.gz" );
+						  outDir + "/actchains-dow-"+startDay+"-"+endDay+"."+year+".xml.gz" );
 	}
 
 	private static void initOut( String outputDir ) {

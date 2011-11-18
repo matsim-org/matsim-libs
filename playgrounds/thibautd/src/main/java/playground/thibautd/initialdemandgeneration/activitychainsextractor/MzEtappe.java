@@ -33,25 +33,26 @@ class MzEtappe implements Identifiable {
 	private final double distance;
 	private final String mode;
 
-
 	public static void notifyStructure(final String headLine) {
-		String[] names = headLine.split("\t");
+		if (GlobalMzInformation.getMzYear() == 2000) {
+			String[] names = headLine.split("\t");
 
-		for (int i=0; i < names.length; i++) {
-			if (names[ i ].equals( PERSON_NAME )) {
-				personIndex = i;
-			}
-			if (names[ i ].equals( WEGNR_NAME )) {
-				wgnrIndex = i;
-			}
-			if (names[ i ].equals( ETAPPENR_NAME )) {
-				etappenrIndex = i;
-			}
-			if (names[ i ].equals( DISTANCE_NAME )) {
-				distanceIndex = i;
-			}
-			if (names[ i ].equals( MODE_NAME )) {
-				modeIndex = i;
+			for (int i=0; i < names.length; i++) {
+				if (names[ i ].equals( PERSON_NAME )) {
+					personIndex = i;
+				}
+				if (names[ i ].equals( WEGNR_NAME )) {
+					wgnrIndex = i;
+				}
+				if (names[ i ].equals( ETAPPENR_NAME )) {
+					etappenrIndex = i;
+				}
+				if (names[ i ].equals( DISTANCE_NAME )) {
+					distanceIndex = i;
+				}
+				if (names[ i ].equals( MODE_NAME )) {
+					modeIndex = i;
+				}
 			}
 		}
 
@@ -62,14 +63,26 @@ class MzEtappe implements Identifiable {
 	// constructor
 	// /////////////////////////////////////////////////////////////////////////
 	public MzEtappe(final String line) {
-		if (!structureIsKnown) throw new IllegalStateException( "structure of file unknown" );
-		String[] lineArray = line.split( "\t" );
+		if (GlobalMzInformation.getMzYear() == 2000) {
+			if (!structureIsKnown) throw new IllegalStateException( "structure of file unknown" );
+			String[] lineArray = line.split( "\t" );
 
-		this.personId = new IdImpl( lineArray[ personIndex ].trim() );
-		this.wegId = new IdImpl( lineArray[ wgnrIndex ].trim() );
-		this.id = new IdImpl( lineArray[ etappenrIndex ].trim() );
-		this.distance = distance( lineArray[ distanceIndex ].trim() );
-		this.mode = mode( lineArray[ modeIndex ].trim() );
+			this.personId = new IdImpl( lineArray[ personIndex ].trim() );
+			this.wegId = new IdImpl( lineArray[ wgnrIndex ].trim() );
+			this.id = new IdImpl( lineArray[ etappenrIndex ].trim() );
+			this.distance = distance( lineArray[ distanceIndex ].trim() );
+			this.mode = mode( lineArray[ modeIndex ].trim() );
+		}
+		else if (GlobalMzInformation.getMzYear() == 1994) {
+			this.personId = null;
+			this.wegId = null;
+			this.id = null;
+			this.distance = 0;
+			this.mode = null;
+		}
+		else {
+			throw new IllegalStateException( "unhandled mz year "+GlobalMzInformation.getMzYear() );
+		}
 	}
 
 	private String mode( final String value ) {

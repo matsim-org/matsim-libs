@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Extracts activity chains from the MZ 2000. Activities do not exist in the MZ
@@ -67,16 +68,26 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author thibautd
  */
 public class MzActivityChainsExtractor {
-	public Scenario run(
+	public Scenario run2000(
 			final String zpFile,
 			final String wgFile,
 			final String etFile,
 			final String start,
 			final String end) {
+		GlobalMzInformation.setMzYear( 2000 );
 		return run(zpFile, wgFile, etFile, new Interval(start, end));
 	}
 
-	public Scenario run(
+	public Scenario run1994(
+			final String zpFile,
+			final String wgFile,
+			final String start,
+			final String end) {
+		GlobalMzInformation.setMzYear( 1994 );
+		return run(zpFile, wgFile, null, new Interval(start, end));
+	}
+
+	private Scenario run(
 			final String zpFile,
 			final String wgFile,
 			final String etFile,
@@ -90,11 +101,14 @@ public class MzActivityChainsExtractor {
 			MzPerson.notifyStructure( reader.readLine() );
 			String line = reader.readLine();
 
+			Counter count = new Counter("MzPerson # ");
 			while (line != null) {
+				count.incCounter();
 				population.addPerson(
 						new MzPerson( line ) );
 				line = reader.readLine();
 			}
+			count.printCounter();
 
 			// ////// add trip info //////////
 			reader = IOUtils.getBufferedReader( wgFile );
@@ -102,22 +116,30 @@ public class MzActivityChainsExtractor {
 			MzWeg.notifyStructure( reader.readLine() );
 			line = reader.readLine();
 
+			count = new Counter("MzWeg # ");
 			while (line != null) {
+				count.incCounter();
 				population.addWeg(
 						new MzWeg( line ) );
 				line = reader.readLine();
 			}
+			count.printCounter();
 
 			// ////// add etap info //////////
-			reader = IOUtils.getBufferedReader( etFile );
+			if (GlobalMzInformation.getMzYear() == 2000) {
+				reader = IOUtils.getBufferedReader( etFile );
 
-			MzEtappe.notifyStructure( reader.readLine() );
-			line = reader.readLine();
-
-			while (line != null) {
-				population.addEtappe(
-						new MzEtappe( line ) );
+				MzEtappe.notifyStructure( reader.readLine() );
 				line = reader.readLine();
+
+				count = new Counter("MzEtappe # ");
+				while (line != null) {
+					count.incCounter();
+					population.addEtappe(
+							new MzEtappe( line ) );
+					line = reader.readLine();
+				}
+				count.printCounter();
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException( e );

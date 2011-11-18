@@ -40,26 +40,35 @@ class MzPerson implements Identifiable {
 	private static final Statistics stats = new Statistics();
 	private static boolean structureIsKnown = false;
 
-	private static final String EMPLOYED_NAME = "F50003";
+
+	private static interface Consts2000 {
+		static final String EMPLOYED_NAME = "F50003";
+		static final String ID_NAME = "INTNR";
+		static final String DOW_NAME = "DAYSTTAG";
+		static final String LICENCE_NAME = "F50005";
+		static final String AGE_NAME = "F50001";
+		static final String WEIGHT_NAME = "WP";
+		static final String GENDER_NAME = "F50002";
+	}
+
+	private static interface Consts1994 {
+		static final String EMPLOYED_NAME = "ZP03";
+		static final String PERSON_NAME = "PERSON";
+		static final String HH_NAME = "HAUSHALT";
+		static final String DOW_NAME = "ZP_WTAGF";
+		static final String LICENCE_NAME = "ZP05";
+		static final String AGE_NAME = "ZP01";
+		static final String WEIGHT_NAME = "WP";
+		static final String GENDER_NAME = "ZP02";
+	}
+
 	private static int employedIndex = -1;
-
-	// id: interview number
-	private static final String ID_NAME = "INTNR";
-	private static int idIndex = -1;
-
-	private static final String DOW_NAME = "DAYSTTAG";
+	private static int personIndex = -1;
+	private static int hhIndex = -1;
 	private static int dayOfWeekIndex = -1;
-
-	private static final String LICENCE_NAME = "F50005";
 	private static int licenceIndex = -1;
-
-	private static final String AGE_NAME = "F50001";
 	private static int ageIndex = -1;
-
-	private static final String WEIGHT_NAME = "WP";
 	private static int weightIndex = -1;
-
-	private static final String GENDER_NAME = "F50002";
 	private static int genderIndex = -1;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -81,28 +90,62 @@ class MzPerson implements Identifiable {
 	public static void notifyStructure(final String headLine) {
 		String[] names = headLine.split("\t");
 
-		for (int i=0; i < names.length; i++) {
-			if (names[ i ].equals( EMPLOYED_NAME )) {
-				employedIndex = i;
-			}
-			else if (names[ i ].equals( ID_NAME )) {
-				idIndex  = i;
-			}
-			else if (names[ i ].equals( DOW_NAME )) {
-				dayOfWeekIndex = i;
-			}
-			else if (names[ i ].equals( LICENCE_NAME )) {
-				licenceIndex = i;
-			}
-			else if (names[ i ].equals( AGE_NAME )) {
-				ageIndex = i;
-			}
-			else if (names[ i ].equals( WEIGHT_NAME )) {
-				weightIndex = i;
-			}
-			else if (names[ i ].equals( GENDER_NAME )) {
-				genderIndex = i;
-			}
+		switch (GlobalMzInformation.getMzYear()) {
+			case 2000:
+				for (int i=0; i < names.length; i++) {
+					if (names[ i ].equals( Consts2000.EMPLOYED_NAME )) {
+						employedIndex = i;
+					}
+					else if (names[ i ].equals( Consts2000.ID_NAME )) {
+						personIndex  = i;
+					}
+					else if (names[ i ].equals( Consts2000.DOW_NAME )) {
+						dayOfWeekIndex = i;
+					}
+					else if (names[ i ].equals( Consts2000.LICENCE_NAME )) {
+						licenceIndex = i;
+					}
+					else if (names[ i ].equals( Consts2000.AGE_NAME )) {
+						ageIndex = i;
+					}
+					else if (names[ i ].equals( Consts2000.WEIGHT_NAME )) {
+						weightIndex = i;
+					}
+					else if (names[ i ].equals( Consts2000.GENDER_NAME )) {
+						genderIndex = i;
+					}
+				}
+				break;
+			case 1994:
+				for (int i=0; i < names.length; i++) {
+					if (names[ i ].equals( Consts1994.EMPLOYED_NAME )) {
+						employedIndex = i;
+					}
+					else if (names[ i ].equals( Consts1994.PERSON_NAME )) {
+						personIndex  = i;
+					}
+					else if (names[ i ].equals( Consts1994.HH_NAME )) {
+						hhIndex  = i;
+					}
+					else if (names[ i ].equals( Consts1994.DOW_NAME )) {
+						dayOfWeekIndex = i;
+					}
+					else if (names[ i ].equals( Consts1994.LICENCE_NAME )) {
+						licenceIndex = i;
+					}
+					else if (names[ i ].equals( Consts1994.AGE_NAME )) {
+						ageIndex = i;
+					}
+					else if (names[ i ].equals( Consts1994.WEIGHT_NAME )) {
+						weightIndex = i;
+					}
+					else if (names[ i ].equals( Consts1994.GENDER_NAME )) {
+						genderIndex = i;
+					}
+				}
+				break;
+			default:
+				throw new IllegalStateException( "unhandled mz year "+GlobalMzInformation.getMzYear() );
 		}
 
 		structureIsKnown = true;
@@ -110,6 +153,10 @@ class MzPerson implements Identifiable {
 
 	public static void printStatistcs() {
 		stats.printStats();
+	}
+
+	static Id id94(final String pers , final String hh) {
+		return new IdImpl( pers.trim() + "-" + hh.trim() );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -120,8 +167,18 @@ class MzPerson implements Identifiable {
 		String[] lineArray = line.split("\t");
 
 		try {
+			switch (GlobalMzInformation.getMzYear()) {
+				case 2000:
+					this.id = new IdImpl( lineArray[ personIndex ].trim() );
+					break;
+				case 1994:
+					this.id = id94( lineArray[ personIndex ] , lineArray[ hhIndex ] );
+					break;
+				default:
+					throw new IllegalStateException( "unhandled year "+GlobalMzInformation.getMzYear());
+			}
+
 			this.employed = booleanField( lineArray[ employedIndex ] );
-			this.id = new IdImpl( lineArray[ idIndex ].trim() );
 			this.dayOfWeek = dayOfWeek( lineArray[ dayOfWeekIndex ] );
 			this.age = Integer.parseInt( lineArray[ ageIndex ] );
 			this.license = licence( age , lineArray[ licenceIndex ] );
