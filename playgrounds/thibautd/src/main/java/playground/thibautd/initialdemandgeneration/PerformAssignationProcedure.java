@@ -54,7 +54,7 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class PerformAssignationProcedure {
 	public static final String CONF_GROUP = "assignation";
-	public static final String POP_FILE_FIELD_REGEXP = "mzPopulationFile*";
+	public static final String POP_FILE_FIELD_REGEXP = "mzPopulationFile.*";
 	public static final String DOW_FIELD = "dayOfWeek";
 	public static final String OUT_FIELD = "outputDir";
 
