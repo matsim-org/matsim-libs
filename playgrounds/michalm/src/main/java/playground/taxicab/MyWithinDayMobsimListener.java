@@ -43,9 +43,9 @@ import org.matsim.pt.qsim.PassengerAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**As stated in the package info, this class is an <i>untested</i> design suggestion.  Comments are welcome.  kai, dec'10
  *
@@ -87,7 +87,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 
 		// somehow find the agents (this is just an example):
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
-			for (QVehicle vehicle : link.getAllNonParkedVehicles()) {
+			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				System.out.println(agent.getId());
 				if ( true ) { // some condition ...
