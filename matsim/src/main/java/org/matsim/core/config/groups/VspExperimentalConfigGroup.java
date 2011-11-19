@@ -166,7 +166,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		
-		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'" ) ;
+		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
+				" Will only work when lastIteration is multiple of events writing interval" ) ;
 		
 		map.put(EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE, "mapping from input road types to HBEFA road types and traffic situations");
 		
