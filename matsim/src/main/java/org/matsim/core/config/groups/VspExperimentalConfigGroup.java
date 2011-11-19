@@ -210,6 +210,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	@Override
+	@Deprecated
 	public String getValue(final String key) {
 		throw new RuntimeException(" use direct getter; aborting ... " ) ;
 	}
