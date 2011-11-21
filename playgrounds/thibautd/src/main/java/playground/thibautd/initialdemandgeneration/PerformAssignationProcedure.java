@@ -38,6 +38,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
+import playground.thibautd.initialdemandgeneration.microcensusdata.MzGroupsModule;
+
 /**
  * Executable class which assigns activity chains to agents.
  * It takes a config file as argument, with a special 
@@ -60,7 +63,10 @@ public class PerformAssignationProcedure {
 
 	public static void main( final String[] args ) {
 		String configFile = args[ 0 ];
-		Config config = ConfigUtils.loadConfig( configFile );
+		MzGroupsModule groups = new MzGroupsModule();
+		Config config = ConfigUtils.createConfig( );
+		config.addModule( groups.NAME , groups );
+		ConfigUtils.loadConfig( config , configFile );
 		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
 		Module configGroup = config.getModule( CONF_GROUP );
 		String outputDir = configGroup.getValue( OUT_FIELD );
@@ -76,7 +82,7 @@ public class PerformAssignationProcedure {
 			}
 		}
 
-		MicroCensus mz = new MicroCensus( popFiles );
+		MicroCensus mz = new MicroCensus( groups , popFiles );
 		PersonAssignActivityChains algo = new PersonAssignActivityChains(
 				getDay( configGroup ),
 				mz,

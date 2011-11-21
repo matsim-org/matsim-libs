@@ -27,6 +27,8 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
+import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
+
 /**
  * On a great extend based on the class of the same name in playground.balmermi.
  * <br>
