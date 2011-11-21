@@ -31,9 +31,6 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
 public interface MobsimVehicle extends VisVehicle{
 	public Link getCurrentLink();
 	
-	public void setDriver(final DriverAgent driver);
-	// yy presumably, this should set DriverAgent
-	
 	public abstract double getSizeInEquivalents();
 	
 

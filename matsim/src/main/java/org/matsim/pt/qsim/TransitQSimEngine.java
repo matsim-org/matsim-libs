@@ -128,8 +128,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 			for (PassengerAgent agent : agentsAtStop.getValue()) {
 				this.qSim.getEventsManager().processEvent(
-						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), stop.getLinkId(), 
-								((TransitAgent) agent).getVehicle().getDriver().getMode()));
+//						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), stop.getLinkId(), 
+//								((TransitAgent) agent).getVehicle().getDriver().getMode()));
+				
+				new AgentStuckEventImpl( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()  )  );
 
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();

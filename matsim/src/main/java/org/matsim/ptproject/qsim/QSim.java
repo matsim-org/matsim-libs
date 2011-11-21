@@ -78,6 +78,7 @@ import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -347,6 +348,7 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
+	@Deprecated // please solve via addAgentSource(...).  kai, nov'11
 	protected void createAdditionalAgents() {
 		// Empty for inheritance. (only one test)
 	}
@@ -416,7 +418,7 @@ public class QSim implements VisMobsim, Netsim {
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), defaultVehicleType);
 		veh = QVehicleUtils.createMobsimVehicle(vehicle);
 
-		veh.setDriver(agent);
+//		((QVehicle)veh).setDriver(agent);
 		// yyyyyy This was, when it was written, needed for OTFVis to show parked vehicles.  Physically, it does not make sense;
 		// driver and vehicle should be connected when the driver _enters_ the vehicle (i.e. at departure).  Can't say if, in 
 		// the meantime, it was started to also use this for something else.  kai, nov'11

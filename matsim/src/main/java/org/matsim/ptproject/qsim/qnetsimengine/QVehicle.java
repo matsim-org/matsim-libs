@@ -110,13 +110,14 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	@Override
 	public MobsimDriverAgent getDriver() {
 		if ( this.driver instanceof MobsimDriverAgent ) {
-			return (MobsimDriverAgent) this.driver; 
+			return (MobsimDriverAgent) this.driver;
+		} else if ( this.driver==null ) {
+			return null ;
 		} else {
 			throw new RuntimeException( "error (downstream methods need to be made to accept DriverAgent)") ;
 		}
 	}
 
-	@Override
 	public void setDriver(final DriverAgent driver) {
 		this.driver = driver;
 	}

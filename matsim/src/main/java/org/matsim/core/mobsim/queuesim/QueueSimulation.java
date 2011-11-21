@@ -61,6 +61,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -227,7 +228,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			agents.add( agent ) ;
 			MobsimVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			//not needed in new agent class
-			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
+//			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
 			agent.setVehicle(veh);
 			QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 			qlink.addParkedVehicle(veh);
@@ -481,11 +482,11 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 				vehicleId = driverAgent.getId(); // backwards-compatibility
 			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
-			MobsimVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
+			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
 				if (this.teleportVehicles) {
-					vehicle = driverAgent.getVehicle();
+					vehicle = (QVehicle) driverAgent.getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;
