@@ -38,7 +38,6 @@ import org.matsim.core.gbl.Gbl;
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
-import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
@@ -51,7 +50,7 @@ import playground.benjamin.emissions.types.WarmPollutant;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
+	private final Map<Integer, String> roadTypeMapping;
 
 	private final Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
 	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
@@ -63,7 +62,7 @@ public class WarmEmissionAnalysisModule {
 	private static Set<Id> personIdSet = new HashSet<Id>();
 
 	public WarmEmissionAnalysisModule(
-			Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping,
+			Map<Integer, String> roadTypeMapping,
 			Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable,
 			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
 			EventsManager emissionEventsManager) {
@@ -235,29 +234,30 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	private String makeKey(WarmPollutant warmPollutant, int roadType, String emConcept, String technology, String sizeClass, HbefaTrafficSituation trafficSit){
-		String trafficSituation = this.roadTypeMapping.get(roadType).getTRAFFIC_SITUATION_MAPPING().get(trafficSit);
-		
-		return "PC[3.1]"
-				+ ";"
-				+ "pass. car"
-				+ ";"
-				+ "2010"
-				+ ";"
-				+ ";"
-				+ warmPollutant.getText()
-				+ ";"
-				+ ";"
-				+ trafficSituation
-				+ ";"
-				+ "0%"
-				+ ";"
-				+ technology
-				+ ";"
-				+ sizeClass
-				+ ";"
-				+ emConcept
-				+ ";"
-				;
+//		String trafficSituation = this.roadTypeMapping.get(roadType).getTRAFFIC_SITUATION_MAPPING().get(trafficSit);
+//		
+//		return "PC[3.1]"
+//				+ ";"
+//				+ "pass. car"
+//				+ ";"
+//				+ "2010"
+//				+ ";"
+//				+ ";"
+//				+ warmPollutant.getText()
+//				+ ";"
+//				+ ";"
+//				+ trafficSituation
+//				+ ";"
+//				+ "0%"
+//				+ ";"
+//				+ technology
+//				+ ";"
+//				+ sizeClass
+//				+ ";"
+//				+ emConcept
+//				+ ";"
+//				;
+		return null;
 	}
 
 	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer
@@ -269,14 +269,14 @@ public class WarmEmissionAnalysisModule {
 	private Map<WarmPollutant, Double> calculateAverageEmissions(Id personId, double travelTime, int roadType, double linkLength) {
 		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
-		int hbefaRoadType = this.roadTypeMapping.get(roadType).getHBEFA_RT_NR();
-		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType).getHBEFA_RT_NAME();
+//		int hbefaRoadType = this.roadTypeMapping.get(roadType);
+		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
 		
-		if (hbefaRoadType == 0) {
-			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-				avgEmissionsOfEvent.put(warmPollutant, null);
-			}
-		} else {
+//		if (hbefaRoadType == 0) {
+//			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+//				avgEmissionsOfEvent.put(warmPollutant, null);
+//			}
+//		} else {
 			
 			HbefaAvgWarmEmissionFactorsKey keyFreeFlow = new HbefaAvgWarmEmissionFactorsKey();
 			HbefaAvgWarmEmissionFactorsKey keyStopAndGo = new HbefaAvgWarmEmissionFactorsKey();
@@ -317,7 +317,7 @@ public class WarmEmissionAnalysisModule {
 				}
 				avgEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 			}
-		}
+//		}
 		return avgEmissionsOfEvent;
 	}
 

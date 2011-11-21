@@ -42,7 +42,6 @@ import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
 import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
-import playground.benjamin.emissions.types.HbefaRoadTypeTrafficSituation;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
@@ -66,7 +65,7 @@ public class EmissionHandler {
 
 	private static String detailedWarmEmissionFactorsFile;
 	//===
-	Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping;
+	Map<Integer, String> roadTypeMapping;
 	
 	private Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
 	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactors>>> avgHbefaColdTable;
@@ -151,50 +150,23 @@ public class EmissionHandler {
 		logger.info("leaving installEmissionsEventHandler") ;
 	}
 
-	//TODO: reduce to RoadTypeMapping only; traffic situations could be mapped when creating the emission factors tables...
-	private static Map<Integer, HbefaRoadTypeTrafficSituation> createRoadTypesTrafficSitMapping(String filename){
+	private static Map<Integer, String> createRoadTypesTrafficSitMapping(String filename){
 		logger.info("entering createRoadTypesTrafficSitMapping ...") ;
 		
-		Map<Integer, HbefaRoadTypeTrafficSituation> roadTypeMapping = new HashMap<Integer, HbefaRoadTypeTrafficSituation>();
+		Map<Integer, String> roadTypeMapping = new HashMap<Integer, String>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
 			
 			while ((strLine = br.readLine()) != null){
-				if ( strLine.contains("\"")) {
-					throw new RuntimeException("cannot handle this character in parsing") ;
-				}
-	
+				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
+				
 				String[] inputArray = strLine.split(";");
-				Map<HbefaTrafficSituation, String> trafficSitMapping = new HashMap<HbefaTrafficSituation, String>();
-				
-				//required for mapping
 				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
-				Integer hbefaRtNr = Integer.parseInt(inputArray[indexFromKey.get("HBEFA_RT_NR")]);
-				trafficSitMapping.put(HbefaTrafficSituation.FREEFLOW, inputArray[indexFromKey.get("TS_FREEFLOW")]);
-				trafficSitMapping.put(HbefaTrafficSituation.HEAVY, inputArray[indexFromKey.get("TS_HEAVY")]);
-				trafficSitMapping.put(HbefaTrafficSituation.SATURATED, inputArray[indexFromKey.get("TS_SATURATED")]);
-				trafficSitMapping.put(HbefaTrafficSituation.STOPANDGO, inputArray[indexFromKey.get("TS_STOPANDGO")]);
+				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
 				
-				HbefaRoadTypeTrafficSituation hbefaRoadTypeTrafficSituation = new HbefaRoadTypeTrafficSituation(hbefaRtNr, trafficSitMapping);
-				
-				//optional for mapping
-				hbefaRoadTypeTrafficSituation.setVISUM_RT_NAME(inputArray[indexFromKey.get("VISUM_RT_NAME")]) ;
-				
-				String hbefaRtName = mapString2HbefaRoadCategory(inputArray[indexFromKey.get("TS_FREEFLOW")]);
-				hbefaRoadTypeTrafficSituation.setHBEFA_RT_NAME(hbefaRtName);
-				
-//				//required for mapping
-//				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
-//				String hbefaRtName = inputArray[indexFromKey.get("HBEFA_RT_NAME")];
-//				
-//				HbefaRoadTypeTrafficSituation hbefaRoadTypeTrafficSituation = new HbefaRoadTypeTrafficSituation(hbefaRtName);
-//				
-//				//optional for mapping
-//				hbefaRoadTypeTrafficSituation.setVISUM_RT_NAME(inputArray[indexFromKey.get("VISUM_RT_NAME")]) ;
-				
-				roadTypeMapping.put(visumRtNr, hbefaRoadTypeTrafficSituation);
+				roadTypeMapping.put(visumRtNr, hbefaRtName);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -205,7 +177,6 @@ public class EmissionHandler {
 		return roadTypeMapping;
 	}
 	
-	//TODO: check direct output from HBEFA and adjust parser...
 	private static Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
@@ -264,11 +235,8 @@ public class EmissionHandler {
 
 	private static String mapString2HbefaRoadCategory(String string) {
 		String hbefaRoadCategory = null;
-		
-		if(!(string.equals("0"))){
-			String[] parts = string.split("/");
-			hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
-		}
+		String[] parts = string.split("/");
+		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
 	}
 

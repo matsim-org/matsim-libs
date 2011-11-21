@@ -61,8 +61,8 @@ public class RunEmissionToolOffline {
 	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
-//	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypeMapping.txt";
+//	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
+	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypeMapping.txt";
 	
 //	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
