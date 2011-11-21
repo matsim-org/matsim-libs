@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
 
-public class TransitQVehicle extends QVehicleImpl implements TransitVehicle {
+public class TransitQVehicle extends QVehicle implements TransitVehicle {
 
 	private final int passengerCapacity;
 	private final List<PassengerAgent> passengers = new LinkedList<PassengerAgent>();

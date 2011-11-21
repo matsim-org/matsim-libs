@@ -38,7 +38,7 @@ public class QVehicleUtils {
 	 * </ul>
 	 */
 	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle, double sizeInEquivalents) {
-		return new QVehicleImpl(basicVehicle, sizeInEquivalents);
+		return new QVehicle(basicVehicle, sizeInEquivalents);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class QVehicleUtils {
 	 * </ul>
 	 */
 	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle) {
-		return new QVehicleImpl(basicVehicle);
+		return new QVehicle(basicVehicle);
 	}
 
 }

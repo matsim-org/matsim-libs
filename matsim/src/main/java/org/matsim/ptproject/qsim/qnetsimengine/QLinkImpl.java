@@ -340,12 +340,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 *          The current time.
 	 */
 	 private void moveLaneToBuffer(final double now) {
-		QVehicleImpl veh;
+		QVehicle veh;
 
 		this.moveTransitToQueue(now);
 
 		// handle regular traffic
-		while ((veh = ((QVehicleImpl) this.vehQueue.peek())) != null) {
+		while ((veh = ((QVehicle) this.vehQueue.peek())) != null) {
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
 			}
