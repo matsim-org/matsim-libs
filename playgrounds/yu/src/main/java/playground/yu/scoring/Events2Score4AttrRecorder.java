@@ -46,44 +46,25 @@ import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.utils.io.SimpleWriter;
+
 /**
  * @author yu
  * 
  */
 public class Events2Score4AttrRecorder extends EventsToScore {
 	public final static List<String> attrNameList = new ArrayList<String>();
-	// public final static List<Double> paramScaleFactorList = new
-	// ArrayList<Double>();
-
-	// private static final String PARAM_SCALE_FACTOR_INDEX =
-	// "paramScaleFactor_";
 
 	protected final Config config;
-	// /** Map<personId,Map<Plan,attr>> */
-	// protected Map<Id/* agent */, Map<Plan, Double>> legDursCar = new
-	// HashMap<Id, Map<Plan, Double>>(),
-	// legDursPt = new HashMap<Id, Map<Plan, Double>>(),
-	// legDursWalk = new HashMap<Id, Map<Plan, Double>>(),
-	// actAttrs = new HashMap<Id, Map<Plan, Double>>(),
-	// stuckAttrs = new HashMap<Id, Map<Plan, Double>>(),
-	// distancesCar = new HashMap<Id, Map<Plan, Double>>(),
-	// distancesPt = new HashMap<Id, Map<Plan, Double>>(),
-	// distancesWalk = new HashMap<Id, Map<Plan, Double>>();
-	// protected Map<Id/* agent */, Map<Plan, Integer>> carLegNos = new
-	// HashMap<Id, Map<Plan, Integer>>(),
-	// ptLegNos = new HashMap<Id, Map<Plan, Integer>>(),
-	// walkLegNos = new HashMap<Id, Map<Plan, Integer>>();
 	protected Population pop = null;
 	protected ScoringFunctionFactory sfFactory = null;
 	protected PlanCalcScoreConfigGroup scoring;
-	// protected boolean setPersonScore = true;
+
 	protected int maxPlansPerAgent;
 	protected final TreeMap<Id, Tuple<Plan, ScoringFunction>> agentScorers = new TreeMap<Id, Tuple<Plan, ScoringFunction>>();
 	protected final TreeMap<Id, Integer> agentPlanElementIndex = new TreeMap<Id, Integer>();
 
 	protected int iteration = -1;
-
-	// boolean setUCinMNL = true;
 
 	public Events2Score4AttrRecorder(Config config,
 			ScoringFunctionFactory sfFactory, Scenario scenario) {
@@ -119,20 +100,6 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 		pop = scenario.getPopulation();
 		maxPlansPerAgent = config.strategy().getMaxAgentPlanMemorySize();
 		this.sfFactory = sfFactory;
-
-		// *********************************************************
-		// mnl = createMultinomialLogit(config);
-		//
-		// String setUCinMNLStr = config.findParam(
-		// BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-		// "setUCinMNL");
-		// if (setUCinMNLStr != null) {
-		// setUCinMNL = Boolean.parseBoolean(setUCinMNLStr);
-		// System.out.println("BSE:\tsetUCinMNL\t=\t" + setUCinMNL);
-		// } else {
-		// System.out.println("BSE:\tsetUCinMNL\t= default value\t"
-		// + setUCinMNL);
-		// }
 	}
 
 	// the local agentScorers has to be used
@@ -254,7 +221,8 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 			sf.finish();
 			double score = sf.getScore();
 			// **********************codes from {@code EventsToScore}
-			/* this line of code must stay under the line of "sf.getScore" */
+			//save attributes as custom attritubes.
+			//#########################################
 			ScoringFunctionAccumulatorWithAttrRecorder sfa = (ScoringFunctionAccumulatorWithAttrRecorder) sf;
 
 			// legTravTimeCar
@@ -298,8 +266,48 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 				plan.setScore(learningRate * score + (1 - learningRate)
 						* oldScore);
 			}
-			// System.out.println("SCORING:\tscoringFunction:\t"
-			// + sf.getClass().getName() + "\tscore:\t" + score);
 		}
+	}
+
+	/**
+	 * strongly suggests, please use this method for some simulation iterations
+	 * WITHOUT plan innovation
+	 * 
+	 * @param outputAttrsFilename
+	 */
+	public void writeScoreAttrs(String outputAttrsFilename) {
+		SimpleWriter writer = new SimpleWriter(outputAttrsFilename);
+		// write filehead
+		writer.write("PersonId\tPlanIdx");
+		for (String attrName : this.attrNameList) {
+			writer.write("\t" + attrName);
+		}
+		writer.writeln("\tASC");
+		writer.flush();
+
+		// write table
+		for (Person person : this.pop.getPersons().values()) {
+			String perId = person.getId().toString();
+			List<? extends Plan> plans = person.getPlans();
+
+			for (Plan plan : plans) {
+				int planIdx = plans.indexOf(plan);
+				StringBuffer sb = new StringBuffer(perId + "\t" + planIdx);
+				Map<String, Object> attrs = plan.getCustomAttributes();
+
+				for (String attrName : this.attrNameList) {
+					sb.append("\t");
+					Object o = attrs.get(attrName);
+					sb.append(o != null ? o : 0);
+				}
+				sb.append("\t");
+				Object asc = attrs.get("utilityCorrection");
+				sb.append(asc != null ? asc : 0);
+
+				writer.writeln(sb);
+				writer.flush();
+			}
+		}
+		writer.close();
 	}
 }
