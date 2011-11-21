@@ -51,10 +51,10 @@ import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
+import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithAttrRecorder;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -483,6 +483,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);
+//		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory4PC(
+//				config.planCalcScore(), ctl.getNetwork()));
+
 		initializeCalibrator(ctl);
 
 		// *********SETTING PARAMETERS FOR "PARAMETER CALIBRATION"****
@@ -707,7 +710,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			((Events2Score4PC) chooser).setMultinomialLogit(mnl);
 
-			CharyparNagelScoringFunctionFactory4PC sfFactory = new CharyparNagelScoringFunctionFactory4PC(
+			CharyparNagelScoringFunctionFactoryWithAttrRecorder sfFactory = new CharyparNagelScoringFunctionFactoryWithAttrRecorder(
 					config.planCalcScore(), ctl.getNetwork());
 			ctl.setScoringFunctionFactory(sfFactory);
 			((Events2Score4PC) chooser).setSfFactory(sfFactory);

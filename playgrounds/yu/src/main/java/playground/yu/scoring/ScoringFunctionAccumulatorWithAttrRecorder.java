@@ -21,14 +21,13 @@
 /**
  *
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
+package playground.yu.scoring;
 
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.scoring.interfaces.ActivityScoring;
@@ -37,14 +36,14 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.LegScoringFunction4PC;
 
 /**
  * @author yu
- *
+ * 
  */
 // in order to get attributes, e.g. actDur, legDurCar, legDurPt, stuck?
-public class ScoringFunctionAccumulator4PC extends ScoringFunctionAdapter {
+public class ScoringFunctionAccumulatorWithAttrRecorder extends
+		ScoringFunctionAdapter {
 	protected CharyparNagelScoringParameters params;
 
 	protected ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
@@ -58,7 +57,8 @@ public class ScoringFunctionAccumulator4PC extends ScoringFunctionAdapter {
 			distanceWalk/* [m] */;
 	private int carLegNo, ptLegNo, walkLegNo;
 
-	public ScoringFunctionAccumulator4PC(CharyparNagelScoringParameters params) {
+	public ScoringFunctionAccumulatorWithAttrRecorder(
+			CharyparNagelScoringParameters params) {
 		this.params = params;
 	}
 
@@ -172,7 +172,7 @@ public class ScoringFunctionAccumulator4PC extends ScoringFunctionAdapter {
 						/ (params.marginalUtilityOfPerforming_s * 3600d)
 						: 0d;
 			} else if (basicScoringFunction instanceof LegScoringFunction) {
-				LegScoringFunction4PC legScoringFunction = (LegScoringFunction4PC) basicScoringFunction;
+				LegScoringFunctionWithAttrRecorder legScoringFunction = (LegScoringFunctionWithAttrRecorder) basicScoringFunction;
 
 				travTimeAttrCar = legScoringFunction.getTravTimeAttrCar();
 				travTimeAttrPt = legScoringFunction.getTravTimeAttrPt();
@@ -209,7 +209,7 @@ public class ScoringFunctionAccumulator4PC extends ScoringFunctionAdapter {
 	/**
 	 * add the scoring function the list of functions, it implemented the
 	 * interfaces.
-	 *
+	 * 
 	 * @param scoringFunction
 	 */
 	public void addScoringFunction(BasicScoring scoringFunction) {

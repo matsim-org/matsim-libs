@@ -1,4 +1,4 @@
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC;
+package playground.yu.scoring;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -30,9 +30,8 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.ScoringFunctionAccumulator4PC;
 
-public class CharyparNagelScoringFunctionFactory4PC extends
+public class CharyparNagelScoringFunctionFactoryWithAttrRecorder extends
 		CharyparNagelScoringFunctionFactory {
 	// private static String CONSTANT_CAR = "constantCar", CONSTANT_PT =
 	// "constantPt",
@@ -40,7 +39,7 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 	// static double constantCar, constantPt, constantWalk;
 	private Network network;
 
-	public CharyparNagelScoringFunctionFactory4PC(
+	public CharyparNagelScoringFunctionFactoryWithAttrRecorder(
 			final PlanCalcScoreConfigGroup config, final Network network) {
 		super(config, network);
 		this.network = network;
@@ -49,12 +48,12 @@ public class CharyparNagelScoringFunctionFactory4PC extends
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		CharyparNagelScoringParameters params = getParams();
-		ScoringFunctionAccumulator4PC scoringFunctionAccumulator = new ScoringFunctionAccumulator4PC(
+		ScoringFunctionAccumulatorWithAttrRecorder scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithAttrRecorder(
 				params);
 		scoringFunctionAccumulator
 				.addScoringFunction(new ActivityScoringFunction(params));
 		scoringFunctionAccumulator
-				.addScoringFunction(new LegScoringFunction4PC(plan, params,
+				.addScoringFunction(new LegScoringFunctionWithAttrRecorder(plan, params,
 						network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
 				params));

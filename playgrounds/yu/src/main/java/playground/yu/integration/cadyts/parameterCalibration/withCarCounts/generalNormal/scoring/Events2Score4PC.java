@@ -58,6 +58,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+import playground.yu.scoring.ScoringFunctionAccumulatorWithAttrRecorder;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
@@ -835,7 +836,7 @@ public class Events2Score4PC extends EventsToScore implements
 			double score = sf.getScore();
 			// **********************codes from {@code EventsToScore}
 			/* this line of code must stay under the line of "sf.getScore" */
-			ScoringFunctionAccumulator4PC sfa = (ScoringFunctionAccumulator4PC) sf;
+			ScoringFunctionAccumulatorWithAttrRecorder sfa = (ScoringFunctionAccumulatorWithAttrRecorder) sf;
 
 			// legTravTimeCar
 			Map<Plan, Double> legDurMapCar = legDursCar.get(agentId);

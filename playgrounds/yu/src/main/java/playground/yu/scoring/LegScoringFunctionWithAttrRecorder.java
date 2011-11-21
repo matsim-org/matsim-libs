@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC;
+package playground.yu.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,9 +32,9 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 
-public class LegScoringFunction4PC extends LegScoringFunction {
+public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 	private final static Logger log = Logger
-			.getLogger(LegScoringFunction4PC.class);
+			.getLogger(LegScoringFunctionWithAttrRecorder.class);
 	private double travTimeAttrCar/* [h] */= 0d, travTimeAttrPt/* [h] */= 0d,
 			travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/*
 														 * [m*utils/unit_of_money
@@ -45,7 +45,7 @@ public class LegScoringFunction4PC extends LegScoringFunction {
 
 	private int carLegNo = 0, ptLegNo = 0, walkLegNo = 0;
 
-	public LegScoringFunction4PC(Plan plan,
+	public LegScoringFunctionWithAttrRecorder(Plan plan,
 			CharyparNagelScoringParameters params, Network network) {
 		super(params, network);
 	}

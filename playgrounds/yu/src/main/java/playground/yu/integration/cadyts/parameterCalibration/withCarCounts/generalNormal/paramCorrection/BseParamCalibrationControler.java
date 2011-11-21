@@ -25,12 +25,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.withLegModeASC.CharyparNagelScoringFunctionFactory4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
+import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithAttrRecorder;
 
 /**
  * @author yu
- *
+ * 
  */
 public abstract class BseParamCalibrationControler extends Controler {
 
@@ -51,7 +51,7 @@ public abstract class BseParamCalibrationControler extends Controler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory4PC(
+		return new CharyparNagelScoringFunctionFactoryWithAttrRecorder(
 				config.planCalcScore(), network);
 	}
 
