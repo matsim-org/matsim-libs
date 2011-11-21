@@ -36,7 +36,6 @@ import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
 
-
 /**
  * @author yu
  * 
@@ -74,7 +73,7 @@ public class ScoringFunctionAccumulatorWithAttrRecorder extends
 		return travTimeAttrPt;
 	}
 
-	public Double getTravTimeAttrWalk() {
+	public double getTravTimeAttrWalk() {
 		return travTimeAttrWalk;
 	}
 

@@ -31,7 +31,7 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
 
-public class CharyparNagelScoringFunctionFactoryWithAttrRecorder extends
+public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
 		CharyparNagelScoringFunctionFactory {
 	// private static String CONSTANT_CAR = "constantCar", CONSTANT_PT =
 	// "constantPt",
@@ -39,7 +39,7 @@ public class CharyparNagelScoringFunctionFactoryWithAttrRecorder extends
 	// static double constantCar, constantPt, constantWalk;
 	private Network network;
 
-	public CharyparNagelScoringFunctionFactoryWithAttrRecorder(
+	public CharyparNagelScoringFunctionFactory4AttrRecorder(
 			final PlanCalcScoreConfigGroup config, final Network network) {
 		super(config, network);
 		this.network = network;

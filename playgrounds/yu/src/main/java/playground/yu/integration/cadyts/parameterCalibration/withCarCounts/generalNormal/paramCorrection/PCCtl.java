@@ -92,11 +92,7 @@ public class PCCtl extends BseParamCalibrationControler {
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new PCStrMn(network, getFirstIteration(),
-				config, Integer.parseInt(config.findParam(
-						PCCtlListener.BSE_CONFIG_MODULE_NAME,
-						"parameterDimension"/*
-											 * 2, traveling , performing
-											 */)));
+				config);
 		StrategyManagerConfigLoader.load(this, manager);
 
 		// deactivate generating of new Plans by plan innovation

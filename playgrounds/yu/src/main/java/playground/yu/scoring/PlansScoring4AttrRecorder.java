@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
+package playground.yu.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -32,6 +32,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
@@ -40,9 +41,9 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author yu
  * 
  */
-public class PlansScoring4PC implements StartupListener, ScoringListener,
+public class PlansScoring4AttrRecorder implements StartupListener, ScoringListener,
 		IterationStartsListener {
-	private final static Logger log = Logger.getLogger(PlansScoring4PC.class);
+	private final static Logger log = Logger.getLogger(PlansScoring4AttrRecorder.class);
 	protected Events2Score4PC planScorer;
 
 	@Override

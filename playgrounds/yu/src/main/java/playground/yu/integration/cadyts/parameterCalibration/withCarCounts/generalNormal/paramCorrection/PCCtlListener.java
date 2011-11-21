@@ -54,7 +54,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetValue;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactoryWithAttrRecorder;
+import playground.yu.scoring.CharyparNagelScoringFunctionFactory4AttrRecorder;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -399,9 +399,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 			delta = Double.parseDouble(deltaStr);
 			System.out.println("BSE:\tdelta\t=\t" + delta);
 		}
-		((PCStrMn) ctl.getStrategyManager()).init(calibrator,
-				ctl.getTravelTimeCalculator(),
-				(MultinomialLogitChoice) chooser, delta);
+		((PCStrMn) ctl.getStrategyManager())
+				.init(calibrator, ctl.getTravelTimeCalculator(),
+						(MultinomialLogitChoice) chooser);
 	}
 
 	private void initializeOutput(Controler ctl) {
@@ -483,8 +483,9 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);
-//		ctl.setScoringFunctionFactory(new CharyparNagelScoringFunctionFactory4PC(
-//				config.planCalcScore(), ctl.getNetwork()));
+		// ctl.setScoringFunctionFactory(new
+		// CharyparNagelScoringFunctionFactory4PC(
+		// config.planCalcScore(), ctl.getNetwork()));
 
 		initializeCalibrator(ctl);
 
@@ -551,7 +552,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 	}
 
 	public void setWriteQGISFile(boolean writeQGISFile) {
-		writeQGISFile = writeQGISFile;
+		this.writeQGISFile = writeQGISFile;
 	}
 
 	private void outputHalfway(Controler ctl, int outputIterInterval) {
@@ -710,7 +711,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 			((Events2Score4PC) chooser).setMultinomialLogit(mnl);
 
-			CharyparNagelScoringFunctionFactoryWithAttrRecorder sfFactory = new CharyparNagelScoringFunctionFactoryWithAttrRecorder(
+			CharyparNagelScoringFunctionFactory4AttrRecorder sfFactory = new CharyparNagelScoringFunctionFactory4AttrRecorder(
 					config.planCalcScore(), ctl.getNetwork());
 			ctl.setScoringFunctionFactory(sfFactory);
 			((Events2Score4PC) chooser).setSfFactory(sfFactory);

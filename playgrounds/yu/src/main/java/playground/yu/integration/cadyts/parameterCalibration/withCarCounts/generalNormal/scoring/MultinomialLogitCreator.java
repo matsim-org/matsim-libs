@@ -57,15 +57,13 @@ public class MultinomialLogitCreator {
 			mnl.setASC(i, 0);
 		}
 		// travelTime
-		int attrNameIndex = Events2Score4PC.attrNameList
-				.indexOf("traveling");
+		int attrNameIndex = Events2Score4PC.attrNameList.indexOf("traveling");
 		mnl.setCoefficient(attrNameIndex, traveling);
 
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("travelingPt");
 		mnl.setCoefficient(attrNameIndex, scoring.getTravelingPt_utils_hr());
 
-		attrNameIndex = Events2Score4PC.attrNameList
-				.indexOf("travelingWalk");
+		attrNameIndex = Events2Score4PC.attrNameList.indexOf("travelingWalk");
 		mnl.setCoefficient(attrNameIndex, scoring.getTravelingWalk_utils_hr());
 
 		//
@@ -102,8 +100,7 @@ public class MultinomialLogitCreator {
 		attrNameIndex = Events2Score4PC.attrNameList.indexOf("constantPt");
 		mnl.setCoefficient(attrNameIndex, scoring.getConstantPt());
 
-		attrNameIndex = Events2Score4PC.attrNameList
-				.indexOf("constantWalk");
+		attrNameIndex = Events2Score4PC.attrNameList.indexOf("constantWalk");
 		mnl.setCoefficient(attrNameIndex, scoring.getConstantWalk());
 
 		return mnl;
