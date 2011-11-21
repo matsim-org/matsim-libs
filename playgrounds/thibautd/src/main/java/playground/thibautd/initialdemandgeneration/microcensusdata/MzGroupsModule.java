@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Module;
 import org.matsim.core.population.PersonImpl;
@@ -34,6 +36,9 @@ import org.matsim.core.population.PersonImpl;
  * @author thibautd
  */
 public class MzGroupsModule extends Module {
+	private static final Logger log =
+		Logger.getLogger(MzGroupsModule.class);
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String NAME = "MzGroups";
@@ -43,7 +48,7 @@ public class MzGroupsModule extends Module {
 	// field names
 	public static final String AGE_THRESHOLD_REGEXP = "ageThreshold.*";
 	public static final String STRATIFY_BY_GENDER = "stratifyByGender";
-	public static final String STRATIFY_BY_LICENCE = "stratifyByLicense";
+	public static final String STRATIFY_BY_LICENCE = "stratifyByLicence";
 	public static final String STRATIFY_BY_WORK = "stratifyByWork";
 	public static final String STRATIFY_BY_EDUC = "stratifyByEduc";
 
@@ -72,20 +77,25 @@ public class MzGroupsModule extends Module {
 	public void addParam(final String name , final String value) {
 		if (!isModifiable) throw new IllegalStateException( "parameters cannot be changed anymore" );
 
+		log.debug( "adding parameter: "+name+" with value "+value );
 		if (name.matches( AGE_THRESHOLD_REGEXP )) {
 			thresholds.addThreshold( value );
 		}
 		else if ( name.equals( STRATIFY_BY_GENDER ) ) {
-			stratifyByGender = Boolean.getBoolean( value );
+			stratifyByGender = Boolean.parseBoolean( value );
+			//log.debug("stratifyByGender = "+stratifyByGender);
 		}
 		else if ( name.equals( STRATIFY_BY_LICENCE ) ) {
-			stratifyByLicence = Boolean.getBoolean( value );
+			stratifyByLicence = Boolean.parseBoolean( value );
+			//log.debug("stratifyByLicence = "+stratifyByLicence);
 		}
 		else if ( name.equals( STRATIFY_BY_WORK ) ) {
-				stratifyByWork = Boolean.getBoolean( value );
+			stratifyByWork = Boolean.parseBoolean( value );
+			//log.debug("stratifyByWork = "+stratifyByWork);
 		}
 		else if ( name.equals( STRATIFY_BY_EDUC ) ) {
-				stratifyByEduc = Boolean.getBoolean( value );
+			stratifyByEduc = Boolean.parseBoolean( value );
+			//log.debug("stratifyByEduc = "+stratifyByEduc);
 		}
 	}
 
