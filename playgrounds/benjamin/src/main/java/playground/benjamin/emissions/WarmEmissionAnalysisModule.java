@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,11 +35,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactors;
-import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorsKey;
+import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorKey;
+import playground.benjamin.emissions.types.HbefaDetailedWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
-import playground.benjamin.emissions.types.HbefaWarmEmissionFactorsDetailed;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
 import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
@@ -52,19 +51,21 @@ public class WarmEmissionAnalysisModule {
 
 	private final Map<Integer, String> roadTypeMapping;
 
-	private final Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable;
-	private final Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable;
+	private final Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private final Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
 	private final EventsManager eventsManager;
 	
-	private static int vehInfoWarnCnt = 0;
+	private static int vehInfoWarnAvailCnt = 0;
+	private static int vehInfoWarnValidCnt = 0;
 	private static int maxVehInfoWarnCnt = 2;
-	private static Set<Id> personIdSet = new HashSet<Id>();
+	private static Set<Id> vehInfoNotAvail = new HashSet<Id>();
+	private static Set<Id> vehInfoNotValid = new HashSet<Id>();
 
 	public WarmEmissionAnalysisModule(
 			Map<Integer, String> roadTypeMapping,
-			Map<HbefaAvgWarmEmissionFactorsKey, HbefaAvgWarmEmissionFactors> avgHbefaWarmTable,
-			Map<String, HbefaWarmEmissionFactorsDetailed> detailedHbefaWarmTable,
+			Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
+			Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
@@ -81,186 +82,165 @@ public class WarmEmissionAnalysisModule {
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
+	// TODO: merge detailed and average emission calculation
 	private Map<WarmPollutant, Double> calculateWarmEmissions(Id personId,
 			Integer roadType, Double linkLength, Double travelTime,
 			String ageFuelCcm) {
 
 		Map<WarmPollutant, Double> warmEmissions;
 
-		if(this.detailedHbefaWarmTable != null){
-			Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> relevantInformation;
-			if (ageFuelCcm != null)	relevantInformation = gatherRelevantInformation(roadType, ageFuelCcm);
-			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
-			else relevantInformation = null;
+		if(this.detailedHbefaWarmTable != null){ // check if detailed emission factors file is set in config
 
-			if (relevantInformation != null) warmEmissions = calculateDetailedEmissions(relevantInformation, travelTime, linkLength);
-			// We don't know anything about the vehicle this person is driving, so we don't know how polluting it is.
-			else {
+			if (ageFuelCcm != null){ // check if vehicle file provides information
+
+				String [] hbefaVehicleAttributes = mapVehicleAttributesFromMiD2Hbefa(ageFuelCcm);
+
+				if(hbefaVehicleAttributes != null){ // check if vehicle information is valid
+					warmEmissions = calculateDetailedEmissions(personId, travelTime, roadType, linkLength, hbefaVehicleAttributes);
+				} else {
+					warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
+					if(vehInfoWarnValidCnt <= maxVehInfoWarnCnt) {
+						logger.warn("Vehicle information for person " + personId + " is not valid. Using fleet average values instead.");
+						if(vehInfoWarnValidCnt == maxVehInfoWarnCnt){
+							logger.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+					}
+					vehInfoWarnValidCnt++;
+					vehInfoNotValid.add(personId);
+				}
+			} else {
 				warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
 
-				if (vehInfoWarnCnt <= maxVehInfoWarnCnt) {
-					logger.warn("Vehicle information for person " + personId + " is either non-existing or not valid. Using fleet average values instead.");
-					if (vehInfoWarnCnt == maxVehInfoWarnCnt)
+				if (vehInfoWarnAvailCnt <= maxVehInfoWarnCnt) {
+					logger.warn("Vehicle information for person " + personId + " is non-existing. Using fleet average values instead.");
+					if (vehInfoWarnAvailCnt == maxVehInfoWarnCnt)
 						logger.warn(Gbl.FUTURE_SUPPRESSED);
 				}
-				vehInfoWarnCnt++;
-				personIdSet.add(personId);
+				vehInfoWarnAvailCnt++;
+				vehInfoNotAvail.add(personId);
 			}
 		} else {
 			warmEmissions = calculateAverageEmissions(personId, travelTime, roadType, linkLength);
-			vehInfoWarnCnt++;
-			personIdSet.add(personId);
+			vehInfoWarnAvailCnt++;
+			vehInfoNotAvail.add(personId);
 		}
 		return warmEmissions;
 	}
 
-	private Map<WarmPollutant, Double> calculateDetailedEmissions(Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> relevantInformation,	double travelTime, double linkLength) {
-			Map<WarmPollutant, Double> emissionsOfEvent = new HashMap<WarmPollutant, Double>();
 	
-			for (WarmPollutant warmPollutant : relevantInformation.keySet()){
-				
-				double generatedEmissions;
-				double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
-	
-				Map<HbefaTrafficSituation, double[]> trafficSit2VandEF = relevantInformation.get(warmPollutant);
-				double freeFlowSpeed = trafficSit2VandEF.get(HbefaTrafficSituation.FREEFLOW)[0];
-				double stopGoSpeed = trafficSit2VandEF.get(HbefaTrafficSituation.STOPANDGO)[0];
-				double efFreeFlow = trafficSit2VandEF.get(HbefaTrafficSituation.FREEFLOW)[1];
-				double efStopGo = trafficSit2VandEF.get(HbefaTrafficSituation.STOPANDGO)[1];
-	
-				double freeFlowFraction;
-				double stopGoFraction;
-				double stopGoTime;
-	
-				if (averageSpeed < stopGoSpeed) {
-					generatedEmissions = linkLength / 1000 * efStopGo;
-				} else {
-					stopGoTime = (linkLength / 1000) / averageSpeed	- (linkLength / 1000) / freeFlowSpeed;
-	
-					stopGoFraction = stopGoSpeed * stopGoTime;
-					
-					freeFlowFraction = (linkLength / 1000) - stopGoFraction;
-					
-					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
-				}
-				emissionsOfEvent.put(warmPollutant, generatedEmissions);
-			}
-			return emissionsOfEvent;
-		}
+	private Map<WarmPollutant, Double> calculateDetailedEmissions(Id personId, double travelTime, int roadType, double linkLength, String[] hbefaVehicleAttributes) {
+		Map<WarmPollutant, Double> emissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
-	private Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> gatherRelevantInformation(Integer roadType, String ageFuelCcm) {
-		Map<WarmPollutant, Map<HbefaTrafficSituation, double[]>> relevantInformation = new TreeMap<WarmPollutant, Map<HbefaTrafficSituation, double[]>>();
+		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
 
-		String[] ageFuelCcmArray = mapVehicleAttributesFromMiD2Hbefa(ageFuelCcm);
-		if (ageFuelCcmArray == null) {
-			return null;
+		String hbefaTechnology = hbefaVehicleAttributes[0];
+		String hbefaSizeClass = hbefaVehicleAttributes[1];
+		String hbefaEmConcept = hbefaVehicleAttributes[2];
+
+		HbefaDetailedWarmEmissionFactorKey keyFreeFlow = new HbefaDetailedWarmEmissionFactorKey();
+		HbefaDetailedWarmEmissionFactorKey keyStopAndGo = new HbefaDetailedWarmEmissionFactorKey();
+		//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
+		if(personId.toString().contains("gv_")){
+			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		} else{
+			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		}
+		keyFreeFlow.setHbefaRoadCategory(hbefaRoadTypeName);
+		keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
+		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+		keyFreeFlow.setHbefaTechnology(hbefaTechnology);
+		keyStopAndGo.setHbefaTechnology(hbefaTechnology);
+		keyFreeFlow.setHbefaSizeClass(hbefaSizeClass);
+		keyStopAndGo.setHbefaSizeClass(hbefaSizeClass);
+		keyFreeFlow.setHbefaEmConcept(hbefaEmConcept);
+		keyStopAndGo.setHbefaEmConcept(hbefaEmConcept);
+
+		double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
 		for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-			Map<HbefaTrafficSituation, double[]> trafficSit2VandEf = new HashMap<HbefaTrafficSituation, double[]>();
+			keyFreeFlow.setHbefaComponent(warmPollutant);
+			keyStopAndGo.setHbefaComponent(warmPollutant);
 
-			for (HbefaTrafficSituation trafficSit : HbefaTrafficSituation.values()) {
-				String key = makeKey(warmPollutant, roadType, ageFuelCcmArray[0], ageFuelCcmArray[1], ageFuelCcmArray[2], trafficSit);
-				HbefaWarmEmissionFactorsDetailed hbefaWarmEmissionFactorsDetailed = this.detailedHbefaWarmTable.get(key);
-				if (hbefaWarmEmissionFactorsDetailed != null) {
-					double[] vAndEf = new double[2];
-					vAndEf[0] = hbefaWarmEmissionFactorsDetailed.getV();
-					vAndEf[1] = hbefaWarmEmissionFactorsDetailed.getEFA();
+			double freeFlowSpeed = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
+			double stopGoSpeed = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
+			Double efFreeFlow = this.detailedHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();				
 
-					trafficSit2VandEf.put(trafficSit, vAndEf);
-				} else {
-					logger.warn("For traffic situation " + trafficSit	+ " and pollutant " + warmPollutant + " no vehicle specific emission factor is found."
-								+ " Continuing calculation with fleet average values instead.");
-					return null;
-				}
+			//TODO: is this really the "right" way of doing this?!?
+			Double generatedEmissions;
+			if (averageSpeed < stopGoSpeed) {
+				generatedEmissions = linkLength / 1000 * efFreeFlow;
+			} else {
+				Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
+				Double stopGoFraction = stopGoSpeed * stopGoTime;
+				Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
+				Double efStopGo = this.detailedHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+
+				generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
 			}
-			relevantInformation.put(warmPollutant, trafficSit2VandEf);
+			emissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		return relevantInformation;
+		return emissionsOfEvent;
 	}
 
+	@Deprecated
 	private String[] mapVehicleAttributesFromMiD2Hbefa(String ageFuelCcm) {
 		String[] ageFuelCcmArray = ageFuelCcm.split(";");
-		String[] result = new String[3];
+		String[] technologySizeConcept = new String[3];
 	
 		int year = splitAndReduce(ageFuelCcmArray[0], ":");
 		int fuelType = splitAndReduce(ageFuelCcmArray[1], ":");
 		int cubicCap = splitAndReduce(ageFuelCcmArray[2], ":");
 
-		if (year < 1993 && fuelType == 1)
-			result[0] = "PC-P-Euro-0";
-		else if (year < 1993 && fuelType == 2)
-			result[0] = "PC-D-Euro-0";
-		else if (year < 1997 && fuelType == 1)
-			result[0] = "PC-P-Euro-1";
-		else if (year < 1997 && fuelType == 2)
-			result[0] = "PC-D-Euro-1";
-		else if (year < 2001 && fuelType == 1)
-			result[0] = "PC-P-Euro-2";
-		else if (year < 2001 && fuelType == 2)
-			result[0] = "PC-D-Euro-2";
-		else if (year < 2006 && fuelType == 1)
-			result[0] = "PC-P-Euro-3";
-		else if (year < 2006 && fuelType == 2)
-			result[0] = "PC-D-Euro-3";
-		else if (year < 2011 && fuelType == 1)
-			result[0] = "PC-P-Euro-4";
-		else if (year < 2011 && fuelType == 2)
-			result[0] = "PC-D-Euro-4";
-		else if (year < 2015 && fuelType == 1)
-			result[0] = "PC-P-Euro-5";
-		else if (year < 2015 && fuelType == 2)
-			result[0] = "PC-D-Euro-5";
-		else
-			return null;
-
 		if (fuelType == 1)
-			result[1] = "petrol (4S)";
+			technologySizeConcept[0] = "petrol (4S)";
 		else if (fuelType == 2)
-			result[1] = "diesel";
+			technologySizeConcept[0] = "diesel";
 		else
 			return null;
-	
+
 		if (cubicCap <= 1400)
-			result[2] = "<1,4L";
+			technologySizeConcept[1] = "<1,4L";
 		else if (cubicCap <= 2000 && cubicCap > 1400)
-			result[2] = "1,4-<2L";
+			technologySizeConcept[1] = "1,4-<2L";
 		else if (cubicCap > 2000 && cubicCap < 90000)
-			result[2] = ">=2L";
+			technologySizeConcept[1] = ">=2L";
+		else
+			return null;
+
+		if (year < 1993 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-0";
+		else if (year < 1993 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-0";
+		else if (year < 1997 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-1";
+		else if (year < 1997 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-1";
+		else if (year < 2001 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-2";
+		else if (year < 2001 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-2";
+		else if (year < 2006 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-3";
+		else if (year < 2006 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-3";
+		else if (year < 2011 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-4";
+		else if (year < 2011 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-4";
+		else if (year < 2015 && fuelType == 1)
+			technologySizeConcept[2] = "PC-P-Euro-5";
+		else if (year < 2015 && fuelType == 2)
+			technologySizeConcept[2] = "PC-D-Euro-5";
 		else
 			return null;
 	
-		return result;
+		return technologySizeConcept;
 	}
 
-	private String makeKey(WarmPollutant warmPollutant, int roadType, String emConcept, String technology, String sizeClass, HbefaTrafficSituation trafficSit){
-//		String trafficSituation = this.roadTypeMapping.get(roadType).getTRAFFIC_SITUATION_MAPPING().get(trafficSit);
-//		
-//		return "PC[3.1]"
-//				+ ";"
-//				+ "pass. car"
-//				+ ";"
-//				+ "2010"
-//				+ ";"
-//				+ ";"
-//				+ warmPollutant.getText()
-//				+ ";"
-//				+ ";"
-//				+ trafficSituation
-//				+ ";"
-//				+ "0%"
-//				+ ";"
-//				+ technology
-//				+ ";"
-//				+ sizeClass
-//				+ ";"
-//				+ emConcept
-//				+ ";"
-//				;
-		return null;
-	}
-
-	// is used in order to split a phrase like baujahr:1900 , we are only interested in 1900 as Integer
+	@Deprecated
 	private int splitAndReduce(String string, String splitSign) {
 		String[] array = string.split(splitSign);
 		return Integer.valueOf(array[1]);
@@ -269,63 +249,63 @@ public class WarmEmissionAnalysisModule {
 	private Map<WarmPollutant, Double> calculateAverageEmissions(Id personId, double travelTime, int roadType, double linkLength) {
 		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
-//		int hbefaRoadType = this.roadTypeMapping.get(roadType);
 		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
-		
-//		if (hbefaRoadType == 0) {
-//			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-//				avgEmissionsOfEvent.put(warmPollutant, null);
-//			}
-//		} else {
-			
-			HbefaAvgWarmEmissionFactorsKey keyFreeFlow = new HbefaAvgWarmEmissionFactorsKey();
-			HbefaAvgWarmEmissionFactorsKey keyStopAndGo = new HbefaAvgWarmEmissionFactorsKey();
-			//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
-			if(personId.toString().contains("gv_")){
-				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-			} else{
-				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			}
-			keyFreeFlow.setHbefaRoadCategory(hbefaRoadTypeName);
-			keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
-			keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
-			keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
-			
-			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
-			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-				keyFreeFlow.setHbefaComponent(warmPollutant);
-				keyStopAndGo.setHbefaComponent(warmPollutant);
-				
-				double freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
-				double stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
-				Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();				
-				
-				//TODO: is this really the "right" way of doing this?!?
-				Double generatedEmissions;
-				if (averageSpeed < stopGoSpeed) {
-					generatedEmissions = linkLength / 1000 * efFreeFlow;
-				} else {
-					Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
-					Double stopGoFraction = stopGoSpeed * stopGoTime;
-					Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
-					Double efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+		HbefaAvgWarmEmissionFactorKey keyFreeFlow = new HbefaAvgWarmEmissionFactorKey();
+		HbefaAvgWarmEmissionFactorKey keyStopAndGo = new HbefaAvgWarmEmissionFactorKey();
+		//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
+		if(personId.toString().contains("gv_")){
+			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		} else{
+			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+		}
+		keyFreeFlow.setHbefaRoadCategory(hbefaRoadTypeName);
+		keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
+		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 
-					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
-				}
-				avgEmissionsOfEvent.put(warmPollutant, generatedEmissions);
+		double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
+
+		for (WarmPollutant warmPollutant : WarmPollutant.values()) {
+			keyFreeFlow.setHbefaComponent(warmPollutant);
+			keyStopAndGo.setHbefaComponent(warmPollutant);
+
+			double freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+			double stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
+			Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();				
+
+			//TODO: is this really the "right" way of doing this?!?
+			Double generatedEmissions;
+			if (averageSpeed < stopGoSpeed) {
+				generatedEmissions = linkLength / 1000 * efFreeFlow;
+			} else {
+				Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
+				Double stopGoFraction = stopGoSpeed * stopGoTime;
+				Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
+				Double efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+
+				generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
 			}
-//		}
+			avgEmissionsOfEvent.put(warmPollutant, generatedEmissions);
+		}
 		return avgEmissionsOfEvent;
 	}
 
-	public static int getVehInfoWarnCnt() {
-		return vehInfoWarnCnt;
+	public static int getVehInfoWarnAvailCnt() {
+		return vehInfoWarnAvailCnt;
+	}
+	
+	public static int getVehInfoWarnValidCnt() {
+		return vehInfoWarnValidCnt;
 	}
 
-	public static Set<Id> getPersonIdSet() {
-		return personIdSet;
+	public static Set<Id> getVehInfoNotAvail() {
+		return vehInfoNotAvail;
+	}
+
+	public static Set<Id> getVehInfoNotValid() {
+		return vehInfoNotValid;
 	}
 }

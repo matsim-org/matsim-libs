@@ -19,61 +19,32 @@
  * *********************************************************************** */
 package playground.benjamin.emissions.types;
 
+
 /**
  * @author benjamin
  *
  */
-public class HbefaAvgColdEmissionFactors {
+public class HbefaWarmEmissionFactor {
 
-	private final String vehCat ;
-	private final String component;
-	private final String parkingTime;
-	private final String distance;
-	private final double coldEF;
-	
-	
-//	public String getVehCat() {
-//		return this.vehCat;
-//	}
-//	public void setVehCat(String vehCat) {
-//		this.vehCat = vehCat;
-//	}
-//	public String getComponent() {
-//		return this.component;
-//	}
-//	public void setComponent(String component) {
-//		this.component = component;
-//	}
-//	public String getParkingTime() {
-//		return parkingTime;
-//	}
-//	public void setParkingTime(String parkingTime) {
-//		this.parkingTime = parkingTime;
-//	}
-//	public String getDistance() {
-//		return distance;
-//	}
-//	public void setDistance(String distance) {
-//		this.distance = distance;
-//	}
-	public double getColdEF() {
-		return coldEF;
+	private double speed;
+	private double emissionFactor;
+
+	public HbefaWarmEmissionFactor(){
 	}
-//	public void setColdEF(double coldEF) {
-//		this.coldEF = coldEF;
-//	}
 
-	public HbefaAvgColdEmissionFactors(
-			String vehCat, 
-			String component,
-			String parkingTime,
-			String distance, 
-			double coldEF){
-		
-		this.vehCat = vehCat;
-		this.component = component;
-		this.parkingTime = parkingTime;
-		this.distance = distance;
-		this.coldEF = coldEF;
-		}
+	public double getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(double speed) {
+		this.speed = speed;
+	}
+	
+	public double getEmissionFactor() {
+		return this.emissionFactor;
+	}
+	
+	public void setEmissionFactor(double emissionFactor) {
+		this.emissionFactor = emissionFactor;
+	}
 }

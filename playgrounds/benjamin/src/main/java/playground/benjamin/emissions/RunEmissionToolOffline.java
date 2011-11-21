@@ -61,16 +61,15 @@ public class RunEmissionToolOffline {
 	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
-//	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypesTrafficSituations.txt";
-	static String roadTypesTrafficSituationsFile = emissionInputPath + "roadTypeMapping.txt";
+	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
 	
-//	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
 //	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
 	
-	static boolean isUsingDetailedEmissionCalculation = false;
-	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
+	static boolean isUsingDetailedEmissionCalculation = true;
+//	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
+	static String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
 	
 	// =======================================================================================================		
 	final Scenario scenario;
@@ -98,15 +97,16 @@ public class RunEmissionToolOffline {
 		
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Detailed warm emission calculation was not possible for "
-				+ WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " link leave events ("
-				+ WarmEmissionAnalysisModule.getPersonIdSet().size() + " vehicles).");
+		logger.info("Vehicle information was not available for "
+				+ WarmEmissionAnalysisModule.getVehInfoNotAvail().size() + " vehicles.");
+		logger.info("Vehicle information was not valid for "
+				+ WarmEmissionAnalysisModule.getVehInfoNotValid().size() + " vehicles.");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 
 	private void setInputFiles() {
 		VspExperimentalConfigGroup vcg = scenario.getConfig().vspExperimental() ;
-		vcg.setEmissionRoadTypeMappingFile(roadTypesTrafficSituationsFile);
+		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
 		
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaAvgWarmEmissionFactorsKey.java
+ * HbefaDetailedWarmEmissionFactorKey.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,18 +23,21 @@ package playground.benjamin.emissions.types;
  * @author benjamin
  *
  */
-public class HbefaAvgWarmEmissionFactorsKey{
+public class HbefaDetailedWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private WarmPollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
+	private String hbefaTechnology;
+	private String hbefaSizeClass;
+	private String hbefaEmConcept;
 	
-	public HbefaAvgWarmEmissionFactorsKey(){
+	public HbefaDetailedWarmEmissionFactorKey(){
 	}
 
 	public HbefaVehicleCategory getHbefaVehicleCategory() {
-		return hbefaVehicleCategory;
+		return this.hbefaVehicleCategory;
 	}
 
 	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
@@ -50,7 +53,7 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	}
 
 	public String getHbefaRoadCategory() {
-		return hbefaRoadCategory;
+		return this.hbefaRoadCategory;
 	}
 
 	public void setHbefaRoadCategory(String hbefaRoadCategory) {
@@ -58,11 +61,35 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	}
 
 	public HbefaTrafficSituation getHbefaTrafficSituation() {
-		return hbefaTrafficSituation;
+		return this.hbefaTrafficSituation;
 	}
 
 	public void setHbefaTrafficSituation(HbefaTrafficSituation hbefaTrafficSituation) {
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
+	}
+
+	public String getHbefaTechnology(){
+		return this.hbefaTechnology;
+	}
+	
+	public void setHbefaTechnology(String hbefaTechnology) {
+		this.hbefaTechnology = hbefaTechnology;		
+	}
+	
+	public String getHbefaSizeClass(){
+		return this.hbefaSizeClass;
+	}
+
+	public void setHbefaSizeClass(String hbefaSizeClass) {
+		this.hbefaSizeClass = hbefaSizeClass;
+	}
+
+	public String getHbefaEmConcept(){
+		return this.hbefaEmConcept;
+	}
+	
+	public void setHbefaEmConcept(String hbefaEmConcept) {
+		this.hbefaEmConcept = hbefaEmConcept;
 	}
 	
 	/* need to implement the "equals" method in order to be able to construct an "equal" key
@@ -72,15 +99,18 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	        if(this == obj) {
 	              return true;
 	         }
-	         if (!(obj instanceof HbefaAvgWarmEmissionFactorsKey)) {
+	         if (!(obj instanceof HbefaDetailedWarmEmissionFactorKey)) {
 	                return false; 
 	         }
-	         HbefaAvgWarmEmissionFactorsKey key = (HbefaAvgWarmEmissionFactorsKey) obj;
+	         HbefaDetailedWarmEmissionFactorKey key = (HbefaDetailedWarmEmissionFactorKey) obj;
 	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
-	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation());
-	  }
+	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
+	         && hbefaTechnology.equals(key.getHbefaTechnology())
+	         && hbefaSizeClass.equals(key.getHbefaSizeClass())
+	         && hbefaEmConcept.equals(key.getHbefaEmConcept());
+	}
 
 	// if "equals" is implemented, "hashCode also needs to be implemented
 	@Override
@@ -91,6 +121,12 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	// needed for "hashCode" method
 	@Override
 	public String toString(){
-		return hbefaVehicleCategory + "; " + hbefaComponent + "; " + hbefaRoadCategory + "; " + hbefaTrafficSituation;
+		return hbefaVehicleCategory + "; " 
+		+ hbefaComponent + "; " 
+		+ hbefaRoadCategory + "; " 
+		+ hbefaTrafficSituation + "; "
+		+ hbefaTechnology + "; "
+		+ hbefaSizeClass + "; "
+		+ hbefaEmConcept;
 	}
 }

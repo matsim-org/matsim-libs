@@ -83,8 +83,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
 		logger.info("Detailed warm emission calculation was not possible for "
-				+ WarmEmissionAnalysisModule.getVehInfoWarnCnt() + " link leave events ("
-				+ WarmEmissionAnalysisModule.getPersonIdSet().size() + " vehicles).");
+				+ WarmEmissionAnalysisModule.getVehInfoWarnValidCnt() + " link leave events ("
+				+ WarmEmissionAnalysisModule.getVehInfoNotValid().size() + " vehicles).");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 }
