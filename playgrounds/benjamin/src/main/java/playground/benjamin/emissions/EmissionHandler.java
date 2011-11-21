@@ -40,8 +40,7 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactor;
-import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorKey;
-import playground.benjamin.emissions.types.HbefaDetailedWarmEmissionFactorKey;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
@@ -67,10 +66,10 @@ public class EmissionHandler {
 	//===
 	Map<Integer, String> roadTypeMapping;
 	
-	private Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable;
 
-	private Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	//===
 	private String vehicleFile;
 
@@ -176,10 +175,10 @@ public class EmissionHandler {
 		return roadTypeMapping;
 	}
 	
-	private static Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
+	private static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
 		
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -189,7 +188,7 @@ public class EmissionHandler {
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
 				
-				HbefaAvgWarmEmissionFactorKey key = new HbefaAvgWarmEmissionFactorKey();
+				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
@@ -260,10 +259,10 @@ public class EmissionHandler {
 		return avgHbefaColdTable;
 	}
 	
-	private static Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
+	private static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
-		Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor>() ;
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>() ;
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -273,7 +272,7 @@ public class EmissionHandler {
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
 
-				HbefaDetailedWarmEmissionFactorKey key = new HbefaDetailedWarmEmissionFactorKey();
+				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));

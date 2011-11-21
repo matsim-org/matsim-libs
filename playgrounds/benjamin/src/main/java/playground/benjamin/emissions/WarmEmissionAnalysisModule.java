@@ -35,8 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.types.HbefaAvgWarmEmissionFactorKey;
-import playground.benjamin.emissions.types.HbefaDetailedWarmEmissionFactorKey;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
@@ -51,8 +50,8 @@ public class WarmEmissionAnalysisModule {
 
 	private final Map<Integer, String> roadTypeMapping;
 
-	private final Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private final Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
 	private final EventsManager eventsManager;
 	
@@ -64,8 +63,8 @@ public class WarmEmissionAnalysisModule {
 
 	public WarmEmissionAnalysisModule(
 			Map<Integer, String> roadTypeMapping,
-			Map<HbefaAvgWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-			Map<HbefaDetailedWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
+			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
+			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 			EventsManager emissionEventsManager) {
 		this.roadTypeMapping = roadTypeMapping;
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
@@ -137,8 +136,8 @@ public class WarmEmissionAnalysisModule {
 		String hbefaSizeClass = hbefaVehicleAttributes[1];
 		String hbefaEmConcept = hbefaVehicleAttributes[2];
 
-		HbefaDetailedWarmEmissionFactorKey keyFreeFlow = new HbefaDetailedWarmEmissionFactorKey();
-		HbefaDetailedWarmEmissionFactorKey keyStopAndGo = new HbefaDetailedWarmEmissionFactorKey();
+		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
+		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
 		//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
 		if(personId.toString().contains("gv_")){
 			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
@@ -251,8 +250,8 @@ public class WarmEmissionAnalysisModule {
 
 		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
 
-		HbefaAvgWarmEmissionFactorKey keyFreeFlow = new HbefaAvgWarmEmissionFactorKey();
-		HbefaAvgWarmEmissionFactorKey keyStopAndGo = new HbefaAvgWarmEmissionFactorKey();
+		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
+		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
 		//TODO: better filter for passenger cars vs. HDVs; maybe through vehicle file?
 		if(personId.toString().contains("gv_")){
 			keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);

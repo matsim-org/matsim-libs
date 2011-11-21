@@ -23,17 +23,18 @@ package playground.benjamin.emissions.types;
  * @author benjamin
  *
  */
-public class HbefaDetailedWarmEmissionFactorKey {
+public class HbefaWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private WarmPollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
-	private String hbefaTechnology;
-	private String hbefaSizeClass;
-	private String hbefaEmConcept;
+	// TODO: better idea for subgroup?
+	private String hbefaTechnology = "";
+	private String hbefaSizeClass = "";
+	private String hbefaEmConcept = "";
 	
-	public HbefaDetailedWarmEmissionFactorKey(){
+	public HbefaWarmEmissionFactorKey(){
 	}
 
 	public HbefaVehicleCategory getHbefaVehicleCategory() {
@@ -99,10 +100,10 @@ public class HbefaDetailedWarmEmissionFactorKey {
 	        if(this == obj) {
 	              return true;
 	         }
-	         if (!(obj instanceof HbefaDetailedWarmEmissionFactorKey)) {
+	         if (!(obj instanceof HbefaWarmEmissionFactorKey)) {
 	                return false; 
 	         }
-	         HbefaDetailedWarmEmissionFactorKey key = (HbefaDetailedWarmEmissionFactorKey) obj;
+	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
 	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
