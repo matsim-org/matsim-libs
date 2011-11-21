@@ -32,10 +32,6 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
@@ -85,27 +81,38 @@ public class SetEmployedFlagFromMz {
 		status.done();
 
 		int count = 0;
-		int nullValuesCount = 0;
+		int educCount = 0;
+		int emplCount = 0;
+		int nullCount = 0;
 
 		status.start( " processing data" );
 		for ( Person person : scen.getPopulation().getPersons().values() ) {
 			Boolean employed;
+			Boolean student;
 
 			try {
 				employed = data.getIsEmployed( person.getId() );
+				student = data.getIsStudent( person.getId() );
 			} catch (MzEmployementData.UnknownIdException e) {
 				throw new RuntimeException( "found unknown id after "+count+" activity chains were processed", e );
 			}
 
 			((PersonImpl) person).setEmployed( employed );
+			if (employed != null && employed) emplCount++;
+			if (student != null && student) {
+				((PersonImpl) person).createDesires( "education" ).putActivityDuration( "e" , 1234 );
+				educCount++;
+			}
 
-			if (employed == null) nullValuesCount++;
+			if ( employed == null ) nullCount++;
 			count++;
 		}
 		status.done();
 
 		log.info( count+" activity chains were processed");
-		log.info( nullValuesCount+" activity chains corresponded to unknown employement status");
+		log.info( educCount+" activity chains corresponded to student employement status");
+		log.info( emplCount+" activity chains corresponded to employed employement status");
+		log.info( nullCount+" activity chains corresponded to unknown employement status");
 
 		status.start( " outputing results" );
 		String outfileName = outFileName( plansFile );
@@ -175,9 +182,14 @@ class MzEmployementData {
 	private static final List<String> EMPLOYED_VALUES =
 			Arrays.asList( "1","2","3" );
 	private static final List<String> UNEMPLOYED_VALUES =
-			Arrays.asList( "4","5","6","7","8","9","10" );
+			Arrays.asList( "4","5","6","7","9","10" );
+	private static final List<String> EDUCATION_VALUES =
+			Arrays.asList( "8" );
+	private static final List<String> NO_ANSWER_VALUES =
+			Arrays.asList( "11" , "-97" );
 
-	private final Map<Id, Boolean> values = new HashMap<Id, Boolean>();
+	private final Map<Id, Boolean> employed = new HashMap<Id, Boolean>();
+	private final Map<Id, Boolean> student = new HashMap<Id, Boolean>();
 	private final Map<Id, Id> idToZpnr = new HashMap<Id, Id>();
 	private final StatusLogger status = new StatusLogger();
 
@@ -211,9 +223,13 @@ class MzEmployementData {
 						+length+" fields were expected.");
 			}
 			
-			values.put(
-					new IdImpl( line[ idIndex ] ),
-					employement( line[ emplIndex ] ));
+			Id  id = new IdImpl( line[ idIndex ] );
+			employed.put(
+					id,
+					employement( line[ emplIndex ].trim() ));
+			student.put(
+					id,
+					education( line[ emplIndex ].trim() ));
 
 			line = nextLine( reader );
 		}
@@ -257,16 +273,35 @@ class MzEmployementData {
 	}
 
 	private Boolean employement( final String emplValue ) {
-		Boolean value = null;
-
 		if (EMPLOYED_VALUES.contains( emplValue )) {
-			value = true;
+			return true;
 		}
-		else if (UNEMPLOYED_VALUES.contains( emplValue )) {
-			value = false;
+		else if (
+				UNEMPLOYED_VALUES.contains( emplValue ) ||
+				EDUCATION_VALUES.contains( emplValue ) ) {
+			return false;
+		}
+		else if (NO_ANSWER_VALUES.contains( emplValue )) {
+			return null;
 		}
 		
-		return value;
+		throw new IllegalArgumentException( "unknown employement status "+emplValue );
+	}
+
+	private Boolean education( final String emplValue ) {
+		if (EDUCATION_VALUES.contains( emplValue )) {
+			return true;
+		}
+		else if (
+				UNEMPLOYED_VALUES.contains( emplValue ) ||
+				EMPLOYED_VALUES.contains( emplValue ) ) {
+			return false;
+		}
+		else if (NO_ANSWER_VALUES.contains( emplValue )) {
+			return null;
+		}
+
+		throw new IllegalArgumentException( "unknown employement status "+emplValue );
 	}
 
 	private String[] nextLine(final BufferedReader reader) {
@@ -279,10 +314,18 @@ class MzEmployementData {
 		}
 	}
 
-	public Boolean getIsEmployed( final Id id ) throws UnknownIdException {
+	private Boolean getValue( final Id id , final Map<Id, Boolean> values ) throws UnknownIdException {
 		Id zp = idToZpnr.get( id );
 		if ((zp == null) || !values.containsKey( zp )) throw new UnknownIdException( "no id "+id+" in MZ" );
 		return values.get( zp );
+	}
+
+	public Boolean getIsEmployed( final Id id ) throws UnknownIdException {
+		return getValue( id, employed );
+	}
+
+	public Boolean getIsStudent( final Id id ) throws UnknownIdException {
+		return getValue( id, student );
 	}
 
 	public static class UnknownIdException extends Exception {
