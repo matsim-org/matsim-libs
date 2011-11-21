@@ -64,6 +64,7 @@ public class MicroCensus {
 			final MzGroupsModule groups,
 			final List<String> popFiles) {
 		this.groups = groups;
+		log.info( "MicroCensus initialised with groups: "+groups.getDescription() );
 
 		List<Population> populations = new ArrayList<Population>();
 		for (String popFile : popFiles) {
@@ -78,17 +79,9 @@ public class MicroCensus {
 	}
 
 	private final void create(final List<Population> pops) {
-		// Consider the weights for different years in the same way (ie do not weight
-		// years)
-		double weight_sum = 0.0;
-
 		Counter count = new Counter( "MicroCensus: import of activity chain #" );
-		for (Population pop : pops) {
-			for (Person p : pop.getPersons().values()) {
-				weight_sum += p.getSelectedPlan().getScore().doubleValue();
-			}
-		}
 
+		int corrWork = 0;
 		for (Population pop : pops) {
 			for (Person pp : pop.getPersons().values()) {
 				count.incCounter();
@@ -106,7 +99,8 @@ public class MicroCensus {
 					if (pe instanceof Activity) {
 						Activity a = (Activity) pe;
 						if (a.getType().equals(WORK) && !has_work) {
-							log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
+							//log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
+							corrWork++;
 							has_work = true;
 						}
 						if (a.getType().equals(EDUC)) {
@@ -121,6 +115,7 @@ public class MicroCensus {
 			}
 		}
 		count.printCounter();
+		log.info( corrWork+" plans with work and unemployement were found. Employement set to true." );
 	}
 
 	//////////////////////////////////////////////////////////////////////

@@ -85,6 +85,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 		}
 		person.addPlan(mz_p.getSelectedPlan());
 		person.setSelectedPlan(mz_p.getSelectedPlan());
+		person.removeUnselectedPlans();
 	}
 
 	private boolean hasWork(final Person p) {

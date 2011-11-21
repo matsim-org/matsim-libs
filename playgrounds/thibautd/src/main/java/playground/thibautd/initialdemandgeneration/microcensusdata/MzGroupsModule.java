@@ -81,12 +81,26 @@ public class MzGroupsModule extends Module {
 		else if ( name.equals( STRATIFY_BY_LICENCE ) ) {
 			stratifyByLicence = Boolean.getBoolean( value );
 		}
+		else if ( name.equals( STRATIFY_BY_WORK ) ) {
+				stratifyByWork = Boolean.getBoolean( value );
+		}
 		else if ( name.equals( STRATIFY_BY_EDUC ) ) {
 				stratifyByEduc = Boolean.getBoolean( value );
 		}
 	}
 
 	//TODO: implement the superclass getters
+	
+	// /////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////
+	public String getDescription() {
+		return "{MzGroupsModule : "+
+			"ages : "+thresholds+
+			"; strat. by gender: "+stratifyByGender+
+			"; strat. by licence: "+stratifyByLicence+
+			"; strat. by work: "+stratifyByWork+
+			"; strat. by educ: "+stratifyByEduc+"}";
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// getters
@@ -225,6 +239,11 @@ class AgeThresholds {
 		}
 
 		throw new RuntimeException( "could not find age category for age "+age );
+	}
+
+	@Override
+	public String toString() {
+		return "[ageThresholds: "+thresholds.toString()+"]";
 	}
 }
 
