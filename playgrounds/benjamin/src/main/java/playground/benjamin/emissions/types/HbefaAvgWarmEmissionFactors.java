@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.benjamin.emissions.types;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author benjamin
@@ -29,7 +27,7 @@ import java.util.Map;
 public class HbefaAvgWarmEmissionFactors {
 
 	private double speed;
-	private final Map<WarmPollutant, Double> emissionFactors = new HashMap<WarmPollutant, Double>();
+	private double emissionFactor;
 
 	public HbefaAvgWarmEmissionFactors(){
 	}
@@ -42,11 +40,11 @@ public class HbefaAvgWarmEmissionFactors {
 		this.speed = speed;
 	}
 	
-	public double getEmissionFactor(WarmPollutant warmPollutant) {
-		return this.emissionFactors.get(warmPollutant);
+	public double getEmissionFactor() {
+		return this.emissionFactor;
 	}
 	
-	public void setEmissionFactor(WarmPollutant warmPollutant, double emissionFactor) {
-		this.emissionFactors.put(warmPollutant, emissionFactor);
+	public void setEmissionFactor(double emissionFactor) {
+		this.emissionFactor = emissionFactor;
 	}
 }

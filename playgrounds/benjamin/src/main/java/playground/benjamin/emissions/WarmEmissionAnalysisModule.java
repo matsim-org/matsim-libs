@@ -270,6 +270,7 @@ public class WarmEmissionAnalysisModule {
 		Map<WarmPollutant, Double> avgEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 
 		int hbefaRoadType = this.roadTypeMapping.get(roadType).getHBEFA_RT_NR();
+		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType).getHBEFA_RT_NAME();
 		
 		if (hbefaRoadType == 0) {
 			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
@@ -287,27 +288,30 @@ public class WarmEmissionAnalysisModule {
 				keyFreeFlow.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 				keyStopAndGo.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 			}
-			keyFreeFlow.setHbefaRoadCategory(hbefaRoadType);
-			keyStopAndGo.setHbefaRoadCategory(hbefaRoadType);
+			keyFreeFlow.setHbefaRoadCategory(hbefaRoadTypeName);
+			keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
 			keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 			keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 			
-			double freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
-			double stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 			double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
 			for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-				Double generatedEmissions;
-				Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor(warmPollutant);				
+				keyFreeFlow.setHbefaComponent(warmPollutant);
+				keyStopAndGo.setHbefaComponent(warmPollutant);
+				
+				double freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+				double stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
+				Double efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();				
 				
 				//TODO: is this really the "right" way of doing this?!?
+				Double generatedEmissions;
 				if (averageSpeed < stopGoSpeed) {
 					generatedEmissions = linkLength / 1000 * efFreeFlow;
 				} else {
 					Double stopGoTime = ((linkLength / 1000) / averageSpeed) - ((linkLength / 1000) / freeFlowSpeed);
 					Double stopGoFraction = stopGoSpeed * stopGoTime;
 					Double freeFlowFraction = (linkLength / 1000) - stopGoFraction;
-					Double efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor(warmPollutant);
+					Double efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
 
 					generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
 				}

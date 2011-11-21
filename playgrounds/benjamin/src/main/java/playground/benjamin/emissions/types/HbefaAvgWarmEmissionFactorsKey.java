@@ -26,7 +26,8 @@ package playground.benjamin.emissions.types;
 public class HbefaAvgWarmEmissionFactorsKey{
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private int hbefaRoadCategory;
+	private WarmPollutant hbefaComponent;
+	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	
 	public HbefaAvgWarmEmissionFactorsKey(){
@@ -40,11 +41,19 @@ public class HbefaAvgWarmEmissionFactorsKey{
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	public int getHbefaRoadCategory() {
+	public WarmPollutant getHbefaComponent(){
+		return this.hbefaComponent;
+	}
+	
+	public void setHbefaComponent(WarmPollutant warmPollutant) {
+		this.hbefaComponent = warmPollutant;
+	}
+
+	public String getHbefaRoadCategory() {
 		return hbefaRoadCategory;
 	}
 
-	public void setHbefaRoadCategory(int hbefaRoadCategory) {
+	public void setHbefaRoadCategory(String hbefaRoadCategory) {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
@@ -68,7 +77,8 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	         }
 	         HbefaAvgWarmEmissionFactorsKey key = (HbefaAvgWarmEmissionFactorsKey) obj;
 	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
-	         && hbefaRoadCategory == key.getHbefaRoadCategory()
+	         && hbefaComponent.equals(key.getHbefaComponent())
+	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
 	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation());
 	  }
 
@@ -81,6 +91,6 @@ public class HbefaAvgWarmEmissionFactorsKey{
 	// needed for "hashCode" method
 	@Override
 	public String toString(){
-		return hbefaVehicleCategory + "; " + hbefaRoadCategory + "; " + hbefaTrafficSituation;
+		return hbefaVehicleCategory + "; " + hbefaComponent + "; " + hbefaRoadCategory + "; " + hbefaTrafficSituation;
 	}
 }

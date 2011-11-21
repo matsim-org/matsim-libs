@@ -182,6 +182,18 @@ public class EmissionHandler {
 				//optional for mapping
 				hbefaRoadTypeTrafficSituation.setVISUM_RT_NAME(inputArray[indexFromKey.get("VISUM_RT_NAME")]) ;
 				
+				String hbefaRtName = mapString2HbefaRoadCategory(inputArray[indexFromKey.get("TS_FREEFLOW")]);
+				hbefaRoadTypeTrafficSituation.setHBEFA_RT_NAME(hbefaRtName);
+				
+//				//required for mapping
+//				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
+//				String hbefaRtName = inputArray[indexFromKey.get("HBEFA_RT_NAME")];
+//				
+//				HbefaRoadTypeTrafficSituation hbefaRoadTypeTrafficSituation = new HbefaRoadTypeTrafficSituation(hbefaRtName);
+//				
+//				//optional for mapping
+//				hbefaRoadTypeTrafficSituation.setVISUM_RT_NAME(inputArray[indexFromKey.get("VISUM_RT_NAME")]) ;
+				
 				roadTypeMapping.put(visumRtNr, hbefaRoadTypeTrafficSituation);
 			}
 		} catch (FileNotFoundException e) {
@@ -210,16 +222,13 @@ public class EmissionHandler {
 				
 				HbefaAvgWarmEmissionFactorsKey key = new HbefaAvgWarmEmissionFactorsKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-				key.setHbefaRoadCategory(Integer.parseInt(array[indexFromKey.get("Road_Category")]));
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TS")]));
+				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
+				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
+				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				
 				HbefaAvgWarmEmissionFactors value = new HbefaAvgWarmEmissionFactors();
-				value.setSpeed(Double.parseDouble(array[indexFromKey.get("S (speed)")]));
-				value.setEmissionFactor(WarmPollutant.FC, Double.parseDouble(array[indexFromKey.get("mKr")]));
-				value.setEmissionFactor(WarmPollutant.NOX, Double.parseDouble(array[indexFromKey.get("EF_Nox")]));
-				value.setEmissionFactor(WarmPollutant.CO2_TOTAL, Double.parseDouble(array[indexFromKey.get("EF_CO2(total)")]));
-				value.setEmissionFactor(WarmPollutant.NO2, Double.parseDouble(array[indexFromKey.get("EF_NO2")]));
-				value.setEmissionFactor(WarmPollutant.PM, Double.parseDouble(array[indexFromKey.get("EF_PM")]));
+				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
+				value.setEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgHbefaWarmTable.put(key, value);
 			}
@@ -228,6 +237,7 @@ public class EmissionHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		logger.info("leaving createAvgHbefaWarmTable ...");
 		return avgHbefaWarmTable;
 	}
@@ -235,7 +245,7 @@ public class EmissionHandler {
 	private static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		else if(string.contains("HDV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else{
 			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
@@ -243,12 +253,31 @@ public class EmissionHandler {
 		return hbefaVehicleCategory;
 	}
 
+	private static WarmPollutant mapComponent2WarmPollutant(String string) {
+		WarmPollutant warmPollutant = null;
+		for(WarmPollutant wp : WarmPollutant.values()){
+			if(string.equals(wp.getText())) warmPollutant = wp;
+			else continue;
+		}
+		return warmPollutant;
+	}
+
+	private static String mapString2HbefaRoadCategory(String string) {
+		String hbefaRoadCategory = null;
+		
+		if(!(string.equals("0"))){
+			String[] parts = string.split("/");
+			hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
+		}
+		return hbefaRoadCategory;
+	}
+
 	private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
 		HbefaTrafficSituation hbefaTrafficSituation = null;
-		if(string.contains("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
-		else if(string.contains("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
-		else if(string.contains("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
-		else if(string.contains("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
+		if(string.endsWith("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
+		else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
+		else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
+		else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
 		else {
 			logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
