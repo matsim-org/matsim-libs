@@ -312,8 +312,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				|| this.getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
 
 			if ( this.isUsingOpportunityCostOfTimeInPtRouting() != usingOpportunityCostOfTimeInPtRoutingDefault ) {
-				log.warn( "violating VSP defaults; usingOpportunityCostOfTimeInPtRouting should be set to: " +
-						usingOpportunityCostOfTimeInPtRoutingDefault ) ;
+				log.warn( "violating VSP defaults; "+USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING + "  should be set to: " +
+						usingOpportunityCostOfTimeInPtRoutingDefault + " in module: " + GROUP_NAME) ;
 				problem = true ;
 			}
 
