@@ -207,6 +207,7 @@ class AgeThresholds {
 		if (isLocked) throw new IllegalStateException( "age thresholds are not modifiable anymore" );
 		if (isDefault) clear();
 
+		isDefault = false;
 		thresholds.add( Integer.parseInt( value ) );
 		Collections.sort( thresholds );
 	}
