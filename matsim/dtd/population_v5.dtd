@@ -39,7 +39,9 @@
 
 <!ELEMENT route          (#PCDATA)>
 <!ATTLIST route
-          type           CDATA #IMPLIED>
+          type           CDATA #IMPLIED
+          vehicleRefId           CDATA #IMPLIED
+          >
 
 <!-- ============================================================ -->
 

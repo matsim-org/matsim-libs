@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -269,6 +270,11 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startRoute(final Attributes atts) {
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(this.currleg.getMode(), null, null);
 		this.currleg.setRoute(this.currRoute);
+		
+		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
+			((NetworkRoute)this.currRoute).setVehicleId(new IdImpl(atts.getValue("vehicleRefId"))) ;
+		}
+
 	}
 
 }

@@ -231,8 +231,13 @@ import org.matsim.core.utils.misc.Time;
 	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		if (route instanceof NetworkRoute) {
-			out.write("type=\"links\">");
 			NetworkRoute nr = (NetworkRoute) route;
+			
+			if ( nr.getVehicleId()!=null ) {
+				out.write("vehicleRefId=\""+ nr.getVehicleId() +"\" ") ;
+			}
+			
+			out.write("type=\"links\">");
 			out.write(nr.getStartLinkId().toString());
 			for (Id linkId : nr.getLinkIds()) {
 				out.write(" ");

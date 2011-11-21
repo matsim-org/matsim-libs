@@ -331,6 +331,37 @@ public class PopulationReaderMatsimV5Test {
 		Assert.assertTrue(plan.getPlanElements().get(3) instanceof Activity);
 	}
 
+	@Test
+	public void testVehicleIdInRoute() {
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+		final Population population = scenario.getPopulation();
+
+		String str = "<?xml version=\"1.0\" ?>"+
+		"<!DOCTYPE population SYSTEM \"http://www.matsim.org/files/dtd/population_v5.dtd\">"+
+		"<population>"+
+		"<person id=\"1\">"+
+		"	<plan>"+
+		"		<act type=\"h\" x=\"-25000\" y=\"0\" end_time=\"06:00\" />"+
+		"		<leg mode=\"car\" >"+
+		"          <route vehicleRefId=\"123\"/>" +
+		"       </leg>" + 
+		"		<act type=\"w\" x=\"10000\" y=\"0\" end_time=\"12:00\" />"+
+		"	</plan>"+
+		"</person>"+
+		"</population>";
+		reader.parse(new ByteArrayInputStream(str.getBytes()));
+
+		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Assert.assertEquals(3, plan.getPlanElements().size());
+		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
+		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
+		Leg leg = (Leg) plan.getPlanElements().get(1) ;
+		NetworkRoute route = (NetworkRoute) leg.getRoute() ;
+		Assert.assertEquals( new IdImpl("123"), route.getVehicleId() ) ;
+		Assert.assertTrue(plan.getPlanElements().get(2) instanceof Activity);
+	}
+
 	private static class XmlParserTestHelper {
 		private final MatsimXmlParser parser;
 		private final Stack<String> context = new Stack<String>();
