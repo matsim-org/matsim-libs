@@ -78,8 +78,8 @@ public class CountsFromLinkStats {
 	public static void main(String[] args) {
 		String countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
 		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
-		, linkStatsFilename = "D:/workspace/runs-svn/run1536/output/ITERS/it.1500/1536.1500.linkstats.txt.gz"//
-		, newCountsFilename = "D:/workspace/runs-svn/run1536/output/ITERS/it.1500/1536.1500.counts.xml";
+		, linkStatsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.linkstats.txt.gz"//
+		, newCountsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.counts.xml";
 		double volScaleFactor = 50;
 		// ////////////////////////////////////////////////
 		Counts counts = new Counts();

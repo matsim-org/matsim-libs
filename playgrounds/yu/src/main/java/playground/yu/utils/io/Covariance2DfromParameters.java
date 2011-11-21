@@ -36,11 +36,10 @@ import utilities.math.Vector;
 
 /**
  * calculates var{E{...}} (variance of expectation, the 2nd part of total
- * variance), see also: {@link http
- * ://en.wikipedia.org/wiki/Law_of_total_covariance}
- *
+ * variance), see also: {@link http://en.wikipedia.org/wiki/Law_of_total_covariance}
+ * 
  * @author yu
- *
+ * 
  */
 public class Covariance2DfromParameters {
 	private class ParameterFileHandler implements TabularFileHandler {
@@ -99,9 +98,9 @@ public class Covariance2DfromParameters {
 
 		ParameterFileHandler fileHandler = new ParameterFileHandler();
 
-        new TabularFileParser().parse(parserConfig, fileHandler);
+		new TabularFileParser().parse(parserConfig, fileHandler);
 
-        iterations = fileHandler.getIterations();
+		iterations = fileHandler.getIterations();
 		travelingPts = fileHandler.getTravelingPts();
 		constantPts = fileHandler.getConstantPts();
 
@@ -135,9 +134,10 @@ public class Covariance2DfromParameters {
 		String paramFilename, outputFilename;
 		int width;
 		if (args.length != 3) {
-			paramFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/fi1kVar4cadyts4rB/pureParams.log";
-			outputFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/parameterCalibration/results/Bln2pct/newCadyts/fi1kVar4cadyts4rB/pureParams1kWindows.log.log";
-			width = 1000;
+//			paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
+			paramFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams.log";
+			outputFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
+			width = 500;
 		} else {
 			paramFilename = args[0];
 			outputFilename = args[1];
