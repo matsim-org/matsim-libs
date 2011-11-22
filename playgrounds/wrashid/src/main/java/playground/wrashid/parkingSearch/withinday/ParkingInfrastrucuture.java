@@ -30,6 +30,10 @@ public class ParkingInfrastrucuture {
 		facilityCapacities.decrement(facilityId);
 	}
 	
+	public static void unParkVehicle(Id facilityId){
+		facilityCapacities.increment(facilityId);
+	}
+	
 	public static LinkedList<Id> getParkingsOnLink(Id linkId){
 		return linkIdParkingFacilityIdsMapping.get(linkId);
 	}
