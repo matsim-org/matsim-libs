@@ -33,10 +33,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -56,18 +55,18 @@ public class QNode implements NetsimNode {
 
 	// necessary if Nodes are (de)activated
 	private NetElementActivator activator = null;
-	
+
 	// for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
 
 	/**
 	 * Indicates whether this node is signalized or not
 	 */
-  private QSimEngineImpl simEngine;
+	private QNetsimEngine simEngine;
 
-	protected QNode(final Node n, final NetsimEngine simEngine) {
+	protected QNode(final Node n, final QNetsimEngine simEngine2) {
 		this.node = n;
-		this.simEngine = (QSimEngineImpl) simEngine; // needs to be of correct impl type when it arrives here.  kai, jun'10
+		this.simEngine = (QNetsimEngine) simEngine2; // needs to be of correct impl type when it arrives here.  kai, jun'10
 		this.activator = this.simEngine;	// by default (single threaded QSim)
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new AbstractQLink[nofInLinks];
@@ -106,7 +105,7 @@ public class QNode implements NetsimNode {
 	/*package*/ void setNetElementActivator(NetElementActivator activator) {
 		this.activator = activator;
 	}
-	
+
 	protected final void activateNode() {
 		if (!this.active) {
 			this.activator.activateNode(this);
@@ -114,7 +113,7 @@ public class QNode implements NetsimNode {
 		}
 	}
 
-	 final boolean isActive() {
+	final boolean isActive() {
 		return this.active;
 	}
 
@@ -173,100 +172,100 @@ public class QNode implements NetsimNode {
 		}
 	}
 
-  protected void clearLinkBuffer(final AbstractQLink link, final double now){
-  	if (link instanceof QLinkImpl){
-      while (!link.bufferIsEmpty()) {
-        QVehicle veh = link.getFirstFromBuffer();
-        if (!moveVehicleOverNode(veh, link, now)) {
-          break;
-        }
-      }
-    }
-    else {
-      for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-      	if (lane.isThisTimeStepGreen()){
-      		while (!lane.bufferIsEmpty()) {
-      			QVehicle veh = lane.getFirstFromBuffer();
-      			if (!moveVehicleOverNode(veh, lane, now)) {
-      				break;
-      			}
-      		}
-      	}
-      }
-    }
-  }
+	protected void clearLinkBuffer(final AbstractQLink link, final double now){
+		if (link instanceof QLinkImpl){
+			while (!link.bufferIsEmpty()) {
+				QVehicle veh = link.getFirstFromBuffer();
+				if (!moveVehicleOverNode(veh, link, now)) {
+					break;
+				}
+			}
+		}
+		else {
+			for (QLane lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
+				if (lane.isThisTimeStepGreen()){
+					while (!lane.bufferIsEmpty()) {
+						QVehicle veh = lane.getFirstFromBuffer();
+						if (!moveVehicleOverNode(veh, lane, now)) {
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
 
 
 	protected void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
-    if (currentLink.getToNode() != nextLink.getFromNode()) {
-      throw new RuntimeException("Cannot move vehicle " + veh.getId() +
-          " from link " + currentLink.getId() + " to link " + nextLink.getId());
-    }
+		if (currentLink.getToNode() != nextLink.getFromNode()) {
+			throw new RuntimeException("Cannot move vehicle " + veh.getId() +
+					" from link " + currentLink.getId() + " to link " + nextLink.getId());
+		}
 	}
 
-  // ////////////////////////////////////////////////////////////////////
-  // Queue related movement code
-  // ////////////////////////////////////////////////////////////////////
-  /**
-   * @param veh
-   * @param qbufferedItem
-   * @param now
-   * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
-   * otherwise (e.g. in case where the next link is jammed)
-   */
-  protected boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane qbufferedItem, final double now) {
-    Id nextLinkId = veh.getDriver().chooseNextLinkId();
-    Link currentLink = veh.getCurrentLink();
-    if ((!qbufferedItem.hasGreenForToLink(nextLinkId))) {
-    		if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime())){
-    			return false;
-    		}
-    }
-    // veh has to move over node
-    if (nextLinkId != null) {
-      AbstractQLink nextQueueLink = this.simEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
-      Link nextLink = nextQueueLink.getLink();
-      this.checkNextLinkSemantics(currentLink, nextLink, veh);
-      if (nextQueueLink.hasSpace()) {
-        qbufferedItem.popFirstFromBuffer();
-        veh.getDriver().notifyMoveOverNode(nextLinkId);
-        nextQueueLink.addFromIntersection(veh);
-        return true;
-      }
+	// ////////////////////////////////////////////////////////////////////
+	// Queue related movement code
+	// ////////////////////////////////////////////////////////////////////
+	/**
+	 * @param veh
+	 * @param qbufferedItem
+	 * @param now
+	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
+	 * otherwise (e.g. in case where the next link is jammed)
+	 */
+	protected boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane qbufferedItem, final double now) {
+		Id nextLinkId = veh.getDriver().chooseNextLinkId();
+		Link currentLink = veh.getCurrentLink();
+		if ((!qbufferedItem.hasGreenForToLink(nextLinkId))) {
+			if (!((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime())){
+				return false;
+			}
+		}
+		// veh has to move over node
+		if (nextLinkId != null) {
+			AbstractQLink nextQueueLink = this.simEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
+			Link nextLink = nextQueueLink.getLink();
+			this.checkNextLinkSemantics(currentLink, nextLink, veh);
+			if (nextQueueLink.hasSpace()) {
+				qbufferedItem.popFirstFromBuffer();
+				veh.getDriver().notifyMoveOverNode(nextLinkId);
+				nextQueueLink.addFromIntersection(veh);
+				return true;
+			}
 
-      // check if veh is stuck!
+			// check if veh is stuck!
 
-      if ((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime()) {
-        /* We just push the vehicle further after stucktime is over, regardless
-         * of if there is space on the next link or not.. optionally we let them
-         * die here, we have a config setting for that!
-         */
-        if (this.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
-          qbufferedItem.popFirstFromBuffer();
-          this.simEngine.getMobsim().getAgentCounter().decLiving();
-          this.simEngine.getMobsim().getAgentCounter().incLost();
-          this.simEngine.getMobsim().getEventsManager().processEvent(
-              new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
-        } else {
-          qbufferedItem.popFirstFromBuffer();
-          veh.getDriver().notifyMoveOverNode(nextLinkId);
-          nextQueueLink.addFromIntersection(veh);
-          return true;
-        }
-      }
-      return false;
-    }
+			if ((now - qbufferedItem.getBufferLastMovedTime()) > this.simEngine.getStuckTime()) {
+				/* We just push the vehicle further after stucktime is over, regardless
+				 * of if there is space on the next link or not.. optionally we let them
+				 * die here, we have a config setting for that!
+				 */
+				if (this.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
+					qbufferedItem.popFirstFromBuffer();
+					this.simEngine.getMobsim().getAgentCounter().decLiving();
+					this.simEngine.getMobsim().getAgentCounter().incLost();
+					this.simEngine.getMobsim().getEventsManager().processEvent(
+							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
+				} else {
+					qbufferedItem.popFirstFromBuffer();
+					veh.getDriver().notifyMoveOverNode(nextLinkId);
+					nextQueueLink.addFromIntersection(veh);
+					return true;
+				}
+			}
+			return false;
+		}
 
-    // --> nextLink == null
-    qbufferedItem.popFirstFromBuffer();
-    this.simEngine.getMobsim().getAgentCounter().decLiving();
-    this.simEngine.getMobsim().getAgentCounter().incLost();
-    log.error(
-        "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-            + " currentLink=" + currentLink.getId().toString()
-            + ". The agent is removed from the simulation.");
-    return true;
-  }
+		// --> nextLink == null
+		qbufferedItem.popFirstFromBuffer();
+		this.simEngine.getMobsim().getAgentCounter().decLiving();
+		this.simEngine.getMobsim().getAgentCounter().incLost();
+		log.error(
+				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
+				+ " currentLink=" + currentLink.getId().toString()
+				+ ". The agent is removed from the simulation.");
+		return true;
+	}
 
 
 	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable, MatsimComparator {
@@ -275,11 +274,6 @@ public class QNode implements NetsimNode {
 		public int compare(final NetsimLink o1, final NetsimLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
-	}
-
-	@Override
-	public VisData getVisData() {
-		return null;
 	}
 
 	@Override

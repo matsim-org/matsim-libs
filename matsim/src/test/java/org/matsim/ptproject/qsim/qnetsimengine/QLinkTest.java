@@ -74,7 +74,7 @@ public class QLinkTest extends MatsimTestCase {
 	public void testAdd() {
 		Fixture f = new Fixture();
 		assertEquals(0, f.qlink1.vehOnLinkCount());
-		QVehicle v = (QVehicle) QVehicleUtils.createMobsimVehicle(f.basicVehicle);
+		QVehicle v = (QVehicle) new QVehicle(f.basicVehicle);
 
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		p.addPlan(new PlanImpl());
@@ -98,7 +98,7 @@ public class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QVehicle veh = (QVehicle) QVehicleUtils.createMobsimVehicle(f.basicVehicle);
+		QVehicle veh = (QVehicle) new QVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
 		p.addPlan(new PlanImpl());
 		veh.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
@@ -143,7 +143,7 @@ public class QLinkTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		Id id1 = new IdImpl("1");
 
-		QVehicle veh = (QVehicle) QVehicleUtils.createMobsimVehicle(f.basicVehicle);
+		QVehicle veh = (QVehicle) new QVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
 		p.addPlan(new PlanImpl());
 		veh.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
@@ -178,7 +178,7 @@ public class QLinkTest extends MatsimTestCase {
 		Id id1 = new IdImpl("1");
 
 
-		QVehicle veh = (QVehicle) QVehicleUtils.createMobsimVehicle(f.basicVehicle);
+		QVehicle veh = (QVehicle) new QVehicle(f.basicVehicle);
 		PersonImpl pers = new PersonImpl(new IdImpl(80));
 		Plan plan = new PlanImpl();
 		pers.addPlan(plan);
@@ -242,7 +242,7 @@ public class QLinkTest extends MatsimTestCase {
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(new IdImpl("1"));
 
-		QVehicle v1 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
+		QVehicle v1 = (QVehicle) new QVehicle(new VehicleImpl(new IdImpl("1"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		PlanImpl plan = p.createAndAddPlan(true);
 		try {
@@ -260,7 +260,7 @@ public class QLinkTest extends MatsimTestCase {
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 
-		QVehicle v2 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
+		QVehicle v2 = (QVehicle) new QVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		PersonDriverAgentImpl pa2 = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
@@ -308,11 +308,11 @@ public class QLinkTest extends MatsimTestCase {
 		p.addPlan(new PlanImpl());
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle veh1 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(new IdImpl(1), vehType));
+		QVehicle veh1 = (QVehicle) new QVehicle(new VehicleImpl(new IdImpl(1), vehType));
 		veh1.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
-		QVehicle veh25 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
+		QVehicle veh25 = (QVehicle) new QVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
 		veh25.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, null));
-		QVehicle veh5 = (QVehicle) QVehicleUtils.createMobsimVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
+		QVehicle veh5 = (QVehicle) new QVehicle(new VehicleImpl(new IdImpl(3), vehType), (double) 5);
 		veh5.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, null));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);

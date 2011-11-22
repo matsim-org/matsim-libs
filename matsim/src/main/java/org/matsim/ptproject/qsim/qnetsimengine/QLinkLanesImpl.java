@@ -37,12 +37,10 @@ import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -142,7 +140,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	private VisData visdata = this.new VisDataImpl();
 
-	private QSimEngineImpl qsimEngine = null;
+	private QNetsimEngine qsimEngine = null;
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
@@ -158,11 +156,11 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	QLinkLanesImpl(final Link link2, NetsimEngine engine,
+	QLinkLanesImpl(final Link link2, QNetsimEngine engine,
 			final QNode toNode, Map<Id, Lane> laneMap) {
 		super(link2) ;
 		this.toQueueNode = toNode;
-		this.qsimEngine = (QSimEngineImpl) engine;
+		this.qsimEngine = (QNetsimEngine) engine;
 		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
 		// But it would still be better to do it correctly.  kai, aug'10
 
@@ -470,7 +468,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	QSimEngineImpl getQSimEngine(){
+	QNetsimEngine getQSimEngine(){
 		return this.qsimEngine;
 	}
 
@@ -480,9 +478,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	void setQSimEngine(NetsimEngine qsimEngine) {
+	void setQSimEngine(QSimEngineInternalI qsimEngine) {
 		// yyyy does it make sense to have this setter?  Seems that this should be immutable after construction. kai, aug'10
-		this.qsimEngine = (QSimEngineImpl) qsimEngine;
+		this.qsimEngine = (QNetsimEngine) qsimEngine;
 		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
 		// But it would still be better to do it correctly.  kai, aug'10
 

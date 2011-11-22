@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.events.ActivityEndEventImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;

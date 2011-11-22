@@ -26,7 +26,6 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 
 
 public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
@@ -40,7 +39,7 @@ public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, Abstrac
 	}
 
 	@Override
-	public AbstractQLink createNetsimLink(Link link, NetsimEngine engine,
+	public AbstractQLink createNetsimLink(Link link, QNetsimEngine engine,
 			QNode queueNode) {
 		AbstractQLink ql = null;
 		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
@@ -53,7 +52,7 @@ public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, Abstrac
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node, NetsimEngine simEngine) {
+	public QNode createNetsimNode(Node node, QNetsimEngine simEngine) {
 		return this.delegate.createNetsimNode(node, simEngine);
 	}
 

@@ -32,7 +32,6 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
@@ -40,7 +39,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
-	private boolean useNodeArray = QSimEngineImpl.useNodeArray;
+	private boolean useNodeArray = QNetsimEngine.useNodeArray;
 
 	private volatile boolean simulationRunning = true;
 
@@ -96,14 +95,8 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		time = t;
 	}
 
-	@Override
 	public void afterSim() {
 		this.simulationRunning = false;
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		// nothing to do here
 	}
 
 	@Override
@@ -234,11 +227,6 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	}
 
 	@Override
-	public void onPrepareSim() {
-		// currently nothing to do
-	}
-
-	@Override
 	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() {
 		return this.positionInfoBuilder;
 	}
@@ -248,14 +236,8 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
 
-	@Override
 	public NetsimNetworkFactory<QNode,AbstractQLink> getNetsimNetworkFactory() {
 		return new DefaultQNetworkFactory() ;
-	}
-
-	@Override
-	public DepartureHandler getDepartureHandler() {
-		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
 
 }

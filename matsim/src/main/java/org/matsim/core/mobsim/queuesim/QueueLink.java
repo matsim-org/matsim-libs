@@ -40,8 +40,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -64,7 +62,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * time has come. They are then filled into the vehQueue, depending on free
 	 * space in the vehQueue
 	 */
-	/* package */final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
+	/* package */final Queue<QueueVehicle> waitingList = new LinkedList<QueueVehicle>();
 	/**
 	 * The Link instance containing the data
 	 */
@@ -80,7 +78,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	private boolean active = false;
 
-	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(
+	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(
 			10);
 
 	/* package */VisData visdata = this.new VisDataImpl();
@@ -100,12 +98,12 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
+	private final LinkedList<QueueVehicle> vehQueue = new LinkedList<QueueVehicle>();
 
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
+	private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
 	private double storageCapacity;
 
@@ -175,12 +173,12 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	/**
 	 * Adds a vehicle to the link, called by
-	 * {@link QueueNode#moveVehicleOverNode(QVehicle, QueueLink, double)}.
+	 * {@link QueueNode#moveVehicleOverNode(QueueVehicle, QueueLink, double)}.
 	 *
 	 * @param veh
 	 *            the vehicle
 	 */
-	/* package */void addFromIntersection(final QVehicle veh) {
+	/* package */void addFromIntersection(final QueueVehicle veh) {
 
 //		double now = SimulationTimer.getTimeOfDayStatic();
 		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay();
@@ -199,7 +197,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * @param now
 	 *            the current time
 	 */
-	/* package */void add(final QVehicle veh, final double now) {
+	/* package */void add(final QueueVehicle veh, final double now) {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		double departureTime;
@@ -226,7 +224,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 //		double now = SimulationTimer.getTimeOfDayStatic();
 		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		for (QVehicle veh : this.waitingList) {
+		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
@@ -242,7 +240,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		this.waitingList.clear();
 
-		for (QVehicle veh : this.vehQueue) {
+		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
@@ -258,7 +256,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		this.vehQueue.clear();
 
-		for (QVehicle veh : this.buffer) {
+		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
@@ -274,23 +272,21 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		this.buffer.clear();
 	}
 
-	/* package */void addParkedVehicle(MobsimVehicle mvehicle) {
-		QVehicle vehicle = (QVehicle) mvehicle ; // when it gets here, it has to be a QVehicle.  kai, nov'11
+	/* package */void addParkedVehicle(QueueVehicle vehicle) {
 		this.parkedVehicles.put(vehicle.getId(), vehicle);
 		vehicle.setCurrentLink(this.link);
 	}
 
-	/* package */QVehicle getParkedVehicle(Id vehicleId) {
+	/* package */QueueVehicle getParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
-	/* package */QVehicle removeParkedVehicle(Id vehicleId) {
+	/* package */QueueVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
-	/* package */void addDepartingVehicle(MobsimVehicle mvehicle) {
-		QVehicle vehicle = (QVehicle) mvehicle ; // cast ok: needs to have runtime type of QVehicle when it gets here.  kai, nov'11
-		this.waitingList.add(vehicle);
+	/* package */void addDepartingVehicle(QueueVehicle queueVehicle) {
+		this.waitingList.add(queueVehicle);
 		this.activateLink();
 	}
 
@@ -336,7 +332,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 *            The current time.
 	 */
 	protected void moveLaneToBuffer(final double now) {
-		QVehicle veh;
+		QueueVehicle veh;
 
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
@@ -377,7 +373,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 */
 	private void moveWaitToBuffer(final double now) {
 		while (hasBufferSpace()) {
-			QVehicle veh = this.waitingList.poll();
+			QueueVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return;
 			}
@@ -388,8 +384,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 	}
 
-	/* package */void processVehicleArrival(final double now, final MobsimVehicle mveh) {
-		QVehicle veh = (QVehicle) mveh ; // cast ok: needs to have runtime type of QVehicle when this is called. kai, nov'11
+	/* package */void processVehicleArrival(final double now, final QueueVehicle mveh) {
+		QueueVehicle veh = (QueueVehicle) mveh ; // cast ok: needs to have runtime type of QueueVehicle when this is called. kai, nov'11
 		// QueueSimulation.getEvents().processEvent(
 		// new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
 		// this.getLink(), veh.getDriver().getCurrentLeg()));
@@ -479,20 +475,20 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		}
 	}
 
-	/* package */QVehicle getVehicle(Id vehicleId) { // needed in tests
-		QVehicle ret = getParkedVehicle(vehicleId);
+	/* package */QueueVehicle getVehicle(Id vehicleId) { // needed in tests
+		QueueVehicle ret = getParkedVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
-		for (QVehicle veh : this.vehQueue) {
+		for (QueueVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
-		for (QVehicle veh : this.buffer) {
+		for (QueueVehicle veh : this.buffer) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
-		for (QVehicle veh : this.waitingList) {
+		for (QueueVehicle veh : this.waitingList) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
@@ -624,7 +620,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0) || (this.buffercap_accumulate >= 1.0)));
 	}
 
-	private void addToBuffer(final QVehicle veh, final double now) {
+	private void addToBuffer(final QueueVehicle veh, final double now) {
 		if (this.bufferCap >= 1.0) {
 			this.bufferCap--;
 		} else if (this.buffercap_accumulate >= 1.0) {
@@ -640,12 +636,12 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		this.getToQueueNode().activateNode();
 	}
 
-	/* package */QVehicle popFirstFromBuffer() {
+	/* package */QueueVehicle popFirstFromBuffer() {
 
 //		double now = SimulationTimer.getTimeOfDayStatic();
 		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		QVehicle veh = this.buffer.poll();
+		QueueVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle
 										// in the buffer that is now the new
 										// front-most
@@ -656,7 +652,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		return veh;
 	}
 
-	QVehicle getFirstFromBuffer() {
+	QueueVehicle getFirstFromBuffer() {
 		return this.buffer.peek();
 	}
 
@@ -714,7 +710,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				double freespeed = QueueLink.this.getLink().getFreespeed();
 
 				// the cars in the buffer
-				for (QVehicle veh : QueueLink.this.buffer) {
+				for (QueueVehicle veh : QueueLink.this.buffer) {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime()
 							+ QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
@@ -729,7 +725,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				}
 
 				// the cars in the drivingQueue
-				for (QVehicle veh : QueueLink.this.vehQueue) {
+				for (QueueVehicle veh : QueueLink.this.vehQueue) {
 					int lane = 1 + (veh.getId().hashCode() % nLanes);
 					int cmp = (int) (veh.getEarliestLinkExitTime()
 							+ QueueLink.this.inverseSimulatedFlowCapacity + 2.0);
@@ -819,7 +815,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		private double positionVehiclesFromBuffer(
 				final Collection<AgentSnapshotInfo> positions, double now,
 				double queueEnd, Link link, double vehLen) {
-			for (QVehicle veh : QueueLink.this.buffer) {
+			for (QueueVehicle veh : QueueLink.this.buffer) {
 
 				int lane = 1 + (veh.getId().hashCode() % NetworkUtils
 						.getNumberOfLanesAsInt(Time.UNDEFINED_TIME,
@@ -852,7 +848,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				double queueEnd, Link link, double vehLen) {
 			double lastDistance = Integer.MAX_VALUE;
 			double ttfs = link.getLength() / link.getFreespeed(now);
-			for (QVehicle veh : QueueLink.this.vehQueue) {
+			for (QueueVehicle veh : QueueLink.this.vehQueue) {
 				double travelTime = now - veh.getLinkEnterTime();
 				double distanceOnLink = (ttfs == 0.0 ? 0.0
 						: ((travelTime / ttfs) * link.getLength()));
@@ -906,7 +902,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				double cellSize) {
 			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME,
 					link) + 1; // place them next to the link
-			for (QVehicle veh : QueueLink.this.waitingList) {
+			for (QueueVehicle veh : QueueLink.this.waitingList) {
 				AgentSnapshotInfo position = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(1.0, veh.getDriver().getId(), 
 						QueueLink.this
 						.getLink(), /* positionOnLink */cellSize, lane);

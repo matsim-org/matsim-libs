@@ -46,7 +46,7 @@ import org.matsim.ptproject.qsim.QSim;
  * The ParallelQSimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
  * The QSimEngineThreads will fulfill the QSimEngine interface downwards (i.e. against nodes and links).
  */
-class ParallelQSimEngine extends QSimEngineImpl {
+class ParallelQSimEngine extends QNetsimEngine {
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 	// yy Until this is realized, the Random object is added as customizable objecte to the QNode. cdober, nov'10
 	

@@ -24,17 +24,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -43,9 +49,9 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavi
  * @author dgrether
  * @author dstrippgen
  */
-public class QSimEngineImpl extends QSimEngineInternalI {
+public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	
-	private static final Logger log = Logger.getLogger(QSimEngineImpl.class);
+	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 	
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
@@ -82,6 +88,8 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	/** This is the collection of nodes that have to be activated in the current time step */
 	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
 	
+	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
+	
 	private final Random random;
 	private final QSim qsim;
 
@@ -90,7 +98,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler ;
 
-	public QSimEngineImpl(final QSim sim, final Random random) {
+	public QNetsimEngine(final QSim sim, final Random random) {
 		this.random = random;
 		this.qsim = sim;
 		
@@ -109,7 +117,7 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		} else {
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
-		dpHandler = new CarDepartureHandler(this.qsim, vehicleBehavior);
+		dpHandler = new CarDepartureHandler(this, vehicleBehavior);
 		
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
@@ -120,6 +128,13 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
+	}
+	
+	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
+		QVehicle veh = new QVehicle(vehicle);
+		vehicles.put(veh.getId(), veh);
+		NetsimLink qlink = qNetwork.getNetsimLink(linkId);
+		qlink.addParkedVehicle(veh);
 	}
 	
 	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
@@ -167,8 +182,6 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		}
 	}
 
-
-	@Override
 	public void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -184,7 +197,6 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
-	@Override
 	public void doSimStep(final double time) {
 		moveNodes(time);
 		moveLinks(time);
@@ -301,14 +313,16 @@ public class QSimEngineImpl extends QSimEngineInternalI {
 		return this.stucktimeCache ;
 	}
 
-	@Override
 	public NetsimNetworkFactory<QNode, AbstractQLink> getNetsimNetworkFactory() {
 		return new DefaultQNetworkFactory() ;
 	}
 
-	@Override
 	public DepartureHandler getDepartureHandler() {
 		return dpHandler;
 	}
 
+	public final Map<Id, QVehicle> getVehicles() {
+		return Collections.unmodifiableMap(this.vehicles);
+	}
+	
 }

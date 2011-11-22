@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.interfaces;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 
 
 /**
@@ -29,9 +30,9 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> extends MatsimFactory {
 
-	public QN createNetsimNode(Node node, NetsimEngine simEngine);
+	public QN createNetsimNode(Node node, QNetsimEngine simEngine);
 
-	public QL createNetsimLink(Link link, NetsimEngine simEngine, QN queueNode);
+	public QL createNetsimLink(Link link, QNetsimEngine simEngine, QN queueNode);
 	
 	public NetsimNetwork createNetsimNetwork( Netsim mobsim ) ;
 

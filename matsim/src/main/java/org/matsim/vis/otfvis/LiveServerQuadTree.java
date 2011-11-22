@@ -31,7 +31,6 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
-import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * @author dgrether
@@ -56,10 +55,6 @@ class LiveServerQuadTree extends OTFServerQuadTree {
 	}
 
 	private void createFactoriesAndFillQuadTree(OTFConnectionManager connect) {
-		Collection<Class<OTFWriterFactory<VisNode>>> nodeFactories = connect.getNodeWriters();
-		List<OTFWriterFactory<VisNode>> nodeWriterFractoryObjects = instanciateFactories(nodeFactories);
-		installNodeWriterFactories(nodeWriterFractoryObjects);
-
 		Collection<Class<OTFWriterFactory<VisLink>>> linkFactories = connect.getLinkWriters();
 		List<OTFWriterFactory<VisLink>> linkWriterFactoryObjects = instanciateFactories(linkFactories);
 		installLinkWriterFactories(linkWriterFactoryObjects);
@@ -95,26 +90,6 @@ class LiveServerQuadTree extends OTFServerQuadTree {
 					writer.setSrc(link);
 				}
 				this.put(middleEast, middleNorth, writer);
-			}
-		}
-	}
-
-	private void installNodeWriterFactories(
-			List<OTFWriterFactory<VisNode>> nodeWriterFractoryObjects) {
-		boolean first = true;
-		for (VisNode node : this.net.getVisNodes().values()) {
-			for (OTFWriterFactory<VisNode> fac : nodeWriterFractoryObjects) {
-				OTFDataWriter<VisNode> writer = fac.getWriter();
-				if (writer != null) {
-					writer.setSrc(node);
-					if (first) {
-						log.info("Connecting Source QNode with "
-								+ writer.getClass().getName());
-						first = false;
-					}
-				}
-				Point2D.Double coord = transform(node.getNode().getCoord());
-				this.put(coord.getX(), coord.getY(), writer);
 			}
 		}
 	}

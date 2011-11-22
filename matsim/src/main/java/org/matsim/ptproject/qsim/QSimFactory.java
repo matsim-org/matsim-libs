@@ -54,9 +54,6 @@ public class QSimFactory implements MobsimFactory {
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
 			ParallelQSimulation sim = new ParallelQSimulation(sc, em);
-
-//			ParallelQSimulation sim = new ParallelQSimulation(sc, eventsManager);
-			
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 			return sim;
 		} else {

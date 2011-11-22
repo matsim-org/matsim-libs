@@ -53,7 +53,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -173,12 +172,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	 QLinkImpl(final Link link2, NetsimEngine engine, final QNode toNode) {
+	 QLinkImpl(final Link link2, QNetsimEngine simEngine, final QNode toNode) {
 		 super(link2) ;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
-		this.qsimEngine = (QSimEngineImpl) engine;
+		this.qsimEngine = (QNetsimEngine) simEngine;
 
 		this.calculateCapacities();
 
@@ -780,8 +779,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	void setQSimEngine(NetsimEngine qsimEngine) { // yyyy this methods feels a bit non-sensical.  kai, oct'10
-		this.qsimEngine = (QSimEngineInternalI) qsimEngine;
+	void setQSimEngine(QSimEngineInternalI qsimEngine) { // yyyy this methods feels a bit non-sensical.  kai, oct'10
+		this.qsimEngine = qsimEngine;
 	}
 
 	@Override

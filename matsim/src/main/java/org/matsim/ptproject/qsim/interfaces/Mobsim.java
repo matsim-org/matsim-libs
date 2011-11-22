@@ -25,6 +25,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 
@@ -116,7 +117,7 @@ public interface Mobsim extends ObservableSimulation {
 
 	void setAgentFactory(AgentFactory agentFactory);
 
-	MobsimTimerI getSimTimer();
+	MobsimTimer getSimTimer();
 
 	Collection<MobsimAgent> getActivityEndsList() ;
 	

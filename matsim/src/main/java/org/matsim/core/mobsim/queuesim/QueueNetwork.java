@@ -31,11 +31,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
-import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
@@ -45,7 +43,8 @@ import org.matsim.vis.snapshotwriters.VisNode;
  * @author dgrether
  */
  class QueueNetwork implements VisNetwork, MatsimNetworkObject {
-	private Netsim qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
+	 
+	private QueueSimulation qSim = null ; // QueueNetwork can exist without qSim, so this is not enforced.
 
 	private final Map<Id, QueueLink> queuelinks;
 
@@ -59,11 +58,11 @@ import org.matsim.vis.snapshotwriters.VisNode;
 	 * @param networkLayer2
 	 * @param qSim2 -- may be null, in particular for tests
 	 */
-	/*package*/ QueueNetwork(final Network networkLayer2, Netsim qSim2) {
+	/*package*/ QueueNetwork(final Network networkLayer2, QueueSimulation qSim2) {
 		this(networkLayer2, new DefaultQueueNetworkFactory(), qSim2);
 	}
 
-	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, Netsim qSim2) {
+	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, QueueSimulation qSim2) {
 		this.networkLayer = networkLayer;
 		this.queueNetworkFactory = factory;
 		this.qSim = qSim2 ;
@@ -116,11 +115,6 @@ import org.matsim.vis.snapshotwriters.VisNode;
 		return Collections.unmodifiableMap( this.queuelinks ) ;
 	}
 
-	@Override
-	public Map<Id,? extends VisNode> getVisNodes() {
-		return Collections.unmodifiableMap( this.queuenodes);
-	}
-
 	/*package*/ QueueLink getQueueLink(final Id id) {
 		return this.queuelinks.get(id);
 	}
@@ -129,7 +123,7 @@ import org.matsim.vis.snapshotwriters.VisNode;
 		return this.queuenodes.get(id);
 	}
 
-	public Netsim getMobsim() {
+	public QueueSimulation getMobsim() {
 		return qSim;
 	}
 }

@@ -17,18 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.ptproject.qsim.interfaces;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 import java.util.Random;
 
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
 /**
  * @author dgrether
  *
  */
-public interface NetsimEngineFactory extends MatsimFactory {
+public interface QNetsimEngineFactory extends MatsimFactory {
 	
-	public NetsimEngine createQSimEngine(final Netsim sim, final Random random);
+	public QNetsimEngine createQSimEngine(final Netsim sim, final Random random);
 }

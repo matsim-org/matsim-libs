@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimNetworkObject;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
@@ -52,7 +53,7 @@ public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
 	public NetsimNode getNetsimNode(final Id id) ;
 
 
-	void initialize(NetsimEngine netEngine);
+	void initialize(QNetsimEngine netEngine);
 	// yyyy not sure if this should/needs to be exposed.  kai, aug'10
 
 }

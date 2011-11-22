@@ -35,15 +35,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -61,15 +60,10 @@ import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
-import org.matsim.ptproject.qsim.helpers.MobsimTimer;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
-import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngineFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
@@ -78,11 +72,10 @@ import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicleUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisMobsim;
@@ -112,13 +105,13 @@ public class QSim implements VisMobsim, Netsim {
 
 	private final EventsManager events;
 
-	private final NetsimEngine netEngine;
+	private final QNetsimEngine netEngine;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
 	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
 
-	private MobsimTimerI simTimer;
+	private MobsimTimer simTimer;
 
 	private Collection<MobsimAgent> transitAgents;
 
@@ -149,10 +142,9 @@ public class QSim implements VisMobsim, Netsim {
 	private TransitQSimEngine transitEngine;
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
-	private final Map<Id, MobsimVehicle> vehicles = new HashMap<Id, MobsimVehicle>();
-    private List<AgentSource> agentSources = new ArrayList<AgentSource>();
+	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
 
-    // everything above this line is private and should remain private. pls
+	// everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
 	// ============================================================================================================================
 	// initialization:
@@ -162,7 +154,7 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	protected QSim(final Scenario sc, final EventsManager events,
-			final NetsimEngineFactory netsimEngFactory) {
+			final QNetsimEngineFactory netsimEngFactory) {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
@@ -172,8 +164,7 @@ public class QSim implements VisMobsim, Netsim {
 				.getTimeStepSize());
 
 		// create the NetworkEngine ...
-		this.netEngine = netsimEngFactory.createQSimEngine(this,
-				MatsimRandom.getRandom());
+		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
 
 		// create the QNetwork ...
@@ -190,9 +181,7 @@ public class QSim implements VisMobsim, Netsim {
 			// yyyyyy the above is now a hack; replace by non-static factory
 			// method. kai, feb'11
 		} else {
-			// network = DefaultQNetworkFactory.staticCreateQNetwork(this);
-			network = this.netEngine.getNetsimNetworkFactory()
-					.createNetsimNetwork(this);
+			network = this.netEngine.getNetsimNetworkFactory().createNetsimNetwork(this);
 		}
 		// overall, one could wonder why this is not done inside the
 		// NetsimEngine. kai, feb'11
@@ -216,7 +205,7 @@ public class QSim implements VisMobsim, Netsim {
 
 			// create MultiModalSimEngine
 			multiModalEngine = new MultiModalSimEngineFactory()
-					.createMultiModalSimEngine(this);
+			.createMultiModalSimEngine(this);
 
 			// add MultiModalDepartureHandler
 			this.addDepartureHandler(new MultiModalDepartureHandler(this,
@@ -228,7 +217,7 @@ public class QSim implements VisMobsim, Netsim {
 		// difficult to do as long
 		// as the transitEngine changes the AgentFactory. kai, feb'11
 
-        this.addAgentSource(new PopulationAgentSource(sc.getPopulation(), new DefaultAgentFactory(this)));
+		this.addAgentSource(new PopulationAgentSource(sc.getPopulation(), new DefaultAgentFactory(this), this));
 
 		// configuring transit (this changes the agent factory as a side
 		// effect).
@@ -283,7 +272,7 @@ public class QSim implements VisMobsim, Netsim {
 		if (!locked ) {
 			if ( this.agentSources.size() == 1) {
 				this.agentSources.clear();
-				this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac));
+				this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac, this));
 			} else {
 				throw new RuntimeException("there is more than one AgentSource; cannot override the " +
 						"agent factory since the code " +
@@ -319,7 +308,6 @@ public class QSim implements VisMobsim, Netsim {
 		}
 
 		createAgents();
-		createDefaultVehiclesForMobsimAgents();
 		createTransitDrivers();
 		createAdditionalAgents();
 
@@ -331,8 +319,8 @@ public class QSim implements VisMobsim, Netsim {
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime()
 				/ INFO_PERIOD)
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
-								// to print out the info at the very first
-								// timestep already
+		// to print out the info at the very first
+		// timestep already
 		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime()
 				/ this.snapshotPeriod)
 				* this.snapshotPeriod;
@@ -353,83 +341,29 @@ public class QSim implements VisMobsim, Netsim {
 		// Empty for inheritance. (only one test)
 	}
 
-	private static int noPlannedVehicleCnt = 0 ;
-	private void createDefaultVehiclesForMobsimAgents() {
-		VehicleType defaultVehicleType = VehicleUtils.getFactory().createVehicleType(new IdImpl("defaultVehicleType"));
-		for (MobsimAgent agent : agents) {
-			if (agent instanceof MobsimDriverAgent) {
-				DriverAgent drAgent = (DriverAgent) agent ;
-				if ( drAgent.getPlannedVehicleId()==null ) {
-					// not sure if it is fully specified how this happens.  Not having a vehicle in the route 
-					// presumably is one option.  But having a vehicle in the route may not change this since the
-					// parser will not parse it (imo).  kai, nov'11
-					if ( noPlannedVehicleCnt < 10 ) {
-						noPlannedVehicleCnt++ ;
-						log.warn("plannedVehicleId==null in agent with id: " + agent.getId() + ".  At this point, I cannot check" +
-								" if this is intended, or if the information was somewhere but did not get here.  \nMake sure" +
-								" that you get what you want. kai, nov'11 ") ;
-						if (noPlannedVehicleCnt==10) {
-							log.warn(Gbl.FUTURE_SUPPRESSED) ;
-						}
-					}
-					
-					MobsimVehicle veh = createAndAddDefaultVehicle( drAgent, defaultVehicleType);
-					parkVehicleOnInitialLink( veh, agent.getCurrentLinkId());
-				}
+	private void createAgents() {
+		for (AgentSource agentSource : agentSources) {
+			List<MobsimAgent> theseAgents = agentSource.insertAgentsIntoMobsim();
+			for (MobsimAgent agent : theseAgents) {
+				agents.add(agent);
 			}
 		}
 	}
 
-	private static int vehWrnCnt = 0;
-
-	private void createAgents() {
-        for (AgentSource agentSource : agentSources) {
-            agents.addAll(agentSource.insertAgentsIntoMobsim());
-        }
+	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
+		netEngine.createAndParkVehicleOnLink(vehicle, linkId);
 	}
 
 	private void createTransitDrivers() {
 		if (this.transitEngine != null) {
-			Collection<MobsimAgent> a = this.transitEngine
-					.createAdditionalAgents();
+			Collection<MobsimAgent> a = this.transitEngine.createAdditionalAgents();
 			this.transitAgents = a;
 			agents.addAll(a);
 		}
 	}
 
-	/**
-	 * Design thoughts:<ul>
-	 * <li> This method may become public so that plug-ins can insert vehicles.  kai, nov'11
-	 * </ul>
-	 */
-	private void parkVehicleOnInitialLink( MobsimVehicle veh, Id linkId ) {
-		NetsimLink qlink = this.netEngine.getNetsimNetwork().getNetsimLink(linkId);
-		qlink.addParkedVehicle(veh);
-	}
 
-	private MobsimVehicle createAndAddDefaultVehicle(DriverAgent agent,
-			VehicleType defaultVehicleType) {
-		MobsimVehicle veh = null;
-		if (vehWrnCnt < 1) {
-			log.warn("QSim generates default vehicles; not sure what that does to vehicle files; needs to be checked.  kai, nov'10");
-			log.warn(Gbl.ONLYONCE);
-			vehWrnCnt++;
-		}
-		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), defaultVehicleType);
-		veh = QVehicleUtils.createMobsimVehicle(vehicle);
 
-//		((QVehicle)veh).setDriver(agent);
-		// yyyyyy This was, when it was written, needed for OTFVis to show parked vehicles.  Physically, it does not make sense;
-		// driver and vehicle should be connected when the driver _enters_ the vehicle (i.e. at departure).  Can't say if, in 
-		// the meantime, it was started to also use this for something else.  kai, nov'11
-		
-		agent.setVehicle(veh);
-		// yyyyyy Physically, it does not make sense;
-		// driver and vehicle should be connected when the driver _enters_ the vehicle (i.e. at departure).  kai, nov'11
-
-		vehicles.put(veh.getId(), veh);
-		return veh ;
-	}
 
 	// ============================================================================================================================
 	// "cleanupSim":
@@ -494,7 +428,7 @@ public class QSim implements VisMobsim, Netsim {
 	 * @return true if the simulation needs to continue
 	 */
 	protected final boolean doSimStep(final double time) { // do not overwrite
-															// in inheritance.
+		// in inheritance.
 		// (network) change events engine:
 		if (this.changeEventsEngine != null) {
 			this.changeEventsEngine.doSimStep(time);
@@ -522,7 +456,7 @@ public class QSim implements VisMobsim, Netsim {
 
 		// console printout:
 		this.printSimLog(time);
-		
+
 		// snapshots:
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
@@ -569,7 +503,7 @@ public class QSim implements VisMobsim, Netsim {
 
 		// remove agent from queue
 		this.activityEndsList.remove(agent);
-		
+
 		// The intention in the following is that an agent that is no longer alive has an activity end time of infinity.  The number of
 		// alive agents is only modified when an activity end time is changed between a finite time and infinite.  kai, jun'11
 		/*
@@ -626,15 +560,15 @@ public class QSim implements VisMobsim, Netsim {
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		// called by TransitEngine
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
-															// this needed? Does
-															// the driver get
-															// registered?
-		// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-		// Id linkId = leg.getRoute().getStartLinkId();
+			// this needed? Does
+			// the driver get
+			// registered?
+			// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
+			// Id linkId = leg.getRoute().getStartLinkId();
 			Id linkId = planAgent.getCurrentLinkId(); // yyyyyy it is not fully
-														// clear that this is
-														// always set correctly.
-														// kai, jun'11
+			// clear that this is
+			// always set correctly.
+			// kai, jun'11
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
 			qLink.registerAdditionalAgentOnLink(planAgent);
@@ -662,9 +596,9 @@ public class QSim implements VisMobsim, Netsim {
 			final MobsimAgent planAgent) {
 		// called by TransitDriver
 		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
-															// this needed?
-		// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-		// Id linkId = leg.getRoute().getStartLinkId();
+			// this needed?
+			// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
+			// Id linkId = leg.getRoute().getStartLinkId();
 			Id linkId = planAgent.getCurrentLinkId();
 			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
 					linkId);
@@ -704,16 +638,16 @@ public class QSim implements VisMobsim, Netsim {
 
 		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
 		// for a hike, or driving a bus).  kai, nov'11
-//		if ( linkId.equals(agent.getDestinationLinkId())) {
-//			// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
-//			// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
-//			// consistently implemented.  One could also decide to not have these departure/arrival events here
-//			// (we would still have actEnd/actStart events).  kai, nov'11
-//			events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
-//			agent.endLegAndAssumeControl(now) ;
-//			return ;
-//		}
-		
+		//		if ( linkId.equals(agent.getDestinationLinkId())) {
+		//			// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
+		//			// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
+		//			// consistently implemented.  One could also decide to not have these departure/arrival events here
+		//			// (we would still have actEnd/actStart events).  kai, nov'11
+		//			events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
+		//			agent.endLegAndAssumeControl(now) ;
+		//			return ;
+		//		}
+
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
 		} else {
@@ -848,11 +782,7 @@ public class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public final NetsimNetwork getNetsimNetwork() {
-		if (this.netEngine != null) {
-			return this.netEngine.getNetsimNetwork();
-		} else {
-			return null;
-		}
+		return this.netEngine.getNetsimNetwork();
 	}
 
 	@Override
@@ -870,11 +800,12 @@ public class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public final MobsimTimerI getSimTimer() {
+	public final MobsimTimer getSimTimer() {
 		return this.simTimer;
 	}
 
-	public final NetsimEngine getNetsimEngine() {
+	// Just for one test. Not happy. michaz 11/11
+	public final MobsimEngine getNetsimEngine() {
 		return this.netEngine;
 	}
 
@@ -913,31 +844,22 @@ public class QSim implements VisMobsim, Netsim {
 		return transitEngine;
 	}
 
-	// different agent sublists:
-
 	@Override
 	public final Collection<MobsimAgent> getAgents() {
 		return Collections.unmodifiableCollection(this.agents);
-		// changed this to unmodifiable in oct'10. kai
 	}
 
 	@Override
 	public final Collection<MobsimAgent> getActivityEndsList() {
 		return Collections.unmodifiableCollection(activityEndsList);
-		// changed this to unmodifiable in oct'10. kai
 	}
 
 	public final Collection<MobsimAgent> getTransitAgents() {
 		return Collections.unmodifiableCollection(this.transitAgents);
-		// changed this to unmodifiable in oct'10. kai
 	}
 
-	public final Map<Id, MobsimVehicle> getVehicles() {
-		return Collections.unmodifiableMap(this.vehicles);
+	public final void addAgentSource(AgentSource agentSource) {
+		agentSources.add(agentSource);
 	}
-
-    public final void addAgentSource(AgentSource agentSource) {
-        agentSources.add(agentSource);
-    }
 
 }

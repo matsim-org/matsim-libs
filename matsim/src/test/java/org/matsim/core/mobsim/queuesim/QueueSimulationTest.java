@@ -72,7 +72,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
@@ -669,8 +668,8 @@ public class QueueSimulationTest extends TestCase {
 		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
 
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QVehicle vehicle1 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(id1, defaultVehicleType));
-		QVehicle vehicle2 = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(id2, defaultVehicleType));
+		QueueVehicle vehicle1 = new QueueVehicle(new VehicleImpl(id1, defaultVehicleType));
+		QueueVehicle vehicle2 = new QueueVehicle(new VehicleImpl(id2, defaultVehicleType));
 		qlink2.addParkedVehicle(vehicle1);
 		qlink2.addParkedVehicle(vehicle2);
 

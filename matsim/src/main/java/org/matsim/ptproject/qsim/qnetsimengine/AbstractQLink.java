@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 
 /**
@@ -49,7 +48,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		this.link = link ;
 	}
 
-	abstract void setQSimEngine(NetsimEngine qsimEngine);
+	abstract void setQSimEngine(QSimEngineInternalI qsimEngine);
 
 	abstract boolean moveLink(double now);
 

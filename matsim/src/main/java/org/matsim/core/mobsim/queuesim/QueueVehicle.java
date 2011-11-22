@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.qnetsimengine;
+package org.matsim.core.mobsim.queuesim;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  */
 
-public class QVehicle extends QItem implements MobsimVehicle {
+class QueueVehicle implements MobsimVehicle {
 
 	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
@@ -50,11 +50,11 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	private double sizeInEquivalents;
 	private Vehicle basicVehicle;
 	
-	public QVehicle(final Vehicle basicVehicle) {
+	public QueueVehicle(final Vehicle basicVehicle) {
 		this(basicVehicle, 1.0);
 	}
 
-	public QVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
+	public QueueVehicle(final Vehicle basicVehicle, final double sizeInEquivalents) {
 		this.id = basicVehicle.getId();
 		this.sizeInEquivalents = sizeInEquivalents;
 		this.basicVehicle = basicVehicle;
@@ -92,12 +92,10 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		this.linkEnterTime = time;
 	}
 
-	@Override
 	public double getEarliestLinkExitTime() {
 		return this.earliestLinkExitTime;
 	}
 
-	@Override
 	public void setEarliestLinkExitTime(final double time) {
 		this.earliestLinkExitTime = time;
 	}

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: matsim
- * QVehicleUtils.java
+ * project: org.matsim.*
+ * QSimTimer
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.framework;
 
-package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.vehicles.Vehicle;
 
 /**
- * @author nagel
- *
+ * @author dgrether
  */
-public class QVehicleUtils {
+public class MobsimTimer {
+	private double simStartTime = 24*3600; // initialized to 24h so as that the time can be successively
+	           // set down when an agent starts earlier until the earliest point of time an agent starts
+	private double time = 0.0;
+	private double stepSize = 1.0;
 
-	/**
-	 * Mobsim factory that returns vehicles of type QVehicle.  Cannot fully hide the implementation since it is needed
-	 * both by QSim and by QueueSimulation. kai, nov'11
-	 * <p/>
-	 * Design thoughts:<ul>
-	 * <li> Should return MobsimVehicle instead of QVehicle.  kai, nov'11
-	 * </ul>
-	 */
-	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle, double sizeInEquivalents) {
-		return new QVehicle(basicVehicle, sizeInEquivalents);
+	public MobsimTimer(){
+		this(1.0);
 	}
 
-	/**
-	 * Mobsim factory that returns vehicles of type QVehicle.  Cannot fully hide the implementation since it is needed
-	 * both by QSim and by QueueSimulation. kai, nov'11
-	 * <p/>
-	 * Design thoughts:<ul>
-	 * <li> See above.
-	 * </ul>
-	 */
-	public static MobsimVehicle createMobsimVehicle(Vehicle basicVehicle) {
-		return new QVehicle(basicVehicle);
+
+	public MobsimTimer(final double stepSize){
+		this.simStartTime = 24*3600;
+		this.time = 0;
+		this.stepSize = stepSize;
+	}
+
+	public final double getSimStartTime() {
+		return this.simStartTime;
+	}
+	
+	public double getTimeOfDay() {
+		return this.time;
+	}
+
+	public double incrementTime(){
+		this.time += stepSize;
+		return this.time;
+	}
+
+	public final double getSimTimestepSize() {
+		return this.stepSize;
+	}
+
+	public void setSimStartTime(double startTimeSec) {
+		this.simStartTime = startTimeSec;
+	}
+
+	public void setTime(double timeSec) {
+		this.time = timeSec;
 	}
 
 }

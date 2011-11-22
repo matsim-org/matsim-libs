@@ -20,11 +20,15 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.core.basic.v01.IdImpl;
+
 /**
  * @author nagel
  *
  */
 public class VehicleUtils {
+
+	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(new IdImpl("defaultVehicleType"));
 
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();
@@ -32,6 +36,10 @@ public class VehicleUtils {
 
 	public static Vehicles createVehiclesContainer() {
 		return new VehiclesImpl();
+	}
+
+	public static VehicleType getDefaultVehicleType() {
+		return DEFAULT_VEHICLE_TYPE;
 	}
 
 }

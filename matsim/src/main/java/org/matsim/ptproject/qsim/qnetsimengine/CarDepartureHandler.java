@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
@@ -39,17 +38,14 @@ class CarDepartureHandler implements DepartureHandler {
 	
 	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
 
-	private final QSim queueSimulation;
-
 	private int cntTeleportVehicle = 0;
 
 	private VehicleBehavior vehicleBehavior;
+
+	private QNetsimEngine qNetsimEngine;
 	
-	CarDepartureHandler(QSim queueSimulation, VehicleBehavior vehicleBehavior) {
-		// yyyy I don't understand why we need to explicitly instantiate this in the qsim; seems to me that this should come for 
-		// free from the netsim engine (i.e. the engines should provide their departure handlers).  kai, aug'10
-		// seems to be resolved now.  kai, feb'11
-		this.queueSimulation = queueSimulation;
+	CarDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
+		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 	}
 
@@ -73,11 +69,11 @@ class CarDepartureHandler implements DepartureHandler {
 		if (vehicleId == null) {
 			vehicleId = agent.getId(); // backwards-compatibility
 		}
-		AbstractQLink qlink = (AbstractQLink) queueSimulation.getNetsimNetwork().getNetsimLink(linkId);
+		AbstractQLink qlink = (AbstractQLink) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT && agent instanceof PersonDriverAgentImpl) {
-				vehicle = findVehicle(vehicleId);
+				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				teleportVehicleTo(vehicle, linkId);
 				qlink.letAgentDepartWithVehicle(agent, vehicle, now);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
@@ -110,13 +106,9 @@ class CarDepartureHandler implements DepartureHandler {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			AbstractQLink qlinkOld = (AbstractQLink) queueSimulation.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			AbstractQLink qlinkOld = (AbstractQLink) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
 			qlinkOld.removeParkedVehicle(vehicle.getId());
 		}
-	}
-
-	private QVehicle findVehicle(Id vehicleId) {
-		return (QVehicle) queueSimulation.getVehicles().get(vehicleId); // cast ok: needs to be QVehicle when it gets here.  kai, nov'11
 	}
 
 }

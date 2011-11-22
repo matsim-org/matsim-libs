@@ -34,15 +34,11 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
-import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * Represents a node in the QueueSimulation.
  */
-class QueueNode implements VisNode, MatsimNetworkObject {
+class QueueNode implements MatsimNetworkObject {
 
 	private static final Logger log = Logger.getLogger(QueueNode.class);
 
@@ -84,8 +80,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 		Arrays.sort(this.inLinksArrayCache, QueueNode.qlinkIdComparator);
 	}
 
-	@Override
-	public Node getNode() { // accessed from elsewhere
+	public Node getNode() { 
 		return this.node;
 	}
 
@@ -99,7 +94,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	protected boolean moveVehicleOverNode(final QVehicle veh, final QueueLink link, final double now) {
+	protected boolean moveVehicleOverNode(final QueueVehicle veh, final QueueLink link, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = link.getLink();
 
@@ -121,7 +116,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 			}
 
 			// check if veh is stuck!
-			Netsim qSim = this.queueNetwork.getMobsim() ;
+			QueueSimulation qSim = this.queueNetwork.getMobsim() ;
 			Scenario sc = qSim.getScenario() ;
 			Config config = sc.getConfig() ;
 
@@ -223,7 +218,7 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 
 	private void clearLaneBuffer(final QueueLink link, final double now){
 		while (!link.bufferIsEmpty()) {
-			QVehicle veh = link.getFirstFromBuffer();
+			QueueVehicle veh = link.getFirstFromBuffer();
 			if (!moveVehicleOverNode(veh, link, now)) {
 				break;
 			}
@@ -236,11 +231,6 @@ class QueueNode implements VisNode, MatsimNetworkObject {
 		public int compare(final QueueLink o1, final QueueLink o2) {
 			return o1.getLink().getId().compareTo(o2.getLink().getId());
 		}
-	}
-
-	@Override
-	public VisData getVisData() {
-		return null;
 	}
 
 }

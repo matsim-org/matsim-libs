@@ -46,6 +46,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
@@ -57,11 +58,8 @@ import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
-import org.matsim.ptproject.qsim.interfaces.MobsimTimerI;
-import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -132,7 +130,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 	//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
-	private MobsimTimerI simTimer ;
+	private MobsimTimer simTimer ;
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -163,7 +161,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		this.agentCounter.reset();
 
 		//		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
-		simTimer = StaticFactoriesContainer.createSimulationTimer(this.config.simulation().getTimeStepSize()) ;
+		simTimer = new MobsimTimer(this.config.simulation().getTimeStepSize()) ;
 
 		setEvents(events);
 		this.population = scenario.getPopulation();
@@ -226,9 +224,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		for (Person p : this.population.getPersons().values()) {
 			MobsimDriverAgent agent = this.agentFactory.createPersonAgent(p);
 			agents.add( agent ) ;
-			MobsimVehicle veh = StaticFactoriesContainer.createQueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
-			//not needed in new agent class
-//			veh.setDriver(agent); // this line is currently only needed for OTFVis to show parked vehicles
+			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			agent.setVehicle(veh);
 			QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
 			qlink.addParkedVehicle(veh);
@@ -482,11 +478,11 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 				vehicleId = driverAgent.getId(); // backwards-compatibility
 			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
-			QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
+			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {
 				// try to fix it somehow
 				if (this.teleportVehicles) {
-					vehicle = (QVehicle) driverAgent.getVehicle();
+					vehicle = (QueueVehicle) driverAgent.getVehicle();
 					if (vehicle.getCurrentLink() != null) {
 						if (this.cntTeleportVehicle < 9) {
 							this.cntTeleportVehicle++;
@@ -598,7 +594,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 
 	@Override
-	public MobsimTimerI getSimTimer() {
+	public MobsimTimer getSimTimer() {
 		return this.simTimer ;
 	}
 

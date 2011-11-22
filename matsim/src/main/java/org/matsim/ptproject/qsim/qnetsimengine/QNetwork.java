@@ -29,13 +29,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 import org.matsim.ptproject.qsim.interfaces.NetsimNode;
-import org.matsim.ptproject.qsim.interfaces.NetsimEngine;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
-import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  *
@@ -43,7 +41,8 @@ import org.matsim.vis.snapshotwriters.VisNode;
  * @author mrieser
  * @author dgrether
  */
-@Deprecated // please try to use the interfaces outside the package.  This will also make your code portable.  kai, oct'10
+
+// please try to use the interfaces outside the package.  This will also make your code portable.  kai, oct'10
 public final class QNetwork implements VisNetwork, NetsimNetwork {
 
 	private final Map<Id, AbstractQLink> links;
@@ -55,7 +54,7 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 	private final NetsimNetworkFactory<QNode, AbstractQLink> queueNetworkFactory;
 
 //	private QSim qSim;
-	private QSimEngineImpl qSimEngine;
+	private QNetsimEngine qSimEngine;
 
 	/**
 	 * This is deliberately package-private.  Please use the factory
@@ -77,8 +76,8 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 
 
 	@Override
-	public void initialize(NetsimEngine simEngine) {
-		this.qSimEngine = (QSimEngineImpl) simEngine;
+	public void initialize(QNetsimEngine simEngine) {
+		this.qSimEngine = simEngine;
 		this.qSimEngine.setQNetwork(this);
 		for (Node n : networkLayer.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n, simEngine));
@@ -108,11 +107,6 @@ public final class QNetwork implements VisNetwork, NetsimNetwork {
 
 	@Override
 	public Map<Id, QNode> getNetsimNodes() {
-		return Collections.unmodifiableMap(this.nodes);
-	}
-
-	@Override
-	public Map<Id, ? extends VisNode> getVisNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 

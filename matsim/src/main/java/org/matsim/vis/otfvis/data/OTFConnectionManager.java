@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisNode;
 
 /**
  * The OTFConnectionManager is the most important class when building an OTFVis instance.
@@ -109,11 +108,6 @@ public class OTFConnectionManager implements Serializable {
 	}
 
 	private final List<Entry> connections = new LinkedList<Entry>();
-
-	public void connectNodeToWriter(Class<? extends OTFDataWriter<? extends VisNode>> writer) {
-		Entry entry = new Entry(VisNode.class, writer);
-		connections.add(entry);
-	}
 
 	public void connectLinkToWriter(Class<? extends OTFDataWriter<? extends VisLink>> writer) {
 		Entry entry = new Entry(VisLink.class, writer);
@@ -205,15 +199,6 @@ public class OTFConnectionManager implements Serializable {
 		for (Entry e : this.connections){
 			log.info("writing entry: " + e.getFrom().getCanonicalName() + " to " + e.getTo().getName());
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public Collection<Class<OTFWriterFactory<VisNode>>> getNodeWriters() {
-		Collection<Class<OTFWriterFactory<VisNode>>> result = new ArrayList<Class<OTFWriterFactory<VisNode>>>();
-		for (Class<?> clazz : getToEntries(VisNode.class)) {
-			result.add((Class<OTFWriterFactory<VisNode>>) clazz);
-		}
-		return result;
 	}
 
 	@SuppressWarnings("unchecked")
