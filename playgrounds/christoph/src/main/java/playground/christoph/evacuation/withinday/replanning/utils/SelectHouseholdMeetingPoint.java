@@ -33,14 +33,10 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.events.HouseholdEnterMeetingPointEventImpl;
 import playground.christoph.evacuation.events.HouseholdLeaveMeetingPointEventImpl;
 import playground.christoph.evacuation.events.HouseholdSetMeetingPointEventImpl;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
@@ -58,18 +54,15 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
 	private final HouseholdsUtils householdsUtils;
-	private final Geometry affectedArea;
+	private final CoordAnalyzer coordAnalyzer;
 	
-	private final GeometryFactory factory;
 	private double time = Time.UNDEFINED_TIME;
 	
-	public SelectHouseholdMeetingPoint(Scenario scenario, EventsManager eventsManager, HouseholdsUtils householdsUtils, Geometry affectedArea) {
+	public SelectHouseholdMeetingPoint(Scenario scenario, EventsManager eventsManager, HouseholdsUtils householdsUtils, CoordAnalyzer coordAnalyzer) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.householdsUtils = householdsUtils;
-		this.affectedArea = affectedArea;
-		
-		this.factory = new GeometryFactory();
+		this.coordAnalyzer = coordAnalyzer;
 	}
 	
 	public void setHomeFacilitySecurity(HouseholdInfo householdInfo) {
@@ -133,8 +126,7 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
 		if (facility == null) return false;
 		else {
-			Point point = factory.createPoint(new Coordinate(facility.getCoord().getX(), facility.getCoord().getY()));
-			return !affectedArea.contains(point);
+			return !coordAnalyzer.isCoordAffected(facility.getCoord());
 		}
 	}
 	
@@ -144,8 +136,7 @@ public class SelectHouseholdMeetingPoint implements SimulationInitializedListene
 	 */
 	public boolean isCoordinateSecure(Coord coord) {
 		
-		Point point = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		return !affectedArea.contains(point);
+		return !coordAnalyzer.isCoordAffected(coord);
 	}
 
 	/*

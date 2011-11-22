@@ -115,10 +115,6 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 				HouseholdInfo householdInfo = householdUtils.getHouseholdInfoMap().get(householdId);
 				selectHouseholdMeetingPoint.selectRescueMeetingPoint(householdId);
 				
-				if (householdId.toString().equals("4273642") || householdId.toString().equals("2843220")) {
-					log.info("blubb..." + householdInfo.allMembersAtMeetingPoint());
-				}
-				
 				Map<Id, String> transportModes = getTransportModes(householdInfo, facilityId);			
 				Id firstPersonWithCarId = null;
 				for (Entry<Id, String> entry : transportModes.entrySet()) {

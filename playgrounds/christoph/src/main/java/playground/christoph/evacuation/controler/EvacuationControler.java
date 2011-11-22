@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -32,11 +32,10 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -64,9 +63,13 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
+import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -77,7 +80,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtil
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
-public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, SimulationBeforeSimStepListener, 
+public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
 	StartupListener, AfterMobsimListener {
 
 	protected boolean adaptOriginalPlans = false;
@@ -85,15 +88,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
 	protected double maxCarAvailableDistance = 250.0;
 	
-	/*
-	 * Define the Probability that an Agent uses the
-	 * Replanning Strategy. It is possible to assign
-	 * multiple Strategies to the Agents.
-	 */
-//	protected double pInitialReplanning = 0.0;
-//	protected double pDuringActivityReplanning = 1.0;
-//	protected double pDuringLegReplanning = 1.0;
-
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
@@ -129,7 +123,16 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerEventsCreator passengerEventsCreator;
-//	protected SelectHandledAgentsByProbability selector;
+	protected CoordAnalyzer coordAnalyzer;
+	protected Geometry affectedArea;
+
+	/*
+	 * Analysis modules
+	 */
+	protected boolean analyzeEvacuation = false;
+	protected EvacuationTimePicture evacuationTimePicture;
+	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
+	
 	protected WithinDayQSim sim;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
@@ -148,13 +151,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 
 		// Use a Scoring Function, that only scores the travel times!
 		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
-
-//		already set in Multi Modal Controler
-//		/*
-//		 * Use a TravelTimeCalculator that buffers the TravelTimes form the
-//		 * previous Iteration.
-//		 */
-//		setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
 	}
 
 	/*
@@ -164,6 +160,18 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+		/*
+		 * If a SimStepParallelEventsManagerImpl is used, we ensure that it it
+		 * processed as very first SimulationListener. Doing so ensures that all
+		 * events of a time step have been processed before the other
+		 * SimulationAfterSimStepListeners are informed. 
+		 */
+		if (this.getEvents() instanceof SimStepParallelEventsManagerImpl) {
+			this.getQueueSimulationListener().remove(this.getEvents());
+			this.getFixedOrderSimulationListener().addSimulationListener((SimStepParallelEventsManagerImpl) this.getEvents());
+		}
+		
 		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), getNetwork());
 
 		// Add Rescue Links to Network
@@ -194,14 +202,43 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		for (String file : this.evacuationAreaSHPFiles) {
 			features.addAll(util.readFile(file));		
 		}
-		Geometry evacuationArea = util.mergeGeomgetries(features);
+		affectedArea = util.mergeGeomgetries(features);
 		
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, evacuationArea);
+		this.coordAnalyzer = new CoordAnalyzer(affectedArea);
+		
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.passengerEventsCreator = new PassengerEventsCreator(this.events);
 		this.getEvents().addHandler(passengerEventsCreator);
-		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);
+		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);		
+		
+		/*
+		 * Create the set of analyzed modes.
+		 */
+		Set<String> transportModes = new HashSet<String>();
+		transportModes.add(TransportMode.bike);
+		transportModes.add(TransportMode.car);
+		transportModes.add(TransportMode.pt);
+		transportModes.add(TransportMode.ride);
+		transportModes.add(TransportMode.walk);
+		transportModes.add(PassengerEventsCreator.passengerTransportMode);
+		
+		if (analyzeEvacuation) {
+			/*
+			 * Create and add an AgentsInEvacuationAreaCounter.
+			 */
+			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
+			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer, scaleFactor);
+			this.addControlerListener(agentsInEvacuationAreaCounter);
+			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
+			this.events.addHandler(agentsInEvacuationAreaCounter);
+			
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, transportModes, coordAnalyzer);
+			this.addControlerListener(evacuationTimePicture);
+			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
+			this.events.addHandler(evacuationTimePicture);			
+		}
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
@@ -233,20 +270,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		((QSim)e.getQueueSimulation()).addDepartureHandler(passengerEventsCreator);
 	}
-	
-	@Override
-	public void notifySimulationBeforeSimStep(SimulationBeforeSimStepEvent e) {
 		
-//		// do replanning only in the time-step where the Evacuation has started.
-//		if (e.getSimulationTime() == EvacuationConfig.evacuationTime) {
-//			this.getReplanningManager().doDuringActivityReplanning(true);
-//			this.getReplanningManager().doDuringLegReplanning(true);
-//		} else {
-//			this.getReplanningManager().doDuringActivityReplanning(false);
-//			this.getReplanningManager().doDuringLegReplanning(false);
-//		}
-	}
-	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		householdsUtils.printStatistics();
@@ -283,9 +307,11 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// without social costs
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCollector());
 
-//		MultiModalPlansCalcRoute router = new MultiModalPlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.charyparNagelScoring())));
+		// use fuzzyTravelTimes
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, this.getTravelTimeCollector(), factory, routeFactory);
+		FuzzyTravelTimeEstimator fuzzyTravelTime = new FuzzyTravelTimeEstimator(this.getTravelTimeCollector(), this.scenarioData);
+		this.getEvents().addHandler(fuzzyTravelTime);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, fuzzyTravelTime, factory, routeFactory);
 		
 		/*
 		 * Intial Replanners
@@ -355,9 +381,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected void setUp() {
 
 		super.setUp();
-
-//		selector = new SelectHandledAgentsByProbability();
-//		this.getFixedOrderSimulationListener().addSimulationListener(selector);
 	}
 
 	/*
