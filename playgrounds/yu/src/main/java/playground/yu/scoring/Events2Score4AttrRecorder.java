@@ -49,6 +49,9 @@ import org.matsim.core.utils.collections.Tuple;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
+ * records the attributes value according to ths scoring function parameters as
+ * custom attributes of {@code Plan}s
+ * 
  * @author yu
  * 
  */
@@ -102,113 +105,6 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 		this.sfFactory = sfFactory;
 	}
 
-	// the local agentScorers has to be used
-	@Override
-	public Double getAgentScore(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
-		if (data == null) {
-			return null;
-		}
-		return data.getSecond().getScore();
-	}
-
-	// the local agentScorers has to be used
-	protected Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(
-			final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
-		if (data == null) {
-			Person person = pop.getPersons().get(agentId);
-			if (person == null) {
-				return null;
-			}
-			data = new Tuple<Plan, ScoringFunction>(
-					person.getSelectedPlan(),
-					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
-			agentScorers.put(agentId, data);
-		}
-		return data;
-	}
-
-	@Override
-	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
-		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(agentId);
-		if (data == null) {
-			return null;
-		}
-		return data.getSecond();
-	}
-
-	public void setSfFactory(ScoringFunctionFactory sfFactory) {
-		this.sfFactory = sfFactory;
-	}
-
-	// the local agentScorers has to be used
-	@Override
-	public void reset(final int iteration) {
-		agentScorers.clear();
-		agentPlanElementIndex.clear();
-		super.reset(iteration);
-		this.iteration = iteration;
-	}
-
-	@Override
-	public void handleEvent(final ActivityStartEvent event) {
-		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
-				.getPersonId());
-		if (data != null) {
-			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) data.getSecond()).startActivity(
-					event.getTime(), (Activity) data.getFirst()
-							.getPlanElements().get(index));
-		}
-	}
-
-	@Override
-	public void handleEvent(final ActivityEndEvent event) {
-		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event
-				.getPersonId());
-		if (planAndScoringFunction != null) {
-			int index = getAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) planAndScoringFunction.getSecond())
-					.endActivity(event.getTime(),
-							(Activity) planAndScoringFunction.getFirst()
-									.getPlanElements().get(index));
-		}
-	}
-
-	protected int getAgentPlanElementIndex(Id personId) {
-		Integer index = agentPlanElementIndex.get(personId);
-		if (index == null) {
-			agentPlanElementIndex.put(personId, Integer.valueOf(0));
-			return 0;
-		}
-		return index.intValue();
-	}
-
-	protected int increaseAgentPlanElementIndex(final Id personId) {
-		Integer index = agentPlanElementIndex.get(personId);
-		if (index == null) {
-			agentPlanElementIndex.put(personId, Integer.valueOf(1));
-			return 1;
-		}
-		agentPlanElementIndex.put(personId,
-				Integer.valueOf(1 + index.intValue()));
-		return 1 + index.intValue();
-	}
-
-	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
-		super.handleEvent(event);
-		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
-				.getPersonId());
-		if (data != null) {
-			int index = increaseAgentPlanElementIndex(event.getPersonId());
-			((ScoringFunctionAdapter) data.getSecond()).startLeg(
-					event.getTime(), (Leg) data.getFirst().getPlanElements()
-							.get(index));
-		}
-	}
-
 	@Override
 	public void finish() {
 		for (Tuple<Plan, ScoringFunction> plansScorFunction : agentScorers
@@ -221,8 +117,8 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 			sf.finish();
 			double score = sf.getScore();
 			// **********************codes from {@code EventsToScore}
-			//save attributes as custom attritubes.
-			//#########################################
+			// save attributes as custom attritubes.
+			// #########################################
 			ScoringFunctionAccumulatorWithAttrRecorder sfa = (ScoringFunctionAccumulatorWithAttrRecorder) sf;
 
 			// legTravTimeCar
@@ -269,6 +165,113 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 		}
 	}
 
+	protected int getAgentPlanElementIndex(Id personId) {
+		Integer index = agentPlanElementIndex.get(personId);
+		if (index == null) {
+			agentPlanElementIndex.put(personId, Integer.valueOf(0));
+			return 0;
+		}
+		return index.intValue();
+	}
+
+	// the local agentScorers has to be used
+	@Override
+	public Double getAgentScore(final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
+		if (data == null) {
+			return null;
+		}
+		return data.getSecond().getScore();
+	}
+
+	// the local agentScorers has to be used
+	protected Tuple<Plan, ScoringFunction> getPlanAndScoringFunctionForAgent(
+			final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = agentScorers.get(agentId);
+		if (data == null) {
+			Person person = pop.getPersons().get(agentId);
+			if (person == null) {
+				return null;
+			}
+			data = new Tuple<Plan, ScoringFunction>(
+					person.getSelectedPlan(),
+					sfFactory.createNewScoringFunction(person.getSelectedPlan()));
+			agentScorers.put(agentId, data);
+		}
+		return data;
+	}
+
+	@Override
+	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(agentId);
+		if (data == null) {
+			return null;
+		}
+		return data.getSecond();
+	}
+
+	@Override
+	public void handleEvent(final ActivityEndEvent event) {
+		Tuple<Plan, ScoringFunction> planAndScoringFunction = getPlanAndScoringFunctionForAgent(event
+				.getPersonId());
+		if (planAndScoringFunction != null) {
+			int index = getAgentPlanElementIndex(event.getPersonId());
+			((ScoringFunctionAdapter) planAndScoringFunction.getSecond())
+			.endActivity(event.getTime(),
+					(Activity) planAndScoringFunction.getFirst()
+					.getPlanElements().get(index));
+		}
+	}
+
+	@Override
+	public void handleEvent(final ActivityStartEvent event) {
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
+				.getPersonId());
+		if (data != null) {
+			int index = increaseAgentPlanElementIndex(event.getPersonId());
+			((ScoringFunctionAdapter) data.getSecond()).startActivity(
+					event.getTime(), (Activity) data.getFirst()
+					.getPlanElements().get(index));
+		}
+	}
+
+	@Override
+	public void handleEvent(final AgentDepartureEvent event) {
+		super.handleEvent(event);
+		Tuple<Plan, ScoringFunction> data = getPlanAndScoringFunctionForAgent(event
+				.getPersonId());
+		if (data != null) {
+			int index = increaseAgentPlanElementIndex(event.getPersonId());
+			((ScoringFunctionAdapter) data.getSecond()).startLeg(
+					event.getTime(), (Leg) data.getFirst().getPlanElements()
+					.get(index));
+		}
+	}
+
+	protected int increaseAgentPlanElementIndex(final Id personId) {
+		Integer index = agentPlanElementIndex.get(personId);
+		if (index == null) {
+			agentPlanElementIndex.put(personId, Integer.valueOf(1));
+			return 1;
+		}
+		agentPlanElementIndex.put(personId,
+				Integer.valueOf(1 + index.intValue()));
+		return 1 + index.intValue();
+	}
+
+	// the local agentScorers has to be used
+	@Override
+	public void reset(final int iteration) {
+		agentScorers.clear();
+		agentPlanElementIndex.clear();
+		super.reset(iteration);
+		this.iteration = iteration;
+	}
+
+	public void setSfFactory(ScoringFunctionFactory sfFactory) {
+		this.sfFactory = sfFactory;
+	}
+
 	/**
 	 * strongly suggests, please use this method for some simulation iterations
 	 * WITHOUT plan innovation
@@ -279,14 +282,14 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 		SimpleWriter writer = new SimpleWriter(outputAttrsFilename);
 		// write filehead
 		writer.write("PersonId\tPlanIdx");
-		for (String attrName : this.attrNameList) {
+		for (String attrName : attrNameList) {
 			writer.write("\t" + attrName);
 		}
 		writer.writeln("\tASC");
 		writer.flush();
 
 		// write table
-		for (Person person : this.pop.getPersons().values()) {
+		for (Person person : pop.getPersons().values()) {
 			String perId = person.getId().toString();
 			List<? extends Plan> plans = person.getPlans();
 
@@ -295,7 +298,7 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 				StringBuffer sb = new StringBuffer(perId + "\t" + planIdx);
 				Map<String, Object> attrs = plan.getCustomAttributes();
 
-				for (String attrName : this.attrNameList) {
+				for (String attrName : attrNameList) {
 					sb.append("\t");
 					Object o = attrs.get(attrName);
 					sb.append(o != null ? o : 0);

@@ -32,8 +32,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
-
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
  * especially in order to put new parameters to CharyparNagelScoringConfigGroup
@@ -41,33 +39,36 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
  * @author yu
  * 
  */
-public class PlansScoring4AttrRecorder implements StartupListener, ScoringListener,
-		IterationStartsListener {
-	private final static Logger log = Logger.getLogger(PlansScoring4AttrRecorder.class);
-	protected Events2Score4PC planScorer;
+public class PlansScoring4AttrRecorder implements StartupListener,
+ScoringListener, IterationStartsListener {
+	private final static Logger log = Logger
+	.getLogger(PlansScoring4AttrRecorder.class);
+	protected Events2Score4AttrRecorder planScorer;
+
+	public Events2Score4AttrRecorder getPlanScorer() {
+		return planScorer;
+	}
+
+	@Override
+	public void notifyIterationStarts(final IterationStartsEvent event) {
+		planScorer.reset(event.getIteration());
+	}
+
+	@Override
+	public void notifyScoring(final ScoringEvent event) {
+		planScorer.finish();
+	}
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		Controler ctl = event.getControler();
 
-		planScorer = new Events2Score4PC(ctl.getConfig(),
+		planScorer = new Events2Score4AttrRecorder(ctl.getConfig(),
 				ctl.getScoringFunctionFactory(), ctl.getScenario());
 
 		log.debug("PlansScoring4PC loaded ScoringFunctionFactory");
 
 		ctl.getEvents().addHandler(planScorer);
-	}
-
-	public Events2Score4PC getPlanScorer() {
-		return planScorer;
-	}
-
-	public void notifyIterationStarts(final IterationStartsEvent event) {
-		planScorer.reset(event.getIteration());
-	}
-
-	public void notifyScoring(final ScoringEvent event) {
-		planScorer.finish();
 	}
 
 }
