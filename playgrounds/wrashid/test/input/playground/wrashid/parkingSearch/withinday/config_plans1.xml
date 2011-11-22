@@ -12,7 +12,7 @@
 	</module>
 
 	<module name="facilities">
-		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
+		<param name="inputFacilitiesFile" value="test/input/playground/wrashid/parkingSearch/withinday/facilities.xml" />
 	</module>
 
 	<module name="plans">
@@ -24,6 +24,7 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name= "writeEventsInterval" value="4" />
+		<param name= "mobsim" value="qsim" />
 	</module>
 
 	<module name="simulation">
@@ -68,6 +69,16 @@
 
 		<param name="ModuleProbability_2" value="0.1" />
 		<param name="Module_2" value="ReRoute" />
+	</module>
+
+	<module name="qsim" >
+		<param name="flowCapacityFactor" value="0.010" />
+		<param name="storageCapacityFactor" value="0.025" />
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="9:00:00" />
+		<param name="numberOfThreads" value="6" />
+		<param name="stuckTime" value="600" />
+		<param name="removeStuckVehicles" value="false" />
 	</module>
 
 </config>
