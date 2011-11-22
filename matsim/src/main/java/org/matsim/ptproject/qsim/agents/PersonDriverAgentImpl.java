@@ -38,6 +38,7 @@ import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -46,7 +47,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author dgrether, nagel
@@ -79,6 +79,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	int currentLinkIdIndex;
 
+	private MobsimAgent.State state;
+
 	// ============================================================================================================================
 	// c'tor
 
@@ -110,19 +112,33 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void endActivityAndAssumeControl(final double now) {
+//		Boolean flag = 
+		endActivityAndComputeNextState(now);
+		scheduleAgentInMobsim( );
+	}
+	private void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
-		this.simulation.getEventsManager().processEvent(new ActivityEndEventImpl(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		this.simulation.getEventsManager().processEvent(
+				this.simulation.getEventsManager().getFactory().createActivityEndEvent(
+						now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		// note that when we are here we don't know if next is another leg, or an activity.  Therefore, we go to a general method:
-		Boolean flag = advancePlan() ;
-		scheduleAgentInMobsim( flag );
+//		Boolean flag = 
+		advancePlan() ;
+		return ;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public final void endLegAndAssumeControl(final double now) {
-
-//		this.simulation.handleAgentArrival(now, this);
+//		Boolean ok = 
+			endLegAndComputeNextState(now);
+		scheduleAgentInMobsim( );
+	}
+	private void endLegAndComputeNextState(final double now) {
+//		Boolean ok = true ;
+		
+		// creating agent arrival event ... ok
 		this.simulation.getEventsManager().processEvent(
 				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
@@ -131,22 +147,38 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			// yyyyyy needs to throw a stuck/abort event
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
-			this.simulation.getAgentCounter().decLiving();
-			this.simulation.getAgentCounter().incLost();
-			return;
+//			this.simulation.getAgentCounter().decLiving();
+//			this.simulation.getAgentCounter().incLost();
+			
+//			ok = false ;
+			this.state = MobsimAgent.State.ABORT ;
+		} else {
+			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
+//			ok = 
+			advancePlan() ;
 		}
-		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-		Boolean flag = advancePlan() ;
-		scheduleAgentInMobsim( flag );
+		return ;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
 
-	private Boolean scheduleAgentInMobsim( Boolean flag ) {
-
-		if ( flag == null ) {
-			throw new RuntimeException("plan has run empty" ) ;
+	private void scheduleAgentInMobsim( ) {
+		
+		if ( this.state.equals( MobsimAgent.State.ABORT ) ) {
+			log.warn("found agent state of ABORT.  Not re-inserting the agent in the mobsim ...") ;
+			this.simulation.getAgentCounter().decLiving();
+			this.simulation.getAgentCounter().incLost();
+			return ;
 		}
+
+//		if ( ok == null ) {
+//			throw new RuntimeException("should not be able to get here any more" ) ;
+////			throw new RuntimeException("plan has run empty" ) ;
+//		}
+//		if ( ok == false ) {
+//			throw new RuntimeException("should not be able to get here any more" ) ;
+////			return ;
+//		}
 
 		PlanElement pe = this.getCurrentPlanElement() ;
 
@@ -155,24 +187,25 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
 				this.simulation.arrangeActivityStart(this);
-				return true ;
+				return ;
 			} else {
 				// this is the last activity
 				this.simulation.getAgentCounter().decLiving();
-				return false ;
+				return ;
 			}
 
 		} else if (pe instanceof Leg) {
 
-			if ( flag ) {
+//			if ( ok ) {
 				this.simulation.arrangeAgentDeparture(this);
-				return true ;
-			} else {
-				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");
-				this.simulation.getAgentCounter().decLiving();
-				this.simulation.getAgentCounter().incLost();
-				return false ;
-			}
+				return ;
+//			} else {
+//				throw new RuntimeException("should not be able to get here any more" ) ;
+////				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");
+////				this.simulation.getAgentCounter().decLiving();
+////				this.simulation.getAgentCounter().incLost();
+////				return ;
+//			}
 
 		} else { // (presumably, this was already caught earlier)
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
@@ -251,17 +284,49 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 		// check if plan has run dry:
 		if ( this.currentPlanElementIndex >= this.getPlanElements().size() ) {
+			log.error("plan of agent with id = " + this.getId() + " has run empty.  Setting agent state to ABORT\n" +
+			"          (but continuing the mobsim).  This used to be an exception ...") ;
+			this.state = MobsimAgent.State.ABORT ;
 			return null ;
 		}
 
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if (pe instanceof Activity) {
-			initNextActivity((Activity) pe);
+			this.state = MobsimAgent.State.ACTIVITY ;
+			Activity act = (Activity) pe;
+			double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
+			this.simulation.getEventsManager().processEvent(
+					this.simulation.getEventsManager().getFactory().createActivityStartEvent(
+							now, this.getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
+			/* schedule a departure if either duration or endtime is set of the activity.
+			 * Otherwise, the agent will just stay at this activity for ever...
+			 */
+			calculateDepartureTime(act);
 			return true ;
 		} else if (pe instanceof Leg) {
-
-			return initNextLeg( (Leg) pe ) ;
+			this.state = MobsimAgent.State.LEG ;
+			Leg leg = (Leg) pe;
+			Route route = leg.getRoute();
+			if (route == null) {
+				log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Setting agent state to ABORT " +
+						"(but continuing the mobsim).");
+				if ( noRouteWrnCnt < 1 ) {
+					log.info( "(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)") ;
+					noRouteWrnCnt++ ;
+				}
+				this.state = MobsimAgent.State.ABORT ;
+				return false;
+			}
+			this.cachedDestinationLinkId = route.getEndLinkId();
+			
+			// set the route according to the next leg
+			this.currentLeg = leg;
+			this.cachedRouteLinkIds = null;
+			this.currentLinkIdIndex = 0;
+			this.cachedNextLinkId = null;
+			return true ;
 		} else {
+			this.state = MobsimAgent.State.ABORT ;
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 		}
 	}
@@ -295,7 +360,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 		Route route = currentLeg.getRoute();
 		if (route == null) {
-			log.error("The agent " + this.getPerson().getId() + " has no route in its leg. Removing the agent from the simulation.");
+			log.error("The agent " + this.getId() + " has no route in its leg. Removing the agent from the simulation.\n" +
+			"          (But as far as I can tell, this will not truly remove the agent???  kai, nov'11)");
 			this.simulation.getAgentCounter().decLiving();
 			this.simulation.getAgentCounter().incLost();
 			return;
@@ -369,35 +435,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	private static int finalActHasDpTimeWrnCnt = 0 ;
 
 
-	private boolean initNextLeg(final Leg leg) {
-		Route route = leg.getRoute();
-		if (route == null) {
-			log.error("The agent " + this.getPerson().getId() + " has no route in its leg.  Returning false from initNextLeg ...");
-			if ( noRouteWrnCnt < 1 ) {
-				log.info( "(Route is needed inside Leg even if you want teleportation since Route carries the start/endLinkId info.)") ;
-				noRouteWrnCnt++ ;
-			}
-			return false;
-		}
-		this.cachedDestinationLinkId = route.getEndLinkId();
-
-		// set the route according to the next leg
-		this.currentLeg = leg;
-		this.cachedRouteLinkIds = null;
-		this.currentLinkIdIndex = 0;
-		this.cachedNextLinkId = null;
-		return true ;
-	}
 	private static int noRouteWrnCnt = 0 ;
-
-	private void initNextActivity(final Activity act) {
-		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-		this.simulation.getEventsManager().processEvent(new ActivityStartEventImpl(now, this.getPerson().getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
-		/* schedule a departure if either duration or endtime is set of the activity.
-		 * Otherwise, the agent will just stay at this activity for ever...
-		 */
-		calculateDepartureTime(act);
-	}
 
 	/**
 	 * Convenience method delegating to person's selected plan
@@ -427,13 +465,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void setVehicle(final MobsimVehicle veh) {
-		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		this.vehicle = veh;
 	}
 
 	@Override
 	public final MobsimVehicle getVehicle() {
-		// yyyy something like this makes sense but does it need to be "Q"Vehicle?  kai, oct'10
 		return this.vehicle;
 	}
 
@@ -507,6 +543,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	@Override
 	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.person.getSelectedPlan());
+	}
+	public MobsimAgent.State getState() {
+		return state;
 	}
 
 }
