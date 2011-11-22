@@ -24,7 +24,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.core.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.config.ConfigUtils;
 
@@ -34,6 +33,7 @@ import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 
 /**
  * Helper class to create a fully configured {@link JointControler} from a config file,
@@ -121,7 +121,7 @@ public class JointControlerUtils {
 
 	/**
 	 * In case facilities are defined, sets the scoring function factory to
-	 * {@link CharyparNagelOpenTimesScoringFunctionFactory}
+	 * {@link KtiLikeActivitiesScoringFunctionFactory}
 	 */
 	private static void setScoringFunction(final Controler controler) {
 		ActivityFacilities facilities = controler.getFacilities();
@@ -130,8 +130,11 @@ public class JointControlerUtils {
 		if (nFacilities > 0) {
 			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
 				controler.getConfig().planCalcScore();
+
+			// TODO: choose from some config group?
 			ScoringFunctionFactory factory =
-				new CharyparNagelOpenTimesScoringFunctionFactory(
+				// new CharyparNagelOpenTimesScoringFunctionFactory(
+				new KtiLikeActivitiesScoringFunctionFactory(
 						planCalcScoreConfigGroup,
 						controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
