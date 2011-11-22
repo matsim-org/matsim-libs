@@ -91,7 +91,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		network = event.getControler().getNetwork();
 		
-		
+		ParkingInfrastrucuture.init(network);
 		
 	}
 	
