@@ -11,13 +11,26 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+/**
+ * erases the scores of all the {@code Plan}s in one {@code Population}
+ * 
+ * @author yu
+ * 
+ */
 public class PlanScoreEraser extends NewPopulation implements PlanAlgorithm {
 
 	public static void main(String[] args) {
-		String networkFilename = "test/input/2car1ptRoutes/net2.xml"//
-			, populationFilename = "test/input/2car1ptRoutes/PC/200.pop100.xml.gz"//
-				, outputPopulationFilename = "test/output/planScoreEraser/outputPop.xml.gz";
 
+		String networkFilename, populationFilename, outputPopulationFilename;
+		if (args.length < 3) {
+			networkFilename = "test/input/2car1ptRoutes/net2.xml";
+			populationFilename = "test/input/2car1ptRoutes/PC/200.pop100.xml.gz";
+			outputPopulationFilename = "test/output/planScoreEraser/outputPop.xml.gz";
+		} else/* length >= 3 */{
+			networkFilename = args[0];
+			populationFilename = args[1];
+			outputPopulationFilename = args[2];
+		}
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils
 				.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
