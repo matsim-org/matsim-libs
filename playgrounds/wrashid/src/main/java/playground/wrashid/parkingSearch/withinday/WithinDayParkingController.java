@@ -1,5 +1,6 @@
 package playground.wrashid.parkingSearch.withinday;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
@@ -90,8 +91,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 		super.createAndInitLinkReplanningMap();
 		
 		network = event.getControler().getNetwork();
-		
-		ParkingInfrastrucuture.init(network);
+		ActivityFacilities facilities = event.getControler().getFacilities();
+		ParkingInfrastrucuture.init(network, facilities);
 		
 	}
 	
@@ -109,12 +110,13 @@ public class WithinDayParkingController extends WithinDayController implements S
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final WithinDayParkingController controller = new WithinDayParkingController(args);
-			controller.setOverwriteFiles(true);
-			controller.run();
+			System.out.println("using default config");
+			args=new String[]{"test/input/playground/wrashid/parkingSearch/withinday/config_plans1.xml"};
 		}
+		final WithinDayParkingController controller = new WithinDayParkingController(args);
+		controller.setOverwriteFiles(true);
+		controller.run();
+		
 		System.exit(0);
 	}
 }

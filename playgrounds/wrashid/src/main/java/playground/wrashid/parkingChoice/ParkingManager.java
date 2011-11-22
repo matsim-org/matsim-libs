@@ -21,6 +21,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.geoGrid.QuadTreeInitializer;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;
@@ -126,30 +127,31 @@ public class ParkingManager implements StartupListener {
 	}
 
 	private void initializeQuadTree(NetworkImpl network) {
-		double minX = Double.MAX_VALUE;
-		double minY = Double.MAX_VALUE;
-		double maxX = Double.MIN_VALUE;
-		double maxY = Double.MIN_VALUE;
-
-		for (Link link : network.getLinks().values()) {
-			if (link.getCoord().getX() < minX) {
-				minX = link.getCoord().getX();
-			}
-
-			if (link.getCoord().getY() < minY) {
-				minY = link.getCoord().getY();
-			}
-
-			if (link.getCoord().getX() > maxX) {
-				maxX = link.getCoord().getX();
-			}
-
-			if (link.getCoord().getY() > maxY) {
-				maxY = link.getCoord().getY();
-			}
-		}
-
-		parkings = new QuadTree<Parking>(minX, minY, maxX + 1.0, maxY + 1.0);
+		parkings=(new QuadTreeInitializer<Parking>()).getLinkQuadTree(network);
+		// double minX = Double.MAX_VALUE;
+		// double minY = Double.MAX_VALUE;
+		// double maxX = Double.MIN_VALUE;
+		// double maxY = Double.MIN_VALUE;
+		//
+		// for (Link link : network.getLinks().values()) {
+		// if (link.getCoord().getX() < minX) {
+		// minX = link.getCoord().getX();
+		// }
+		//
+		// if (link.getCoord().getY() < minY) {
+		// minY = link.getCoord().getY();
+		// }
+		//
+		// if (link.getCoord().getX() > maxX) {
+		// maxX = link.getCoord().getX();
+		// }
+		//
+		// if (link.getCoord().getY() > maxY) {
+		// maxY = link.getCoord().getY();
+		// }
+		// }
+		//
+		// parkings = new QuadTree<Parking>(minX, minY, maxX + 1.0, maxY + 1.0);
 	}
 
 	@Override
