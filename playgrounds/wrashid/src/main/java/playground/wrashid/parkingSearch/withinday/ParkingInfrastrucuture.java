@@ -29,7 +29,7 @@ public class ParkingInfrastrucuture {
 			linkIdParkingFacilityIdsMapping.put(linkIds.get(facility.getCoord().getX(), facility.getCoord().getY()),
 					facility.getId());
 			
-			// init capacities:
+			// init capacities (TODO: assign capacity with the rest of other parking attributes).
 			facilityCapacities.incrementBy(facility.getId(), 100);
 		}
 	}
