@@ -171,7 +171,7 @@ public class MzGroupsModule extends Module {
 
 		@Override
 		public String toString() {
-			return "[group: age="+ageCategory+
+			return "[group: ageCategory="+thresholds.printCategory( ageCategory )+
 				( stratifyByGender ? "; gender="+gender : "" )+
 				( stratifyByLicence ? "; licence="+licence : "" )+
 				( stratifyByWork ? "; work="+work : "" )+
@@ -249,6 +249,17 @@ class AgeThresholds {
 		}
 
 		return i;
+	}
+
+	public String printCategory(final int index ) {
+		if (index < 0 || index > thresholds.size()) {
+			throw new IllegalArgumentException( "trying to print unexisting category "+index );
+		}
+
+		String low = ""+((index == 0) ? 0 : thresholds.get( index - 1 ));
+		String up = ""+((index == thresholds.size()) ? "+Infinity" : thresholds.get( index ));
+
+		return "["+low+" , "+up+"[";
 	}
 
 	@Override
