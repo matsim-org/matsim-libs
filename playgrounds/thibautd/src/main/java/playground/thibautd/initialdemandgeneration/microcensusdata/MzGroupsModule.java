@@ -214,7 +214,7 @@ class AgeThresholds {
 	private boolean isLocked = false;
 
 	public AgeThresholds() {
-		thresholds.add( 0 );
+		//thresholds.add( 0 );
 		thresholds.add( 7 );
 		thresholds.add( 15 );
 		thresholds.add( 18 );
@@ -224,7 +224,7 @@ class AgeThresholds {
 	public void clear() {
 		if (isLocked) throw new IllegalStateException( "age thresholds are not modifiable anymore" );
 		thresholds.clear();
-		thresholds.add( 0 );
+		// thresholds.add( 0 );
 	}
 
 	public void addThreshold( final String value ) {
@@ -242,13 +242,13 @@ class AgeThresholds {
 		int i = 0;
 
 		for (int threshold : thresholds) {
-			if (age >= threshold) {
+			if (age < threshold) {
 				return i;
 			}
 			i++;
 		}
 
-		throw new RuntimeException( "could not find age category for age "+age );
+		return i;
 	}
 
 	@Override
