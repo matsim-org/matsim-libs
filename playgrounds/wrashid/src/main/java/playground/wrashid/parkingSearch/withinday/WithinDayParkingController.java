@@ -4,6 +4,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -35,6 +36,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayInitialReplanner initialReplanner;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
+
+	private NetworkImpl network;
 	
 	public WithinDayParkingController(String[] args) {
 		super(args);
@@ -85,6 +88,11 @@ public class WithinDayParkingController extends WithinDayController implements S
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
+		
+		network = event.getControler().getNetwork();
+		
+		
+		
 	}
 	
 	@Override
