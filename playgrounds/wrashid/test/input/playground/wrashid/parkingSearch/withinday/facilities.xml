@@ -75,6 +75,9 @@
 
 		<activity type="w">
 		</activity>
+		
+		<activity type="parking">
+		</activity>
 
 	</facility>
 
@@ -118,6 +121,9 @@
 		</activity>
 
 		<activity type="w">
+		</activity>
+		
+		<activity type="parking">
 		</activity>
 
 	</facility>
@@ -164,6 +170,9 @@
 		<activity type="w">
 		</activity>
 
+<activity type="parking">
+		</activity>
+
 	</facility>
 
 <!-- ====================================================================== -->
@@ -184,6 +193,9 @@
 		</activity>
 
 		<activity type="w">
+		</activity>
+		
+		<activity type="parking">
 		</activity>
 
 	</facility>
@@ -206,6 +218,9 @@
 		</activity>
 
 		<activity type="w">
+		</activity>
+		
+		<activity type="parking">
 		</activity>
 
 	</facility>
