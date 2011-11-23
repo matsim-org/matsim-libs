@@ -76,7 +76,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 			Collection<QVehicle> vehQueue, double offset, Integer laneNumber, 
 			double linkLength, VisLane qBufferItem)
 	{
-		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = qBufferItem.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		Link  link = qBufferItem.getQLink().getLink() ;
 		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
 

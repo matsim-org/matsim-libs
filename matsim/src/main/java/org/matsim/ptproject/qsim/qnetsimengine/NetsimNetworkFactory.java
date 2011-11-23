@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QLanesNetworkFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,34 +21,16 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.lanes.LaneDefinitions;
+import org.matsim.core.api.internal.MatsimFactory;
 
 
-public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
+/**
+ * @author dgrether
+ */
+public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> extends MatsimFactory {
 
-	private NetsimNetworkFactory<QNode, AbstractQLink> delegate;
-	private LaneDefinitions laneDefinitions;
+	public QN createNetsimNode(Node node, QNetwork network);
 
-	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, AbstractQLink> delegate, LaneDefinitions laneDefintions){
-		this.delegate = delegate;
-		this.laneDefinitions = laneDefintions;
-	}
-
-	@Override
-	public AbstractQLink createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-		AbstractQLink ql = null;
-		if (this.laneDefinitions.getLanesToLinkAssignments().containsKey(link.getId())){
-			ql = new QLinkLanesImpl(link, network, queueNode, this.laneDefinitions.getLanesToLinkAssignments().get(link.getId()).getLanes());
-		}
-		else {
-			ql = this.delegate.createNetsimLink(link, network, queueNode);
-		}
-		return ql;
-	}
-
-	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return this.delegate.createNetsimNode(node, network);
-	}
+	public QL createNetsimLink(Link link, QNetwork network, QN queueNode);
 
 }

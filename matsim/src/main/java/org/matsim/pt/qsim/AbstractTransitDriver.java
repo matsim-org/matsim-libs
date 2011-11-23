@@ -244,7 +244,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		boolean handled = this.vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, this.currentStop.getStopFacility().getId());
-			this.getSimulation().unregisterAdditionalAgentOnLink( (MobsimAgent) passenger ) ;
+			MobsimAgent planAgent = (MobsimAgent) passenger;
+			if (planAgent instanceof PersonDriverAgentImpl) { 
+				Id agentId = planAgent.getId();
+				Id linkId = planAgent.getCurrentLinkId();
+				this.getSimulation().unregisterAdditionalAgentOnLink(agentId, linkId);
+			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,

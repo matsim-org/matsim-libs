@@ -28,10 +28,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNode;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
 
 public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 

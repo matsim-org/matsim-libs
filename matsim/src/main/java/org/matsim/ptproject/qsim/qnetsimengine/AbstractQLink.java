@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 
 /**
  * 
@@ -39,29 +39,35 @@ import org.matsim.ptproject.qsim.interfaces.NetsimLink;
  */
 abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 	
-	// the question if variables that exist both in QLinkImpl and QLinkLanesImpl are pulled to here
-	// depends on the question if they are needed here (for methods that are pulled up).  kai, nov'11
+	AbstractQLink(Link link, QNetwork network) {
+		this.link = link ;
+		this.network = network;
+		this.netElementActivator = network.simEngine;
+	}
 	
 	final Link link ;
 	
-	AbstractQLink(Link link) {
-		this.link = link ;
-	}
-
-	abstract void setQSimEngine(QSimEngineInternalI qsimEngine);
-
+	final QNetwork network;	
+	
 	abstract boolean moveLink(double now);
 
 	abstract QVehicle removeParkedVehicle(Id vehicleId);
-	// in contrast to "addParkedVehicle", this here does not need to be public since it is only used internally.  kai, aug'10
-
+	
 	abstract void activateLink();
 
 	abstract void addFromIntersection(final QVehicle veh);
+	
+	abstract void addDepartingVehicle(MobsimVehicle vehicle);
+	
+	abstract void registerAdditionalAgentOnLink(MobsimAgent planAgent);
+	
+	abstract MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId);
 
-	abstract QSimEngineInternalI getQSimEngine() ;
+	abstract void addParkedVehicle(MobsimVehicle vehicle);
+	
+	abstract QNode getToNode() ;
 
-	void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
+	final void letAgentDepartWithVehicle(MobsimDriverAgent agent, QVehicle vehicle, double now) {
 		vehicle.setDriver(agent);
 		if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
 			// yyyy this should be handled at person level, not vehicle level.  kai, feb'10
@@ -72,31 +78,19 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 			this.addDepartingVehicle(vehicle);
 		}
 	}
-
-	/**
-     * Design thoughts:<ul>
-     * <li> This method could also be private (never called from outside the class). kai, nov'11
-     * </ul>
-	 */
-	abstract QVehicle getParkedVehicle( Id id ) ;
-	
-	/**
-	 * modifying the return type ...
-	 */
-	@Override
-	public abstract QSim getMobsim() ;
-
 	
 	// joint implementation for Customizable
 	private Map<String, Object> customAttributes = new HashMap<String, Object>();
 
+	protected NetElementActivator netElementActivator;
+
 	@Override
-	public Map<String, Object> getCustomAttributes() {
+	public final Map<String, Object> getCustomAttributes() {
 		return customAttributes;
 	}
-	
-	@Override
-	public abstract QNode getToNetsimNode() ;
-	// return type change 
 
+	public void setNetElementActivator(NetElementActivator qSimEngineRunner) {
+		this.netElementActivator = qSimEngineRunner;
+	}
+	
 }

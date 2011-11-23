@@ -49,9 +49,9 @@ import org.matsim.ptproject.qsim.QSim;
 class ParallelQNetsimEngine extends QNetsimEngine {
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 	// yy Until this is realized, the Random object is added as customizable objecte to the QNode. cdober, nov'10
-	
+
 	final private static Logger log = Logger.getLogger(ParallelQNetsimEngine.class);
-	
+
 	private int numOfThreads;
 	private Thread[] threads;
 	private QSimEngineRunner[] engines;
@@ -68,16 +68,16 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	ParallelQNetsimEngine(final QSim sim, final Random random) {
 		super(sim, random);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
-		
+
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
-	  @Override
-	  public void onPrepareSim() {
-		  super.onPrepareSim();
-		  initQSimEngineThreads(this.numOfThreads);
-	  }
-	
+	@Override
+	public void onPrepareSim() {
+		super.onPrepareSim();
+		initQSimEngineThreads(this.numOfThreads);
+	}
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -125,7 +125,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	 * this Method does, it should work anyway.
 	 */
 	private void run(double time) {
-		
+
 		try {
 			// set current Time
 			for (QSimEngineRunner engine : this.engines) {
@@ -138,7 +138,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 		} catch (InterruptedException e) {
 			Gbl.errorMsg(e);
 		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
+			Gbl.errorMsg(e);
 		}
 	}
 
@@ -156,7 +156,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 		log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 		super.activateLink(link);
 	}
-	
+
 	@Override
 	protected synchronized void activateNode(final QNode node) {
 		log.warn("Nodes should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
@@ -177,7 +177,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 	@Override
 	public int getNumberOfSimulatedNodes() {
-	
+
 		int numNodes = 0;
 
 		for (QSimEngineRunner engine : this.engines) {
@@ -186,7 +186,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 		return numNodes;
 	}
-	
+
 	private void initQSimEngineThreads(int numOfThreads) {
 		this.numOfThreads = numOfThreads;
 
@@ -198,7 +198,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 			// if we use arrays, we don't need the lists anymore
 			this.parallelNodesLists = null;
 		}
-		
+
 		this.threads = new Thread[numOfThreads];
 		this.engines = new QSimEngineRunner[numOfThreads] ;
 		LinkReActivator linkReActivator = new LinkReActivator(this.engines);
@@ -206,20 +206,20 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.separationBarrier = new CyclicBarrier(numOfThreads, linkReActivator);
-//		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
+		//		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1, nodeReActivator);
 
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
 			QSimEngineRunner engine = new QSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
 					this.endBarrier, this.getMobsim(), this.getAgentSnapshotInfoBuilder());
-			
+
 			if (useNodeArray) {
 				engine.setQNodeArray(this.parallelNodesArrays[i]);
 			} else {
 				engine.setQNodeList(this.parallelNodesLists.get(i));
 			}
-			
+
 			engine.setLinks(this.parallelSimLinksLists.get(i));
 			Thread thread = new Thread(engine);
 			thread.setName("QSimEngineThread" + i);
@@ -256,7 +256,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 			roundRobin++;
 		}
 	}
-	
+
 	/*
 	 * Create Nodes Array
 	 */
@@ -304,18 +304,16 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 	 */
 	private void assignNetElementActivators() {
 		int thread = 0;
-		
 		if (useNodeArray) {
 			for (QNode[] array : parallelNodesArrays) {
 				for (QNode node : array) {
-					// set activator for nodes
 					node.setNetElementActivator(this.engines[thread]);
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						AbstractQLink qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
+						AbstractQLink qLink = network.getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-						qLink.setQSimEngine(this.engines[thread]);
+						qLink.setNetElementActivator(this.engines[thread]);
 					}
 				}
 				thread++;
@@ -325,20 +323,17 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 				for (QNode node : list) {
 					// set activator for nodes
 					node.setNetElementActivator(this.engines[thread]);
-					
 					// If we simulate all Nodes, we have to add them initially to the Lists.
 					if (simulateAllNodes) this.engines[thread].activateNode(node);
 					
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
-						AbstractQLink qLink = this.getNetsimNetwork().getNetsimLink(outLink.getId());
+						AbstractQLink qLink = network.getNetsimLink(outLink.getId());
 						// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-						qLink.setQSimEngine(this.engines[thread]);
+						qLink.setNetElementActivator(this.engines[thread]);
 					}
 				}
-				
 				if (simulateAllNodes) this.engines[thread].activateNodes();
-				
 				thread++;
 			}
 		}
@@ -375,7 +370,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 			}
 		}
 	}
-	
+
 	/*package*/ static class NodeReActivator implements Runnable {
 		private final QSimEngineRunner[] runners;
 

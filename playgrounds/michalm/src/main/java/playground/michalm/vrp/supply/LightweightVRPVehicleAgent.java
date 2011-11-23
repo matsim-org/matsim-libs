@@ -5,6 +5,7 @@ import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -86,9 +87,8 @@ public class LightweightVRPVehicleAgent
                     
                     Id currentLinkId = passenger.getCurrentLinkId();
 
-                    NetsimLink link = netsim.getNetsimNetwork().getNetsimLink(currentLinkId);
                     
-                    if (link.unregisterAdditionalAgentOnLink(passenger.getId()) == null) {
+                    if (netsim.unregisterAdditionalAgentOnLink(passenger.getId(), currentLinkId) == null) {
                         throw new RuntimeException("Passenger id=" + passenger.getId() +
                                 "is not waiting for taxi");
                     }

@@ -84,7 +84,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 			double vehSpacing, Collection<QVehicle> buffer, double offset, Integer laneNumber, 
 			VisLane qBufferItem)
 	{
-		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = qBufferItem.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		Link  link = qBufferItem.getQLink().getLink() ;
 		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
 
@@ -115,7 +115,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber,
 			double linkLength, VisLane qBufferItem)
 	{
-		double now = qBufferItem.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = qBufferItem.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		Link  link = qBufferItem.getQLink().getLink() ;
 		double inverseSimulatedFlowCapacity = qBufferItem.getInverseSimulatedFlowCapacity() ;
 

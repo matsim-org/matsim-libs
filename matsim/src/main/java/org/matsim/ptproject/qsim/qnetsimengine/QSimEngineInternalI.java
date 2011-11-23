@@ -30,7 +30,7 @@ abstract class QSimEngineInternalI extends NetElementActivator {
 	
 	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
 	
-	abstract public QNetwork getNetsimNetwork() ;
+	abstract public NetsimNetwork getNetsimNetwork() ;
 
 	abstract public QSim getMobsim() ;
 }

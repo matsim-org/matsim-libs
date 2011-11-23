@@ -23,9 +23,9 @@ package org.matsim.ptproject.qsim.multimodalsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.NetsimNode;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
 public class MultiModalSimEngineFactory implements MatsimFactory {
@@ -57,7 +57,7 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 		}
 		
 		for (NetsimLink link : network.getNetsimLinks().values()) {
-			QNode toNode = (QNode)link.getToNetsimNode();
+			QNode toNode = (QNode) network.getNetsimNodes().get(link.getLink().getToNode().getId());
 			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, simEngine, toNode);
 			link.getCustomAttributes().put(MultiModalQLinkExtension.class.getName(), extension);
 		}

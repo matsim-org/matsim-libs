@@ -94,7 +94,7 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 					+ "quantities refer to the link and which to the lane.  kai, nov'10" ) ;
 		}
 
-		double now = visLane.getQLink().getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = visLane.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		Link  link = visLane.getQLink().getLink() ;
 
 		Queue<Tuple<Double, QItem>> qItemList = new PriorityQueue<Tuple<Double, QItem>>(30, new TupleDoubleComparator() );

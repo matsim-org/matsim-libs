@@ -63,8 +63,6 @@ class CarDepartureHandler implements DepartureHandler {
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
-//		NetworkRoute route = (NetworkRoute) leg.getRoute();
-//		Id vehicleId = route.getVehicleId();
 		Id vehicleId = agent.getPlannedVehicleId() ;
 		if (vehicleId == null) {
 			vehicleId = agent.getId(); // backwards-compatibility

@@ -49,9 +49,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time

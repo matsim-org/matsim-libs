@@ -1,4 +1,4 @@
-package org.matsim.ptproject.qsim.interfaces;
+package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;

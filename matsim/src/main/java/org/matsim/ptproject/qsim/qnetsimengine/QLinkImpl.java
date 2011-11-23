@@ -50,7 +50,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
@@ -100,8 +99,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
 
 	/*package*/ VisData visdata = null ;
-
-	private QSimEngineInternalI qsimEngine = null;
 
 	private double length = Double.NaN;
 
@@ -166,21 +163,20 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
+	
+
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param link2
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	 QLinkImpl(final Link link2, QNetsimEngine simEngine, final QNode toNode) {
-		 super(link2) ;
+	 QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
+		 super(link2, network) ;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
-		this.qsimEngine = (QNetsimEngine) simEngine;
-
 		this.calculateCapacities();
-
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
@@ -191,7 +187,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	 void activateLink() {
 		if (!this.active) {
-			this.qsimEngine.activateLink(this);
+			netElementActivator.activateLink(this);
 			this.active = true;
 		}
 	}
@@ -205,11 +201,11 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 */
 	@Override
 	final void addFromIntersection(final QVehicle veh) {
-		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
-		this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
 						this.getLink().getId()));
 		if ( HOLES ) {
@@ -245,30 +241,30 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	 void clearVehicles() {
 		this.parkedVehicles.clear();
-		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.waitingList) {
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
-		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
-		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
+		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.waitingList.size());
+		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QVehicle veh : this.vehQueue) {
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
-		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
-		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.vehQueue.size());
+		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
+		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 
 		for (QVehicle veh : this.buffer) {
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
-		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.buffer.size());
-		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.buffer.size());
+		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.buffer.size());
+		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 	}
 
@@ -279,17 +275,11 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		qveh.setCurrentLink(this.link);
 	}
 
-	/*package*/ @Override
-	QVehicle getParkedVehicle(Id vehicleId) {
-		return this.parkedVehicles.get(vehicleId);
-	}
-
 	@Override
 	final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
-	@Override
 	public void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle ;
 		this.waitingList.add(vehicle);
@@ -455,7 +445,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				return;
 			}
 
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 			boolean handled = this.addTransitToBuffer(now, veh);
 
@@ -580,7 +570,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	final boolean hasSpace() {
-		double now = this.qsimEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
 		if ( !HOLES ) {
@@ -622,20 +612,20 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
-		* this.getQSimEngine().getMobsim().getSimTimer().getSimTimestepSize()
-		* this.getQSimEngine().getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+		* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQSimEngine().getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-		/ ((NetworkImpl) this.qsimEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
+		/ ((NetworkImpl) network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -712,10 +702,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 	}
 
-
-	@Override
-	public QVehicle getVehicle(Id vehicleId) {
-		QVehicle ret = getParkedVehicle(vehicleId);
+	QVehicle getVehicle(Id vehicleId) {
+		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
@@ -763,24 +751,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	/**
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
-	@Override
-	public double getSpaceCap() {
+	double getSpaceCap() {
 		return this.storageCapacity;
-	}
-
-	@Override
-	 QSimEngineInternalI getQSimEngine(){
-		return this.qsimEngine;
-	}
-
-	@Override
-	public QSim getMobsim() {
-		return this.qsimEngine.getMobsim();
-	}
-
-	@Override
-	void setQSimEngine(QSimEngineInternalI qsimEngine) { // yyyy this methods feels a bit non-sensical.  kai, oct'10
-		this.qsimEngine = qsimEngine;
 	}
 
 	@Override
@@ -796,7 +768,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	public QNode getToNetsimNode() {
+	public QNode getToNode() {
 		return this.toQueueNode;
 	}
 
@@ -829,12 +801,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return active;
 	}
 
-//	@Override
-//	@Deprecated // this really should not be exposed
-//	public LinkedList<QVehicle> getVehQueue() {
-//		return this.vehQueue;
-//	}
-
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
@@ -857,15 +823,15 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 		}
-		this.getToNetsimNode().activateNode();
+		this.getToNode().activateNode();
 	}
 
 	@Override
 	QVehicle popFirstFromBuffer() {
-		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		this.getQSimEngine().getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 		return veh;
 	}
 
@@ -905,7 +871,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
-		if (!this.getToNetsimNode().getNode().getOutLinks().containsKey(toLinkId)){
+		if (!this.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + this.getLink().getId());
 		}
 		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
@@ -930,7 +896,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
+			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			snapshotInfoBuilder.addVehiclePositions(QLinkImpl.this, positions, QLinkImpl.this.buffer, QLinkImpl.this.vehQueue,
 					QLinkImpl.this.holes, QLinkImpl.this.getLink().getLength(), 0.0, null);

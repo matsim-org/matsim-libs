@@ -45,7 +45,7 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.withinday.utils.EditRoutes;
 
 

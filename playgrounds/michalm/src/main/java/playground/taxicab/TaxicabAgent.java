@@ -29,9 +29,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsFactoryImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 
 /**
  * @author nagel
@@ -156,8 +156,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		if ( this.expectedPassengerId!=null && this.currentPassenger==null ) {
 			// (= no passenger on board, but having a request)
 			
-			MobsimAgent passenger = 
-				this.netsim.getNetsimNetwork().getNetsimLink(this.currentLinkId).unregisterAdditionalAgentOnLink(this.expectedPassengerId) ;
+			MobsimAgent passenger = ((QSim) this.netsim).unregisterAdditionalAgentOnLink(this.expectedPassengerId, this.currentLinkId) ;
 			this.expectedPassengerId = null ;
 			this.currentPassenger = passenger ;
 			if ( passenger != null ) {

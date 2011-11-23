@@ -19,7 +19,9 @@
 
 package org.matsim.ptproject.qsim.interfaces;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 
 
 /**Mobsim could, at least in theory, also operate without a network (e.g. based on activities with
@@ -39,7 +41,10 @@ public interface Netsim extends Mobsim {
 	 * This needs the "getCurrentLinkId()" of the MobsimAgent filled with meaningful information.
 	 * 	 */
 	void registerAdditionalAgentOnLink( final MobsimAgent agent ) ;
-	void unregisterAdditionalAgentOnLink( final MobsimAgent agent ) ;
+
+	MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId);
+
+	void addParkedVehicle(MobsimVehicle veh, Id startLinkId);
 
 
 	

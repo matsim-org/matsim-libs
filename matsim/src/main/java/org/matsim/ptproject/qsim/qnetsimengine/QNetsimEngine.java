@@ -34,11 +34,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
 import org.matsim.vehicles.Vehicle;
 
@@ -50,9 +51,9 @@ import org.matsim.vehicles.Vehicle;
  * @author dstrippgen
  */
 public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
-	
+
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
-	
+
 	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
 	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
 	 * car is in one of the many queues).
@@ -62,7 +63,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	 */
 	/*package*/ static boolean simulateAllLinks = false;
 	/*package*/ static boolean simulateAllNodes = false;
-	
+
 	/*
 	 * "Classic" behavior is using an array of nodes. However, in many
 	 * cases it is faster, if non-active nodes are de-activated. Note that
@@ -74,6 +75,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	 * there is no difference anymore between the results w/o de-activated nodes.
 	 */
 	/*package*/ static boolean useNodeArray = false;
+	/*package*/   QNetwork network;
 
 	/*package*/  List<AbstractQLink> allLinks = null;
 	/*package*/  List<QNode> allNodes = null;
@@ -87,24 +89,24 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	/** This is the collection of nodes that have to be activated in the current time step */
 	/*package*/  ArrayList<QNode> simActivateNodes = new ArrayList<QNode>();
-	
+
 	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
-	
+
 	private final Random random;
 	private final QSim qsim;
 
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
-	private QNetwork qNetwork;
+
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler ;
 
 	public QNetsimEngine(final QSim sim, final Random random) {
 		this.random = random;
 		this.qsim = sim;
-		
+
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
-		
+
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().getQSimConfigGroup();
 		VehicleBehavior vehicleBehavior;
@@ -118,7 +120,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
 		dpHandler = new CarDepartureHandler(this, vehicleBehavior);
-		
+
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
 			QLinkImpl.HOLES=false ;
@@ -128,15 +130,25 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
 		}
+		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
+			if (((ScenarioImpl) sim.getScenario()).getLaneDefinitions() == null) {
+				throw new IllegalStateException(
+						"Lane definitions have to be set if feature is enabled!");
+			}
+			log.info("Lanes enabled...");
+			network = new QNetwork(sim.getScenario().getNetwork(), new QLanesNetworkFactory(new DefaultQNetworkFactory(), ((ScenarioImpl) sim.getScenario()).getLaneDefinitions()));
+		} else {
+			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
+		}
+		network.initialize(this);
 	}
-	
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
-		QVehicle veh = new QVehicle(vehicle);
-		vehicles.put(veh.getId(), veh);
-		NetsimLink qlink = qNetwork.getNetsimLink(linkId);
+
+	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+		vehicles.put(veh.getId(), (QVehicle) veh);
+		AbstractQLink qlink = network.getNetsimLinks().get(startLinkId);
 		qlink.addParkedVehicle(veh);
 	}
-	
+
 	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
 		String  snapshotStyle = scenario.getConfig().getQSimConfigGroup().getSnapshotStyle();
 		if ("queue".equalsIgnoreCase(snapshotStyle)){
@@ -156,10 +168,10 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		this.allLinks = new ArrayList<AbstractQLink>(this.getNetsimNetwork().getNetsimLinks().values());
-		this.allNodes = new ArrayList<QNode>(this.getNetsimNetwork().getNetsimNodes().values());
+		this.allLinks = new ArrayList<AbstractQLink>(network.getNetsimLinks().values());
+		this.allNodes = new ArrayList<QNode>(network.getNetsimNodes().values());
 		if (useNodeArray) {
-			this.simNodesArray = this.qsim.getNetsimNetwork().getNetsimNodes().values().toArray(new QNode[this.qsim.getNetsimNetwork().getNetsimNodes().values().size()]);
+			this.simNodesArray = network.getNetsimNodes().values().toArray(new QNode[network.getNetsimNodes().values().size()]);
 			//dg[april08] as the order of nodes has an influence on the simulation
 			//results they are sorted to avoid indeterministic simulations
 			Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
@@ -223,11 +235,11 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			reactivateNodes();
 			ListIterator<QNode> simNodes = this.simNodesList.listIterator();
 			QNode node;
-			
+
 			while (simNodes.hasNext()) {
 				node = simNodes.next();
 				node.moveNode(time, random);
-				
+
 				if (!node.isActive()) simNodes.remove();
 			}
 		}
@@ -261,21 +273,21 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			this.simActivateLinks.clear();
 		}
 	}
-	
+
 	@Override
 	protected void activateNode(QNode node) {
 		if (!useNodeArray && !simulateAllNodes) {
 			this.simActivateNodes.add(node);
 		}
 	}
-	
+
 	private void reactivateNodes() {
 		if ((!simulateAllNodes) && (!this.simActivateNodes.isEmpty())) {
 			this.simNodesList.addAll(this.simActivateNodes);
 			this.simActivateNodes.clear();
 		}
 	}
-	
+
 	@Override
 	public int getNumberOfSimulatedNodes() {
 		if (useNodeArray) return this.simNodesArray.length;
@@ -297,13 +309,9 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		return this.positionInfoBuilder;
 	}
 
-	public void setQNetwork(QNetwork qNetwork2) {
-		this.qNetwork = qNetwork2 ;
-	}
-
 	@Override
-	public QNetwork getNetsimNetwork() {
-		return this.qNetwork ;
+	public NetsimNetwork getNetsimNetwork() {
+		return this.network ;
 	}
 
 	/**
@@ -313,10 +321,6 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		return this.stucktimeCache ;
 	}
 
-	public NetsimNetworkFactory<QNode, AbstractQLink> getNetsimNetworkFactory() {
-		return new DefaultQNetworkFactory() ;
-	}
-
 	public DepartureHandler getDepartureHandler() {
 		return dpHandler;
 	}
@@ -324,5 +328,17 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	public final Map<Id, QVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
-	
+
+	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
+		Id linkId = planAgent.getCurrentLinkId(); 
+		AbstractQLink qLink = network.getNetsimLink(linkId);
+		qLink.registerAdditionalAgentOnLink(planAgent);
+	}
+
+
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		AbstractQLink qLink = network.getNetsimLink(linkId);
+		return qLink.unregisterAdditionalAgentOnLink(agentId);
+	}
+
 }

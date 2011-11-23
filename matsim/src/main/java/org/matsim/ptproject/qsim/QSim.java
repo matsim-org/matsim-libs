@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -45,7 +43,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.AbstractTransitDriver;
@@ -54,7 +51,6 @@ import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
@@ -63,15 +59,14 @@ import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.QLanesNetworkFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
@@ -105,7 +100,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private final EventsManager events;
 
-	private final QNetsimEngine netEngine;
+	public final QNetsimEngine netEngine;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
@@ -154,7 +149,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	public QSim(final Scenario sc, final EventsManager events,
-                final QNetsimEngineFactory netsimEngFactory) {
+			final QNetsimEngineFactory netsimEngFactory) {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
@@ -165,40 +160,11 @@ public final class QSim implements VisMobsim, Netsim {
 
 		// create the NetworkEngine ...
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
+
+
+
+
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
-
-		// create the QNetwork ...
-		NetsimNetwork network;
-		if (sc.getConfig().scenario().isUseLanes()) {
-			if (((ScenarioImpl) sc).getLaneDefinitions() == null) {
-				throw new IllegalStateException(
-						"Lane definitions have to be set if feature is enabled!");
-			}
-			log.info("Lanes enabled...");
-			network = DefaultQNetworkFactory.createQNetwork(this,
-					new QLanesNetworkFactory(new DefaultQNetworkFactory(),
-							((ScenarioImpl) sc).getLaneDefinitions()));
-			// yyyyyy the above is now a hack; replace by non-static factory
-			// method. kai, feb'11
-		} else {
-			network = this.netEngine.getNetsimNetworkFactory().createNetsimNetwork(this);
-		}
-		// overall, one could wonder why this is not done inside the
-		// NetsimEngine. kai, feb'11
-		// well, we may want to see the construction explicitly as long as we
-		// use factories (and not builders). kai, feb'11
-
-		// then tell the QNetwork to use the netsimEngine (this also creates
-		// qlinks and qnodes)
-		// yyyy feels a bit weird to me ... kai, feb'11
-		network.initialize(this.netEngine);
-
-		// configuring signalSystems:
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			log.info("Signals enabled...");
-			// ... but not clear where this is actually configured?? Maybe drop
-			// completely from here?? kai, feb'11
-		}
 
 		// configuring multiModalEngine ...
 		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
@@ -267,8 +233,6 @@ public final class QSim implements VisMobsim, Netsim {
 
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
-		// not final since WithindayQSim overrides (essentially: disables) it.
-		// kai, nov'10
 		if (!locked ) {
 			if ( this.agentSources.size() == 1) {
 				this.agentSources.clear();
@@ -335,7 +299,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-    private void createAgents() {
+	private void createAgents() {
 		for (AgentSource agentSource : agentSources) {
 			List<MobsimAgent> theseAgents = agentSource.insertAgentsIntoMobsim();
 			for (MobsimAgent agent : theseAgents) {
@@ -345,7 +309,13 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
-		netEngine.createAndParkVehicleOnLink(vehicle, linkId);
+		QVehicle veh = new QVehicle(vehicle);
+		netEngine.addParkedVehicle(veh, linkId);
+	}
+
+	@Override
+	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+		netEngine.addParkedVehicle(veh, startLinkId);
 	}
 
 	private void createTransitDrivers() {
@@ -487,7 +457,9 @@ public final class QSim implements VisMobsim, Netsim {
 	@Override
 	public final void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
-		registerAgentAtActivityLocation(agent);
+		if (!(agent instanceof AbstractTransitDriver)) {
+			netEngine.registerAdditionalAgentOnLink(agent);
+		}
 	}
 
 	@Override
@@ -512,7 +484,7 @@ public final class QSim implements VisMobsim, Netsim {
 			} else {
 				// newTime != Double.POSITIVE_INFINITY - re-activate the agent
 				this.activityEndsList.add(agent);
-				this.registerAgentAtActivityLocation(agent);
+				this.netEngine.registerAdditionalAgentOnLink(agent);
 				this.getAgentCounter().incLiving();				
 			}
 		} 
@@ -532,72 +504,22 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	private void registerAgentAtActivityLocation(final MobsimAgent agent) {
-		// if the "activities" engine were separate, this would need to be
-		// public. kai, aug'10
-		if (!(agent instanceof AbstractTransitDriver)) {
-			// PlanElement pe = agent.getCurrentPlanElement();
-			// if (pe instanceof Leg) {
-			// throw new RuntimeException();
-			// } else {
-			// Activity act = (Activity) pe;
-			// Id linkId = act.getLinkId();
-			Id linkId = agent.getCurrentLinkId();
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
-					linkId);
-			qLink.registerAdditionalAgentOnLink(agent);
-			// }
-		}
-	}
-
 	@Override
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		// called by TransitEngine
-		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
-			// this needed? Does
-			// the driver get
-			// registered?
-			// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-			// Id linkId = leg.getRoute().getStartLinkId();
-			Id linkId = planAgent.getCurrentLinkId(); // yyyyyy it is not fully
-			// clear that this is
-			// always set correctly.
-			// kai, jun'11
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
-					linkId);
-			qLink.registerAdditionalAgentOnLink(planAgent);
-		}
+		netEngine.registerAdditionalAgentOnLink(planAgent);
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		if (!(agent instanceof TransitDriver)) {
-			// PlanElement pe = agent.getCurrentPlanElement();
-			// if (pe instanceof Leg) {
-			// throw new RuntimeException();
-			// } else {
-			// Activity act = (Activity) pe;
-			// Id linkId = act.getLinkId();
+			Id agentId = agent.getId();
 			Id linkId = agent.getCurrentLinkId();
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
-					linkId);
-			qLink.unregisterAdditionalAgentOnLink(agent.getId());
-			// }
+			netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
 	}
 
 	@Override
-	public final void unregisterAdditionalAgentOnLink(
-			final MobsimAgent planAgent) {
-		// called by TransitDriver
-		if (planAgent instanceof PersonDriverAgentImpl) { // yyyy but why is
-			// this needed?
-			// Leg leg = (Leg) planAgent.getCurrentPlanElement() ;
-			// Id linkId = leg.getRoute().getStartLinkId();
-			Id linkId = planAgent.getCurrentLinkId();
-			NetsimLink qLink = this.netEngine.getNetsimNetwork().getNetsimLink(
-					linkId);
-			qLink.unregisterAdditionalAgentOnLink(planAgent.getId());
-		}
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 	}
 
 	private void handleActivityEnds(final double time) {

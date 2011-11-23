@@ -35,7 +35,6 @@ import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LaneDefinitionsFactory;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

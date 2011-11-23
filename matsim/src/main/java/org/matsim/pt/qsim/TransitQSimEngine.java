@@ -48,7 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
@@ -174,14 +173,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
-		NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(firstLeg.getRoute().getStartLinkId());
-		if ( qlink==null ) {
-			throw new RuntimeException("did not find link from transit route with id: " + firstLeg.getRoute().getStartLinkId() + " in network; aborting ...") ;
-		}
-		qlink.addParkedVehicle(veh);
-		// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
-		// would not need to be exposed at all.  kai, may'10
-
+		Id startLinkId = firstLeg.getRoute().getStartLinkId();
+		this.qSim.addParkedVehicle(veh, startLinkId);
 		this.qSim.arrangeActivityStart(driver);
 		this.qSim.getAgentCounter().incLiving();
 		return driver;
@@ -202,10 +195,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);
-					NetsimLink qlink = this.qSim.getNetsimNetwork().getNetsimLinks().get(driver.getCurrentLeg().getRoute().getStartLinkId());
-					// yyyyyy this could, in principle, also be a method mobsim.addVehicle( ..., linkId), and then the qnetwork
-					// would not need to be exposed at all.  kai, may'10
-					qlink.addParkedVehicle(veh);
+					Id startLinkId = driver.getCurrentLeg().getRoute().getStartLinkId();
+					this.qSim.addParkedVehicle(veh, startLinkId);
 					this.qSim.arrangeActivityStart(driver);
 					this.qSim.getAgentCounter().incLiving();
 					drivers.add(driver);
@@ -214,11 +205,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		}
 		return drivers;
 	}
-
-//	public void beforeHandleAgentArrival(PersonAgent agent) {
-//
-//	}
-	// this method is not used anywhere.  kai, nov'10
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
 		// this puts the agent into the transit stop.

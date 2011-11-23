@@ -80,8 +80,8 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.testcases.MatsimTestCase;
@@ -752,8 +752,8 @@ public class ParallelQSimTest extends TestCase {
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle vehicle1 = new QVehicle(new VehicleImpl(id1, defaultVehicleType));
 		QVehicle vehicle2 = new QVehicle(new VehicleImpl(id2, defaultVehicleType));
-		qlink2.addParkedVehicle(vehicle1);
-		qlink2.addParkedVehicle(vehicle2);
+		sim.addParkedVehicle(vehicle1, id2);
+		sim.addParkedVehicle(vehicle2, id2);
 
 		sim.getSimTimer().setTime(100.0);
 		PersonDriverAgentImpl agent = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, sim);

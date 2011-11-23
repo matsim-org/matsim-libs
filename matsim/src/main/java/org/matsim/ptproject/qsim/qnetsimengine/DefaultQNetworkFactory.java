@@ -21,10 +21,6 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 
 
 /**
@@ -33,30 +29,13 @@ import org.matsim.ptproject.qsim.interfaces.NetsimNetworkFactory;
 public final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {
 
 	@Override
-	public AbstractQLink createNetsimLink(final Link link, final QNetsimEngine simEngine, final QNode toQueueNode) {
-		return new QLinkImpl(link, simEngine, toQueueNode);
+	public AbstractQLink createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+		return new QLinkImpl(link, network, toQueueNode);
 	}
 
-	/**
-	 * @see org.matsim.core.mobsim.queuesim.QueueNetworkFactory#createNetsimNode(org.matsim.core.network.NodeImpl, org.matsim.core.mobsim.queuesim.QueueNetwork)
-	 */
 	@Override
-	public QNode createNetsimNode(final Node node, QNetsimEngine simEngine) {
-		return new QNode(node, simEngine);
-	}
-
-	public static NetsimNetwork createQNetwork(QSim qs, NetsimNetworkFactory<QNode, AbstractQLink> factory) {
-		return new QNetwork(qs, factory);
-	}
-
-//	public static NetsimNetwork staticCreateQNetwork(QSim qs) {
-//		return new QNetwork(qs);
-//	}
-	
-	@Override
-	public NetsimNetwork createNetsimNetwork( Netsim mobsim ) {
-		QSim qsim = (QSim) mobsim ; // cast needs to be ok in order to make this work
-		return new QNetwork( qsim ) ;
+	public QNode createNetsimNode(final Node node, QNetwork network) {
+		return new QNode(node, network);
 	}
 
 }

@@ -39,9 +39,7 @@ import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -140,8 +138,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	private VisData visdata = this.new VisDataImpl();
 
-	private QNetsimEngine qsimEngine = null;
-
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
@@ -156,14 +152,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @param toNode
 	 * @see NetsimLink#createLanes(List)
 	 */
-	QLinkLanesImpl(final Link link2, QNetsimEngine engine,
-			final QNode toNode, Map<Id, Lane> laneMap) {
-		super(link2) ;
+	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, Map<Id, Lane> laneMap) {
+		super(link2, network) ;
 		this.toQueueNode = toNode;
-		this.qsimEngine = (QNetsimEngine) engine;
-		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
-		// But it would still be better to do it correctly.  kai, aug'10
-
 		this.queueLanes = new ArrayList<QLane>();
 		this.toNodeQueueLanes = new ArrayList<QLane>();
 		this.createLanes(laneMap);
@@ -249,7 +240,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	void activateLink() {
 		if (!this.active) {
-			this.qsimEngine.activateLink(this);
+			network.simEngine.activateLink(this);
 			this.active = true;
 		}
 	}
@@ -263,25 +254,25 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 */
 	@Override
 	void addFromIntersection(final QVehicle veh) {
-		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.originalLane.addToVehicleQueue(veh, now);
 		veh.setCurrentLink(this.getLink());
-		this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
 						this.getLink().getId()));
 	}
 
 	@Override
 	void clearVehicles() {
-		double now = this.getQSimEngine().getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		this.parkedVehicles.clear();
 		for (QVehicle veh : this.waitingList) {
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
-		this.getQSimEngine().getMobsim().getAgentCounter().decLiving(this.waitingList.size());
-		this.getQSimEngine().getMobsim().getAgentCounter().incLost(this.waitingList.size());
+		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.waitingList.size());
+		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.waitingList.size());
 		this.waitingList.clear();
 
 		for (QLane lane : this.queueLanes){
@@ -294,11 +285,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 		QVehicle qveh = (QVehicle) vehicle ; // cast ok: when it gets here, it needs to have a runtime type of QVehicle. kai, nov'11
 		this.parkedVehicles.put(qveh.getId(), qveh);
 		qveh.setCurrentLink(this.link);
-	}
-
-	/*package*/ @Override
-	QVehicle getParkedVehicle(Id vehicleId) {
-		return this.parkedVehicles.get(vehicleId);
 	}
 
 	@Override
@@ -346,7 +332,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 				return movedAtLeastOne;
 			}
 			movedAtLeastOne = true;
-			this.getQSimEngine().getMobsim().getEventsManager().processEvent(
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
 			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
 			if (!handled) {
@@ -383,9 +369,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 		}
 	}
 
-	@Override
-	public QVehicle getVehicle(Id vehicleId) {
-		QVehicle ret = getParkedVehicle(vehicleId);
+	QVehicle getVehicle(Id vehicleId) {
+		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
@@ -421,8 +406,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
-	@Override
-	public double getSpaceCap() {
+	double getSpaceCap() {
 		double total = 0.0;
 		for (QLane ql : this.getQueueLanes()) {
 			total += ql.getStorageCapacity();
@@ -450,7 +434,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	public QNode getToNetsimNode() {
+	public QNode getToNode() {
 		return this.toQueueNode;
 	}
 
@@ -465,25 +449,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	double getSimulatedFlowCapacity() {
 		return this.originalLane.getSimulatedFlowCapacity();
-	}
-
-	@Override
-	QNetsimEngine getQSimEngine(){
-		return this.qsimEngine;
-	}
-
-	@Override
-	public QSim getMobsim() {
-		return this.qsimEngine.getMobsim();
-	}
-
-	@Override
-	void setQSimEngine(QSimEngineInternalI qsimEngine) {
-		// yyyy does it make sense to have this setter?  Seems that this should be immutable after construction. kai, aug'10
-		this.qsimEngine = (QNetsimEngine) qsimEngine;
-		// yyyy this cast is not so bad because this is not meant to be pluggable (QLinkImpl together with some other engine).
-		// But it would still be better to do it correctly.  kai, aug'10
-
 	}
 
 	/**
@@ -502,18 +467,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 		return this.originalLane;
 	}
 
-//	@Override
-//	@Deprecated // imo, should not be exposed (implementation detail).  kai, nov'11
-//	public LinkedList<QVehicle> getVehQueue() {
-//		LinkedList<QVehicle> ll = this.originalLane.getVehQueue();
-//		for (QLane l : this.getToNodeQueueLanes()){
-//			ll.addAll(l.getVehQueue());
-//		}
-//		return ll;
-//	}
-
-
-
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -524,7 +477,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		@Override
 		public Collection<AgentSnapshotInfo> getVehiclePositions( final Collection<AgentSnapshotInfo> positions) {
 
-			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.getQSimEngine().getAgentSnapshotInfoBuilder();
+			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
 				lane.visdata.getVehiclePositions(positions);

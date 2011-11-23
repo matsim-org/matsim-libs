@@ -34,7 +34,7 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
 public class MultiModalQLinkExtension {

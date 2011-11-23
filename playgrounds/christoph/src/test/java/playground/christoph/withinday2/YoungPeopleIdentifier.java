@@ -9,7 +9,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimLink;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 public class YoungPeopleIdentifier extends DuringLegIdentifier {

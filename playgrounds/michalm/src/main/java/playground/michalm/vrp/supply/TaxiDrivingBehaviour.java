@@ -1,17 +1,15 @@
 package playground.michalm.vrp.supply;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.events.*;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.ShortestPath.*;
-import playground.michalm.vrp.demand.*;
-import playground.michalm.withinday.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import playground.michalm.vrp.data.network.ShortestPath;
+import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.demand.TaxiCustomer;
+import playground.michalm.withinday.DrivingWorld;
 
 
 public class TaxiDrivingBehaviour
@@ -50,8 +48,7 @@ public class TaxiDrivingBehaviour
 
                 Id currentLinkId = passenger.getCurrentLinkId();
 
-                if (netsim.getNetsimNetwork().getNetsimLink(currentLinkId)
-                        .unregisterAdditionalAgentOnLink(passenger.getCurrentLinkId()) == null) {
+                if (netsim.unregisterAdditionalAgentOnLink(passenger.getCurrentLinkId(), currentLinkId) == null) {
                     throw new RuntimeException("Passenger id=" + passenger.getId() +
                             "is not waiting for taxi");
                 }

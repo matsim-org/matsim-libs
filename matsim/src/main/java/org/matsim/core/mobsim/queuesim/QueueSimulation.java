@@ -58,8 +58,9 @@ import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.interfaces.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -618,12 +619,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 
 	@Override
-	public void unregisterAdditionalAgentOnLink(MobsimAgent planAgent) {
-		throw new UnsupportedOperationException() ;
-	}
-
-
-	@Override
 	public Collection<MobsimAgent> getActivityEndsList() {
 		throw new UnsupportedOperationException() ;
 	}
@@ -634,5 +629,16 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		throw new UnsupportedOperationException() ;
 	}
 
+
+	@Override
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		throw new UnsupportedOperationException() ;
+	}
+
+
+	@Override
+	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+		throw new UnsupportedOperationException() ;
+	}
 
 }
