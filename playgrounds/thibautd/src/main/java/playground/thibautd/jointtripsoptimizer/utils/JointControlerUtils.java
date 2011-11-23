@@ -136,12 +136,12 @@ public class JointControlerUtils {
 			// TODO: choose from some config group?
 			ScoringFunctionFactory factory =
 				// new CharyparNagelOpenTimesScoringFunctionFactory(
-				// new KtiLikeActivitiesScoringFunctionFactory(
-				// 		planCalcScoreConfigGroup,
-				// 		controler.getScenario());
-				new HerbieBasedScoringFunctionFactory(
-						config,
+				new KtiLikeActivitiesScoringFunctionFactory(
+						planCalcScoreConfigGroup,
 						controler.getScenario());
+				//new HerbieBasedScoringFunctionFactory(
+				//		config,
+				//		controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
 		}
 	}
