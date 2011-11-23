@@ -18,7 +18,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
-import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 
@@ -43,127 +42,127 @@ import com.vividsolutions.jts.geom.MultiPoint;
 
 public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Runnable {
 
-	private HashMap<String, Agent> agents = null; 
+	private HashMap<String, Agent> agents = null;
 	private HashMap<Integer, DataPoint> nodes = null;
 	private HashMap<Integer, int[]> links = null;
-	
+
 	private Double maxPosX,maxPosY,maxPosZ,maxTimeStep=Double.MIN_VALUE;
 	private Double minPosX,minPosY,minPosZ,minTimeStep=Double.MAX_VALUE;
-	
+
 	private Controller controller = null;
-	
+
 	private Double[] timeStepsAsDoubleValues;
-	
+
 	private LinkedList<Double> timeSteps;
-	
+
 	private Thread readerThread;
-	
+
 	private ShapeFileReader shapeFileReader;
-	
+
 
 	public Importer(Controller controller)
 	{
 		this.controller = controller;
-		
+
 	}
-	
-	
+
+
 
 	public Importer(Controller controller, Scenario sc, Thread readerThread)
 	{
-		
+
 		this.controller = controller;
 		this.readerThread = readerThread;
-		
+
 		Network network = sc.getNetwork();
-		
-//		private HashMap<Integer, DataPoint> nodes = null;
-//		private HashMap<Integer, int[]> links = null;
+
+		//		private HashMap<Integer, DataPoint> nodes = null;
+		//		private HashMap<Integer, int[]> links = null;
 		//sc.getNetwork().get -> nur über Links (hat from / to nodes (getcoord (get x y)))
-		
+
 		Map<Id, ? extends org.matsim.api.core.v01.network.Node> networkNodes = network.getNodes();
-		
+
 		//int k = 0;
-		
-		minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
-		maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
-		
-		
-		nodes = new HashMap<Integer, DataPoint>();
-		links = new HashMap<Integer, int[]>();
-		
+
+		this.minPosX = this.minPosY = this.minPosZ = this.minTimeStep = Double.MAX_VALUE;
+		this.maxPosX = this.maxPosY = this.maxPosZ = this.maxTimeStep = Double.MIN_VALUE;
+
+
+		this.nodes = new HashMap<Integer, DataPoint>();
+		this.links = new HashMap<Integer, int[]>();
+
 		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
 		{
 			//k++;
-//			System.out.println("");
-//			System.out.println("---------------------------------");
-//			
-//		    System.out.println(node.getKey() + "|" + node.getValue());
-		    
-		    //store current node in variable
-		    org.matsim.api.core.v01.network.Node currentNode;
-		    currentNode = (org.matsim.api.core.v01.network.Node)node.getValue();
-		    
-		    
-		    //get coordinates of the current node
-		    double posX = currentNode.getCoord().getX();
-		    double posY = currentNode.getCoord().getY();
-		    
-		    //recalculate min and max values
-			maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
-			maxPosY = Math.max(maxPosY, posY); minPosY = Math.min(minPosY, posY);
-		    
-		    //store node as DataPoint
+			//			System.out.println("");
+			//			System.out.println("---------------------------------");
+			//
+			//		    System.out.println(node.getKey() + "|" + node.getValue());
+
+			//store current node in variable
+			org.matsim.api.core.v01.network.Node currentNode;
+			currentNode = node.getValue();
+
+
+			//get coordinates of the current node
+			double posX = currentNode.getCoord().getX();
+			double posY = currentNode.getCoord().getY();
+
+			//recalculate min and max values
+			this.maxPosX = Math.max(this.maxPosX, posX); this.minPosX = Math.min(this.minPosX, posX);
+			this.maxPosY = Math.max(this.maxPosY, posY); this.minPosY = Math.min(this.minPosY, posY);
+
+			//store node as DataPoint
 			DataPoint nodeDataPoint = new DataPoint(posX, posY);
-			
+
 			//transform id to string (@TODO: use IdImpl)
 			int nodeID = Integer.valueOf(currentNode.getId().toString());
-			
+
 			//store node datapoint + id to nodes hashmap
-			nodes.put(nodeID, nodeDataPoint);
-		    		    
+			this.nodes.put(nodeID, nodeDataPoint);
+
 			//get in and out links
-		    //Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
-		    Map<Id, ? extends Link> outLinks = currentNode.getOutLinks();
-		    
-//		    System.out.println("IN LINKS");
-//		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
-//		    {
-//		    	System.out.println(inLink.getKey() + "|" + inLink.getValue());
-//		    	
-//		    }
-		    
-//		    System.out.println("OUT LINKS");
-		    for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
-		    {
+			//Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
+			Map<Id, ? extends Link> outLinks = currentNode.getOutLinks();
+
+			//		    System.out.println("IN LINKS");
+			//		    for (Map.Entry<Id, ? extends Link> inLink : inLinks.entrySet())
+			//		    {
+			//		    	System.out.println(inLink.getKey() + "|" + inLink.getValue());
+			//
+			//		    }
+
+			//		    System.out.println("OUT LINKS");
+			for (Map.Entry<Id, ? extends Link> outLink : outLinks.entrySet())
+			{
 				int from = Integer.valueOf(outLink.getValue().getFromNode().getId().toString());
 				int to = Integer.valueOf(outLink.getValue().getToNode().getId().toString());
-				
+
 				System.out.println(Integer.valueOf(outLink.getKey().toString()) + ": from: " + from + "| to: "  + to );
-				
+
 				//internal structure
 				int[] fromTo = {from, to};
-				
+
 				//store to links hashmap
-				links.put(Integer.valueOf(outLink.getKey().toString()),fromTo);
-		    }
-		    
-		    //if (k>100) System.exit(0);
-		    
-		    //@TODO: matsim nodes auf datapoints übertragen
-		    //@TODO: thread suspend ? (stepper implementieren)
+				this.links.put(Integer.valueOf(outLink.getKey().toString()),fromTo);
+			}
+
+			//if (k>100) System.exit(0);
+
+			//@TODO: matsim nodes auf datapoints übertragen
+			//@TODO: thread suspend ? (stepper implementieren)
 		}
 
 
-		
-//		for (Iterator iterator = networkNodes.iterator(); iterator.hasNext();) {
-//			type type = (type) iterator.next();
-//			
-//		}
-		
-		
-		
-		
+
+		//		for (Iterator iterator = networkNodes.iterator(); iterator.hasNext();) {
+		//			type type = (type) iterator.next();
+		//
+		//		}
+
+
+
+
 	}
 
 	public void readEventFile(String fileName)
@@ -177,11 +176,11 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 			doc.getDocumentElement().normalize();
 			NodeList eventList = doc.getElementsByTagName("event");
 
-			agents = new HashMap<String,Agent>();
+			this.agents = new HashMap<String,Agent>();
 
 			int currentAgent = 0;
 
-			timeSteps = new LinkedList<Double>();
+			this.timeSteps = new LinkedList<Double>();
 			//minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
 			//maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
 
@@ -193,14 +192,14 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				NamedNodeMap attributeList = currentNode.getAttributes();
 
 				//check all attributes
-				for (int r = 0; r < attributeList.getLength(); r++) 
+				for (int r = 0; r < attributeList.getLength(); r++)
 				{
 
 					//xml /w type node
 					if (attributeList.item(r).getNodeName().equals("type"))
 					{
 						String nodeValue = attributeList.item(r).getNodeValue();
-						
+
 
 
 						if (nodeValue.equals("XYZAzimuth"))
@@ -211,7 +210,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 							String agentNumber = String.valueOf(attributeList.getNamedItem("person").getNodeValue());
 
 							//Get current agent data & check if agent data has already been collected
-							Agent agent = agents.get(agentNumber);
+							Agent agent = this.agents.get(agentNumber);
 							if (agent==null)
 								agent = new Agent();
 
@@ -222,22 +221,22 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 							Double posZ = Double.valueOf(attributeList.getNamedItem("z").getNodeValue());
 
 							//add time
-							if (!timeSteps.contains(time))
-								timeSteps.addLast(time);
+							if (!this.timeSteps.contains(time))
+								this.timeSteps.addLast(time);
 
 							//Determine minimum and maximum positions
-							maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
-							maxPosY = Math.max(maxPosY, posY); minPosY = Math.min(minPosY, posY);
-							maxPosZ = Math.max(maxPosZ, posZ); minPosZ = Math.min(minPosZ, posZ);
-							maxTimeStep = Math.max(maxTimeStep, time); minTimeStep = Math.min(minTimeStep, time);
-							
-							System.out.println("px:"+posX+" | mpx: "+ maxPosX );
+							this.maxPosX = Math.max(this.maxPosX, posX); this.minPosX = Math.min(this.minPosX, posX);
+							this.maxPosY = Math.max(this.maxPosY, posY); this.minPosY = Math.min(this.minPosY, posY);
+							this.maxPosZ = Math.max(this.maxPosZ, posZ); this.minPosZ = Math.min(this.minPosZ, posZ);
+							this.maxTimeStep = Math.max(this.maxTimeStep, time); this.minTimeStep = Math.min(this.minTimeStep, time);
+
+							System.out.println("px:"+posX+" | mpx: "+ this.maxPosX );
 
 							//add dataPoint to agent
 							agent.addDataPoint(time, posX, posY, posZ);
 
 							//add agent data to agents hashMap
-							agents.put(String.valueOf(agentNumber), agent);
+							this.agents.put(String.valueOf(agentNumber), agent);
 
 						}
 					}
@@ -246,8 +245,8 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 
 					//System.out.println(attributeList.item(r).getNodeName() + ":" + attributeList.item(r).getNodeValue());
 				}
-				
-				
+
+
 
 				//System.out.println(timeLine.size());
 				//System.out.println("first:" + timeLine.first() + "| last: " + timeLine.last());
@@ -257,31 +256,31 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				}
 
 			}
-			
+
 
 		} catch (Exception e) {
-			
-			
-			
+
+
+
 			e.printStackTrace();
 		}
 	}
 
 	public void readShapeFile(String shapeFileString)
 	{
-//		ShapeFileReader shapeFileReader = new ShapeFileReader();
-//		
-//		shapeFileReader.readFileAndInitialize(shapeFileString);
-//		
-//		List<Geometry> geos = new ArrayList<Geometry>();
-//		for (Feature ft : shapeFileReader.getFeatureSet())
-//		{
-//			Geometry geo = ft.getDefaultGeometry();
-//			geos.add(geo);
-//		}
-		
+		//		ShapeFileReader shapeFileReader = new ShapeFileReader();
+		//
+		//		shapeFileReader.readFileAndInitialize(shapeFileString);
+		//
+		//		List<Geometry> geos = new ArrayList<Geometry>();
+		//		for (Feature ft : shapeFileReader.getFeatureSet())
+		//		{
+		//			Geometry geo = ft.getDefaultGeometry();
+		//			geos.add(geo);
+		//		}
+
 		System.out.println("shape file reader not implemented yet");
-		
+
 		/*
 		 * DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
 		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
@@ -291,34 +290,34 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 		}
 		this.c.setQuadTree(quad);
 		 */
-		
-		
+
+
 	}
-	
+
 	public HashMap<String, Agent> importAgentData()
 	{
 
 
-		return agents;
+		return this.agents;
 	}
 
 	public Double[] getExtremeValues()
 	{
-		Double[] extremeValues = {maxPosX, maxPosY, maxPosZ, minPosX, minPosY, minPosZ, maxTimeStep, minTimeStep}; 
+		Double[] extremeValues = {this.maxPosX, this.maxPosY, this.maxPosZ, this.minPosX, this.minPosY, this.minPosZ, this.maxTimeStep, this.minTimeStep};
 		return extremeValues;
 	}
-	
+
 	public LinkedList<Double> getTimeSteps()
 	{
-		timeStepsAsDoubleValues = timeSteps.toArray(new Double[timeSteps.size()]);
-		Arrays.sort(timeStepsAsDoubleValues);
-		
-		timeSteps = new LinkedList<Double>();
-		for (Double timeStepValue : timeStepsAsDoubleValues)
-			timeSteps.addLast(timeStepValue);
-		
-		return timeSteps;
-		
+		this.timeStepsAsDoubleValues = this.timeSteps.toArray(new Double[this.timeSteps.size()]);
+		Arrays.sort(this.timeStepsAsDoubleValues);
+
+		this.timeSteps = new LinkedList<Double>();
+		for (Double timeStepValue : this.timeStepsAsDoubleValues)
+			this.timeSteps.addLast(timeStepValue);
+
+		return this.timeSteps;
+
 		//return timeStepsAsDoubleValues;
 	}
 
@@ -330,30 +329,30 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	 */
 	public void readNetworkFile(String networkFileName)
 	{
-		
-		nodes = new HashMap<Integer, DataPoint>();
-		links = new HashMap<Integer, int[]>();
+
+		this.nodes = new HashMap<Integer, DataPoint>();
+		this.links = new HashMap<Integer, int[]>();
 
 		try
 		{
-			
+
 
 			File file = new File(networkFileName);
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			Document doc = db.parse(file);
 			doc.getDocumentElement().normalize();
-			
+
 			//System.out.println("Root element " + doc.getDocumentElement().getNodeName());
 			NodeList nodeList = doc.getElementsByTagName("node");
 			//System.out.println("Information of all events");
 
-			nodes = new HashMap<Integer,DataPoint>();
+			this.nodes = new HashMap<Integer,DataPoint>();
 
-			minPosX = minPosY = minPosZ = minTimeStep = Double.MAX_VALUE;
-			maxPosX = maxPosY = maxPosZ = maxTimeStep = Double.MIN_VALUE;
-			
-			
+			this.minPosX = this.minPosY = this.minPosZ = this.minTimeStep = Double.MAX_VALUE;
+			this.maxPosX = this.maxPosY = this.maxPosZ = this.maxTimeStep = Double.MIN_VALUE;
+
+
 			for (int s = 0; s < nodeList.getLength(); s++)
 			{
 
@@ -366,28 +365,28 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				int nodeID = Integer.valueOf(attributeList.getNamedItem("id").getNodeValue());
 				Double posX = Double.valueOf(attributeList.getNamedItem("x").getNodeValue());
 				Double posY = Double.valueOf(attributeList.getNamedItem("y").getNodeValue());
-				
-				maxPosX = Math.max(maxPosX, posX); minPosX = Math.min(minPosX, posX);
-				maxPosY = Math.max(maxPosY, posY); minPosY = Math.min(minPosY, posY);
+
+				this.maxPosX = Math.max(this.maxPosX, posX); this.minPosX = Math.min(this.minPosX, posX);
+				this.maxPosY = Math.max(this.maxPosY, posY); this.minPosY = Math.min(this.minPosY, posY);
 
 				//create a new dataPoint containing the coordinates
 				DataPoint nodeDataPoint = new DataPoint(posX, posY);
-				
+
 				//add node ID and coordinates to node ArrayList
-				nodes.put(nodeID, nodeDataPoint);
-			
+				this.nodes.put(nodeID, nodeDataPoint);
+
 				System.out.println("node (" + nodeID + ") : x:" + posX + " | y: " + posY );
 
 			}
-			
+
 			//max/min timestep not relevant within network data & z value handling not implemented yet
-			maxPosZ = minPosZ = maxTimeStep = minTimeStep = Double.NaN;
-			
+			this.maxPosZ = this.minPosZ = this.maxTimeStep = this.minTimeStep = Double.NaN;
+
 
 			//Get links
 			NodeList linkList = doc.getElementsByTagName("link");
 
-			//Iterate over all links 
+			//Iterate over all links
 			for (int s = 0; s < linkList.getLength(); s++)
 			{
 
@@ -401,71 +400,71 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				int linkID = Integer.valueOf(attributeList.getNamedItem("id").getNodeValue());
 				int from = Integer.valueOf(attributeList.getNamedItem("from").getNodeValue());
 				int to = Integer.valueOf(attributeList.getNamedItem("to").getNodeValue());
-				
+
 				int[] fromTo = {from,to};
-				
+
 				//add link ID and from/to to link ArrayList
-				links.put(linkID, fromTo);
-			
+				this.links.put(linkID, fromTo);
+
 				System.out.println("link (" + linkID + ") : from:" + from + " | to: " + to );
 
 			}
 
 
-			
-			
-			
+
+
+
 
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	public HashMap<Integer, int[]> getLinks()
 	{
-		return links;
+		return this.links;
 	}
 
 	public HashMap<Integer, DataPoint> getNodes()
 	{
-		return nodes;
+		return this.nodes;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(XYVxVyEvent event)
 	{
-		if (controller!=null)
+		if (this.controller!=null)
 		{
-			
-			controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
-			controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getVX(), event.getVY(), event.getTime());
+
+			this.controller.console.println("time: " + event.getTime() + " - Agent " + event.getPersonId().toString() + ": " + event.getX() + "|" + event.getY() );
+			this.controller.updateAgentData(event.getPersonId().toString(), event.getX(), event.getY(), event.getVX(), event.getVY(), event.getTime());
 		}
-		
+
 	}
 
 	@Override
 	public void run() {
 		System.out.println("importer: go go!");
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event)
 	{
-		if (controller!=null)
-			controller.updateAgentLink(event.getPersonId().toString(), event.getLinkId().toString());
-		
-		
+		if (this.controller!=null)
+			this.controller.updateAgentLink(event.getPersonId().toString(), event.getLinkId().toString());
+
+
 	}
 
 

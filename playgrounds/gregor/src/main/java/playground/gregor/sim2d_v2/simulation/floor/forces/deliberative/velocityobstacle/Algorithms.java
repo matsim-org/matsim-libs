@@ -1,9 +1,15 @@
 package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle;
 
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class Algorithms {
 
+
+	private static final TreeMap<Double,Double> atans = new TreeMap<Double,Double>();
+	private static final double ATANS_LOOKUP_TABLE_RES = Math.PI/100.;
 
 	/**
 	 * tests whether then polar angle of vector s0s1 is bigger than the polar angle of vector t0t1
@@ -57,11 +63,12 @@ public class Algorithms {
 
 		double ret;
 		if (x > 0) {
-			ret = Math.atan(y/x);
+
+			ret = lazyLookupAtan(y/x);
 		} else if (y >= 0 && x < 0) {
-			ret = Math.atan(y/x) + Math.PI;
+			ret = lazyLookupAtan(y/x) + Math.PI;
 		} else if (y < 0 && x <0) {
-			ret =  Math.atan(y/x) - Math.PI;
+			ret =  lazyLookupAtan(y/x) - Math.PI;
 		} else if (y > 0 && x == 0) {
 			ret =  Math.PI/2;
 		} else if (y < 0 && x == 0) {
@@ -73,6 +80,33 @@ public class Algorithms {
 			return ret + 2*Math.PI;
 		}
 		return ret;
+	}
+
+	private static double lazyLookupAtan(double d) {
+		Entry<Double, Double> c = atans.ceilingEntry(d);
+		double ret;
+		if (c == null){
+			ret = Math.atan(d);
+			atans.put(d, ret);
+			return ret;
+		}
+
+		Entry<Double, Double> f = atans.floorEntry(d);
+		if (f == null) {
+			ret = Math.atan(d);
+			atans.put(d, ret);
+			return ret;
+		}
+
+		if (Math.abs(c.getValue()-f.getValue()) > ATANS_LOOKUP_TABLE_RES) {
+			ret = Math.atan(d);
+			atans.put(d, ret);
+			return ret;
+		}
+
+
+
+		return (c.getValue()+f.getValue())/2;
 	}
 
 	/**

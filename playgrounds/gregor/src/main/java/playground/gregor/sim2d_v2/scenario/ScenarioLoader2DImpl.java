@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.Point;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.helper.DenseMultiPointFromGeometries;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
 public class ScenarioLoader2DImpl  {
 
@@ -83,8 +83,14 @@ public class ScenarioLoader2DImpl  {
 		reader.readFileAndInitialize(file);
 
 		this.scenarioData.addScenarioElement(reader);
+		generateDenseCoords(reader);
+
+		QuadTree<CCWPolygon> q = new SegmentsFromGeometries(reader).getQuadTree();
+		this.c.setSegmentsQuadTree(q);
+	}
 
 
+	private void generateDenseCoords(ShapeFileReader reader) {
 		Envelope e = reader.getBounds();
 		QuadTree<Coordinate> quad = new QuadTree<Coordinate>(e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
 
@@ -99,7 +105,8 @@ public class ScenarioLoader2DImpl  {
 			Point p = (Point) mp.getGeometryN(i);
 			quad.put(p.getX(), p.getY(), p.getCoordinate());
 		}
-		this.c.setQuadTree(quad);
+		this.c.setDenseCoordsQuadTree(quad);
+
 	}
 
 }

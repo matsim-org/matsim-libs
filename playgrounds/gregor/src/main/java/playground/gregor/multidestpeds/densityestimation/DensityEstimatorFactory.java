@@ -68,7 +68,7 @@ public class DensityEstimatorFactory {
 		ret.setMinDist(.300);
 		ret.setEventsManager(this.events);
 
-		ret.setStaticEnvironmentDistancesQuadtree(this.sc.getScenarioElement(MyDataContainer.class).getQuadTree());
+		ret.setStaticEnvironmentDistancesQuadtree(this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree());
 
 
 		return ret;

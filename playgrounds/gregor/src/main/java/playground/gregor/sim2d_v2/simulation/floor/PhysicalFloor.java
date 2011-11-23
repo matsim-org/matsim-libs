@@ -54,6 +54,8 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
@@ -90,6 +92,7 @@ public class PhysicalFloor implements Floor {
 	private final EventsManager em;
 	private final Collection<? extends Link> links;
 	private FinishLineCrossedChecker finishLineCrossChecker;
+	private LinkSwitcher mlsw;
 
 
 	private static final boolean MS_FORCE_UPDATE = false;
@@ -103,6 +106,7 @@ public class PhysicalFloor implements Floor {
 		this.em = em;
 		this.emitXYZAzimuthEvents = emitEvents;
 
+
 	}
 
 	/**
@@ -111,9 +115,21 @@ public class PhysicalFloor implements Floor {
 	public void init() {
 		calculateEnvelope();
 
-		//for testing!!
-		this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
 
+		if (this.sim2DConfig.isEnableMentalLinkSwitch()){
+			this.mlsw = new MentalLinkSwitcher(this.scenario);
+		} else {
+			this.mlsw = new LinkSwitcher() {
+				@Override
+				public void checkForMentalLinkSwitch(Id curr, Id next, Agent2D agent) {
+					// nothing to do here
+				}
+			};
+		}
+
+		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
+			this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
+		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
 			this.dynamicForceModules.add(new CircularAgentInteractionModule(this, this.scenario));
@@ -348,13 +364,13 @@ public class PhysicalFloor implements Floor {
 
 
 		for (ForceModule m : this.dynamicForceModules) {
-			m.run(agent);
+			m.run(agent,time);
 		}
 
 
 
 		for (ForceModule m : this.forceModules) {
-			m.run(agent);
+			m.run(agent,time);
 		}
 	}
 
@@ -379,7 +395,7 @@ public class PhysicalFloor implements Floor {
 	 * @param agent
 	 */
 	public void agentDepart(MobsimDriverAgent pda) {
-		Agent2D agent = new Agent2D(pda,this.scenario);
+		Agent2D agent = new Agent2D(pda,this.scenario,this.mlsw);
 		Activity act = (Activity) getPreviousPlanElement(pda);
 		if (act.getCoord() != null) {
 			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));

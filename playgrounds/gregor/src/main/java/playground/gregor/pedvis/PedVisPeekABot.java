@@ -296,6 +296,25 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		double az = getAzimuth(l.getFromNode().getCoord(), l.getToNode().getCoord());
 		this.pc.setBotPositionII(event.getPersonId().toString().hashCode(), (float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0, (float) az,(float)(this.scale));
 		this.locations.put(event.getPersonId(), new Coordinate((float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0));
+
+
+		float r = 0;
+		float g = 0;
+		float b = 0;
+
+		// experimental id dependent colorization
+		MatsimRandom.reset(event.getLinkId().toString().hashCode());
+		MatsimRandom.getRandom().nextDouble();
+		MatsimRandom.getRandom().nextDouble();
+		b = MatsimRandom.getRandom().nextFloat();
+		g = MatsimRandom.getRandom().nextFloat();
+		r = MatsimRandom.getRandom().nextFloat();
+		//		if (event.getPersonId().toString().contains("r")) {
+		//			r = 1.f;
+		//		} else {
+		//			g = 1.f;
+		//		}
+		this.pc.setBotColorII(event.getPersonId().toString().hashCode(), r, g, b);
 	}
 
 	/**
@@ -351,8 +370,8 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.0/0.events.xml.gz", true, 1);
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
+		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}
@@ -397,7 +416,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 			this.inSim.add(e.getPersonId());
 
 		}
-		if (e.getLegMode().equals("car")) {
+		if (e.getLegMode().equals("walk2d")) {
 			this.carAgents.add(e.getPersonId());
 		}
 		//			this.pc.setBotShapeII(Integer.parseInt(e.getPersonId().toString()), PeekABotClient.CAR);

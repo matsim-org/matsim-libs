@@ -20,17 +20,19 @@ public class MultiThreadedForceUpdater implements Runnable{
 	@Override
 	public void run(){
 
+
 		while (true) {
 			Agent2D agent = this.queue.poll();
 			if (agent == null) {
 				return;
 			}
 			for (ForceModule m : this.dynamicForceModules) {
-				m.run(agent);
+				m.run(agent,Double.NaN);
 			}
 			for (ForceModule m : this.forceModules) {
-				m.run(agent);
+				m.run(agent,Double.NaN);
 			}
+			throw new RuntimeException("this does not work!!");
 		}
 	}
 

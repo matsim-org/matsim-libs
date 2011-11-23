@@ -52,7 +52,7 @@ DynamicForceModule {
 	}
 
 	@Override
-	public void run(Agent2D agent) {
+	public void run(Agent2D agent,double time) {
 		double fx = 0;
 		double fy = 0;
 

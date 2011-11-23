@@ -42,7 +42,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 	}
 
 	@Override
-	public void run(Agent2D agent) {
+	public void run(Agent2D agent, double time) {
 		double fx = 0;
 		double fy = 0;
 
@@ -132,7 +132,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 	@Override
 	public void init() {
-		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getQuadTree();
+		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree();
 	}
 
 	private static final class Vector {

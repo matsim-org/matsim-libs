@@ -41,7 +41,7 @@ public class EnvironmentForceModuleII implements ForceModule {
 	 * .gregor.sim2_v2.simulation.Agent2D)
 	 */
 	@Override
-	public void run(Agent2D agent) {
+	public void run(Agent2D agent, double time) {
 		double fx = 0;
 		double fy = 0;
 
@@ -59,13 +59,13 @@ public class EnvironmentForceModuleII implements ForceModule {
 		double tanDvx = (- agent.getVx()) * dx;
 		double tanDvy = (- agent.getVy()) * dy;
 
-		double tanX = tanDvx * -dx;
-		double tanY = tanDvy * dy;
+		double tanX = tanDvx * -dy;
+		double tanY = tanDvy * dx;
 
-		//		double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
-		//		double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
-		double xc = (k*g)* dx;
-		double yc = (k*g)* dy;
+		double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
+		double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
+		//		double xc = (k*g)* dx;
+		//		double yc = (k*g)* dy;
 		fx += xc;
 		fy += yc;
 
@@ -84,6 +84,6 @@ public class EnvironmentForceModuleII implements ForceModule {
 	 */
 	@Override
 	public void init() {
-		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getQuadTree();
+		this.quad = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree();
 	}
 }

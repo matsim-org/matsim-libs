@@ -18,6 +18,7 @@ import com.vividsolutions.jts.geom.Point;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 public class PathAndDrivingAcceleration {
 
@@ -29,14 +30,12 @@ public class PathAndDrivingAcceleration {
 
 	GeometryFactory geofac = new GeometryFactory();
 
-	private static final double VIRTUAL_LENGTH = 1000;
 
 	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =50;
-	private static final double Bpath = 500;
+	private static final double Apath =25;
 
 
 
@@ -44,6 +43,7 @@ public class PathAndDrivingAcceleration {
 		this.floor = floor;
 		this.tau = 0.5; //1/1.52;
 		this.sc = sc;
+
 		init();
 	}
 
@@ -57,15 +57,15 @@ public class PathAndDrivingAcceleration {
 			double length = Math.sqrt(Math.pow(c.x, 2) + Math.pow(c.y, 2));
 			c.x /= length;
 			c.y /= length;
-			Coordinate virtualFrom = new Coordinate(from.x - c.x*VIRTUAL_LENGTH, from.y - c.y * VIRTUAL_LENGTH);
-			LineString ls = this.geofac.createLineString(new Coordinate[] { virtualFrom, to });
 			Coordinate perpendicularVec = new Coordinate(COS_RIGHT * c.x + SIN_RIGHT * c.y, -SIN_RIGHT * c.x + COS_RIGHT * c.y);
 
 			double minWidth = getMinWidth(this.geofac.createLineString(new Coordinate[]{from,to}),link.getCoord());
 			LinkInfo li = new LinkInfo();
 			li.pathWidth = minWidth;
-			li.ls = ls;
+			li.c0 = from;
+			li.c1 = to;
 			li.perpendicularVector = perpendicularVec;
+			li.length = from.distance(to);
 			this.linkGeos.put(link.getId(), li);
 		}
 		this.drivingDirections = new HashMap<Id, Coordinate>();
@@ -79,7 +79,7 @@ public class PathAndDrivingAcceleration {
 	}
 
 	private double getMinWidth(LineString link, Coord coord) {
-		QuadTree<Coordinate> q = this.sc.getScenarioElement(MyDataContainer.class).getQuadTree();
+		QuadTree<Coordinate> q = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree();
 		Collection<Coordinate> coll = q.get(coord.getX(), coord.getY(), link.getLength());
 		double minDist = Double.POSITIVE_INFINITY;
 		for (Coordinate c : coll) {
@@ -95,45 +95,32 @@ public class PathAndDrivingAcceleration {
 	public double [] getDesiredAccelerationForce(Agent2D agent) {
 
 
-		Coordinate d = this.drivingDirections.get(agent.getCurrentLinkId());
+		Id mentalLinkId =  agent.getMentalLink();
+		Coordinate d = this.drivingDirections.get(mentalLinkId);
 		double driveX = d.x  * agent.getDesiredVelocity();
 		double driveY = d.y * agent.getDesiredVelocity();
 
-		//		Coordinate d2 = this.drivingDirections.get(agent.chooseNextLinkId());
-		//		if (d2 != null) {
-		//			double x = (d.x + d2.x);
-		//			double y = (d.y + d2.y);
-		//			double denom = Math.sqrt(x*x+y*y);
-		//			driveX =  x/ denom* agent.getDesiredVelocity();
-		//			driveY = y /denom * agent.getDesiredVelocity();
-		//		}
 
 		double fdx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/this.tau;
 		double fdy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/this.tau;
 
 		Coordinate pos = agent.getPosition();
-		LinkInfo li = this.linkGeos.get(agent.getCurrentLinkId());
-		double bpath = Math.max(0.1, li.pathWidth/2);
+		LinkInfo li = this.linkGeos.get(mentalLinkId);
+		double bpath = Math.max(1, li.pathWidth-Agent2D.AGENT_DIAMETER);
+		//		double bpath = 1;
 
-		LineString ls = li.ls;
+		//		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls); //this line takes 12.5% of the overall runtime. optimization needed!! see http://softsurfer.com/Archive/algorithm_0102/algorithm_0102.htm
+		double pathDist = Math.abs(((li.c0.y-li.c1.y) * pos.x + (li.c1.x-li.c0.x)*pos.y + (li.c0.x*li.c1.y - li.c1.x*li.c0.y))/li.length);
 
-		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls);
 		double fpx = 0;
 		double fpy = 0;
-		if (pathDist > bpath){
-			double f = Apath * Math.exp(pathDist / bpath);
-			Point orig = ls.getStartPoint();
-			Point dest = ls.getEndPoint();
-			double x2 = orig.getX() - dest.getX();
-			double y2 = orig.getY() - dest.getY();
-			double x3 = orig.getX() - pos.x;
-			double y3 = orig.getY() - pos.y;
-			boolean rightHandSide = x2*y3 - y2*x3 < 0 ? false : true;
-			double dx = rightHandSide == true ? -li.perpendicularVector.x : li.perpendicularVector.x;
-			double dy = rightHandSide == true ? -li.perpendicularVector.y : li.perpendicularVector.y;
-			fpx  = dx * f;
-			fpy = dy * f;
-		}
+		double f = Apath * Math.exp(pathDist / bpath);
+
+		boolean rightHandSide = Algorithms.isLeftOfLine(pos, li.c0, li.c1) > 0;
+		double dx = rightHandSide == true ? -li.perpendicularVector.x : li.perpendicularVector.x;
+		double dy = rightHandSide == true ? -li.perpendicularVector.y : li.perpendicularVector.y;
+		fpx  = dx * f;
+		fpy = dy * f;
 		double fx = fdx + fpx;
 		double fy = fdy + fpy;
 
@@ -142,8 +129,10 @@ public class PathAndDrivingAcceleration {
 
 	private static final class LinkInfo {
 		double pathWidth;
-		LineString ls;
+		double length;
 		Coordinate perpendicularVector;
+		Coordinate c0;
+		Coordinate c1;
 	}
 
 }

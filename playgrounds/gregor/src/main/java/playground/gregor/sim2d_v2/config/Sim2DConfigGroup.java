@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import org.matsim.core.config.Module;
 
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
 
 /**
  * @author laemmel
@@ -53,9 +54,13 @@ public class Sim2DConfigGroup extends Module {
 	public static final String ENABLE_ENVIRONMENT_FORCE_MODULE = "enableEnvironmentForceModule";
 	public static final String ENABLE_PATH_FORCE_MODULE = "enablePathForthModule";
 
+	public static final String ENABLE_MENTAL_LINK_SWITCH = "enableMentalLinkSwitch";
+
 	public static final String PHANTOM_POPULATION_EVENTS_FILE = "phantomPopulationEventsFile";
 
 	public static final String MAX_SENSING_RANGE = "maxSensingRange";
+
+	private static final String ENABLE_VELOCITY_OBSTACLE_MODULE = "enableVelocityObstacleModule";
 
 	private double maxSensingRang = 5;
 
@@ -71,19 +76,23 @@ public class Sim2DConfigGroup extends Module {
 
 	private String phantomPopulationEventsFile;
 
-	private boolean enableCircularAgentInteractionModule = false;
+	private boolean enableCircularAgentInteractionModule = true;
 	private boolean enableCollisionPredictionAgentInteractionModule = false;
+
+	private boolean enableVelocityObstacleModule = false;
 
 
 
 	private boolean enableCollisionPredictionEnvironmentForceModule = false;
-	private boolean enableDrivingForceModule = false;
+	private boolean enableDrivingForceModule = true;
 
 
 	private boolean enableEnvironmentForceModule = true;
 
 
 	private boolean enablePathForceModule = true;
+
+	private boolean enableMentalLinkSwitch = false;
 
 
 	//Zanlungo et al constant
@@ -166,14 +175,27 @@ public class Sim2DConfigGroup extends Module {
 			setEnableEnvironmentForceModule(value);
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)){
 			setEnablePathForceModule(value);
-		} else if (MAX_SENSING_RANGE.equals(key)) {
+		} else if (ENABLE_VELOCITY_OBSTACLE_MODULE.equals(key)){
+			setEnableVelocityObstacleModule(value);
+		}else if (MAX_SENSING_RANGE.equals(key)) {
 			setMaxSensingRange(value);
+		} else if (ENABLE_MENTAL_LINK_SWITCH.equals(key)){
+			setEnableMentalLinkSwitch(value);
 		}
 		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
 
+
+
+	private void setEnableMentalLinkSwitch(String value) {
+		this.enableMentalLinkSwitch = Boolean.parseBoolean(value);
+	}
+
+	public boolean isEnableMentalLinkSwitch(){
+		return this.enableMentalLinkSwitch;
+	}
 
 	private void setMaxSensingRange(String value) {
 		double range = Double.parseDouble(value);
@@ -206,6 +228,15 @@ public class Sim2DConfigGroup extends Module {
 
 	public void setEnablePathForceModule(String value) {
 		this.enablePathForceModule = Boolean.parseBoolean(value);
+
+	}
+
+	public boolean isEnableVelocityObstacleModule() {
+		return this.enableVelocityObstacleModule;
+	}
+
+	private void setEnableVelocityObstacleModule(String value) {
+		this.enableVelocityObstacleModule = Boolean.parseBoolean(value);
 
 	}
 
@@ -261,8 +292,12 @@ public class Sim2DConfigGroup extends Module {
 			return Boolean.toString(isEnableEnvironmentForceModule());
 		} else if (ENABLE_PATH_FORCE_MODULE.equals(key)) {
 			return Boolean.toString(isEnablePathForceModule());
-		} else if (MAX_SENSING_RANGE.equals(key)) {
+		} else if(ENABLE_VELOCITY_OBSTACLE_MODULE.equals(key)){
+			return Boolean.toString(isEnableVelocityObstacleModule());
+		}else if (MAX_SENSING_RANGE.equals(key)) {
 			return Double.toString(getMaxSensingRange());
+		}else if (ENABLE_MENTAL_LINK_SWITCH.equals(key)){
+			return Boolean.toString(isEnableMentalLinkSwitch());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -288,7 +323,9 @@ public class Sim2DConfigGroup extends Module {
 		map.put(ENABLE_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_ENVIRONMENT_FORCE_MODULE));
 		map.put(ENABLE_PATH_FORCE_MODULE, getValue(ENABLE_PATH_FORCE_MODULE));
 		map.put(PHANTOM_POPULATION_EVENTS_FILE, getValue(PHANTOM_POPULATION_EVENTS_FILE));
+		map.put(ENABLE_VELOCITY_OBSTACLE_MODULE, getValue(ENABLE_VELOCITY_OBSTACLE_MODULE));
 		map.put(MAX_SENSING_RANGE, getValue(MAX_SENSING_RANGE));
+		map.put(ENABLE_MENTAL_LINK_SWITCH, getValue(ENABLE_MENTAL_LINK_SWITCH));
 		return map;
 	}
 

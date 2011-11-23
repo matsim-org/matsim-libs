@@ -49,9 +49,12 @@ public class GISBasedPopulationGenerator {
 	private final Collection<Feature> ftsEnv;
 
 	private final GeometryFactory geofac = new GeometryFactory();
-	private final Id safeLinkId1 = new IdImpl(501);
-	private final Id safeLinkId2 = new IdImpl(581);
-	private final Id safeLinkId3 = new IdImpl(0);
+	//	private final Id safeLinkId1 = new IdImpl(501);
+	//	private final Id safeLinkId2 = new IdImpl(581);
+	//	private final Id safeLinkId3 = new IdImpl(0);
+	private final Id safeLinkId1 = new IdImpl(871);
+	private final Id safeLinkId2 = new IdImpl(0);
+	private final Id safeLinkId3 = new IdImpl(905);
 
 	public GISBasedPopulationGenerator(Scenario sc, Collection<Feature> population, Collection<Feature> environment, Id destination) {
 		this.sc = sc;

@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 
@@ -50,7 +51,7 @@ public class Agent2D  {
 	private final double maxV = 2.;
 
 	public static final double AGENT_WEIGHT = 80;// * 1000;
-	public static final double AGENT_DIAMETER = 0.25;
+	public static final double AGENT_DIAMETER = 0.5;
 
 	private CCWPolygon geometry;
 	private final double a_min = .18;
@@ -61,18 +62,23 @@ public class Agent2D  {
 	private double v;
 	private double alpha = 0;
 
+	private double earliestUpdate = -1;
+
+	private boolean mentalSwitched = false;
+	private final LinkSwitcher mentalLinkSwitcher;
+
 	/**
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(MobsimDriverAgent pda, Scenario sc) {
+	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw) {
 
 		this.pda = pda;
 		this.sc = sc;
 		// TODO think about this
-		this.desiredVelocity = 1.34; //+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+		this.desiredVelocity = 1.34;//+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
 		this.currentDesiredVelocity = this.desiredVelocity;
-
+		this.mentalLinkSwitcher = mlsw;
 		initGeometry();
 
 	}
@@ -142,6 +148,8 @@ public class Agent2D  {
 		this.geometry = this.geometryQuad.get(this.v, this.alpha);
 		this.geometry.translate(this.currentPosition);
 
+		this.mentalLinkSwitcher.checkForMentalLinkSwitch(getCurrentLinkId(), chooseNextLinkId(), this);
+
 	}
 
 
@@ -176,6 +184,22 @@ public class Agent2D  {
 		this.pda.notifyMoveOverNode(newLinkId);
 		double sp = this.sc.getNetwork().getLinks().get(newLinkId).getFreespeed(time);
 		this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
+		this.mentalSwitched = false;
+	}
+
+	public void switchMental() {
+		this.mentalSwitched = true;
+	}
+
+	public boolean isMentalSwitched() {
+		return this.mentalSwitched;
+	}
+
+	public Id getMentalLink() {
+		if (this.mentalSwitched) {
+			return this.chooseNextLinkId();
+		}
+		return this.getCurrentLinkId();
 	}
 
 	public Id getId() {
@@ -195,5 +219,12 @@ public class Agent2D  {
 	}
 
 
+	public void setEarliestUpdate(double time) {
+		this.earliestUpdate = time;
+	}
+
+	public double getEarliestUpdate() {
+		return this.earliestUpdate;
+	}
 
 }

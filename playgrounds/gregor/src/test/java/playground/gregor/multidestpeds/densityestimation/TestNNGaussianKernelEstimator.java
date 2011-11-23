@@ -63,7 +63,7 @@ public class TestNNGaussianKernelEstimator implements DoubleValueStringKeyAtCoor
 		Scenario sc = ScenarioUtils.createScenario(c);
 		QuadTree<Coordinate> tree = createQuadTreeAndNetwork(sc);
 		MyDataContainer cc = new MyDataContainer();
-		cc.setQuadTree(tree);
+		cc.setDenseCoordsQuadTree(tree);
 		sc.addScenarioElement(cc);
 
 		EventsManager events = EventsUtils.createEventsManager();

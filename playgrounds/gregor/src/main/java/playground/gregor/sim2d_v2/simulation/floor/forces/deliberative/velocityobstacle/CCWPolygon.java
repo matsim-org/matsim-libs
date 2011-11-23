@@ -53,7 +53,7 @@ public class CCWPolygon {
 			throw new RuntimeException("Coordinate array must be a ring!");
 		}
 
-		if (!CGAlgorithms.isCCW(coords)) {
+		if (coords.length > 3 && !CGAlgorithms.isCCW(coords)) {
 			reverseCoords(coords);
 		}
 

@@ -52,8 +52,8 @@ public class PathForceModule implements ForceModule {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =10;
-	private static final double Bpath = .5;
+	private static final double Apath =25; //*Agent2D.AGENT_WEIGHT;
+	private static final double Bpath = 2.;
 
 
 	/**
@@ -113,10 +113,10 @@ public class PathForceModule implements ForceModule {
 	 * .gregor.sim2_v2.simulation.Agent2D)
 	 */
 	@Override
-	public void run(Agent2D agent) {
+	public void run(Agent2D agent, double time) {
 
 		Coordinate pos = agent.getPosition();
-		LinkInfo li = this.linkGeos.get(agent.getCurrentLinkId());
+		LinkInfo li = this.linkGeos.get(agent.getMentalLink());
 		LineString ls = li.ls;
 
 		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls);

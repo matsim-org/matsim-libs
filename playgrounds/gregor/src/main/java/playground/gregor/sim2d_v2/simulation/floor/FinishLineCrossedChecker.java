@@ -31,6 +31,8 @@ public class FinishLineCrossedChecker {
 	private HashMap<Id, FinishLines> finishLines;
 	private HashMap<Id, LineString> perpendicularLines;
 
+	private final HashMap<Id, ArrivalArea> arrivalAreas = new HashMap<Id,ArrivalArea>();
+
 	private GeometryFactory geofac;
 
 	private List<Geometry> geos;
@@ -41,7 +43,6 @@ public class FinishLineCrossedChecker {
 	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
-	private final double earlySwitchOffset = 0.25;
 
 	public FinishLineCrossedChecker(Scenario sc) {
 		this.sc = sc;
@@ -56,6 +57,8 @@ public class FinishLineCrossedChecker {
 		this.geofac = new GeometryFactory();
 		for (Link link : this.sc.getNetwork().getLinks().values()) {
 			FinishLines lines = new FinishLines();
+			ArrivalArea a = new ArrivalArea();
+			this.arrivalAreas.put(link.getId(), a);
 			for (Link next : link.getToNode().getOutLinks().values()) {
 				LineString ls = null;
 				if (next.getToNode() == link.getFromNode()) {
@@ -67,7 +70,9 @@ public class FinishLineCrossedChecker {
 				lines.finishLines.put(next.getId(), ls);
 			}
 			this.finishLines.put(link.getId(), lines);
+
 		}
+
 	}
 
 	private void initGeometries() {
@@ -82,6 +87,9 @@ public class FinishLineCrossedChecker {
 
 		Coordinate a = MGC.coord2Coordinate(link.getFromNode().getCoord());
 		Coordinate b = MGC.coord2Coordinate(link.getToNode().getCoord());
+
+
+
 		Coordinate c = MGC.coord2Coordinate(next.getToNode().getCoord());
 		Coordinate d = Triangle.angleBisector(a, b, c);
 
@@ -90,8 +98,8 @@ public class FinishLineCrossedChecker {
 		double abx = b.x - a.x;
 		double aby = b.y - a.y;
 
-		double nbx = a.x + abx/lengthAb * (lengthAb - this.earlySwitchOffset);
-		double nby = a.y + aby/lengthAb * (lengthAb - this.earlySwitchOffset);
+		double nbx = a.x + abx/lengthAb * (lengthAb );
+		double nby = a.y + aby/lengthAb * (lengthAb );
 
 		Coordinate nb = new Coordinate(nbx,nby);
 
@@ -135,6 +143,18 @@ public class FinishLineCrossedChecker {
 		} else {
 			ret = this.geofac.createLineString(new Coordinate[]{cc2,cc1});
 		}
+
+
+		Coordinate c0 = MGC.coord2Coordinate(next.getFromNode().getCoord());
+		double aa0 = c.x - c0.x;
+		double aa1 = c.y - c0.y;
+		Coordinate ccc1 = ret.getCoordinateN(0);
+		Coordinate ccc2 = ret.getCoordinateN(1);
+
+		Coordinate [] arrival = new Coordinate[]{ccc2, new Coordinate(ccc2.x+aa0,ccc2.y+aa1),new Coordinate(ccc1.x+aa0,ccc1.y+aa1),ccc1};
+		this.arrivalAreas.get(link.getId()).arrivalAreas.put(next.getId(), arrival);
+
+
 		return ret;
 	}
 
@@ -187,11 +207,21 @@ public class FinishLineCrossedChecker {
 			ls = this.finishLines.get(currentLinkId).finishLines.get(nextLinkId);
 		}
 
-		//isLeftOfLine is about 50x faster than crosses so we test crosses only if we are left of the finish line
-		// where the end point of the trajectory is left of the finish line if crosses returns true
+
 		if (Algorithms.isLeftOfLine(newPos, ls.getCoordinateN(0), ls.getCoordinateN(1)) > 0) {
-			LineString trajectory = this.geofac.createLineString(new Coordinate[]{oldPos,newPos});
-			return trajectory.crosses(ls);
+			//			Coordinate[] coords = this.arrivalAreas.get(currentLinkId).arrivalAreas.get(nextLinkId);
+			//
+			//			//TODO repair this!!
+			//			if (coords == null) {
+			//				return true;
+			//			}
+			//
+			//			if (Algorithms.isLeftOfLine(newPos, coords[0],coords[1]) > 0 && Algorithms.isLeftOfLine(newPos, coords[2],coords[3]) > 0) {
+			//				return true;
+			//			}
+			return true;
+			//			LineString trajectory = this.geofac.createLineString(new Coordinate[]{oldPos,newPos});
+			//			return trajectory.crosses(ls);
 		}
 
 		return false;
@@ -199,6 +229,10 @@ public class FinishLineCrossedChecker {
 
 	private static final class FinishLines {
 		public Map<Id,LineString> finishLines = new HashMap<Id,LineString>();
+	}
+
+	private static final class ArrivalArea {
+		public Map<Id,Coordinate[]> arrivalAreas = new HashMap<Id,Coordinate[]>();
 	}
 
 }

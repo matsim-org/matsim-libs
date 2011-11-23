@@ -13,7 +13,7 @@ public class PhantomAgent2D extends Agent2D {
 
 	private final Id id;
 	public PhantomAgent2D(Id id) {
-		super(null,null);
+		super(null,null,null);
 		this.id = id;
 	}
 

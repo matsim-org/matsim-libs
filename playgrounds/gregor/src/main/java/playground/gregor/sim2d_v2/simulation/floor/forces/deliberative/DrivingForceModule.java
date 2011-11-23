@@ -80,8 +80,8 @@ public class DrivingForceModule implements ForceModule {
 	 * .gregor.sim2_v2.simulation.Agent2D)
 	 */
 	@Override
-	public void run(Agent2D agent) {
-		Coordinate d = this.drivingDirections.get(agent.getCurrentLinkId());
+	public void run(Agent2D agent, double time) {
+		Coordinate d = this.drivingDirections.get(agent.getMentalLink());
 		double driveX = d.x  * agent.getDesiredVelocity();
 		double driveY = d.y * agent.getDesiredVelocity();
 

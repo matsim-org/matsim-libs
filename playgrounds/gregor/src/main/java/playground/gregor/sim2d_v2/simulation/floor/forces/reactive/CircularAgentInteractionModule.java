@@ -73,7 +73,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	 * .gregor.sim2_v2.simulation.Agent2D)
 	 */
 	@Override
-	public void run(Agent2D agent) {
+	public void run(Agent2D agent,double time) {
 		updateForces(agent);
 	}
 
@@ -108,14 +108,16 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			double bounderyDist = Agent2D.AGENT_DIAMETER - dist;
 			double g = bounderyDist > 0 ? bounderyDist : 0;
 
-			double tanDvx = (other.getVx() - agent.getVx()) * -dx;
+			double tanDvx = (other.getVx() - agent.getVx()) * dx;
 			double tanDvy = (other.getVy() - agent.getVy()) * dy;
 
-			double tanX = tanDvx * -dx;
-			double tanY = tanDvy * dy;
+			double tanX = tanDvx * -dy;
+			double tanY = tanDvy * dx;
 
 			double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
 			double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
+			//			double xc = ( k*g)* dx;
+			//			double yc = (k*g)* dy ;
 
 			fx += xc;
 			fy += yc;
