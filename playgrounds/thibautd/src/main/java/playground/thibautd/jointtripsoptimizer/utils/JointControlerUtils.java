@@ -33,6 +33,7 @@ import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.scoring.HerbieBasedScoringFunctionFactory;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 
 /**
@@ -128,14 +129,18 @@ public class JointControlerUtils {
 		int nFacilities = facilities.getFacilities().size();
 
 		if (nFacilities > 0) {
+			Config config = controler.getConfig();
 			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
-				controler.getConfig().planCalcScore();
+				config.planCalcScore();
 
 			// TODO: choose from some config group?
 			ScoringFunctionFactory factory =
 				// new CharyparNagelOpenTimesScoringFunctionFactory(
-				new KtiLikeActivitiesScoringFunctionFactory(
-						planCalcScoreConfigGroup,
+				// new KtiLikeActivitiesScoringFunctionFactory(
+				// 		planCalcScoreConfigGroup,
+				// 		controler.getScenario());
+				new HerbieBasedScoringFunctionFactory(
+						config,
 						controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
 		}
