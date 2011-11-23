@@ -85,7 +85,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					facilityPenalties,
 					((ScenarioImpl) scenario).getActivityFacilities() ));
 		scoringFunctionAccumulator.addScoringFunction(
-				new LegScoringFunction(
+				new CarPoolingLegScoringFunction(
 					params,
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
