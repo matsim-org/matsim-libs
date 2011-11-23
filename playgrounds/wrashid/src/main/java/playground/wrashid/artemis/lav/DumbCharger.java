@@ -76,7 +76,9 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 			chargingPowerInterface = new CharingPowerScenario3();
 		} else if (chargingScenarioNumber == 4) {
 			chargingPowerInterface = new CharingPowerScenario4();
-		} else {
+		} else if (chargingScenarioNumber == 5) {
+			chargingPowerInterface = new CharingPowerScenario5();
+		}else {
 			DebugLib.stopSystemAndReportInconsistency("scenario not defined...");
 		}
 
@@ -296,4 +298,12 @@ class CharingPowerScenario4 implements ChargingPowerInterface {
 	}
 }
 
+class CharingPowerScenario5 extends CharingPowerScenario1 {
+
+	public CharingPowerScenario5() {
+		super();
+		this.chargingLocationFilter = new HashMap<String, Double>();
+		chargingLocationFilter.put("home", 11000.0);
+	}
+}
 
