@@ -28,6 +28,7 @@ import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 
 /**
  * The MobsimFactory is necessary so that something can be passed to the controler which instantiates this.
@@ -53,7 +54,7 @@ public class QSimFactory implements MobsimFactory {
 		
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-			ParallelQSimulation sim = new ParallelQSimulation(sc, em);
+            QSim sim = new QSim(sc, em, new ParallelQNetsimEngineFactory());
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 			return sim;
 		} else {

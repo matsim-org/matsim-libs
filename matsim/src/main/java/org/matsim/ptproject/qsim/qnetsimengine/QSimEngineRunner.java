@@ -110,7 +110,7 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 				/*
 				 * The Threads wait at the startBarrier until they are
 				 * triggered in the next TimeStep by the run() method in
-				 * the ParallelQSimEngine.
+				 * the ParallelQNetsimEngine.
 				 */
 				startBarrier.await();
 

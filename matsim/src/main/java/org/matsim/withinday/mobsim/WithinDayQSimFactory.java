@@ -26,7 +26,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngineFactory;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 
 /*
  * Depending on the number of threads in the config file a
@@ -34,9 +38,23 @@ import org.matsim.ptproject.qsim.qnetsimengine.ParallelQSimEngineFactory;
  */
 public class WithinDayQSimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
-	  
-	@Override
-	public WithinDayQSim createMobsim(Scenario sc, EventsManager eventsManager) {
+
+    public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
+        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+		qSim.setAgentFactory(agentFactory);
+        return qSim;
+    }
+
+    public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
+        QSim qSim = new QSim(scenario, events, factory);
+        ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+		qSim.setAgentFactory(agentFactory);
+        return qSim;
+    }
+
+    @Override
+	public QSim createMobsim(Scenario sc, EventsManager eventsManager) {
 		// Get number of parallel Threads
 		QSimConfigGroup conf = (QSimConfigGroup) sc.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
 		  
@@ -45,7 +63,7 @@ public class WithinDayQSimFactory implements MobsimFactory {
 
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-			WithinDayQSim sim = new WithinDayQSim(sc, em, new ParallelQSimEngineFactory());
+			QSim sim = createWithinDayQSim(sc, em, new ParallelQNetsimEngineFactory());
 			  			  
 			// Get number of parallel Threads
 			log.info("Using parallel QSim with " + numOfThreads + " parallel Threads.");
@@ -53,7 +71,7 @@ public class WithinDayQSimFactory implements MobsimFactory {
 			return sim;
 		}
 		else {
-			return new WithinDayQSim(sc, eventsManager); 
+			return createWithinDayQSim(sc, eventsManager);
 		}
 	}
 }

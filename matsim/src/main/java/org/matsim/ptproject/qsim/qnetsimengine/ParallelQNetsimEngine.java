@@ -43,14 +43,14 @@ import org.matsim.ptproject.qsim.QSim;
  * simulated Node instead of one in total as the Single CPU
  * QSim does, the Results will slightly vary between the parallel and the sequential version.
  * <br/><br/>
- * The ParallelQSimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
+ * The ParallelQNetsimEngine (this class) will fulfill the QSimEngine interface upwards (i.e. against the QSim).
  * The QSimEngineThreads will fulfill the QSimEngine interface downwards (i.e. against nodes and links).
  */
-class ParallelQSimEngine extends QNetsimEngine {
+class ParallelQNetsimEngine extends QNetsimEngine {
 	// yy I think we could consider moving the node-based rnd num gen also into the sequential version. kai, jun'10
 	// yy Until this is realized, the Random object is added as customizable objecte to the QNode. cdober, nov'10
 	
-	final private static Logger log = Logger.getLogger(ParallelQSimEngine.class);
+	final private static Logger log = Logger.getLogger(ParallelQNetsimEngine.class);
 	
 	private int numOfThreads;
 	private Thread[] threads;
@@ -65,7 +65,7 @@ class ParallelQSimEngine extends QNetsimEngine {
 	private CyclicBarrier endBarrier;
 
 
-	ParallelQSimEngine(final QSim sim, final Random random) {
+	ParallelQNetsimEngine(final QSim sim, final Random random) {
 		super(sim, random);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 		
@@ -153,13 +153,13 @@ class ParallelQSimEngine extends QNetsimEngine {
 	 */
 	@Override
 	protected synchronized void activateLink(final AbstractQLink link) {
-		log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQSimEngine!");
+		log.warn("Links should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 		super.activateLink(link);
 	}
 	
 	@Override
 	protected synchronized void activateNode(final QNode node) {
-		log.warn("Nodes should be activated by a QSimEngineRunner and not by the ParallelQSimEngine!");
+		log.warn("Nodes should be activated by a QSimEngineRunner and not by the ParallelQNetsimEngine!");
 		super.activateNode(node);
 	}
 

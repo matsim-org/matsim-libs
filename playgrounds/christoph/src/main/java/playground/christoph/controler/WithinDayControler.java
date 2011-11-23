@@ -31,8 +31,8 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -90,7 +90,7 @@ public class WithinDayControler extends WithinDayController {
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
 	protected SelectHandledAgentsByProbability selector;
-	protected WithinDayQSim sim;
+	protected QSim sim;
 	
 	static final Logger log = Logger.getLogger(WithinDayControler.class);
 

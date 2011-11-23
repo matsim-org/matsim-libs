@@ -91,7 +91,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  * @author knagel
  */
-public class QSim implements VisMobsim, Netsim {
+public final class QSim implements VisMobsim, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -153,8 +153,8 @@ public class QSim implements VisMobsim, Netsim {
 		this(scenario, events, new DefaultQSimEngineFactory());
 	}
 
-	protected QSim(final Scenario sc, final EventsManager events,
-			final QNetsimEngineFactory netsimEngFactory) {
+	public QSim(final Scenario sc, final EventsManager events,
+                final QNetsimEngineFactory netsimEngFactory) {
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
@@ -309,7 +309,6 @@ public class QSim implements VisMobsim, Netsim {
 
 		createAgents();
 		createTransitDrivers();
-		createAdditionalAgents();
 
 		this.initSimTimer();
 
@@ -336,12 +335,7 @@ public class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	@Deprecated // please solve via addAgentSource(...).  kai, nov'11
-	protected void createAdditionalAgents() {
-		// Empty for inheritance. (only one test)
-	}
-
-	private void createAgents() {
+    private void createAgents() {
 		for (AgentSource agentSource : agentSources) {
 			List<MobsimAgent> theseAgents = agentSource.insertAgentsIntoMobsim();
 			for (MobsimAgent agent : theseAgents) {

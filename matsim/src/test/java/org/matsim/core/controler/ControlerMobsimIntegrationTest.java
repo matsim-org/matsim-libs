@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.ptproject.qsim.ParallelQSimulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -72,7 +71,7 @@ public class ControlerMobsimIntegrationTest {
 		c.setDumpDataAtEnd(false);
 		c.setWriteEventsInterval(0);
 		c.run();
-		Assert.assertTrue(c.sim instanceof ParallelQSimulation);
+		Assert.assertTrue(c.sim instanceof QSim);
 	}
 
 	@Test

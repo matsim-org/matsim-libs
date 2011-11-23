@@ -29,11 +29,11 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * @author dgrether
  *
  */
-public class ParallelQSimEngineFactory implements QNetsimEngineFactory {
+public class ParallelQNetsimEngineFactory implements QNetsimEngineFactory {
 
 	@Override
 	public QNetsimEngine createQSimEngine(Netsim sim, Random random) {
-		return new ParallelQSimEngine( (QSim) sim, random);
+		return new ParallelQNetsimEngine( (QSim) sim, random);
 	}
 
 }

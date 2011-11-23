@@ -52,7 +52,6 @@ import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -133,7 +132,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected EvacuationTimePicture evacuationTimePicture;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
-	protected WithinDayQSim sim;
+	protected QSim sim;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 

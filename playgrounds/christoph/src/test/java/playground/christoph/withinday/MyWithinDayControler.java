@@ -27,8 +27,9 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.withinday.mobsim.ReplanningManager;
-import org.matsim.withinday.mobsim.WithinDayQSim;
+import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -64,7 +65,7 @@ class MyWithinDayControler extends Controler {
 	protected int numReplanningThreads = 5;
 
 	protected ReplanningManager replanningManager;
-	protected WithinDayQSim sim;
+	protected QSim sim;
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 
@@ -133,7 +134,7 @@ class MyWithinDayControler extends Controler {
 		createHandlersAndListeners();
 		// initializes "replanningManager"
 
-		sim = new WithinDayQSim(this.scenarioData, this.events);
+		sim = WithinDayQSimFactory.createWithinDayQSim(this.scenarioData, this.events);
 		// a QSim with two differences:
 		// (1) uses WithinDayAgentFactory instead of the regular agent factory
 		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications

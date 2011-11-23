@@ -48,7 +48,6 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.mobsim.WithinDayQSim;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
@@ -392,7 +391,7 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		protected void collectAgents(QSim sim) {
 			this.withinDayAgents = new ArrayList<PlanBasedWithinDayAgent>();
 
-			for (MobsimAgent mobsimAgent : ((WithinDayQSim) sim).getAgents()) {
+			for (MobsimAgent mobsimAgent : sim.getAgents()) {
 				if (mobsimAgent instanceof MobsimAgent) {
 					MobsimAgent personAgent = mobsimAgent;
 					withinDayAgents.add((PlanBasedWithinDayAgent) personAgent);

@@ -37,9 +37,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.ptproject.qsim.ParallelQSimulation;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 
 import java.util.Collection;
 
@@ -70,7 +70,7 @@ public class City2000WQSimFactory implements MobsimFactory {
 
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-			ParallelQSimulation sim = new ParallelQSimulation(sc, em);
+            QSim sim = new QSim(sc, em, new ParallelQNetsimEngineFactory());
 			return sim;
 		} else {
 			final QSim sim = new QSim(sc, eventsManager);
