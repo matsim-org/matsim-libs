@@ -5,7 +5,12 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
-
+/**
+ * This class is used for route visualization in OTFVis 
+ *
+ * @author michalm
+ *
+ */
 public class DynAgentWithPlan
     implements MobsimDriverAgent, PlanAgent
 {
@@ -121,14 +126,14 @@ public class DynAgentWithPlan
     @Override
     public PlanElement getCurrentPlanElement()
     {
-        throw new UnsupportedOperationException("");
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public PlanElement getNextPlanElement()
     {
-        throw new UnsupportedOperationException("");
+        throw new UnsupportedOperationException();
 
     }
 

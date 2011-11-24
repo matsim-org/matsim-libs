@@ -46,9 +46,7 @@ public class VRPAgentFactory
             DynAgent dynAgent = new DynAgent(p.getId(), startLinkId, netsim,
                     taxiAgentLogic);
 
-            taxiAgentLogic.setAgent(dynAgent);
-
-            data.getVrpSimEngine().addAgent(taxiAgentLogic);
+            data.getVrpSimEngine().addAgentLogic(taxiAgentLogic);
 
             return dynAgent;
         }

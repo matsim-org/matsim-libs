@@ -28,7 +28,7 @@ public class VRPSimEngine
     private static final int MAX_TIME_DIFFERENCE = 180; // in seconds
     private boolean demandChanged;
 
-    private List<TaxiAgentLogic> agents = new ArrayList<TaxiAgentLogic>();
+    private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
 
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
@@ -140,21 +140,21 @@ public class VRPSimEngine
     
     private void notifyAgents()
     {
-        for (TaxiAgentLogic a : agents) {
+        for (TaxiAgentLogic a : agentLogics) {
             a.scheduleUpdated();
         }
     }
 
 
-    public void addAgent(TaxiAgentLogic agent)
+    public void addAgentLogic(TaxiAgentLogic agentLogic)
     {
-        agents.add(agent);
+        agentLogics.add(agentLogic);
     }
 
 
     public void removeAgent(TaxiAgentLogic agent)
     {
-        agents.remove(agent);
+        agentLogics.remove(agent);
     }
 
 

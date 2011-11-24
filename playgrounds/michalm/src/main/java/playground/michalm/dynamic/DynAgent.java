@@ -92,9 +92,9 @@ public class DynAgent
     }
 
 
-    public void startLeg(DynLeg drivingBehavior, double now)
+    public void startLeg(DynLeg leg, double now)
     {
-        this.vrpLeg = drivingBehavior;
+        this.vrpLeg = leg;
         nextLinkId = UNCHOSEN_NEXT_LINK;
 
         // TODO: any events firing here??
@@ -146,8 +146,9 @@ public class DynAgent
     @Override
     public final Id getPlannedVehicleId()
     {
+        //I am not sure about this function. In general, throwing null works:)
         // return null;
-        return veh == null ? null : veh.getId();
+        return (vrpLeg != null) ? (veh == null ? null : veh.getId()) : null;
     }
 
 

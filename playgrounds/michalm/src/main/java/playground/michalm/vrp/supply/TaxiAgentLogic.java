@@ -5,7 +5,6 @@ import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
-import org.matsim.ptproject.qsim.qnetsimengine.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -36,12 +35,6 @@ public class TaxiAgentLogic
     private Request currentRequest = null;
 
     private Netsim netsim = null;
-
-
-    public void setAgent(DynAgent agent)
-    {
-        this.agent = agent;
-    }
 
 
     @Override
