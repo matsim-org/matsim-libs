@@ -29,12 +29,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -47,7 +49,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  * @author cdobler
  */
-public class LegModeChecker implements PlanAlgorithm {
+public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private Scenario scenario;
 	private double maxDistance = 2000.0;	// allowed distance between an activity location and the place where the car is parked
@@ -83,6 +85,11 @@ public class LegModeChecker implements PlanAlgorithm {
 	
 	public double getMaxDistance() {
 		return this.maxDistance;
+	}
+	
+	@Override
+	public void run(Person person) {
+		for (Plan plan : person.getPlans()) this.run(plan);
 	}
 	
 	@Override

@@ -22,18 +22,9 @@
 	<module name="controler">
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="10" />
+		<param name="lastIteration" value="0" />
 		<param name= "writeEventsInterval" value="4" />
 		<param name= "mobsim" value="qsim" />
-	</module>
-
-	<module name="simulation">
-		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
-		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="00:00:00" />
-	
-		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
-
 	</module>
 
 	<module name="planCalcScore">
@@ -59,6 +50,11 @@
 		<param name="activityLatestStartTime_1" value="09:00:00" />
 		<param name="activityEarliestEndTime_1" value="" />
 		<param name="activityClosingTime_1"     value="18:00:00" />
+		
+		<param name="activityType_2"            value="parking" /> <!-- parking -->
+		<param name="activityPriority_2"        value="1" />
+		<param name="activityTypicalDuration_2" value="00:03:00" />
+		<param name="activityMinimalDuration_2" value="00:03:00" />
 	</module>
 	
 	<module name="strategy">
@@ -75,9 +71,9 @@
 		<param name="flowCapacityFactor" value="0.010" />
 		<param name="storageCapacityFactor" value="0.025" />
 		<param name="startTime" value="00:00:00" />
-		<param name="endTime" value="9:00:00" />
-		<param name="numberOfThreads" value="6" />
-		<param name="stuckTime" value="600" />
+		<param name="endTime" value="0:00:00" />
+		<param name="numberOfThreads" value="2" />
+		<param name="stuckTime" value="60" />
 		<param name="removeStuckVehicles" value="false" />
 	</module>
 

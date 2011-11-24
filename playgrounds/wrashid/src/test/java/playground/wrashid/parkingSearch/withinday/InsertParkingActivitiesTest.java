@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsertParkingActivitiesReplannerTest.java
+ * InsertParkingActivitiesTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.withinday;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,47 +42,75 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-public class InsertParkingActivitiesReplannerTest extends TestCase {
+public class InsertParkingActivitiesTest extends TestCase {
 
+	private static final Logger log = Logger.getLogger(InsertParkingActivitiesTest.class);
+	
 	public void testInsertParkingActivities() {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
+		createFacilities(sc);
 		
 		PopulationFactory factory = sc.getPopulation().getFactory();
 		
 		Person person = factory.createPerson(sc.createId("1"));
+		sc.getPopulation().addPerson(person);
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
 		
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		ActivityImpl activity;
+		
+		activity = (ActivityImpl) factory.createActivityFromLinkId("home", sc.createId("l2"));
+		activity.setFacilityId(sc.createId("f2"));
+		plan.addActivity(activity);
+		
 		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addActivity(factory.createActivityFromLinkId("work", sc.createId("l4")));
+		
+		activity = (ActivityImpl) factory.createActivityFromLinkId("work", sc.createId("l4"));
+		activity.setFacilityId(sc.createId("f4"));
+		plan.addActivity(activity);
+		
 		plan.addLeg(factory.createLeg(TransportMode.car));
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		
+		activity = (ActivityImpl) factory.createActivityFromLinkId("home", sc.createId("l2"));
+		activity.setFacilityId(sc.createId("f2"));
+		plan.addActivity(activity);
+		
 		plan.addLeg(factory.createLeg(TransportMode.walk));
-		plan.addActivity(factory.createActivityFromLinkId("shopping", sc.createId("l5")));
+		
+		activity = (ActivityImpl) factory.createActivityFromLinkId("shopping", sc.createId("l5"));
+		activity.setFacilityId(sc.createId("f5"));
+		plan.addActivity(activity);
+		
 		plan.addLeg(factory.createLeg(TransportMode.pt));
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		
+		activity = (ActivityImpl) factory.createActivityFromLinkId("home", sc.createId("l2"));
+		activity.setFacilityId(sc.createId("f2"));
+		plan.addActivity(activity);
 		
 		/*
 		 * Set activity durations and coordinates
 		 */
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof ActivityImpl) {
-				ActivityImpl activity = (ActivityImpl) planElement;
+				activity = (ActivityImpl) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 			}
 		}
+		
 		
 		assertEquals(9, plan.getPlanElements().size());
 		
@@ -91,12 +120,21 @@ public class InsertParkingActivitiesReplannerTest extends TestCase {
 		PersonalizableTravelCost travelCost = new TravelTimeDistanceCostCalculator(travelTime, sc.getConfig().planCalcScore());
 		
 		PlanAlgorithm plansAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCost, travelTime, routeFactory);
-		WithinDayInitialReplanner replanner = new InsertParkingActivitiesReplanner(sc.createId("replanner"), sc, plansAlgorithm);
+		
+		// initialize routes
+		new PersonPrepareForSim(plansAlgorithm, (ScenarioImpl) sc).run(sc.getPopulation());
+
+		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc);
+		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, plansAlgorithm, parkingInfrastructure);
 		
 		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(person, null);
-		replanner.doReplanning(agent);
+		insertParkingActivities.run(agent.getSelectedPlan());
 		
 		assertEquals(17, agent.getSelectedPlan().getPlanElements().size());
+		
+		for (PlanElement planElement : agent.getSelectedPlan().getPlanElements()) {
+			log.info(planElement.toString());
+		}
 				
 		/*
 		 * Add two consecutive car legs which cannot be handled by the Replanner
@@ -110,7 +148,7 @@ public class InsertParkingActivitiesReplannerTest extends TestCase {
 		
 		agent = new ExperimentalBasicWithindayAgent(person, null);
 		try {
-			replanner.doReplanning(agent);
+			insertParkingActivities.run(agent.getSelectedPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");
 		} catch (RuntimeException e) { }
 	}
@@ -190,6 +228,39 @@ public class InsertParkingActivitiesReplannerTest extends TestCase {
 		network.addLink(l7);
 		network.addLink(l8);
 		network.addLink(l9);
+	}
+	
+	private void createFacilities(Scenario sc) {
+		
+		ActivityFacilityImpl facility = null;
+		ActivityFacilitiesImpl facilities = ((ScenarioImpl) sc).getActivityFacilities();
+		
+		facility = facilities.createFacility(sc.createId("f1"), sc.getNetwork().getLinks().get(sc.createId("l1")).getCoord());
+		facility.createActivityOption("parking");
+		
+		facility = facilities.createFacility(sc.createId("f2"), sc.getNetwork().getLinks().get(sc.createId("l2")).getCoord());
+		facility.createActivityOption("home");
+		
+		facility = facilities.createFacility(sc.createId("f3"), sc.getNetwork().getLinks().get(sc.createId("l3")).getCoord());
+		facility.createActivityOption("parking");
+		
+		facility = facilities.createFacility(sc.createId("f4"), sc.getNetwork().getLinks().get(sc.createId("l4")).getCoord());
+		facility.createActivityOption("work");
+		
+		facility = facilities.createFacility(sc.createId("f5"), sc.getNetwork().getLinks().get(sc.createId("l5")).getCoord());
+		facility.createActivityOption("shopping");
+		
+		facility = facilities.createFacility(sc.createId("f6"), sc.getNetwork().getLinks().get(sc.createId("l6")).getCoord());
+		facility.createActivityOption("parking");
+		
+		facility = facilities.createFacility(sc.createId("f7"), sc.getNetwork().getLinks().get(sc.createId("l7")).getCoord());
+		facility.createActivityOption("parking");
+		
+		facility = facilities.createFacility(sc.createId("f8"), sc.getNetwork().getLinks().get(sc.createId("l8")).getCoord());
+		facility.createActivityOption("parking");
+		
+		facility = facilities.createFacility(sc.createId("f9"), sc.getNetwork().getLinks().get(sc.createId("l9")).getCoord());
+		facility.createActivityOption("parking");		
 	}
 
 }

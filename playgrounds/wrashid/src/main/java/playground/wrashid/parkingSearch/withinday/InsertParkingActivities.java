@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsertParkingActivitiesReplanner.java
+ * InsertParkingActivities.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,38 +28,37 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
-public class InsertParkingActivitiesReplanner extends WithinDayInitialReplanner {
+public class InsertParkingActivities implements PlanAlgorithm {
 
-	private PlanAlgorithm planAlgorithm;
+	private final Scenario scenario;
+	private final PersonAlgorithm personPrepareForSim;
+	private final ParkingInfrastructure parkingInfrastructure;
 	
 	/*
 	 * use a InitialIdentifierImpl and set handleAllAgents to true
 	 */
-	public InsertParkingActivitiesReplanner(Id id, Scenario scenario, PlanAlgorithm planAlgorithm) {
-		super(id, scenario);
-		
-		this.planAlgorithm = planAlgorithm;
+	public InsertParkingActivities(Scenario scenario, PlanAlgorithm planAlgorithm, ParkingInfrastructure parkingInfrastructure) {
+		this.scenario = scenario;		
+		this.personPrepareForSim = new PersonPrepareForSim(planAlgorithm, (ScenarioImpl) scenario);
+		this.parkingInfrastructure = parkingInfrastructure;
 	}
-
+	
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
-		List<PlanElement> planElements = executedPlan.getPlanElements();
+	public void run(Plan plan)  {
+		List<PlanElement> planElements = plan.getPlanElements();
 		
 		/*
-		 * TODO:
-		 * changes to this plan will be executed but not written to the person
-		 *  
-		 * - select parking facility (e.g. nearest to origin and destination, assigned to location, ...)
-		 * - reroute car leg
-		 * - recalculate walk leg distance
+		 * Changes to this plan will be executed but not written to the person
 		 */
 		List<Integer> carLegIndices = new ArrayList<Integer>();
 		int index = 0;
@@ -72,6 +71,9 @@ public class InsertParkingActivitiesReplanner extends WithinDayInitialReplanner 
 			index++;
 		}
 		
+		// if no car legs are performed, no adaption of the plan is necessary
+		if (carLegIndices.size() == 0) return;
+		
 		for (int i = carLegIndices.size(); i > 0; i--) {
 			index = carLegIndices.get(i-1);
 			
@@ -80,26 +82,45 @@ public class InsertParkingActivitiesReplanner extends WithinDayInitialReplanner 
 			
 			if (!(previousActivity instanceof Activity)) throw new RuntimeException("Expected an activity before each car leg!");
 			if (!(nextActivity instanceof Activity)) throw new RuntimeException("Expected an activity after each car leg!");
-		
+			
 			planElements.add(index + 1, createWalkLeg());
-			planElements.add(index + 1, createParkingActivity(((Activity) nextActivity).getLinkId()));
-			planElements.add(index, createParkingActivity(((Activity) previousActivity).getLinkId()));
+			planElements.add(index + 1, createParkingActivity(((Activity) nextActivity).getFacilityId()));
+			planElements.add(index, createParkingActivity(((Activity) previousActivity).getFacilityId()));
 			planElements.add(index, createWalkLeg());
 		}
 		
-		planAlgorithm.run(executedPlan);
-		
-		return true;
+		/*
+		 * Create initial routes for new legs
+		 * 
+		 * Since we only want the current plan to be prepared, we
+		 * create a dummy person, add the plan, prepare this person
+		 * and the reassign the plan to the person it really belongs to.
+		 */
+		Person person = plan.getPerson();
+		Person dummyPerson = this.scenario.getPopulation().getFactory().createPerson(scenario.createId("dummy"));
+		dummyPerson.addPlan(plan);
+		personPrepareForSim.run(dummyPerson);
+		plan.setPerson(person);
 	}
 
-	private Activity createParkingActivity(Id linkId) {
+	private Activity createParkingActivity(Id facilityId) {
+
+		// get the facility where the activity is performed
+		ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
+		Id parkingFacilityId = this.parkingInfrastructure.getClosestFacilityFromCoord(facility.getCoord());
+		
+		// get the closest parking facility
+		ActivityFacility parkingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);
+		
+		Id linkId = parkingFacility.getLinkId();
 		ActivityImpl activity = (ActivityImpl) this.scenario.getPopulation().getFactory().createActivityFromLinkId("parking", linkId);
-		activity.setMaximumDuration(0);
-		activity.setCoord(this.scenario.getNetwork().getLinks().get(linkId).getCoord());
+		activity.setMaximumDuration(180);
+		activity.setCoord(parkingFacility.getCoord());
 		return activity;
 	}
 	
 	private Leg createWalkLeg() {
 		return this.scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
 	}
+	
 }
