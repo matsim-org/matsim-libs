@@ -35,10 +35,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
@@ -81,7 +81,6 @@ public class WarmEmissionAnalysisModule {
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	// TODO: merge detailed and average emission calculation
 	private Map<WarmPollutant, Double> calculateWarmEmissions(Id personId,
 			Integer roadType, Double linkLength, Double travelTime,
 			String ageFuelCcm) {

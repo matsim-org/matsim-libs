@@ -48,16 +48,17 @@ public class RunEmissionToolOnline {
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
+	static String emissionVehicleFile = inputPath + "vehicles.xml";
 	
+	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetColdEmissionFactors.txt";
-	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "hbefaAverageFleetWarmEmissionFactors.txt";
+//	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
 	
-	static boolean isUsingDetailedEmissionCalculation = true;
-	static String detailedWarmEmissionFactorsFile = emissionInputPath + "hbefaDetailedWarmEmissionFactorsPC.txt";
+	static boolean isUsingDetailedEmissionCalculation = false;
+	static String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
 	
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
 	
-	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		Config config = new Config();
 		config.addCoreModules();
@@ -132,6 +133,7 @@ public class RunEmissionToolOnline {
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
+		vcg.setEmissionVehicleFile(emissionVehicleFile);
 		
 		vcg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 		vcg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);

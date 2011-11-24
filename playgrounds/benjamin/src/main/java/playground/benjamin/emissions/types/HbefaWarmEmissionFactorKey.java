@@ -29,7 +29,7 @@ public class HbefaWarmEmissionFactorKey {
 	private WarmPollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
-	// TODO: better idea for subgroup?
+	// only necessary for detailed emission calculation:
 	private String hbefaTechnology = "";
 	private String hbefaSizeClass = "";
 	private String hbefaEmConcept = "";

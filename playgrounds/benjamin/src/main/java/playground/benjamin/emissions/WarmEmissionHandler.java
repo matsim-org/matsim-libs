@@ -47,7 +47,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
 	private final Network network;
-	private final Vehicles vehicles;
+	private final Vehicles emissionVehicles;
 	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	private static int linkLeaveWarnCnt = 0;
 	private static int maxLinkLeaveWarnCnt = 3;
@@ -56,8 +56,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private final Map<Id, Double> agentarrival = new HashMap<Id, Double>();
 	private final Map<Id, Double> agentdeparture = new HashMap<Id, Double>();
 
-	public WarmEmissionHandler(Vehicles vehicles, final Network network, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
-		this.vehicles = vehicles;
+	public WarmEmissionHandler(Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
+		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
 	}
@@ -120,8 +120,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 			Id vehicleId = personId;
 			String ageFuelCcm;
-			if(this.vehicles.getVehicles().containsKey(vehicleId)){
-				Vehicle vehicle = this.vehicles.getVehicles().get(vehicleId);
+			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
+				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
 				String description = vehicleType.getDescription();
 				if (description.equals("default")) {

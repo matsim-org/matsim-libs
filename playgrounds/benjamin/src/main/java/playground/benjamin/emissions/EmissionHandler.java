@@ -40,10 +40,10 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactor;
-import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
+import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
@@ -53,25 +53,26 @@ import playground.benjamin.emissions.types.WarmPollutant;
 public class EmissionHandler {
 	private static final Logger logger = Logger.getLogger(EmissionHandler.class);
 	
-	private final Scenario scenario;
-	private static EventWriterXML emissionEventWriter;
+	final Scenario scenario;
+	static EventWriterXML emissionEventWriter;
 
 	//===
-	private static String roadTypeMappingFile;
+	static String roadTypeMappingFile;
+	static String emissionVehicleFile;
 	
-	private static String averageFleetColdEmissionFactorsFile;
-	private static String averageFleetWarmEmissionFactorsFile;
+	static String averageFleetColdEmissionFactorsFile;
+	static String averageFleetWarmEmissionFactorsFile;
 
-	private static String detailedWarmEmissionFactorsFile;
+	static String detailedWarmEmissionFactorsFile;
+	
 	//===
 	Map<Integer, String> roadTypeMapping;
+	Vehicles emissionVehicles;
 	
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable;
+	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable;
 
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	//===
-	private String vehicleFile;
+	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
 	public EmissionHandler(Scenario scenario) {
 		this.scenario = scenario;
@@ -83,6 +84,7 @@ public class EmissionHandler {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
+		emissionVehicles = createEmissionVehicles(emissionVehicleFile);
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
@@ -99,6 +101,7 @@ public class EmissionHandler {
 	private void getInputFiles() {
 		
 		roadTypeMappingFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
+		emissionVehicleFile = scenario.getConfig().vspExperimental().getEmissionVehicleFile();
 
 		averageFleetWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageWarmEmissionFactorsFile();
 		averageFleetColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageColdEmissionFactorsFile();
@@ -112,12 +115,6 @@ public class EmissionHandler {
 		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
-		//TODO: Vehicles should be read in vspExperimentalConfigGroup
-		vehicleFile = "../../detailedEval/emissions/testScenario/input/vehicles.xml";
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(vehicles);
-		vehicleReader.readFile(vehicleFile);
-		
 		// instantiate analysis modules
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
 				roadTypeMapping,
@@ -130,7 +127,7 @@ public class EmissionHandler {
 		
 		// create different emission handler
 		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
-				vehicles,
+				emissionVehicles,
 				network,
 				warmEmissionAnalysisModule);
 		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
@@ -148,7 +145,7 @@ public class EmissionHandler {
 		logger.info("leaving installEmissionsEventHandler") ;
 	}
 
-	private static Map<Integer, String> createRoadTypeMapping(String filename){
+	private Map<Integer, String> createRoadTypeMapping(String filename){
 		logger.info("entering createRoadTypeMapping ...") ;
 		
 		Map<Integer, String> roadTypeMapping = new HashMap<Integer, String>();
@@ -175,7 +172,16 @@ public class EmissionHandler {
 		return roadTypeMapping;
 	}
 	
-	private static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
+	private Vehicles createEmissionVehicles(String emissionVehicleFile) {
+		logger.info("entering createEmissionVehicles ...") ;
+		emissionVehicles = VehicleUtils.createVehiclesContainer();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
+		vehicleReader.readFile(emissionVehicleFile);
+		logger.info("leaving createEmissionVehicles ...") ;
+		return emissionVehicles;
+	}
+
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
@@ -210,7 +216,7 @@ public class EmissionHandler {
 		return avgHbefaWarmTable;
 	}
 	
-	private static Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
+	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
 		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable =
@@ -259,7 +265,7 @@ public class EmissionHandler {
 		return avgHbefaColdTable;
 	}
 	
-	private static Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>() ;
@@ -296,7 +302,7 @@ public class EmissionHandler {
 		return hbefaWarmTableDetailed;
 	}
 	
-	private static Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {
+	private Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {
 		String[] keys = strLine.split(fieldSeparator) ;
 
 		Map<String, Integer> indexFromKey = new HashMap<String, Integer>() ;
@@ -306,7 +312,7 @@ public class EmissionHandler {
 		return indexFromKey ;
 	}
 
-	private static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
@@ -317,7 +323,7 @@ public class EmissionHandler {
 		return hbefaVehicleCategory;
 	}
 
-	private static WarmPollutant mapComponent2WarmPollutant(String string) {
+	private WarmPollutant mapComponent2WarmPollutant(String string) {
 		WarmPollutant warmPollutant = null;
 		for(WarmPollutant wp : WarmPollutant.values()){
 			if(string.equals(wp.getText())) warmPollutant = wp;
@@ -326,14 +332,14 @@ public class EmissionHandler {
 		return warmPollutant;
 	}
 
-	private static String mapString2HbefaRoadCategory(String string) {
+	private String mapString2HbefaRoadCategory(String string) {
 		String hbefaRoadCategory = null;
 		String[] parts = string.split("/");
 		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
 	}
 
-	private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
+	private HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
 		HbefaTrafficSituation hbefaTrafficSituation = null;
 		if(string.endsWith("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
 		else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
