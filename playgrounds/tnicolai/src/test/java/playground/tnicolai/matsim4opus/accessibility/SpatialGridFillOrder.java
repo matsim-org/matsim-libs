@@ -106,7 +106,7 @@ public class SpatialGridFillOrder {
 		return grid;
 	}
 	
-	private static NetworkImpl createNetwork() {
+	static NetworkImpl createNetwork() {
 		
 		/*
 		 * (2)		(5)			
@@ -155,7 +155,7 @@ public class SpatialGridFillOrder {
 	/**
 	 * creating workplaces ...
 	 */
-	private static JobClusterObject[] createWorkplaces(NetworkImpl network){
+	static JobClusterObject[] createWorkplaces(NetworkImpl network){
 		
 		System.out.println("Creating workplaces ...");
 		
@@ -212,7 +212,7 @@ public class SpatialGridFillOrder {
 	 * @param dummyJobClusterArray
 	 * @return
 	 */
-	private static Map<Id, Double> travelTimeAccessibility(final NetworkImpl network, 
+	static Map<Id, Double> travelTimeAccessibility(final NetworkImpl network, 
 													final JobClusterObject[] dummyJobClusterArray){
 		
 		System.out.println("Computing travel time accessibility ...");
