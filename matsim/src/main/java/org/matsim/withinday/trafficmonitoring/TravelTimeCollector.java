@@ -61,6 +61,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.interfaces.Mobsim;
 
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
@@ -95,7 +96,7 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	private UpdateMeanTravelTimesThread[] updateMeanTravelTimesThreads;
 	private final int numOfThreads;
 
-	private int infoTimeStep = 3600;
+	private final int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
 	
 	private Set<Id> agentsToFilter;
@@ -251,6 +252,17 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 
+		if (e.getQueueSimulation() instanceof Mobsim) {
+			double simStartTime = ((Mobsim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
+
+			/*
+			 * infoTime may be < simStartTime, this ensures to print 
+			 * out the info at the very first timestep already			
+			 */
+			this.nextInfoTime = (int)(Math.floor(simStartTime / this.infoTimeStep) * this.infoTimeStep);
+		}
+		
+		
 		for (Link link : this.network.getLinks().values()) {
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 
