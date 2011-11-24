@@ -136,8 +136,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 	
-	private static final String EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE = "emissionRoadTypesTrafficSituationsFile";
-	private String emissionRoadTypesTrafficSituationsFile = null;
+	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
+	private String emissionRoadTypeMappingFile = null;
+
+	private static final String EMISSION_VEHICLE_FILE = "emissionVehicleFile";
+	private String emissionVehicleFile = null;
 
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE = "averageFleetWarmEmissionFactorsFile";
 	private String averageFleetWarmEmissionFactorsFile = null;
@@ -169,15 +172,20 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
 				" Will only work when lastIteration is multiple of events writing interval" ) ;
 		
-		map.put(EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE, "mapping from input road types to HBEFA road types and traffic situations");
+		map.put(EMISSION_ROADTYPE_MAPPING_FILE, "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings");
+
+		map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (which is allowed to choose a vehicle in the simulation):" + "\n" +
+				" - REQUIRED: vehicle type description must start with the respective HbefaVehicleCategory followed by `;'" + "\n" + 
+				" - OPTIONAL: if detailed warm emission calculation is switched on, vehicle type description should aditionally contain " +
+				"`Technology;SizeClasse;EmConcept', corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
 		
-		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average warm emission factors");
+		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
 		
-		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA fleet average cold emission factors");
+		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors");
 		
 		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed warm emission factors file must be provided!");
 		
-		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA detailed warm emission factors") ;
+		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors") ;
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
@@ -245,8 +253,10 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 					"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
 		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
 			this.setVspDefaultsCheckingLevel(value) ;
-		} else if ( EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE.equals(key)){
+		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
+		} else if ( EMISSION_VEHICLE_FILE.equals(key)){
+			this.setEmissionVehicleFile(value);
 		} else if ( EMISSION_FACTORS_WARM_FILE_AVERAGE.equals(key)){	
 			this.setAverageWarmEmissionFactorsFile(value);
 		} else if ( EMISSION_FACTORS_COLD_FILE_AVERAGE.equals(key)){
@@ -284,7 +294,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
 		
-		map.put(EMISSION_ROADTYPES_TRAFFIC_SITUATIONS_FILE, this.getEmissionRoadTypeMappingFile());
+		map.put(EMISSION_ROADTYPE_MAPPING_FILE, this.getEmissionRoadTypeMappingFile());
+		
+		map.put(EMISSION_VEHICLE_FILE, this.getEmissionVehicleFile());
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
 		
@@ -409,12 +421,20 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		return this.vspDefaultsCheckingLevel;
 	}
 
-	public void setEmissionRoadTypeMappingFile(String roadTypesTrafficSituationsFile) {
-		this.emissionRoadTypesTrafficSituationsFile = roadTypesTrafficSituationsFile;
+	public void setEmissionRoadTypeMappingFile(String roadTypeMappingFile) {
+		this.emissionRoadTypeMappingFile = roadTypeMappingFile;
 	}
 
 	public String getEmissionRoadTypeMappingFile() {
-		return this.emissionRoadTypesTrafficSituationsFile;
+		return this.emissionRoadTypeMappingFile;
+	}
+
+	public void setEmissionVehicleFile(String emissionVehicleFile) {
+		this.emissionVehicleFile = emissionVehicleFile;
+	}
+
+	public String getEmissionVehicleFile() {
+		return this.emissionVehicleFile;
 	}
 
 	public void setAverageWarmEmissionFactorsFile(String averageFleetWarmEmissionFactorsFile) {
@@ -456,5 +476,4 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
 		this.writingOutputEvents = writingOutputEvents;
 	}
-
 }
