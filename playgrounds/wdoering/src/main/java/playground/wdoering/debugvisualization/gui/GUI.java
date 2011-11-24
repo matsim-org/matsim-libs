@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import javax.swing.JFrame;
 
 import playground.wdoering.debugvisualization.controller.Controller;
+import playground.wdoering.debugvisualization.controller.XYVxVyEventThread;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
@@ -35,6 +36,7 @@ public class GUI extends JFrame {
 	GUIToolbar guiToolbar;
 	GUIInfo guiInfo;
 	P3DRenderer renderer;
+	Thread rendererThread = null;
 	
 
 	public GUI(Controller controller, int traceTimeRange, int width, int height, int visualizationMode) {
@@ -47,6 +49,9 @@ public class GUI extends JFrame {
 		
 		//get toolbar and renderer (processing applet)
 		guiToolbar = new GUIToolbar(controller);
+		
+		//this.rendererThread = new Thread(renderer = new P3DRenderer(controller, traceTimeRange, width, (int)(height), visualizationMode), "readerthread"); 
+		//renderer = rendererThread.getClass();
 		renderer = new P3DRenderer(controller, traceTimeRange, width, (int)(height), visualizationMode);
 		guiInfo = new GUIInfo(controller);
 		
@@ -56,6 +61,8 @@ public class GUI extends JFrame {
 		add(renderer, BorderLayout.CENTER);
 		add(guiToolbar, BorderLayout.SOUTH);
 		add(guiInfo,BorderLayout.EAST);
+		
+		//rendererThread.run();
 	
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -156,6 +163,28 @@ public class GUI extends JFrame {
 		renderer.updateExtremeValues(maxPosX, minPosX, maxPosY, minPosY);		
 	}
 
+	public void suspendRenderThread() {
+		if (rendererThread != null)
+			rendererThread.suspend();
+		
+		
+	}
+
+	public void resumeRenderThread() {
+		if (rendererThread != null)
+		{
+			rendererThread.resume();
+//			try {
+//				System.out.println("before sleep");
+//				Thread.sleep(100);
+//				System.out.println("after sleep");
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+		}
+		
+	}
 	
 	
 }

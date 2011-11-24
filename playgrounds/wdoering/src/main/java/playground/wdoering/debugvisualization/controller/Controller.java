@@ -52,7 +52,7 @@ public class Controller {
 	private LinkedList<Double> timeSteps = new LinkedList<Double>();
 	private boolean liveMode;
 	private Double currentTime = Double.NaN;
-	private int traceTimeRange = 50;
+	private int traceTimeRange = 1;
 	private Thread readerThread;
 	private boolean paused = false;
 	
@@ -188,7 +188,6 @@ public class Controller {
 
 		//Thread importerThread = new Thread(new Importer(this,sc),"ha");
 
-
 		//assign scenario and eventsmanager
 		this.scenario = sc;
 		this.eventsManager = e;
@@ -198,6 +197,8 @@ public class Controller {
 		this.importer = new Importer(this, this.scenario, readerThread);
 		this.nodes = this.importer.getNodes();
 		this.links = this.importer.getLinks();
+		
+		this.importer.readShapeFile("C:\\temp\\big\\floorplan.shp");
 
 		//set determined extreme value coordinates
 		this.extremeValues = this.importer.getExtremeValues();
@@ -296,11 +297,14 @@ public class Controller {
 	{
 		//Daten werden gelesen
 		isReadingData = true;
+		
+//		gui.suspendRenderThread();
 
 		//@TODO: capsulate truncate old data function and maybe even more
 		//for a better readability
 
 
+		HashMap <String, Agent> currentAgents = getAgentHashMap();
 
 		this.console.println("ID:" + ID + "| time:" + time + "|");
 
@@ -420,11 +424,8 @@ public class Controller {
 
 				}
 
-
 				this.gui.updateExtremeValues(this.maxPosX, this.minPosX, this.maxPosY, this.minPosY);
 				this.gui.updateView(this.timeSteps, this.agents);
-				
-				
 
 				this.currentTime = time;
 				this.timeSteps.addLast(this.currentTime);
@@ -435,6 +436,8 @@ public class Controller {
 		}
 
 		isReadingData = false;
+//		gui.resumeRenderThread();
+
 
 
 	}
@@ -446,6 +449,7 @@ public class Controller {
 
 	public void updateAgentLink(String ID, String linkID)
 	{
+//		gui.suspendRenderThread();
 		isReadingData = true;
 	
 		//on the first run in live mode the agents hashmap is still empty
@@ -469,7 +473,13 @@ public class Controller {
 		this.gui.updateView(this.timeSteps, this.agents);
 		
 		isReadingData = false;
+//		gui.resumeRenderThread();
 	}
 
+	
+	public synchronized HashMap<String,Agent> getAgentHashMap()
+	{
+		return agents;
+	}
 
 }

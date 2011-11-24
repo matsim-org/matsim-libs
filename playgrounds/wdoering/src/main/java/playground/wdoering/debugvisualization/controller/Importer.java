@@ -18,8 +18,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v2.scenario.DenseMultiPointFromGeometries;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
+
+import net.opengis.wfs.v_1_1_0.GetGmlObjectType;
 
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +39,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPoint;
 
@@ -43,8 +47,9 @@ import com.vividsolutions.jts.geom.MultiPoint;
 public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Runnable {
 
 	private HashMap<String, Agent> agents = null;
-	private HashMap<Integer, DataPoint> nodes = null;
-	private HashMap<Integer, int[]> links = null;
+	private HashMap<Integer, DataPoint> networkNodes = null;
+	private HashMap<Integer, int[]> networkLinks = null;
+	private ArrayList<Geometry> geometries = null;
 
 	private Double maxPosX,maxPosY,maxPosZ,maxTimeStep=Double.MIN_VALUE;
 	private Double minPosX,minPosY,minPosZ,minTimeStep=Double.MAX_VALUE;
@@ -88,8 +93,8 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 		this.maxPosX = this.maxPosY = this.maxPosZ = this.maxTimeStep = Double.MIN_VALUE;
 
 
-		this.nodes = new HashMap<Integer, DataPoint>();
-		this.links = new HashMap<Integer, int[]>();
+		this.networkNodes = new HashMap<Integer, DataPoint>();
+		this.networkLinks = new HashMap<Integer, int[]>();
 
 		for (Map.Entry<Id, ? extends org.matsim.api.core.v01.network.Node> node : networkNodes.entrySet())
 		{
@@ -119,7 +124,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 			int nodeID = Integer.valueOf(currentNode.getId().toString());
 
 			//store node datapoint + id to nodes hashmap
-			this.nodes.put(nodeID, nodeDataPoint);
+			this.networkNodes.put(nodeID, nodeDataPoint);
 
 			//get in and out links
 			//Map<Id, ? extends Link> inLinks = currentNode.getInLinks();
@@ -144,7 +149,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				int[] fromTo = {from, to};
 
 				//store to links hashmap
-				this.links.put(Integer.valueOf(outLink.getKey().toString()),fromTo);
+				this.networkLinks.put(Integer.valueOf(outLink.getKey().toString()),fromTo);
 			}
 
 			//if (k>100) System.exit(0);
@@ -268,30 +273,60 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 
 	public void readShapeFile(String shapeFileString)
 	{
-		//		ShapeFileReader shapeFileReader = new ShapeFileReader();
-		//
-		//		shapeFileReader.readFileAndInitialize(shapeFileString);
-		//
-		//		List<Geometry> geos = new ArrayList<Geometry>();
-		//		for (Feature ft : shapeFileReader.getFeatureSet())
-		//		{
-		//			Geometry geo = ft.getDefaultGeometry();
-		//			geos.add(geo);
-		//		}
+				ShapeFileReader shapeFileReader = new ShapeFileReader();
+		
+				shapeFileReader.readFileAndInitialize(shapeFileString);
+		
+				this.geometries  = new ArrayList<Geometry>();
+				for (Feature ft : shapeFileReader.getFeatureSet())
+				{
+					Geometry geo = ft.getDefaultGeometry();
+					//System.out.println(ft.getFeatureType());
+					geometries.add(geo);
+				}
+				
+				
+//				int j = 0;			
+//				for (Geometry geo : geometries)
+//				{
+//					
+//					System.out.println(geo.toText());
+//					Coordinate [] coordinates = geo.getCoordinates();
+//					
+//					System.out.println("geomobj # " + j);
+//					for (int i = 0; i < coordinates.length; i++)
+//						System.out.println(i + ":" + coordinates[i].x + "|"  + coordinates[i].y + "|" +coordinates[i].z);	
+//					
+//					j++;
+//					
+//				}
+//				
+//				System.out.print(this.maxPosX);
+//				System.out.println(" - " + this.minPosX);
+//				System.out.print(this.maxPosY);
+//				System.out.println(" - " + this.minPosY);
+//				
+//				System.exit(0);
+				
 
-		System.out.println("shape file reader not implemented yet");
+		
+//		DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
+//		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
+//		for (int i = 0; i < mp.getNumPoints(); i++)
+//		{
+//			System.out.println(i + ": " + mp.getGeometryN(i));
+//			//Point p = (Point) mp.getGeometryN(i).get;
+//			//quad.put(p.getX(), p.getY(), p.getCoordinate());
+//		}
+		
+		
+		//this.c.setQuadTree(quad);
 
-		/*
-		 * DenseMultiPointFromGeometries dmp = new DenseMultiPointFromGeometries();
-		MultiPoint mp = dmp.getDenseMultiPointFromGeometryCollection(geos);
-		for (int i = 0; i < mp.getNumPoints(); i++) {
-			Point p = (Point) mp.getGeometryN(i);
-			quad.put(p.getX(), p.getY(), p.getCoordinate());
-		}
-		this.c.setQuadTree(quad);
-		 */
-
-
+	}
+	
+	public ArrayList<Geometry> getGeometries()
+	{
+		return geometries;
 	}
 
 	public HashMap<String, Agent> importAgentData()
@@ -330,8 +365,8 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	public void readNetworkFile(String networkFileName)
 	{
 
-		this.nodes = new HashMap<Integer, DataPoint>();
-		this.links = new HashMap<Integer, int[]>();
+		this.networkNodes = new HashMap<Integer, DataPoint>();
+		this.networkLinks = new HashMap<Integer, int[]>();
 
 		try
 		{
@@ -347,7 +382,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 			NodeList nodeList = doc.getElementsByTagName("node");
 			//System.out.println("Information of all events");
 
-			this.nodes = new HashMap<Integer,DataPoint>();
+			this.networkNodes = new HashMap<Integer,DataPoint>();
 
 			this.minPosX = this.minPosY = this.minPosZ = this.minTimeStep = Double.MAX_VALUE;
 			this.maxPosX = this.maxPosY = this.maxPosZ = this.maxTimeStep = Double.MIN_VALUE;
@@ -373,7 +408,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				DataPoint nodeDataPoint = new DataPoint(posX, posY);
 
 				//add node ID and coordinates to node ArrayList
-				this.nodes.put(nodeID, nodeDataPoint);
+				this.networkNodes.put(nodeID, nodeDataPoint);
 
 				System.out.println("node (" + nodeID + ") : x:" + posX + " | y: " + posY );
 
@@ -404,7 +439,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				int[] fromTo = {from,to};
 
 				//add link ID and from/to to link ArrayList
-				this.links.put(linkID, fromTo);
+				this.networkLinks.put(linkID, fromTo);
 
 				System.out.println("link (" + linkID + ") : from:" + from + " | to: " + to );
 
@@ -425,12 +460,12 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 
 	public HashMap<Integer, int[]> getLinks()
 	{
-		return this.links;
+		return this.networkLinks;
 	}
 
 	public HashMap<Integer, DataPoint> getNodes()
 	{
-		return this.nodes;
+		return this.networkNodes;
 	}
 
 	@Override
