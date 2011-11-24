@@ -33,6 +33,7 @@ import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.scoring.CarPoolingLegScoringFunction;
 import playground.thibautd.scoring.HerbieBasedScoringFunctionFactory;
 import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
 
@@ -143,6 +144,7 @@ public class JointControlerUtils {
 				//		config,
 				//		controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
+			controler.addControlerListener( CarPoolingLegScoringFunction.getInformationLogger() );
 		}
 	}
 }

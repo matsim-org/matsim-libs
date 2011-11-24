@@ -23,10 +23,16 @@ import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 
 /**
  * @author thibautd
@@ -36,6 +42,8 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 		Logger.getLogger(CarPoolingLegScoringFunction.class);
 
 	private static int distanceWrnCnt = 0;
+	private static int carLegCount = 0;
+	private static int invalidCarRoutes = 0;
 
 	public CarPoolingLegScoringFunction(
 			final CharyparNagelScoringParameters params,
@@ -46,6 +54,7 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 	// /////////////////////////////////////////////////////////////////////////
 	// overriden methods
 	// /////////////////////////////////////////////////////////////////////////
+
 	/**
 	 * reimplementation taking distance from leg rather than route.
 	 * TODO: include car pooling
@@ -68,7 +77,24 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				dist = leg.getRoute().getDistance();
+				LinkNetworkRoute route = null;
+				boolean isValidRoute = true;
+
+				try {
+					route = (LinkNetworkRoute) leg.getRoute();
+				} catch (ClassCastException e) {
+					isValidRoute = false;
+				}
+
+				carLegCount++;
+				if (isValidRoute) {
+					dist = RouteUtils.calcDistance(route, network);
+				}
+				else {
+					invalidCarRoutes++;
+					dist = leg.getRoute().getDistance();
+				}
+
                 if ( distanceWrnCnt<1 ) {
 				/*
 				 * TODO the route-distance does not contain the length of the
@@ -89,23 +115,27 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.params.constantCar ;
-		} else if (TransportMode.pt.equals(leg.getMode())) {
+		}
+		else if (TransportMode.pt.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
 			tmpScore += this.params.constantPt ;
-		} else if (TransportMode.walk.equals(leg.getMode())
+		}
+		else if (TransportMode.walk.equals(leg.getMode())
 				|| TransportMode.transit_walk.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceWalk_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s + this.params.marginalUtilityOfDistanceWalk_m * dist;
 			tmpScore += this.params.constantWalk ;
-		} else if (TransportMode.bike.equals(leg.getMode())) {
+		}
+		else if (TransportMode.bike.equals(leg.getMode())) {
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
 			tmpScore += this.params.constantBike ;
-		} else {
+		}
+		else {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
@@ -115,6 +145,21 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 		}
 
 		return tmpScore;
+
+	}
+
+	private static class LogListener implements IterationEndsListener {
+		@Override
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			log.info( "leg scoring information for iteration "+event.getIteration()+": got "+carLegCount+" car legs, "+invalidCarRoutes+" with no route." );
+
+			carLegCount = 0;
+			invalidCarRoutes = 0;
+		}
+	}
+
+	public static IterationEndsListener getInformationLogger() {
+		return new LogListener();
 	}
 }
 
