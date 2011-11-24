@@ -303,7 +303,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	private final double delta(final int t,final double y) {
 		double r = this.randomGenerator.nextDouble();
-		double exponant = Math.pow((1d - t/this.NUM_ITER), this.NON_UNIFORMITY_PARAM);
+		double exponant = Math.pow((1d - ((double) t)/this.NUM_ITER), this.NON_UNIFORMITY_PARAM);
 
 		return (y * (1 - Math.pow(r, exponant)));
 	}
