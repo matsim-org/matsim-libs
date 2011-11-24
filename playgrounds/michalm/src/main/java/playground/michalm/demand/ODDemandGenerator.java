@@ -53,9 +53,9 @@ public class ODDemandGenerator
                 for (int k = 0; k < 2 * odFlow; k++) {
                     // generatePlans for the OD pair
 
-                    if (!(k % 100 == 0 && i < 9 && j < 9)) {
-                        continue;
-                    }
+//                    if (!(k % 100 == 0 && i < 9 && j < 9)) {
+//                        continue;
+//                    }
 
                     
                     Plan plan = createPlan();

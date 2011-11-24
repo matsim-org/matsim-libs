@@ -17,19 +17,26 @@ import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 
 
 public class VRPSchedulePlan
-    extends PlanImpl
+    implements Plan
 {
     private PopulationFactory populFactory;
     private Network network;
     private ShortestPath[][] shortestPaths;
 
+    private Person driver;
     private Vehicle vehicle;
+
+    private List<PlanElement> actsLegs;
+    private List<PlanElement> unmodifiableActsLegs;
 
 
     public VRPSchedulePlan(Person driver, Vehicle vehicle, MATSimVRPData data)
     {
-        super(driver);
+        this.driver = driver;
         this.vehicle = vehicle;
+        
+        actsLegs = new ArrayList<PlanElement>();
+        unmodifiableActsLegs = (List<PlanElement>)Collections.unmodifiableList(actsLegs);
 
         populFactory = data.getScenario().getPopulation().getFactory();
         network = data.getScenario().getNetwork();
@@ -44,7 +51,7 @@ public class VRPSchedulePlan
         MATSimVertex depotVertex = (MATSimVertex)vehicle.getDepot().getVertex();
 
         Schedule schedule = vehicle.getSchedule();
-        
+
         if (schedule.getStatus().isUnplanned()) {// vehicle stays at the depot
             addActivity(depotVertex, -1, "RtU");
             return;
@@ -126,7 +133,7 @@ public class VRPSchedulePlan
         leg.setTravelTime(travelTime);
         ((LegImpl)leg).setArrivalTime(arrivalTime);
 
-        addLeg(leg);
+        actsLegs.add(leg);
     }
 
 
@@ -140,6 +147,70 @@ public class VRPSchedulePlan
             act.setEndTime(endTime);
         }
 
-        addActivity(act);
+        actsLegs.add(act);
     }
+
+
+    @Override
+    public Map<String, Object> getCustomAttributes()
+    {
+        return null;
+    }
+
+
+    @Override
+    public List<PlanElement> getPlanElements()
+    {
+        return unmodifiableActsLegs;
+    }
+
+
+    @Override
+    public void addLeg(Leg leg)
+    {
+        throw new UnsupportedOperationException("This plan is read-only");
+    }
+
+
+    @Override
+    public void addActivity(Activity act)
+    {
+        throw new UnsupportedOperationException("This plan is read-only");
+    }
+
+
+    @Override
+    public boolean isSelected()
+    {
+        return driver.getSelectedPlan() == this;
+    }
+
+
+    @Override
+    public void setScore(Double score)
+    {
+        throw new UnsupportedOperationException("This plan is read-only");
+    }
+
+
+    @Override
+    public Double getScore()
+    {
+        return null;
+    }
+
+
+    @Override
+    public Person getPerson()
+    {
+        return driver;
+    }
+
+
+    @Override
+    public void setPerson(Person person)
+    {
+        throw new UnsupportedOperationException("This plan is read-only");
+    }
+
 }

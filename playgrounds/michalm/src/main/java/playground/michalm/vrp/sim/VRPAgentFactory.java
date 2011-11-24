@@ -1,14 +1,15 @@
 package playground.michalm.vrp.sim;
 
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.agents.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
+import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.supply.*;
-import playground.michalm.withinday.*;
-import playground.michalm.withinday.*;
 
 
 public class VRPAgentFactory
@@ -20,10 +21,10 @@ public class VRPAgentFactory
     public final static String VRP_DRIVER_PREFIX = "vrpDriver_";
 
 
-    public VRPAgentFactory(Netsim netsim, MATSimVRPData data)
+    public VRPAgentFactory(MATSimVRPData data)
     {
-        this.netsim = netsim;
         this.data = data;
+        this.netsim = data.getVrpSimEngine().getMobsim();
     }
 
 
@@ -33,13 +34,23 @@ public class VRPAgentFactory
         if (p instanceof VRPDriverPerson) {
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
 
-            RealAgent vrpAgent = new LightweightVRPVehicleAgent(
+            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(
                     driverPerson.getVrpVehicle(), data.getVrpGraph().getShortestPaths(), netsim);
-            
-            AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), netsim, vrpAgent);
-            netsim.addQueueSimulationListeners(adapterAgent);
 
-            return adapterAgent;
+            // VRPSchedulePlanFactory planFactory = new VRPSchedulePlanFactory(p,
+            // driverPerson.getVrpVehicle(), data);
+
+            Id startLinkId = ((MATSimVertex)driverPerson.getVrpVehicle().getDepot().getVertex())
+                    .getLink().getId();
+
+            DynAgent dynAgent = new DynAgent(p.getId(), startLinkId, netsim,
+                    taxiAgentLogic);
+
+            taxiAgentLogic.setAgent(dynAgent);
+
+            data.getVrpSimEngine().addAgent(taxiAgentLogic);
+
+            return dynAgent;
         }
         // else if ()// other possible agents
         // {}

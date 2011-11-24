@@ -22,6 +22,7 @@ import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.*;
 import org.matsim.run.*;
 import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.gui.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
@@ -31,6 +32,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.visualization.*;
+import playground.michalm.visualization.VRPOTFClientLive;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
 import playground.michalm.vrp.data.network.*;
@@ -61,7 +63,7 @@ public class SingleIterOnlineDVRPLauncher
             netFileName = dirName + "network.xml";
             plansFileName = dirName + "plans.xml";
             depotsFileName = dirName + "depots.xml";
-            oftVis = true;
+            oftVis = !true;
         }
         else if (args.length == 5) {
             dirName = args[0];
@@ -119,7 +121,7 @@ public class SingleIterOnlineDVRPLauncher
         if (oftVis) { // OFTVis visualization
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, sim.getEventsManager(), sim);
-            OTFClientLive.run(scenario.getConfig(), server);
+            VRPOTFClientLive.run(scenario.getConfig(), server);
         }
 
         sim.run();
@@ -133,16 +135,19 @@ public class SingleIterOnlineDVRPLauncher
         // ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
     }
 
+    public static OTFQueryControl queryControl;
 
     private static QSim createMobsim(Scenario sc, EventsManager eventsManager, MATSimVRPData data,
             VRPOptimizerFactory optimizerFactory, String vrpOutDirName)
     {
         QSim sim = new QSim(sc, eventsManager);
-        sim.setAgentFactory(new VRPAgentFactory(sim, data));
 
         VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, optimizerFactory);
         data.setVrpSimEngine(vrpSimEngine);
         sim.addMobsimEngine(vrpSimEngine);
+
+        sim.setAgentFactory(new VRPAgentFactory(data));
+
 
         // The above is slighly confusing:
         // (1) The VRPSimEngine adds "VRP" persons to the population (in onPrepareSim) ...
@@ -217,11 +222,11 @@ public class SingleIterOnlineDVRPLauncher
             Id personId = scenario.createId(vrpVeh.getName());
             VRPDriverPerson vrpDriver = new VRPDriverPerson(personId, vrpVeh);
 
-            Plan dummyPlan = new PlanImpl(vrpDriver);
-            MATSimVertex vertex = (MATSimVertex)vrpVeh.getDepot().getVertex();
-            Activity dummyAct = new ActivityImpl("w", vertex.getCoord(), vertex.getLink().getId());
-            dummyPlan.addActivity(dummyAct);
-            vrpDriver.addPlan(dummyPlan);
+//            Plan dummyPlan = new PlanImpl(vrpDriver);
+//            MATSimVertex vertex = (MATSimVertex)vrpVeh.getDepot().getVertex();
+//            Activity dummyAct = new ActivityImpl("w", vertex.getCoord(), vertex.getLink().getId());
+//            dummyPlan.addActivity(dummyAct);
+//            vrpDriver.addPlan(dummyPlan);
 
             population.addPerson(vrpDriver);
         }
