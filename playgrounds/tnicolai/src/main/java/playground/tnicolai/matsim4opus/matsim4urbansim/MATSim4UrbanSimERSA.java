@@ -139,7 +139,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Improvements part 1:<ul>
  * 
  * <li> Now the workplaces (destinations) are aggregated to their assigned parcel, which reduces the number of iterations in the accessibility computation dramatically.
- * The number of workplaces of a parcel are used a weight in the accessibility measure. This also reduces time expansive look up in the network to determine nearest nodes.
+ * The number of workplaces of a parcel are used as a weight in the accessibility measure. This also reduces time expansive look up in the network to determine nearest nodes.
  * <li> The ERSAControlerListener now uses separate LeastCostPathTrees with own cost calculators for travel time and distance...
  * <li> The travel distance computation is revised. The distance is now computed by the LeastCostPathTree (using a travel distance cost calculator). Before that distances
  * where computed separately, which took a huge amount of time.
@@ -148,7 +148,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * Improvements part 2:<ul>
  * 
- * <li> Now the workplaces (desinations) are aggregated directly to their nearest node in the network. This considerably reduces the number of designations 
+ * <li> Now the workplaces (desinations) are aggregated directly to their nearest node in the network. This considerably reduces the number of destinations 
  *  
  * </ul>
  *

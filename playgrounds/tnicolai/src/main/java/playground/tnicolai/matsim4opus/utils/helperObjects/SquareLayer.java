@@ -22,6 +22,7 @@ public class SquareLayer {
 	/** fields regarding square mean value (Layer2) */
 	private ArrayList<Id> squareMeanNodeList = null;
 	private double squareMeanAccessibility = 0.;
+	private double squareMeanAccessibilitySum = 0.;
 	
 	/** fields regarding derivation between Layer 1 and 2 (Layer3) */
 	private double squareAccessibilityDerivation = 0.;
@@ -32,10 +33,23 @@ public class SquareLayer {
 		this.squareCentroidCoord = squareCentroid;
 	}
 	
+	public void setSquareCentroidV2(Id nearestNodeID, double accessibilityValue, Coord squareCentroid){
+		this.squareCentroidNodeID = nearestNodeID;
+		this.squareCentroidAccessibility = accessibilityValue;
+		this.squareCentroidCoord = squareCentroid;
+	}
+	
 	public void addNode(Node node){
 		if(this.squareMeanNodeList == null)
 			this.squareMeanNodeList = new ArrayList<Id>();
 		this.squareMeanNodeList.add( node.getId() );
+	}
+	
+	public void addNodeV2(Node node, double accessibilityValue){
+		if(this.squareMeanNodeList == null)
+			this.squareMeanNodeList = new ArrayList<Id>();
+		this.squareMeanNodeList.add( node.getId() );
+		this.squareMeanAccessibilitySum += accessibilityValue;
 	}
 	
 	public void computeDerivation(final Map<Id, Double> resultMap){
@@ -79,6 +93,28 @@ public class SquareLayer {
 	public double getMeanAccessibility(){
 		return this.squareMeanAccessibility;
 	}
+	
+	public double getMeanAccessibilityV2(){
+		if(this.squareMeanNodeList != null){
+			int numberOfNodes = this.squareMeanNodeList.size();
+			if(numberOfNodes > 0){
+				return this.squareMeanAccessibilitySum / numberOfNodes;
+			}
+		}
+		return 0.;
+	}
+	
+	public double getAccessibilityDerivationV2(){
+		if(this.squareMeanNodeList != null){
+			int numberOfNodes = this.squareMeanNodeList.size();
+			if(numberOfNodes > 0){
+				double mean = this.squareMeanAccessibilitySum / numberOfNodes;
+				return Math.abs( mean - this.squareCentroidAccessibility );
+			}
+		}
+		return 0.;
+	}
+	
 	public double getAccessibilityDerivation(){
 		return this.squareAccessibilityDerivation;
 	}

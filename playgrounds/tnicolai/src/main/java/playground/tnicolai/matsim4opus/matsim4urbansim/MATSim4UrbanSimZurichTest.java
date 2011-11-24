@@ -6,6 +6,15 @@ import org.matsim.core.network.NetworkImpl;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
 
+/**
+ * Potential MATSim input files (from shared-svn/studies/schweiz-ivtch/baseCase/)
+ * Network: network/ivtch-changed.xml
+ * Persons: plans/plans_complete/plans.xml
+ * Facilities: facilities/facilities.xml
+ * 
+ * @author thomas
+ */
+
 public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 	
 	// logger

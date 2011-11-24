@@ -289,14 +289,30 @@ public class InitMATSimScenario {
 		SimulationConfigGroup simulation = new SimulationConfigGroup();
 		
 		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
-		double factor = popSampling * 1.0; //1.2;
-		if(factor > 1.)
-			factor = 1.;
-		// tnicolai: implement flow capacity correction factor!!!
-		simulation.setFlowCapFactor( factor );	
-		simulation.setStorageCapFactor( factor );	
-		log.warn("This uses the population sampling rate (" + popSampling + ") for flowCapFactor and storageCapFactor!");
-		log.warn("Needs to be soveld by an flow capacity correction factor (tnicolai nov'12)!");
+		
+		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ".");
+		
+		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
+		simulation.setFlowCapFactor( popSampling );	
+		
+		// Adapting the storageCapFactor has the following reason:
+		// Too low SorageCapacities especially with small sampling 
+		// rates can (eg 1%) lead to strong backlog on the traffic network. 
+		// This leads to an unstable behavior of the simulation (by breackdowns 
+		// during the learning progress).
+		// The correction fetch factor introduced here raises the 
+		// storage capacity at low sampling rates and becomes flatten 
+		// with increasing sampling rates (at a 100% sample, the 
+		// storage capacity == 1).			tnicolai nov'11
+		if(popSampling <= 0.){
+			popSampling = 0.01;
+			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
+		}
+		double fetchFactor = Math.pow(popSampling, -0.25);
+		double storageCap = popSampling * fetchFactor; // same as: 1. / Math.sqrt(Math.sqrt(sample))
+		
+		// setting StorageCapFactor
+		simulation.setStorageCapFactor( storageCap );	
 		
 		boolean removeStuckVehicles = false;
 		simulation.setRemoveStuckVehicles( removeStuckVehicles );
@@ -305,8 +321,11 @@ public class InitMATSimScenario {
 		scenario.getConfig().addSimulationConfigGroup( simulation );
 		
 		log.info("... done!");
-		log.warn("Simulation FlowCapFactor: "+ scenario.getConfig().simulation().getFlowCapFactor() + " StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + 
-						   " RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") + " StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+		
+		log.warn("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
+		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() );
+		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
+		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
 	}
 	
 	/**
@@ -338,6 +357,17 @@ public class InitMATSimScenario {
 						 " Strategy_2: " + changeExpBeta.getModuleName() + " Probability Strategy_2: " + changeExpBeta.getProbability() +
 						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
 	}
-
+	
+	// Testing fetch  factor calculation for storageCap 
+	public static void main(String[] args) {
+		// testing calculation of storage capacity fetch factor
+		for(double sample = 0.; sample <=1.; sample += 0.01){
+			
+			double factor = Math.pow(sample, -0.25); // same as: 1. / Math.sqrt(Math.sqrt(sample))
+			double storageCap = sample * factor;
+			
+			System.out.println("Sample rate " + sample + " leads to a fetch fector of: " + factor + " and a StroraceCapacity of: " + storageCap );
+		}
+	}
 }
 
