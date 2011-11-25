@@ -116,7 +116,7 @@ public class ParkingInfrastructure {
 			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
 		}
 		
-		resetParkingFacilitiesQuadTree(tmpList, parkingFacility);
+		resetParkingFacilitiesQuadTree(tmpList);
 		
 		return parkingFacility.getId();
 	}
@@ -126,9 +126,9 @@ public class ParkingInfrastructure {
 		parkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getX(), parkingFacility);
 	}
 
-	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList, ActivityFacility parkingFacility) {
+	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList) {
 		for (ActivityFacility parking:tmpList){
-			parkingFacilities.put(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getX(), parkingFacility);
+			parkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getX(), parking);
 		}
 	}
 
