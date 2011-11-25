@@ -40,9 +40,10 @@ public class ParkingInfrastructure {
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
 																	// List<FacilityId>>
 	private final Map<Id, Id> facilityToLinkMapping; // <FacilityId, LinkId>
-	private IntegerValueHashMap<Id> facilityCapacities;
+	private final IntegerValueHashMap<Id> facilityCapacities;
 
 	public ParkingInfrastructure(Scenario scenario) {
+		facilityCapacities = new IntegerValueHashMap<Id>();
 		facilityToLinkMapping = new HashMap<Id, Id>();
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
