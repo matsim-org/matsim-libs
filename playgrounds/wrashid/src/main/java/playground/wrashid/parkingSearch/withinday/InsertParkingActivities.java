@@ -107,7 +107,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 
 		// get the facility where the activity is performed
 		ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
-		Id parkingFacilityId = this.parkingInfrastructure.getClosestFacilityFromCoord(facility.getCoord());
+		Id parkingFacilityId = this.parkingInfrastructure.getClosestFreeParkingFacility(facility.getCoord());
 		
 		// get the closest parking facility
 		ActivityFacility parkingFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);

@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.withinday;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 
 public class ParkingInfrastructure {
 
-	private final QuadTree<Id> parkingFacilities;
+	private final QuadTree<ActivityFacility> parkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
 																	// List<FacilityId>>
 	private final Map<Id, Id> facilityToLinkMapping; // <FacilityId, LinkId>
@@ -63,14 +64,14 @@ public class ParkingInfrastructure {
 		maxx += 1.0;
 		maxy += 1.0;
 		
-		parkingFacilities = new QuadTree<Id>(minx, miny, maxx, maxy);
+		parkingFacilities = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
 			
 			// if the facility offers a parking activity
 			if (facility.getActivityOptions().containsKey("parking")) {
 				
 				// add the facility to the quadtree
-				parkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility.getId());
+				parkingFacilities.put(facility.getCoord().getX(), facility.getCoord().getY(), facility);
 				
 				// add the facility to the facilitiesOnLinkMapping
 				List<Id> list = parkingFacilitiesOnLinkMapping.get(facility.getLinkId());
@@ -105,8 +106,30 @@ public class ParkingInfrastructure {
 		return parkingFacilitiesOnLinkMapping.get(linkId);
 	}
 
-	public Id getClosestFacilityFromCoord(Coord coord) {
-		return parkingFacilities.get(coord.getX(), coord.getY());
+	public Id getClosestFreeParkingFacility(Coord coord) {
+		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
+		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		
+		// if parking full, try finding other free parkings in the quadtree
+		while (facilityCapacities.get(parkingFacility.getId())<=0){
+			removeFullParkingFromQuadTree(tmpList, parkingFacility);
+			parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
+		}
+		
+		resetParkingFacilitiesQuadTree(tmpList, parkingFacility);
+		
+		return parkingFacility.getId();
+	}
+
+	private void removeFullParkingFromQuadTree(LinkedList<ActivityFacility> tmpList, ActivityFacility parkingFacility) {
+		tmpList.add(parkingFacility);
+		parkingFacilities.remove(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getX(), parkingFacility);
+	}
+
+	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList, ActivityFacility parkingFacility) {
+		for (ActivityFacility parking:tmpList){
+			parkingFacilities.put(parkingFacility.getCoord().getX(), parkingFacility.getCoord().getX(), parkingFacility);
+		}
 	}
 
 }
