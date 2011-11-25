@@ -420,6 +420,27 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 	}
 
+	public final void arrangeNextAgentAction( MobsimAgent agent ) {
+		// yy the material of the methods could probably be inlined ... but this is not possible as 
+		// long as they are public.  kai, nov'11
+		
+		switch( agent.getState() ) {
+		case ACTIVITY: 
+			this.arrangeActivityStart(agent) ; 
+			break ;
+		case LEG: 
+			this.arrangeAgentDeparture(agent) ; 
+			break ;
+		case ABORT:
+			this.getAgentCounter().decLiving();
+			this.getAgentCounter().incLost();
+			break ;
+		default:
+			throw new RuntimeException("agent with unknown state (possibly null)") ;
+		}
+	}
+
+
 	/**
 	 * Registers this agent as performing an activity and makes sure that the
 	 * agent will be informed once his departure time has come.
@@ -428,8 +449,8 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	 *
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
-	@Override
-	public void arrangeActivityStart(final MobsimAgent agent) {
+//	@Override
+	private void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 	}
 

@@ -177,6 +177,12 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 		return 1.0;
 	}
 
+	@Override
+	public State getState() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
+	}
+
 //	@Override
 //	public Plan getSelectedPlan() {
 //		return PopulationUtils.unmodifiablePlan(this.dummyPerson.getSelectedPlan());

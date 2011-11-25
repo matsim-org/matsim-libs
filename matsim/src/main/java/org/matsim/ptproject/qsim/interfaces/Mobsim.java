@@ -90,6 +90,8 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  *
  */
 public interface Mobsim extends ObservableSimulation {
+	void arrangeNextAgentAction( MobsimAgent agent ) ;
+	
 	void arrangeAgentDeparture(MobsimAgent planAgent);
 
 	EventsManager getEventsManager();
@@ -101,7 +103,7 @@ public interface Mobsim extends ObservableSimulation {
 	 * 
 	 * @param planAgent
 	 */
-	void arrangeActivityStart(MobsimAgent planAgent);
+//	void arrangeActivityStart(MobsimAgent planAgent);
 
 	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
 	 * 

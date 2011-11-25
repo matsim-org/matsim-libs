@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -85,7 +86,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 	private Departure departure;
-
+	
 	public UmlaufDriver(Umlauf umlauf,
 			String transportMode,
 			TransitStopAgentTracker thisAgentTracker, Netsim transitQueueSimulation) {
@@ -124,7 +125,10 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			if (this.departureTime < now) {
 				this.departureTime = now;
 			}
-			this.sim.arrangeActivityStart(this);
+
+//			this.sim.arrangeActivityStart(this);
+			this.sim.arrangeNextAgentAction(this) ;
+
 		} else {
 			this.getSimulation().getAgentCounter().decLiving();
 		}

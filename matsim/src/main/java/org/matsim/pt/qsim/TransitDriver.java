@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -52,6 +53,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	final double departureTime;
 
 	private final Leg currentLeg;
+	
 
 	// as long as all instance variables are final, it should be ok to leave "resetCaches" empty.  kai, oct'10
 

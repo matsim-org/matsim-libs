@@ -61,6 +61,13 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
+	
+	private MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
+	// yy not so great: implicit instantiation at activity.  kai, nov'11
+	@Override
+	public MobsimAgent.State getState() {
+		return this.state ;
+	}
 
 	@Override
 	public abstract void endLegAndAssumeControl(final double now);

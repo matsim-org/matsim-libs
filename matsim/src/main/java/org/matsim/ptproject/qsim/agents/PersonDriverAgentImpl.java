@@ -77,7 +77,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	int currentLinkIdIndex;
 
-	private MobsimAgent.State state;
+	private MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
+	// (yy not so great: implicit initialization.  kai, nov'11) 
 
 	// ============================================================================================================================
 	// c'tor
@@ -99,7 +100,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			this.currentLinkId = firstAct.getLinkId();
 			if ((actEndTime != Time.UNDEFINED_TIME) && (planElements.size() > 1)) {
 				this.activityEndTime = actEndTime ;
-				this.simulation.arrangeActivityStart(this);
+
+//				this.simulation.arrangeActivityStart(this);
+				this.state = MobsimAgent.State.ACTIVITY ;
+				this.simulation.arrangeNextAgentAction(this) ;
+
 				this.simulation.getAgentCounter().incLiving();
 			}
 		}
@@ -184,7 +189,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 			if ((this.currentPlanElementIndex+1) < this.getPlanElements().size()) {
 				// there is still at least on plan element left
-				this.simulation.arrangeActivityStart(this);
+
+//				this.simulation.arrangeActivityStart(this);
+				this.state = MobsimAgent.State.ACTIVITY ;
+				this.simulation.arrangeNextAgentAction(this);
+				
 				return ;
 			} else {
 				// this is the last activity

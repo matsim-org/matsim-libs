@@ -175,7 +175,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		Id startLinkId = firstLeg.getRoute().getStartLinkId();
 		this.qSim.addParkedVehicle(veh, startLinkId);
-		this.qSim.arrangeActivityStart(driver);
+
+//		this.qSim.arrangeActivityStart(driver);
+		this.qSim.arrangeNextAgentAction(driver) ;
+		
 		this.qSim.getAgentCounter().incLiving();
 		return driver;
 	}
@@ -197,7 +200,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 					driver.setVehicle(veh);
 					Id startLinkId = driver.getCurrentLeg().getRoute().getStartLinkId();
 					this.qSim.addParkedVehicle(veh, startLinkId);
-					this.qSim.arrangeActivityStart(driver);
+
+//					this.qSim.arrangeActivityStart(driver);
+					this.qSim.arrangeNextAgentAction(driver) ;
+
 					this.qSim.getAgentCounter().incLiving();
 					drivers.add(driver);
 				}

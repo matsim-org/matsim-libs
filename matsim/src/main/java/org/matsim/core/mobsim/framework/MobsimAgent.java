@@ -78,6 +78,8 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	public enum State {
 		ACTIVITY, LEG, ABORT
 	}
+	
+	State getState() ;
 
 	/**
 	 * The time the agent wants to depart from an Activity. If the agent is currently driving,
