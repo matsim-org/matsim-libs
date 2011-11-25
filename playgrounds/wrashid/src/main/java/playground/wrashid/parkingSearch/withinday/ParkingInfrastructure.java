@@ -37,10 +37,11 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 public class ParkingInfrastructure {
 
 	private final QuadTree<Id> parkingFacilities;
-	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping;	// <LinkId, List<FacilityId>>
-	private final Map<Id, Id> facilityToLinkMapping;				// <FacilityId, LinkId>
+	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
+																	// List<FacilityId>>
+	private final Map<Id, Id> facilityToLinkMapping; // <FacilityId, LinkId>
 	private IntegerValueHashMap<Id> facilityCapacities;
-	
+
 	public ParkingInfrastructure(Scenario scenario) {
 		facilityToLinkMapping = new HashMap<Id, Id>();
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
@@ -80,10 +81,13 @@ public class ParkingInfrastructure {
 				
 				// add the facility to the facilityToLinkMapping
 				facilityToLinkMapping.put(facility.getId(), facility.getLinkId());
+				
+				// set initial capacity
+				facilityCapacities.incrementBy(facility.getId(), 100);
 			}
 		}
 	}
-	
+
 	public int getFreeCapacity(Id facilityId) {
 		return facilityCapacities.get(facilityId);
 	}
@@ -99,7 +103,7 @@ public class ParkingInfrastructure {
 	public List<Id> getParkingsOnLink(Id linkId) {
 		return parkingFacilitiesOnLinkMapping.get(linkId);
 	}
-	
+
 	public Id getClosestFacilityFromCoord(Coord coord) {
 		return parkingFacilities.get(coord.getX(), coord.getY());
 	}
