@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FhMain.java
+ * HbefaAvgColdEmissionFactor.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,81 +24,45 @@ package playground.benjamin.emissions.types;
  *
  */
 public class HbefaAvgColdEmissionFactor {
-	
-	//TODO test: deleted final modifier on all variables
 
-	/*private String vehCat ;
-	private String component;
-	private String parkingTime;
-	private String distance;*/
-	private double coldEF;
-
-	public double getColdEF() {
-		return coldEF;
-	}
-
-	public void setColdEF(double coldEF) {
-		this.coldEF = coldEF;
-	}
-	
-	public HbefaAvgColdEmissionFactor(
-			String vehCat, 
-			String component,
-			String parkingTime,
-			String distance, 
-			double coldEF){
-		this.coldEF = coldEF;
-		}
-	
-	public HbefaAvgColdEmissionFactor(double coldEF){
-		this.coldEF=coldEF;
-	}
-	
-	public HbefaAvgColdEmissionFactor(){
-		this.coldEF=0.0;
-	}
+	private final String vehCat ;
+	private final String component;
+	private final String parkingTime;
+	private final String distance;
+	private final double coldEF;
 	
 	
-	/*
 //	public String getVehCat() {
 //		return this.vehCat;
 //	}
-public void setVehCat(String vehCat) {
-		this.vehCat = vehCat;
-	}
+//	public void setVehCat(String vehCat) {
+//		this.vehCat = vehCat;
+//	}
 //	public String getComponent() {
 //		return this.component;
 //	}
-	public void setComponent(String component) {
-		this.component = component;
-	}
+//	public void setComponent(String component) {
+//		this.component = component;
+//	}
 //	public String getParkingTime() {
 //		return parkingTime;
 //	}
-	public void setParkingTime(String parkingTime) {
-		this.parkingTime = parkingTime;
-	}
+//	public void setParkingTime(String parkingTime) {
+//		this.parkingTime = parkingTime;
+//	}
 //	public String getDistance() {
 //		return distance;
 //	}
-	public void setDistance(String distance) {
-		this.distance = distance;
-	}
+//	public void setDistance(String distance) {
+//		this.distance = distance;
+//	}
 	public double getColdEF() {
 		return coldEF;
 	}
-	public void setColdEF(double coldEF) {
-		this.coldEF = coldEF;
-	}
+//	public void setColdEF(double coldEF) {
+//		this.coldEF = coldEF;
+//	}
 
-	public HbefaAvgColdEmissionFactor(){
-		this.vehCat="";
-		this.component="";
-		this.distance="";
-		this.parkingTime="";
-		this.coldEF=0.0;
-	}
-	
 	public HbefaAvgColdEmissionFactor(
 			String vehCat, 
 			String component,
@@ -112,21 +76,4 @@ public void setVehCat(String vehCat) {
 		this.distance = distance;
 		this.coldEF = coldEF;
 		}
-
-	public String getVehCat() {
-		return vehCat;
-	}
-
-	public String getComponent() {
-		return component;
-	}
-
-	public String getParkingTime() {
-		return parkingTime;
-	}
-
-	public String getDistance() {
-		return distance;
-	}
-*/
 }

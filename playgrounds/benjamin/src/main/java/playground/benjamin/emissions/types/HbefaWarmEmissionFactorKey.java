@@ -29,10 +29,7 @@ public class HbefaWarmEmissionFactorKey {
 	private WarmPollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
-	// only necessary for detailed emission calculation:
-	private String hbefaTechnology = "";
-	private String hbefaSizeClass = "";
-	private String hbefaEmConcept = "";
+	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaWarmEmissionFactorKey(){
 	}
@@ -69,28 +66,12 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 
-	public String getHbefaTechnology(){
-		return this.hbefaTechnology;
+	public HbefaVehicleAttributes getHbefaVehicleAttributes(){
+		return this.hbefaVehicleAttributes;
 	}
 	
-	public void setHbefaTechnology(String hbefaTechnology) {
-		this.hbefaTechnology = hbefaTechnology;		
-	}
-	
-	public String getHbefaSizeClass(){
-		return this.hbefaSizeClass;
-	}
-
-	public void setHbefaSizeClass(String hbefaSizeClass) {
-		this.hbefaSizeClass = hbefaSizeClass;
-	}
-
-	public String getHbefaEmConcept(){
-		return this.hbefaEmConcept;
-	}
-	
-	public void setHbefaEmConcept(String hbefaEmConcept) {
-		this.hbefaEmConcept = hbefaEmConcept;
+	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
+		this.hbefaVehicleAttributes = hbefaVehicleAttributes;		
 	}
 	
 	/* need to implement the "equals" method in order to be able to construct an "equal" key
@@ -104,13 +85,12 @@ public class HbefaWarmEmissionFactorKey {
 	                return false; 
 	         }
 	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
-	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
+	         return
+	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
 	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
-	         && hbefaTechnology.equals(key.getHbefaTechnology())
-	         && hbefaSizeClass.equals(key.getHbefaSizeClass())
-	         && hbefaEmConcept.equals(key.getHbefaEmConcept());
+	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
 	// if "equals" is implemented, "hashCode also needs to be implemented
@@ -122,12 +102,11 @@ public class HbefaWarmEmissionFactorKey {
 	// needed for "hashCode" method
 	@Override
 	public String toString(){
-		return hbefaVehicleCategory + "; " 
+		return
+		  hbefaVehicleCategory + "; " 
 		+ hbefaComponent + "; " 
 		+ hbefaRoadCategory + "; " 
 		+ hbefaTrafficSituation + "; "
-		+ hbefaTechnology + "; "
-		+ hbefaSizeClass + "; "
-		+ hbefaEmConcept;
+		+ hbefaVehicleAttributes;
 	}
 }

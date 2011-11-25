@@ -82,9 +82,7 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyShutdown(ShutdownEvent event) {
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Vehicle information was not available for "
-				+ WarmEmissionAnalysisModule.getVehInfoNotAvail().size() + " vehicles.");
-		logger.info("Vehicle information was not valid for "
+		logger.info("Detailed vehicle information was not valid for "
 				+ WarmEmissionAnalysisModule.getVehInfoNotValid().size() + " vehicles.");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}

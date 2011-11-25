@@ -75,7 +75,6 @@ public class RunEmissionToolOffline {
 	final Scenario scenario;
 
 
-
 	public RunEmissionToolOffline(){
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
@@ -98,9 +97,7 @@ public class RunEmissionToolOffline {
 		
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Vehicle information was not available for "
-				+ WarmEmissionAnalysisModule.getVehInfoNotAvail().size() + " vehicles.");
-		logger.info("Vehicle information was not valid for "
+		logger.info("Detailed vehicle information was not valid for "
 				+ WarmEmissionAnalysisModule.getVehInfoNotValid().size() + " vehicles.");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}

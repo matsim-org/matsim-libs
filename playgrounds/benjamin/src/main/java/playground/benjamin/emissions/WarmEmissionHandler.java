@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.vehicles.Vehicle;
@@ -119,39 +120,33 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			}
 
 			Id vehicleId = personId;
-			String ageFuelCcm;
+			String vehicleInformation = null;
 			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
-				String description = vehicleType.getDescription();
-				if (description.equals("default")) {
-					ageFuelCcm = null;
-					// This person has a vehicle of the "default" vehicle type.
-					// We don't know anything about it.
-				} else {
-					ageFuelCcm = description;
-				}
-			} else {
-				ageFuelCcm = null;
-			}
-			warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
-					linkId,
-					personId,
-					roadType,
-					freeVelocity,
-					linkLength,
-					enterTime,
-					travelTime,
-					ageFuelCcm);
-		}
-		else{
+				vehicleInformation = vehicleType.getDescription();
+				warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
+						linkId,
+						personId,
+						roadType,
+						freeVelocity,
+						linkLength,
+						enterTime,
+						travelTime,
+						vehicleInformation);
+			} else throw new RuntimeException("No vehicle defined for person " + personId + ". " +
+				      						  "Please make sure that requirements for emission vehicles in " + 
+				      						  VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			
+		} else{
 			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
 				linkLeaveWarnCnt++;
 				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
-						"Thus, no emissions are calculated for this link leave event.");
+				"Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt)
 					logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 		}
 	}
+
 }

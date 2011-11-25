@@ -41,6 +41,7 @@ import org.matsim.vehicles.Vehicles;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactor;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
+import playground.benjamin.emissions.types.HbefaVehicleAttributes;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
 import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
@@ -199,6 +200,7 @@ public class EmissionHandler {
 				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
+				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
@@ -283,9 +285,11 @@ public class EmissionHandler {
 				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
-				key.setHbefaTechnology(array[indexFromKey.get("Technology")]);
-				key.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
-				key.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
+				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
+				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
+				hbefaVehicleAttributes.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
+				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V")]));
