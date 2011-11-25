@@ -100,11 +100,16 @@ public class TaxiAgentLogic
 
         int time = (int)now;
         Task task = schedule.nextTask(time);
-        System.err.println("NEXT TASK: " + task);
 
         if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
             agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
             return;
+        }
+
+        if (task.getSchedule().getVehicle().getId() == 5) {
+            System.err.println("NEXT TASK: " + task + " time="
+                    + now);
+            System.out.println(".");
         }
 
         switch (task.getType()) {
@@ -200,8 +205,8 @@ public class TaxiAgentLogic
         // event handling
         EventsManager events = netsim.getEventsManager();
         EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
-        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(), agent
-                .getId(), agent.getId()));
+        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
+                agent.getId(), agent.getId()));
 
         return TaxiTaskActivity.createServeActivity(task);
     }

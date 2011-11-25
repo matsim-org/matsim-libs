@@ -5,8 +5,6 @@ import java.util.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.*;
 
-import playground.michalm.dynamic.*;
-
 
 /**
  * 

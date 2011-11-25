@@ -114,6 +114,8 @@ public class VRPSimEngine
     {
         vrpData.setTime((int)time + 1);// optimize for the next time step
 
+        //TODO: the approach with "demandChanged" causes 1 second delay!!!
+        
         if (demandChanged) {// reoptimize
             optimize(time);
         }
