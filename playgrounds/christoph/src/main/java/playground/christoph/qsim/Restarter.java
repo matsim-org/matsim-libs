@@ -91,7 +91,11 @@ public class Restarter implements SimulationInitializedListener {
 			if (activityPerforming.containsKey(agent.getId())) {
 				int planElementIndex = activityPerforming.get(agent.getId());
 				setPlanElementIndex(agent, planElementIndex);
-				sim.arrangeActivityStart(agent);
+
+//				sim.arrangeActivityStart(agent);
+				
+				throw new RuntimeException("can't set the agent state.  don't know how to fix this.  aborting.  kai, nov'11") ;
+//				sim.arrangeNextAgentState(agent) ;
 				
 			} else if (legPerforming.containsKey(agent.getId())) {
 				int planElementIndex = legPerforming.get(agent.getId());

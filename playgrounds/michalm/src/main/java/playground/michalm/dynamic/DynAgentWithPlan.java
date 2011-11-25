@@ -17,6 +17,13 @@ public class DynAgentWithPlan
     private final DynAgent dynAgent;
     private final DynPlanFactory planFactory;
 
+	private MobsimAgent.State state ;
+	@Override
+	public MobsimAgent.State getState() {
+		return this.state ;
+	}
+	
+
 
     public DynAgentWithPlan(DynAgent dynAgent, DynPlanFactory planFactory)
     {

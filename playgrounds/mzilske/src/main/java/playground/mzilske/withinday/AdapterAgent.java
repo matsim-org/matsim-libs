@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
@@ -30,6 +31,12 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 	private DrivingBehavior drivingBehavior;
 	
 	private Id nextLinkId;
+	
+	private MobsimAgent.State state ;
+	@Override
+	public MobsimAgent.State getState() {
+		return this.state ;
+	}
 	
 	TeleportationWorld teleportationWorld = new TeleportationWorld() {
 
@@ -88,7 +95,11 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 				public void startDoing(ActivityBehavior activityBehavior) {
 					AdapterAgent.this.activityBehavior = activityBehavior;
 					eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
-					simulation.arrangeActivityStart(AdapterAgent.this);
+					
+//					simulation.arrangeActivityStart(AdapterAgent.this);
+					AdapterAgent.this.state = MobsimAgent.State.ACTIVITY ;
+					simulation.arrangeNextAgentAction(AdapterAgent.this) ;
+					
 				}
 				
 			};

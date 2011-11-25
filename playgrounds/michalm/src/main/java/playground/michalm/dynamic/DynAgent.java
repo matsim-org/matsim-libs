@@ -21,6 +21,14 @@ public class DynAgent
 
     private EventsManager eventsManager;
     
+	private MobsimAgent.State state ;
+	@Override
+	public MobsimAgent.State getState() {
+		return this.state ;
+	}
+	
+
+    
     // =====
 
     private DynLeg vrpLeg;// DRIVE task
@@ -53,8 +61,12 @@ public class DynAgent
         activityEndTime = vrpActivity.getEndTime();
 
         if (activityEndTime != Time.UNDEFINED_TIME || activityEndTime != Double.POSITIVE_INFINITY) {
-            simulation.arrangeActivityStart(this);
-            simulation.getAgentCounter().incLiving();
+
+//        	simulation.arrangeActivityStart(this);
+        	this.state = MobsimAgent.State.ACTIVITY ;
+        	simulation.arrangeNextAgentAction(this) ;
+
+        	simulation.getAgentCounter().incLiving();
         }
     }
 
@@ -87,7 +99,9 @@ public class DynAgent
             simulation.getAgentCounter().decLiving();
         }
         else {
-            simulation.arrangeActivityStart(this);
+//            simulation.arrangeActivityStart(this);
+        	this.state = MobsimAgent.State.ACTIVITY ;
+        	simulation.arrangeNextAgentAction(this) ;
         }
     }
 

@@ -53,6 +53,14 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	private Id expectedPassengerId;
 	private MobsimAgent currentPassenger ;
 	private double activityEndTime;
+	
+	private MobsimAgent.State state ;
+	@Override
+	public MobsimAgent.State getState() {
+		return this.state ;
+	}
+	
+
 
 	private TaxicabAgent(Netsim simulation) {
 		netsim = simulation ;
@@ -64,7 +72,12 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		}
 		
 		this.activityEndTime = 24000. ;
-		netsim.arrangeActivityStart(this) ;
+
+//		netsim.arrangeActivityStart(this) ;
+		this.state = MobsimAgent.State.ACTIVITY ;
+		netsim.arrangeNextAgentAction(this) ;
+		
+		
 	}
 	
 	@Override
