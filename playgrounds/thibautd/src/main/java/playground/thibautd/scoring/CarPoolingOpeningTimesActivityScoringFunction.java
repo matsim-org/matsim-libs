@@ -285,7 +285,7 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 		double typicalDuration = ((PersonImpl) plan.getPerson()).getDesires().getActivityDuration(actType);
 
 		if (typicalDuration < 0) {
-			if (actType.equals( JointActingTypes.PICK_UP ) &&
+			if (actType.equals( JointActingTypes.PICK_UP ) ||
 				actType.equals( JointActingTypes.DROP_OFF ) ) {
 				// no desired duration is OK
 				typicalDuration = 0;
