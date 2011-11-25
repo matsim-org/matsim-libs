@@ -2,6 +2,9 @@ package playground.thibautd.initialdemandgeneration.counts;
 
 import org.matsim.core.utils.geometry.CoordImpl;
 
+/**
+ * Represent a traffic count at a given station in a given instant of time.
+ */
 public class RawCount {
 	String id;
 	int year;
@@ -20,8 +23,14 @@ public class RawCount {
 	CoordImpl coord;
 	
 	
-	public RawCount(String id, String year, String month,
-			String day, String hour, String vol1, String vol2) {
+	public RawCount(
+			final String id,
+			final String year,
+			final String month,
+			final String day,
+			final String hour,
+			final String vol1,
+			final String vol2) {
 		this.id = id;
 		this.year = Integer.parseInt(year);
 		this.month = Integer.parseInt(month);

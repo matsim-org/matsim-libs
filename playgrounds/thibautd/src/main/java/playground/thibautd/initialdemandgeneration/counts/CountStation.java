@@ -80,19 +80,4 @@ public class CountStation {
 	public void setLink2(LinkInfo link2) {
 		this.link2 = link2;
 	}
-	
-	
-/*	public void finish() {
-		Collections.sort(this.counts, new CountsComparator());
-	}
-	
-	static class CountsComparator implements Comparator<RawCount>, Serializable {
-		private static final long serialVersionUID = 1L;
-
-		public int compare(final RawCount rc0, final RawCount rc1) {
-			if (rc0.getHour() < rc1.getHour()) return -1;
-			else if (rc0.getHour() > rc1.getHour()) return +1;
-			return 0;
-		}
-	}*/
 }

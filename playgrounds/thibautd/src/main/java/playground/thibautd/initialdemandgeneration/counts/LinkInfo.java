@@ -4,6 +4,12 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
+/**
+ * Container for count data associated to one link, for a whole year.
+ * Mapping inforation for different networks is retained.
+ *
+ * @author anhorni
+ */
 public class LinkInfo {
 		
 	private TreeMap<String, String> ids = new TreeMap<String, String>();

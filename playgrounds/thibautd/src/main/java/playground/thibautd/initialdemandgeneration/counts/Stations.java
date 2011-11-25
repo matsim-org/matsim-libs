@@ -4,6 +4,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+/**
+ * container for count stations
+ */
 public class Stations {
 	List<CountStation> countStations = new Vector<CountStation>();
 

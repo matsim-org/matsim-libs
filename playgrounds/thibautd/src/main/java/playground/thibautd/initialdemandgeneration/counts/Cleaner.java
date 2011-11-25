@@ -7,25 +7,24 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Removes data entries with missing data (indicated by negative values)
+ *
+ * @author anhorni
+ */
 public class Cleaner {
 	
 	private final static Logger log = Logger.getLogger(Cleaner.class);
 	//TreeMap<String, Vector<RawCount>> rawCounts = new TreeMap<String, Vector<RawCount>>();
 		
-	/*
+	/**
 	 * Identify the days of the station for which at least one volume (vol1 oder vol2) is smaller than -0.5
 	 */
-	private List<String> getStationDays2ThrowAway(TreeMap<String, Vector<RawCount>> rawCounts_) {
+	private List<String> getStationDays2ThrowAway(TreeMap<String, Vector<RawCount>> rawCounts) {
 		List<String> stationDays2ThrowAway = new Vector<String>();
 		
-		Iterator<Vector<RawCount>> rawCountStation_it = rawCounts_.values().iterator();
-		while (rawCountStation_it.hasNext()) {
-			Vector<RawCount> rawCountsListPerStation = rawCountStation_it.next();
-			
-			Iterator<RawCount> rawCount_it = rawCountsListPerStation.iterator();
-			while (rawCount_it.hasNext()) {
-				RawCount rawCount = rawCount_it.next();
-				
+		for (Vector<RawCount> rawCountsListPerStation : rawCounts.values()) {
+			for (RawCount rawCount : rawCountsListPerStation) {
 				if (rawCount.getVol1() < -0.5 || rawCount.getVol2() < -0.5) {
 					if (!stationDays2ThrowAway.contains(rawCount.getId() + "_" + this.convert(rawCount))) {
 						stationDays2ThrowAway.add(rawCount.getId() + "_" + this.convert(rawCount));
@@ -36,7 +35,7 @@ public class Cleaner {
 		return stationDays2ThrowAway;
 	}
 	
-	/* 
+	/** 
 	 *  Clean rawCounts. I.e., throw away the days with data gaps (identified by getStationDays2ThrowAway)
 	 *  Have to do it in 2 steps due to concurrency problems
 	 */

@@ -12,6 +12,12 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+/**
+ * Passes from raw count data to a list of {@link CountStation}
+ * instances, with network link information properly set.
+ *
+ * @author anhorni
+ */
 public class NetworkMapper {
 	
 	private List<CountStation> countStations = new Vector<CountStation>();

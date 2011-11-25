@@ -7,6 +7,11 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Creates datasets of traffic volume per hour and per day.
+ *
+ * @author anhorni
+ */
 public class Aggregator {
 	private final static Logger log = Logger.getLogger(Aggregator.class);
 	
@@ -28,7 +33,10 @@ public class Aggregator {
 	private double avgDay = 0.0;
 	private double standarddevDay = 0.0;
 		
-	public void aggregate(TreeMap<Integer, List<Double>> volumes, TreeMap<Integer, List<Double>> volumesDay, boolean removeOutliers) {
+	public void aggregate(
+			final TreeMap<Integer, List<Double>> volumes,
+			final TreeMap<Integer, List<Double>> volumesDay,
+			final boolean removeOutliers) {
 		this.volumes = volumes;	
 		this.volumesDay = volumesDay;
 		if (removeOutliers) this.removeOutliers();
@@ -40,7 +48,7 @@ public class Aggregator {
 		this.standarddevDay = this.standarddevDay_s();
 	}
 		
-	public int getSize(int hour) {
+	public int getSize(final int hour) {
 		return this.volumes.get(hour).size();
 	}
 	
@@ -90,7 +98,7 @@ public class Aggregator {
 		}
 	}
 	
-	public double getDailyVolume(int date) {
+	public double getDailyVolume(final int date) {
 		double dailyVol = 0.0;
 		for (double hourlyVol : this.volumesDay.get(date)) {
 			dailyVol += hourlyVol;
@@ -103,7 +111,8 @@ public class Aggregator {
 		double avgDayTmp = 0.0;
 		for (Integer date : this.volumesDay.keySet()) {
 			double dailyVol = this.getDailyVolume(date);
-			if (dailyVol > -1.0) { // filter undefined values
+			if (dailyVol > -1.0) {
+				// filter undefined values
 				avgDayTmp += dailyVol;
 				n++;
 			}
@@ -116,7 +125,8 @@ public class Aggregator {
 		double variance = 0.0;
 		for (Integer date : this.volumesDay.keySet()) {
 			double dailyVol = this.getDailyVolume(date);
-			if (dailyVol > -1.0) { // filter undefined values
+			if (dailyVol > -1.0) {
+				// filter undefined values
 				variance += Math.pow(dailyVol - this.avgDay , 2.0);
 				n++;
 			}
@@ -133,7 +143,8 @@ public class Aggregator {
 		for (int hour = 0; hour < 24; hour++) {
 			int n = 0;
 			for (double vol : volumes.get(hour)) {
-				if (vol > -1.0) { // filter undefined values
+				if (vol > -1.0) {
+					// filter undefined values
 					avg[hour] += vol;
 					n++;
 				}
@@ -147,7 +158,8 @@ public class Aggregator {
 			double variance = 0.0;
 			int n = 0;
 			for (double vol : volumes.get(hour)) {
-				if (vol > -1.0) { // filter undefined values
+				if (vol > -1.0) {
+					// filter undefined values
 					variance += Math.pow(vol - avg[hour] , 2.0);
 					n++;
 				}

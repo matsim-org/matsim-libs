@@ -11,12 +11,17 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 
+/**
+ * Reads count data from a set of files
+ *
+ * @author anhorni
+ */
 public class CountsReaderYear {
 	
 	private final static Logger log = Logger.getLogger(CountsReaderYear.class);
 	TreeMap<String, Vector<RawCount>> rawCounts = new TreeMap<String, Vector<RawCount>>();
 	
-	public void read(String datasetsfile) {
+	public void read(final String datasetsfile) {
 		List<String> paths = new Vector<String>();
 		try {
 			FileReader fileReader = new FileReader(datasetsfile);
@@ -37,14 +42,13 @@ public class CountsReaderYear {
 	
 	private void readFiles(final List<String> paths) {
 		try {
-			
 			for (int i = 0; i < paths.size(); i++) {
 				FileReader fileReader = new FileReader(paths.get(i));
-				BufferedReader bufferedReader = new BufferedReader(fileReader);				
+				BufferedReader bufferedReader = new BufferedReader(fileReader);
 				log.info("Reading: " + paths.get(i));
-				
+	
 				String curr_line = bufferedReader.readLine(); // Skip header
-				
+	
 				int counter = 0;
 				int nextMsg = 1;				
 				while ((curr_line = bufferedReader.readLine()) != null) {
@@ -53,7 +57,7 @@ public class CountsReaderYear {
 						nextMsg *= 2;
 						log.info(" line # " + counter);
 					}
-					String[] entries = curr_line.split("\t", -1);											
+					String[] entries = curr_line.split("\t", -1);
 					String dataset = entries[0].trim();
 					String nr = entries[1].trim();
 					String year = entries[3].trim();

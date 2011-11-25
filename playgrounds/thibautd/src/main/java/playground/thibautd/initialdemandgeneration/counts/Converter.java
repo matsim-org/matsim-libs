@@ -1,12 +1,18 @@
 package playground.thibautd.initialdemandgeneration.counts;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
+/**
+ * Converts data from {@link CountStation} data to
+ * network-based {@link Counts} data, using hardCoded
+ * network types.
+ *
+ * @author anhorni
+ */
 public class Converter {
 	
 	Counts countsIVTCH = new Counts();
@@ -14,11 +20,7 @@ public class Converter {
 	Counts countsTeleatlas = new Counts();
 		
 	public void convert(List<CountStation> incounts) {
-		
-		Iterator<CountStation> countStation_it = incounts.iterator();
-		while (countStation_it.hasNext()) {
-			CountStation countStation = countStation_it.next();
-			
+		for (CountStation countStation : incounts) {
 			this.createCounts(countStation, countsIVTCH, 
 					new IdImpl(countStation.getLink1().getLinkidIVTCH()),
 					new IdImpl(countStation.getLink2().getLinkidIVTCH()));

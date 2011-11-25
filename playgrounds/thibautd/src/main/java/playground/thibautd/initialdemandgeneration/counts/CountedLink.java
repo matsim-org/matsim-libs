@@ -1,5 +1,11 @@
 package playground.thibautd.initialdemandgeneration.counts;
 
+/**
+ * Represents count data for one day on a given link,
+ * for real counts and simulation data.
+ *
+ * @author anhorni
+ */
 public class CountedLink {
 	
 	private String id;
