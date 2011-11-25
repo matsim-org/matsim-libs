@@ -20,24 +20,16 @@ public class DynAgent
     private Mobsim simulation;
 
     private EventsManager eventsManager;
-    
-	private MobsimAgent.State state ;
-	@Override
-	public MobsimAgent.State getState() {
-		return this.state ;
-	}
-	
 
-    
+    private MobsimAgent.State state;
+
     // =====
 
     private DynLeg vrpLeg;// DRIVE task
 
     private Id currentLinkId;
 
-    private Id nextLinkId = UNCHOSEN_NEXT_LINK;
-
-    private static final Id UNCHOSEN_NEXT_LINK = new IdImpl("Unchosen next link");
+    private Id nextLinkId;
 
     // =====
 
@@ -61,12 +53,10 @@ public class DynAgent
         activityEndTime = vrpActivity.getEndTime();
 
         if (activityEndTime != Time.UNDEFINED_TIME || activityEndTime != Double.POSITIVE_INFINITY) {
+            state = MobsimAgent.State.ACTIVITY;
+            simulation.arrangeNextAgentAction(this);
 
-//        	simulation.arrangeActivityStart(this);
-        	this.state = MobsimAgent.State.ACTIVITY ;
-        	simulation.arrangeNextAgentAction(this) ;
-
-        	simulation.getAgentCounter().incLiving();
+            simulation.getAgentCounter().incLiving();
         }
     }
 
@@ -96,12 +86,12 @@ public class DynAgent
                 currentLinkId, null, vrpActivity.getActivityType()));
 
         if (activityEndTime == Double.POSITIVE_INFINITY) {
+            //TODO set state to ACTIVITY??
             simulation.getAgentCounter().decLiving();
         }
         else {
-//            simulation.arrangeActivityStart(this);
-        	this.state = MobsimAgent.State.ACTIVITY ;
-        	simulation.arrangeNextAgentAction(this) ;
+            state = MobsimAgent.State.ACTIVITY;
+            simulation.arrangeNextAgentAction(this);
         }
     }
 
@@ -109,11 +99,10 @@ public class DynAgent
     public void startLeg(DynLeg leg, double now)
     {
         this.vrpLeg = leg;
-        nextLinkId = UNCHOSEN_NEXT_LINK;
+        nextLinkId = leg.getNextLinkId();
 
-        // TODO: any events firing here??
-
-        simulation.arrangeAgentDeparture(this);
+        state = MobsimAgent.State.LEG;
+        simulation.arrangeNextAgentAction(this);
     }
 
 
@@ -125,6 +114,7 @@ public class DynAgent
 
         DynActivity oldActivity = vrpActivity;
         vrpActivity = null;
+        state = null;
 
         agentLogic.endActivityAndAssumeControl(oldActivity, now);
     }
@@ -138,6 +128,7 @@ public class DynAgent
 
         DynLeg oldLeg = vrpLeg;
         vrpLeg = null;
+        state = null;
 
         agentLogic.endLegAndAssumeControl(oldLeg, now);
     }
@@ -151,18 +142,23 @@ public class DynAgent
 
 
     @Override
+    public MobsimAgent.State getState()
+    {
+        return this.state;
+    }
+
+
+    @Override
     public String getMode()
     {
-        return (vrpLeg != null) ? TransportMode.car : null;
+        return (state == State.LEG) ? TransportMode.car : null;
     }
 
 
     @Override
     public final Id getPlannedVehicleId()
     {
-        //I am not sure about this function. In general, throwing null works:)
-        // return null;
-        return (vrpLeg != null) ? (veh == null ? null : veh.getId()) : null;
+        return (state == State.LEG) ? id : null;
     }
 
 
@@ -197,10 +193,6 @@ public class DynAgent
     @Override
     public Id chooseNextLinkId()
     {
-        if (nextLinkId == UNCHOSEN_NEXT_LINK) {
-            nextLinkId = vrpLeg.getNextLinkId();// this happens only once on each link
-        }
-
         return nextLinkId;
     }
 
@@ -208,7 +200,7 @@ public class DynAgent
     @Override
     public void notifyMoveOverNode(Id newLinkId)
     {
-        nextLinkId = UNCHOSEN_NEXT_LINK;// why not to call: chooseNextLinkId() here ???
+        nextLinkId = vrpLeg.getNextLinkId();
         currentLinkId = newLinkId;
     }
 
@@ -223,7 +215,6 @@ public class DynAgent
     @Override
     public void notifyTeleportToLink(Id linkId)
     {
-        // this.currentLinkId = linkId;
         throw new UnsupportedOperationException(
                 "This is used only for teleportation and this agent does not teleport");
     }
