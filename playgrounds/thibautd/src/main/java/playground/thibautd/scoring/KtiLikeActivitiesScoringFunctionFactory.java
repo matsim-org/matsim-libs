@@ -36,8 +36,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
-import playground.meisterk.kti.scoring.ActivityScoringFunction;
-
 /**
  * This factory creates "CharyparNagel" scoring functions, but with
  * a KTI activity scoring function.
@@ -79,7 +77,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
 		scoringFunctionAccumulator.addScoringFunction(
-				new ActivityScoringFunction(
+				new CarPoolingOpeningTimesActivityScoringFunction(
 					plan, 
 					params,
 					facilityPenalties,
