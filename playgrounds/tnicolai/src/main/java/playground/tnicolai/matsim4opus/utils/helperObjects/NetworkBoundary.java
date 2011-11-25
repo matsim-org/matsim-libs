@@ -32,4 +32,10 @@ public class NetworkBoundary {
 	public double getMinY(){
 		return this.ymin;
 	}
+	public double getXLength(){
+		return this.xmax - this.xmin;
+	}
+	public double getYLength(){
+		return this.ymax - this.ymin;
+	}
 }
