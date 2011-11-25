@@ -115,6 +115,10 @@ public class SingleIterOnlineDVRPLauncher
 		LeastCostPathCalculator router =  new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc );
 		// (reason why both "time" and "cost" are needed is that, if you use generalized costs, they are still time
 		// dependent).
+		
+		// IMPORTANT: if that router is meant to be "real time" (i.e. reacting to unexpected events),  
+		// then the ttimeCalc object needs to be manipulated in order
+		// to reflect real-time predicted travel times (and possibly caches need to be reset).
 
         // === kai test end
 
