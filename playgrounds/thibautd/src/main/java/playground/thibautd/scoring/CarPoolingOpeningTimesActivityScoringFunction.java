@@ -75,6 +75,8 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
  *
  */
 public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScoringFunction {
+	private static final Logger log =
+		Logger.getLogger( CarPoolingOpeningTimesActivityScoringFunction.class );
 
 	// TODO should be in person.desires
 	public static final int DEFAULT_PRIORITY = 1;
@@ -96,8 +98,19 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 		DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 
-	/*package*/ static final Logger logger = Logger.getLogger(ActivityScoringFunction.class);
+	/*
+	 * Variables only used in activity score calculation.
+	 */
+	private List<ScoringPenalty> penalty = null;
+	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
+	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
+	private double accumulatedTooShortDuration = 0;
+	private double timeSpentWaiting = 0;
+	private double accumulatedNegativeDuration = 0;
 
+	// /////////////////////////////////////////////////////////////////////////
+	// constructor
+	// /////////////////////////////////////////////////////////////////////////
 	public CarPoolingOpeningTimesActivityScoringFunction(
 			final Plan plan,
 			final CharyparNagelScoringParameters params,
@@ -110,16 +123,9 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 		this.plan = plan;
 	}
 
-	/*
-	 * Variables only used in activity score calculation.
-	 */
-	private List<ScoringPenalty> penalty = null;
-	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
-	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
-	private double accumulatedTooShortDuration;
-	private double timeSpentWaiting;
-	private double accumulatedNegativeDuration;
-
+	// /////////////////////////////////////////////////////////////////////////
+	// super methods
+	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	protected double calcActScore(
 			final double arrivalTime,
@@ -147,8 +153,7 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 			// assume facility is always open
 			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 
-			if ( JointActingTypes.PICK_UP.equals( act.getType() ) ||
-					JointActingTypes.DROP_OFF.equals( act.getType() ) ) {
+			if ( isPuDo( act.getType() ) ) {
 				openTimes = null;
 			}
 			else if (actOpt != null) {
@@ -158,9 +163,9 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 				}
 			}
 			else {
-				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
-				logger.error("facility id: " + act.getFacilityId());
-				logger.error("activity type: " + act.getType());
+				log.error("Agent wants to perform an activity whose type is not available in the planned facility.");
+				log.error("facility id: " + act.getFacilityId());
+				log.error("activity type: " + act.getType());
 				Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
 			}
 
@@ -239,10 +244,10 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 			this.accumulatedTimeSpentPerforming.put(act.getType(), accumulatedDuration + timeSpentPerforming);
 
 			// disutility if duration of that activity was too short
-			if (timeSpentPerforming < MINIMUM_DURATION) {
+			// this does not apply to pick up or drop offs (which are *NEVER* too short)
+			if ( timeSpentPerforming < MINIMUM_DURATION && !isPuDo( act.getType() ) ) {
 				this.accumulatedTooShortDuration += (MINIMUM_DURATION - timeSpentPerforming);
 			}
-
 		}
 
 		// no actual score is computed here
@@ -264,6 +269,24 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 		this.score += this.getNegativeDurationScore();
 	}
 	
+	@Override
+	public void reset() {
+		super.reset();
+
+		penalty = null;
+		if ( accumulatedTimeSpentPerforming != null) {
+			// otherwise, call from the super constructor fails.
+			accumulatedTimeSpentPerforming.clear();
+			zeroUtilityDurations.clear();
+		}
+		accumulatedTooShortDuration = 0;
+		timeSpentWaiting = 0;
+		accumulatedNegativeDuration = 0;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// helper methods
+	// /////////////////////////////////////////////////////////////////////////
 	public double getFacilityPenaltiesScore() {
 		double facilityPenaltiesScore = 0.0;
 
@@ -330,7 +353,7 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 
 			tmpScore = Math.max(0, utilPerf);
 		} else if (duration < 0.0) {
-			logger.error("Accumulated activity durations < 0.0 must not happen.");
+			log.error("Accumulated activity durations < 0.0 must not happen.");
 		}
 
 		return tmpScore;
@@ -377,4 +400,10 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 	public double getAccumulatedNegativeDuration() {
 		return accumulatedNegativeDuration;
 	}
+
+	private boolean isPuDo(final String actType) {
+		 return JointActingTypes.PICK_UP.equals( actType ) ||
+				JointActingTypes.DROP_OFF.equals( actType ) ;
+	}
+
 }
