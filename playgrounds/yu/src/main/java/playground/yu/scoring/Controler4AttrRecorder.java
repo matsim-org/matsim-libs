@@ -17,9 +17,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class Controler4AttrRecorder extends Controler {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0]
-		                                            // "test/input/2car1ptRoutes/writeScorAttrs/cfg.xml"
-		);
+		Config config = ConfigUtils.loadConfig(
+				// args[0]
+		"test/input/2car1ptRoutes/writeScorAttrs/cfg-6_-3.xml");
 		Controler4AttrRecorder controler = new Controler4AttrRecorder(config);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);

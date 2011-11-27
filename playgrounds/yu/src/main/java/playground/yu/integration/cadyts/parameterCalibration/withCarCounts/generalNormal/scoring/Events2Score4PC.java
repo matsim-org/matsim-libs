@@ -41,11 +41,10 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.PCCtlListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.scoring.Events2Score4AttrRecorder;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
@@ -57,7 +56,7 @@ import utilities.math.Vector;
  * 
  */
 public class Events2Score4PC extends Events2Score4AttrRecorder implements
-		MultinomialLogitChoice, CadytsChoice {
+MultinomialLogitChoice, CadytsChoice {
 	// public final static List<String> attrNameList = new ArrayList<String>();
 	// public final static List<Double> paramScaleFactorList = new
 	// ArrayList<Double>();
@@ -90,8 +89,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		mnl = createMultinomialLogit(config);
 
 		String setUCinMNLStr = config.findParam(
-				BseParamCalibrationControlerListener.BSE_CONFIG_MODULE_NAME,
-				"setUCinMNL");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "setUCinMNL");
 		if (setUCinMNLStr != null) {
 			setUCinMNL = Boolean.parseBoolean(setUCinMNLStr);
 			System.out.println("BSE:\tsetUCinMNL\t=\t" + setUCinMNL);
@@ -101,26 +99,39 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		}
 	}
 
-	@Override
-	public MultinomialLogit getMultinomialLogit() {
-		return mnl;
+	private Vector buildAttrVector(Plan plan) {
+		Vector attrVector = new Vector(attrNameList.size());
+		for (String attrName : attrNameList) {
+			int attrNameIndex = attrNameList.indexOf(attrName);
+			Object o = plan.getCustomAttributes().get(attrName);
+
+			attrVector.set(attrNameIndex,
+					o == null ? 0d : Double.parseDouble(o.toString()));
+		}
+		return attrVector;
 	}
 
-	public void setMultinomialLogit(MultinomialLogit mnl) {
-		this.mnl = mnl;
+	/**
+	 * should be called after that all setPersonScore(Person) have been called
+	 * in every iteration.
+	 */
+	public void closeWriter() {
+		if (writer != null) {
+			writer.close();
+		}
 	}
 
 	private MultinomialLogit createMultinomialLogit(Config config) {
 		int choiceSetSize = config.strategy().getMaxAgentPlanMemorySize(), // =4
 		attributeCount = Integer.parseInt(config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "attributeCount"));
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "attributeCount"));
 
 		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		double traveling = scoring.getTraveling_utils_hr();
 		double betaStuck = Math.min(
 				Math.min(scoring.getLateArrival_utils_hr(),
 						scoring.getEarlyDeparture_utils_hr()),
-				Math.min(traveling, scoring.getWaiting_utils_hr()));
+						Math.min(traveling, scoring.getWaiting_utils_hr()));
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
@@ -153,13 +164,13 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRateCar()
-						* scoring.getMarginalUtilityOfMoney());
+				* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRatePt()
-						* scoring.getMarginalUtilityOfMoney());
+				* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
 		mnl.setCoefficient(attrNameIndex,
@@ -186,7 +197,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 			// outputCalcDetail = true;
 			ControlerIO ctlIO = new ControlerIO(ctlCfg.getOutputDirectory());
 			writer = new SimpleWriter(ctlIO.getIterationFilename(iteration,
-					"scoreCalcDetails.log.gz"));
+			"scoreCalcDetails.log.gz"));
 
 			StringBuilder head = new StringBuilder("AgentID");
 			for (String attrName : attrNameList) {
@@ -199,14 +210,9 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		}
 	}
 
-	/**
-	 * should be called after that all setPersonScore(Person) have been called
-	 * in every iteration.
-	 */
-	public void closeWriter() {
-		if (writer != null) {
-			writer.close();
-		}
+	@Override
+	public MultinomialLogit getMultinomialLogit() {
+		return mnl;
 	}
 
 	@Override
@@ -214,29 +220,20 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		return scoring;
 	}
 
-	private Vector buildAttrVector(Plan plan) {
-		Vector attrVector = new Vector(attrNameList.size());
-		for (String attrName : attrNameList) {
-			int attrNameIndex = attrNameList.indexOf(attrName);
-			Object o = plan.getCustomAttributes().get(attrName);
-
-			attrVector.set(attrNameIndex,
-					o == null ? 0d : Double.parseDouble(o.toString()));
-		}
-		return attrVector;
-	}
-
+	@Override
 	public void reset(List<Tuple<Id, Plan>> toRemoves) {
 		// just dummy
 	}
 
 	private void setAttr2MNL(int choiceIdx, String attrName, Plan plan) {
 		int attrNameIndex = attrNameList.indexOf(attrName);
-		mnl.setAttribute(
-				choiceIdx,
-				attrNameIndex,
-				Double.parseDouble(plan.getCustomAttributes().get(attrName)
-						.toString()));
+		Object o = plan.getCustomAttributes().get(attrName);
+		mnl.setAttribute(choiceIdx, attrNameIndex,
+				o != null ? Double.parseDouble(o.toString()) : 0d);
+	}
+
+	public void setMultinomialLogit(MultinomialLogit mnl) {
+		this.mnl = mnl;
 	}
 
 	/**
@@ -265,7 +262,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 
 				// set attributes to MultinomialLogit
 				for (String attrName : attrNameList) {
-					this.setAttr2MNL(choiceIdx, attrName, plan);
+					setAttr2MNL(choiceIdx, attrName, plan);
 				}
 
 				// ##########################################################
@@ -302,7 +299,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		for (Plan plan : person.getPlans()) {
 
 			// calculate utility of the plan
-			Vector attrVector = this.buildAttrVector(plan);
+			Vector attrVector = buildAttrVector(plan);
 
 			Object uc = plan.getCustomAttributes().get(
 					BseStrategyManager.UTILITY_CORRECTION);
@@ -310,9 +307,9 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 
 			Vector coeff = mnl.getCoeff();
 			double util = coeff/*
-								 * s. the attributes order in
-								 * Events2Score4PC2.attrNameList
-								 */
+			 * s. the attributes order in
+			 * Events2Score4PC2.attrNameList
+			 */
 			.innerProd(attrVector) + utilCorrection
 			/* utilityCorrection is also an important ASC */;
 			plan.setScore(util);
@@ -363,7 +360,7 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		// set attributes to MultinomialLogit
 		// set attributes to MultinomialLogit
 		for (String attrName : attrNameList) {
-			this.setAttr2MNL(choiceIdx, attrName, plan);
+			setAttr2MNL(choiceIdx, attrName, plan);
 		}
 
 		// ##########################################################
@@ -372,12 +369,11 @@ public class Events2Score4PC extends Events2Score4AttrRecorder implements
 		 */
 		// #############################################
 
-		Object uc = plan.getCustomAttributes().get(
-				BseStrategyManager.UTILITY_CORRECTION);
-
 		// add UC as ASC into MNL
 
 		if (setUCinMNL) {
+			Object uc = plan.getCustomAttributes().get(
+					BseStrategyManager.UTILITY_CORRECTION);
 			mnl.setASC(choiceIdx, uc != null ? (Double) uc : 0d);
 		}
 

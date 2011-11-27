@@ -22,13 +22,14 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  */
 public class ScorAttrReader implements TabularFileHandler {
 	private final TabularFileParserConfig parserConfig;
-	private final Population population;
+	private Population population=null;
 	private String[] attrNames = null;
 
 	public ScorAttrReader(String scorAttrFilename, Population population) {
 		parserConfig = new TabularFileParserConfig();
 		parserConfig.setFileName(scorAttrFilename);
-		parserConfig.setStartRegex("PersonId");
+		parserConfig.setDelimiterRegex("\t");
+		//		parserConfig.setStartTag("PersonId");
 		this.population = population;
 	}
 
@@ -39,7 +40,7 @@ public class ScorAttrReader implements TabularFileHandler {
 
 	@Override
 	public void startRow(String[] row) {
-		if (!row[0].equals(parserConfig.getStartRegex())) {
+		if (!row[0].equals("PersonId")) {
 			if (attrNames == null) {
 				throw new RuntimeException(
 				"There is not yet attributes name collection, was Filehead not read?");
@@ -48,7 +49,7 @@ public class ScorAttrReader implements TabularFileHandler {
 			Person person = population.getPersons().get(new IdImpl(row[0]));
 			Plan plan = person.getPlans().get(Integer.parseInt(row[1]));
 			Map<String, Object> attrs = plan.getCustomAttributes();
-			for (int i = 2; i < row.length - 1; i++) {
+			for (int i = 2; i < row.length; i++) {
 				attrs.put(attrNames[i], Double.parseDouble(row[i]));
 			}
 		} else/* is started */{

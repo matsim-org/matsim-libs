@@ -31,30 +31,30 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
  * @author yu
  * 
  */
-public class ScoringConfigGetValue {
+public class ScoringConfigGetSetValues {
 	private final static Logger log = Logger
-			.getLogger(ScoringConfigGetValue.class);
+	.getLogger(ScoringConfigGetSetValues.class);
 	private static PlanCalcScoreConfigGroup scoringCfgGroup;
 	private static Config config;
 
 	private static final String PERFORMING = "performing";
+
 	private static final String TRAVELING = "traveling";
 	private static final String TRAVELING_PT = "travelingPt";
 	private static final String TRAVELING_WALK = "travelingWalk";
-
 	private static final String MARGINAL_UTL_OF_DISTANCE_WALK = "marginalUtlOfDistanceWalk";
 
 	private static final String MARGINAL_UTL_OF_MONEY = "marginalUtilityOfMoney";
+
 	private static final String MONETARY_DISTANCE_COST_RATE_CAR = "monetaryDistanceCostRateCar";
 	private static final String MONETARY_DISTANCE_COST_RATE_PT = "monetaryDistanceCostRatePt";
-
 	private static final String CONSTANT_CAR = "constantCar";
+
 	private static final String CONSTANT_PT = "constantPt";
 	private static final String CONSTANT_WALK = "constantWalk";
 
-	public static void setConfig(Config config) {
-		ScoringConfigGetValue.config = config;
-		ScoringConfigGetValue.scoringCfgGroup = config.planCalcScore();
+	public static PlanCalcScoreConfigGroup getScoringCfgGroup() {
+		return scoringCfgGroup;
 	}
 
 	/*
@@ -100,6 +100,41 @@ public class ScoringConfigGetValue {
 		} else if (CONSTANT_WALK.equals(key)) {
 			// return config.findParam("bse", key);
 			return Double.toString(scoringCfgGroup.getConstantWalk());
+		} else {
+			log.info(key + "\tcan not be calibrated by the current code.");
+			throw new RuntimeException();
+		}
+	}
+
+	public static void setConfig(Config config) {
+		ScoringConfigGetSetValues.config = config;
+		ScoringConfigGetSetValues.scoringCfgGroup = config.planCalcScore();
+	}
+
+	public static void setValue(String key, double value) {
+		if (PERFORMING.equals(key)) {
+			scoringCfgGroup.setPerforming_utils_hr(value);
+		} else if (TRAVELING.equals(key)) {
+			scoringCfgGroup.setTraveling_utils_hr(value);
+		} else if (TRAVELING_PT.equals(key)) {
+			scoringCfgGroup.setTravelingPt_utils_hr(value);
+		} else if (TRAVELING_WALK.equals(key)) {
+			scoringCfgGroup.setTravelingWalk_utils_hr(value);
+		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)) {
+			scoringCfgGroup.setMarginalUtlOfDistanceWalk(value);
+		} else if (MONETARY_DISTANCE_COST_RATE_CAR.equals(key)) {
+			scoringCfgGroup.setMonetaryDistanceCostRateCar(value);
+		} else if (MONETARY_DISTANCE_COST_RATE_PT.equals(key)) {
+			scoringCfgGroup.setMonetaryDistanceCostRatePt(value);
+		} else if (CONSTANT_CAR.equals(key)) {
+			// return config.findParam("bse", key);
+			scoringCfgGroup.setConstantCar(value);
+		} else if (CONSTANT_PT.equals(key)) {
+			// return config.findParam("bse", key);
+			scoringCfgGroup.setConstantPt(value);
+		} else if (CONSTANT_WALK.equals(key)) {
+			// return config.findParam("bse", key);
+			scoringCfgGroup.setConstantWalk(value);
 		} else {
 			log.info(key + "\tcan not be calibrated by the current code.");
 			throw new RuntimeException();

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -56,6 +57,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.param
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
 import playground.yu.scoring.CharyparNagelScoringFunctionFactory4AttrRecorder;
 import playground.yu.scoring.Events2Score4AttrRecorder;
+import playground.yu.scoring.ScorAttrReader;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -237,6 +239,12 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 				(MultinomialLogitChoice) chooser);
 	}
 
+	private void loadScoringAttributes(String scorAttrFilename,
+			Population population) {
+		new ScorAttrReader(scorAttrFilename, population).parser();
+
+	}
+
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		PCCtl ctl = (PCCtl) event.getControler();
@@ -246,133 +254,127 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		// this.chooser.finish();-->called in notifyScoring()
 		PCStrMn strategyManager = (PCStrMn) ctl.getStrategyManager();
 
-		if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
-			ControlerIO io = ctl.getControlerIO();
-			// ***************************************************
-			calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
-			"flowAnalysis.log"));
-			calibrator.afterNetworkLoading(resultsContainer);
-			// ************************************************
-			if (iter % writeLinkUtilOffsetsInterval == 0) {
-				try {
-					DynamicData<Link> linkCostOffsets = calibrator
-					.getLinkCostOffsets();
-					new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(io
-							.getIterationFilename(iter, "linkUtilOffsets.xml"),
-							linkCostOffsets);
+		// if (iter - firstIter > strategyManager.getMaxPlansPerAgent()) {
+		ControlerIO io = ctl.getControlerIO();
+		// ***************************************************
+		calibrator.setFlowAnalysisFile(io.getIterationFilename(iter,
+		"flowAnalysis.log"));
+		calibrator.afterNetworkLoading(resultsContainer);
+		// ************************************************
+		if (iter % writeLinkUtilOffsetsInterval == 0) {
+			try {
+				DynamicData<Link> linkCostOffsets = calibrator
+				.getLinkCostOffsets();
+				new BseLinkCostOffsetsXMLFileIO(ctl.getNetwork()).write(
+						io.getIterationFilename(iter, "linkUtilOffsets.xml"),
+						linkCostOffsets);
 
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-			// ************************************************
-			if (calibrator.getParameterCovarianceExpOfVarComponent()
-					// getParameterCovariance()
-					!= null) {
-				writerCV.writeln(iter
-						// + "\t"
-						// + calibrator.getParameterCovariance()
-						// .toSingleLineString()
-						+ "\t"
-						+ calibrator.getParameterCovarianceExpOfVarComponent()
-						.toSingleLineString()
-						// + "\t"
-						// + calibrator.getParameterCovarianceVarOfExpComponent()
-						// .toSingleLineString()
-				);
-			}
-			writerCV.flush();
-
-			// ###################################################
-			Vector avgParams = calibrator.getAvgParameters();
-			// PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
-
-			ScoringConfigGetSetValues.setConfig(config);
-			// VERY IMPORTANT #########################################
-
-			// if (
-			// // !watching &&
-			// cycleIdx == 0) {
-			MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
-			.getMultinomialLogit();
-
-			// *******should after Scoring Listener!!!*******
-
-			if (calibrator.getInitialStepSize() != 0d) {
-
-				StringBuffer sb = new StringBuffer(Integer.toString(iter));
-
-				for (int i = 0; i < paramNames.length; i++) {
-					int paramNameIndex = Events2Score4AttrRecorder.attrNameList
-					.indexOf(paramNames[i]/*
-					 * pos. of param in Parameters
-					 * in Cadyts
-					 */);
-
-					// double paramScaleFactor =
-					// Events2Score4PC_mnl_mnl.paramScaleFactorList
-					// .get(paramNameIndex);
-
-					double value = avgParams.get(i);
-					// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
-					// AGAIN!!!***
-					if (config.planCalcScore().getParams()
-							.containsKey(paramNames[i])) {
-						// if
-						// (scoringCfg.getParams().containsKey(paramNames[i])) {
-						// scoringCfg.addParam(paramNames[i],
-						// Double.toString(value
-						// // / paramScaleFactor
-						// ));
-						ScoringConfigGetSetValues
-						.setValue(paramNames[i], value);
-					} else/* bse */{
-						config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
-								Double.toString(value
-										// / paramScaleFactor
-								));
-					}
-					// *****************************************************
-					// ****SET CALIBRATED PARAMETERS IN MNL*****************
-					mnl.setParameter(paramNameIndex, value);
-
-					// text output
-					paramArrays[i][iter - firstIter] = value
-					// / paramScaleFactor
-					;
-					sb.append("\t");
-					sb.append(value
-							// /paramScaleFactor
-					);
-				}
-
-				// ********calibrator.getParameters() JUST FOR ANALYSIS********
-				Vector params = calibrator.getParameters();
-				for (int i = 0; i < paramNames.length; i++) {
-					sb.append("\t");
-					sb.append(params.get(i));
-				}
-
-				writer.writeln(sb);
-				writer.flush();
-			}
-			/*-----------------initialStepSize==0, no parameters are changed----------------------*/
-
-			((Events2Score4PC) chooser).setMultinomialLogit(mnl);
-
-			CharyparNagelScoringFunctionFactory4AttrRecorder sfFactory = new CharyparNagelScoringFunctionFactory4AttrRecorder(
-					config.planCalcScore(), ctl.getNetwork());
-			ctl.setScoringFunctionFactory(sfFactory);
-			((Events2Score4PC) chooser).setSfFactory(sfFactory);
-
-			strategyManager.setChooser(chooser);
-
-			// }
-			// cycleIdx++;
-			// if (cycleIdx == cycle) {
-			// cycleIdx = 0;
-			// }
 		}
+		// ************************************************
+		if (calibrator.getParameterCovarianceExpOfVarComponent()
+				// getParameterCovariance()
+				!= null) {
+			writerCV.writeln(iter
+					// + "\t"
+					// + calibrator.getParameterCovariance()
+					// .toSingleLineString()
+					+ "\t"
+					+ calibrator.getParameterCovarianceExpOfVarComponent()
+					.toSingleLineString()
+					// + "\t"
+					// + calibrator.getParameterCovarianceVarOfExpComponent()
+					// .toSingleLineString()
+			);
+		}
+		writerCV.flush();
+
+		// ###################################################
+		Vector avgParams = calibrator.getAvgParameters();
+		PlanCalcScoreConfigGroup scoringCfg = config.planCalcScore();
+
+		// ScoringConfigGetSetValues.setConfig(config);
+		// VERY IMPORTANT #########################################
+
+		// if (
+		// // !watching &&
+		// cycleIdx == 0) {
+		MultinomialLogit mnl = ((MultinomialLogitChoice) chooser)
+		.getMultinomialLogit();
+
+		// *******should after Scoring Listener!!!*******
+
+		if (calibrator.getInitialStepSize() != 0d) {
+
+			StringBuffer sb = new StringBuffer(Integer.toString(iter));
+
+			for (int i = 0; i < paramNames.length; i++) {
+				int paramNameIndex = Events2Score4AttrRecorder.attrNameList
+				.indexOf(paramNames[i]/*
+				 * pos. of param in Parameters in
+				 * Cadyts
+				 */);
+
+				// double paramScaleFactor =
+				// Events2Score4PC_mnl_mnl.paramScaleFactorList
+				// .get(paramNameIndex);
+
+				double value = avgParams.get(i);
+				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
+				// AGAIN!!!***
+				if (scoringCfg.getParams().containsKey(paramNames[i])) {
+					scoringCfg.addParam(paramNames[i],
+							Double.toString(value + 0.1
+									// / paramScaleFactor
+							));
+					// ScoringConfigGetSetValues
+					// .setValue(paramNames[i], value);
+				} else/* bse */{
+					config.setParam(BSE_CONFIG_MODULE_NAME, paramNames[i],
+							Double.toString(value
+									// / paramScaleFactor
+							));
+				}
+				// *****************************************************
+				// ****SET CALIBRATED PARAMETERS IN MNL*****************
+				mnl.setParameter(paramNameIndex, value + 0.1);
+
+				// text output
+				paramArrays[i][iter - firstIter] = value;
+				sb.append("\t");
+				sb.append(value);
+			}
+
+			// ********calibrator.getParameters() JUST FOR
+			// ANALYSIS********
+			Vector params = calibrator.getParameters();
+			for (int i1 = 0; i1 < paramNames.length; i1++) {
+				sb.append("\t");
+				sb.append(params.get(i1));
+			}
+
+			writer.writeln(sb);
+			writer.flush();
+		}
+		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
+
+		((Events2Score4PC) chooser).setMultinomialLogit(mnl);
+
+		CharyparNagelScoringFunctionFactory4AttrRecorder sfFactory = new CharyparNagelScoringFunctionFactory4AttrRecorder(
+				config.planCalcScore(), ctl.getNetwork());
+		ctl.setScoringFunctionFactory(sfFactory);
+		((Events2Score4PC) chooser).setSfFactory(sfFactory);
+
+		strategyManager.setChooser(chooser);
+
+		// }
+		// cycleIdx++;
+		// if (cycleIdx == cycle) {
+		// cycleIdx = 0;
+		// }
+		// }
 
 		// TESTS: calculate log-likelihood -(q-y)^2/(2sigma^2)
 		if (writeLlhInterval > 0 && avgLlhOverIters > 0) {
@@ -475,9 +477,14 @@ implements StartupListener, ShutdownListener, IterationEndsListener {
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);
-		// ctl.setScoringFunctionFactory(new
-		// CharyparNagelScoringFunctionFactory4PC(
-		// config.planCalcScore(), ctl.getNetwork()));
+
+		String scorAttrFilename = config.findParam(BSE_CONFIG_MODULE_NAME,
+		"scorAttrFilename");
+		if (scorAttrFilename != null) {
+			loadScoringAttributes(scorAttrFilename, ctl.getPopulation());
+			//			ctl.getScenario().setPopulation(population2);
+			System.out.println("ENDING of loading scoring function attributes.");
+		}
 
 		initializeCalibrator(ctl);
 
