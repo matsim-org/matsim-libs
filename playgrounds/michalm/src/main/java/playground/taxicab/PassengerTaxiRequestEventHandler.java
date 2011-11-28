@@ -20,7 +20,7 @@
 
 package playground.taxicab;
 
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.handler.*;
 
 /**
  * @author nagel

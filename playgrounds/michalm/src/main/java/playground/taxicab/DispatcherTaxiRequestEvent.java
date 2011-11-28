@@ -19,10 +19,10 @@
 
 package playground.taxicab;
 
-import java.util.Map;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.events.EventImpl;
+import org.matsim.api.core.v01.*;
+import org.matsim.core.events.*;
 
 /**
  * @author nagel

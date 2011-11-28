@@ -19,25 +19,20 @@
  * *********************************************************************** */
 package playground.taxicab;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.api.core.v01.*;
+import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.mobsim.framework.*;
+import org.matsim.ptproject.qsim.*;
+import org.matsim.ptproject.qsim.interfaces.*;
 
 /**
  * @author nagel
  *
  */
 public class MyMobsimFactory implements MobsimFactory {
-	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
+	//private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 
 	@Override
 	public Simulation createMobsim(final Scenario sc, EventsManager events) {
