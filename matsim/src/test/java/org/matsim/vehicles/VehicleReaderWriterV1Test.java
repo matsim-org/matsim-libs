@@ -77,7 +77,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 			
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
-		VehicleType vehType = vehicleTypes.get(new IdImpl("normalCar"));
+		VehicleType vehType = vehicleTypes.get(new IdImpl("normal&Car"));
 		assertNotNull(vehType);
 		assertEquals(9.5, vehType.getLength(), EPSILON);
 		assertEquals(3.0, vehType.getWidth(), EPSILON);
@@ -94,7 +94,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(42.42, vehType.getEgressTime(), EPSILON);
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
 		
-		vehType = vehicleTypes.get(new IdImpl("defaultValueCar"));
+		vehType = vehicleTypes.get(new IdImpl("defaultValue>Car"));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), EPSILON);
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
@@ -107,11 +107,11 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
-		assertEquals(new IdImpl("normalCar"), vehicles.get(id23).getType().getId());
+		assertEquals(new IdImpl("normal&Car"), vehicles.get(id23).getType().getId());
 
 		assertNotNull(vehicles.get(id42));
 		assertEquals(id42, vehicles.get(id42).getId());
-		assertEquals(new IdImpl("defaultValueCar"), vehicles.get(id42).getType().getId());
+		assertEquals(new IdImpl("defaultValue>Car"), vehicles.get(id42).getType().getId());
 	
 		assertNotNull(vehicles.get(id42_23));
 		assertEquals(id42_23, vehicles.get(id42_23).getId());

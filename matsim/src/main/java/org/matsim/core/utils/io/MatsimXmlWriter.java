@@ -255,7 +255,8 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * Encodes the given string in such a way that it no longer contains
 	 * characters that have a special meaning in xml.
-	 *
+	 * 
+	 * @see http://www.w3.org/International/questions/qa-escapes#use
 	 * @param attributeValue
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
