@@ -23,17 +23,17 @@ package playground.benjamin.emissions.types;
 /**
  * @author benjamin
  * @author julia
+ * 
  **/
-public class HbefaAvgColdEmissionFactorKey {
+public class HbefaColdEmissionFactorKey {
 	
-	//veh category, pollutant,  time, distance
 	private HbefaVehicleCategory hbefaVehicleCategory;
 	private ColdPollutant hbefaComponent;
 	private Integer hbefaParkingTime;
 	private Integer hbefaDistance;
+	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
-	public HbefaAvgColdEmissionFactorKey(){
-		
+	public HbefaColdEmissionFactorKey(){
 	}
 
 	public HbefaVehicleCategory getHbefaVehicleCategory() {
@@ -67,30 +67,34 @@ public class HbefaAvgColdEmissionFactorKey {
 	public void setHbefaDistance(Integer hbefaDistance) {
 		this.hbefaDistance = hbefaDistance;
 	}
-	
-
-	
-	
 		
+	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
+		return hbefaVehicleAttributes;
+	}
+
+	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
+		this.hbefaVehicleAttributes = hbefaVehicleAttributes;
+	}
+
 	/* need to implement the "equals" method in order to be able to construct an "equal" key
 	 later on (e.g. from data available in the simulation)*/
-	
 	@Override
 	public boolean equals(Object obj) {
 	        if(this == obj) {
 	              return true;
 	         }
-	         if (!(obj instanceof HbefaAvgColdEmissionFactorKey)) {
+	         if (!(obj instanceof HbefaColdEmissionFactorKey)) {
 	                return false; 
 	         }
-	         HbefaAvgColdEmissionFactorKey key = (HbefaAvgColdEmissionFactorKey) obj;
+	         HbefaColdEmissionFactorKey key = (HbefaColdEmissionFactorKey) obj;
 	         return hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaParkingTime.equals(key.getHbefaParkingTime())
-	         && hbefaDistance.equals(key.getHbefaDistance());
+	         && hbefaDistance.equals(key.getHbefaDistance())
+	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
-	// if "equals" is implemented, "hashCode also needs to be implemented
+	// if "equals" is implemented, "hashCode" also needs to be implemented
 	@Override
 	public int hashCode(){
 		return toString().hashCode();
@@ -103,7 +107,7 @@ public class HbefaAvgColdEmissionFactorKey {
 		return hbefaVehicleCategory + "; " 
 		+ hbefaComponent + "; "
 		+ hbefaParkingTime + "; "
-		+ hbefaDistance;
+		+ hbefaDistance+ "; "
+		+ hbefaVehicleAttributes;
 	}
- 
 }

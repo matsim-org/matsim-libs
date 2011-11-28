@@ -56,6 +56,7 @@ public class RunEmissionToolOnline {
 	
 	static boolean isUsingDetailedEmissionCalculation = false;
 	static String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
+	static String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
 	
 	static String outputPath = "../../detailedEval/emissions/testScenario/output/";
 	
@@ -140,6 +141,7 @@ public class RunEmissionToolOnline {
 		
 		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;

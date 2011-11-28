@@ -70,6 +70,7 @@ public class RunEmissionToolOffline {
 	
 	static boolean isUsingDetailedEmissionCalculation = true;
 	static String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
+	static String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
 	
 	// =======================================================================================================		
 	final Scenario scenario;
@@ -112,6 +113,7 @@ public class RunEmissionToolOffline {
 		
 		vcg.setIsUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 		vcg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
+		vcg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 	}
 
 	@SuppressWarnings("deprecation")

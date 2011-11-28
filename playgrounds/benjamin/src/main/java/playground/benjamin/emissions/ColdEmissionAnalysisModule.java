@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.benjamin.emissions.events.ColdEmissionEventImpl;
 import playground.benjamin.emissions.types.ColdPollutant;
-import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactor;
+import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
 
 /**
  * @author benjamin
@@ -42,10 +42,10 @@ public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 	
 	private final EventsManager eventsManager;
-	private final Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable;
+	private final Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
 
 	public ColdEmissionAnalysisModule(
-			Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable,
+			Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable,
 			EventsManager emissionEventsManager) {
 		this.eventsManager = emissionEventsManager;
 		this.avgHbefaColdTable = avgHbefaColdTable;
@@ -81,9 +81,9 @@ public class ColdEmissionAnalysisModule {
 		Double generatedEmissions = null;
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 
-		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> entry : avgHbefaColdTable.entrySet()){
-			Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>> value = entry.getValue();
-			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEF();
+		for (Entry<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> entry : avgHbefaColdTable.entrySet()){
+			Map<Integer, Map<Integer, HbefaColdEmissionFactor>> value = entry.getValue();
+			double coldEf  = value.get(distance_km).get(parkingDuration_h).getColdEmissionFactor();
 			coldPollutant = entry.getKey();
 			generatedEmissions = coldEf ;
 			coldEmissions.put(coldPollutant, generatedEmissions);

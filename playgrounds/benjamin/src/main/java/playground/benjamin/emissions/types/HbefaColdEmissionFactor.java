@@ -23,57 +23,18 @@ package playground.benjamin.emissions.types;
  * @author benjamin
  *
  */
-public class HbefaAvgColdEmissionFactor {
+public class HbefaColdEmissionFactor {
 
-	private final String vehCat ;
-	private final String component;
-	private final String parkingTime;
-	private final String distance;
-	private final double coldEF;
+	private double coldEmissionFactor;
 	
-	
-//	public String getVehCat() {
-//		return this.vehCat;
-//	}
-//	public void setVehCat(String vehCat) {
-//		this.vehCat = vehCat;
-//	}
-//	public String getComponent() {
-//		return this.component;
-//	}
-//	public void setComponent(String component) {
-//		this.component = component;
-//	}
-//	public String getParkingTime() {
-//		return parkingTime;
-//	}
-//	public void setParkingTime(String parkingTime) {
-//		this.parkingTime = parkingTime;
-//	}
-//	public String getDistance() {
-//		return distance;
-//	}
-//	public void setDistance(String distance) {
-//		this.distance = distance;
-//	}
-	public double getColdEF() {
-		return coldEF;
+	public HbefaColdEmissionFactor(){
 	}
-//	public void setColdEF(double coldEF) {
-//		this.coldEF = coldEF;
-//	}
 
-	public HbefaAvgColdEmissionFactor(
-			String vehCat, 
-			String component,
-			String parkingTime,
-			String distance, 
-			double coldEF){
-		
-		this.vehCat = vehCat;
-		this.component = component;
-		this.parkingTime = parkingTime;
-		this.distance = distance;
-		this.coldEF = coldEF;
-		}
+	public double getColdEmissionFactor() {
+		return coldEmissionFactor;
+	}
+	
+	public void setColdEmissionFactor(double coldEmissionFactor){
+		this.coldEmissionFactor = coldEmissionFactor;
+	}
 }

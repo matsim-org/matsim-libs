@@ -39,7 +39,8 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.types.ColdPollutant;
-import playground.benjamin.emissions.types.HbefaAvgColdEmissionFactor;
+import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
+import playground.benjamin.emissions.types.HbefaColdEmissionFactorKey;
 import playground.benjamin.emissions.types.HbefaTrafficSituation;
 import playground.benjamin.emissions.types.HbefaVehicleAttributes;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
@@ -65,15 +66,17 @@ public class EmissionHandler {
 	static String averageFleetWarmEmissionFactorsFile;
 
 	static String detailedWarmEmissionFactorsFile;
+	static String detailedColdEmissionFactorsFile;
 	
 	//===
 	Map<Integer, String> roadTypeMapping;
 	Vehicles emissionVehicles;
 	
 	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable;
+	Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable;
 
 	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
 	public EmissionHandler(Scenario scenario) {
 		this.scenario = scenario;
@@ -92,9 +95,10 @@ public class EmissionHandler {
 		
 		if(scenario.getConfig().vspExperimental().isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
 		}
 		else{
-			logger.warn("Detailed warm emission calculation is switched off in " + VspExperimentalConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
+			logger.warn("Detailed emission calculation is switched off in " + VspExperimentalConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
 		}
 		logger.info("leaving createLookupTables");
 	}
@@ -107,7 +111,8 @@ public class EmissionHandler {
 		averageFleetWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageWarmEmissionFactorsFile();
 		averageFleetColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageColdEmissionFactorsFile();
 		
-		detailedWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedWarmEmissionFactorsFile() ;
+		detailedWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedWarmEmissionFactorsFile();
+		detailedColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedColdEmissionFactorsFile();
 	}
 
 	public void installEmissionEventHandler(EventsManager eventsManager, String emissionEventOutputFile) {
@@ -204,7 +209,7 @@ public class EmissionHandler {
 				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
-				value.setEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
+				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgHbefaWarmTable.put(key, value);
 			}
@@ -218,11 +223,11 @@ public class EmissionHandler {
 		return avgHbefaWarmTable;
 	}
 	
-	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
+	private Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
-		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>> avgHbefaColdTable =
-			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>>();
+		Map<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>> avgHbefaColdTable =
+			new TreeMap<ColdPollutant, Map<Integer, Map<Integer, HbefaColdEmissionFactor>>>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -230,12 +235,8 @@ public class EmissionHandler {
 			
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
-				HbefaAvgColdEmissionFactor coldEmissionFactor = new HbefaAvgColdEmissionFactor(
-						array[indexFromKey.get("VehCat")],
-						array[indexFromKey.get("Component")],
-						array[indexFromKey.get("ParkingTime [h]")],
-						array[indexFromKey.get("Distance [km]")],
-						Double.parseDouble(array[indexFromKey.get("EFA_km_weighted")]));
+				HbefaColdEmissionFactor coldEmissionFactor = new HbefaColdEmissionFactor();
+				coldEmissionFactor.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_km_weighted")]));
 				
 				ColdPollutant coldPollutant = ColdPollutant.getValue(array[indexFromKey.get("Component")]);
 				int parkingTime = Integer.valueOf(array[indexFromKey.get("ParkingTime [h]")].split("-")[0]);
@@ -245,15 +246,15 @@ public class EmissionHandler {
 						avgHbefaColdTable.get(coldPollutant).get(distance).put(parkingTime, coldEmissionFactor);
 					}
 					else{
-						Map<Integer, HbefaAvgColdEmissionFactor> tempParkingTime = new TreeMap<Integer, HbefaAvgColdEmissionFactor>();
+						Map<Integer, HbefaColdEmissionFactor> tempParkingTime = new TreeMap<Integer, HbefaColdEmissionFactor>();
 						tempParkingTime.put(parkingTime, coldEmissionFactor);
 						avgHbefaColdTable.get(coldPollutant).put(distance, tempParkingTime);	  
 					}
 				}
 				else{
-					Map<Integer,HbefaAvgColdEmissionFactor> tempParkingTime =	new TreeMap<Integer, HbefaAvgColdEmissionFactor>();
+					Map<Integer,HbefaColdEmissionFactor> tempParkingTime =	new TreeMap<Integer, HbefaColdEmissionFactor>();
 					tempParkingTime.put(parkingTime, coldEmissionFactor);
-					Map<Integer, Map<Integer, HbefaAvgColdEmissionFactor>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaAvgColdEmissionFactor>>();
+					Map<Integer, Map<Integer, HbefaColdEmissionFactor>> tempDistance = new TreeMap<Integer, Map<Integer, HbefaColdEmissionFactor>>();
 					tempDistance.put(parkingTime, tempParkingTime);
 					avgHbefaColdTable.put(coldPollutant, tempDistance);				
 				}
@@ -293,7 +294,7 @@ public class EmissionHandler {
 
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V")]));
-				value.setEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
+				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 
 				hbefaWarmTableDetailed.put(key, value);
 			}
@@ -306,6 +307,11 @@ public class EmissionHandler {
 		return hbefaWarmTableDetailed;
 	}
 	
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String detailedColdEmissionFactorsFile) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	private Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {
 		String[] keys = strLine.split(fieldSeparator) ;
 

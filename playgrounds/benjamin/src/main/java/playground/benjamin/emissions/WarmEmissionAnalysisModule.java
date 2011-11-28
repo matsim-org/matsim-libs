@@ -150,13 +150,13 @@ public class WarmEmissionAnalysisModule {
 				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
 					freeFlowSpeed = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
-					efFreeFlow = this.detailedHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();
-					efStopGo = this.detailedHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+					efFreeFlow = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+					efStopGo = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 				} else {
 					freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
-					efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();
-					efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+					efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+					efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 					if(vehInfoWarnValidCnt < maxVehInfoWarnCnt) {
 						vehInfoWarnValidCnt++;
@@ -170,8 +170,8 @@ public class WarmEmissionAnalysisModule {
 			} else {
 				freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 				stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
-				efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getEmissionFactor();
-				efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getEmissionFactor();
+				efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+				efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 			}
 
 			//TODO: is this really the "right" way of doing this?!?

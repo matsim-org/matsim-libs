@@ -27,7 +27,7 @@ package playground.benjamin.emissions.types;
 public class HbefaWarmEmissionFactor {
 
 	private double speed;
-	private double emissionFactor;
+	private double warmEmissionFactor;
 
 	public HbefaWarmEmissionFactor(){
 	}
@@ -40,11 +40,11 @@ public class HbefaWarmEmissionFactor {
 		this.speed = speed;
 	}
 	
-	public double getEmissionFactor() {
-		return this.emissionFactor;
+	public double getWarmEmissionFactor() {
+		return this.warmEmissionFactor;
 	}
 	
-	public void setEmissionFactor(double emissionFactor) {
-		this.emissionFactor = emissionFactor;
+	public void setWarmEmissionFactor(double warmEmissionFactor) {
+		this.warmEmissionFactor = warmEmissionFactor;
 	}
 }
