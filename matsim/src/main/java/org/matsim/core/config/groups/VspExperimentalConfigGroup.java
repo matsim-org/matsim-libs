@@ -154,6 +154,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
 	
+	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
+	private String detailedColdEmissionFactorsFile;
+	
 	// ---
 
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
@@ -176,8 +179,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n" +
 				" - REQUIRED: vehicle type description must start with the respective HbefaVehicleCategory followed by `;'" + "\n" + 
-				" - OPTIONAL: if detailed warm emission calculation is switched on, vehicle type description should aditionally contain " +
-				"`Technology;SizeClasse;EmConcept', corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
+				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type description should aditionally contain " +
+				" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
 		
@@ -186,6 +189,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed warm emission factors file must be provided!");
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors") ;
+		
+		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
@@ -264,7 +269,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if ( USING_DETAILED_EMISSION_CALCULATION.equals(key)){
 			this.setIsUsingDetailedEmissionCalculation(Boolean.parseBoolean(value));
 		} else if ( EMISSION_FACTORS_WARM_FILE_DETAILED.equals(key)) {
-			this.setDetailedWarmEmissionFactorsFile(value) ;
+			this.setDetailedWarmEmissionFactorsFile(value);
+		} else if (EMISSION_FACTORS_COLD_FILE_DETAILED.equals(key)){
+			this.setDetailedColdEmissionFactorsFile(value);
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
 			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
 		}
@@ -304,7 +311,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		
 		map.put(USING_DETAILED_EMISSION_CALCULATION, Boolean.toString( this.isUsingDetailedEmissionCalculation));
 		
-		map.put( EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile() ) ;
+		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile()) ;
+		
+		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, this.getDetailedColdEmissionFactorsFile());
 		
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
 
@@ -466,9 +475,17 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	}
 
 	public String getDetailedWarmEmissionFactorsFile() {
-		return detailedWarmEmissionFactorsFile;
+		return this.detailedWarmEmissionFactorsFile;
 	}
 
+	public void setDetailedColdEmissionFactorsFile(String detailedColdEmissionFactorsFile) {
+		this.detailedColdEmissionFactorsFile = detailedColdEmissionFactorsFile;
+	}
+
+	public String getDetailedColdEmissionFactorsFile(){
+		return this.detailedColdEmissionFactorsFile;
+	}
+	
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;
 	}
