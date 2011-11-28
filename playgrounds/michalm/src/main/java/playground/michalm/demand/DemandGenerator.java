@@ -6,20 +6,19 @@ import java.util.*;
 import javax.naming.*;
 import javax.xml.parsers.*;
 
-import org.matsim.core.config.ConfigUtils;
-import playground.michalm.demand.Zone.Act;
-import playground.michalm.demand.Zone.Group;
-
 import org.apache.log4j.*;
 import org.geotools.feature.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.*;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.*;
 import org.matsim.core.utils.geometry.geotools.*;
 import org.xml.sax.*;
 
+import playground.michalm.demand.Zone.Act;
+import playground.michalm.demand.Zone.Group;
 import cern.jet.random.*;
 import cern.jet.random.engine.*;
 

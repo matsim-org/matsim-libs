@@ -6,9 +6,6 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
-import pl.poznan.put.vrp.dynamic.customer.*;
-import pl.poznan.put.vrp.dynamic.customer.CustomerAction.CAType;
-import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
@@ -45,11 +42,11 @@ public class TaxiModeDepartureHandler
             Id toLinkId = agent.getDestinationLinkId();
             MATSimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
-            
+            List<Customer> customers = data.getVrpData().getCustomers();
             List<Request> requests = data.getVrpData().getRequests();
-            
+
             int id = requests.size();
-            
+
             // notify the DVRP Optimizer
             // agent -> customerId -> Customer
             Customer customer = new TaxiCustomer(id, fromVertex, agent);// TODO
@@ -60,14 +57,11 @@ public class TaxiModeDepartureHandler
             Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
                     t0, t1, false);
 
+            customers.add(customer);
             requests.add(request);
-            // call for a taxi -> means notify DVRPOptimizer
-            vrpEngine.taxiRequestSubmitted(request);
-
-            CustomerAction ca = new CustomerAction(CAType.REQ_SUBMIT, t0, request);// ??
-            // notify listeners about this event?
 
             vrpEngine.getMobsim().registerAdditionalAgentOnLink(agent);
+            vrpEngine.taxiRequestSubmitted(request, now);
 
             return true;
         }

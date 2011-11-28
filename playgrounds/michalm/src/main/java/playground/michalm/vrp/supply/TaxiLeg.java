@@ -17,6 +17,6 @@ public class TaxiLeg
     }
 
 
-    public void notifyLegEnded(double now)
+    public void endLeg(double now)
     {}
 }

@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.*;
 import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -13,28 +12,28 @@ import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 import playground.michalm.vrp.demand.*;
+import playground.michalm.vrp.sim.*;
 
 
 public class TaxiAgentLogic
     implements DynAgentLogic
 {
-    private Vehicle vrpVehicle;
+    private VRPSimEngine vrpSimEngine;
     private ShortestPath[][] shortestPaths;
 
+    private Vehicle vrpVehicle;
     private DynAgent agent;
 
+    private Request currentRequest;
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, ShortestPath[][] shortestPaths, Netsim netsim)
+
+    public TaxiAgentLogic(Vehicle vrpVehicle, ShortestPath[][] shortestPaths,
+            VRPSimEngine vrpSimEngine)
     {
         this.vrpVehicle = vrpVehicle;
         this.shortestPaths = shortestPaths;
-        this.netsim = netsim;
+        this.vrpSimEngine = vrpSimEngine;
     }
-
-
-    private Request currentRequest = null;
-
-    private Netsim netsim = null;
 
 
     @Override
@@ -56,28 +55,8 @@ public class TaxiAgentLogic
     public void endLegAndAssumeControl(DynLeg oldLeg, double now)
     {
         if (oldLeg instanceof TaxiLeg) {
-            ((TaxiLeg)oldLeg).notifyLegEnded(now);// handle passenger-related stuff
+            ((TaxiLeg)oldLeg).endLeg(now);// handle passenger-related stuff
         }
-
-        // TODO: NOTIFY OPTIMIZER !!!!
-        // because some delays in DRIVE task may influence further execution of the schedule
-
-        // VRPSimEngine
-
-        // // compare actual vs. planned arrival time:
-        // int actualArrivalTime = (int)drivingWorld.getTime();// I assume this is the current
-        // time!XXX
-        // int plannedArrivalTime = driveTask.getEndTime();
-        // int timeDiff = actualArrivalTime - plannedArrivalTime;
-        //
-        // // TODO if ANY difference in time - update vrpData; "Scheduler" would be very useful here
-        // // XXX [VRPSimEngine/Optimizer should be responsible for this]
-        //
-        // // if the difference is significant - consider reoptimization
-        // // BUT: reoptimization can be only done after each time step in VRPSimEngine
-        //
-        // // TODO
-        // // vrpSimEngine.timeDifferenceOccurred(route.vehicle, timeDiff);
 
         scheduleNextTask(now);
     }
@@ -92,24 +71,33 @@ public class TaxiAgentLogic
     private void scheduleNextTask(double now)
     {
         Schedule schedule = vrpVehicle.getSchedule();
+        ScheduleStatus status = schedule.getStatus();
 
-        if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
+        if (status == ScheduleStatus.UNPLANNED) {
             agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
             return;
         }
 
         int time = (int)now;
-        Task task = schedule.nextTask(time);
 
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
+        if (status == ScheduleStatus.STARTED) {
+            // TODO: maybe in General DVRP but not here in simple TAXI...
+            // optimizer.optimize();
+            //
+            // however, here just a simple update of this schedule
+            vrpSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
+        }
+
+        Task task = schedule.nextTask();
+        status = schedule.getStatus();// REFRESH status!!!
+
+        if (status == ScheduleStatus.COMPLETED) {
             agent.startActivity(createAfterScheduleActivity(), now);// FINAL ACTIVITY
             return;
         }
 
-        if (task.getSchedule().getVehicle().getId() == 5) {
-            System.err.println("NEXT TASK: " + task + " time="
-                    + now);
-            System.out.println(".");
+        if (task.getSchedule().getVehicle().getId() == printVehId) {
+            System.err.println("NEXT TASK: " + task + " time=" + now);
         }
 
         switch (task.getType()) {
@@ -125,13 +113,12 @@ public class TaxiAgentLogic
                 // System.err.println("fromLink" + fromLinkId + " toLink: " + toLinkId);
 
                 if (currentRequest != null) {
-                    agent.startLeg(
-                            createLegWithPassenger((DriveTask)task, shortestPaths, time,
-                                    currentRequest), now);
+                    agent.startLeg(createLegWithPassenger((DriveTask)task, time, currentRequest),
+                            now);
                     currentRequest = null;
                 }
                 else {
-                    agent.startLeg(createLeg((DriveTask)task, shortestPaths, time), now);
+                    agent.startLeg(createLeg((DriveTask)task, time), now);
                 }
                 break;
 
@@ -148,6 +135,9 @@ public class TaxiAgentLogic
                 throw new IllegalStateException();
         }
     }
+
+
+    private final int printVehId = 13;
 
 
     // ========================================================================================
@@ -197,13 +187,14 @@ public class TaxiAgentLogic
             throw new IllegalStateException("Passanger and taxi on different links!");
         }
 
-        if (netsim.unregisterAdditionalAgentOnLink(passenger.getId(), currentLinkId) == null) {
+        if (vrpSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),
+                currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()
                     + "is not waiting for taxi");
         }
 
         // event handling
-        EventsManager events = netsim.getEventsManager();
+        EventsManager events = vrpSimEngine.getMobsim().getEventsManager();
         EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
         events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
                 agent.getId(), agent.getId()));
@@ -214,8 +205,8 @@ public class TaxiAgentLogic
 
     // ========================================================================================
 
-    private TaxiLeg createLegWithPassenger(DriveTask driveTask, ShortestPath[][] shortestPaths,
-            int realDepartTime, final Request request)
+    private TaxiLeg createLegWithPassenger(DriveTask driveTask, int realDepartTime,
+            final Request request)
     {
         SPEntry path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
                 .getId()].getSPEntry(realDepartTime);
@@ -224,12 +215,12 @@ public class TaxiAgentLogic
 
         return new TaxiLeg(path, destinationLinkId) {
             @Override
-            public void notifyLegEnded(double now)
+            public void endLeg(double now)
             {
                 MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassanger();
 
                 // deliver the passenger
-                EventsManager events = netsim.getEventsManager();
+                EventsManager events = vrpSimEngine.getMobsim().getEventsManager();
                 EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
                         agent.getId(), agent.getId()));
@@ -241,8 +232,7 @@ public class TaxiAgentLogic
     }
 
 
-    private TaxiLeg createLeg(DriveTask driveTask, ShortestPath[][] shortestPaths,
-            int realDepartTime)
+    private TaxiLeg createLeg(DriveTask driveTask, int realDepartTime)
     {
         SPEntry path = shortestPaths[driveTask.getFromVertex().getId()][driveTask.getToVertex()
                 .getId()].getSPEntry(realDepartTime);

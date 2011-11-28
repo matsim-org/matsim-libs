@@ -3,15 +3,14 @@ package playground.michalm.vrp.offline;
 import java.io.*;
 import java.util.*;
 
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.fullsp.*;
-
 import org.matsim.api.core.v01.*;
 import org.matsim.core.controler.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
+import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.fullsp.*;
 
 
 public class SimLauncherWithArcEstimator

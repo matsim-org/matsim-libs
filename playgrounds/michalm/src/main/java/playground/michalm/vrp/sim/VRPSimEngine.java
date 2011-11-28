@@ -10,6 +10,7 @@ import org.matsim.vis.otfvis.opengl.queries.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import playground.michalm.visualization.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.supply.*;
@@ -18,18 +19,14 @@ import playground.michalm.vrp.supply.*;
 public class VRPSimEngine
     implements MobsimEngine
 {
-    private Netsim netsim;
-
     private VRPData vrpData;
 
-    private VRPOptimizerFactory optimizerFactory;
-    private VRPOptimizer optimizer;
+    private Netsim netsim;
 
-    private static final int MAX_TIME_DIFFERENCE = 180; // in seconds
-    private boolean demandChanged;
+    private VRPOptimizerFactory optimizerFactory;
+    private TaxiVRPOptimizer optimizer;
 
     private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
-
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
 
@@ -52,6 +49,7 @@ public class VRPSimEngine
     @Override
     public void onPrepareSim()
     {
+        vrpData.setTime(0);
         // Reset schedules
         for (Vehicle v : vrpData.getVehicles()) {
             v.resetSchedule();
@@ -60,9 +58,9 @@ public class VRPSimEngine
         // remove all existing requests
         vrpData.getRequests().clear();
 
-        optimizer = optimizerFactory.create();
+        optimizer = (TaxiVRPOptimizer)optimizerFactory.create(vrpData);
 
-        optimize(-1);//?? -1 ??
+        optimize(0);// "0" should not be hard-coded
 
         if (VRPOTFClientLive.queryControl != null) {
             SwingUtilities.invokeLater(new Runnable() {
@@ -80,29 +78,25 @@ public class VRPSimEngine
     }
 
 
-    private void optimize(double time)
+    public void optimize(double now)
     {
-        optimizer.optimize(vrpData);
-        System.err.println("Simulation time = " + vrpData.getTime());
-
-        // update: DVRPData -> MATSim ???
-        // for each vehicle, starting from the current Request do update....
-
-        // or
-        // notify agents (vehAgents and customerAgents) of the results:
-        // - for each "requesting" Customer -> accept/reject
-        // - for each "modified" Vehicle -> schedule update
+        optimizer.optimize();
+        System.err.println("Optimization @simTime=" + vrpData.getTime());
 
         notifyAgents();
-        
-        notifyOptimizerListeners(new OptimizerEvent((int)time, vrpData));
+        notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData));
     }
 
 
-    public void taxiRequestSubmitted(Request request)
+    public void updateScheduleBeforeNextTask(Vehicle vrpVehicle, double now)
     {
-        // System.err.println("Req: " + request + " has been submitted");
-        demandChanged = true;
+        optimizer.updateSchedule(vrpVehicle);
+    }
+
+
+    public void taxiRequestSubmitted(Request request, double now)
+    {
+        optimize(now);
     }
 
 
@@ -112,15 +106,9 @@ public class VRPSimEngine
     @Override
     public void doSimStep(double time)
     {
-        vrpData.setTime((int)time + 1);// optimize for the next time step
-
-        //TODO: the approach with "demandChanged" causes 1 second delay!!!
-        
-        if (demandChanged) {// reoptimize
-            optimize(time);
-        }
-
-        demandChanged = false;
+        // this happens at the end of QSim.doSimStep() therefore "time+1"
+        // this value will be used throughout the next QSim.doSimStep()
+        vrpData.setTime((int)time + 1);
     }
 
 
@@ -132,14 +120,6 @@ public class VRPSimEngine
     }
 
 
-    public void timeDifferenceOccurred(Vehicle vrpVeh, int timeDiff)
-    {
-        if (timeDiff > MAX_TIME_DIFFERENCE) {
-            // reoptimize!!!
-        }
-    }
-    
-    
     private void notifyAgents()
     {
         for (TaxiAgentLogic a : agentLogics) {
@@ -178,5 +158,4 @@ public class VRPSimEngine
     {
         optimizerListeners.remove(listener);
     }
-
 }

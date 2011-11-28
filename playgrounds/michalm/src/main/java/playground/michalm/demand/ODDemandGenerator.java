@@ -6,7 +6,6 @@ import java.util.*;
 import javax.naming.*;
 import javax.xml.parsers.*;
 
-import org.apache.log4j.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.xml.sax.*;
@@ -17,7 +16,7 @@ import pl.poznan.put.util.array2d.*;
 public class ODDemandGenerator
     extends DemandGenerator
 {
-    private static final Logger log = Logger.getLogger(ODDemandGenerator.class);
+    // private static final Logger log = Logger.getLogger(ODDemandGenerator.class);
 
     private int zoneCount;
     private int[][] odMatrix;
@@ -27,7 +26,7 @@ public class ODDemandGenerator
             String zonesShpFileName, String odMatrixFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
     {
-        super(networkFileName, zonesXMLFileName, zonesShpFileName,  idField);
+        super(networkFileName, zonesXMLFileName, zonesShpFileName, idField);
 
         // read OD matrix
         zoneCount = fileOrderedZones.size();
@@ -53,11 +52,10 @@ public class ODDemandGenerator
                 for (int k = 0; k < 2 * odFlow; k++) {
                     // generatePlans for the OD pair
 
-//                    if (!(k % 100 == 0 && i < 9 && j < 9)) {
-//                        continue;
-//                    }
+                    // if (!(k % 100 == 0 && i < 9 && j < 9)) {
+                    // continue;
+                    // }
 
-                    
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);

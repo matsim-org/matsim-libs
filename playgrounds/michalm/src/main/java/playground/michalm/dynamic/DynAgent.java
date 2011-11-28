@@ -2,7 +2,6 @@ package playground.michalm.dynamic;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.basic.v01.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.utils.misc.*;
 import org.matsim.ptproject.qsim.interfaces.*;
@@ -63,16 +62,32 @@ public class DynAgent
 
     public void scheduleUpdated()
     {
-        if (vrpActivity != null) {
-            if (activityEndTime != vrpActivity.getEndTime()) {
-                double oldTime = activityEndTime;
-                activityEndTime = vrpActivity.getEndTime();
-
-                simulation.rescheduleActivityEnd(DynAgent.this, oldTime, activityEndTime);
-            }
+        // this agent is right now switching from one task (Act/Leg) to another (Act/Leg)
+        // so he is the source of this schedule updating process and so he will not be handled here
+        // TODO: verify this condition!!!
+        if (state == null) {
+            return;
         }
-        else if (vrpLeg != null) {
-            // currently not supported (only if VEHICLE DIVERSION is turned ON)
+
+        switch (state) {
+            case ACTIVITY: // WAIT (will it be also SERVE???)
+                if (activityEndTime != vrpActivity.getEndTime()) {
+                    double oldTime = activityEndTime;
+                    activityEndTime = vrpActivity.getEndTime();
+
+                    simulation.rescheduleActivityEnd(DynAgent.this, oldTime, activityEndTime);
+                }
+                break;
+
+            case LEG: // DRIVE
+                // currently not supported (only if VEHICLE DIVERSION is turned ON)
+                // but in general, this should be handled by vrpLeg itself!
+
+                // idea: pass destionationLinkId and linkIds to the vrpLeg...
+                break;
+
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -86,7 +101,7 @@ public class DynAgent
                 currentLinkId, null, vrpActivity.getActivityType()));
 
         if (activityEndTime == Double.POSITIVE_INFINITY) {
-            //TODO set state to ACTIVITY??
+            // TODO set state to ACTIVITY??
             simulation.getAgentCounter().decLiving();
         }
         else {
@@ -113,8 +128,8 @@ public class DynAgent
                 currentLinkId, null, vrpActivity.getActivityType()));
 
         DynActivity oldActivity = vrpActivity;
-        vrpActivity = null;
-        state = null;
+        vrpActivity = null;// !!!
+        state = null;// !!!
 
         agentLogic.endActivityAndAssumeControl(oldActivity, now);
     }
@@ -127,8 +142,8 @@ public class DynAgent
                 currentLinkId, TransportMode.car));
 
         DynLeg oldLeg = vrpLeg;
-        vrpLeg = null;
-        state = null;
+        vrpLeg = null;// !!!
+        state = null;// !!!
 
         agentLogic.endLegAndAssumeControl(oldLeg, now);
     }

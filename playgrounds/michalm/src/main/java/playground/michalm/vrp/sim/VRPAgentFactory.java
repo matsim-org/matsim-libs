@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.agents.*;
-import org.matsim.ptproject.qsim.interfaces.*;
 
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.*;
@@ -15,16 +14,14 @@ import playground.michalm.vrp.supply.*;
 public class VRPAgentFactory
     implements AgentFactory
 {
-    private Netsim netsim;
     private MATSimVRPData data;
+    private VRPSimEngine vrpSimEngine;
 
-    public final static String VRP_DRIVER_PREFIX = "vrpDriver_";
 
-
-    public VRPAgentFactory(MATSimVRPData data)
+    public VRPAgentFactory(MATSimVRPData data, VRPSimEngine vrpSimEngine)
     {
         this.data = data;
-        this.netsim = data.getVrpSimEngine().getMobsim();
+        this.vrpSimEngine = vrpSimEngine;
     }
 
 
@@ -34,8 +31,8 @@ public class VRPAgentFactory
         if (p instanceof VRPDriverPerson) {
             VRPDriverPerson driverPerson = (VRPDriverPerson)p;
 
-            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(
-                    driverPerson.getVrpVehicle(), data.getVrpGraph().getShortestPaths(), netsim);
+            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(driverPerson.getVrpVehicle(), data
+                    .getVrpGraph().getShortestPaths(), vrpSimEngine);
 
             // VRPSchedulePlanFactory planFactory = new VRPSchedulePlanFactory(p,
             // driverPerson.getVrpVehicle(), data);
@@ -43,17 +40,16 @@ public class VRPAgentFactory
             Id startLinkId = ((MATSimVertex)driverPerson.getVrpVehicle().getDepot().getVertex())
                     .getLink().getId();
 
-            DynAgent dynAgent = new DynAgent(p.getId(), startLinkId, netsim,
+            DynAgent dynAgent = new DynAgent(p.getId(), startLinkId, vrpSimEngine.getMobsim(),
                     taxiAgentLogic);
 
             data.getVrpSimEngine().addAgentLogic(taxiAgentLogic);
 
             return dynAgent;
         }
-        // else if ()// other possible agents
-        // {}
         else {// default agents (according to DefaultAgentFactory)
-            return PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, netsim);
+            return PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p,
+                    vrpSimEngine.getMobsim());
         }
     }
 }

@@ -57,7 +57,7 @@ public class Routes2QGIS
                 if (ls != null) {
                     try {
                         features.add(featureType.create(new Object[] { ls, v.getId(), v.getName(),
-                                v.getId(), drive.getScheduleIdx() }));
+                                v.getId(), drive.getTaskIdx() }));
                     }
                     catch (IllegalAttributeException e) {
                         e.printStackTrace();
