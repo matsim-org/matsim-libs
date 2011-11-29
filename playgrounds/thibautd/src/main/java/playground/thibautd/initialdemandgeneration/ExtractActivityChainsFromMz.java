@@ -19,17 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
 
 import playground.thibautd.initialdemandgeneration.activitychainsextractor.MzActivityChainsExtractor;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * executable class to extract activity chains from MZ2000
@@ -76,7 +70,7 @@ public class ExtractActivityChainsFromMz {
 			}
 		}
 
-		initOut( outDir );
+		MoreIOUtils.initOut( outDir );
 		MzActivityChainsExtractor extractor = new MzActivityChainsExtractor();
 
 		Scenario scen; 
@@ -103,31 +97,6 @@ public class ExtractActivityChainsFromMz {
 							  scen.getNetwork())).write(
 						  outDir + "/actchains-dow-"+startDay+"-"+endDay+"."+year+".xml.gz" );
 	}
-
-	private static void initOut( String outputDir ) {
-		try {
-			// create directory if does not exist
-			if (!outputDir.endsWith("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
-	}
-
 
 }
 

@@ -40,6 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MzGroupsModule;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * Executable class which assigns activity chains to agents.
@@ -72,7 +73,7 @@ public class PerformAssignationProcedure {
 		String outputDir = configGroup.getValue( OUT_FIELD );
 
 		// TODO: log, creation of output
-		initOut( outputDir );
+		MoreIOUtils.initOut( outputDir );
 
 		List<String> popFiles = new ArrayList<String>();
 
@@ -97,30 +98,6 @@ public class PerformAssignationProcedure {
 				  scen.getNetwork(),
 				  scen.getKnowledges())).write(
 			  outputDir + "plans-"+getDay( configGroup ) +".xml.gz");
-	}
-
-	private static void initOut( String outputDir ) {
-		try {
-			// create directory if does not exist
-			if (!outputDir.endsWith("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
 	}
 
 	private static PersonAssignActivityChains.DayOfWeek

@@ -45,6 +45,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.thibautd.utils.MoreIOUtils;
+
 /**
  * Simple utility which takes a "population" of activity chains from the mikrozensus
  * and a MZ file linking persons IDs with the employement status, and returns a the
@@ -62,7 +64,7 @@ public class SetEmployedFlagFromMz {
 		String wegeFile = args[ 2 ];
 		String outDir = args[ 3 ];
 
-		initOut( outDir );
+		MoreIOUtils.initOut( outDir );
 
 		StatusLogger status = new StatusLogger();
 		status.start( " Beginning employement status setting");
@@ -128,32 +130,6 @@ public class SetEmployedFlagFromMz {
 		int index = fileName.lastIndexOf( ".xml" );
 		fileName = fileName.substring(0, index) + "-withEmployement" + fileName.substring( index );
 		return fileName;
-	}
-
-	private static void initOut( String outputDir ) {
-		try {
-			// create directory if does not exist
-			if (!outputDir.endsWith("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
-
-
 	}
 }
 
