@@ -92,7 +92,7 @@ public class PathAndDrivingAcceleration {
 		return minDist;
 	}
 
-	public double [] getDesiredAccelerationForce(Agent2D agent) {
+	public double [] getDesiredVelocity(Agent2D agent) {
 
 
 		Id mentalLinkId =  agent.getMentalLink();
@@ -100,31 +100,40 @@ public class PathAndDrivingAcceleration {
 		double driveX = d.x  * agent.getDesiredVelocity();
 		double driveY = d.y * agent.getDesiredVelocity();
 
-
-		double fdx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/this.tau;
-		double fdy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/this.tau;
+		double fdx = Agent2D.AGENT_WEIGHT *(driveX)/this.tau;
+		double fdy = Agent2D.AGENT_WEIGHT *(driveY)/this.tau;
 
 		Coordinate pos = agent.getPosition();
 		LinkInfo li = this.linkGeos.get(mentalLinkId);
-		double bpath = Math.max(1, li.pathWidth-Agent2D.AGENT_DIAMETER);
-		//		double bpath = 1;
 
-		//		double pathDist = MGC.xy2Point(agent.getPosition().x, agent.getPosition().y).distance(ls); //this line takes 12.5% of the overall runtime. optimization needed!! see http://softsurfer.com/Archive/algorithm_0102/algorithm_0102.htm
 		double pathDist = Math.abs(((li.c0.y-li.c1.y) * pos.x + (li.c1.x-li.c0.x)*pos.y + (li.c0.x*li.c1.y - li.c1.x*li.c0.y))/li.length);
 
 		double fpx = 0;
 		double fpy = 0;
-		double f = Apath * Math.exp(pathDist / bpath);
+		if (pathDist > 0.2) {
+			double bpath = Math.max(1, li.pathWidth-Agent2D.AGENT_DIAMETER);
+			double f = Apath * Math.exp(pathDist / bpath);
 
-		boolean rightHandSide = Algorithms.isLeftOfLine(pos, li.c0, li.c1) > 0;
-		double dx = rightHandSide == true ? -li.perpendicularVector.x : li.perpendicularVector.x;
-		double dy = rightHandSide == true ? -li.perpendicularVector.y : li.perpendicularVector.y;
-		fpx  = dx * f;
-		fpy = dy * f;
+			boolean rightHandSide = Algorithms.isLeftOfLine(pos, li.c0, li.c1) > 0;
+			double dx = rightHandSide == true ? -li.perpendicularVector.x : li.perpendicularVector.x;
+			double dy = rightHandSide == true ? -li.perpendicularVector.y : li.perpendicularVector.y;
+			fpx  = dx * f;
+			fpy = dy * f;
+		}
 		double fx = fdx + fpx;
 		double fy = fdy + fpy;
 
-		return new double []{fx,fy};
+
+		double dvx = (this.tau *fx)/Agent2D.AGENT_WEIGHT; //desired velocity
+		double dvy =(this.tau *fy)/Agent2D.AGENT_WEIGHT;
+
+		//		double dvx = agent.getVx()+(this.tau*fx)/Agent2D.AGENT_WEIGHT; //desired velocity
+		//		double dvy = agent.getVy()+(this.tau*fy)/Agent2D.AGENT_WEIGHT;
+		double denominator = Math.sqrt(Math.pow(dvx, 2)+Math.pow(dvy, 2)) / agent.getDesiredVelocity();
+		dvx /= denominator;
+		dvy /= denominator;
+
+		return new double []{dvx,dvy};
 	}
 
 	private static final class LinkInfo {

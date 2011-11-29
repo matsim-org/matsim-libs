@@ -17,7 +17,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class DenseMultiPointFromGeometries {
 	private final GeometryFactory geofac = new GeometryFactory();
 
-	private static final double MAX_STEP_SIZE = .1;
+	private static final double MAX_STEP_SIZE = .05;
 
 	private final List<Point> points = new ArrayList<Point>();
 

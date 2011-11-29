@@ -88,7 +88,7 @@ DynamicForceModule {
 			double term1 = this.Ai * decel * Math.exp(-dist/this.Bi);
 
 			Vector v = getDistVector(agent,other,t_i);
-			double projectedDist = Math.sqrt(v.x*v.x+v.y*v.y);
+			double projectedDist = Math.max(0.01, Math.sqrt(v.x*v.x+v.y*v.y));
 
 
 			double phi = getPhi(agent,other);

@@ -20,9 +20,11 @@
 package playground.gregor.pedvis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -77,6 +79,10 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  */
 public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ArrowEventHandler, LinkEnterEventHandler, DoubleValueStringKeyAtCoordinateEventHandler, IterationEndsListener {
+
+
+	private double densEventTime = 0;
+	private final List<Double> dens = new ArrayList<Double>();
 
 	private final PeekABotClient pc;
 	private String file;
@@ -265,7 +271,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 	private void play(){
 		EventsManager ev = EventsUtils.createEventsManager();
 		ev.addHandler(this);
-		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc,0.25).createDensityEstimator();
+		//		NNGaussianKernelEstimator est = new DensityEstimatorFactory(ev, this.sc,0.25).createDensityEstimator();
 		//		ev.addHandler(est);
 		XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(ev);
 		try {
@@ -309,11 +315,15 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		b = MatsimRandom.getRandom().nextFloat();
 		g = MatsimRandom.getRandom().nextFloat();
 		r = MatsimRandom.getRandom().nextFloat();
-		//		if (event.getPersonId().toString().contains("r")) {
-		//			r = 1.f;
-		//		} else {
-		//			g = 1.f;
-		//		}
+		if (event.getLinkId().toString().equals("3")) {
+			r = 1.f;
+			MatsimRandom.reset(event.getPersonId().toString().hashCode());
+			g = MatsimRandom.getRandom().nextFloat();
+		} else {
+			g = 1.f;
+			MatsimRandom.reset(event.getPersonId().toString().hashCode());
+			r = MatsimRandom.getRandom().nextFloat();
+		}
 		this.pc.setBotColorII(event.getPersonId().toString().hashCode(), r, g, b);
 	}
 
@@ -370,8 +380,10 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		Config c = ConfigUtils.loadConfig(config);
 
 
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
-		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
+		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}
@@ -499,6 +511,18 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 
 	@Override
 	public void handleEvent(DoubleValueStringKeyAtCoordinateEvent e) {
+
+		if (e.getTime() > this.densEventTime) {
+			double denom = this.dens.size();
+			double res = 0;
+			for (Double d : this.dens) {
+				res += d/denom;
+			}
+			System.err.println("density:" + res);
+			this.dens.clear();
+			this.densEventTime = e.getTime();
+		}
+		this.dens.add(e.getValue());
 		//		if (e.getValue() < .01) {
 		//			return;
 		//		}

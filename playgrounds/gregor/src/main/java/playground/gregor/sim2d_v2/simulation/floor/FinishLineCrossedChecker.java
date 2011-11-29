@@ -66,6 +66,9 @@ public class FinishLineCrossedChecker {
 					this.perpendicularLines.put(link.getId(), ls);
 				} else{
 					ls = getBisectorialLine(link,next);
+					if (ls == null) { //collinear links
+						ls = getPerpendicularLine(link);
+					}
 				}
 				lines.finishLines.put(next.getId(), ls);
 			}
@@ -104,6 +107,11 @@ public class FinishLineCrossedChecker {
 		Coordinate nb = new Coordinate(nbx,nby);
 
 		double lengthBd = b.distance(d);
+
+		//happens if links are collinear
+		if (lengthBd == 0){
+			return null;
+		}
 		double dx = 30 *(d.x - b.x) / lengthBd;
 		double dy = 30 * (d.y - b.y)/ lengthBd;
 

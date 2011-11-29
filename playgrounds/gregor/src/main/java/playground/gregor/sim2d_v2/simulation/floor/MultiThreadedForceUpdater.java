@@ -10,11 +10,13 @@ public class MultiThreadedForceUpdater implements Runnable{
 	private final List<DynamicForceModule> dynamicForceModules;
 	private final List<ForceModule> forceModules;
 	private final BlockingQueue<Agent2D> queue;
+	private final double time;
 
-	public MultiThreadedForceUpdater(BlockingQueue<Agent2D> queue, List<ForceModule> forceModules, List<DynamicForceModule> dynamicForceModules) {
+	public MultiThreadedForceUpdater(BlockingQueue<Agent2D> queue, List<ForceModule> forceModules, List<DynamicForceModule> dynamicForceModules, double time) {
 		this.queue = queue;
 		this.forceModules = forceModules;
 		this.dynamicForceModules = dynamicForceModules;
+		this.time = time;
 	}
 
 	@Override
@@ -27,12 +29,11 @@ public class MultiThreadedForceUpdater implements Runnable{
 				return;
 			}
 			for (ForceModule m : this.dynamicForceModules) {
-				m.run(agent,Double.NaN);
+				m.run(agent,this.time);
 			}
 			for (ForceModule m : this.forceModules) {
-				m.run(agent,Double.NaN);
+				m.run(agent,this.time);
 			}
-			throw new RuntimeException("this does not work!!");
 		}
 	}
 

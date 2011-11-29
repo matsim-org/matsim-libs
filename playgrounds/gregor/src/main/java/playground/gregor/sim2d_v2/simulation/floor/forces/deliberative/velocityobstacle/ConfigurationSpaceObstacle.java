@@ -50,9 +50,13 @@ public class ConfigurationSpaceObstacle {
 
 		}while (i < v.length && j < w.length);
 
-		Coordinate[] a = minkowskiCoords.toArray(new Coordinate[0]);//FIXME don't create an array here!! (it slows down the simulation (a bit))
+		Coordinate[] a = getArray(minkowskiCoords);
 
 		return a;
+	}
+
+	private static Coordinate[] getArray(List<Coordinate> minkowskiCoords) {
+		return minkowskiCoords.toArray(new Coordinate[0]);//FIXME don't create an array here!! (it slows down the simulation (a bit))
 	}
 
 	public static void main(String [] args) {

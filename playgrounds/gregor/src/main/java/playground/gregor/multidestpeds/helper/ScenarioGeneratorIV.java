@@ -71,8 +71,18 @@ public class ScenarioGeneratorIV {
 		PopulationFactory pb = pop.getFactory();
 
 		int persId = 0;
-		for (int i = 0; i < 30; i ++) {
-			for (double y = .5; y <=3.5; y++) {
+		for (int i = 0; i < 100; i ++) {
+			double incr = 0;
+			if (i < 10) {
+				incr = 1;
+			} else if (i < 40) {
+				incr = .75;
+			} else {
+				incr = 4;
+			}
+
+
+			for (double y = .5; y <=3.5; y+=incr) {
 				Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
@@ -237,14 +247,14 @@ public class ScenarioGeneratorIV {
 		LineString ls0 = geofac.createLineString(new Coordinate[]{c0,c1});
 		GisDebugger.addGeometry(ls0);
 
-		Coordinate c2 = new Coordinate(8,4);
-		Coordinate c3 = new Coordinate(14,4);
+		Coordinate c2 = new Coordinate(8,3);
+		Coordinate c3 = new Coordinate(14,3);
 		LineString ls1 = geofac.createLineString(new Coordinate[]{c2,c3});
 		GisDebugger.addGeometry(ls1);
 
 		//hallway 50m length 20m width
-		Coordinate c4 = new Coordinate(8,0);
-		Coordinate c5 = new Coordinate(14,0);
+		Coordinate c4 = new Coordinate(8,1);
+		Coordinate c5 = new Coordinate(14,1);
 		LineString ls3 = geofac.createLineString(new Coordinate[]{c4,c5});
 		GisDebugger.addGeometry(ls3);
 
@@ -254,20 +264,24 @@ public class ScenarioGeneratorIV {
 		GisDebugger.addGeometry(ls4);
 
 
-		Coordinate c8 = new Coordinate(6,1);
-		Coordinate c9 = new Coordinate(8,1);
+		//		Coordinate c8 = new Coordinate(6,1);
+		//		Coordinate c9 = new Coordinate(8,1);
+		Coordinate c8 = new Coordinate(6,0);
+		Coordinate c9 = new Coordinate(8,0);
 		LineString ls5 = geofac.createLineString(new Coordinate[]{c8,c9});
 		GisDebugger.addGeometry(ls5);
 
-		Coordinate c10 = new Coordinate(6,3);
-		Coordinate c11 = new Coordinate(8,3);
+		//		Coordinate c10 = new Coordinate(6,3);
+		//		Coordinate c11 = new Coordinate(8,3);
+		Coordinate c10 = new Coordinate(6,4);
+		Coordinate c11 = new Coordinate(8,4);
 		LineString ls6 = geofac.createLineString(new Coordinate[]{c10,c11});
 		GisDebugger.addGeometry(ls6);
 
-		Coordinate c12 = new Coordinate(6,1);
-		Coordinate c13 = new Coordinate(6,0);
-		LineString ls7 = geofac.createLineString(new Coordinate[]{c12,c13});
-		GisDebugger.addGeometry(ls7);
+		//		Coordinate c12 = new Coordinate(6,1);
+		//		Coordinate c13 = new Coordinate(5,0);
+		//		LineString ls7 = geofac.createLineString(new Coordinate[]{c12,c13});
+		//		GisDebugger.addGeometry(ls7);
 
 		Coordinate c14 = new Coordinate(8,1);
 		Coordinate c15 = new Coordinate(8,0);
@@ -279,10 +293,10 @@ public class ScenarioGeneratorIV {
 		LineString ls9 = geofac.createLineString(new Coordinate[]{c16,c17});
 		GisDebugger.addGeometry(ls9);
 
-		Coordinate c18 = new Coordinate(6,3);
-		Coordinate c19 = new Coordinate(6,4);
-		LineString ls10 = geofac.createLineString(new Coordinate[]{c18,c19});
-		GisDebugger.addGeometry(ls10);
+		//		Coordinate c18 = new Coordinate(6,3);
+		//		Coordinate c19 = new Coordinate(5,4);
+		//		LineString ls10 = geofac.createLineString(new Coordinate[]{c18,c19});
+		//		GisDebugger.addGeometry(ls10);
 
 		GisDebugger.dump(dir + "/floorplan.shp");
 

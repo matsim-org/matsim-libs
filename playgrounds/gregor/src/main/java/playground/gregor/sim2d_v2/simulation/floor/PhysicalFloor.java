@@ -293,7 +293,7 @@ public class PhysicalFloor implements Floor {
 
 			} else {
 				agent.notifyMoveOverNode(id,time);
-				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId(), null);
+				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId(),null);
 				this.em.processEvent(e2);
 			}
 		}
@@ -343,7 +343,7 @@ public class PhysicalFloor implements Floor {
 		List<Thread> threads = new ArrayList<Thread>();
 
 		for (int i = 0; i < numOfThreads; i++) {
-			MultiThreadedForceUpdater t1 = new MultiThreadedForceUpdater(queue,this.forceModules,this.dynamicForceModules);
+			MultiThreadedForceUpdater t1 = new MultiThreadedForceUpdater(queue,this.forceModules,this.dynamicForceModules,time);
 			Thread th1 = new Thread(t1);
 			th1.start();
 			threads.add(th1);

@@ -74,8 +74,8 @@ public class SegmentsFromGeometries {
 
 		this.quad.put(c0.x, c0.y, ccwp);
 		for (int i = 1; i <= increments; i++) {
-			double x = c1.x + i*dx;
-			double y = c1.y + i*dy;
+			double x = c0.x + i*dx;
+			double y = c0.y + i*dy;
 			this.quad.put(x, y, ccwp);
 		}
 		this.quad.put(c1.x, c1.y, ccwp);
