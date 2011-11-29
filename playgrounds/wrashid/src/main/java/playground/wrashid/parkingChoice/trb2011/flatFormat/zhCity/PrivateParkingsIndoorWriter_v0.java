@@ -359,7 +359,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 		return mainUsagePurposeOfBuilding.containsKey(EGID);
 	}
 
-	private static HashMap<Integer, String> getMainBuildingUsagePurpose() {
+	public static HashMap<Integer, String> getMainBuildingUsagePurpose() {
 		StringMatrix mainUsagePurposeOfBuildingFile = GeneralLib.readStringMatrix("c:/data/My Dropbox/ETH/static data/parking/zürich city/Private Parkplätze/GebaeudeHauptnutzung.txt");
 
 		HashMap<Integer, String> mainUsagePurposeOfBuilding=new HashMap<Integer, String>();
