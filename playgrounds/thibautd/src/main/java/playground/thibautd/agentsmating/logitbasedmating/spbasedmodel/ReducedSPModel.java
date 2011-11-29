@@ -142,7 +142,7 @@ public class ReducedSPModel extends LogitModel {
 			params.betaCost() * alternative.getAttribute( ReducedModelConstants.A_COST ) +
 			params.betaWalkPt() * alternative.getAttribute( ReducedModelConstants.A_WALKING_TIME ) +
 			params.betaWaitPt() * alternative.getAttribute( ReducedModelConstants.A_WAITING_TIME ) +
-			params.betaAboPt() * decisionMaker.getAttribute( ReducedModelConstants.A_HAS_PT_ABO ) +
+			params.betaAboPt() * decisionMaker.getAttribute( ReducedModelConstants.A_HAS_GENERAL_ABO ) +
 			params.betaLogAgePt() * Math.log( decisionMaker.getAttribute( ReducedModelConstants.A_AGE ) ) +
 			params.betaTransfersPt() * alternative.getAttribute( ReducedModelConstants.A_N_TRANSFERS );
 	}

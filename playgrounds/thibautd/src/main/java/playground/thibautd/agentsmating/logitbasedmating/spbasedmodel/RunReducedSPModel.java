@@ -52,6 +52,7 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.PlatformBased
 import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTimeEstimatorFactory;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * @author thibautd
@@ -61,7 +62,7 @@ public class RunReducedSPModel {
 		String configFileName = args[0];
 		String outputPath = args[1];
 
-		initOut( outputPath );
+		MoreIOUtils.initOut( outputPath );
 
 		Config config = new Config();
 		ReducedModelParametersConfigGroup configGroup =
@@ -146,31 +147,5 @@ public class RunReducedSPModel {
 			}
 		}
 	}
-
-	private static void initOut( String outputDir ) {
-		try {
-			// create directory if does not exist
-			if (!outputDir.endsWith("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
-	}
-
-
 }
 

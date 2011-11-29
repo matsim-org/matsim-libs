@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,11 +31,17 @@ import org.matsim.core.population.PersonImpl;
 import playground.thibautd.agentsmating.logitbasedmating.basic.DecisionMakerImpl;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMakerFactory;
+import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.SpeaksGermanModel;
+import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.TravelCardModel;
+import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.TravelCardModel.TravelCard;
 
 /**
  * @author thibautd
  */
 public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory {
+
+	private final TravelCardModel travelCardModel = new TravelCardModel();
+	private final SpeaksGermanModel speaksGermanModel = new SpeaksGermanModel();
 
 	@Override
 	public DecisionMaker createDecisionMaker(final Person agent) throws UnelectableAgentException {
@@ -53,21 +61,29 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
-		attributes.put( ReducedModelConstants.A_AGE , agent.getAge() );
-		attributes.put( ReducedModelConstants.A_IS_MALE , agent.getSex().matches("m.*") );
-		// idealy, only General Abonnements should be counted.
-		// but in the population, the only card type available is "unknown"...
-		attributes.put( ReducedModelConstants.A_HAS_PT_ABO , hasPtAbo( agent ) );
-		attributes.put( ReducedModelConstants.A_SPEAKS_GERMAN , true );
-		attributes.put( ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL , agent.getCarAvail().equals("always") );
+		attributes.put(
+				ReducedModelConstants.A_AGE ,
+				agent.getAge() );
+		attributes.put(
+				ReducedModelConstants.A_IS_MALE ,
+				agent.getSex().matches("m.*") );
+
+		Collection<TravelCard> cards = travelCardModel.getTravelCards( agent );
+		attributes.put(
+				ReducedModelConstants.A_HAS_GENERAL_ABO ,
+				cards.contains( TravelCard.GENERAL_ABONNEMENT ) );
+
+		attributes.put(
+				ReducedModelConstants.A_HAS_HALBTAX ,
+				cards.contains( TravelCard.HALBTAX ) );
+		attributes.put(
+				ReducedModelConstants.A_SPEAKS_GERMAN ,
+				speaksGermanModel.speaksGerman( agent ) );
+		attributes.put(
+				ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL ,
+				agent.getCarAvail().equals("always") );
 
 		return new DecisionMakerImpl( agent.getId() , attributes );
-	}
-
-	private boolean hasPtAbo( final PersonImpl agent ) {
-		Set cards = agent.getTravelcards();
-
-		return (cards == null) ? false : (cards.size() > 0);
 	}
 
 	private void checkEligible(final PersonImpl agent) throws UnelectableAgentException {

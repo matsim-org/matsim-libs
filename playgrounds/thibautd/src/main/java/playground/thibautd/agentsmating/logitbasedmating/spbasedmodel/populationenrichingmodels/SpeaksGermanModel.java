@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReducedModelConstants.java
+ * SpeaksGermanModel.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,32 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
+package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels;
+
+import org.matsim.api.core.v01.population.Person;
 
 /**
- * Defines some useful constants for the reduced model
  * @author thibautd
  */
-public final class ReducedModelConstants {
-	private ReducedModelConstants() {}
-
-	public static final String GA_ABO = "generalAbonnement";
-	public static final String HT_ABO = "halbtax";
-
-	// model attributes names: alternative
-	public static final String A_TRAVEL_TIME = "travelTime";
-	public static final String A_COST = "cost";
-	public static final String A_WALKING_TIME = "walkingTime";
-	public static final String A_PARK_COST = "parkingCost";
-	public static final String A_WAITING_TIME = "waitingTime";
-	public static final String A_N_TRANSFERS = "nTransfers";
-
-	// model attributes names: decider
-	public static final String A_AGE = "age";
-	public static final String A_IS_MALE = "isMale";
-	public static final String A_SPEAKS_GERMAN = "speaksGerman";
-	public static final String A_HAS_GENERAL_ABO = "hasGeneralAbo";
-	public static final String A_HAS_HALBTAX = "hasHalbtax";
-	public static final String A_IS_CAR_ALWAYS_AVAIL = "carAvailability";
+public class SpeaksGermanModel {
+	public boolean speaksGerman(final Person person) {
+		return true;
+	}
 }
 
