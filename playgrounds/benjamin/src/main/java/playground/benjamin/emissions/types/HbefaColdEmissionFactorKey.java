@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * HbefaDetailedWarmEmissionFactorKey.java
+ * HbefaColdEmissionFactorKey.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHotImpl.java
+ * ColdEmissionEventImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -28,8 +28,9 @@ import org.matsim.core.events.EventImpl;
 import playground.benjamin.emissions.types.ColdPollutant;
 
 /**
+ * Implement this to get notified when ColdEmissionEvents are thrown
+ * 
  * @author benjamin
- *
  */
 public class ColdEmissionEventImpl extends EventImpl implements ColdEmissionEvent{
 	private final Id linkId;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionEventHandler.java
+ * WarmEmissionEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,9 +22,9 @@ package playground.benjamin.emissions.events;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * Implement this to get notified when HotEmissionEvents are thrown
+ * Implement this to get notified when WarmEmissionEvents are thrown
+ * 
  * @author benjamin
- *
  */
 
 public interface WarmEmissionEventHandler extends EventHandler {

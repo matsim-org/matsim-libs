@@ -188,6 +188,7 @@ public class EmissionHandler {
 		return emissionVehicles;
 	}
 
+	// TODO: WarmPollutant should also have "HC" and "CO"
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
@@ -259,6 +260,7 @@ public class EmissionHandler {
 		return avgHbefaColdTable;
 	}
 	
+	// TODO: WarmPollutant should also have "HC" and "CO"
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
