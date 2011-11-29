@@ -334,7 +334,7 @@ public class InitMATSimScenario {
 	private void initStrategy(){
 		log.info("Setting strategy to config...");
 		// configure strategies for re-planning tnicolai: make configurable
-		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5);
+		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5); // 5
 		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator");
@@ -361,7 +361,7 @@ public class InitMATSimScenario {
 	// Testing fetch  factor calculation for storageCap 
 	public static void main(String[] args) {
 		// testing calculation of storage capacity fetch factor
-		for(double sample = 0.; sample <=1.; sample += 0.01){
+		for(double sample = 0.01; sample <=1.; sample += 0.05){
 			
 			double factor = Math.pow(sample, -0.25); // same as: 1. / Math.sqrt(Math.sqrt(sample))
 			double storageCap = sample * factor;

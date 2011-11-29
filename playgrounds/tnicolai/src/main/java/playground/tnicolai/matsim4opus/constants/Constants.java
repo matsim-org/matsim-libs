@@ -79,6 +79,8 @@ public class Constants {
 	
 	/** file names */
 	public static final String GENERATED_PLANS_FILE_NAME = "output_plans.xml.gz";
+	public static final String SCORESTATS_FILE_NAME = "scorestats.txt";
+	public static final String TRAVELDISTANCESSTAT_FILE_NAME = "traveldistancestats.txt";
 	public static final String GENERATED_MATSIM_CONFIG_FILE_NAME = "MATSimConfigFile.xml.gz";
 	public static final String URBANSIM_PARCEL_DATASET_TABLE = "parcel__dataset_table__exported_indicators__";
 	public static final String URBANSIM_PERSON_DATASET_TABLE = "person__dataset_table__exported_indicators__";

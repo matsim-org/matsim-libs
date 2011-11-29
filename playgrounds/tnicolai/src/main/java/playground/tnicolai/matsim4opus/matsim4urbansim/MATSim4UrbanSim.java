@@ -316,10 +316,14 @@ public class MATSim4UrbanSim {
 		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
 		
 		String newPlansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
+		String scorestatFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.SCORESTATS_FILE_NAME;
+		String traveldistances = Constants.MATSIM_4_OPUS_OUTPUT + Constants.TRAVELDISTANCESSTAT_FILE_NAME;
 		
 		// get population / plans file
 		try {
 			FileCopy.fileCopy( new File(newPlansFile) , new File(savePath + Constants.GENERATED_PLANS_FILE_NAME) );
+			FileCopy.fileCopy( new File(scorestatFile) , new File(savePath + Constants.SCORESTATS_FILE_NAME) );
+			FileCopy.fileCopy( new File(traveldistances) , new File(savePath + Constants.TRAVELDISTANCESSTAT_FILE_NAME) );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
