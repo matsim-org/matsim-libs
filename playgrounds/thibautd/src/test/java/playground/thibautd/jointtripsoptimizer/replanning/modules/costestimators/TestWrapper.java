@@ -81,7 +81,7 @@ public class TestWrapper {
 			linkMap.get( new IdImpl(5) )};
 
 		int nTimes = 600;
-		double step = (24 * 3600) / nTimes;
+		double step = (24 * 3600d) / nTimes;
 		times = new double[nTimes];
 
 		for (int i=0; i < times.length; i++) {
