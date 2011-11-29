@@ -34,7 +34,7 @@ public class ChargingProfiles {
 
 	public ChargingProfiles(){
 		this.profiles = new HashMap<Id , AbstractEnergyProfile>();
-		this.profiles.put(new IdImpl("default"), value)
+//		this.profiles.put(new IdImpl("default"), value)
 	}
 	
 	public void addProfile(AbstractEnergyProfile profile){
