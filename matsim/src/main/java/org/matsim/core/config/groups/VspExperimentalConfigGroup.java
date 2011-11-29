@@ -178,8 +178,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings");
 
 		map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n" +
-				" - REQUIRED: vehicle type description must start with the respective HbefaVehicleCategory followed by `;'" + "\n" + 
-				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type description should aditionally contain " +
+				" - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n" + 
+				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
 				" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
