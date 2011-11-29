@@ -3,6 +3,7 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -12,7 +13,7 @@ public class Config {
 	private static double radiusInMetersOfStudyArea = 1000;
 	private static Coord studyAreaCenter = ParkingHerbieControler.getCoordinatesQuaiBridgeZH();
 	private static String baseFolder = "H:/data/experiments/TRBAug2011/runs/ktiRun22/output/";
-	private static String outputFolder= "H:/data/experiments/matlabExprVoresung/Nov2011/";
+	private static String outputFolder= "H:/data/experiments/matlabExprVoresung/2011/29-Nov/";
 	
 	private static NetworkImpl network=null;
 	
@@ -28,13 +29,17 @@ public class Config {
 		return baseFolder + "ITERS/it.50/50.events.xml.gz";
 	}
 
+	public static boolean isInsideStudyArea(double x, double y) {
+		return isInsideStudyArea(new CoordImpl(x,y));
+	}
+	
 	public static boolean isInsideStudyArea(Coord coord) {
 		return GeneralLib.getDistance(coord, studyAreaCenter) < radiusInMetersOfStudyArea;
 	}
 	
 	public static boolean isInsideStudyArea(Id linkId) {
 		Coord coord=getNetwork().getLinks().get(linkId).getCoord();
-		return GeneralLib.getDistance(coord, studyAreaCenter) < radiusInMetersOfStudyArea;
+		return isInsideStudyArea(coord);
 	}
 	
 	public static NetworkImpl getNetwork(){

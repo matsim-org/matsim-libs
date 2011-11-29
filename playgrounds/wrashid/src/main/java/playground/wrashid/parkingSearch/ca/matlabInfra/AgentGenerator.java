@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import org.jgap.Gene;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -37,6 +38,8 @@ public class AgentGenerator {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
 
+		eventHandler.fillUnknownActDurations();
+		
 		writeOutAgents(eventHandler.processedAgents, Config.getOutputFolder() + "population.xml");
 	}
 
@@ -58,13 +61,23 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 	private final NetworkImpl network;
 	private HashMap<Id, Agent> agentsInStudyArea;
 	public LinkedList<Agent> processedAgents;
+	public HashMap<Id,Double> agentLastArrivalTime;
 
 	MyEventHandler(NetworkImpl network) {
 		this.network = network;
 		agentsInStudyArea = new HashMap<Id, Agent>();
 		processedAgents = new LinkedList<Agent>();
+		agentLastArrivalTime=new HashMap<Id, Double>();
 	}
 
+	public void fillUnknownActDurations(){
+		for (Agent agent: processedAgents){
+			if (agent.actDur==Double.NEGATIVE_INFINITY){
+				agent.actDur=GeneralLib.getIntervalDuration(agent.tripStartTime, agentLastArrivalTime.get(agent.id));
+			}
+		}
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -84,6 +97,7 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 			agent.actStartTime = event.getTime();
 
 		}
+		agentLastArrivalTime.put(personId, event.getTime());
 	}
 
 	@Override
@@ -100,7 +114,11 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 				agentsInStudyArea.put(personId, new Agent(personId, event.getTime()));
 				Agent agent = agentsInStudyArea.get(personId);
 				
-				agent.actDur = Double.NEGATIVE_INFINITY;
+				if (agentLastArrivalTime.containsKey(personId)){
+					agent.actDur = GeneralLib.getIntervalDuration(agentLastArrivalTime.get(personId),event.getTime());
+				} else {
+					agent.actDur = Double.NEGATIVE_INFINITY;
+				}
 			} else {
 				// agent continues trip
 				
