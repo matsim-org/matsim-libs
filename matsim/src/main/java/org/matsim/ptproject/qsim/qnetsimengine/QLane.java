@@ -597,7 +597,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			));
 		}
 		this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(
-				now, veh.getDriver().getId(), this.queueLink.getLink().getId()
+				now, veh.getDriver().getId(), this.queueLink.getLink().getId(), veh.getId()
 		));
 		return veh;
 	}

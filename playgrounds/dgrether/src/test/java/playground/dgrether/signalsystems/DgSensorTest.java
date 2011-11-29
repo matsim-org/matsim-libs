@@ -80,7 +80,7 @@ public class DgSensorTest {
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1);
+		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
@@ -94,12 +94,12 @@ public class DgSensorTest {
 		}
 		Assert.assertNotNull(e);
 
-		LinkEnterEvent enterEvent2 = new LinkEnterEventImpl(10.0, id2, id1);
+		LinkEnterEvent enterEvent2 = new LinkEnterEventImpl(10.0, id2, id1, null);
 		sensor.handleEvent(enterEvent2);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1, null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
@@ -109,12 +109,12 @@ public class DgSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1);
+		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1);
+		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1, null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
@@ -131,12 +131,12 @@ public class DgSensorTest {
 		int numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 0.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1);
+		LinkEnterEvent enterEvent = new LinkEnterEventImpl(0.0, id1, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		enterEvent = new LinkEnterEventImpl(1.0, id2, id1);
+		enterEvent = new LinkEnterEventImpl(1.0, id2, id1, null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
@@ -163,7 +163,7 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 85.0);
 		Assert.assertEquals(2, numberOfCarsInDistance);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEventImpl(100.0, id1, id1, null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
@@ -175,13 +175,13 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1);
+		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEventImpl(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 
-		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1);
+		leaveEvent = new LinkLeaveEventImpl(120.0, id2, id1, null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);

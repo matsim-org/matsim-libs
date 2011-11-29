@@ -20,15 +20,13 @@
 
 package org.matsim.core.api.experimental.events;
 
+import org.matsim.api.core.v01.Id;
+
 /**
  * @author mrieser
  */
 public interface AgentWait2LinkEvent extends AgentEvent {
-
-	/**
-	 * This method always returns null and should not be used.
-	 */
-	@Override @Deprecated
-	public String getLegMode();
-
+	
+	public Id getVehicleId();
+	
 }

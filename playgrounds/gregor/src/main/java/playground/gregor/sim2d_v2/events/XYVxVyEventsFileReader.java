@@ -71,9 +71,9 @@ public class XYVxVyEventsFileReader extends MatsimXmlParser {
 		double time = Double.parseDouble(atts.getValue("time"));
 		String eventType = atts.getValue("type");
 		if (LinkLeaveEventImpl.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(this.builder.getFactory().createLinkLeaveEvent(time, new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_LINK))));
+			this.events.processEvent(this.builder.getFactory().createLinkLeaveEvent(time, new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_LINK)), null));
 		} else if (LinkEnterEventImpl.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(this.builder.getFactory().createLinkEnterEvent(time, new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_LINK))));
+			this.events.processEvent(this.builder.getFactory().createLinkEnterEvent(time, new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_LINK)), null));
 		} else if (ActivityEndEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.getFactory().createActivityEndEvent(time, new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_LINK)), atts.getValue(ActivityEndEventImpl.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_FACILITY)), atts.getValue(ActivityEndEventImpl.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEventImpl.EVENT_TYPE.equals(eventType)) {

@@ -174,7 +174,7 @@ public class DBSimLink {
 		veh.setCurrentLink(this.getLink());
 		DBSimulation.getEvents().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getPerson().getId(),
-						this.getLink().getId()));
+						this.getLink().getId(), null));
 	}
 
 	/**
@@ -331,7 +331,7 @@ public class DBSimLink {
 			}
 
 			DBSimulation.getEvents().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), null));
 			addToBuffer(veh, now);
 		}
 	}
@@ -546,7 +546,7 @@ public class DBSimLink {
 		double now = SimulationTimer.getTime();
 		DBSimVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		DBSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId()));
+		DBSimulation.getEvents().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getPerson().getId(), this.getLink().getId(), null));
 		return veh;
 	}
 	DBSimVehicle getFirstFromBuffer() {

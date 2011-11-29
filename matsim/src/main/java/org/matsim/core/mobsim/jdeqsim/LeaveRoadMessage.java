@@ -45,7 +45,7 @@ public class LeaveRoadMessage extends EventMessage {
 		Road road = (Road) this.getReceivingUnit();
 		EventImpl event = null;
 
-		event = new LinkLeaveEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), road.getLink().getId());
+		event = new LinkLeaveEventImpl(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), road.getLink().getId(), null);
 
 		SimulationParameters.getProcessEventThread().processEvent(event);
 	}

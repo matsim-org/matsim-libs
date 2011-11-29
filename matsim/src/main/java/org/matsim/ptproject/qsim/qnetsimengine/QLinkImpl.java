@@ -207,7 +207,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
-						this.getLink().getId()));
+						this.getLink().getId(), veh.getId()));
 		if ( HOLES ) {
 			holes.poll();
 		}
@@ -446,7 +446,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.addTransitToBuffer(now, veh);
 
 			if (!handled) {
@@ -831,7 +831,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 		return veh;
 	}
 

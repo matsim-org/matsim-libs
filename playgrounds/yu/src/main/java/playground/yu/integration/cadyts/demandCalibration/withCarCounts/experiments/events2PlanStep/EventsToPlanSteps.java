@@ -307,7 +307,7 @@ public class EventsToPlanSteps implements AgentDepartureEventHandler,
 					LinkImpl link = (LinkImpl) net.getLinks().get(linkId);
 					{
 						PersonEvent event = new LinkEnterEventImpl(time,
-								agentId, linkId);
+								agentId, linkId, null);
 						System.out.println("Event\tEntering\t" + event);
 						events.processEvent(event);
 					}

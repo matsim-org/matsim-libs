@@ -44,11 +44,11 @@ public class Mobsim {
 
 		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
 
-		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId) ;
+		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, null) ;
 
-		LinkLeaveEvent lle = eb.createLinkLeaveEvent( time, agentId, linkId ) ;
+		LinkLeaveEvent lle = eb.createLinkLeaveEvent( time, agentId, linkId, null ) ;
 
-		LinkEnterEvent lee = eb.createLinkEnterEvent( time, agentId, linkId ) ;
+		LinkEnterEvent lee = eb.createLinkEnterEvent( time, agentId, linkId, null ) ;
 
 		AgentArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
 

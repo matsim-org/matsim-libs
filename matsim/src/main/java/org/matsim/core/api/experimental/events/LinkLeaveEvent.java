@@ -20,6 +20,10 @@
 
 package org.matsim.core.api.experimental.events;
 
+import org.matsim.api.core.v01.Id;
+
 public interface LinkLeaveEvent extends LinkEvent {
+	
+	public Id getVehicleId();
 
 }

@@ -30,10 +30,11 @@ import org.matsim.testcases.MatsimTestCase;
 public class LinkLeaveEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final LinkLeaveEventImpl event1 = new LinkLeaveEventImpl(68423.98, new IdImpl("648"), new IdImpl(".235"));
+		final LinkLeaveEventImpl event1 = new LinkLeaveEventImpl(68423.98, new IdImpl("648"), new IdImpl(".235"), new IdImpl("veh"));
 		final LinkLeaveEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId(), event2.getPersonId());
 		assertEquals(event1.getLinkId(), event2.getLinkId());
+		assertEquals(event1.getVehicleId(), event2.getVehicleId());
 	}
 }

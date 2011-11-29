@@ -108,9 +108,9 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
 	public void testGetLinkTravelCost() {
 
-		LinkEnterEvent enter = new LinkEnterEventImpl(Time.parseTime("06:01:00"), DUMMY_PERSON_ID, TEST_LINK_ID);
+		LinkEnterEvent enter = new LinkEnterEventImpl(Time.parseTime("06:01:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
 		this.events.processEvent(enter);
-		LinkLeaveEvent leave = new LinkLeaveEventImpl(Time.parseTime("06:21:00"), DUMMY_PERSON_ID, TEST_LINK_ID);
+		LinkLeaveEvent leave = new LinkLeaveEventImpl(Time.parseTime("06:21:00"), DUMMY_PERSON_ID, TEST_LINK_ID, null);
 		this.events.processEvent(leave);
 
 		double expectedLinkTravelCost = 6.5;

@@ -248,12 +248,13 @@ public class CharyparNagelScoringFunctionTest extends MatsimTestCase {
     private void handleLeg(Leg leg) {
         eventsToScore.handleEvent(new AgentDepartureEventImpl(leg.getDepartureTime(), person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
         if (leg.getRoute() instanceof NetworkRoute) {
-            eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), leg.getRoute().getStartLinkId()));
-            for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
-                eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime(), person.getId(), linkId));
-                eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), linkId));
+        	NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+            eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
+			for (Id linkId : networkRoute.getLinkIds()) {
+                eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime(), person.getId(), linkId, networkRoute.getVehicleId()));
+                eventsToScore.handleEvent(new LinkLeaveEventImpl(leg.getDepartureTime(), person.getId(), linkId, networkRoute.getVehicleId()));
             }
-            eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getEndLinkId()));
+            eventsToScore.handleEvent(new LinkEnterEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getEndLinkId(), null));
         } else {
             eventsToScore.handleEvent(new TravelEventImpl(leg.getDepartureTime() + leg.getTravelTime(), person.getId(), leg.getRoute().getDistance()));
         }

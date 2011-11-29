@@ -324,7 +324,7 @@ public class CountControlerListenerTest {
 		public void run() {
 			Id linkId = new IdImpl("100");
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEventImpl(60.0, new IdImpl(i), linkId));
+				this.eventsManager.processEvent(new LinkLeaveEventImpl(60.0, new IdImpl(i), linkId, null));
 			}
 		}
 	}

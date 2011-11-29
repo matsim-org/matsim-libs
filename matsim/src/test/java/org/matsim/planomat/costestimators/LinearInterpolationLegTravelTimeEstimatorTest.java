@@ -129,8 +129,8 @@ public class LinearInterpolationLegTravelTimeEstimatorTest extends TestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(linkTravelTimeEstimator);
 
-		events.processEvent(new LinkEnterEventImpl(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID));
-		events.processEvent(new LinkLeaveEventImpl(Time.parseTime("07:49:00"), dummyPersonId, HIGHWAY_LINK_ID));
+		events.processEvent(new LinkEnterEventImpl(Time.parseTime("06:50:00"), dummyPersonId, HIGHWAY_LINK_ID, null));
+		events.processEvent(new LinkLeaveEventImpl(Time.parseTime("07:49:00"), dummyPersonId, HIGHWAY_LINK_ID, null));
 
 		LegImpl legIntermediate = new LegImpl(TransportMode.car);
 		for (String str : new String[] {

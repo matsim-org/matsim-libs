@@ -31,9 +31,9 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
  */
 public interface EventsFactory extends MatsimFactory {
 
-	LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId);
+	LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId, Id vehicleId);
 
-	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId);
+	LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId, Id vehicleId);
 
 	LinkChangeEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue);
 	
@@ -43,7 +43,7 @@ public interface EventsFactory extends MatsimFactory {
 	
 	AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode);
 
-	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId);
+	AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId);
 
 	AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode);
 

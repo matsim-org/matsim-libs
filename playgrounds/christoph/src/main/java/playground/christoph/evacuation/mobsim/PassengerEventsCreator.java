@@ -151,7 +151,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 				((DriverAgent) this.agents.get(passengerId)).notifyMoveOverNode(event.getLinkId());
 				((DriverAgent) this.agents.get(passengerId)).chooseNextLinkId();
 				
-				Event e = eventsManager.getFactory().createLinkEnterEvent(event.getTime(), passengerId, event.getLinkId());
+				Event e = eventsManager.getFactory().createLinkEnterEvent(event.getTime(), passengerId, event.getLinkId(), null);
 				eventsManager.processEvent(e);
 			}
 		}
@@ -163,7 +163,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 		
 		if (passengers != null) {
 			for (Id passengerId : passengers) {
-				Event e = eventsManager.getFactory().createLinkLeaveEvent(event.getTime(), passengerId, event.getLinkId());
+				Event e = eventsManager.getFactory().createLinkLeaveEvent(event.getTime(), passengerId, event.getLinkId(), null);
 				eventsManager.processEvent(e);
 			}
 		}
@@ -175,7 +175,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 		
 		if (passengers != null) {
 			for (Id passengerId : passengers) {
-				Event e = eventsManager.getFactory().createAgentWait2LinkEvent(event.getTime(), passengerId, event.getLinkId());
+				Event e = eventsManager.getFactory().createAgentWait2LinkEvent(event.getTime(), passengerId, event.getLinkId(), null);
 				eventsManager.processEvent(e);
 			}
 		}

@@ -110,7 +110,7 @@ import playground.mrieser.core.mobsim.api.MobsimVehicle;
 		double now = this.link.network.simEngine.getCurrentTime();
 		MobsimVehicle veh = this.buffer.poll();
 		this.lastMovedTime = now;
-		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getId(), this.link.getId()));
+		this.link.network.simEngine.getEventsManager().processEvent(new LinkLeaveEventImpl(now, veh.getId(), this.link.getId(), null));
 		return veh;
 	}
 

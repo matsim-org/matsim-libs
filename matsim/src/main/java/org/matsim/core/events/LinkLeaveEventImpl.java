@@ -20,15 +20,20 @@
 
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 public class LinkLeaveEventImpl extends LinkEventImpl implements LinkLeaveEvent {
 
 	public static final String EVENT_TYPE = "left link";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	private final Id vehicleId;
 
-	public LinkLeaveEventImpl(final double time, final Id agentId, final Id linkId) {
+	public LinkLeaveEventImpl(final double time, final Id agentId, final Id linkId, Id vehicleId) {
 		super(time, agentId, linkId);
+		this.vehicleId = vehicleId;
 	}
 
 	@Override
@@ -36,4 +41,18 @@ public class LinkLeaveEventImpl extends LinkEventImpl implements LinkLeaveEvent 
 		return EVENT_TYPE;
 	}
 
+	@Override
+	public Id getVehicleId() {
+		return vehicleId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		if (this.vehicleId != null) {
+			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		}
+		return attr;
+	}
+	
 }

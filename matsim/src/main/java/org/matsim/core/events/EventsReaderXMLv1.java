@@ -76,11 +76,13 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		if (LinkLeaveEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createLinkLeaveEvent(time,
 					new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_LINK)),
+					atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(LinkLeaveEventImpl.ATTRIBUTE_VEHICLE))));
 		} else if (LinkEnterEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createLinkEnterEvent(time,
 					new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_LINK)),
+					atts.getValue(LinkEnterEventImpl.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(LinkEnterEventImpl.ATTRIBUTE_VEHICLE))));
 		} else if (ActivityEndEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createActivityEndEvent(time,
 					new IdImpl(atts.getValue(ActivityEndEventImpl.ATTRIBUTE_PERSON)),
@@ -98,19 +100,18 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.createAgentArrivalEvent(time,
 					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LINK)),
-					mode));
+					new IdImpl(atts.getValue(AgentArrivalEventImpl.ATTRIBUTE_LINK)), mode));
 		} else if (AgentDepartureEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(this.builder.createAgentDepartureEvent(time,
 					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)),
-					mode));
+					new IdImpl(atts.getValue(AgentDepartureEventImpl.ATTRIBUTE_LINK)), mode));
 		} else if (AgentWait2LinkEventImpl.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createAgentWait2LinkEvent(time,
 					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK))));
+					new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_LINK)), 
+					atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(AgentWait2LinkEventImpl.ATTRIBUTE_VEHICLE))));
 		} else if (AgentStuckEventImpl.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentStuckEventImpl.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

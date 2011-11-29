@@ -278,7 +278,7 @@ public class PhysicalFloor implements Floor {
 	 */
 	protected boolean checkForEndOfLinkReached(Agent2D agent, Coordinate oldPos, Coordinate newPos, double time) {
 		if (this.finishLineCrossChecker.crossesFinishLine(agent.getCurrentLinkId(),agent.chooseNextLinkId(),oldPos,newPos)) {
-			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId());
+			LinkLeaveEventImpl e = new LinkLeaveEventImpl(time, agent.getId(), agent.getCurrentLinkId(), null);
 			this.em.processEvent(e);
 
 			Id id = agent.chooseNextLinkId();
@@ -293,7 +293,7 @@ public class PhysicalFloor implements Floor {
 
 			} else {
 				agent.notifyMoveOverNode(id,time);
-				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId());
+				LinkEnterEventImpl e2 = new LinkEnterEventImpl(time, agent.getId(), agent.getCurrentLinkId(), null);
 				this.em.processEvent(e2);
 			}
 		}

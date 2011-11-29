@@ -260,7 +260,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
-						this.getLink().getId()));
+						this.getLink().getId(), veh.getId()));
 	}
 
 	@Override
@@ -333,7 +333,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			}
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId()));
+					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);

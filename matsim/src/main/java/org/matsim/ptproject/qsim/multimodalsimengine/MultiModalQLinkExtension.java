@@ -85,7 +85,7 @@ public class MultiModalQLinkExtension {
 		this.addAgent(personAgent, now);
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-			new LinkEnterEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
+			new LinkEnterEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
 	}
 
 	private void addAgent(MobsimAgent personAgent, double now) {
@@ -102,7 +102,7 @@ public class MultiModalQLinkExtension {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
+				new AgentWait2LinkEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
 	}
 
 	protected boolean moveLink(double now) {
@@ -175,7 +175,7 @@ public class MultiModalQLinkExtension {
 	public MobsimAgent getNextWaitingAgent(double now) {
 		MobsimAgent personAgent = waitingToLeaveAgents.poll();
 		if (personAgent != null) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getId(), qLink.getLink().getId()));
+			this.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEventImpl(now, personAgent.getId(), qLink.getLink().getId(), null));
 		}
 		return personAgent;
 	}

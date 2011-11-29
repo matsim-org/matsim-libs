@@ -61,10 +61,10 @@ public class EventsToLegsTest extends MatsimTestCase {
         });
         IdImpl agentId = new IdImpl("1");
         eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(10.0, agentId, new IdImpl("l1")));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(11.0, agentId, new IdImpl("l2")));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(15.0, agentId, new IdImpl("l2")));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(16.0, agentId, new IdImpl("l3")));
+        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
+        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
+        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
+        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
         eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
         assertNotNull(producedLeg);
         assertEquals(10.0,producedLeg.getDepartureTime());

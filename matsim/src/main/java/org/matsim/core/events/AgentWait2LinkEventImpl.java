@@ -20,15 +20,20 @@
 
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 
 public class AgentWait2LinkEventImpl extends AgentEventImpl implements AgentWait2LinkEvent {
 
 	public static final String EVENT_TYPE = "wait2link";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	private final Id vehicleId;
 
-	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId) {
+	public AgentWait2LinkEventImpl(final double time, final Id agentId, final Id linkId, Id vehicleId) {
 		super(time, agentId, linkId, null);
+		this.vehicleId = vehicleId;
 	}
 
 	@Override
@@ -36,4 +41,18 @@ public class AgentWait2LinkEventImpl extends AgentEventImpl implements AgentWait
 		return EVENT_TYPE;
 	}
 
+	@Override
+	public Id getVehicleId() {
+		return vehicleId;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		if (this.vehicleId != null) {
+			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		}
+		return attr;
+	}
+	
 }

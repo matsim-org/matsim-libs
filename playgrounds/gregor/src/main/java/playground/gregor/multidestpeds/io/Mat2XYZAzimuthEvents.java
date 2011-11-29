@@ -137,9 +137,9 @@ public class Mat2XYZAzimuthEvents {
 					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
 					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
 				} else if (checkForNextLink(ped,c)) {
-					manager.processEvent(fac.createLinkLeaveEvent(time, id, ped.path.links.get(ped.currLink).getId()));
+					manager.processEvent(fac.createLinkLeaveEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
 					ped.currLink++;
-					manager.processEvent(fac.createLinkEnterEvent(time, id, ped.path.links.get(ped.currLink).getId()));
+					manager.processEvent(fac.createLinkEnterEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
 				}
 
 			}

@@ -146,7 +146,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 			this.earliestLeaveTimes.put(vehicle, earliestLeaveTime);
 			this.usedStorageCapacity += vehicle.getSizeInEquivalents();
 			this.network.simEngine.getEventsManager().processEvent(
-					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId()));
+					new LinkEnterEventImpl(now, vehicle.getId(), this.link.getId(), null));
 		} else {
 			activate();
 			if (priority == MobsimLink.PRIORITY_IMMEDIATELY) {
@@ -274,7 +274,7 @@ import playground.mrieser.core.mobsim.network.api.MobsimLink;
 			}
 
 			this.network.simEngine.getEventsManager().processEvent(
-					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId()));
+					new AgentWait2LinkEventImpl(time, vehicle.getId(), this.link.getId(), null));
 			this.buffer.addVehicle(vehicle, time);
 		}
 	}

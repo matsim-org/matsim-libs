@@ -20,20 +20,39 @@
 
 package org.matsim.core.events;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 
 public class LinkEnterEventImpl extends LinkEventImpl implements LinkEnterEvent {
 
 	public static final String EVENT_TYPE = "entered link";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	private final Id vehicleId;
 
-	public LinkEnterEventImpl(final double time, final Id agentId, final Id linkId) {
+	public LinkEnterEventImpl(final double time, final Id agentId, final Id linkId, Id vehicleId) {
 		super(time, agentId, linkId);
+		this.vehicleId = vehicleId;
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	@Override
+	public Id getVehicleId() {
+		return vehicleId;
+	}
+	
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		if (this.vehicleId != null) {
+			attr.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
+		}
+		return attr;
 	}
 
 }

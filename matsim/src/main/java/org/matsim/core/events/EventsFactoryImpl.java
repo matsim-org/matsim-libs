@@ -72,18 +72,18 @@ public class EventsFactoryImpl implements EventsFactory {
 	}
 
 	@Override
-	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId) {
-		return new AgentWait2LinkEventImpl(time, agentId, linkId);
+	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+		return new AgentWait2LinkEventImpl(time, agentId, linkId, vehicleId);
 	}
 
 	@Override
-	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId) {
-		return new LinkEnterEventImpl(time, agentId, linkId);
+	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+		return new LinkEnterEventImpl(time, agentId, linkId, vehicleId);
 	}
 
 	@Override
-	public LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId) {
-		return new LinkLeaveEventImpl(time, agentId, linkId);
+	public LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+		return new LinkLeaveEventImpl(time, agentId, linkId, vehicleId);
 	}
 
 	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
