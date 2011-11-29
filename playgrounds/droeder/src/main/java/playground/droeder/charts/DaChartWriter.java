@@ -38,6 +38,14 @@ import org.matsim.core.utils.io.IOUtils;
  */
 public class DaChartWriter {
 	
+	
+	public static void saveAsPng(String fileName, Integer width, Integer height, JFreeChart jchart){
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileName), jchart, width, height, null, true, 5);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	public static void writeChart(String filename, Integer width, Integer height, JFreeChart jchart){
 		writeToPng(filename, width, height, jchart);
 		writeToTxt(filename, jchart);
