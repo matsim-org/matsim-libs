@@ -39,6 +39,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.controler.HerbieControler;
+
 import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedModeChooserFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
 import playground.thibautd.agentsmating.logitbasedmating.framework.PlatformBasedModeChooser;
@@ -51,7 +54,7 @@ import playground.thibautd.utils.MoreIOUtils;
  * Executable class which runs the whole mating procedure.
  * <br>
  * <br>
- * Usage: <tt>RunReducedSPModel configFile outputDir</tt>
+ * Usage: <tt>RunReducedSPModel configFile outputDir [controler]</tt>
  *
  * <br>
  * <br>
@@ -63,31 +66,75 @@ import playground.thibautd.utils.MoreIOUtils;
  * <br>
  * A {@link ReducedModelParametersConfigGroup} can be set as well, if the
  * model parameters are to be changed from the defaults.
+ * <br><br>
+ * 
+ * The optional <tt>controler</tt> parameter can take the values "core" (default) or
+ * "herbie".
  *
  * @author thibautd
  */
 public class RunReducedSPModel {
+	private static enum ControlerType {
+		CORE, HERBIE};
+
 	public static void main(final String[] args) {
 		String configFileName = args[0];
 		String outputPath = args[1];
+		ControlerType controlerType = ControlerType.CORE;
+
+		if (args.length > 2) {
+			if ( args[ 2 ].toLowerCase().equals( "core" ) ) {
+				controlerType = ControlerType.CORE;
+			}
+			if ( args[ 2 ].toLowerCase().equals( "herbie" ) ) {
+				controlerType = ControlerType.HERBIE;
+			}
+			else throw new IllegalArgumentException( "unknown controler "+args[ 2 ] );
+		}
 
 		MoreIOUtils.initOut( outputPath );
 
+		// //////////////////////// load data...
 		Config config = new Config();
 		ReducedModelParametersConfigGroup configGroup =
 			new ReducedModelParametersConfigGroup();
+
 		config.addModule( ReducedModelParametersConfigGroup.NAME , configGroup );
+
+		switch (controlerType) {
+			case HERBIE:
+				config.addModule(
+						HerbieConfigGroup.GROUP_NAME,
+						new  HerbieConfigGroup() );
+				break;
+		}
+
 		ConfigUtils.loadConfig( config , configFileName );
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		// run a mobsim iteration to obtain travel time estimates
 		consolidatePopulation( scenario );
+		// //////////////////////// load data... DONE
 
+		// //////////////////////// run an iteration...
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
-		Controler controler = new Controler( scenario );
-		controler.run();
+		Controler controler;
+		
+		switch (controlerType) {
+			case CORE:
+				controler = new Controler( scenario );
+				break;
+			case HERBIE:
+				controler = new CustomHerbieControler( scenario );
+				break;
+			default:
+				throw new RuntimeException( "got unexisting controler type "+controlerType+" !?" );
+		}
 
+		controler.run();
+		// //////////////////////// run an iteration... DONE
+
+		// //////////////////////// run the affectation...
 		ChoiceModel model = new ReducedSPModel(
 				configGroup,
 				scenario,
@@ -115,7 +162,9 @@ public class RunReducedSPModel {
 
 		modeChooser.process();
 		Map<Id, List<Id>> cliques = modeChooser.getCliques();
+		// //////////////////////// run the affectation... DONE
 
+		// //////////////////////// output files.
 		PopulationWriter popWriter = new PopulationWriter(
 				scenario.getPopulation(),
 				scenario.getNetwork(),
@@ -157,4 +206,3 @@ public class RunReducedSPModel {
 		}
 	}
 }
-
