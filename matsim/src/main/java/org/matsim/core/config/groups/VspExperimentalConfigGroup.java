@@ -186,7 +186,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors");
 		
-		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed warm emission factors file must be provided!");
+		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed emission factor files must be provided!");
 		
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors") ;
 		
