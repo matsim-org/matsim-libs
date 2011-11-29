@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
+import playground.wdoering.debugvisualization.controller.AgentDataController;
 import playground.wdoering.debugvisualization.controller.Console;
 import playground.wdoering.debugvisualization.controller.Controller;
 
@@ -39,6 +41,7 @@ public class P3DRenderer extends PApplet
 
 	private final float agentSize = 20; //(meter / si units)
 	private HashMap<String, Agent> agents;
+	private HashMap<String, Agent> agentsCopy = null;
 	private HashMap<Integer, DataPoint> nodes;
 	private HashMap<Integer, int[]> links;
 	//private LinkedList<HashMap<Integer, Agent>>;
@@ -63,20 +66,14 @@ public class P3DRenderer extends PApplet
 	private double minPosY;
 	private double maxPosY;
 	private double currentTime;
-	
+	private boolean displayingData = false;
 	private int currentFrame = 1;
 	private Double avgRenderingTime = 1d;
-	
 	private Visualization visualization;
-
 	private boolean mousePressed = false;
-
 	private final Console console;
-
 	private int traceTimeRange = 3;
-
 	private LinkedList<Scene> scenes;
-
 	private ArrayList<int[]> colors;
 	private Controller controller;
 	private long oldTime;
@@ -87,6 +84,7 @@ public class P3DRenderer extends PApplet
 	private Point offset = new Point(0,0);
 	
 	private float zoomFactor = 10;
+	private AgentDataController agentDataController;
 	
 	
 
@@ -268,6 +266,7 @@ public class P3DRenderer extends PApplet
 		this.width = width;
 		this.height = height;
 
+		this.agentDataController = controller.getAgentDataController();
 
 		setAgentColors(2500);
 
@@ -647,149 +646,162 @@ public class P3DRenderer extends PApplet
 
 				//Iterate through all agents and display the current data point + traces
 				
-				while (controller.isReadingAgentData())
+				while (displayingData)
 					try {
-						Thread.sleep(2);
+						Thread.sleep(1);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				
-				//TODO syncrhonisierte get Methode!
-				HashMap<String, Agent> agentsCopy = (HashMap<String, Agent>) this.agents.clone();
+				displayingData = true;
 				
-				Iterator agentsIterator = agentsCopy.entrySet().iterator();
-				int agentCount = 0;
-
-				//While there are still agents in the agents array
-				while (agentsIterator.hasNext())
+				//TODO syncrhonisierte get Methode!
+//				HashMap<String, Agent> agentsCopy = (HashMap<String, Agent>) this.agents.clone();
+//				agentsCopy = null;
+				try {
+					 agentsCopy = (HashMap<String, Agent>)agentDataController.getAgents().clone();
+				} catch (Exception e) {
+//					System.out.println("");
+				}
+				
+				if (agentsCopy!=null)
 				{
-					Map.Entry pairs = null;
-					//Get current agent
-					pairs = (Map.Entry) agentsIterator.next();
 					
-					Agent currentAgent = (Agent)pairs.getValue();
-					String currentAgentID = (String)pairs.getKey();
-
-					HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
-
-					//check if there are any data points for the current agent
-					if ((dataPoints != null) && (dataPoints.size() > 0))
+					Iterator agentsIterator = agentsCopy.entrySet().iterator();
+					int agentCount = 0;
+	
+					//While there are still agents in the agents array
+					while (agentsIterator.hasNext())
 					{
-						//pick preattentive agent color
-						int[] agentColor = new int[3];
-
-						//							if (colors.size()<=agentCount)
-						//								setAgentColors(agentCount+1);
-
-						agentColor = this.colors.get(agentCount);
-						strokeWeight(4);   // Thicker
-
-						//draw node trajectories if there is more then one datapoint for the current agent
-						if (dataPoints.size() > 1)
+						Map.Entry pairs = null;
+						//Get current agent
+						pairs = (Map.Entry) agentsIterator.next();
+						
+						Agent currentAgent = (Agent)pairs.getValue();
+						String currentAgentID = (String)pairs.getKey();
+	
+						HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
+	
+						//check if there are any data points for the current agent
+						if ((dataPoints != null) && (dataPoints.size() > 0))
 						{
-							//number of lines (trajectories) to draw (between 2 and traceTimeRange)
-							int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
-
-							//loop through the datapoints with the corresponding timesteps
-							for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
+							//pick preattentive agent color
+							int[] agentColor = new int[3];
+	
+							//							if (colors.size()<=agentCount)
+							//								setAgentColors(agentCount+1);
+	
+							agentColor = this.colors.get(agentCount);
+							strokeWeight(4);   // Thicker
+	
+							//draw node trajectories if there is more then one datapoint for the current agent
+							if (dataPoints.size() > 1)
 							{
-
-								this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
-
-								//extract current and next datapoint (to draw a trajectory line)
-								DataPoint currentDataPoint = dataPoints.get(this.timeSteps.get(timeStep));
-								DataPoint nextDataPoint = dataPoints.get(this.timeSteps.get(timeStep+1));
-
-								if ((currentDataPoint != null )&&(nextDataPoint != null))
+								//number of lines (trajectories) to draw (between 2 and traceTimeRange)
+								int traceDisplayCount = Math.min(this.traceTimeRange, dataPoints.size());
+	
+								//loop through the datapoints with the corresponding timesteps
+								for (int timeStep = 0; timeStep < traceDisplayCount-2; timeStep++)
 								{
-									//pick line color and make far away trajectories more transparent
-									float jFloat = timeStep;
-									float iFloat = traceDisplayCount;
-									stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
-
-									this.console.println("@@@ cdp:" + currentDataPoint.toString());
-									this.console.println("@@@ x:"+ currentDataPoint.getPosX());
-									this.console.println("@@@ mipX:"+ this.minPosX);
-									this.console.println("@@@ fX:"+ this.factorX);
-
-									//draw line
-									line((float)(((currentDataPoint.getPosX() - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
-											(float)((height-(currentDataPoint.getPosY() - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y),
-											(float)(((nextDataPoint.getPosX()    - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
-											(float)((height-(nextDataPoint.getPosY()    - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y));
+	
+									this.console.println("tp size: " + traceDisplayCount + " | dp size:" + dataPoints.size() + "| current timestep: " + timeStep + "| timesteps: " + this.timeSteps.size());
+	
+									//extract current and next datapoint (to draw a trajectory line)
+									DataPoint currentDataPoint = dataPoints.get(this.timeSteps.get(timeStep));
+									DataPoint nextDataPoint = dataPoints.get(this.timeSteps.get(timeStep+1));
+	
+									if ((currentDataPoint != null )&&(nextDataPoint != null))
+									{
+										//pick line color and make far away trajectories more transparent
+										float jFloat = timeStep;
+										float iFloat = traceDisplayCount;
+										stroke(agentColor[0], agentColor[1],agentColor[2],255-(int)(255f*((iFloat+1f-jFloat)/iFloat)));
+	
+										this.console.println("@@@ cdp:" + currentDataPoint.toString());
+										this.console.println("@@@ x:"+ currentDataPoint.getPosX());
+										this.console.println("@@@ mipX:"+ this.minPosX);
+										this.console.println("@@@ fX:"+ this.factorX);
+	
+										//draw line
+										line((float)(((currentDataPoint.getPosX() - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
+												(float)((height-(currentDataPoint.getPosY() - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y),
+												(float)(((nextDataPoint.getPosX()    - this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x),
+												(float)((height-(nextDataPoint.getPosY()    - this.minPosY) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y));
+									}
+	
 								}
-
+	
+	
+	
+	
 							}
-
-
-
-
-						}
-						noStroke();
-
-						DataPoint lastDataPoint = dataPoints.get(this.currentTime);
-						//console.println("current agent: " + currentAgent.get);
-						//							console.println("@________@________@: " + timeSteps.toString());
-						//							console.println("TS GET LAST " + timeSteps.getLast());
-						//							console.println("AVAILABLE DP: " + dataPoints.toString());
-						//							console.println("| " + lastDataPoint.toString());
-
-
-						if (lastDataPoint != null)
-						{
-							//draw agent
-							
-							//calculate relative position
-							float posX = (float)((lastDataPoint.getPosX()-this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x;
-							float posY = (float)(this.height-(((lastDataPoint.getPosY())-this.minPosY)) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y;
-							
-							
-							this.console.println("********* MINPOS X: "+ this.minPosX +" | FACT X: " + this.factorX + "***************");
-							this.console.println("********* MINPOS Y: "+ this.minPosY +" | FACT Y: " + this.factorY + "***************");
-							this.console.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
-
-							//stroke
-							//								SMOOTH();
-							//								STROKEWEIGHT(4);
-							//								STROKE(0,0,0);
-
-							//noStroke();
-
-							int halfAgentSize = (int) this.agentSize / 2;
-
-							if    ((this.mouseX < posX+halfAgentSize) && (this.mouseX > posX-halfAgentSize)
-								&& (this.mouseY < posY+halfAgentSize) && (this.mouseY > posY-halfAgentSize))
+							noStroke();
+	
+							DataPoint lastDataPoint = dataPoints.get(this.currentTime);
+							//console.println("current agent: " + currentAgent.get);
+							//							console.println("@________@________@: " + timeSteps.toString());
+							//							console.println("TS GET LAST " + timeSteps.getLast());
+							//							console.println("AVAILABLE DP: " + dataPoints.toString());
+							//							console.println("| " + lastDataPoint.toString());
+	
+	
+							if (lastDataPoint != null)
 							{
-								//controller.
+								//draw agent
 								
-								//controller.
+								//calculate relative position
+								float posX = (float)((lastDataPoint.getPosX()-this.minPosX) / this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x;
+								float posY = (float)(this.height-(((lastDataPoint.getPosY())-this.minPosY)) / this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y;
 								
-								fill(255, 255, 255,255);
+								
+								this.console.println("********* MINPOS X: "+ this.minPosX +" | FACT X: " + this.factorX + "***************");
+								this.console.println("********* MINPOS Y: "+ this.minPosY +" | FACT Y: " + this.factorY + "***************");
+								this.console.println("********* DRAW: posX:" + posX + "| posY: " + posY + "***************");
+	
+								//stroke
+								//								SMOOTH();
+								//								STROKEWEIGHT(4);
+								//								STROKE(0,0,0);
+	
+								//noStroke();
+	
+								int halfAgentSize = (int) this.agentSize / 2;
+	
+								if    ((this.mouseX < posX+halfAgentSize) && (this.mouseX > posX-halfAgentSize)
+									&& (this.mouseY < posY+halfAgentSize) && (this.mouseY > posY-halfAgentSize))
+								{
+									//controller.
+									
+									//controller.
+									
+									fill(255, 255, 255,255);
+								}
+								else
+									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
+	
+								ellipse (posX, posY, this.agentSize, this.agentSize);
+	
+								fill(0, 0, 0, 255);
+								text(currentAgentID,posX+(this.agentSize/2)-12,posY+(this.agentSize/2)-6);
+	
 							}
 							else
-								fill(color(agentColor[0], agentColor[1],agentColor[2],255));
-
-							ellipse (posX, posY, this.agentSize, this.agentSize);
-
-							fill(0, 0, 0, 255);
-							text(currentAgentID,posX+(this.agentSize/2)-12,posY+(this.agentSize/2)-6);
-
+							{
+								//this.console.println("agent " + currentAgentID + " missing at " + this.currentTime + " (" + this.timeSteps.getLast() + ") :" + dataPoints.toString());
+							}
+	
+	
+	
+	
 						}
-						else
-						{
-							//this.console.println("agent " + currentAgentID + " missing at " + this.currentTime + " (" + this.timeSteps.getLast() + ") :" + dataPoints.toString());
-						}
-
-
-
-
+						agentCount++;
 					}
-					agentCount++;
+					agentsCopy.clear();
 				}
-				agentsCopy.clear();
-
 			}
+			
+			displayingData = false;
 		}
 
 		

@@ -44,6 +44,7 @@ public class GUIInfo extends JPanel {
 	
 	DefaultTableModel tableModel;
 	private boolean displayData = true;
+	private long lastTime = 0l;
 
 	public GUIInfo(Controller controller) {
 		this.controller = controller;
@@ -91,7 +92,15 @@ public class GUIInfo extends JPanel {
 			HashMap<String, Agent> agents)
 	{
 		
-		if (updateData)
+		long currentTime = System.currentTimeMillis();
+		boolean timeInterval = false;
+		if ((lastTime > 0l) && (currentTime - lastTime > 1000l))
+		{
+			timeInterval = true;
+			lastTime = 0l;
+		}
+		
+		if ((updateData) && (timeInterval)) 
 		{
 	
 			// update values
@@ -264,10 +273,16 @@ public class GUIInfo extends JPanel {
 		
 					//labelTitle.setText(agentIDs);
 				}
+				
+				
 			}
+			
 		}
 		// this.update(this.getGraphics());
 
+		if (lastTime == 0l)
+			lastTime = currentTime;
+		
 	}
 
 	public void disableUpdate(boolean b) {

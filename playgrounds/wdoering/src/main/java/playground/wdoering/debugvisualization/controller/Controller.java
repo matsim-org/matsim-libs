@@ -46,6 +46,9 @@ public class Controller {
 	private HashMap<String,Agent> agents;
 	private HashMap<Integer,DataPoint> nodes;
 	private HashMap<Integer,int[]> links;
+	
+	private AgentDataController agentDataController;
+	
 	//private HashMap<Integer,LineString> walls;
 	private Double[] extremeValues;
 	private Double maxPosX, minPosX, maxPosY, minPosY;
@@ -185,6 +188,8 @@ public class Controller {
 
 		//set to live mode
 		this.liveMode = true;
+		
+		this.setAgentDataController(new AgentDataController());
 
 		//Thread importerThread = new Thread(new Importer(this,sc),"ha");
 
@@ -302,9 +307,10 @@ public class Controller {
 
 		//@TODO: capsulate truncate old data function and maybe even more
 		//for a better readability
-
-
-		HashMap <String, Agent> currentAgents = getAgentHashMap();
+//		HashMap <String, Agent> currentAgents;
+//		
+//		if (agentDataController.isAgentDataSet())
+//			currentAgents = (HashMap <String, Agent>) agentDataController.getAgents().clone();
 
 		this.console.println("ID:" + ID + "| time:" + time + "|");
 
@@ -411,14 +417,19 @@ public class Controller {
 					{
 						//System.out.println(removedTimeStep + "<rts | c> " + currentTime + " | " + this.timeSteps.toString());
 
-						//iterate through all agents and delete oldest timestep
-						Iterator agentsIterator = this.agents.entrySet().iterator();
-						while (agentsIterator.hasNext())
+						if (timeSteps.size()>2)
 						{
-							//Get current agent
-							Map.Entry pairs = (Map.Entry) agentsIterator.next();
-							Agent agent = (XYVxVyAgent)pairs.getValue();
-							agent.removeDataPoint(removedTimeStep);
+							//iterate through all agents and delete oldest timestep
+							Iterator agentsIterator = this.agents.entrySet().iterator();
+							while (agentsIterator.hasNext())
+							{
+								//Get current agent
+								Map.Entry pairs = (Map.Entry) agentsIterator.next();
+								Agent agent = (XYVxVyAgent)pairs.getValue();
+								
+								if (agent.getDataPoints().size()>3)
+									agent.removeDataPoint(removedTimeStep);
+							}
 						}
 					}
 
@@ -437,6 +448,8 @@ public class Controller {
 
 		isReadingData = false;
 //		gui.resumeRenderThread();
+		
+		agentDataController.setAgents(agents);
 
 
 
@@ -469,6 +482,9 @@ public class Controller {
 		//update agent in hashmap
 		agents.put(ID, updateAgent);
 		
+		agentDataController.setAgents(agents);
+		
+		
 		//update view
 		this.gui.updateView(this.timeSteps, this.agents);
 		
@@ -480,6 +496,14 @@ public class Controller {
 	public synchronized HashMap<String,Agent> getAgentHashMap()
 	{
 		return agents;
+	}
+
+	public AgentDataController getAgentDataController() {
+		return agentDataController;
+	}
+
+	public void setAgentDataController(AgentDataController agentDataController) {
+		this.agentDataController = agentDataController;
 	}
 
 }
