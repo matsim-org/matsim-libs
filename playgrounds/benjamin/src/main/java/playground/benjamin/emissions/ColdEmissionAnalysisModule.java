@@ -64,9 +64,11 @@ public class ColdEmissionAnalysisModule {
 	
 	private final EventsManager eventsManager;
 	
-	private static int vehInfoWarnValidCnt = 0;
-	private static int maxVehInfoWarnCnt = 3;
-	private static Set<Id> vehInfoNotValid = new HashSet<Id>();
+	private static int vehInfoWarnHDVCnt = 0;
+	private static int vehAttributesNotSpecifiedCnt = 0;
+	private static int maxWarnCnt = 3;
+	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
+	private static Set<Id> vehicleIdSet = new HashSet<Id>();
 
 	public ColdEmissionAnalysisModule(
 			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
@@ -113,15 +115,19 @@ public class ColdEmissionAnalysisModule {
 
 		Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<ColdPollutant, Double>();
 		
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-		hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-		hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
-		hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
-		
 		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 		
 		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
 			key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+			
+			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE + 
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
 		} else{
 			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		}
@@ -130,12 +136,11 @@ public class ColdEmissionAnalysisModule {
 		if ((accumulatedDistance / 1000) < 1.0) distance_km = 1;
 		else distance_km = 2;
 
-		int parkingDuration_h = (int) (parkingDuration / 3600);
+		int parkingDuration_h = Math.max(1, (int) (parkingDuration / 3600));
 		if (parkingDuration_h >= 12) parkingDuration_h = 13;
 		
 		key.setHbefaDistance(distance_km);
 		key.setHbefaParkingTime(parkingDuration_h);
-		key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 		
 		for (ColdPollutant coldPollutant : ColdPollutant.values()) {
 			Double generatedEmissions;
@@ -143,23 +148,29 @@ public class ColdEmissionAnalysisModule {
 			key.setHbefaComponent(coldPollutant);
 			
 			if(this.detailedHbefaColdTable != null){ // check if detailed emission factors file is set in config
+				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+				hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+				hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+				hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+				
 				if(this.detailedHbefaColdTable.containsKey(key)){
 					generatedEmissions = this.detailedHbefaColdTable.get(key).getColdEmissionFactor();
 				} else {
 					generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
 					
-					if(vehInfoWarnValidCnt < maxVehInfoWarnCnt) {
-						vehInfoWarnValidCnt++;
-						logger.warn("Detailed vehicle information for person " + personId + " is not valid. Using fleet average values instead.");
-						if(vehInfoWarnValidCnt == maxVehInfoWarnCnt){
-							logger.warn(Gbl.FUTURE_SUPPRESSED);
-						}
+					if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
+						vehAttributesNotSpecifiedCnt++;
+						logger.warn("Detailed vehicle attributes are not specified correctly for person " + personId + ": " + 
+							    "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
+						if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
-					vehInfoNotValid.add(personId);
+					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
 				generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
 			}
+			vehicleIdSet.add(personId);
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
 		return coldEmissionsOfEvent;
@@ -173,7 +184,7 @@ public class ColdEmissionAnalysisModule {
 		String[] vehicleInformationArray = vehicleInformation.split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.equals(vehicleInformationArray[0])){
+			if(vehCat.toString().equals(vehicleInformationArray[0])){
 				hbefaVehicleCategory = vehCat;
 			} else continue;
 		}
@@ -183,18 +194,18 @@ public class ColdEmissionAnalysisModule {
 			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
 			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
 		} else{
-			//do nothing
+			// interpretation as "average vehicle"
 		}
 
 		vehicleInformationTuple = new Tuple<HbefaVehicleCategory, HbefaVehicleAttributes>(hbefaVehicleCategory, hbefaVehicleAttributes);
 		return vehicleInformationTuple;
 	}
 
-	public static int getVehInfoWarnValidCnt() {
-		return vehInfoWarnValidCnt;
+	public static Set<Id> getVehAttributesNotSpecified() {
+		return vehAttributesNotSpecified;
 	}
 
-	public static Set<Id> getVehInfoNotValid() {
-		return vehInfoNotValid;
+	public static Set<Id> getVehicleIdSet() {
+		return vehicleIdSet;
 	}
 }

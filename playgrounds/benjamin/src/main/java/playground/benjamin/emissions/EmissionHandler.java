@@ -246,7 +246,7 @@ public class EmissionHandler {
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_km_weighted")]));
+				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgHbefaColdTable.put(key, value);
 			}
@@ -324,7 +324,7 @@ public class EmissionHandler {
 				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
-				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_km_weighted")]));
+				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 				
 				detailedHbefaColdTable.put(key, value);
 			}

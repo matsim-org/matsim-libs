@@ -124,7 +124,7 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
-				vehicleInformation = vehicleType.getDescription();
+				vehicleInformation = vehicleType.getId().toString();
 				this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
 						coldEmissionEventLinkId,
 						personId,

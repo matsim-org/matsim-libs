@@ -101,17 +101,11 @@ public class EmissionVehicleGenerator {
 				vehicleAttributes = new HbefaVehicleAttributes();
 			}
 			
-			String sizeClassXMLConformSyntax = convertSizeClass2XMLConformSyntax(vehicleAttributes.getHbefaSizeClass());
-			
 			Id vehTypeId = new IdImpl(vehicleCategory + ";" + 
 									  vehicleAttributes.getHbefaTechnology() + ";" + 
-									  sizeClassXMLConformSyntax + ";" + 
+									  vehicleAttributes.getHbefaSizeClass() + ";" + 
 									  vehicleAttributes.getHbefaEmConcept());
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
-			vehicleType.setDescription(vehicleCategory + ";" + 
-					  				   vehicleAttributes.getHbefaTechnology() + ";" +
-					  				   vehicleAttributes.getHbefaSizeClass() + ";" +
-					  				   vehicleAttributes.getHbefaEmConcept());
 			
 			if(!(outputVehicles.getVehicles().containsKey(vehTypeId))){
 				outputVehicles.getVehicleTypes().put(vehTypeId, vehicleType);
@@ -127,38 +121,36 @@ public class EmissionVehicleGenerator {
 		vehicleWriter.writeFile(outputVehicleFile);
 	}
 
-	private String convertSizeClass2XMLConformSyntax(String hbefaSizeClass) {
-		if(hbefaSizeClass.equals("<1,4L")) return "smaller1400";
-		else if(hbefaSizeClass.equals("1,4-<2L")) return "1400-2000";
-		else if(hbefaSizeClass.equals(">=2L")) return "bigger2000";
-		else return hbefaSizeClass;
-	}
-
 	private HbefaVehicleAttributes mapVehicleAttributesFromMiD2Hbefa(String ageFuelCcm) {
 		HbefaVehicleAttributes vehicleAttributes = new HbefaVehicleAttributes();
 
-//		logger.info(ageFuelCcm);
 		String[] ageFuelCcmArray = ageFuelCcm.split(";");
-		
+
 		if(ageFuelCcmArray.length == 3){
 			int year = splitAndReduce(ageFuelCcmArray[0], ":");
 			int fuelType = splitAndReduce(ageFuelCcmArray[1], ":");
 			int cubicCap = splitAndReduce(ageFuelCcmArray[2], ":");
-			
+
 			if (fuelType == 1)
 				vehicleAttributes.setHbefaTechnology("petrol (4S)");
 			else if (fuelType == 2)
 				vehicleAttributes.setHbefaTechnology("diesel");
-			else ; // do nothing
-			
+			else {
+				logger.info("Technology for " + ageFuelCcm + " can not be interpreted; Creating average vehicle...");
+				return new HbefaVehicleAttributes();
+			}
+
 			if (cubicCap < 1400)
 				vehicleAttributes.setHbefaSizeClass("<1,4L");
-			else if (cubicCap < 2000 && cubicCap > 1400)
+			else if (cubicCap < 2000 && cubicCap >= 1400)
 				vehicleAttributes.setHbefaSizeClass("1,4-<2L");
 			else if (cubicCap >= 2000 && cubicCap < 90000)
 				vehicleAttributes.setHbefaSizeClass(">=2L");
-			else ; // do nothing
-			
+			else {
+				logger.info("SizeClass for " + ageFuelCcm + " can not be interpreted; Creating average vehicle...");
+				return new HbefaVehicleAttributes();
+			}
+
 			if (year < 1993 && fuelType == 1)
 				vehicleAttributes.setHbefaEmConcept("PC-P-Euro-0");
 			else if (year < 1993 && fuelType == 2)
@@ -183,11 +175,11 @@ public class EmissionVehicleGenerator {
 				vehicleAttributes.setHbefaEmConcept("PC-P-Euro-5");
 			else if (year < 2015 && fuelType == 2)
 				vehicleAttributes.setHbefaEmConcept("PC-D-Euro-5");
-			else ; // do nothing
-		} else {
-			// do nothing
+			else {
+				logger.info("EmConcept for " + ageFuelCcm + " can not be interpreted; Creating average vehicle...");
+				return new HbefaVehicleAttributes();
+			}
 		}
-
 		return vehicleAttributes;
 	}
 

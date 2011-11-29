@@ -124,7 +124,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
-				vehicleInformation = vehicleType.getDescription();
+				vehicleInformation = vehicleType.getId().toString();
 				warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 						linkId,
 						personId,

@@ -82,8 +82,12 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyShutdown(ShutdownEvent event) {
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
-		logger.info("Detailed vehicle information was not valid for "
-				+ WarmEmissionAnalysisModule.getVehInfoNotValid().size() + " vehicles.");
+		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
+				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
+				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
+		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
+				+ ColdEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
+				+ ColdEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
 		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 }

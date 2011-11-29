@@ -55,10 +55,11 @@ public class WarmEmissionAnalysisModule {
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
 	private final EventsManager eventsManager;
-
-	private static int vehInfoWarnValidCnt = 0;
-	private static int maxVehInfoWarnCnt = 3;
-	private static Set<Id> vehInfoNotValid = new HashSet<Id>();
+	
+	private static int vehAttributesNotSpecifiedCnt = 0;
+	private static int maxWarnCnt = 3;
+	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
+	private static Set<Id> vehicleIdSet = new HashSet<Id>();
 
 	public WarmEmissionAnalysisModule(
 			Map<Integer, String> roadTypeMapping,
@@ -112,11 +113,6 @@ public class WarmEmissionAnalysisModule {
 
 		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType);
 
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-		hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-		hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
-		hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
-
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
 
@@ -131,8 +127,6 @@ public class WarmEmissionAnalysisModule {
 		keyStopAndGo.setHbefaRoadCategory(hbefaRoadTypeName);
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
-		keyFreeFlow.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 		double averageSpeed = (linkLength / 1000) / (travelTime / 3600);
 
@@ -148,25 +142,32 @@ public class WarmEmissionAnalysisModule {
 			double efStopGo;
 
 			if(this.detailedHbefaWarmTable != null){ // check if detailed emission factors file is set in config
+				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+				hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+				hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+				hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+				keyFreeFlow.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+				keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+
 				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
 					freeFlowSpeed = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+					
 				} else {
 					freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
-					if(vehInfoWarnValidCnt < maxVehInfoWarnCnt) {
-						vehInfoWarnValidCnt++;
-						logger.warn("Detailed vehicle information for person " + personId + " is not valid. Using fleet average values instead.");
-						if(vehInfoWarnValidCnt == maxVehInfoWarnCnt){
-							logger.warn(Gbl.FUTURE_SUPPRESSED);
-						}
+					if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
+						vehAttributesNotSpecifiedCnt++;
+						logger.warn("Detailed vehicle attributes are not specified correctly for person " + personId + ": " + 
+								    "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
+						if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
-					vehInfoNotValid.add(personId);
+					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
 				freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
@@ -187,6 +188,7 @@ public class WarmEmissionAnalysisModule {
 			}
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
+		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
 	}
 
@@ -198,7 +200,7 @@ public class WarmEmissionAnalysisModule {
 		String[] vehicleInformationArray = vehicleInformation.split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.equals(vehicleInformationArray[0])){
+			if(vehCat.toString().equals(vehicleInformationArray[0])){
 				hbefaVehicleCategory = vehCat;
 			} else continue;
 		}
@@ -208,18 +210,18 @@ public class WarmEmissionAnalysisModule {
 			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
 			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
 		} else{
-			//do nothing
+			// interpretation as "average vehicle"
 		}
 
 		vehicleInformationTuple = new Tuple<HbefaVehicleCategory, HbefaVehicleAttributes>(hbefaVehicleCategory, hbefaVehicleAttributes);
 		return vehicleInformationTuple;
 	}
 
-	public static int getVehInfoWarnValidCnt() {
-		return vehInfoWarnValidCnt;
+	public static Set<Id> getVehAttributesNotSpecified() {
+		return vehAttributesNotSpecified;
 	}
 
-	public static Set<Id> getVehInfoNotValid() {
-		return vehInfoNotValid;
+	public static Set<Id> getVehicleIdSet() {
+		return vehicleIdSet;
 	}
 }
