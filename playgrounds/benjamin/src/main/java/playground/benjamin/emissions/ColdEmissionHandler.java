@@ -35,7 +35,11 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * @author benjamin
@@ -45,6 +49,7 @@ public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
+	private final Vehicles emissionVehicles;
 	private final Network network;
 	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
@@ -57,7 +62,13 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private final Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
 	private final Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
 
-	public ColdEmissionHandler(Network network, ColdEmissionAnalysisModule coldEmissionAnalysisModule ){
+
+	public ColdEmissionHandler(
+			Vehicles emissionVehicles,
+			Network network,
+			ColdEmissionAnalysisModule coldEmissionAnalysisModule ){
+		
+		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.coldEmissionAnalysisModule = coldEmissionAnalysisModule;
 	}
@@ -95,11 +106,11 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			Id personId= event.getPersonId();
 			Double stopEngineTime = event.getTime();
 			this.stopEngine.put(personId, stopEngineTime);
-			
+
 			double startEngineTime = this.startEngine.get(personId);
 			double parkingDuration = this.parkingDuration.get(personId);
 			Id coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
-			
+
 			Double accumulatedDistance;
 			if(this.accumulatedDistance.containsKey(personId)){
 				accumulatedDistance = this.accumulatedDistance.get(personId);
@@ -107,15 +118,26 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 				accumulatedDistance = 0.0;
 				this.accumulatedDistance.put(personId, 0.0);
 			}
-			this.coldEmissionAnalysisModule.calculateColdEmissions(
-					coldEmissionEventLinkId,
-					personId,
-					startEngineTime,
-					parkingDuration,
-					accumulatedDistance);
+
+			Id vehicleId = personId;
+			String vehicleInformation = null;
+			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
+				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+				VehicleType vehicleType = vehicle.getType();
+				vehicleInformation = vehicleType.getDescription();
+				this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
+						coldEmissionEventLinkId,
+						personId,
+						startEngineTime,
+						parkingDuration,
+						accumulatedDistance,
+						vehicleInformation);
+			} else throw new RuntimeException("No vehicle defined for person " + personId + ". " +
+					"Please make sure that requirements for emission vehicles in " + 
+					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+
 			this.accumulatedDistance.remove(personId);
-		}
-		else{
+		} else {
 			// no emissions to calculate...
 		}
 	}

@@ -65,6 +65,7 @@ public class WarmEmissionAnalysisModule {
 			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 			EventsManager emissionEventsManager) {
+		
 		this.roadTypeMapping = roadTypeMapping;
 		this.avgHbefaWarmTable = avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
