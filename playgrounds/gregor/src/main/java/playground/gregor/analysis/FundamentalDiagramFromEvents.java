@@ -1,6 +1,7 @@
 package playground.gregor.analysis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
+import org.matsim.core.utils.collections.Tuple;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -36,7 +38,9 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 	private final List<Double> dens = new ArrayList<Double>();
 
 	private final Map<Double,Double> timeVelo = new TreeMap<Double,Double>();
-	private final Map<Double,Double> timeDens = new TreeMap<Double,Double>();
+	private final TreeMap<Double,Double> timeDens = new TreeMap<Double,Double>();
+
+	private double maxDens = 0;
 
 	public FundamentalDiagramFromEvents(Envelope e) {
 		this.e = e;
@@ -46,18 +50,23 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 	public void handleEvent(XYVxVyEvent event) {
 		if (event.getTime() > this.eventTime) {
 			double denom = this.velo.size();
+
 			double v = 0;
 			for (double d : this.velo){
-				v += d/denom;
+				v += d;
 			}
-			this.timeVelo.put(this.eventTime, v);
+			if (denom > 0) {
+				this.timeVelo.put(this.eventTime, v/denom);
+			} else {
+				this.timeVelo.put(this.eventTime, 0.);
+			}
 			this.velo.clear();
 			this.eventTime = event.getTime();
 		}
 
 		if (this.e.contains(event.getCoordinate())){
-			double v = Math.sqrt(event.getVX()*event.getVX()+event.getVY()*event.getVY());
-			this.velo.add(v);
+			//			double v = Math.sqrt(event.getVX()*event.getVX()+event.getVY()*event.getVY());
+			this.velo.add(event.getVX());
 		}
 	}
 
@@ -68,9 +77,12 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 			double denom = this.dens.size();
 			double v = 0;
 			for (double d : this.dens){
-				v += d/denom;
+				v += d;
 			}
-			this.timeDens.put(v,this.densEventTime);
+			this.timeDens.put(v/denom,this.densEventTime);
+			if (v/denom > this.maxDens) {
+				this.maxDens = v/denom;
+			}
 			this.dens.clear();
 			this.densEventTime = e.getTime();
 		}
@@ -81,19 +93,45 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 
 
 	public void saveAsPng(String dir) {
+		List<Tuple<Double, Double>> l = smoothData();
 		XYLineChart chart = new XYLineChart("Fundamental diagram", "density p/m^2", "velocity in m/s");
-		double [] xs = new double[this.timeDens.size()];
-		double [] ys = new double[this.timeDens.size()];
+		double [] xs = new double[l.size()];
+		double [] ys = new double[l.size()];
 		int pos = 0;
-		for (Entry<Double, Double> dens : this.timeDens.entrySet()) {
-			double velo = this.timeVelo.get(dens.getValue());
-			double d = dens.getKey();
-			xs[pos] = d;
-			ys[pos++] = velo;
+		for (Tuple<Double, Double> t : l) {
+
+			xs[pos] = t.getFirst();
+			ys[pos++] = t.getSecond();
 		}
 
 		chart.addSeries("model", xs, ys);
 		chart.saveAsPng(dir + "/fnd.png", 800, 400);
+	}
+
+	private List<Tuple<Double, Double>> smoothData() {
+		double nextK = 0.5;
+		List<Double> v = new ArrayList<Double>();
+		List<Double> rho = new ArrayList<Double>();
+		List<Tuple<Double,Double>> ret = new ArrayList<Tuple<Double,Double>>();
+		for (Entry<Double, Double> dens : this.timeDens.entrySet()) {
+			double velo = this.timeVelo.get(dens.getValue());
+			double d = dens.getKey();
+			if (d < nextK) {
+				rho.add(d);
+				v.add(velo);
+			} else{
+				Collections.sort(rho);
+				Collections.sort(v);
+				Tuple<Double, Double> t = new Tuple<Double,Double>(rho.get(rho.size()/2),v.get(v.size()/2));
+				ret.add(t);
+				nextK += 0.1;
+				rho.clear();
+				v.clear();
+				rho.add(d);
+				v.add(velo);
+			}
+		}
+		return ret;
 	}
 
 	@Override
@@ -123,7 +161,7 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 		EventsManager em = EventsUtils.createEventsManager();
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
-		Envelope e = new Envelope(6,8,1,3);
+		Envelope e = new Envelope(6,10,1.5,2.5);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += .125 ) {
