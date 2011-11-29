@@ -19,13 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
-import java.io.File;
-import java.io.IOException;
-
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -42,8 +37,6 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedModeChooserFactory;
@@ -55,6 +48,22 @@ import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTri
 import playground.thibautd.utils.MoreIOUtils;
 
 /**
+ * Executable class which runs the whole mating procedure.
+ * <br>
+ * <br>
+ * Usage: <tt>RunReducedSPModel configFile outputDir</tt>
+ *
+ * <br>
+ * <br>
+ * The config must be valid for a run, as an iteration is
+ * lanched to get travel times estimates.
+ * The population must correspond to the <u>converged</u> state,
+ * as departure and arrival times from the population are interpreted as
+ * <i>desired</i> departure and arrival.
+ * <br>
+ * A {@link ReducedModelParametersConfigGroup} can be set as well, if the
+ * model parameters are to be changed from the defaults.
+ *
  * @author thibautd
  */
 public class RunReducedSPModel {
