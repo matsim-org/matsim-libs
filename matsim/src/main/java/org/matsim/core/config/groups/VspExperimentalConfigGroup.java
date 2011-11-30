@@ -24,7 +24,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
 
-//interface ConfigKey {} 
+//interface ConfigKey {}
 
 /**
  * config group for experimental parameters. this group and its parameters should not be used outside of vsp.
@@ -32,40 +32,40 @@ import org.matsim.core.utils.misc.Time;
  * @author nagel
  */
 public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
-	
-	// === testing area begin === 
+
+	// === testing area begin ===
 	// The following contains the beginning of a more general infrastructure for config, since I am getting tired of
 	// re-typing the same thing many times every time I add a config parameter.
 	// The idea is essentially based on the fact that "toString()" of an enum type returns the enum type string.
-	// Unfortunately, I did not get around to finishing this. 
-	
-//	private enum VspExperimentalConfigKey implements ConfigKey { 
-//		activityDurationInterpretation,
-//		vspDefaultsCheckingLevel
-//	} 
-//	
-//	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
-//	
-//	private void addParamNew( final String keyStr, final String value ) {
-//		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
-//			if ( keyStr.equalsIgnoreCase( key.toString() ) ) {
-//				addParam( key, value ) ;
-//			}
-//		}
-//		throw new RuntimeException("keyStr was not found as key: " + keyStr ) ;	
-//	}
-//	
-//	private void addParam( final ConfigKey key, final String value ) {
-//		String retVal = this.typedParam.put( key,value );
-//		if ( !retVal.equals(value) ) {
-//			Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
-//		}
-//	}
-//
-//	private String getValue( final ConfigKey key ) {
-//		return this.typedParam.get(key) ;
-//	}
-	
+	// Unfortunately, I did not get around to finishing this.
+
+	//	private enum VspExperimentalConfigKey implements ConfigKey {
+	//		activityDurationInterpretation,
+	//		vspDefaultsCheckingLevel
+	//	}
+	//
+	//	private final Map<ConfigKey,String> typedParam = new TreeMap<ConfigKey,String>();
+	//
+	//	private void addParamNew( final String keyStr, final String value ) {
+	//		for ( VspExperimentalConfigKey key : VspExperimentalConfigKey.values() ) {
+	//			if ( keyStr.equalsIgnoreCase( key.toString() ) ) {
+	//				addParam( key, value ) ;
+	//			}
+	//		}
+	//		throw new RuntimeException("keyStr was not found as key: " + keyStr ) ;
+	//	}
+	//
+	//	private void addParam( final ConfigKey key, final String value ) {
+	//		String retVal = this.typedParam.put( key,value );
+	//		if ( !retVal.equals(value) ) {
+	//			Logger.getLogger(this.getClass()).warn("parameter was already there; overwriting ...") ;
+	//		}
+	//	}
+	//
+	//	private String getValue( final ConfigKey key ) {
+	//		return this.typedParam.get(key) ;
+	//	}
+
 	// === testing area end ===
 
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
@@ -88,8 +88,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public static final String TRY_END_TIME_THEN_DURATION="tryEndTimeThenDuration" ;
 	public static final String END_TIME_ONLY="endTimeOnly" ;
 
-//	@Deprecated
-//	private boolean useActivityDurations = true;
+	//	@Deprecated
+	//	private boolean useActivityDurations = true;
 	private String activityDurationInterpretation = MIN_OF_DURATION_AND_END_TIME ;
 
 	// ---
@@ -136,7 +136,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	private String vspDefaultsCheckingLevel = IGNORE ;
 
 	// ---
-	
+
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
 	private String emissionRoadTypeMappingFile = null;
 
@@ -145,31 +145,31 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE = "averageFleetWarmEmissionFactorsFile";
 	private String averageFleetWarmEmissionFactorsFile = null;
-	
+
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
 	private String averageFleetColdEmissionFactorsFile = null;
-	
+
 	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
 	private boolean isUsingDetailedEmissionCalculation = false;
-	
+
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
-	
+
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
 	private String detailedColdEmissionFactorsFile;
-	
+
 	// ---
 
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
 	private boolean writingOutputEvents = false ;
 
 	// ---
-	
-	private static final String WRITING_FRACTIONAL_SECONDS = "writingFractionalSeconds" ;
-	private boolean writingFractionalSeconds = false ;
-	
+
+	private static final String MATSIM_GLOBAL_TIME_FORMAT = "matsimGlobalTimeformat" ;
+	private String matsimGlobalTimeFormat = Time.TIMEFORMAT_HHMMSS;
+
 	// ---
-	
+
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -177,34 +177,34 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		
-		map.put(WRITING_FRACTIONAL_SECONDS, "if true, then factional seconds are written e.g. in output_plans.  " +
-				"default is `false' (because of backwards compatibility).") ;
-		
+
+		map.put(MATSIM_GLOBAL_TIME_FORMAT, "changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  " +
+		"default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats");
+
 		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
-				" Will only work when lastIteration is multiple of events writing interval" ) ;
-		
+		" Will only work when lastIteration is multiple of events writing interval" ) ;
+
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, "REQUIRED: mapping from input road types to HBEFA 3.1 road type strings");
 
 		map.put(EMISSION_VEHICLE_FILE, "definition of a vehicle for every person (who is allowed to choose a vehicle in the simulation):" + "\n" +
-				" - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n" + 
+				" - REQUIRED: vehicle type Id must start with the respective HbefaVehicleCategory followed by `;'" + "\n" +
 				" - OPTIONAL: if detailed emission calculation is switched on, vehicle type Id should aditionally contain" +
 				" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED);
-		
+
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors");
-		
+
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors");
-		
+
 		map.put(USING_DETAILED_EMISSION_CALCULATION, "if true then detailed emission factor files must be provided!");
-		
+
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors") ;
-		
+
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors");
 
 		map.put(VSP_DEFAULTS_CHECKING_LEVEL, "Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
 				+WARN+"'.\n\t\t" +
-						"When violating VSP defaults, this results in " +
-				"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
+				"When violating VSP defaults, this results in " +
+		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
 		map.put(USE_ACTIVITY_DURATIONS, "(deprecated, use " + ACTIVITY_DURATION_INTERPRETATION
 				+ " instead) Set this flag to false if the duration attribute of the activity should not be considered in QueueSimulation");
@@ -212,7 +212,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				+ "', '" + END_TIME_ONLY + "'") ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not yet implemented) will remove plan attributes that are presumably not used, such as " +
-				"activityStartTime. default=false") ;
+		"activityStartTime. default=false") ;
 
 		map.put(INPUT_MZ05_FILE, "Set this filename of MZ05 daily analysis");
 
@@ -220,7 +220,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
 
 		map.put(OFFSET_WALK, "(deprecated, use corresponding option in planCalcScore) " +
-				"set offset for mode \"walk\" in leg scoring function");
+		"set offset for mode \"walk\" in leg scoring function");
 
 		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
@@ -228,7 +228,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 				"utilities of time.\n\t\t" +
 				"Default is false although some of us (bk, kn) think this should always be true.\n\t\t" +
 				"This is only a suggestion since there is (by matsim design) no way to enforce that mental modules " +
-				"obey this." ) ;
+		"obey this." ) ;
 		return map;
 	}
 
@@ -241,7 +241,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (USE_ACTIVITY_DURATIONS.equalsIgnoreCase(key)) {
-//			this.setUseActivityDurations(Boolean.parseBoolean(value));
+			//			this.setUseActivityDurations(Boolean.parseBoolean(value));
 			if ( Boolean.parseBoolean(value) ) {
 				setActivityDurationInterpretation( MIN_OF_DURATION_AND_END_TIME ) ;
 			} else {
@@ -262,16 +262,16 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		} else if (CHAIN_BASED_MODES.equalsIgnoreCase(key)) {
 			setChainBasedModes(value);
 		} else if (OFFSET_WALK.equalsIgnoreCase(key)) {
-//			this.setOffsetWalk(Double.parseDouble(value));
+			//			this.setOffsetWalk(Double.parseDouble(value));
 			throw new RuntimeException( "offsetWalk in vspExperimentalConfigGroup is no longer; use the (alternative-specific) " +
-					"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
+			"constants in planCalcScore.  Aborting since you need to fix this ..." ) ;
 		} else if ( VSP_DEFAULTS_CHECKING_LEVEL.equals(key) ) {
 			this.setVspDefaultsCheckingLevel(value) ;
 		} else if ( EMISSION_ROADTYPE_MAPPING_FILE.equals(key)){
 			this.setEmissionRoadTypeMappingFile(value);
 		} else if ( EMISSION_VEHICLE_FILE.equals(key)){
 			this.setEmissionVehicleFile(value);
-		} else if ( EMISSION_FACTORS_WARM_FILE_AVERAGE.equals(key)){	
+		} else if ( EMISSION_FACTORS_WARM_FILE_AVERAGE.equals(key)){
 			this.setAverageWarmEmissionFactorsFile(value);
 		} else if ( EMISSION_FACTORS_COLD_FILE_AVERAGE.equals(key)){
 			this.setAverageColdEmissionFactorsFile(value);
@@ -283,8 +283,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			this.setDetailedColdEmissionFactorsFile(value);
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
 			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
-		} else if ( WRITING_FRACTIONAL_SECONDS.equals(key) ) {
-			this.setWritingFractionalSeconds(Boolean.parseBoolean(value)) ;
+		} else if ( MATSIM_GLOBAL_TIME_FORMAT.equals(key) ) {
+			this.setMatsimGlobalTimeFormat(value) ;
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -294,7 +294,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
-//		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
+		//		map.put(USE_ACTIVITY_DURATIONS, isUseActivityDurations() );
 		map.put(ACTIVITY_DURATION_INTERPRETATION, getActivityDurationInterpretation()) ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, Boolean.toString(isRemovingUnneccessaryPlanAttributes()) ) ;
@@ -304,31 +304,31 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(MODES_FOR_SUBTOURMODECHOICE, getModesForSubTourModeChoice() ) ;
 		map.put(CHAIN_BASED_MODES, getChainBasedModes() );
 
-//		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
+		//		map.put(OFFSET_WALK, Double.toString( this.getOffsetWalk() ) );
 
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_PT_ROUTING,
 				Boolean.toString( this.isUsingOpportunityCostOfTimeInPtRouting()) ) ;
 		map.put(COLORING, getColoring() ) ;
 
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, this.getVspDefaultsCheckingLevel() ) ;
-		
+
 		map.put(EMISSION_ROADTYPE_MAPPING_FILE, this.getEmissionRoadTypeMappingFile());
-		
+
 		map.put(EMISSION_VEHICLE_FILE, this.getEmissionVehicleFile());
-		
+
 		map.put(EMISSION_FACTORS_WARM_FILE_AVERAGE, this.getAverageWarmEmissionFactorsFile());
-		
+
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, this.getAverageColdEmissionFactorsFile());
-		
+
 		map.put(USING_DETAILED_EMISSION_CALCULATION, Boolean.toString( this.isUsingDetailedEmissionCalculation));
-		
+
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED,  this.getDetailedWarmEmissionFactorsFile()) ;
-		
+
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, this.getDetailedColdEmissionFactorsFile());
-		
+
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
-		
-		map.put( WRITING_FRACTIONAL_SECONDS, Boolean.toString(this.isWritingFractionalSeconds()) );
+
+		map.put( MATSIM_GLOBAL_TIME_FORMAT, this.getMatsimGlobalTimeFormat() );
 
 		return map;
 	}
@@ -364,13 +364,13 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 
 
-//	public boolean isUseActivityDurations() {
-//		return this.useActivityDurations;
-//	}
-//
-//	public void setUseActivityDurations(final boolean useActivityDurations) {
-//		this.useActivityDurations = useActivityDurations;
-//	}
+	//	public boolean isUseActivityDurations() {
+	//		return this.useActivityDurations;
+	//	}
+	//
+	//	public void setUseActivityDurations(final boolean useActivityDurations) {
+	//		this.useActivityDurations = useActivityDurations;
+	//	}
 
 	public String getColoring() {
 		return this.coloring ;
@@ -403,13 +403,13 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		this.chainBasedModes = chainBasedModes;
 	}
 
-//	public double getOffsetWalk() {
-//		return this.offsetWalk;
-//	}
+	//	public double getOffsetWalk() {
+	//		return this.offsetWalk;
+	//	}
 
-//	public void setOffsetWalk(final double offsetWalk) {
-//		this.offsetWalk = offsetWalk;
-//	}
+	//	public void setOffsetWalk(final double offsetWalk) {
+	//		this.offsetWalk = offsetWalk;
+	//	}
 
 	public String getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation;
@@ -478,7 +478,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public boolean isUsingDetailedEmissionCalculation(){
 		return this.isUsingDetailedEmissionCalculation;
 	}
-	
+
 	public void setIsUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
 		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
@@ -498,7 +498,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	public String getDetailedColdEmissionFactorsFile(){
 		return this.detailedColdEmissionFactorsFile;
 	}
-	
+
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;
 	}
@@ -507,12 +507,12 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		this.writingOutputEvents = writingOutputEvents;
 	}
 
-	public boolean isWritingFractionalSeconds() {
-		return writingFractionalSeconds;
+	public String getMatsimGlobalTimeFormat() {
+		return this.matsimGlobalTimeFormat;
 	}
 
-	public void setWritingFractionalSeconds(boolean writingFractionalSeconds) {
-		this.writingFractionalSeconds = writingFractionalSeconds;
-//		Time.setDefaultTimeFormat(format) ;
+	public void setMatsimGlobalTimeFormat(String format) {
+		this.matsimGlobalTimeFormat = format;
+		Time.setDefaultTimeFormat(format) ;
 	}
 }
