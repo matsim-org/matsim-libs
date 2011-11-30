@@ -52,7 +52,7 @@ public class DgFigure9OtfVis {
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim otfVisQSim = new QSim(scenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 
 		

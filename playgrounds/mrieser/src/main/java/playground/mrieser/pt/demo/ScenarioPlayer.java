@@ -55,7 +55,7 @@ public class ScenarioPlayer {
 
 	public static void play(final Scenario scenario, final EventsManager events) {
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-		final QSim sim = new QSim(scenario, events);
+		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

@@ -122,7 +122,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -161,7 +161,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -199,7 +199,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -245,7 +245,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -297,7 +297,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -325,7 +325,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -357,7 +357,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -416,7 +416,7 @@ public class QSimTest {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -474,7 +474,7 @@ public class QSimTest {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -544,7 +544,7 @@ public class QSimTest {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -588,7 +588,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -659,7 +659,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -724,7 +724,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		try {
 			sim.run();
 			Assert.fail("expected RuntimeException, but there was none.");
@@ -771,7 +771,7 @@ public class QSimTest {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		/* prepare sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		NetsimNetwork qnet = sim.getNetsimNetwork();
 		sim.prepareSim();
 		NetsimLink qlink2 = qnet.getNetsimLink(id2);
@@ -831,7 +831,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -885,7 +885,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		QSim sim = new QSim(f.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -1037,7 +1037,7 @@ public class QSimTest {
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter(Level.WARN);
 		Logger.getRootLogger().addAppender(logger);
-		new QSim(f.scenario, events).run();
+		QSim.createQSimAndAddAgentSource(f.scenario, events).run();
 		Logger.getRootLogger().removeAppender(logger);
 
 		return logger;
@@ -1083,7 +1083,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		// first test without special settings
-		QSim sim = new QSim(scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.run();
 		Assert.assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1092,7 +1092,7 @@ public class QSimTest {
 		// second test with special start/end times
 		config.getQSimConfigGroup().setStartTime(8.0*3600);
 		config.getQSimConfigGroup().setEndTime(11.0*3600);
-		sim = new QSim(scenario, events);
+		sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.run();
 		Assert.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1184,7 +1184,7 @@ public class QSimTest {
 		// run the simulation
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setEndTime(simEndTime);
-		QSim sim = new QSim(scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.run();
 		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test

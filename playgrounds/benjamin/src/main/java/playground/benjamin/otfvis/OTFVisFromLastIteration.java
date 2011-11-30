@@ -122,7 +122,7 @@ public class OTFVisFromLastIteration {
 		Scenario sc = loader.loadScenario();
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
-		QSim otfVisQSim = new QSim(sc, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(
 					new FromDataBuilder(sc.getScenarioElement(SignalsData.class), events)

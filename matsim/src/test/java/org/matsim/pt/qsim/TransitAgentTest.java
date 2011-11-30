@@ -88,7 +88,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, EventsUtils.createEventsManager());
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.endActivityAndAssumeControl(10);
 
@@ -126,7 +126,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addLeg(leg);
 		plan.addActivity(workAct);
 
-		QSim sim = new QSim(scenario, EventsUtils.createEventsManager());
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
 		TransitAgent agent = new TransitAgent(person, sim);
 		agent.endActivityAndAssumeControl(10);
 

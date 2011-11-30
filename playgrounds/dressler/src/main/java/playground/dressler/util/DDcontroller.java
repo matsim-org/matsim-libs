@@ -124,7 +124,7 @@ public class DDcontroller {
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
 
-			QSim sim = new QSim(scenario, events);
+			QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 //			sim.openNetStateWriter("./output/simout", netFilename, 10); // NetVis is no longer supported
 			sim.run();
 

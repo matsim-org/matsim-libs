@@ -134,7 +134,7 @@ public class TravelTimeOneWayTest {
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 			SignalEngine signalEngine = new QSimSignalEngine(manager);
 			//run the qsim
-			QSim sim = new QSim(scenario, events);
+			QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 			sim.addQueueSimulationListeners(signalEngine);
 			sim.run();
 			log.debug("circulationTime: " + circulationTime);
@@ -171,7 +171,7 @@ public class TravelTimeOneWayTest {
 
 		SignalEngine signalEngine = this.initSignalEngine(scenario.getConfig().signalSystems(), events);
 		
-		QSim sim = new QSim(scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		MeasurementPoint qSimMeasurementPoint = eventHandler.beginningOfLink2;
@@ -181,7 +181,7 @@ public class TravelTimeOneWayTest {
 		events = (EventsManager) EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		new QSim(scenario, events).run();
+		QSim.createQSimAndAddAgentSource(scenario, events).run();
 		if (eventHandler.beginningOfLink2 != null) {
 			log.debug("tF = 60s, " + eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure
 					+ ", " + eventHandler.beginningOfLink2.numberOfVehPassed + ", "

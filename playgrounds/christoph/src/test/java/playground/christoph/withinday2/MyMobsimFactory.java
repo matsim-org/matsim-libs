@@ -60,7 +60,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-		Netsim mobsim = new QSim( sc, eventsManager ) ;
+		Netsim mobsim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
 
 		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory( mobsim ) ;
 		mobsim.setAgentFactory(agentFactory) ;

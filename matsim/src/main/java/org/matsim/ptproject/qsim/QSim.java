@@ -43,12 +43,10 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
+import org.matsim.core.scoring.OnlyTimeDependentScoringFunction;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.AbstractTransitDriver;
-import org.matsim.pt.qsim.TransitDriver;
-import org.matsim.pt.qsim.TransitQSimEngine;
-import org.matsim.pt.qsim.UmlaufDriver;
+import org.matsim.pt.qsim.*;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
@@ -134,22 +132,44 @@ public final class QSim implements VisMobsim, Netsim {
 	private final Scenario scenario;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
-	private TransitQSimEngine transitEngine;
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
+    private TransitQSimEngine transitEngine;
 
-	// everything above this line is private and should remain private. pls
+    // everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
 	// ============================================================================================================================
 	// initialization:
 
-	public QSim(final Scenario scenario, final EventsManager events) {
-		this(scenario, events, new DefaultQSimEngineFactory());
-	}
 
-	public QSim(final Scenario sc, final EventsManager events,
-			final QNetsimEngineFactory netsimEngFactory) {
+    public static QSim createQSimAndAddAgentSource(final Scenario sc, final EventsManager events, final QNetsimEngineFactory netsimEngFactory) {
+        QSim qSim = new QSim(sc, events, netsimEngFactory);
+        AgentFactory agentFactory;
+        if (sc.getConfig().scenario().isUseTransit()) {
+            agentFactory = new TransitAgentFactory(qSim);
+            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            transitEngine.setUseUmlaeufe(true);
+            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+            qSim.addDepartureHandler(transitEngine);
+            qSim.addAgentSource(transitEngine);
+            qSim.addMobsimEngine(transitEngine);
+        } else {
+            agentFactory = new DefaultAgentFactory(qSim);
+        }
+        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+        return qSim;
+     }
+
+     public static QSim createQSimAndAddAgentSource(final Scenario scenario, final EventsManager events) {
+         return createQSimAndAddAgentSource(scenario, events, new DefaultQSimEngineFactory());
+     }
+
+
+    public QSim(final Scenario sc, final EventsManager events,
+                final QNetsimEngineFactory netsimEngFactory) {
+
 		this.scenario = sc;
 		this.events = events;
 		log.info("Using QSim...");
@@ -179,29 +199,15 @@ public final class QSim implements VisMobsim, Netsim {
 
 		}
 
-		// set the agent factory. might be better to have this in the c'tor, but
-		// difficult to do as long
-		// as the transitEngine changes the AgentFactory. kai, feb'11
-
-		this.addAgentSource(new PopulationAgentSource(sc.getPopulation(), new DefaultAgentFactory(this), this));
-
-		// configuring transit (this changes the agent factory as a side
-		// effect).
-		if (sc.getConfig().scenario().isUseTransit()) {
-			this.transitEngine = new TransitQSimEngine(this);
-			this.addDepartureHandler(this.transitEngine);
-		}
 	}
 
 	// ============================================================================================================================
 	// "run" method:
 
-	private boolean locked = false;
 
-	@Override
+    @Override
 	public final void run() {
-		this.locked = true;
-		prepareSim();
+        prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
 		// do iterations
 		boolean doContinue = true;
@@ -216,37 +222,15 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 		cleanupSim(time);
-
-		// delete reference to clear memory
-		// this.listenerManager = null;
 	}
 
 	// ============================================================================================================================
 	// setters that should reasonably be called between constructor and
 	// "prepareSim" (triggered by "run"):
 
-	// yy my current intuition is that those should be set in a factory, and the
-	// factory should pass them as immutable
-	// into the QSim. But I can't change into that direction because the
-	// TransitEngine changes the AgentFactory fairly
-	// late in the initialization sequence ...
-
 	@Override
 	public void setAgentFactory(final AgentFactory fac) {
-		if (!locked ) {
-			if ( this.agentSources.size() == 1) {
-				this.agentSources.clear();
-				this.addAgentSource(new PopulationAgentSource(this.scenario.getPopulation(), fac, this));
-			} else {
-				throw new RuntimeException("there is more than one AgentSource; cannot override the " +
-						"agent factory since the code " +
-						"would not know to which AgentSource this should refer to.\nTry first changing the agentFactory " +
-						"and only then adding other agent sources." ) ;
-			}
-		} else {
-			throw new RuntimeException(
-					"too late to set agent factory; aborting ...");
-		}
+		throw new RuntimeException();
 	}
 
 	// ============================================================================================================================
@@ -272,7 +256,6 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		createAgents();
-		createTransitDrivers();
 
 		this.initSimTimer();
 
@@ -318,14 +301,6 @@ public final class QSim implements VisMobsim, Netsim {
 		netEngine.addParkedVehicle(veh, startLinkId);
 	}
 
-	private void createTransitDrivers() {
-		if (this.transitEngine != null) {
-			Collection<MobsimAgent> a = this.transitEngine.createAdditionalAgents();
-			this.transitAgents = a;
-			agents.addAll(a);
-		}
-	}
-
 
 
 
@@ -336,9 +311,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * Close any files, etc.
 	 */
 	protected final void cleanupSim(final double seconds) {
-		if (this.transitEngine != null) { // yyyy do after features
-			this.transitEngine.afterSim();
-		}
+
 
 		if (this.netEngine != null) {
 			this.netEngine.afterSim();
@@ -379,9 +352,6 @@ public final class QSim implements VisMobsim, Netsim {
 			writer.finish();
 		}
 
-		// this.netEngine = null;
-		// this.events = null; // delete events object to free events handlers,
-		// if they are nowhere else referenced
 	}
 
 	/**
@@ -751,6 +721,9 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
+        if (mobsimEngine instanceof TransitQSimEngine) {
+            this.transitEngine = (TransitQSimEngine) mobsimEngine;
+        }
 		this.mobsimEngines.add(mobsimEngine);
 	}
 
@@ -759,8 +732,7 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.agentCounter;
 	}
 
-	public final void addDepartureHandler(
-			final DepartureHandler departureHandler) {
+	public final void addDepartureHandler(DepartureHandler departureHandler) {
 		this.departureHandlers.add(departureHandler);
 	}
 
@@ -771,11 +743,16 @@ public final class QSim implements VisMobsim, Netsim {
 	 * @param listeners
 	 */
 	@Override
-	public final void addQueueSimulationListeners(
-			final SimulationListener listener) {
+	public final void addQueueSimulationListeners(SimulationListener listener) {
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
+    /**
+     * Only OTFVis is allowed to use this. If you want access to the TransitQSimEngine,
+     * just "inline" the factory method of this class to plug together your own QSim, and you've got it!
+     * This getter will disappear very soon. michaz 11/11
+     */
+    @Deprecated
 	public final TransitQSimEngine getTransitEngine() {
 		return transitEngine;
 	}
@@ -790,11 +767,7 @@ public final class QSim implements VisMobsim, Netsim {
 		return Collections.unmodifiableCollection(activityEndsList);
 	}
 
-	public final Collection<MobsimAgent> getTransitAgents() {
-		return Collections.unmodifiableCollection(this.transitAgents);
-	}
-
-	public final void addAgentSource(AgentSource agentSource) {
+    public final void addAgentSource(AgentSource agentSource) {
 		agentSources.add(agentSource);
 	}
 

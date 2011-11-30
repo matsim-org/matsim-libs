@@ -37,7 +37,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(final Scenario sc, EventsManager events) {
 
-		final QSim mobsim = new QSim( sc, events ) ;
+		final QSim mobsim = QSim.createQSimAndAddAgentSource(sc, events);
 		
 		// add the taxi departure handler to the mobsim:
 		DepartureHandler departureHandler = new TaxiModeDepartureHandler(mobsim) ;

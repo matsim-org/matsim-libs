@@ -58,7 +58,7 @@ public class LaneLayoutTestShowLanes {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		
 		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
-		QSim otfVisQSim = new QSim(sc, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);
 		otfVisQSim.run();

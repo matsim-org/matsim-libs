@@ -42,6 +42,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitAgentFactory;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -51,6 +53,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
@@ -277,7 +282,18 @@ public class AccessEgressDemoSimple {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		final QSim sim = new QSim(this.scenario, events);
+        QSim qSim = new QSim(this.scenario, events, new DefaultQSimEngineFactory());
+        AgentFactory agentFactory;
+            agentFactory = new TransitAgentFactory(qSim);
+            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            transitEngine.setUseUmlaeufe(true);
+            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+            qSim.addDepartureHandler(transitEngine);
+            qSim.addAgentSource(transitEngine);
+            qSim.addMobsimEngine(transitEngine);
+        PopulationAgentSource agentSource = new PopulationAgentSource(this.scenario.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+        final QSim sim = qSim;
 		// VisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(sim);
 		// Transit vehicle drivers are created inside the TransitQueueSimulation, by the createAgents() method. That is, they exist
 		// as derivatives from the schedule, not as behavioral entities by themselves.  kai, oct'09
@@ -286,7 +302,7 @@ public class AccessEgressDemoSimple {
 //		sim.getEventsManager().addHandler(queueSimulationFeature) ;
 		
 		
-		sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

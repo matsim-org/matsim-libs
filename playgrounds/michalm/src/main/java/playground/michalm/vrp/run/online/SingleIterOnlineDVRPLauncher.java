@@ -20,6 +20,7 @@ import org.matsim.core.scenario.*;
 import org.matsim.core.trafficmonitoring.*;
 import org.matsim.population.algorithms.*;
 import org.matsim.ptproject.qsim.*;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.run.*;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.gui.*;
@@ -178,7 +179,7 @@ public class SingleIterOnlineDVRPLauncher
     private static QSim createMobsim(Scenario sc, EventsManager eventsManager, MATSimVRPData data,
             VRPOptimizerFactory optimizerFactory, String vrpOutDirName)
     {
-        QSim sim = new QSim(sc, eventsManager);
+        QSim sim = new QSim(sc, eventsManager, new DefaultQSimEngineFactory());
 
         VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data, optimizerFactory);
         data.setVrpSimEngine(vrpSimEngine);

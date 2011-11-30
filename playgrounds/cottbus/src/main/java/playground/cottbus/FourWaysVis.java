@@ -73,7 +73,7 @@ public class FourWaysVis {
 		loader.loadScenario();
 		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		QSim otfVisQSim = new QSim(scenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 			
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);

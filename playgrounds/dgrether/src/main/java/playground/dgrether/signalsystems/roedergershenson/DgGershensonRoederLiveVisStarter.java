@@ -68,7 +68,7 @@ public class DgGershensonRoederLiveVisStarter {
 		}
 
 		SignalEngine engine = new QSimSignalEngine(signalManager);
-		QSim otfVisQSim = new QSim(scenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);

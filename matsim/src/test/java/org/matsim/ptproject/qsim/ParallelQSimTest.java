@@ -127,7 +127,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -170,7 +170,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -212,7 +212,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -262,7 +262,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -318,7 +318,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -350,7 +350,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -386,7 +386,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -449,7 +449,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -511,7 +511,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -585,7 +585,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -633,7 +633,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -689,7 +689,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		try {
 			sim.run();
 			fail("expected RuntimeException, but there was none.");
@@ -743,7 +743,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		NetsimNetwork qnet = sim.getNetsimNetwork();
 		sim.prepareSim();
 		NetsimLink qlink2 = qnet.getNetsimLink(id2);
@@ -807,7 +807,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -865,7 +865,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 
 		/* finish */
@@ -1023,7 +1023,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        new QSim(f.scenario, events, new ParallelQNetsimEngineFactory()).run();
+        QSim.createQSimAndAddAgentSource(f.scenario, events, new ParallelQNetsimEngineFactory()).run();
 		Logger.getRootLogger().removeAppender(logger);
 
 		return logger;
@@ -1074,7 +1074,7 @@ public class ParallelQSimTest extends TestCase {
 
 		// first test without special settings
 		/* run parallelQSim */
-        QSim sim = new QSim(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1084,7 +1084,7 @@ public class ParallelQSimTest extends TestCase {
 		config.getQSimConfigGroup().setStartTime(8.0*3600);
 		config.getQSimConfigGroup().setEndTime(11.0*3600);
 		/* run parallelQSim */
-        new QSim(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory()).run();
+        QSim.createQSimAndAddAgentSource(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory()).run();
 
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1181,7 +1181,7 @@ public class ParallelQSimTest extends TestCase {
 		conf.setNumberOfThreads(2);
 
 		/* run parallelQSim */
-        QSim sim = new QSim(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
+        QSim sim = QSim.createQSimAndAddAgentSource(scenario, synchronizedEvents, new ParallelQNetsimEngineFactory());
 		sim.run();
 		assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test

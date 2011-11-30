@@ -204,7 +204,7 @@ public class VisualizeTransitPlans {
 
 	private void visualize() {
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = new QSim(this.visScenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(this.visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.visScenario.getConfig(), this.visScenario, events, otfVisQSim);
 		OTFClientLive.run(this.visScenario.getConfig(), server);
 		otfVisQSim.run();

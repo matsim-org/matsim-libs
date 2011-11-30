@@ -27,8 +27,7 @@ public class MMoyoTransitControler extends Controler {
 	
 	@Override
 	protected void runMobSim() {
-		QSim sim = new QSim(this.scenarioData, this.events);
-		sim.getTransitEngine().setUseUmlaeufe(true);
+		QSim sim = QSim.createQSimAndAddAgentSource(this.scenarioData, this.events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenarioData.getConfig(), this.scenarioData, events, sim);
 		OTFClientLive.run(this.scenarioData.getConfig(), server);

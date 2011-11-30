@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -85,6 +86,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.VehicleCapacity;
@@ -209,16 +214,22 @@ public class TransitQueueSimulationTest {
 
         scenario.getConfig().addSimulationConfigGroup(new SimulationConfigGroup() ) ;
         scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
-        QSim sim = new QSim(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+        QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
         sim.run();
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
+        Collections.sort(agents, new Comparator<MobsimAgent>() {
+            @Override
+            public int compare(MobsimAgent mobsimAgent, MobsimAgent mobsimAgent1) {
+                return Double.compare(mobsimAgent.getActivityEndTime(), mobsimAgent1.getActivityEndTime());
+            }
+        });
         assertEquals(5, agents.size());
         assertTrue(agents.get(0) instanceof TransitDriverAgent);
-        assertEquals(6.0*3600, ((TransitDriverAgent) agents.get(0)).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(7.0*3600, ((TransitDriverAgent) agents.get(1)).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.0*3600, ((TransitDriverAgent) agents.get(2)).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(8.5*3600, ((TransitDriverAgent) agents.get(3)).getActivityEndTime(), MatsimTestCase.EPSILON);
-        assertEquals(9.0*3600, ((TransitDriverAgent) agents.get(4)).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(6.0*3600, agents.get(0).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(7.0*3600, agents.get(1).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(8.0*3600, agents.get(2).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(8.5*3600, agents.get(3).getActivityEndTime(), MatsimTestCase.EPSILON);
+        assertEquals(9.0*3600, agents.get(4).getActivityEndTime(), MatsimTestCase.EPSILON);
     }
 
     /**
@@ -228,6 +239,7 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
@@ -273,12 +285,21 @@ public class TransitQueueSimulationTest {
         population.addPerson(person);
 
         // run simulation
-        EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-        QSim simulation = new QSim(scenario, events);
-        simulation.run();
+        EventsManager events = EventsUtils.createEventsManager();
+        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        AgentFactory agentFactory = new TransitAgentFactory(qSim);
+        TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+        transitEngine.setUseUmlaeufe(true);
+        transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+        qSim.addDepartureHandler(transitEngine);
+        qSim.addAgentSource(transitEngine);
+        qSim.addMobsimEngine(transitEngine);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+        qSim.run();
 
         // check everything
-        assertEquals(1, simulation.getTransitEngine().getAgentTracker().getAgentsAtStop(stop1.getId()).size());
+        assertEquals(1, transitEngine.getAgentTracker().getAgentsAtStop(stop1.getId()).size());
     }
 
     /**
@@ -290,6 +311,7 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStopWrongLink() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
@@ -342,7 +364,7 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-        QSim simulation = new QSim(scenario, events);
+        QSim simulation = QSim.createQSimAndAddAgentSource(scenario, events);
         simulation.run();
     }
 
@@ -356,6 +378,7 @@ public class TransitQueueSimulationTest {
     public void testHandleStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
         scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
@@ -521,11 +544,21 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-            qSim = new QSim(scenario, events);
+            QSim qSim1 = new QSim(scenario, events, new DefaultQSimEngineFactory());
+            AgentFactory agentFactory = new TransitAgentFactory(qSim1);
+            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
+            transitEngine.setUseUmlaeufe(true);
+            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+            qSim1.addDepartureHandler(transitEngine);
+            qSim1.addAgentSource(transitEngine);
+            qSim1.addMobsimEngine(transitEngine);
+            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim1);
+            qSim1.addAgentSource(agentSource);
+            qSim = qSim1;
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public List<MobsimAgent> insertAgentsIntoMobsim() {
-                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, qSim.getTransitEngine().getAgentTracker(), qSim);
+                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, transitEngine.getAgentTracker(), qSim);
 
                     VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));
                     VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -659,7 +692,7 @@ public class TransitQueueSimulationTest {
         events.addHandler(collector);
 
         // first test without special settings
-        QSim sim = new QSim(scenario, events);
+        QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
         sim.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -668,7 +701,7 @@ public class TransitQueueSimulationTest {
         // second test with special start/end times
         config.getQSimConfigGroup().setStartTime(depTime + 20.0);
         config.getQSimConfigGroup().setEndTime(depTime + 90.0);
-        sim = new QSim(scenario, events);
+        sim = QSim.createQSimAndAddAgentSource(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -783,7 +816,7 @@ public class TransitQueueSimulationTest {
         EventsManager events = (EventsManager) EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
-        new QSim(scenario, events).run();
+        QSim.createQSimAndAddAgentSource(scenario, events).run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

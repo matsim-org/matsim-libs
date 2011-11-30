@@ -9,6 +9,7 @@ import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
@@ -20,11 +21,13 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 	private QSim qSim;
 	
 	HashMap<Id, FixedHeadwayCycleUmlaufDriver> umlaufDriver;	
-	HashMap<Id, FixedHeadwayCycleUmlaufDriver> stopId2LastDriverPassedMap = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();	
+	HashMap<Id, FixedHeadwayCycleUmlaufDriver> stopId2LastDriverPassedMap = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();
+    private TransitQSimEngine transitEngine;
 
-	public FixedHeadwayControler(QSim qSim) {
+    public FixedHeadwayControler(QSim qSim, TransitQSimEngine transitEngine) {
 		super();
 		this.qSim = qSim;
+        this.transitEngine = transitEngine;
 //		for (PersonAgent personAgent : ptAgents) {
 //			this.umlaufDriver.put(((FixedHeadwayCycleUmlaufDriver) personAgent).getVehicle().getBasicVehicle().getId(), (FixedHeadwayCycleUmlaufDriver) personAgent); 
 //		}
@@ -72,7 +75,7 @@ public class FixedHeadwayControler implements VehicleDepartsAtFacilityEventHandl
 
 	private void init() {		
 		this.umlaufDriver = new HashMap<Id, FixedHeadwayCycleUmlaufDriver>();
-		for (MobsimAgent personAgent : this.qSim.getTransitAgents()) {
+		for (MobsimAgent personAgent : this.transitEngine.getPtDrivers()) {
 			this.umlaufDriver.put(((FixedHeadwayCycleUmlaufDriver) personAgent).getVehicle().getVehicle().getId(), (FixedHeadwayCycleUmlaufDriver) personAgent); 
 		}
 		log.info("initialized with " + this.umlaufDriver.size() + " drivers");		

@@ -85,7 +85,7 @@ public class FourWaysVis {
 		SignalEngine engine = new QSimSignalEngine(manager);
 
 		
-		QSim otfVisQSim = new QSim(scenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());

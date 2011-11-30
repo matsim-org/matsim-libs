@@ -202,7 +202,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = new QSim(visScenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(visScenario.getConfig(), visScenario, events, otfVisQSim);
 		OTFClientLive.run(visScenario.getConfig(), server);
 		otfVisQSim.run();

@@ -70,14 +70,10 @@ public class City2000WQSimFactory implements MobsimFactory {
 
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-            QSim sim = new QSim(sc, em, new ParallelQNetsimEngineFactory());
+            QSim sim = QSim.createQSimAndAddAgentSource(sc, em, new ParallelQNetsimEngineFactory());
 			return sim;
 		} else {
-			final QSim sim = new QSim(sc, eventsManager);
-			if (sc.getConfig().scenario().isUseTransit()) {
-				sim.getTransitEngine().setUseUmlaeufe(true);
-				sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			}
+			final QSim sim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
             Collection<Plan> plans = carrierAgentTracker.createPlans();
             sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim)));
 			return sim;

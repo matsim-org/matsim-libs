@@ -37,8 +37,7 @@ public class OccupancyCounts {
 
 	public static void play(final ScenarioImpl scenario, final EventsManager events) {
 		scenario.getConfig().simulation().setSnapshotStyle("queue");
-		final QSim sim = new QSim(scenario, (events));
-		sim.getTransitEngine().setUseUmlaeufe(true);
+		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, (events));
 		sim.run();
 	}
 
@@ -81,7 +80,7 @@ public class OccupancyCounts {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		QSim sim = new QSim(scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 

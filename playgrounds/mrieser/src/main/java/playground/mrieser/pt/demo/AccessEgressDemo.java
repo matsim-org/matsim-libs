@@ -202,7 +202,7 @@ public class AccessEgressDemo {
 		RouteTimeDiagram diagram = new RouteTimeDiagram();
 		events.addHandler(diagram);
 
-		final QSim sim = new QSim(this.scenario, events);
+		final QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
 		OTFClientLive.run(this.scenario.getConfig(), server);

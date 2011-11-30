@@ -20,11 +20,7 @@
 
 package org.matsim.pt.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -34,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.AgentStuckEventImpl;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -55,10 +52,12 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
+public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource {
 
 
-	public static class TransitAgentTriesToTeleportException extends RuntimeException {
+    private Collection<MobsimAgent> ptDrivers;
+
+    public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
 		public TransitAgentTriesToTeleportException(String message) {
 			super(message);
@@ -76,8 +75,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 
 	protected final TransitStopAgentTracker agentTracker;
 
-	private final Map<Person, MobsimAgent> agents = new HashMap<Person, MobsimAgent>(100);
-
 	private boolean useUmlaeufe = false;
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
@@ -88,12 +85,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 		this.qSim = queueSimulation;
 		this.schedule = ((ScenarioImpl) queueSimulation.getScenario()).getTransitSchedule();
 		this.agentTracker = new TransitStopAgentTracker();
-		afterConstruct();
-	}
-
-	private void afterConstruct() {
-		qSim.setAgentFactory(new TransitAgentFactory(qSim, this.agents));
-//		qSim.getNotTeleportedModes().add(TransportMode.pt);
 	}
 
 
@@ -108,30 +99,13 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	}
 
 
-	public Collection<MobsimAgent> createAdditionalAgents() {
-		Collection<MobsimAgent> ptDrivers;
-		if (useUmlaeufe ) {
-			ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
-		} else {
-			ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
-		}
-		return ptDrivers;
-	}
-
-
-	@Override
+    @Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
 		for (Entry<Id, List<PassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
-
 			for (PassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(
-//						new AgentStuckEventImpl(now, ((TransitAgent) agent).getPerson().getId(), stop.getLinkId(), 
-//								((TransitAgent) agent).getVehicle().getDriver().getMode()));
-				
-				new AgentStuckEventImpl( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()  )  );
-
+				this.qSim.getEventsManager().processEvent(new AgentStuckEventImpl( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
 			}
@@ -277,6 +251,20 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine {
 	public void doSimStep(double time) {
 		// Nothing to do here.
 	}
+
+    @Override
+    public List<MobsimAgent> insertAgentsIntoMobsim() {
+        if (useUmlaeufe ) {
+            ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
+        } else {
+            ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
+        }
+        return Collections.unmodifiableList(new ArrayList(ptDrivers));
+    }
+
+    public Collection<MobsimAgent> getPtDrivers() {
+        return Collections.unmodifiableCollection(ptDrivers);
+    }
 
 
 }

@@ -26,8 +26,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitAgentFactory;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -40,16 +46,14 @@ public class WithinDayQSimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
 
     public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
-        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
-        ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-		qSim.setAgentFactory(agentFactory);
-        return qSim;
+        return createWithinDayQSim(scenario, events, new DefaultQSimEngineFactory());
     }
 
     public static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
         QSim qSim = new QSim(scenario, events, factory);
         ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-		qSim.setAgentFactory(agentFactory);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
         return qSim;
     }
 

@@ -30,19 +30,16 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 public class TransitAgentFactory implements AgentFactory {
 
-	private final Map<Person, MobsimAgent> agentsMap;
 	private final Netsim simulation;
 
 
-	public TransitAgentFactory(final Netsim simulation, final Map<Person, MobsimAgent> agents) {
+	public TransitAgentFactory(final Netsim simulation) {
 		this.simulation = simulation ;
-		this.agentsMap = agents;
 	}
 
 	@Override
 	public MobsimDriverPassengerAgent createMobsimAgentFromPersonAndInsert(final Person p) {
 		MobsimDriverPassengerAgent agent = new TransitAgent(p, this.simulation);
-		this.agentsMap.put(p, agent);
 		return agent;
 	}
 

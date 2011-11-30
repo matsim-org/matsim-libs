@@ -241,7 +241,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		((EventsManager)events).addHandler(handler);
 
-		QSim qsim = new QSim(this.sc, events);
+		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
 		qsim.run();
 
 		assertTrue(handler.hasCollectedLink2Event);
@@ -256,7 +256,7 @@ public class MixedLaneTest extends TestCase {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
 		((EventsManager)events).addHandler(handler);
 
-		QSim qsim = new QSim(this.sc, events);
+		QSim qsim = QSim.createQSimAndAddAgentSource(this.sc, events);
 		qsim.run();
 
 		assertTrue(handler.hasCollectedLink2Event);

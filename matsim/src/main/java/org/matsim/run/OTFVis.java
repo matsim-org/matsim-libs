@@ -199,7 +199,7 @@ public class OTFVis {
 		qSim.run();
 	}
 
-	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
+    public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
 		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(server, qSim);
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
@@ -209,7 +209,7 @@ public class OTFVis {
 		server.setSimulation(queueSimulationFeature);
 
 		if (config.scenario().isUseTransit()) {
-			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(scenario.getNetwork(), ((ScenarioImpl) scenario).getTransitSchedule(), qSim.getTransitEngine().getAgentTracker());
+            FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(scenario.getNetwork(), ((ScenarioImpl) scenario).getTransitSchedule(), qSim.getTransitEngine().getAgentTracker());
 			server.addAdditionalElement(facilityWriter);
 		}
 

@@ -45,7 +45,6 @@ import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -133,13 +132,11 @@ public class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		QSim sim = new QSim(this.scenarioData, this.events);
+		QSim sim = QSim.createQSimAndAddAgentSource(this.scenarioData, this.events);
 		if (useOTFVis) {
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenarioData.getConfig(), this.scenarioData, events, sim);
 			OTFClientLive.run(this.scenarioData.getConfig(), server);
 		}
-		sim.getTransitEngine().setUseUmlaeufe(true);
-		sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 
 //		this.events.addHandler(new LogOutputEventHandler());
 

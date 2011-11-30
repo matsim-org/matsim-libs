@@ -123,7 +123,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim qsim = new QSim(scenario, events);
+		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}
@@ -157,7 +157,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 		
-		QSim qsim = new QSim(scenario, events);
+		QSim qsim = QSim.createQSimAndAddAgentSource(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}

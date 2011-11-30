@@ -68,7 +68,7 @@ public class CottbusLiveVis {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		QSim qSim = new QSim(scenario, events);
+		QSim qSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();
 			CarsOnLaneHandler carsOnLaneHandler = new CarsOnLaneHandler();

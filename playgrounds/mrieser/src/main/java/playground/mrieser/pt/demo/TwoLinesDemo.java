@@ -313,7 +313,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		QSim sim = new QSim(this.scenario, events);
+		QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

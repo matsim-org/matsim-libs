@@ -40,6 +40,7 @@ import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 
 import java.util.Collection;
@@ -71,14 +72,10 @@ public class City2000WQSimFactory implements MobsimFactory {
 
 		if (numOfThreads > 1) {
 			SynchronizedEventsManagerImpl em = new SynchronizedEventsManagerImpl(eventsManager);
-            QSim sim = new QSim(sc, em, new ParallelQNetsimEngineFactory());
+            QSim sim = QSim.createQSimAndAddAgentSource(sc, em, new ParallelQNetsimEngineFactory());
 			return sim;
 		} else {
-			final QSim sim = new QSim(sc, eventsManager);
-			if (sc.getConfig().scenario().isUseTransit()) {
-				sim.getTransitEngine().setUseUmlaeufe(true);
-				sim.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			}
+            final QSim sim = QSim.createQSimAndAddAgentSource(sc, eventsManager, new DefaultQSimEngineFactory());
             Collection<Plan> plans = carrierAgentTracker.createPlans();
             sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim)));
 			return sim;

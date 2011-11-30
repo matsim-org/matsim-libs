@@ -63,7 +63,7 @@ public class Run {
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
 		
-		final QSim queueSimulation = new QSim(scenario, events);
+		final QSim queueSimulation = QSim.createQSimAndAddAgentSource(scenario, events);
 		
 		queueSimulation.setAgentFactory(new AgentFactory() {
 

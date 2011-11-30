@@ -46,7 +46,7 @@ public class DenverStarter {
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		Scenario sc = scl.loadScenario();
 		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
-		QSim otfVisQSim = new QSim(sc, e);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, e);
 			
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, e, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);

@@ -108,7 +108,7 @@ public class PseudoNetworkDemo {
 		EventWriterXML writer = new EventWriterXML("./output/testEvents.xml");
 		events.addHandler(writer);
 
-		final QSim sim = new QSim(scenario, events);
+		final QSim sim = QSim.createQSimAndAddAgentSource(scenario, events);
 		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);

@@ -40,8 +40,8 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 	 */
 	public void testCreateMobsim() {
 		
-				Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		QSimConfigGroup qSimConfig = new QSimConfigGroup();
 		scenario.getConfig().addQSimConfigGroup(qSimConfig);

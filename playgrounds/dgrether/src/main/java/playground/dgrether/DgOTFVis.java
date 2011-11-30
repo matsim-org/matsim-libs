@@ -49,7 +49,7 @@ public class DgOTFVis {
 	public void playScenario(Scenario scenario) {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
-		QSim qSim = new QSim(scenario, events);
+		QSim qSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario.getScenarioElement(SignalsData.class), events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);

@@ -65,7 +65,7 @@ public class DgTeleportationVisEquil {
 		events.addHandler(new LogOutputEventHandler());
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		QSim otfVisQSim = new QSim(scenario, events);
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
 		// client.setVisualizeTeleportedAgents(true);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);

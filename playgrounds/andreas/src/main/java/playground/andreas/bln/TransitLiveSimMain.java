@@ -8,8 +8,14 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitAgentFactory;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.run.OTFVis;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -41,8 +47,19 @@ public class TransitLiveSimMain {
 		reconstructingUmlaufBuilder.build();
 
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim sim = new QSim(scenario, events);
-		sim.getTransitEngine().setUseUmlaeufe(true);
+        QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+        AgentFactory agentFactory;
+            agentFactory = new TransitAgentFactory(qSim);
+            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            transitEngine.setUseUmlaeufe(true);
+            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+            qSim.addDepartureHandler(transitEngine);
+            qSim.addAgentSource(transitEngine);
+            qSim.addMobsimEngine(transitEngine);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+        qSim.addAgentSource(agentSource);
+        QSim sim = qSim;
+		transitEngine.setUseUmlaeufe(true);
 		
 		
 		

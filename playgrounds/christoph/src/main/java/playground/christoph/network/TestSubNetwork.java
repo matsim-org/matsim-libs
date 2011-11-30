@@ -125,7 +125,7 @@ public class TestSubNetwork {
 	}
 
 	private void initReplanner() {
-		QSim sim = new QSim(this.scenario, (EventsUtils.createEventsManager()));
+		QSim sim = QSim.createQSimAndAddAgentSource(this.scenario, (EventsUtils.createEventsManager()));
 		qNetwork = sim.getNetsimNetwork();
 
 		travelTime = new KnowledgeTravelTimeCalculator(qNetwork);

@@ -51,7 +51,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager events) {
 
-		Netsim mobsim = new QSim( sc, events ) ;
+		Netsim mobsim = QSim.createQSimAndAddAgentSource(sc, events);
 
 		if ( replanningType.equals( ReplanningType.general ) ) {
 			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;

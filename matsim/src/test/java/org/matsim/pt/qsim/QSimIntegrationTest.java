@@ -79,7 +79,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = new QSim(f.scenario, eventsManager);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -138,7 +138,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = new QSim(f.scenario, eventsManager);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -213,7 +213,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = new QSim(f.scenario, eventsManager);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -293,7 +293,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = new QSim(f.scenario, eventsManager);
+		QSim sim = QSim.createQSimAndAddAgentSource(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
