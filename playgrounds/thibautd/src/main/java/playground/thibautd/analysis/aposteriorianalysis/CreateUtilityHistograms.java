@@ -52,8 +52,8 @@ import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
-import playground.thibautd.utils.WrapperChartUtil;
-import playground.thibautd.utils.XYLineHistogramDataset;
+import playground.thibautd.utils.charts.WrapperChartUtil;
+import playground.thibautd.utils.charts.XYLineHistogramDataset;
 
 /**
  * @author thibautd
@@ -64,7 +64,7 @@ public class CreateUtilityHistograms {
 
 	private static final double BIN_WIDTH = 5;
 	// size of the cliques to analyse (negative means all cliques)
-	private static final int N_MEMBERS = 2;
+	private static final int N_MEMBERS = 3;
 
 	/**
 	 * true for getting data from dumps of a previously analysed population
@@ -147,8 +147,8 @@ public class CreateUtilityHistograms {
 	}
 
 	private static void tuneDomainAxis(final ValueAxis axis) {
-		axis.setLowerBound(0);
-		axis.setUpperBound(800);
+		//axis.setLowerBound(0);
+		//axis.setUpperBound(800);
 	}
 
 	private static ChartUtil getLineHistogram(

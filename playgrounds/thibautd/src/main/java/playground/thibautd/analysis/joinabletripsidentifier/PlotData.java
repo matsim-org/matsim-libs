@@ -39,8 +39,8 @@ import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.Passenger
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
-import playground.thibautd.utils.ChartsAxisUnifier;
 import playground.thibautd.utils.MoreIOUtils;
+import playground.thibautd.utils.charts.ChartsAxisUnifier;
 
 /**
  * Executable class able to plot statistics about exported XML data

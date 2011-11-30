@@ -38,7 +38,7 @@ import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.utils.WrapperChartUtil;
+import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**
  * Counts the number of cliques of each size, and outputs a graph

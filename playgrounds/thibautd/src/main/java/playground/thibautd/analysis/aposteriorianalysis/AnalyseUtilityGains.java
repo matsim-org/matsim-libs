@@ -38,8 +38,8 @@ import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
-import playground.thibautd.utils.BoxAndWhiskersChart;
-import playground.thibautd.utils.XYChartUtils;
+import playground.thibautd.utils.charts.BoxAndWhiskersChart;
+import playground.thibautd.utils.charts.XYChartUtils;
 
 /**
  * Output graphs related to the utility gains due to joint trips at the

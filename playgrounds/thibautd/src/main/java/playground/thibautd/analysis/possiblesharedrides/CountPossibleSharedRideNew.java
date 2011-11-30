@@ -55,7 +55,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.utils.BoxAndWhiskersChart;
+import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 
 /**
  * Computes and outputs statistics about number of possible shared rides.

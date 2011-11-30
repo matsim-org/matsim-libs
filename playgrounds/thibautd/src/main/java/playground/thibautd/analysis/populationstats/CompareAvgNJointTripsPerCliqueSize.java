@@ -42,8 +42,8 @@ import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
-import playground.thibautd.utils.BoxAndWhiskerXYNumberDataset;
-import playground.thibautd.utils.WrapperChartUtil;
+import playground.thibautd.utils.charts.BoxAndWhiskerXYNumberDataset;
+import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**
  * output plots comparing the avg number of joint trips per agent

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.thibautd.utils.charts;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.core.utils.charts.ChartUtil;

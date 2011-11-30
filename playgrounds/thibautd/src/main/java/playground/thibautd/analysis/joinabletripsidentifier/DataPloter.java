@@ -42,10 +42,10 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
-import playground.thibautd.utils.BoxAndWhiskersChart;
-import playground.thibautd.utils.TwoCategoriesBoxAndWhiskerChart;
-import playground.thibautd.utils.WrapperChartUtil;
-import playground.thibautd.utils.XYLineHistogramDataset;
+import playground.thibautd.utils.charts.BoxAndWhiskersChart;
+import playground.thibautd.utils.charts.TwoCategoriesBoxAndWhiskerChart;
+import playground.thibautd.utils.charts.WrapperChartUtil;
+import playground.thibautd.utils.charts.XYLineHistogramDataset;
 
 /**
  * Class responsible for creating relevant plots from the data

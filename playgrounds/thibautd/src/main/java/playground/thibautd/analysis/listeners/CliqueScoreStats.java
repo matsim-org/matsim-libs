@@ -48,9 +48,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.utils.BoxAndWhiskersChart;
-import playground.thibautd.utils.BoxAndWhiskerXYNumberDataset;
-import playground.thibautd.utils.XYChartUtils;
+import playground.thibautd.utils.charts.BoxAndWhiskerXYNumberDataset;
+import playground.thibautd.utils.charts.BoxAndWhiskersChart;
+import playground.thibautd.utils.charts.XYChartUtils;
 
 /**
  * Calculates at the end of each iteration the following statistics:

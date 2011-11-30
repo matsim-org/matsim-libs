@@ -50,8 +50,8 @@ import org.matsim.core.config.ConfigUtils;
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
-import playground.thibautd.utils.WrapperChartUtil;
-import playground.thibautd.utils.XYLineHistogramDataset;
+import playground.thibautd.utils.charts.WrapperChartUtil;
+import playground.thibautd.utils.charts.XYLineHistogramDataset;
 
 /**
  * @author thibautd
