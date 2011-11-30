@@ -35,8 +35,10 @@ public class AccessibilityCSVWriter {
 		}
 	}
 	
-	public static void write(Node node, double travelTimeAccessibility, 
-							 double travelCostAccessibility, double travelDistanceAccessibility){
+	public static void write(Node node, 
+							 double travelTimeAccessibility, 
+							 double travelCostAccessibility, 
+							 double travelDistanceAccessibility){
 		
 		try{
 			assert(AccessibilityCSVWriter.accessibilityIndicatorWriter != null);

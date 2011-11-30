@@ -80,7 +80,8 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
-		controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
+		//controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
+		controler.addControlerListener( new ERSAControlerListenerV3(aggregatedWorkplaces, resolutionMeter, benchmark));
 		controler.run();
 		// Controler done!
 		
@@ -101,7 +102,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/matsim4opus/matsim_config/seattle_parcel_interpolation_config.xml"});
+		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/seattle_parcel_interpolation_config_quick.xml"});
 		m4ui.runMATSim();		
 	}
 	
