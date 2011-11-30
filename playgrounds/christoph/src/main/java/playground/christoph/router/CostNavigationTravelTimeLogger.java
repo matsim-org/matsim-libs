@@ -45,6 +45,16 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	private Network network;
 	private TravelTime travelTime;
 	
+	/*
+	 * Initialize counters with 1 - as a result, the first returned
+	 * trust value will be 0.5
+	 */
+	private int followedAndAccepted = 1;
+	private int followedAndNotAccepted = 1;
+	private int notFollowedAndAccepted = 1;
+	private int notFollowedAndNotAccepted = 1;
+
+	
 	private Map<Id, PersonInfo> personInfos;
 	private Map<Id, Boolean> followed;
 	private Map<Id, Double> enterTimes;
@@ -59,21 +69,34 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 		this.population = population;
 		this.network = network;
 		this.travelTime = travelTime;
+
+		init();
+	}
+	
+	public CostNavigationTravelTimeLogger(Population population, Network network, TravelTime travelTime, 
+			int followedAndAccepted, int followedAndNotAccepted, int notFollowedAndAccepted, int notFollowedAndNotAccepted) {
+		this.population = population;
+		this.network = network;
+		this.travelTime = travelTime;
 		
+		this.followedAndAccepted = followedAndAccepted;
+		this.followedAndNotAccepted = followedAndNotAccepted;
+		this.notFollowedAndAccepted = notFollowedAndAccepted;
+		this.notFollowedAndNotAccepted = notFollowedAndNotAccepted;
+		
+		init();
+	}
+	
+	private void init() {		
 		personInfos = new ConcurrentHashMap<Id, PersonInfo>();
 		followed = new ConcurrentHashMap<Id, Boolean>();
 		enterTimes = new ConcurrentHashMap<Id, Double>();
 		expectedTravelTimes = new ConcurrentHashMap<Id, Double>();
 		expectedAlternativeTravelTimes = new ConcurrentHashMap<Id, Double>();
 		
-		init();
-	}
-	
-	private void init() {
-		
 		// set initial trust for the whole population
 		for (Person person : this.population.getPersons().values()) {
-			personInfos.put(person.getId(), new PersonInfo());
+			personInfos.put(person.getId(), new PersonInfo(followedAndAccepted, followedAndNotAccepted, notFollowedAndAccepted, notFollowedAndNotAccepted));
 		}
 		
 		followed.clear();
@@ -94,7 +117,7 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Id personId = event.getPersonId();
-		Id linkId = event.getLinkId();
+//		Id linkId = event.getLinkId();
 		double time = event.getTime();
 		
 		/*
@@ -192,14 +215,18 @@ public class CostNavigationTravelTimeLogger implements LinkEnterEventHandler, Li
 	}
 		
 	private class PersonInfo {
-		/*
-		 * Initialize counters with 1 - as a result, the first returned
-		 * trust value will be 0.5
-		 */
-		int followedAndAccepted = 1;
-		int followedAndNotAccepted = 1;
-		int notFollowedAndAccepted = 1;
-		int notFollowedAndNotAccepted = 1;
+
+		int followedAndAccepted;
+		int followedAndNotAccepted;
+		int notFollowedAndAccepted;
+		int notFollowedAndNotAccepted;
+
+		public PersonInfo(int followedAndAccepted, int followedAndNotAccepted, int notFollowedAndAccepted, int notFollowedAndNotAccepted) {
+			this.followedAndAccepted = followedAndAccepted;
+			this.followedAndNotAccepted = followedAndNotAccepted;
+			this.notFollowedAndAccepted = notFollowedAndAccepted;
+			this.notFollowedAndNotAccepted = notFollowedAndNotAccepted;
+		}
 		
 		Random random = MatsimRandom.getLocalInstance();
 		

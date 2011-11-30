@@ -41,7 +41,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -79,6 +78,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 	/*package*/ double tau = 1.10;
 	/*package*/ double tauplus = 0.75;
 	/*package*/ double tauminus = 1.25;
+	/*package*/ int followedAndAccepted = 1;
+	/*package*/ int followedAndNotAccepted = 1;
+	/*package*/ int notFollowedAndAccepted = 1;
+	/*package*/ int notFollowedAndNotAccepted = 1;
 		
 	protected DuringLegIdentifier duringLegIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
@@ -91,7 +94,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	protected LookupTravelTime lookupTravelTime;
 	protected int updateLookupTravelTimeInterval = 15;
 	
-	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
+	private static final Logger log = Logger.getLogger(CostNavigationRouteController.class);
 
 	public CostNavigationRouteController(String[] args) {
 		super(args);
@@ -119,7 +122,8 @@ public class CostNavigationRouteController extends WithinDayController implement
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory, routeFactory);
 		
 		if (agentsLearn) {
-			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime);			
+			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime,
+					followedAndAccepted, followedAndNotAccepted, notFollowedAndAccepted, notFollowedAndNotAccepted);			
 		} else {
 			costNavigationTravelTimeLogger = new NonLearningCostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime, this.gamma);
 			log.info("Agents learning is disabled - using constant gamma of " + this.gamma + "!");
@@ -232,6 +236,10 @@ public class CostNavigationRouteController extends WithinDayController implement
 	private final static String TAU = "-tau";
 	private final static String TAUPLUS = "-tauplus";
 	private final static String TAUMINUS = "-tauminus";
+	private final static String FOLLOWEDANDACCEPTED = "-followedandaccepted";
+	private final static String FOLLOWEDANDNOTACCEPTED = "-followedandnotaccepted";
+	private final static String NOTFOLLOWEDANDACCEPTED = "-notfollowedandaccepted";
+	private final static String NOTFOLLOWEDANDNOTACCEPTED = "-notfollowedandnotaccepted";
 	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -296,9 +304,33 @@ public class CostNavigationRouteController extends WithinDayController implement
 					if (tauminus < 1.0) tauminus = 1.0;
 					controller.tauminus = tauminus;
 					log.info("tauminus: " + tauminus);
+				} else if (args[i].equalsIgnoreCase(FOLLOWEDANDACCEPTED)) {
+					i++;
+					int value = Integer.parseInt(args[i]);
+					if (value < 0) value = 0;
+					controller.followedAndAccepted = value;
+					log.info("followedAndAccepted: " + value);
+				} else if (args[i].equalsIgnoreCase(FOLLOWEDANDNOTACCEPTED)) {
+					i++;
+					int value = Integer.parseInt(args[i]);
+					if (value < 0) value = 0;
+					controller.followedAndNotAccepted = value;
+					log.info("followedAndNotAccepted: " + value);
+				} else if (args[i].equalsIgnoreCase(NOTFOLLOWEDANDACCEPTED)) {
+					i++;
+					int value = Integer.parseInt(args[i]);
+					if (value < 0) value = 0;
+					controller.notFollowedAndAccepted = value;
+					log.info("notFollowedAndAccepted: " + value);
+				} else if (args[i].equalsIgnoreCase(NOTFOLLOWEDANDNOTACCEPTED)) {
+					i++;
+					int value = Integer.parseInt(args[i]);
+					if (value < 0) value = 0;
+					controller.notFollowedAndNotAccepted = value;
+					log.info("notFollowedAndNotAccepted: " + value);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
-			
+
 			controller.run();
 		}
 		System.exit(0);
