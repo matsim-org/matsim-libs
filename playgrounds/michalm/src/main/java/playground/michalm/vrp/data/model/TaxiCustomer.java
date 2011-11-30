@@ -13,7 +13,7 @@ public class TaxiCustomer
     private Vertex vertex;
     private MobsimAgent passanger;
 
-    
+
     public TaxiCustomer(int id, Vertex vertex, MobsimAgent passanger)
     {
         this.id = id;
@@ -41,8 +41,8 @@ public class TaxiCustomer
     {
         return vertex;
     }
-    
-    
+
+
     public MobsimAgent getPassanger()
     {
         return passanger;

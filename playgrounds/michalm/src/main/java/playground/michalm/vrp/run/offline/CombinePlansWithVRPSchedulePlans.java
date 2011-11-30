@@ -56,7 +56,7 @@ public class CombinePlansWithVRPSchedulePlans
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
         new MatsimNetworkReader(scenario).readFile(networkFileName);
-        
+
         new MatsimPopulationReader(scenario).readFile(plansFileName);
 
         String vrpOutDirName = vrpDirName + "\\output";

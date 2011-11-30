@@ -11,7 +11,8 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 import playground.michalm.vrp.taxi.*;
 
 

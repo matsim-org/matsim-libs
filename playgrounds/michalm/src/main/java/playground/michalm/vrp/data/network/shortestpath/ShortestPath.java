@@ -1,14 +1,13 @@
-package playground.michalm.vrp.data.network;
+package playground.michalm.vrp.data.network.shortestpath;
 
 import org.matsim.api.core.v01.*;
 
 
 public interface ShortestPath
 {
-    //optimization
+    // optimization
     public static final SPEntry ZERO_PATH_ENTRY = new SPEntry(0, 0, new Id[0]);
-    
-    
+
     // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
     // by default: true (toLinks are included)
     public final static boolean INCLUDE_TO_LINK = true;

@@ -39,62 +39,87 @@ import org.matsim.vis.otfvis.interfaces.*;
 import org.matsim.vis.otfvis.opengl.drawer.*;
 import org.matsim.vis.otfvis.opengl.layer.*;
 
-public class VRPOTFClientLive {
+
+public class VRPOTFClientLive
+{
 
     public static OTFQueryControl queryControl;
-    
-	public static void run(final Config config, final OTFServer server) {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				OTFConnectionManager connectionManager = new OTFConnectionManager();
-				connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
-				connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
-				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
-				connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);
-				connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class, VRPAgentPointDrawer.class);
-				connectionManager.connectReceiverToLayer(VRPAgentPointDrawer.class, OGLAgentPointLayer.class);
-				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
-				connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class, VRPAgentPointDrawer.class);
-				
-				if (config.scenario().isUseTransit()) {
-					connectionManager.connectWriterToReader(FacilityDrawer.Writer.class, FacilityDrawer.Reader.class);
-					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
-					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
-				}
-				
-				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
-					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
-					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				} else if (config.scenario().isUseSignalSystems()) {
-					connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-					connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
-					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				}
-				OTFClient otfClient = new OTFClient();
-				otfClient.setServer(server);
-				SettingsSaver saver = new SettingsSaver("otfsettings");
-				OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
-				if (visconf == null) {
-					visconf = server.getOTFVisConfig();
-				}
-				OTFClientControl.getInstance().setOTFVisConfig(visconf);
-				OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
-				OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server, connectionManager);
-				clientQuadTree.setConnectionManager(connectionManager);
-				clientQuadTree.getConstData();
-				OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
-				OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config.otfVis());
-				queryControl = new OTFQueryControl(server, hostControlBar, visconf);
-				OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl, visconf);
-				queryControl.setQueryTextField(queryControlBar.getTextField());
-				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
-				mainDrawer.setQueryHandler(queryControl);
-				otfClient.addDrawerAndInitialize(mainDrawer, saver);
-				otfClient.show();
-			}
-		});
-	}
+
+
+    public static void run(final Config config, final OTFServer server)
+    {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run()
+            {
+                OTFConnectionManager connectionManager = new OTFConnectionManager();
+                connectionManager.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
+                connectionManager.connectWriterToReader(OTFLinkAgentsHandler.Writer.class,
+                        OTFLinkAgentsHandler.class);
+                connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class,
+                        OGLSimpleQuadDrawer.class);
+                connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class,
+                        OGLSimpleStaticNetLayer.class);
+                connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class,
+                        VRPAgentPointDrawer.class);
+                connectionManager.connectReceiverToLayer(VRPAgentPointDrawer.class,
+                        OGLAgentPointLayer.class);
+                connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,
+                        OTFAgentsListHandler.class);
+                connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,
+                        VRPAgentPointDrawer.class);
+
+                if (config.scenario().isUseTransit()) {
+                    connectionManager.connectWriterToReader(FacilityDrawer.Writer.class,
+                            FacilityDrawer.Reader.class);
+                    connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class,
+                            FacilityDrawer.DataDrawer.class);
+                    connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class,
+                            SimpleSceneLayer.class);
+                }
+
+                if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+                    connectionManager.connectWriterToReader(OTFLaneWriter.class,
+                            OTFLaneReader.class);
+                    connectionManager.connectReaderToReceiver(OTFLaneReader.class,
+                            OTFLaneSignalDrawer.class);
+                    connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
+                            SimpleSceneLayer.class);
+                }
+                else if (config.scenario().isUseSignalSystems()) {
+                    connectionManager.connectWriterToReader(OTFSignalWriter.class,
+                            OTFSignalReader.class);
+                    connectionManager.connectReaderToReceiver(OTFSignalReader.class,
+                            OTFLaneSignalDrawer.class);
+                    connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
+                            SimpleSceneLayer.class);
+                }
+                OTFClient otfClient = new OTFClient();
+                otfClient.setServer(server);
+                SettingsSaver saver = new SettingsSaver("otfsettings");
+                OTFVisConfigGroup visconf = saver.tryToReadSettingsFile();
+                if (visconf == null) {
+                    visconf = server.getOTFVisConfig();
+                }
+                OTFClientControl.getInstance().setOTFVisConfig(visconf);
+                OTFServerQuadTree serverQuadTree = server.getQuad(connectionManager);
+                OTFClientQuadTree clientQuadTree = serverQuadTree.convertToClient(server,
+                        connectionManager);
+                clientQuadTree.setConnectionManager(connectionManager);
+                clientQuadTree.getConstData();
+                OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
+                OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, config
+                        .otfVis());
+                queryControl = new OTFQueryControl(server, hostControlBar, visconf);
+                OTFQueryControlToolBar queryControlBar = new OTFQueryControlToolBar(queryControl,
+                        visconf);
+                queryControl.setQueryTextField(queryControlBar.getTextField());
+                otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
+                mainDrawer.setQueryHandler(queryControl);
+                otfClient.addDrawerAndInitialize(mainDrawer, saver);
+                otfClient.show();
+            }
+        });
+    }
 
 }

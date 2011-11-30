@@ -89,47 +89,41 @@ public class SingleIterOnlineDVRPLauncher
         new DepotReader(scenario, data).readFile(depotsFileName);
         createDriverPersons(scenario, data.getVrpData());
 
-        // // === kai test begin ===
-        // // the following should roughly be the syntax to build a router that reads pre-existing
-        // events (from
-        // // some other Berlin simulation) in order to generate time-dependent travel times. I did
-        // not test this.
-        // // But many people have used something like this so it should work. kai, nov'11
-        //
-        // // create a separate events manager:
-        // EventsManager inputEvents = EventsUtils.createEventsManager() ;
-        //
-        // // generate a travel time calculation object. Using the factory since some switches need
-        // to be set
-        // // (see there, maybe this is not necessary):
-        // TravelTimeCalculator ttimeCalc = new
-        // TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-        // scenario.getNetwork(), scenario.getConfig().travelTimeCalculator() ) ;
-        //
-        // // generate a travel cost calculation object (which will use time=cost):
-        // TravelCost tcostCalc = new OnlyTimeDependentTravelCostCalculator(ttimeCalc) ;
-        //
-        // // attach the ttime calc object to the events handler:
-        // inputEvents.addHandler(ttimeCalc) ;
-        //
-        // // parse the events (which should, in theory, fill ttimeCalc and in consequence tcostCalc
-        // with travel times
-        // // that depend on the time-of-day):
-        // new EventsReaderXMLv1( inputEvents ).parse("filename") ;
-        //
-        // // generating a router that uses those time objects:
-        // LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc
-        // );
-        // // (reason why both "time" and "cost" are needed is that, if you use generalized costs,
-        // they are still time
-        // // dependent).
-        //
-        // // IMPORTANT: if that router is meant to be "real time" (i.e. reacting to unexpected
-        // events),
-        // // then the ttimeCalc object needs to be manipulated in order
-        // // to reflect real-time predicted travel times (and possibly caches need to be reset).
-        //
-        // // === kai test end
+        // === kai test begin ===
+        // the following should roughly be the syntax to build a router that reads pre-existing
+        // events (from some other Berlin simulation) in order to generate time-dependent travel
+        // times. I did not test this. But many people have used something like this so it should
+        // work. kai, nov'11
+
+        // create a separate events manager:
+        EventsManager inputEvents = EventsUtils.createEventsManager();
+
+        // generate a travel time calculation object. Using the factory since some switches need to
+        // be set (see there, maybe this is not necessary):
+        TravelTimeCalculator ttimeCalc = new TravelTimeCalculatorFactoryImpl()
+                .createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig()
+                        .travelTimeCalculator());
+
+        // generate a travel cost calculation object (which will use time=cost):
+        TravelCost tcostCalc = new OnlyTimeDependentTravelCostCalculator(ttimeCalc);
+
+        // attach the ttime calc object to the events handler:
+        inputEvents.addHandler(ttimeCalc);
+
+        // parse the events (which should, in theory, fill ttimeCalc and in consequence tcostCalc
+        // with travel times that depend on the time-of-day):
+        new EventsReaderXMLv1(inputEvents).parse("filename");
+
+        // generating a router that uses those time objects:
+        LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcostCalc, ttimeCalc);
+        // (reason why both "time" and "cost" are needed is that, if you use generalized costs, they
+        // are still time dependent).
+
+        // IMPORTANT: if that router is meant to be "real time" (i.e. reacting to unexpected
+        // events), then the ttimeCalc object needs to be manipulated in order
+        // to reflect real-time predicted travel times (and possibly caches need to be reset).
+
+        // === kai test end
 
         SparseShortestPathFinder sspf = new SparseShortestPathFinder(data);
         sspf.findShortestPaths(new FreeSpeedTravelTimeCalculator(), new DijkstraFactory());

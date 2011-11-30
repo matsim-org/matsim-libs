@@ -13,7 +13,7 @@ import org.opengis.referencing.crs.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 import com.vividsolutions.jts.geom.*;
 

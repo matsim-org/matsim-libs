@@ -1,7 +1,6 @@
-package playground.michalm.vrp.data.network.arc;
+package playground.michalm.vrp.data.network.shortestpath;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import playground.michalm.vrp.data.network.*;
 
 
 /**

@@ -6,6 +6,7 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 
 public class SparseShortestPath

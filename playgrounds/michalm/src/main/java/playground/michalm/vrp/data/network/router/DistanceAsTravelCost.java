@@ -1,4 +1,4 @@
-package playground.michalm.vrp.data.network;
+package playground.michalm.vrp.data.network.router;
 
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.router.util.*;

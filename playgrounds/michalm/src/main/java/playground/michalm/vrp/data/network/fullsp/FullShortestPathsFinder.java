@@ -15,7 +15,9 @@ import pl.poznan.put.util.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class FullShortestPathsFinder

@@ -13,7 +13,8 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.*;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 
 public class VRPSchedulePlan
@@ -34,7 +35,7 @@ public class VRPSchedulePlan
     {
         this.driver = driver;
         this.vehicle = vehicle;
-        
+
         actsLegs = new ArrayList<PlanElement>();
         unmodifiableActsLegs = (List<PlanElement>)Collections.unmodifiableList(actsLegs);
 

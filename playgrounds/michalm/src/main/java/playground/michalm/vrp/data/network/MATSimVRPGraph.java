@@ -5,6 +5,7 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 
 public class MATSimVRPGraph

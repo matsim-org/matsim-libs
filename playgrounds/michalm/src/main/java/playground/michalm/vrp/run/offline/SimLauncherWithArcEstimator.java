@@ -75,7 +75,8 @@ public class SimLauncherWithArcEstimator
         MATSimVRPData data = new MATSimVRPData(vrpData, scenario);
 
         FullShortestPathsFinder spf = new FullShortestPathsFinder(data);
-        spf.findShortestPaths(controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory());
+        spf.findShortestPaths(controler.getTravelTimeCalculator(),
+                controler.getLeastCostPathCalculatorFactory());
         spf.writeShortestPaths(vrpArcTimesFileName, vrpArcCostsFileName, vrpArcPathsFileName);
     }
 }

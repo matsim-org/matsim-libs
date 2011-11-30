@@ -9,7 +9,8 @@ import org.matsim.core.router.util.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.arc.*;
+import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 
 public class SparseShortestPathFinder

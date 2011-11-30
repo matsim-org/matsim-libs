@@ -108,7 +108,7 @@ public class VRPSimEngine
     {
         // this happens at the end of QSim.doSimStep() therefore "time+1"
         // this value will be used throughout the next QSim.doSimStep()
-        vrpData.setTime((int)time + 1);
+        vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
     }
 
 

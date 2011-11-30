@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 
+
 /**
  * This class is used for route visualization in OTFVis 
  *
@@ -52,9 +53,10 @@ public class DynAgentWithPlan
         return dynAgent.getExpectedTravelTime();
     }
 
-    
+
     @Override
-    public MobsimAgent.State getState() {
+    public MobsimAgent.State getState()
+    {
         return dynAgent.getState();
     }
 

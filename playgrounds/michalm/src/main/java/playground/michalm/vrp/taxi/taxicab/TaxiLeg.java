@@ -3,7 +3,7 @@ package playground.michalm.vrp.taxi.taxicab;
 import org.matsim.api.core.v01.*;
 
 import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
 
 import com.google.common.collect.*;
 

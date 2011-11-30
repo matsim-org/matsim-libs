@@ -36,8 +36,8 @@ public class DepotReader
 
         graph = data.getVrpGraph();
     }
-    
-    
+
+
     public void readFile(String filename)
     {
         parse(filename);
@@ -96,8 +96,8 @@ public class DepotReader
         double cost = getDouble(atts, "cost", 0);
 
         int t0 = getInt(atts, "t0", 0);
-        int t1 = getInt(atts, "t1", 86400); //default: 24 * 3600
-        int tLimit = getInt(atts, "tLimit", 86400); //default: 24 * 3600
+        int t1 = getInt(atts, "t1", 86400); // default: 24 * 3600
+        int tLimit = getInt(atts, "tLimit", 86400); // default: 24 * 3600
 
         vehicles.add(new VehicleImpl(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }
@@ -106,7 +106,7 @@ public class DepotReader
     private int getInt(Attributes atts, String qName, int defaultValue)
     {
         String val = atts.getValue(qName);
-        
+
         if (val != null) {
             return Integer.parseInt(val);
         }
@@ -115,11 +115,11 @@ public class DepotReader
         }
     }
 
-    
+
     private double getDouble(Attributes atts, String qName, double defaultValue)
     {
         String val = atts.getValue(qName);
-        
+
         if (val != null) {
             return Double.parseDouble(val);
         }

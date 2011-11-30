@@ -1,6 +1,6 @@
 package playground.michalm.vrp.data.network.fullsp;
 
-import playground.michalm.vrp.data.network.*;
+import playground.michalm.vrp.data.network.shortestpath.*;
 
 
 public class FullShortestPath

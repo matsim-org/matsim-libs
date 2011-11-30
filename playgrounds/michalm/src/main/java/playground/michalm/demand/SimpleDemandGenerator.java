@@ -25,6 +25,7 @@ public class SimpleDemandGenerator
 
     private Scenario scenario;
 
+
     public SimpleDemandGenerator(String networkFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
 
@@ -47,9 +48,8 @@ public class SimpleDemandGenerator
         List<Link> links = new ArrayList<Link>(network.getLinks().values());
         int linkCount = links.size();
         int planCount = 100;
-        
-        Uniform uniform = new Uniform(new MersenneTwister(new Date()));
 
+        Uniform uniform = new Uniform(new MersenneTwister(new Date()));
 
         for (int p = 0; p < planCount; p++) {
             Person person = pf.createPerson(scenario.createId(Integer.toString(id++)));

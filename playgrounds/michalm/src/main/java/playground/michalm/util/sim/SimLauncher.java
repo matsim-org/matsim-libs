@@ -23,7 +23,7 @@ public class SimLauncher
             cfgFileName = "config-verB.xml";
 
             dirName = "d:\\PP-dyplomy\\2010_11-mgr\\test_network\\";
-            cfgFileName = "config-verB.xml"; 
+            cfgFileName = "config-verB.xml";
         }
         else if (args.length == 2) {
             dirName = args[0];
@@ -37,15 +37,15 @@ public class SimLauncher
         Controler controler = new Controler(new String[] { dirName + cfgFileName });
         controler.setOverwriteFiles(true);
         controler.run();
-        
+
         TravelTime travelTime = controler.getTravelTimeCalculator();
 
         Map<Id, Link> links = controler.getNetwork().getLinks();
         Id idB = controler.getScenario().createId("B");
         Link linkB = links.get(idB);
-        
-        for (int i = 0; i < 2 * 60 * 60; i += 5*60) {//each 5 minutes during the first 2 hours
-            int m = i/60;
+
+        for (int i = 0; i < 2 * 60 * 60; i += 5 * 60) {// each 5 minutes during the first 2 hours
+            int m = i / 60;
             System.out.println(m + " : " + travelTime.getLinkTravelTime(linkB, i));
         }
     }

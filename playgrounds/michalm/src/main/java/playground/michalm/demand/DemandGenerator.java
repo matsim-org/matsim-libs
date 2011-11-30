@@ -38,8 +38,8 @@ public class DemandGenerator
     List<Zone> fileOrderedZones;
 
 
-    public DemandGenerator(String networkFileName, String zonesXMLFileName, String zonesShpFileName,
-            String idField)
+    public DemandGenerator(String networkFileName, String zonesXMLFileName,
+            String zonesShpFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
 
     {
@@ -236,7 +236,7 @@ public class DemandGenerator
         return scenario.createCoord(p.getX(), p.getY());
     }
 
-    
+
     private int id = 0;
 
 
@@ -263,12 +263,12 @@ public class DemandGenerator
         String idField;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-         dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-         networkFileName = dirName + "network.xml";
-         zonesXMLFileName = dirName + "zones1.xml";
-         zonesShpFileName = dirName + "zones1.shp";
-         plansFileName = dirName + "plans1.xml";
-         idField = "ID";
+            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
+            networkFileName = dirName + "network.xml";
+            zonesXMLFileName = dirName + "zones1.xml";
+            zonesShpFileName = dirName + "zones1.shp";
+            plansFileName = dirName + "plans1.xml";
+            idField = "ID";
 
             // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
             // networkFileName = dirName + "network2.xml";
@@ -282,11 +282,11 @@ public class DemandGenerator
             // zonesShpFileName = dirName + "zone.shp";
             // plansFileName = dirName + "plans.xml";
 
-//            dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
-//            networkFileName = dirName + "network2.xml";
-//            zonesXMLFileName = dirName + "zones2.xml";
-//            zonesShpFileName = dirName + "zone.shp";
-//            plansFileName = dirName + "plans.xml";
+            // dirName = "D:\\PP-dyplomy\\2010_11-mgr\\gintrowicz_marcin\\NSE\\";
+            // networkFileName = dirName + "network2.xml";
+            // zonesXMLFileName = dirName + "zones2.xml";
+            // zonesShpFileName = dirName + "zone.shp";
+            // plansFileName = dirName + "plans.xml";
         }
         else if (args.length == 6) {
             dirName = args[0];
