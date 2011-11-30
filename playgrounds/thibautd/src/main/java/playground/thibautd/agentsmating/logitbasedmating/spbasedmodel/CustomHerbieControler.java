@@ -80,7 +80,7 @@ public class CustomHerbieControler extends Controler {
 				this.getFacilityPenalties(),
 				this.getFacilities(),
 				this.getNetwork());
-		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
+		// this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
