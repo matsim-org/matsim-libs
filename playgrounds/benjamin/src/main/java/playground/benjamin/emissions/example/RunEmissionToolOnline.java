@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions;
+package playground.benjamin.emissions.example;
 
 import java.util.HashSet;
 import java.util.Set;

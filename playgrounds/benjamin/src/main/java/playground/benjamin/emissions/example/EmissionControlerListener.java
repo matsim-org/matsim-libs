@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions;
+package playground.benjamin.emissions.example;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +30,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
+
+import playground.benjamin.emissions.ColdEmissionAnalysisModule;
+import playground.benjamin.emissions.EmissionHandler;
+import playground.benjamin.emissions.WarmEmissionAnalysisModule;
 
 /**
  * @author benjamin

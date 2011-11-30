@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions;
+package playground.benjamin.emissions.example;
 
 import java.io.IOException;
 
@@ -33,6 +33,10 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.benjamin.emissions.ColdEmissionAnalysisModule;
+import playground.benjamin.emissions.EmissionHandler;
+import playground.benjamin.emissions.WarmEmissionAnalysisModule;
 
 /**
  * @author benjamin
