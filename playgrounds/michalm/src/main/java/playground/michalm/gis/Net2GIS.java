@@ -1,4 +1,4 @@
-package playground.michalm.network;
+package playground.michalm.gis;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ import org.matsim.core.utils.geometry.transformations.*;
 import org.matsim.utils.gis.matsim2esri.network.*;
 
 
-public class Net2QGIS
+public class Net2GIS
 {
     public static void main(String[] args)
     {

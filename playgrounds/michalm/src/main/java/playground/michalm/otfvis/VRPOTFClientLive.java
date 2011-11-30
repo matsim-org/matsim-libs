@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.visualization;
+package playground.michalm.otfvis;
 
 import java.awt.*;
 

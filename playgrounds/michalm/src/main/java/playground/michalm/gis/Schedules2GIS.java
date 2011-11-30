@@ -1,4 +1,4 @@
-package playground.michalm.visualization;
+package playground.michalm.gis;
 
 import java.util.*;
 
@@ -18,7 +18,7 @@ import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
 import com.vividsolutions.jts.geom.*;
 
 
-public class Routes2QGIS
+public class Schedules2GIS
 {
     private List<Vehicle> vehicles;
     private String filename;
@@ -28,7 +28,7 @@ public class Routes2QGIS
     private Collection<Feature> features;
 
 
-    public Routes2QGIS(List<Vehicle> vehicles, MATSimVRPData data, String filename)
+    public Schedules2GIS(List<Vehicle> vehicles, MATSimVRPData data, String filename)
     {
         this.vehicles = vehicles;
         this.data = data;

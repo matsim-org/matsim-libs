@@ -1,4 +1,4 @@
-package playground.michalm.visualization;
+package playground.michalm.gis;
 
 import java.io.*;
 import java.util.*;
@@ -19,14 +19,14 @@ import com.vividsolutions.jts.geom.*;
 
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape
-public class Localizables2QGIS<T extends Localizable>
+public class Localizables2GIS<T extends Localizable>
 {
     private List<T> localizables;
     private String filename;
     private FeatureType featureType;
 
 
-    public Localizables2QGIS(List<T> localizables, String filename, String coordinateSystem)
+    public Localizables2GIS(List<T> localizables, String filename, String coordinateSystem)
     {
         this.localizables = localizables;
         this.filename = filename;
@@ -109,6 +109,6 @@ public class Localizables2QGIS<T extends Localizable>
                 VertexImpl.getBuilder());
         String coordSystem = TransformationFactory.WGS84_UTM33N;
 
-        new Localizables2QGIS<Customer>(data.getCustomers(), outFileNameCust, coordSystem).write();
+        new Localizables2GIS<Customer>(data.getCustomers(), outFileNameCust, coordSystem).write();
     }
 }

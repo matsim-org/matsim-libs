@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.michalm.visualization;
+package playground.michalm.otfvis;
 
 import java.awt.*;
 
@@ -32,7 +32,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * This class is based on {@code org.matsim.vis.otfvis.opengl.layer.AgentPointDrawer}
-
+ *
  * 
  * yyyy Despite its name, this is not a Drawer but a Receiver. It receives agents 
  * (as declared by its interface but not by its name) and pushes them towards the AgentPointLayer.  
