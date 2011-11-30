@@ -361,7 +361,7 @@ public class InitMATSimScenario {
 	// Testing fetch  factor calculation for storageCap 
 	public static void main(String[] args) {
 		// testing calculation of storage capacity fetch factor
-		for(double sample = 0.01; sample <=1.; sample += 0.05){
+		for(double sample = 0.01; sample <=1.; sample += 0.01){
 			
 			double factor = Math.pow(sample, -0.25); // same as: 1. / Math.sqrt(Math.sqrt(sample))
 			double storageCap = sample * factor;

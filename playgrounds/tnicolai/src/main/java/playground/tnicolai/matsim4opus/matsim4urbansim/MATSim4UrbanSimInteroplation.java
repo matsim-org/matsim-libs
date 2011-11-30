@@ -70,7 +70,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		// set population in scenario
 		scenario.setPopulation( readUrbansimPersons(readUrbanSimData, parcels, network) );
 		
-		log.info("### DONE with demand generation from urbansim ###");
+		log.info("### DONE with demand generation from UrbanSim ###");
 		
 		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
 		JobClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
