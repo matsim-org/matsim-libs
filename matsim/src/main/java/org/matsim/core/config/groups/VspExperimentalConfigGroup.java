@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.misc.Time;
 
 //interface ConfigKey {} 
 
@@ -164,6 +165,11 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	// ---
 	
+	private static final String WRITING_FRACTIONAL_SECONDS = "writingFractionalSeconds" ;
+	private boolean writingFractionalSeconds = false ;
+	
+	// ---
+	
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -171,6 +177,9 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+		
+		map.put(WRITING_FRACTIONAL_SECONDS, "if true, then factional seconds are written e.g. in output_plans.  " +
+				"default is `false' (because of backwards compatibility).") ;
 		
 		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
 				" Will only work when lastIteration is multiple of events writing interval" ) ;
@@ -274,6 +283,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 			this.setDetailedColdEmissionFactorsFile(value);
 		} else if ( WRITING_OUTPUT_EVENTS.equals(key) ) {
 			this.setWritingOutputEvents(Boolean.parseBoolean(value) ) ;
+		} else if ( WRITING_FRACTIONAL_SECONDS.equals(key) ) {
+			this.setWritingFractionalSeconds(Boolean.parseBoolean(value)) ;
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -316,6 +327,8 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 		map.put(EMISSION_FACTORS_COLD_FILE_DETAILED, this.getDetailedColdEmissionFactorsFile());
 		
 		map.put( WRITING_OUTPUT_EVENTS, Boolean.toString(this.isWritingOutputEvents()) ) ;
+		
+		map.put( WRITING_FRACTIONAL_SECONDS, Boolean.toString(this.isWritingFractionalSeconds()) );
 
 		return map;
 	}
@@ -492,5 +505,14 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
 		this.writingOutputEvents = writingOutputEvents;
+	}
+
+	public boolean isWritingFractionalSeconds() {
+		return writingFractionalSeconds;
+	}
+
+	public void setWritingFractionalSeconds(boolean writingFractionalSeconds) {
+		this.writingFractionalSeconds = writingFractionalSeconds;
+//		Time.setDefaultTimeFormat(format) ;
 	}
 }
