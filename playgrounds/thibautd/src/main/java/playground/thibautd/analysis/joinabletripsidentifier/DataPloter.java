@@ -26,13 +26,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
@@ -41,6 +43,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.utils.BoxAndWhiskersChart;
+import playground.thibautd.utils.TwoCategoriesBoxAndWhiskerChart;
 import playground.thibautd.utils.WrapperChartUtil;
 import playground.thibautd.utils.XYLineHistogramDataset;
 
@@ -75,7 +78,8 @@ public class DataPloter {
 			title,
 			"time of day (h)",
 			"number of joinable trips",
-			1);
+			1,
+			true);
 
 		for (JoinableTrips.TripRecord trip : filteredTrips) {
 			int count = 0;
@@ -108,7 +112,8 @@ public class DataPloter {
 			title,
 			"trip length (km)",
 			"number of joinable trips",
-			1);
+			1,
+			true);
 
 		for (JoinableTrips.TripRecord trip : filteredTrips) {
 			int count = 0;
@@ -136,7 +141,9 @@ public class DataPloter {
 	 		final List<? extends TwofoldTripValidator> conditions) {
 		String title = "Number of possible joint trips for different criteria";
 
-		DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
+		TwoCategoriesBoxAndWhiskerChart chart = new TwoCategoriesBoxAndWhiskerChart(
+				title , "", "number of possible joint trips", true);
+
 		Collections.sort(conditions, new ConditionComparator());
 		
 		for (TwofoldTripValidator validator : conditions) {
@@ -156,13 +163,10 @@ public class DataPloter {
 
 				counts.add(count);
 			}
-			dataset.add(counts, validator.getFirstCriterion(), validator.getSecondCriterion());
+			chart.addItem(counts, validator.getFirstCriterion(), validator.getSecondCriterion());
 		}
 
-		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
-				title, "", "number of possible joint trips", dataset, true);
-
-		return new WrapperChartUtil(chart);
+		return chart;
 	}
 
 	/**
@@ -205,6 +209,59 @@ public class DataPloter {
 		List<PassengerFilter> filters = new ArrayList<PassengerFilter>(1);
 		filters.add(filter);
 		return getTripsForConditions(filters);
+	}
+
+	/**
+	 * @return a chart displaying the number of possivle passengers per driver,
+	 * as a function of the driver's trip length.
+	 */
+	public ChartUtil getBoxAndWhiskerChartNPassengersPerDriverTripLength(
+			final PassengerFilter filter,
+			final DriverTripValidator validator,
+			final Network network) {
+		List<JoinableTrips.TripRecord> filteredTrips =
+			filter.filterRecords(trips);
+		validator.setJoinableTrips(trips);
+
+		String title = "Number of possible passengers per driver trip\n"+
+			filter.getConditionDescription()+"\n"+
+			validator.getConditionDescription();
+
+		BoxAndWhiskersChart chart = new BoxAndWhiskersChart(
+			title,
+			"driver trip length (km)",
+			"number of possible passengers",
+			1,
+			true);
+
+		// collect data: parse passenger trips and update driver info
+		Map<Id, Integer> counts = new TreeMap<Id, Integer>();
+		for (JoinableTrips.TripRecord trip : filteredTrips) {
+			Integer count;
+
+			for (JoinableTrips.JoinableTrip driverTrip : trip.getJoinableTrips()) { 
+				if (validator.isValid(driverTrip)) {
+					count = counts.get( driverTrip.getTripId() );
+
+					if ( count == null ) {
+						count = 1;
+					}
+					else {
+						count++;
+					}
+
+					counts.put( driverTrip.getTripId() , count );
+				}
+			}
+		}
+
+		// create chart
+		for ( Map.Entry<Id, Integer> count : counts.entrySet() ) {
+			double tripLength = trips.getTripRecords().get( count.getKey() ).getDistance( network );
+			chart.add(tripLength / 1000d, count.getValue());
+		}
+
+		return chart;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -321,4 +378,3 @@ public class DataPloter {
 	}
 
 }
-

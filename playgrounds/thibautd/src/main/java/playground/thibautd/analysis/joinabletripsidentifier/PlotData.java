@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.io.File;
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,13 +33,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
+import playground.thibautd.utils.ChartsAxisUnifier;
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * Executable class able to plot statistics about exported XML data
@@ -61,8 +59,10 @@ public class PlotData {
 	private static final String TIME = "acceptableTime_";
 	private static final String DIR = "outputDir";
 	private static final String XML_FILE = "xmlFile";
-	private static final int WIDTH = 1024;
-	private static final int HEIGHT = 800;
+	//private static final int WIDTH = 1024;
+	//private static final int HEIGHT = 800;
+	private static final int WIDTH = 800;
+	private static final int HEIGHT = 600;
 
 	public static void main(final String[] args) {
 		// TODO: define a set of minimal distances
@@ -75,27 +75,7 @@ public class PlotData {
 		String outputDir = module.getValue(DIR);
 		String xmlFile = module.getValue(XML_FILE);
 
-		try {
-			// create directory if does not exist
-			if (!outputDir.substring(outputDir.length() - 1, outputDir.length()).equals("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
+		MoreIOUtils.initOut( outputDir );
 
 		List<ConditionValidator> conditions = new ArrayList<ConditionValidator>();
 
@@ -116,21 +96,56 @@ public class PlotData {
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
 		CommutersFilter filter = new CommutersFilter(network, -1, -1);
 		CommutersFilter shortFilter = new CommutersFilter(network, -1, LONGER_DIST);
+		ChartsAxisUnifier unifier = new ChartsAxisUnifier( false , true );
+		List< Tuple< String , ChartUtil > > charts = 
+			 new ArrayList< Tuple< String , ChartUtil > >();
 
 		int count = 0;
 		for (ConditionValidator condition : conditions) {
 			log.info("creating charts for condition "+condition);
 			count++;
 
-			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(filter, condition);
-			chart.saveAsPng(outputDir+count+"-TimePlot.png", WIDTH, HEIGHT);
+			// number of joinable trips per passenger
+			// -----------------------------------------------------------------
+			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(
+					filter,
+					condition);
+			unifier.addChart( chart );
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+count+"-TimePlot.png",
+						chart) );
 
-			chart = ploter.getBoxAndWhiskerChartPerTripLength(filter, condition, network);
-			chart.saveAsPng(outputDir+count+"-DistancePlot.png", WIDTH, HEIGHT);
+			chart = ploter.getBoxAndWhiskerChartPerTripLength(
+					filter,
+					condition,
+					network);
+			unifier.addChart( chart );
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+count+"-DistancePlot.png",
+						chart) );
 
-			chart = ploter.getBoxAndWhiskerChartPerTripLength(shortFilter, condition, network);
-			chart.saveAsPng(outputDir+count+"-DistancePlot-short.png", WIDTH, HEIGHT);
+			chart = ploter.getBoxAndWhiskerChartPerTripLength(
+					shortFilter,
+					condition,
+					network);
+			unifier.addChart( chart );
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+count+"-DistancePlot-short.png",
+						chart) );
 
+			// Number of possible passenger per driver
+			// -----------------------------------------------------------------
+			chart = ploter.getBoxAndWhiskerChartNPassengersPerDriverTripLength(
+					filter,
+					condition,
+					network);
+			unifier.addChart( chart );
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+count+"-nPassengers-per-drivers.png",
+						chart) );
+
+			// VIA: home and work locations of passengers and drivers
+			// -----------------------------------------------------------------
 			List<Coord> locations = ploter.getMatchingLocations(
 					filter,
 					condition,
@@ -140,7 +155,8 @@ public class PlotData {
 					"h.*");
 			ploter.writeViaXy(
 					locations,
-					outputDir+condition.getFirstCriterion()+"-"+condition.getSecondCriterion()+"-homeLocations.xy");
+					outputDir+condition.getFirstCriterion()+"-"
+						+condition.getSecondCriterion()+"-homeLocations.xy");
 
 			locations = ploter.getMatchingLocations(
 					filter,
@@ -151,7 +167,18 @@ public class PlotData {
 					"w.*");
 			ploter.writeViaXy(
 					locations,
-					outputDir+condition.getFirstCriterion()+"-"+condition.getSecondCriterion()+"-workLocations.xy");
+					outputDir+condition.getFirstCriterion()+"-"
+						+condition.getSecondCriterion()+"-workLocations.xy");
+		}
+
+		// format and save
+		// ---------------------------------------------------------------------
+		unifier.applyUniformisation();
+		for (Tuple<String, ChartUtil> chart : charts) {
+			chart.getSecond().saveAsPng(
+					chart.getFirst(),
+					WIDTH,
+					HEIGHT);
 		}
 
 		ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);

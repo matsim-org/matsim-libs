@@ -19,14 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.io.File;
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
@@ -36,9 +31,9 @@ import org.matsim.core.config.Module;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.config.ConfigUtils;
+
+import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * @author thibautd
@@ -61,27 +56,7 @@ public class RunExtractData {
 		String eventFile = module.getValue(EVENTS);
 		String outputDir = module.getValue(DIR);
 
-		try {
-			// create directory if does not exist
-			if (!outputDir.substring(outputDir.length() - 1, outputDir.length()).equals("/")) {
-				outputDir += "/";
-			}
-			File outputDirFile = new File(outputDir);
-			if (!outputDirFile.exists()) {
-				outputDirFile.mkdirs();
-			}
-
-			// init logFile
-			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
-			Logger.getRootLogger().addAppender(appender);
-
-			IOUtils.initOutputDirLogging(
-				outputDir,
-				appender.getLogEvents());
-		} catch (IOException e) {
-			// do NOT continue without proper logging!
-			throw new RuntimeException("error while creating log file",e);
-		}
+		MoreIOUtils.initOut( outputDir );
 
 		List<AcceptabilityCondition> conditions = new ArrayList<AcceptabilityCondition>();
 
