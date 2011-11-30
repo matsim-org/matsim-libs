@@ -10,14 +10,12 @@ import playground.michalm.vrp.data.*;
 public class VRPSchedulePlanFactory
     implements DynPlanFactory
 {
-    private Person driver;
     private Vehicle vehicle;
     private MATSimVRPData data;
 
 
-    public VRPSchedulePlanFactory(Person driver, Vehicle vehicle, MATSimVRPData data)
+    public VRPSchedulePlanFactory(Vehicle vehicle, MATSimVRPData data)
     {
-        this.driver = driver;
         this.vehicle = vehicle;
         this.data = data;
     }
@@ -26,6 +24,6 @@ public class VRPSchedulePlanFactory
     @Override
     public Plan create(DynAgent agent)
     {
-        return new VRPSchedulePlan(driver, vehicle, data);
+        return new VRPSchedulePlan(vehicle, data);
     }
 }

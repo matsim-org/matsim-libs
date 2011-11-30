@@ -11,7 +11,6 @@ import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.taxi.taxicab.*;
 
@@ -30,12 +29,12 @@ public class VRPSimEngine
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
 
-    public VRPSimEngine(Netsim netsim, MATSimVRPData data, VRPOptimizerFactory optimizerFactory)
+    public VRPSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
     {
         this.netsim = netsim;
         this.optimizerFactory = optimizerFactory;
 
-        vrpData = data.getVrpData();
+        vrpData = data;
     }
 
 

@@ -6,10 +6,8 @@ import java.util.*;
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.*;
 import org.matsim.core.network.*;
-import org.matsim.core.population.*;
 import org.matsim.core.scenario.*;
 
 import pl.poznan.put.util.jfreechart.*;
@@ -193,8 +191,7 @@ public class OfflineDVRPLauncher
             for (Vehicle v : vehicles) {
                 Person person = pf.createPerson(scenario.createId("vrpDriver_" + v.getId()));
 
-                VRPSchedulePlan plan = new VRPSchedulePlan(new PersonImpl(scenario.createId(Integer
-                        .toString(v.getId()))), v, data);
+                VRPSchedulePlan plan = new VRPSchedulePlan(v, data);
 
                 person.addPlan(plan);
                 scenario.getPopulation().addPerson(person);

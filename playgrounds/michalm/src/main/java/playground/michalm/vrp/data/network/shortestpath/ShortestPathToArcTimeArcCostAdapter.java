@@ -9,13 +9,13 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
  * @author michalm
  *
  */
-public class ShortestPathAsArcTimeAndCost
+public class ShortestPathToArcTimeArcCostAdapter
     implements ShortestPath, ArcTime, ArcCost
 {
     private ShortestPath shortestPath;
 
 
-    public ShortestPathAsArcTimeAndCost(ShortestPath shortestPath)
+    public ShortestPathToArcTimeArcCostAdapter(ShortestPath shortestPath)
     {
         this.shortestPath = shortestPath;
     }

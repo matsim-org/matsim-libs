@@ -24,16 +24,14 @@ public class VRPSchedulePlan
     private Network network;
     private ShortestPath[][] shortestPaths;
 
-    private Person driver;
     private Vehicle vehicle;
 
     private List<PlanElement> actsLegs;
     private List<PlanElement> unmodifiableActsLegs;
 
 
-    public VRPSchedulePlan(Person driver, Vehicle vehicle, MATSimVRPData data)
+    public VRPSchedulePlan(Vehicle vehicle, MATSimVRPData data)
     {
-        this.driver = driver;
         this.vehicle = vehicle;
 
         actsLegs = new ArrayList<PlanElement>();
@@ -153,16 +151,37 @@ public class VRPSchedulePlan
 
 
     @Override
-    public Map<String, Object> getCustomAttributes()
+    public List<PlanElement> getPlanElements()
+    {
+        return unmodifiableActsLegs;
+    }
+
+
+    @Override
+    public boolean isSelected()
+    {
+        return true;// TODO ???
+    }
+
+
+    @Override
+    public Double getScore()
     {
         return null;
     }
 
 
     @Override
-    public List<PlanElement> getPlanElements()
+    public Person getPerson()
     {
-        return unmodifiableActsLegs;
+        return null;
+    }
+
+
+    @Override
+    public Map<String, Object> getCustomAttributes()
+    {
+        return null;
     }
 
 
@@ -181,30 +200,9 @@ public class VRPSchedulePlan
 
 
     @Override
-    public boolean isSelected()
-    {
-        return driver.getSelectedPlan() == this;
-    }
-
-
-    @Override
     public void setScore(Double score)
     {
         throw new UnsupportedOperationException("This plan is read-only");
-    }
-
-
-    @Override
-    public Double getScore()
-    {
-        return null;
-    }
-
-
-    @Override
-    public Person getPerson()
-    {
-        return driver;
     }
 
 
@@ -213,5 +211,4 @@ public class VRPSchedulePlan
     {
         throw new UnsupportedOperationException("This plan is read-only");
     }
-
 }
