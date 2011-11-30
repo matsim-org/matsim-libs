@@ -349,17 +349,6 @@ public class EmissionHandler {
 		return indexFromKey ;
 	}
 
-	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
-		HbefaVehicleCategory hbefaVehicleCategory = null;
-		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
-		else{
-			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
-			throw new RuntimeException();
-		}
-		return hbefaVehicleCategory;
-	}
-	
 	private Integer mapAmbientCondPattern2Distance(String string) {
 		Integer distance = null;
 		String distanceString = string.split(",")[2];
@@ -403,6 +392,17 @@ public class EmissionHandler {
 		String[] parts = string.split("/");
 		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
+	}
+
+	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+		HbefaVehicleCategory hbefaVehicleCategory = null;
+		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
+		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		else{
+			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			throw new RuntimeException();
+		}
+		return hbefaVehicleCategory;
 	}
 
 	private HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {

@@ -45,13 +45,13 @@ import playground.benjamin.emissions.types.HbefaVehicleCategory;
 public class EmissionVehicleGenerator {
 	private static final Logger logger = Logger.getLogger(EmissionVehicleGenerator.class);
 	
-	private final String populationFile = "../../detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-	private final String inputVehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml.gz";
-	private final String outputVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
+//	private final String populationFile = "../../detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+//	private final String inputVehicleFile = "../../detailedEval/pop/14k-synthetische-personen/vehicles.xml.gz";
+//	private final String outputVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_1pct.xml.gz";
 	
-//	private String populationFile = "../../detailedEval/pop/mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-//	private String vehicleFile = "../../detailedEval/pop/140k-synthetische-personen/vehicles.xml.gz";
-//	private String outputFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
+	private final String populationFile = "../../detailedEval/pop/merged/mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+	private final String inputVehicleFile = "../../detailedEval/pop/140k-synthetische-personen/vehicles.xml.gz";
+	private final String outputVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
 	
 	private final String netFile = "../../detailedEval/Net/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 

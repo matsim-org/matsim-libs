@@ -169,6 +169,7 @@ public class ColdEmissionAnalysisModule {
 				}
 			} else {
 				generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
+				vehAttributesNotSpecified.add(personId);
 			}
 			vehicleIdSet.add(personId);
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);

@@ -174,6 +174,8 @@ public class WarmEmissionAnalysisModule {
 				stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+				
+				vehAttributesNotSpecified.add(personId);
 			}
 
 			//TODO: is this really the "right" way of doing this?!?
