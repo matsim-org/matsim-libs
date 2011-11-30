@@ -1,4 +1,4 @@
-package playground.michalm.vrp.sim;
+package playground.michalm.vrp.taxi;
 
 import java.util.*;
 
@@ -11,10 +11,9 @@ import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.otfvis.*;
-import playground.michalm.vrp.supply.*;
+import playground.michalm.vrp.taxi.taxicab.*;
 
 
 public class VRPSimEngine

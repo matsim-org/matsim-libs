@@ -1,4 +1,4 @@
-package playground.michalm.vrp.data.file;
+package playground.michalm.vrp.data;
 
 import java.io.*;
 import java.util.*;
@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.VRPData.VRPType;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 
 

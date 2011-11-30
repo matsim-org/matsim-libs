@@ -1,4 +1,4 @@
-package playground.michalm.vrp.supply;
+package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.api.experimental.events.*;
@@ -9,10 +9,10 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import playground.michalm.dynamic.*;
+import playground.michalm.vrp.data.model.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.ShortestPath.SPEntry;
-import playground.michalm.vrp.demand.*;
-import playground.michalm.vrp.sim.*;
+import playground.michalm.vrp.taxi.*;
 
 
 public class TaxiAgentLogic

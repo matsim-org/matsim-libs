@@ -1,4 +1,4 @@
-package playground.michalm.vrp.online;
+package playground.michalm.vrp.run.online;
 
 import java.io.*;
 import java.util.*;
@@ -32,13 +32,13 @@ import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
-import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
 import playground.michalm.vrp.data.network.sparsesp.*;
-import playground.michalm.vrp.demand.*;
+import playground.michalm.vrp.driver.*;
 import playground.michalm.vrp.otfvis.*;
-import playground.michalm.vrp.sim.*;
+import playground.michalm.vrp.taxi.*;
+import playground.michalm.vrp.taxi.taxicab.*;
 
 
 public class SingleIterOnlineDVRPLauncher
@@ -190,7 +190,7 @@ public class SingleIterOnlineDVRPLauncher
         data.setVrpSimEngine(vrpSimEngine);
         sim.addMobsimEngine(vrpSimEngine);
 
-        sim.setAgentFactory(new VRPAgentFactory(data, vrpSimEngine));
+        sim.setAgentFactory(new TaxiAgentFactory(data, vrpSimEngine));
 
         // The above is slighly confusing:
         // (1) The VRPSimEngine adds "VRP" persons to the population (in onPrepareSim) ...

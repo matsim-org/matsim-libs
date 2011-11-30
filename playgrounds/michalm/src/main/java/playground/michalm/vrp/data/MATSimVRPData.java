@@ -5,7 +5,7 @@ import org.matsim.core.utils.geometry.transformations.*;
 
 import pl.poznan.put.vrp.dynamic.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.sim.*;
+import playground.michalm.vrp.taxi.*;
 
 
 public class MATSimVRPData

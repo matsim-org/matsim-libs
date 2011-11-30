@@ -1,4 +1,4 @@
-package playground.michalm.vrp.demand;
+package playground.michalm.vrp.taxi;
 
 import java.util.*;
 
@@ -8,8 +8,8 @@ import org.matsim.ptproject.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.data.model.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.sim.*;
 
 
 public class TaxiModeDepartureHandler

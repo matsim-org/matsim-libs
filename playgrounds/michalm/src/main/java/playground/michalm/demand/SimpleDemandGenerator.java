@@ -1,4 +1,4 @@
-package playground.michalm.vrp.data.file;
+package playground.michalm.demand;
 
 import java.io.*;
 import java.util.*;
@@ -19,13 +19,13 @@ import cern.jet.random.*;
 import cern.jet.random.engine.*;
 
 
-public class DemandGenerator
+public class SimpleDemandGenerator
 {
-    private static final Logger log = Logger.getLogger(DemandGenerator.class);
+    private static final Logger log = Logger.getLogger(SimpleDemandGenerator.class);
 
     private Scenario scenario;
 
-    public DemandGenerator(String networkFileName, String idField)
+    public SimpleDemandGenerator(String networkFileName, String idField)
         throws IOException, SAXException, ParserConfigurationException
 
     {
@@ -94,7 +94,7 @@ public class DemandGenerator
         plansFileName = dirName + "plans.xml";
         idField = "ID";
 
-        DemandGenerator dg = new DemandGenerator(networkFileName, idField);
+        SimpleDemandGenerator dg = new SimpleDemandGenerator(networkFileName, idField);
         dg.generate();
         dg.write(plansFileName);
     }

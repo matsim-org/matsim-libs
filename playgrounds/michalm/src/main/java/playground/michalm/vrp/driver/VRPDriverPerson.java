@@ -1,4 +1,4 @@
-package playground.michalm.vrp.sim;
+package playground.michalm.vrp.driver;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.core.population.*;

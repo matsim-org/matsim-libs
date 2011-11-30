@@ -1,4 +1,4 @@
-package playground.michalm.vrp.offline;
+package playground.michalm.vrp.run.offline;
 
 import java.io.*;
 import java.util.*;

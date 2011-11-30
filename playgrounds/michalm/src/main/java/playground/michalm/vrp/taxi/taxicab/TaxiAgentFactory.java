@@ -1,4 +1,4 @@
-package playground.michalm.vrp.sim;
+package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
@@ -8,17 +8,18 @@ import org.matsim.ptproject.qsim.agents.*;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.supply.*;
+import playground.michalm.vrp.driver.*;
+import playground.michalm.vrp.taxi.*;
 
 
-public class VRPAgentFactory
+public class TaxiAgentFactory
     implements AgentFactory
 {
     private MATSimVRPData data;
     private VRPSimEngine vrpSimEngine;
 
 
-    public VRPAgentFactory(MATSimVRPData data, VRPSimEngine vrpSimEngine)
+    public TaxiAgentFactory(MATSimVRPData data, VRPSimEngine vrpSimEngine)
     {
         this.data = data;
         this.vrpSimEngine = vrpSimEngine;

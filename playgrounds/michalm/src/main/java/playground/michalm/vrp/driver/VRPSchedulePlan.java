@@ -1,4 +1,4 @@
-package playground.michalm.vrp.supply;
+package playground.michalm.vrp.driver;
 
 import java.util.*;
 

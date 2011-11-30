@@ -1,4 +1,4 @@
-package playground.michalm.vrp.supply;
+package playground.michalm.vrp.taxi.taxicab;
 
 import org.matsim.api.core.v01.*;
 

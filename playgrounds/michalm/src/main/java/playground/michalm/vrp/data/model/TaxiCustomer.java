@@ -1,4 +1,4 @@
-package playground.michalm.vrp.demand;
+package playground.michalm.vrp.data.model;
 
 import org.matsim.core.mobsim.framework.*;
 

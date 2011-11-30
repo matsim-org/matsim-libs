@@ -1,4 +1,4 @@
-package playground.michalm.vrp.offline;
+package playground.michalm.vrp.run.offline;
 
 import java.io.*;
 import java.util.*;
@@ -21,11 +21,10 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
-import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.fullsp.*;
-import playground.michalm.vrp.supply.*;
+import playground.michalm.vrp.driver.*;
 
 
 public class OfflineDVRPLauncher
