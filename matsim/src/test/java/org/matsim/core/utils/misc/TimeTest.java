@@ -116,7 +116,13 @@ public class TimeTest extends TestCase {
 		assertEquals("12:34", Time.writeTime(12*3600 + 34*60 + 56.789));
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_SSSS);
 		assertEquals(Integer.toString(12*3600 + 34*60 + 56), Time.writeTime(12*3600 + 34*60 + 56.789));
-	}
+
+	
+		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSSDOTSS);
+		assertEquals("12:34:56.78", Time.writeTime(12*3600 + 34*60 + 56.789).substring(0, 11));
+		// (conversion to double of .789 looks like .788999999999... thus that dirty trick.  
+		//  kai/gregor, nov'11)
+}
 
 	public void testWriting() {
 		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSS);
