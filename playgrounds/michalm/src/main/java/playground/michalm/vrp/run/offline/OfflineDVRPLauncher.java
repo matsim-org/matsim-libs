@@ -23,7 +23,7 @@ import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.fullsp.*;
+import playground.michalm.vrp.data.network.shortestpath.full.*;
 import playground.michalm.vrp.driver.*;
 
 

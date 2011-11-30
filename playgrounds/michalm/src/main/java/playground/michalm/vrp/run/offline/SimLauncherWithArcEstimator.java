@@ -10,7 +10,7 @@ import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.fullsp.*;
+import playground.michalm.vrp.data.network.shortestpath.full.*;
 
 
 public class SimLauncherWithArcEstimator

@@ -34,7 +34,7 @@ import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
-import playground.michalm.vrp.data.network.sparsesp.*;
+import playground.michalm.vrp.data.network.shortestpath.sparse.*;
 import playground.michalm.vrp.driver.*;
 import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.taxi.*;
