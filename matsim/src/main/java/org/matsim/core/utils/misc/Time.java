@@ -111,6 +111,8 @@ public abstract class Time {
 		if (TIMEFORMAT_HHMMSS.equals(timeformat)) {
 			str.append(separator);
 			str.append(timeElements[(int)s]);
+			str.append(".") ;
+			str.append(s-(int)s) ;
 			return str.toString();
 		}
 		throw new IllegalArgumentException("The time format (" + timeformat + ") is not known.");
