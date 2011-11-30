@@ -31,11 +31,13 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
-import playground.michalm.visualization.*;
+import playground.michalm.util.gis.*;
+import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
 import playground.michalm.vrp.data.network.sparsesp.*;
 import playground.michalm.vrp.demand.*;
+import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.sim.*;
 
 
@@ -167,7 +169,7 @@ public class SingleIterOnlineDVRPLauncher
         sim.run();
 
         if (VRP_OUT_FILES) {
-            new Routes2QGIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
+            new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
                     .write();
         }
 

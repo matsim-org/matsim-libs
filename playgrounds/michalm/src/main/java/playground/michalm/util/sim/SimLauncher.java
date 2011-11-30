@@ -1,4 +1,4 @@
-package playground.michalm.simulation;
+package playground.michalm.util.sim;
 
 import java.util.*;
 

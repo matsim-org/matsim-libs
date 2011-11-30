@@ -20,7 +20,8 @@ import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
-import playground.michalm.visualization.*;
+import playground.michalm.util.gis.*;
+import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.fullsp.*;
@@ -181,7 +182,7 @@ public class OfflineDVRPLauncher
         if (VRP_OUT_FILES) {
             List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
-            new Routes2QGIS(vehicles, data, vrpOutDirName + "\\route_").write();
+            new Schedules2GIS(vehicles, data, vrpOutDirName + "\\route_").write();
 
             // PopulationReader popReader = new MatsimPopulationReader(scenario).readFile(dirName +
             // );

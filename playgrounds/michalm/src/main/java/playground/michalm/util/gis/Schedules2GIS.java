@@ -1,4 +1,4 @@
-package playground.michalm.gis;
+package playground.michalm.util.gis;
 
 import java.util.*;
 

@@ -1,31 +1,30 @@
-package playground.michalm.otfvis;
+package playground.michalm.util.otfvis;
 
 import java.util.*;
 
 import org.matsim.run.*;
 
 
-public class OTFVisSimLive
+public class OTFVisNet
 {
     public static void main(String[] args)
     {
         String dirName;
-        String cfgFileName;
+        String netFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
             dirName = "D:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec1\\";
-
-            cfgFileName = "config-verB_with_vrp.xml";
+            netFileName = "network.xml";
         }
         else if (args.length == 2) {
             dirName = args[0];
-            cfgFileName = args[1];
+            netFileName = args[1];
         }
         else {
             throw new IllegalArgumentException("Incorrect program arguments: "
                     + Arrays.toString(args));
         }
 
-        OTFVis.playConfig(dirName + cfgFileName);
+        OTFVis.playNetwork(dirName + netFileName);
     }
 }

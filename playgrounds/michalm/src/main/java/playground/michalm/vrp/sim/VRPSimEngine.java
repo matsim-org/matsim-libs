@@ -11,8 +11,9 @@ import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import playground.michalm.visualization.*;
+import playground.michalm.util.otfvis.*;
 import playground.michalm.vrp.data.*;
+import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.supply.*;
 
 
