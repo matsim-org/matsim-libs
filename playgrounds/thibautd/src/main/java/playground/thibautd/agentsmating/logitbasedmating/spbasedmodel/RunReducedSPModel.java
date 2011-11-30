@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -37,6 +38,9 @@ import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
 import herbie.running.config.HerbieConfigGroup;
@@ -131,6 +135,12 @@ public class RunReducedSPModel {
 				throw new RuntimeException( "got unexisting controler type "+controlerType+" !?" );
 		}
 
+		// XXX: Dirty hack, aiming at avoiding exceptions while
+		// scoring in the herbie controler. This is not a problem,
+		// as the MATSim score is not used anywhere; but this is
+		// ugly, and should be removed as soon as the scoring function
+		// works again.
+		controler.setScoringFunctionFactory( new FakeScoringFunctionFactory() );
 		controler.run();
 		// //////////////////////// run an iteration... DONE
 
@@ -204,5 +214,13 @@ public class RunReducedSPModel {
 				}
 			}
 		}
+	}
+}
+
+class FakeScoringFunctionFactory implements ScoringFunctionFactory {
+
+	@Override
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		return new ScoringFunctionAccumulator();
 	}
 }
