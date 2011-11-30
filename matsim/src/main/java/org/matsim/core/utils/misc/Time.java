@@ -35,6 +35,8 @@ public abstract class Time {
 	public static final String TIMEFORMAT_HHMM = "HH:mm";
 	public static final String TIMEFORMAT_HHMMSS = "HH:mm:ss";
 	public static final String TIMEFORMAT_SSSS = "ssss";
+	
+	public static final String TIMEFORMAT_HHMMSSDOTSS = "HH:mm:ss.ss" ;
 
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
 
@@ -111,10 +113,18 @@ public abstract class Time {
 		if (TIMEFORMAT_HHMMSS.equals(timeformat)) {
 			str.append(separator);
 			str.append(timeElements[(int)s]);
-			str.append(".") ;
-			str.append(s-(int)s) ;
 			return str.toString();
 		}
+		if ( TIMEFORMAT_HHMMSSDOTSS.equals(timeformat)) {
+			str.append(separator);
+
+			if ( s < 10. ) {
+				str.append("0") ;
+			}
+			str.append(s);
+			return str.toString();
+		}
+
 		throw new IllegalArgumentException("The time format (" + timeformat + ") is not known.");
 	}
 
