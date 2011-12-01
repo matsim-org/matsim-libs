@@ -61,9 +61,12 @@ public class WarmEmissionAnalysisModule {
 	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
 	private static Set<Id> vehicleIdSet = new HashSet<Id>();
 
-	static int emissionEventCounter = 0;
-	static int fractionCounter = 0;
 	static int stopGoCounter = 0;
+	static int fractionCounter = 0;
+	static int emissionEventCounter = 0;
+	
+	static double kmCounter = 0.0;
+	static double stopGoKmCounter = 0.0;
 
 	public WarmEmissionAnalysisModule(
 			Map<Integer, String> roadTypeMapping,
@@ -93,7 +96,7 @@ public class WarmEmissionAnalysisModule {
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
 
 			if (vehicleInformationTuple.getFirst() != null){ // check if the required vehicle category could be interpreted
-				warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, linkLength, vehicleInformationTuple);
+				warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 			} else throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
@@ -110,6 +113,7 @@ public class WarmEmissionAnalysisModule {
 			Id personId,
 			Double travelTime,
 			Integer roadType,
+			Double freeVelocity,
 			Double linkLength,
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
@@ -132,7 +136,7 @@ public class WarmEmissionAnalysisModule {
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 
-		double freeFlowSpeed_kmh;
+//		double freeFlowSpeed_kmh;
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -152,13 +156,13 @@ public class WarmEmissionAnalysisModule {
 				keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 				
 				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
-					freeFlowSpeed_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//					freeFlowSpeed_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 				} else {
-					freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//					freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
@@ -172,7 +176,7 @@ public class WarmEmissionAnalysisModule {
 					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
-				freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+//				freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 				stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
@@ -182,11 +186,13 @@ public class WarmEmissionAnalysisModule {
 
 			double linkLength_km = linkLength / 1000;
 			double travelTime_h = travelTime / 3600;
+			double freeFlowSpeed_kmh = freeVelocity * 3.6;
 			double averageSpeed_kmh = linkLength_km / travelTime_h;
 			
 			if (averageSpeed_kmh <= stopGoSpeed_kmh) {
 				generatedEmissions = linkLength_km * efStopGo_gpkm;
 				stopGoCounter++;
+				stopGoKmCounter = stopGoKmCounter + linkLength_km;
 			} else {
 				double timeStopGo_h = (linkLength_km / averageSpeed_kmh) - (linkLength_km / freeFlowSpeed_kmh);
 				double distanceStopGo_km = stopGoSpeed_kmh * timeStopGo_h;
@@ -194,7 +200,9 @@ public class WarmEmissionAnalysisModule {
 
 				generatedEmissions = (distanceFreeFlow_km * efFreeFlow_gpkm) + (distanceStopGo_km * efStopGo_gpkm);
 				fractionCounter++;
+				stopGoKmCounter = stopGoKmCounter + distanceStopGo_km;
 			}
+			kmCounter = kmCounter + linkLength_km;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
 		emissionEventCounter++;
@@ -245,5 +253,13 @@ public class WarmEmissionAnalysisModule {
 
 	public static int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
+	}
+
+	public static double getKmCounter() {
+		return Math.round(kmCounter / WarmPollutant.values().length);
+	}
+
+	public static double getStopGoKmCounter() {
+		return Math.round(stopGoKmCounter / WarmPollutant.values().length);
 	}
 }

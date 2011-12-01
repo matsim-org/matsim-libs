@@ -105,6 +105,8 @@ public class RunEmissionToolOffline {
 				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + WarmEmissionAnalysisModule.getStopGoOccurences() + " of " +
 				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Stop&Go occured on " + WarmEmissionAnalysisModule.getStopGoKmCounter() + " km of total " + 
+				WarmEmissionAnalysisModule.getKmCounter() + " km traveled.");
 		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
 				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
 				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
