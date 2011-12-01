@@ -48,6 +48,7 @@ public class MicroCensus {
 
 	private final static Logger log = Logger.getLogger(MicroCensus.class);
 
+	private final List<Population> populations;
 	private final MzGroupsModule groups;
 	private static final String WORK = "w";
 	private static final String EDUC = "e";
@@ -66,7 +67,7 @@ public class MicroCensus {
 		this.groups = groups;
 		log.info( "MicroCensus initialised with groups: "+groups.getDescription() );
 
-		List<Population> populations = new ArrayList<Population>();
+		this.populations = new ArrayList<Population>();
 		for (String popFile : popFiles) {
 			log.info( "loading activity chains from file "+popFile );
 			Scenario scen = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
@@ -122,7 +123,7 @@ public class MicroCensus {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Person getRandomWeightedMZPerson(
+	public Person getRandomWeightedMZPerson(
 			final int age,
 			final String sex,
 			final String lic,
@@ -131,5 +132,9 @@ public class MicroCensus {
 		MzGroup g = groups.getGroup( age , sex , lic , has_work , has_educ );
 
 		return g.size() > 0 ? g.getRandomWeightedPerson() : null;
+	}
+
+	public List<Population> getPopulations() {
+		return populations;
 	}
 }

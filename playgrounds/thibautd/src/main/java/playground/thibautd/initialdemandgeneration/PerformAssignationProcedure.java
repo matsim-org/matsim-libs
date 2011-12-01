@@ -29,14 +29,15 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
+
+import playground.balmermi.census2000v2.modules.PlansAnalyse;
 
 import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MzGroupsModule;
@@ -66,13 +67,12 @@ public class PerformAssignationProcedure {
 		String configFile = args[ 0 ];
 		MzGroupsModule groups = new MzGroupsModule();
 		Config config = ConfigUtils.createConfig( );
-		config.addModule( groups.NAME , groups );
+		config.addModule( MzGroupsModule.NAME , groups );
 		ConfigUtils.loadConfig( config , configFile );
 		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
 		Module configGroup = config.getModule( CONF_GROUP );
 		String outputDir = configGroup.getValue( OUT_FIELD );
 
-		// TODO: log, creation of output
 		MoreIOUtils.initOut( outputDir );
 
 		List<String> popFiles = new ArrayList<String>();
@@ -91,6 +91,11 @@ public class PerformAssignationProcedure {
 
 		for ( Person person : scen.getPopulation().getPersons().values() ) {
 			algo.run( person );
+		}
+
+		new PlansAnalyse().run(scen.getPopulation());
+		for ( Population pop : mz.getPopulations() ) {
+			new PlansAnalyse().run(pop);
 		}
 
 		(new PopulationWriter(
