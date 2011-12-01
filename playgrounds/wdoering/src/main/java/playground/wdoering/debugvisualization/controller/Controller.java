@@ -15,6 +15,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
@@ -69,6 +70,7 @@ public class Controller {
 	public Console console;
 	private Long oldTime = 0l;
 	private boolean isReadingData;
+	private ArrayList<Geometry> geometries;
 
 	public boolean isLiveMode() {
 		return this.liveMode;
@@ -204,6 +206,7 @@ public class Controller {
 		this.links = this.importer.getLinks();
 		
 		this.importer.readShapeFile("C:\\temp\\big\\floorplan.shp");
+		this.geometries = this.importer.getGeometries();
 
 		//set determined extreme value coordinates
 		this.extremeValues = this.importer.getExtremeValues();
@@ -504,6 +507,12 @@ public class Controller {
 
 	public void setAgentDataController(AgentDataController agentDataController) {
 		this.agentDataController = agentDataController;
+	}
+
+	public ArrayList<Geometry> getGeometries()
+	{
+		// TODO Auto-generated method stub
+		return geometries;
 	}
 
 }

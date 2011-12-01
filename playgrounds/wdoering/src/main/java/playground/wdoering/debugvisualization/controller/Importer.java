@@ -286,26 +286,26 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 				}
 				
 				
-//				int j = 0;			
-//				for (Geometry geo : geometries)
-//				{
-//					
-//					System.out.println(geo.toText());
-//					Coordinate [] coordinates = geo.getCoordinates();
-//					
-//					System.out.println("geomobj # " + j);
-//					for (int i = 0; i < coordinates.length; i++)
-//						System.out.println(i + ":" + coordinates[i].x + "|"  + coordinates[i].y + "|" +coordinates[i].z);	
-//					
-//					j++;
-//					
-//				}
-//				
-//				System.out.print(this.maxPosX);
-//				System.out.println(" - " + this.minPosX);
-//				System.out.print(this.maxPosY);
-//				System.out.println(" - " + this.minPosY);
-//				
+				int j = 0;			
+				for (Geometry geo : geometries)
+				{
+					
+					System.out.println(geo.toText());
+					Coordinate [] coordinates = geo.getCoordinates();
+					
+					System.out.println("geomobj # " + j);
+					for (int i = 0; i < coordinates.length; i++)
+						System.out.println(i + ":" + coordinates[i].x + "|"  + coordinates[i].y + "|" +coordinates[i].z);	
+					
+					j++;
+					
+				}
+				
+				System.out.print(this.maxPosX);
+				System.out.println(" - " + this.minPosX);
+				System.out.print(this.maxPosY);
+				System.out.println(" - " + this.minPosY);
+				
 //				System.exit(0);
 				
 

@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+
 import EDU.oswego.cs.dl.util.concurrent.SynchronizedBoolean;
 
 import playground.wdoering.debugvisualization.controller.AgentDataController;
@@ -18,6 +21,7 @@ import playground.wdoering.debugvisualization.controller.Controller;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.Scene;
+import playground.wdoering.debugvisualization.model.XYVxVyAgent;
 import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -79,6 +83,8 @@ public class P3DRenderer extends PApplet
 	private long oldTime;
 	private boolean mouseDragged;
 	private Point mouseDragBeginPosition = new Point(0,0);
+	
+	private ArrayList<Geometry> geometries = null;
 	
 	private Point panOffset = new Point(0,0);
 	private Point offset = new Point(0,0);
@@ -267,6 +273,8 @@ public class P3DRenderer extends PApplet
 		this.height = height;
 
 		this.agentDataController = controller.getAgentDataController();
+		
+		this.geometries = controller.getGeometries();
 
 		setAgentColors(2500);
 
@@ -445,6 +453,12 @@ public class P3DRenderer extends PApplet
 
 	//not implemented yet
 	PImage b = loadImage("http://upload.wikimedia.org/wikipedia/commons/thumb/1/10/LaBelle_Blueprint.jpg/250px-LaBelle_Blueprint.jpg");
+	private XYVxVyAgent toolTippedAgent;
+	private float toolTippedAgentPosX;
+	private float toolTippedAgentPosY;
+	private String toolTippedAgentID;
+	private XYVxVyDataPoint toolTippedAgentDataPoint;
+	private String toolTipAgentText;
 
 	@Override
 	public void setup()
@@ -562,19 +576,21 @@ public class P3DRenderer extends PApplet
 			currentFrame++;
 		else
 			currentFrame=1;
-
 		
 		double timeMeas = System.currentTimeMillis();
 		background(33);
 		fill(0, 0, 0);
 		//visualization.draw();
-		//FIRST
-
+		
+		
+		//FIRST  ----------------------------------------
 		//draw network
 		drawNetwork();
 		
-		//SECOND
-
+		//draw geometries (walls etc)
+		drawGeometries();
+		
+		//SECOND ----------------------------------------
 		//draw agents
 		if (this.liveMode)
 		{
@@ -592,6 +608,42 @@ public class P3DRenderer extends PApplet
 		
 
 
+	}
+
+	private void drawGeometries()
+	{
+		//Draw Network
+				if ((this.geometries!=null))
+				{
+					//Stroke color
+					stroke(100,255,0,250);
+
+					//Iterate through all geometries + coordinates
+					for (Geometry geo : geometries)
+					{
+						
+						Coordinate [] coordinates = geo.getCoordinates();
+						if (coordinates.length>0)
+						{
+							Coordinate lastCoordinate = null;
+							
+							for (int i = 0; i < coordinates.length; i++)
+							{
+								if (lastCoordinate != null)
+								{
+									//draw a line (from - to - datapoint)
+									line((float)((coordinates[i].x-this.minPosX)/this.factorX*(this.zoomFactor/10f))+panOffset.x+offset.x,
+											(float)(height-((coordinates[i].y-this.minPosY))/this.factorY*(this.zoomFactor/10f))+panOffset.y+offset.y,
+											(float)((lastCoordinate.x-this.minPosX)/this.factorX*(this.zoomFactor/10.02f))+panOffset.x+offset.x,
+											(float)(height-((lastCoordinate.y-this.minPosY))/this.factorY*(this.zoomFactor/10.02f))+panOffset.y+offset.y);
+								}
+								lastCoordinate = coordinates[i];
+							}
+						}
+					}
+					noStroke();
+				}
+		
 	}
 
 	private void drawAgents()
@@ -642,7 +694,8 @@ public class P3DRenderer extends PApplet
 			if (this.timeSteps.size()>0)
 			{
 
-				//console.println("----- + + + + ----- " + timeSteps.size() + "| agents:" + agents.toString());
+				//to determine whether a tooltip has already been drawn or not 
+				boolean drawTooltip = false;
 
 				//Iterate through all agents and display the current data point + traces
 				
@@ -670,7 +723,7 @@ public class P3DRenderer extends PApplet
 					
 					Iterator agentsIterator = agentsCopy.entrySet().iterator();
 					int agentCount = 0;
-	
+					
 					//While there are still agents in the agents array
 					while (agentsIterator.hasNext())
 					{
@@ -678,7 +731,7 @@ public class P3DRenderer extends PApplet
 						//Get current agent
 						pairs = (Map.Entry) agentsIterator.next();
 						
-						Agent currentAgent = (Agent)pairs.getValue();
+						XYVxVyAgent currentAgent = (XYVxVyAgent)pairs.getValue();
 						String currentAgentID = (String)pairs.getKey();
 	
 						HashMap<Double,DataPoint> dataPoints = currentAgent.getDataPoints();
@@ -738,7 +791,7 @@ public class P3DRenderer extends PApplet
 							}
 							noStroke();
 	
-							DataPoint lastDataPoint = dataPoints.get(this.currentTime);
+							XYVxVyDataPoint lastDataPoint = (XYVxVyDataPoint)dataPoints.get(this.currentTime);
 							//console.println("current agent: " + currentAgent.get);
 							//							console.println("@________@________@: " + timeSteps.toString());
 							//							console.println("TS GET LAST " + timeSteps.getLast());
@@ -768,22 +821,29 @@ public class P3DRenderer extends PApplet
 	
 								int halfAgentSize = (int) this.agentSize / 2;
 	
-								if    ((this.mouseX < posX+halfAgentSize) && (this.mouseX > posX-halfAgentSize)
+								if     ((!drawTooltip)
+									&& (this.mouseX < posX+halfAgentSize) && (this.mouseX > posX-halfAgentSize)
 									&& (this.mouseY < posY+halfAgentSize) && (this.mouseY > posY-halfAgentSize))
 								{
-									//controller.
 									
-									//controller.
+									//calculate v
+									float v = (float)(lastDataPoint.getvX()*lastDataPoint.getvX()
+											+ lastDataPoint.getvY()*lastDataPoint.getvY());
 									
+									//create tooltip string, save x + y position
+									toolTipAgentText = "Agent " +  currentAgentID  + " | V: " + v + "\ncurrent link: " + currentAgent.getCurrentLinkID();
+									
+									//draw current agent white
 									fill(255, 255, 255,255);
+									
+									//tooltipped agent found
+									drawTooltip = true;
 								}
 								else
 									fill(color(agentColor[0], agentColor[1],agentColor[2],255));
 	
 								ellipse (posX, posY, this.agentSize, this.agentSize);
 	
-								fill(0, 0, 0, 255);
-								text(currentAgentID,posX+(this.agentSize/2)-12,posY+(this.agentSize/2)-6);
 	
 							}
 							else
@@ -798,6 +858,19 @@ public class P3DRenderer extends PApplet
 						agentCount++;
 					}
 					agentsCopy.clear();
+					
+					//draw tooltip
+					if (drawTooltip)
+					{
+						//draw white box
+						fill(255, 255, 255, 150);
+						rect(mouseX+(this.agentSize/2), mouseY+(this.agentSize/2), 180, 80);
+						
+						//draw text
+						fill(0, 0, 0, 255);
+						text(toolTipAgentText,mouseX+(this.agentSize/2)+6,mouseY+(this.agentSize*1.5f));
+					}
+					
 				}
 			}
 			
