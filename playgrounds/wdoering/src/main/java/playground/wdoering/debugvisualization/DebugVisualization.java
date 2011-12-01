@@ -60,19 +60,21 @@ public class DebugVisualization {
 		
 		
 		
-		//argument syntax: DebugSim.java eventfile.xml networkfile.xml liveMode [=true / false / null||else(=false) ]
+		//argument syntax: DebugSim.java eventfile.xml networkfile.xml shapefile.shp liveMode [=true / false / null||else(=false) ]
 		if ((args.length > 0) && (!args[0].equals("")))
 		{
 			//console.println("Initializing Debug Simulation.");
 			//Controller controller = new Controller(args[0], args[1], console, 3, true);
 			
 			String eventFile = args[0];
+			String shapeFile = args[2];
 
 			XYVxVyEventsFileReader reader = new XYVxVyEventsFileReader(e);
 			
-			Thread readerThread = new Thread(new XYVxVyEventThread(reader,eventFile), "readerthread"); 
+			Thread readerThread = new Thread(new XYVxVyEventThread(reader,eventFile), "readerthread");
 			
-			Controller controller = new Controller(e, sc, console, readerThread);
+			
+			Controller controller = new Controller(e, sc, console, readerThread, shapeFile);
 			
 
 		}

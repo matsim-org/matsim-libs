@@ -180,7 +180,7 @@ public class Controller {
 	 * @param traceTimeRange
 	 * @param liveMode
 	 */	
-	public Controller(EventsManager e, Scenario sc, Console console, Thread readerThread)
+	public Controller(EventsManager e, Scenario sc, Console console, Thread readerThread, String shapeFile)
 	{
 
 		//assign console
@@ -205,7 +205,7 @@ public class Controller {
 		this.nodes = this.importer.getNodes();
 		this.links = this.importer.getLinks();
 		
-		this.importer.readShapeFile("C:\\temp\\big\\floorplan.shp");
+		this.importer.readShapeFile(shapeFile);
 		this.geometries = this.importer.getGeometries();
 
 		//set determined extreme value coordinates
