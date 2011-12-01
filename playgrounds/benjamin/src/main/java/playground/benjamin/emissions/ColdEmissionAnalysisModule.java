@@ -121,8 +121,8 @@ public class ColdEmissionAnalysisModule {
 
 	private Map<ColdPollutant, Double> calculateColdEmissions(
 			Id personId,
-			Double parkingDuration,
-			Double accumulatedDistance,
+			double parkingDuration,
+			double accumulatedDistance,
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<ColdPollutant, Double>();
@@ -155,7 +155,7 @@ public class ColdEmissionAnalysisModule {
 		key.setHbefaParkingTime(parkingDuration_h);
 		
 		for (ColdPollutant coldPollutant : ColdPollutant.values()) {
-			Double generatedEmissions;
+			double generatedEmissions;
 			
 			key.setHbefaComponent(coldPollutant);
 			

@@ -61,8 +61,8 @@ public class WarmEmissionAnalysisModule {
 	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
 	private static Set<Id> vehicleIdSet = new HashSet<Id>();
 
-	static int eventCounter = 0;
-	static int freeFlowCounter = 0;
+	static int emissionEventCounter = 0;
+	static int fractionCounter = 0;
 	static int stopGoCounter = 0;
 
 	public WarmEmissionAnalysisModule(
@@ -132,13 +132,13 @@ public class WarmEmissionAnalysisModule {
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 
-		double freeFlowSpeed;
-		double stopGoSpeed;
-		double efFreeFlow;
-		double efStopGo;
+		double freeFlowSpeed_kmh;
+		double stopGoSpeed_kmh;
+		double efFreeFlow_gpkm;
+		double efStopGo_gpkm;
 
 		for (WarmPollutant warmPollutant : WarmPollutant.values()) {
-			Double generatedEmissions;
+			double generatedEmissions;
 
 			keyFreeFlow.setHbefaComponent(warmPollutant);
 			keyStopAndGo.setHbefaComponent(warmPollutant);
@@ -152,16 +152,16 @@ public class WarmEmissionAnalysisModule {
 				keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 				
 				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
-					freeFlowSpeed = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
-					stopGoSpeed = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
-					efFreeFlow = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
-					efStopGo = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+					freeFlowSpeed_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
+					stopGoSpeed_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
+					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 				} else {
-					freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
-					stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
-					efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
-					efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+					freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+					stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
+					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 					if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
 						vehAttributesNotSpecifiedCnt++;
@@ -172,30 +172,32 @@ public class WarmEmissionAnalysisModule {
 					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
-				freeFlowSpeed = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
-				stopGoSpeed = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
-				efFreeFlow = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
-				efStopGo = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+				freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+				stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
+				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
+				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 				vehAttributesNotSpecified.add(personId);
 			}
-			//TODO: is this really the "right" way of doing this?!?
-			double linkLength_m = linkLength / 1000;
-			double averageSpeed = linkLength_m / (travelTime / 3600);
-			if (averageSpeed < stopGoSpeed) {
-				generatedEmissions = linkLength_m * efFreeFlow;
-				freeFlowCounter++;
-			} else {
-				Double stopGoTime = (linkLength_m / averageSpeed) - (linkLength_m / freeFlowSpeed);
-				Double stopGoFraction = stopGoSpeed * stopGoTime;
-				Double freeFlowFraction = linkLength_m - stopGoFraction;
 
-				generatedEmissions = (freeFlowFraction * efFreeFlow) + (stopGoFraction * efStopGo);
+			double linkLength_km = linkLength / 1000;
+			double travelTime_h = travelTime / 3600;
+			double averageSpeed_kmh = linkLength_km / travelTime_h;
+			
+			if (averageSpeed_kmh <= stopGoSpeed_kmh) {
+				generatedEmissions = linkLength_km * efStopGo_gpkm;
 				stopGoCounter++;
+			} else {
+				double timeStopGo_h = (linkLength_km / averageSpeed_kmh) - (linkLength_km / freeFlowSpeed_kmh);
+				double distanceStopGo_km = stopGoSpeed_kmh * timeStopGo_h;
+				double distanceFreeFlow_km = linkLength_km - distanceStopGo_km;
+
+				generatedEmissions = (distanceFreeFlow_km * efFreeFlow_gpkm) + (distanceStopGo_km * efStopGo_gpkm);
+				fractionCounter++;
 			}
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
-		eventCounter++;
+		emissionEventCounter++;
 		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
 	}
@@ -233,15 +235,15 @@ public class WarmEmissionAnalysisModule {
 		return vehicleIdSet;
 	}
 
-	public static int getFreeFlowOccurences() {
-		return freeFlowCounter / WarmPollutant.values().length;
+	public static int getFractionOccurences() {
+		return fractionCounter / WarmPollutant.values().length;
 	}
 	
 	public static int getStopGoOccurences() {
 		return stopGoCounter / WarmPollutant.values().length;
 	}
 
-	public static int getEventCounter() {
-		return eventCounter;
+	public static int getWarmEmissionEventCounter() {
+		return emissionEventCounter;
 	}
 }
