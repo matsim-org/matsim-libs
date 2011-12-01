@@ -154,7 +154,7 @@ public class GUI extends JFrame {
 	public void updateView(LinkedList<Double> timeSteps, HashMap<String, Agent> agents)
 	{
 		renderer.updateView(timeSteps, agents);
-		guiInfo.updateView(timeSteps, agents);
+		guiInfo.updateView(timeSteps);
 		
 	}
 

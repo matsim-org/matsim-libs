@@ -29,6 +29,8 @@ public class GUIToolbar extends JPanel {
 	
 	Controller controller;
 	
+	boolean isPaused = false;
+	
 	public GUIToolbar(Controller controller)
 	{
 		this.controller = controller;
@@ -41,16 +43,23 @@ public class GUIToolbar extends JPanel {
         buttonPause = new JButton("pause");
         buttonPlay = new JButton("play");
         
-        JPanel panelButtons = new JPanel(new GridLayout(0,3));
-        
-        
         buttonPlay.addActionListener(new ActionPlay());
         buttonPause.addActionListener(new ActionPause());
         buttonRewind.addActionListener(new ActionRewind());
         
-        panelButtons.add(buttonRewind);
+        JPanel panelButtons;
+        
+        if (!controller.isLiveMode())
+        {
+        	panelButtons = new JPanel(new GridLayout(0,3));
+	        panelButtons.add(buttonPlay);
+	        panelButtons.add(buttonRewind);
+        }
+        else
+        	panelButtons = new JPanel(new BorderLayout());
+        
         panelButtons.add(buttonPause);
-        panelButtons.add(buttonPlay);
+        	
         
         add(panelButtons, BorderLayout.NORTH);
         add(labelTitle, BorderLayout.CENTER);
@@ -76,6 +85,13 @@ public class GUIToolbar extends JPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			// TODO Auto-generated method stub
 		
+			isPaused = !isPaused;
+			
+			if (isPaused)
+				buttonPause.setText("play");
+			else
+				buttonPause.setText("pause");
+				
 			controller.pause();
 		}
 		

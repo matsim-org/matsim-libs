@@ -2,6 +2,7 @@ package playground.wdoering.debugvisualization.model;
 
 import java.util.HashMap;
 
+@Deprecated
 public class Scene
 {
 	double time;

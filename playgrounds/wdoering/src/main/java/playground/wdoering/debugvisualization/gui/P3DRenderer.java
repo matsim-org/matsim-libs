@@ -687,9 +687,12 @@ public class P3DRenderer extends PApplet
 
 
 		//console.println(timeSteps);
+		
+		//agents from synchronized agent data controller
+		try { agentsCopy = (HashMap<String, Agent>)agentDataController.getAgents().clone(); } catch (Exception e) {}
 
 		
-		if ((this.agents != null) && (this.timeSteps != null))
+		if ((this.agentsCopy != null) && (this.timeSteps != null))
 		{
 			if (this.timeSteps.size()>0)
 			{
@@ -709,14 +712,6 @@ public class P3DRenderer extends PApplet
 				
 				displayingData = true;
 				
-				//TODO syncrhonisierte get Methode!
-//				HashMap<String, Agent> agentsCopy = (HashMap<String, Agent>) this.agents.clone();
-//				agentsCopy = null;
-				try {
-					 agentsCopy = (HashMap<String, Agent>)agentDataController.getAgents().clone();
-				} catch (Exception e) {
-//					System.out.println("");
-				}
 				
 				if (agentsCopy!=null)
 				{
@@ -827,8 +822,8 @@ public class P3DRenderer extends PApplet
 								{
 									
 									//calculate v
-									float v = (float)(lastDataPoint.getvX()*lastDataPoint.getvX()
-											+ lastDataPoint.getvY()*lastDataPoint.getvY());
+									float v = (float)Math.sqrt((lastDataPoint.getvX()*lastDataPoint.getvX()
+											+ lastDataPoint.getvY()*lastDataPoint.getvY()));
 									
 									//create tooltip string, save x + y position
 									toolTipAgentText = "Agent " +  currentAgentID  + " | V: " + v + "\ncurrent link: " + currentAgent.getCurrentLinkID();
@@ -863,7 +858,7 @@ public class P3DRenderer extends PApplet
 					if (drawTooltip)
 					{
 						//draw white box
-						fill(255, 255, 255, 150);
+						fill(255, 255, 255, 190);
 						rect(mouseX+(this.agentSize/2), mouseY+(this.agentSize/2), 180, 80);
 						
 						//draw text
