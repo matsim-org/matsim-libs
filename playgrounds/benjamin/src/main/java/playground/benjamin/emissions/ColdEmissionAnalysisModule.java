@@ -42,16 +42,28 @@ import playground.benjamin.emissions.types.HbefaVehicleAttributes;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 
 /**
- * Two categories for distance driven AFTER coldstart:
+ * 2 categories for distance driven AFTER coldstart:
  * <ul>
- * <li> 0-1km </li>
- * <li> 1-2km </li>
+ * <li> 0 - 1 km </li>
+ * <li> 1 - 2 km </li>
  * </ul>
- * HBEFA 3.1 does not provide further distance categories for cold start emission factors; <br>
- * HBEFA 3.1 does not provide cold start emission factors for Heavy Goods Vehicles; <br>
- * <br>
- * The biggest part of cold start emissions is known to be emitted during the first few kilometers;
- * here it is assumed to be emitted at the first link of the leg.
+ * 
+ * 13 categories for parking time BEFORE coldstart:
+ * <ul>
+ * <li> 0 - 1 h [1]</li>
+ * <li> 1 - 2 h [2]</li>
+ * <li> ... </li>
+ * <li> 11 - 12 h [12]</li>
+ * <li> > 12 h [13]</li>
+ * </ul>
+ * 
+ * Remarks:
+ * <ul>
+ * <li>HBEFA 3.1 does not provide further distance categories for cold start emission factors; <br>
+ * <li>HBEFA 3.1 does not provide cold start emission factors for Heavy Goods Vehicles; <br>
+ * <li>The major part of cold start emissions is known to be emitted during the first few kilometers;
+ * here it is assumed to be emitted on the first link of the leg.
+ * </ul>
  * 
  * 
  * @author benjamin
@@ -171,9 +183,9 @@ public class ColdEmissionAnalysisModule {
 				generatedEmissions = this.avgHbefaColdTable.get(key).getColdEmissionFactor();
 				vehAttributesNotSpecified.add(personId);
 			}
-			vehicleIdSet.add(personId);
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
+		vehicleIdSet.add(personId);
 		return coldEmissionsOfEvent;
 	}
 

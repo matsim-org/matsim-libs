@@ -86,6 +86,10 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyShutdown(ShutdownEvent event) {
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
+		logger.info("Freeflow occured for " + WarmEmissionAnalysisModule.getFreeFlowOccurences() + " of " +
+				WarmEmissionAnalysisModule.getEventCounter() + " link leave events.");
+		logger.info("Stop&Go occured for " + WarmEmissionAnalysisModule.getStopGoOccurences() + " of " +
+				WarmEmissionAnalysisModule.getEventCounter() + " link leave events.");
 		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
 				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
 				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
