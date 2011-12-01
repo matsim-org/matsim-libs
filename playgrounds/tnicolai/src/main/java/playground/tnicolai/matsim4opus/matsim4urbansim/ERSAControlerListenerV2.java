@@ -20,7 +20,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.matsim4urbansim.ERSAControlerListener.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -160,12 +160,17 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
 				
-				// assign accessibility 
-				this.travelCostAccessibilityMap.put(originNode.getId(), Math.log( accessibilityTravelTimeCosts ));
-				this.travelDistanceAccessibilityMap.put(originNode.getId(), Math.log( accessibilityTravelDistanceCosts ));
-				this.travelTimeAccessibilityMap.put(originNode.getId(), Math.log( accessibilityTravelTimes ));
-			
-				AccessibilityCSVWriter.write(originNode, accessibilityTravelTimes, accessibilityTravelTimeCosts, accessibilityTravelDistanceCosts);
+				double travelCostLogSum = Math.log( accessibilityTravelTimeCosts );
+				double travelDistanceLogSum = Math.log( accessibilityTravelDistanceCosts );
+				double travelTimeLogSum = Math.log( accessibilityTravelTimes );
+				
+				// assigning each accessibility value with current node id (as key) to corresponding hash map
+				this.travelCostAccessibilityMap.put(originNode.getId(), travelCostLogSum );
+				this.travelDistanceAccessibilityMap.put(originNode.getId(), travelDistanceLogSum );
+				this.travelTimeAccessibilityMap.put(originNode.getId(), travelTimeLogSum );
+				
+				// using hash maps to dump out log sum of current node in csv format
+				AccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
 			}
 			this.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with " + numberOfStartNodes

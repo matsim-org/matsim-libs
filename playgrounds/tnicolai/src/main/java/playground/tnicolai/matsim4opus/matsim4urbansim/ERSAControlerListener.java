@@ -51,6 +51,7 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
@@ -196,14 +197,15 @@ public class ERSAControlerListener implements ShutdownListener{
 					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobCounter; // tnicolai: find another beta for travel distance
 				}
 				
+				// assign log sums (accessibilities) to current starZone object. 
 				setAccessibilityValue2StartZone(startZone,
 						accessibilityTravelTimes, accessibilityTravelTimeCosts,
 						accessibilityTravelDistanceCosts);
 				
-				// sets the accessibility values for each spatial grid (travel times, travel costs and travel distance)
+				// accessibility values stored in current starZone object are now used in spatial grid
 				setAccessiblityValue2SpatialGrid(startZone);
 				
-				// dumping results into csv file
+				// writing accessibility values (stored in starZone object) in csv format ...
 				dumpCSVData(accessibilityIndicatorWriter, startZone, coordFromZone);
 			}
 			System.out.println("");
@@ -425,42 +427,42 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	
 	
-	/**
-	 * cost calculator for travel distances
-	 * @author thomas
-	 *
-	 */
-	static class TravelDistanceCostCalculator implements TravelCost{
-		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
-		
-		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-			if(link != null)
-				return link.getLength();
-			log.warn("Link is null. Reurned 0 as link length.");
-			return 0.;
-		}
-	}
+//	/**
+//	 * cost calculator for travel distances
+//	 * @author thomas
+//	 *
+//	 */
+//	static class TravelDistanceCostCalculator implements TravelCost{
+//		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
+//		
+//		@Override
+//		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+//			if(link != null)
+//				return link.getLength();
+//			log.warn("Link is null. Returned 0 as link length.");
+//			return 0.;
+//		}
+//	}
 	
-	/**
-	 * cost calculator for travel times
-	 * @author thomas
-	 *
-	 */
-	static class TravelTimeCostCalculator implements TravelCost{
-//		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
-		
-		protected final TravelTime timeCalculator;
-		
-		public TravelTimeCostCalculator(final TravelTime timeCalculator) {
-			this.timeCalculator = timeCalculator;
-		}
-		
-		@Override
-		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-			return this.timeCalculator.getLinkTravelTime(link, time);
-		}
-	}
+//	/**
+//	 * cost calculator for travel times
+//	 * @author thomas
+//	 *
+//	 */
+//	static class TravelTimeCostCalculator implements TravelCost{
+////		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
+//		
+//		protected final TravelTime timeCalculator;
+//		
+//		public TravelTimeCostCalculator(final TravelTime timeCalculator) {
+//			this.timeCalculator = timeCalculator;
+//		}
+//		
+//		@Override
+//		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
+//			return this.timeCalculator.getLinkTravelTime(link, time);
+//		}
+//	}
 	
 	// tnicolai: these methods are not needed anymore 
 //	/**

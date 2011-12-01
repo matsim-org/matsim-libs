@@ -33,6 +33,13 @@ public class FixedSizeGrid {
 	private int coarseningSteps;
 	private double resolution;
 	
+	/**
+	 * creates numbers 
+	 * @param resolutionMeter
+	 * @param network
+	 * @param resultMap
+	 * @param coarseningSteps
+	 */
 	public FixedSizeGrid(final double resolutionMeter, final NetworkImpl network, final Map<Id, AccessibilityStorage> resultMap, int coarseningSteps){
 		
 		logger.info("Initializing Grid ...");
@@ -53,8 +60,8 @@ public class FixedSizeGrid {
 		this.minY = boundary.getMinY();
 		this.rowPoints = (int)Math.ceil( boundary.getYLength() / resolutionMeter ) + 1;
 		this.colPoints = (int)Math.ceil( boundary.getXLength() / resolutionMeter ) + 1;
-		this.maxX = minX + ((colPoints - 1) * resolutionMeter);
-		this.maxY = minY + ((rowPoints - 1) * resolutionMeter);
+		this.maxX = minX + ((colPoints - 1) * resolutionMeter); // round up max x-coordinate 
+		this.maxY = minY + ((rowPoints - 1) * resolutionMeter); // round up max y-coordinate
 		
 		logger.info("Determined area:");
 		logger.info("Y Min: " + this.minY);
@@ -95,6 +102,11 @@ public class FixedSizeGrid {
 			write(coarseFactor);
 	}
 	
+	/**
+	 * writing grid matrices as txt file into "matsim4opus/tmp" directory
+	 * 
+	 * @param coarseFactor
+	 */
 	private void write(int coarseFactor){
 		
 		logger.info("Writing accessibility matrix with coarse factor = " + coarseFactor);
@@ -102,7 +114,7 @@ public class FixedSizeGrid {
 		logger.info("The matrix has a relolution of " + currResolution + " meter.");
 		
 		try{
-			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_CSV);
+			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
 			
 			// writing x coordinates (header)
 			for(int col = 0; (col < colPoints) && (col % Math.pow(2, coarseFactor)) == 0; col++ ){
@@ -123,22 +135,28 @@ public class FixedSizeGrid {
 				// writing y-coordinates (header)
 				ttWriter.write( String.valueOf( yCoord ) );
 				
-				
+				// writing a row (at yCoord)
 				for(int col = 0; (col < colPoints) && (col % Math.pow(2, coarseFactor)) == 0; col++ ){
 					ttWriter.write("\t");
 					ttWriter.write( String.valueOf( grid[row][col].getTravelTimeAccessibility() ));
-//					System.out.println("col: " + col + " row: " + row);
 				}
 				ttWriter.newLine();
 			}
+			// close writer
 			ttWriter.flush();
 			ttWriter.close();
+			
+			logger.info("Done writing accessibility matrix with coase factor " + coarseFactor + "!");
 		}
 		catch(IOException ioe){
 			ioe.printStackTrace();
 		}
 	}
 
+	/**
+	 * Testing only
+	 * @param args
+	 */
 	public static void main(String args[]){
 		
 		for(int i = 0; i < 30; i++){

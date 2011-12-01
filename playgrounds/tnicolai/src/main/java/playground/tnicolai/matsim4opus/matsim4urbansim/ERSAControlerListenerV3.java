@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.math.genetics.FixedGenerationCount;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,7 +18,7 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.FixedSizeGrid;
-import playground.tnicolai.matsim4opus.matsim4urbansim.ERSAControlerListener.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -115,11 +114,14 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				double accessibilityTravelTimeCosts = 0.;
 				double accessibilityTravelDistanceCosts = 0.;
 				
-				// go through all jobs (nearest network node) and calculate workplace accessibility
+				// iterate through all aggregated jobs (respectively their nearest network nodes) 
+				// and calculate workplace accessibility for current start/origin node.
 				for ( int i = 0; i < this.aggregatedWorkplaces.length; i++ ) {
 					
+					// get stored network node (this is the nearest node next to an aggegated workplace)
 					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
+					// using number of aggegated workplaces as weight for log sum measure
 					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfJobs();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
@@ -144,10 +146,13 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				double tCostAccessibility = Math.log( accessibilityTravelTimeCosts );
 				double tDistanceAccessibility = Math.log( accessibilityTravelDistanceCosts );
 				
+				// storing accessibility measures of different cost functions (log sums) in a storage
 				AccessibilityStorage as = new AccessibilityStorage(tTimeAccessibility, tCostAccessibility, tDistanceAccessibility);
 				
+				// assigning each storage object with its corresponding node id
 				this.resultMap.put(originNode.getId(), as);
-			
+				
+				// writing accessibility measures of current node in csv format
 				AccessibilityCSVWriter.write(originNode, tTimeAccessibility, tCostAccessibility, tDistanceAccessibility);
 			}
 			
@@ -163,18 +168,16 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		}
 		catch(Exception e){ e.printStackTrace(); }
 		finally{
-			// writing accessibility as matrix
+			// writing accessibility measures stored in a hash map as matrix
 			int coarseSteps = 10;
 			FixedSizeGrid grid = new FixedSizeGrid(resolutionMeter, network, resultMap, coarseSteps);
 			grid.writeGrid();
 			
-			// dumping workplace data
+			// writing aggregated workplace data in csv format
 			AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedWorkplaces );
 			
-			// accessibility measures in csv format were written while computing, just closing file now .
+			// finalizing/closing csv file containing accessibility measures
 			AccessibilityCSVWriter.close();
 		}
 	}
-	
-
 }
