@@ -16,7 +16,7 @@ import org.matsim.core.population.routes.*;
  * @author michalm
  *
  */
-public class PlanBasedDynAgentLogic
+public class PlanToDynAgentLogicAdapter
     implements DynAgentLogic
 {
     private DynAgent agent;
@@ -26,7 +26,7 @@ public class PlanBasedDynAgentLogic
     /**
      * @param plan (always starts with Activity)
      */
-    public PlanBasedDynAgentLogic(Plan plan)
+    public PlanToDynAgentLogicAdapter(Plan plan)
     {
         planElemIter = plan.getPlanElements().iterator();
     }

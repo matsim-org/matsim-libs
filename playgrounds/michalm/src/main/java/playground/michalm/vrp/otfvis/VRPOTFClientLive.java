@@ -61,13 +61,13 @@ public class VRPOTFClientLive
                 connectionManager.connectReceiverToLayer(OGLSimpleQuadDrawer.class,
                         OGLSimpleStaticNetLayer.class);
                 connectionManager.connectReaderToReceiver(OTFLinkAgentsHandler.class,
-                        VRPAgentPointDrawer.class);
-                connectionManager.connectReceiverToLayer(VRPAgentPointDrawer.class,
+                        AgentPointDrawer.class);
+                connectionManager.connectReceiverToLayer(AgentPointDrawer.class,
                         OGLAgentPointLayer.class);
                 connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class,
                         OTFAgentsListHandler.class);
                 connectionManager.connectReaderToReceiver(OTFAgentsListHandler.class,
-                        VRPAgentPointDrawer.class);
+                        AgentPointDrawer.class);
 
                 if (config.scenario().isUseTransit()) {
                     connectionManager.connectWriterToReader(FacilityDrawer.Writer.class,
@@ -94,6 +94,8 @@ public class VRPOTFClientLive
                     connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class,
                             SimpleSceneLayer.class);
                 }
+                
+                
                 OTFClient otfClient = new OTFClient();
                 otfClient.setServer(server);
                 SettingsSaver saver = new SettingsSaver("otfsettings");

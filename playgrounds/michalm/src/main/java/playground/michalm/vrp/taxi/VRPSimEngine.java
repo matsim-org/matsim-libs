@@ -61,19 +61,19 @@ public class VRPSimEngine
 
         optimize(0);// "0" should not be hard-coded
 
-        if (VRPOTFClientLive.queryControl != null) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run()
-                {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run()
+            {
+                if (VRPOTFClientLive.queryControl != null) {
                     for (Vehicle v : vrpData.getVehicles()) {
                         QueryAgentPlan query = new QueryAgentPlan();
                         query.setId(v.getName());
                         VRPOTFClientLive.queryControl.createQuery(query);
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
 
