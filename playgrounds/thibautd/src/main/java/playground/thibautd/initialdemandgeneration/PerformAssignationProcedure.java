@@ -37,8 +37,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.balmermi.census2000v2.modules.PlansAnalyse;
-
 import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MzGroupsModule;
 import playground.thibautd.utils.MoreIOUtils;
