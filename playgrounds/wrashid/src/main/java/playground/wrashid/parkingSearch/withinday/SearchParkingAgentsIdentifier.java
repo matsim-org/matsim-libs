@@ -20,45 +20,59 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class SearchParkingAgentsIdentifier extends DuringLegIdentifier {
+public class SearchParkingAgentsIdentifier extends DuringLegIdentifier implements SimulationInitializedListener {
 	
 	/*
 	 * TODO:
 	 * Add a datastructure that logs when an agent has been replanned
 	 */
-	private final LinkReplanningMap linkReplanningMap;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final Map<Id, PlanBasedWithinDayAgent> agents;
 	
-	public SearchParkingAgentsIdentifier(LinkReplanningMap linkReplanningMap, ParkingAgentsTracker parkingAgentsTracker) {
-		this.linkReplanningMap = linkReplanningMap;
+	public SearchParkingAgentsIdentifier(ParkingAgentsTracker parkingAgentsTracker) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
+		
+		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
 	}
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 
-		Set<PlanBasedWithinDayAgent> agents = this.linkReplanningMap.getLegPerformingAgents();
+		Set<Id> searchingAgents = this.parkingAgentsTracker.getSearchingAgents();		
+		Set<PlanBasedWithinDayAgent> identifiedAgents = new TreeSet<PlanBasedWithinDayAgent>();
 		
-		for (PlanBasedWithinDayAgent agent : agents) {
-			
-			/*
-			 * - get current link Id
-			 * - get current link
-			 * - get destination facility (leg after the parking activity!!!)
-			 * - calculate distance to facility
-			 * - decide whether replanning should be enabled
-			 */
-//			agent.getCurrentLinkId()
+		for (Id agentId : searchingAgents) {
+			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			if (requiresReplanning(agent)) identifiedAgents.add(agent);
 		}
 		
-		return new TreeSet<PlanBasedWithinDayAgent>();
+		return identifiedAgents;
+	}
+	
+	private boolean requiresReplanning(PlanBasedWithinDayAgent agent) {
+		return false;
+	}
+
+	@Override
+	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		this.agents.clear();
+		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
+			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
+		}
 	}
 
 

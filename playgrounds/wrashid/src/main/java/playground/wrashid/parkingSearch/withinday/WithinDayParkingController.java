@@ -22,11 +22,15 @@ package playground.wrashid.parkingSearch.withinday;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -47,7 +51,10 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
-public class WithinDayParkingController extends WithinDayController implements SimulationInitializedListener, StartupListener {
+import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
+
+public class WithinDayParkingController extends WithinDayController implements SimulationInitializedListener, 
+	StartupListener, ReplanningListener {
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -57,7 +64,9 @@ public class WithinDayParkingController extends WithinDayController implements S
 	protected DuringLegIdentifier searchParkingAgentsIdentifier;
 	protected WithinDayDuringLegReplanner duringLegReplanner;
 
+	protected LegModeChecker legModeChecker;
 	protected ParkingAgentsTracker parkingAgentsTracker;
+	protected InsertParkingActivities insertParkingActivities;
 	protected ParkingInfrastructure parkingInfrastructure;
 	
 	public WithinDayParkingController(String[] args) {
@@ -86,7 +95,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		 * to do a replanning. -> replace duringLegIdentifier with your own implementation
 		 */
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
-		this.searchParkingAgentsIdentifier = new SearchParkingAgentsIdentifier(linkReplanningMap, parkingAgentsTracker);		
+		this.searchParkingAgentsIdentifier = new SearchParkingAgentsIdentifier(parkingAgentsTracker);		
 		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.searchParkingAgentsIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
@@ -107,16 +116,34 @@ public class WithinDayParkingController extends WithinDayController implements S
 		super.createAndInitTravelTimeCollector();
 		super.createAndInitLinkReplanningMap();
 		
-		LegModeChecker legModeChecker = new LegModeChecker(this.scenarioData, this.createRoutingAlgorithm());
+		// ensure that all agents' plans have valid mode chains
+		legModeChecker = new LegModeChecker(this.scenarioData, this.createRoutingAlgorithm());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 		
 		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData);
 		
-		parkingAgentsTracker = new ParkingAgentsTracker();
+		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 30000.0);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
+		
+		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
+		
+		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities);
+		this.setMobsimFactory(mobsimFactory);		
+	}
+
+	@Override
+	public void notifyReplanning(ReplanningEvent event) {
+		/*
+		 * During the replanning the mode chain of the agents' selcted plans
+		 * might have been changed. Therefore, we have to ensure that the 
+		 * chains are still valid.
+		 */
+		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
+			legModeChecker.run(person.getSelectedPlan());			
+		}
 	}
 	
 	@Override
@@ -128,7 +155,6 @@ public class WithinDayParkingController extends WithinDayController implements S
 		 * Add parking activities to the executed plans of the agents before the mobsim is started
 		 * and ensure that agents' vehicles are parked where they want to use the for the first time.
 		 */
-		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
 		for (MobsimAgent agent : sim.getAgents()) {
 			Plan plan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
 			insertParkingActivities.run(plan);

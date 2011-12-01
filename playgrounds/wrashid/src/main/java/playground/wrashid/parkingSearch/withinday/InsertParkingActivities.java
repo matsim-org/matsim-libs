@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InsertParkingActivities.java
+ * InsertParkingActivitiesReplanner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -116,6 +116,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		ActivityImpl activity = (ActivityImpl) this.scenario.getPopulation().getFactory().createActivityFromLinkId("parking", linkId);
 		activity.setMaximumDuration(180);
 		activity.setCoord(parkingFacility.getCoord());
+		activity.setFacilityId(parkingFacilityId);
 		return activity;
 	}
 	

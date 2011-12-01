@@ -38,9 +38,8 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 public class ParkingInfrastructure {
 
 	private final QuadTree<ActivityFacility> parkingFacilities;
-	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId,
-																	// List<FacilityId>>
-	private final Map<Id, Id> facilityToLinkMapping; // <FacilityId, LinkId>
+	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
+	private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
 	private final IntegerValueHashMap<Id> facilityCapacities;
 
 	public ParkingInfrastructure(Scenario scenario) {
