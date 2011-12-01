@@ -27,7 +27,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -54,6 +58,9 @@ import playground.thibautd.utils.charts.XYLineHistogramDataset;
  * @author thibautd
  */
 public class DataPloter {
+	private static final Logger log =
+		Logger.getLogger(DataPloter.class);
+
 	private final JoinableTrips trips;
 
 	public DataPloter(final JoinableTrips trips) {
@@ -236,11 +243,21 @@ public class DataPloter {
 
 		// collect data: parse passenger trips and update driver info
 		Map<Id, Integer> counts = new TreeMap<Id, Integer>();
+		Set<Id> passengersIds = new TreeSet<Id>();
+		Set<Id> potentialPassengersIds = new TreeSet<Id>();
+
 		for (JoinableTrips.TripRecord trip : filteredTrips) {
 			Integer count;
+			potentialPassengersIds.add( trip.getAgentId() );
 
 			for (JoinableTrips.JoinableTrip driverTrip : trip.getJoinableTrips()) { 
+				boolean passengerKnown = false;
 				if (validator.isValid(driverTrip)) {
+					if (!passengerKnown) {
+						passengersIds.add( trip.getAgentId() );
+						passengerKnown = true;
+					}
+
 					count = counts.get( driverTrip.getTripId() );
 
 					if ( count == null ) {
@@ -254,6 +271,11 @@ public class DataPloter {
 				}
 			}
 		}
+
+		// log info on really possible passenger trips
+		log.info( "information for condition "+filter+"\n"+validator+"\n\n"+
+				potentialPassengersIds.size()+" filtered potential passengers, "+
+				passengersIds.size()+" have a joint trip opportunity" );
 
 		// create chart
 		for ( Map.Entry<Id, Integer> count : counts.entrySet() ) {

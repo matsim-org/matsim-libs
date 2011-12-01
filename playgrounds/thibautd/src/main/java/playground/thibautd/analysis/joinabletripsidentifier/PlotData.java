@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.DriverTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.PassengerFilter;
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
@@ -52,6 +53,7 @@ public class PlotData {
 		Logger.getLogger(PlotData.class);
 
 	private static double LONGER_DIST = 25 * 1000;
+	private static double LONGER_DRIVER_DIST = 100 * 1000;
 
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
@@ -96,7 +98,17 @@ public class PlotData {
 		DataPloter ploter = new DataPloter(reader.getJoinableTrips());
 		CommutersFilter filter = new CommutersFilter(network, -1, -1);
 		CommutersFilter shortFilter = new CommutersFilter(network, -1, LONGER_DIST);
-		ChartsAxisUnifier unifier = new ChartsAxisUnifier( false , true );
+		ShortDriverTripValidator shortDriverTripValidator =
+			new ShortDriverTripValidator( network , LONGER_DRIVER_DIST );
+
+		List<ChartsAxisUnifier> unifiers = new ArrayList<ChartsAxisUnifier>();
+		ChartsAxisUnifier perDistanceUnifier = new ChartsAxisUnifier( false , true );
+		unifiers.add( perDistanceUnifier );
+		ChartsAxisUnifier perTimeUnifier = new ChartsAxisUnifier( false , true );
+		unifiers.add( perTimeUnifier );
+		ChartsAxisUnifier passengersPerDriverUnifier = new ChartsAxisUnifier( false , true );
+		unifiers.add( passengersPerDriverUnifier );
+
 		List< Tuple< String , ChartUtil > > charts = 
 			 new ArrayList< Tuple< String , ChartUtil > >();
 
@@ -110,7 +122,7 @@ public class PlotData {
 			ChartUtil chart = ploter.getBasicBoxAndWhiskerChart(
 					filter,
 					condition);
-			unifier.addChart( chart );
+			perTimeUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
 						outputDir+count+"-TimePlot.png",
 						chart) );
@@ -119,7 +131,7 @@ public class PlotData {
 					filter,
 					condition,
 					network);
-			unifier.addChart( chart );
+			perDistanceUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
 						outputDir+count+"-DistancePlot.png",
 						chart) );
@@ -128,7 +140,7 @@ public class PlotData {
 					shortFilter,
 					condition,
 					network);
-			unifier.addChart( chart );
+			perDistanceUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
 						outputDir+count+"-DistancePlot-short.png",
 						chart) );
@@ -139,9 +151,19 @@ public class PlotData {
 					filter,
 					condition,
 					network);
-			unifier.addChart( chart );
+			passengersPerDriverUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
 						outputDir+count+"-nPassengers-per-drivers.png",
+						chart) );
+
+			shortDriverTripValidator.setValidator( condition );
+			chart = ploter.getBoxAndWhiskerChartNPassengersPerDriverTripLength(
+					filter,
+					shortDriverTripValidator,
+					network);
+			passengersPerDriverUnifier.addChart( chart );
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+count+"-nPassengers-per-drivers-short.png",
 						chart) );
 
 			// VIA: home and work locations of passengers and drivers
@@ -173,7 +195,9 @@ public class PlotData {
 
 		// format and save
 		// ---------------------------------------------------------------------
-		unifier.applyUniformisation();
+		for (ChartsAxisUnifier unifier : unifiers) {
+			unifier.applyUniformisation();
+		}
 		for (Tuple<String, ChartUtil> chart : charts) {
 			chart.getSecond().saveAsPng(
 					chart.getFirst(),
@@ -266,7 +290,11 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	@Override
 	public String getConditionDescription() {
-		return "all drivers\nacceptable distance = "+condition.getDistance()+" m"+
+		return "all drivers\n"+getTailDescription();
+	}
+
+	public String getTailDescription() {
+		return "acceptable distance = "+condition.getDistance()+" m"+
 			"\nacceptable time = "+(condition.getTime()/60d)+" min";
 	}
 
@@ -343,3 +371,40 @@ class ConditionValidator implements TwofoldTripValidator {
 	}
 }
 
+/**
+ * Wraps a condition validator, and only accepts trips valid for this validator
+ * and which obey to a max-distance criterion.
+ */
+class ShortDriverTripValidator implements DriverTripValidator {
+	private final double maxDist;
+	private JoinableTrips trips = null;
+	private ConditionValidator validator = null;
+	private final Network network;
+
+	public ShortDriverTripValidator(
+			final Network network,
+			final double maxDist) {
+		this.network = network;
+		this.maxDist = maxDist;
+	}
+
+	@Override
+	public void setJoinableTrips(final JoinableTrips joinableTrips) {
+		trips = joinableTrips;
+	}
+
+	public void setValidator( final ConditionValidator validator ) {
+		this.validator = validator;
+	}
+
+	@Override
+	public boolean isValid(final JoinableTrip driverTrip) {
+		return validator.isValid( driverTrip ) && trips.getTripRecords().get(
+				driverTrip.getTripId() ).getDistance( network ) <= maxDist;
+	}
+
+	@Override
+	public String getConditionDescription() {
+		return "maximum driver trips distance: "+maxDist+"\n"+validator.getTailDescription();
+	}
+}
