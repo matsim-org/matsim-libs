@@ -64,7 +64,7 @@ class MzGroup {
 	// /////////////////////////////////////////////////////////////////////////
 	// get
 	// /////////////////////////////////////////////////////////////////////////
-	Person getRandomWeightedPerson() {
+	public Person getRandomWeightedPerson() {
 		isModifiable = false;
 
 		if (values.size() == 0) throw new RuntimeException( "try to draw from empty group "+id );
@@ -78,6 +78,10 @@ class MzGroup {
 		}
 
 		throw new RuntimeException( "problem while drawing a random person" );
+	}
+
+	public int size() {
+		return values.size();
 	}
 }
 

@@ -75,12 +75,20 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 		boolean has_educ = hasEducation( person );
 
 		Person mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),person.getSex(),person.getLicense(), has_work, has_educ);
+		// if (mz_p == null) {
+		// 	log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
+		// 	mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);
+		// 	log.warn("=> Assigning same demographics except that person is handled as a female. NOTE: Works only for CH-Microcensus 2005.");
+		// 	if (mz_p == null) {
+		// 		Gbl.errorMsg("No corresponding MZ record found for person "+person.getId()+". In CH-Microcensus 2005: That should not happen!");
+		// 	}
+		// }
 		if (mz_p == null) {
 			log.warn("pid="+person.getId()+": Person does not belong to a micro census group!");
-			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);
-			log.warn("=> Assigning same demographics except that person is handled as a female. NOTE: Works only for CH-Microcensus 2005.");
+			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(), person.getSex() ,person.getLicense(), has_work, false);
+			log.warn("=> Assigning same demographics except that person is handled as not having education. Note that it may produce significant bias for week days.");
 			if (mz_p == null) {
-				Gbl.errorMsg("No corresponding MZ record found for person "+person.getId()+". In CH-Microcensus 2005: That should not happen!");
+				Gbl.errorMsg("No corresponding MZ record found for person "+person.getId());
 			}
 		}
 		person.addPlan(mz_p.getSelectedPlan());
@@ -111,24 +119,31 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 		KnowledgeImpl knowledge =
 			knowledges.getKnowledgesByPersonId().get(p.getId());
 
-		switch (day) {
-			case week: 
-				return !knowledge.getActivities(CAtts.ACT_EKIGA).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EPRIM).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_ESECO).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EHIGH).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
-			case saturday:
-				return !knowledge.getActivities(CAtts.ACT_EKIGA).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EPRIM).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_ESECO).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EHIGH).isEmpty() ||
-					!knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
-			case sunday:
-				// only for "other" types
-				return !knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
-			default:
-				throw new RuntimeException( "error in detecting the day" );
-		}
+		//switch (day) {
+		//	case week: 
+		//		return !knowledge.getActivities(CAtts.ACT_EKIGA).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EPRIM).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_ESECO).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EHIGH).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
+		//	case saturday:
+		//		return !knowledge.getActivities(CAtts.ACT_EKIGA).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EPRIM).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_ESECO).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EHIGH).isEmpty() ||
+		//			!knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
+		//	case sunday:
+		//		// only for "other" types
+		//		return !knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
+		//	default:
+		//		throw new RuntimeException( "error in detecting the day" );
+		//}
+
+		// otherwise, inconsistent with the way the "educated" flag is set in MZ
+		return !knowledge.getActivities(CAtts.ACT_EKIGA).isEmpty() ||
+				!knowledge.getActivities(CAtts.ACT_EPRIM).isEmpty() ||
+				!knowledge.getActivities(CAtts.ACT_ESECO).isEmpty() ||
+				!knowledge.getActivities(CAtts.ACT_EHIGH).isEmpty() ||
+				!knowledge.getActivities(CAtts.ACT_EOTHR).isEmpty();
 	}
 }

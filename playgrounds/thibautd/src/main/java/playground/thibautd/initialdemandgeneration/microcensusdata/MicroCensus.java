@@ -130,6 +130,6 @@ public class MicroCensus {
 			final boolean has_educ) {
 		MzGroup g = groups.getGroup( age , sex , lic , has_work , has_educ );
 
-		return g.getRandomWeightedPerson();
+		return g.size() > 0 ? g.getRandomWeightedPerson() : null;
 	}
 }
