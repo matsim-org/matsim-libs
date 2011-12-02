@@ -172,11 +172,17 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			final String act_type) {
 		ArrayList<String> act_types = new ArrayList<String>();
 		if (act_type.startsWith(S)) {
-			act_types.add(CAtts.ACT_S1); act_types.add(CAtts.ACT_S2); act_types.add(CAtts.ACT_S3);
-			act_types.add(CAtts.ACT_S4); act_types.add(CAtts.ACT_S5); act_types.add(CAtts.ACT_SOTHR);
+			act_types.add(CAtts.ACT_S1);
+			act_types.add(CAtts.ACT_S2);
+			act_types.add(CAtts.ACT_S3);
+			act_types.add(CAtts.ACT_S4);
+			act_types.add(CAtts.ACT_S5);
+			act_types.add(CAtts.ACT_SOTHR);
 		}
 		else if (act_type.startsWith(L)) {
-			act_types.add(CAtts.ACT_LC); act_types.add(CAtts.ACT_LG); act_types.add(CAtts.ACT_LS);
+			act_types.add(CAtts.ACT_LC);
+			act_types.add(CAtts.ACT_LG);
+			act_types.add(CAtts.ACT_LS);
 		}
 		else {
 			Gbl.errorMsg("act_type="+act_type+" not allowed!");
@@ -203,9 +209,16 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	//////////////////////////////////////////////////////////////////////
 
 	private final QuadTree<ActivityOption> getActivities(final String act_type) {
-		if (act_type.startsWith(S)) { return this.shopActQuadTree; }
-		else if (act_type.startsWith(L)) { return this.leisActQuadTree; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		if (act_type.startsWith(S)) {
+			return this.shopActQuadTree;
+		}
+		else if (act_type.startsWith(L)) {
+			return this.leisActQuadTree;
+		}
+		else {
+			Gbl.errorMsg("act_type=" + act_type + " not allowed!");
+			return null;
+		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -215,7 +228,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			final double radius,
 			final String act_type) {
 		Collection<ActivityOption> acts =
-			this.getActivities(act_type).get(
+			this.getActivities( act_type ).get(
 					coord.getX(),
 					coord.getY(),
 					radius);
@@ -246,7 +259,11 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					coord2.getY(),
 					radius));
 		if (acts.isEmpty()) {
-			if (radius > 200000.0) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000.0) {
+				Gbl.errorMsg("radius>200'000 meters and still no facility found "+
+						"for acttype="+act_type+
+						" and coords={ "+coord1+" ; "+coord2+" }");
+			}
 			return this.getActivity( coord1 , coord2 , 2.0 * radius , act_type);
 		}
 		return this.getActivity( acts , act_type );

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -70,77 +72,87 @@ import playground.thibautd.utils.MoreIOUtils;
  * @author thibautd
  */
 public class PerformAssignationProcedure {
+	private static final Logger log =
+		Logger.getLogger(PerformAssignationProcedure.class);
+
 	public static final String CONF_GROUP = "assignation";
 	public static final String POP_FILE_FIELD_REGEXP = "mzPopulationFile.*";
 	public static final String DOW_FIELD = "dayOfWeek";
 	public static final String OUT_FIELD = "outputDir";
 
 	public static void main( final String[] args ) {
-		String configFile = args[ 0 ];
-		MzGroupsModule groups = new MzGroupsModule();
-		Config config = ConfigUtils.createConfig( );
-		config.addModule( MzGroupsModule.NAME , groups );
-		ConfigUtils.loadConfig( config , configFile );
-		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
-		Module configGroup = config.getModule( CONF_GROUP );
-		String outputDir = configGroup.getValue( OUT_FIELD );
+		try{
+			String configFile = args[ 0 ];
+			MzGroupsModule groups = new MzGroupsModule();
+			Config config = ConfigUtils.createConfig( );
+			config.addModule( MzGroupsModule.NAME , groups );
+			ConfigUtils.loadConfig( config , configFile );
+			ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
+			Module configGroup = config.getModule( CONF_GROUP );
+			String outputDir = configGroup.getValue( OUT_FIELD );
 
-		MoreIOUtils.initOut( outputDir );
+			MoreIOUtils.initOut( outputDir );
 
-		List<String> popFiles = new ArrayList<String>();
+			List<String> popFiles = new ArrayList<String>();
 
-		for (Map.Entry<String, String> entry : configGroup.getParams().entrySet()) {
-			if (entry.getKey().matches( POP_FILE_FIELD_REGEXP )) {
-				popFiles.add( entry.getValue() );
+			for (Map.Entry<String, String> entry : configGroup.getParams().entrySet()) {
+				if (entry.getKey().matches( POP_FILE_FIELD_REGEXP )) {
+					popFiles.add( entry.getValue() );
+				}
 			}
-		}
 
-		MicroCensus mz = new MicroCensus( groups , popFiles );
+			MicroCensus mz = new MicroCensus( groups , popFiles );
 
-		// construct the routine
-		// ---------------------------------------------------------------------
-		List<PersonAlgorithm> algos = new ArrayList<PersonAlgorithm>();
-		Knowledges knowledges = scen.getKnowledges();
-		ActivityFacilities facilities = scen.getActivityFacilities();
-		// first assign  act chains
-		algos.add( new PersonAssignActivityChains(
-				getDay( configGroup ),
-				mz,
-				knowledges));
-		// then, set location of primary activities
-		algos.add( new PersonSetLocationsFromKnowledge(
-					knowledges,
-					facilities) );
-		// then, search for close secondary activity locations, and assign them
-		algos.add( new PersonAssignShopLeisureLocations(
-					facilities ) );
-		// fill the knowledge (the class is badly named. see javadoc)
-		algos.add( new PersonAssignPrimaryActivities(
-					knowledges,
-					facilities) );
-		// finally, make facility / activity link information consistent
-		algos.add( new PersonAssignToNetwork(
-					scen.getNetwork(),
-					facilities) );
+			// construct the routine
+			// ---------------------------------------------------------------------
+			List<PersonAlgorithm> algos = new ArrayList<PersonAlgorithm>();
+			Knowledges knowledges = scen.getKnowledges();
+			ActivityFacilities facilities = scen.getActivityFacilities();
+			// first assign  act chains
+			algos.add( new PersonAssignActivityChains(
+					getDay( configGroup ),
+					mz,
+					knowledges));
+			// then, set location of primary activities
+			algos.add( new PersonSetLocationsFromKnowledge(
+						knowledges,
+						facilities) );
+			// then, search for close secondary activity locations, and assign them
+			algos.add( new PersonAssignShopLeisureLocations(
+						facilities ) );
+			// fill the knowledge (the class is badly named. see javadoc)
+			algos.add( new PersonAssignPrimaryActivities(
+						knowledges,
+						facilities) );
+			// finally, make facility / activity link information consistent
+			algos.add( new PersonAssignToNetwork(
+						scen.getNetwork(),
+						facilities) );
 
-		// apply the routine
-		// ---------------------------------------------------------------------
-		for ( Person person : scen.getPopulation().getPersons().values() ) {
-			for (PersonAlgorithm algo : algos) {
-				algo.run( person );
+			// apply the routine
+			// ---------------------------------------------------------------------
+			for ( Person person : scen.getPopulation().getPersons().values() ) {
+				for (PersonAlgorithm algo : algos) {
+					algo.run( person );
+				}
 			}
-		}
 
-		new PlansAnalyse().run(scen.getPopulation());
-		for ( Population pop : mz.getPopulations() ) {
-			new PlansAnalyse().run(pop);
-		}
+			new PlansAnalyse().run(scen.getPopulation());
+			for ( Population pop : mz.getPopulations() ) {
+				new PlansAnalyse().run(pop);
+			}
 
-		(new PopulationWriter(
-				  scen.getPopulation(),
-				  scen.getNetwork(),
-				  scen.getKnowledges())).write(
-			  outputDir + "plans-"+getDay( configGroup ) +".xml.gz");
+			(new PopulationWriter(
+					  scen.getPopulation(),
+					  scen.getNetwork(),
+					  scen.getKnowledges())).write(
+				  outputDir + "plans-"+getDay( configGroup ) +".xml.gz");
+		} catch(Exception e) {
+			// Log the stack trace, and rethrow the exception.
+			// This allows the stack trace to be written to the logFile.
+			log.error( "got an uncaught exception", e );
+			throw new RuntimeException( e );
+		}
 	}
 
 	private static PersonAssignActivityChains.DayOfWeek
