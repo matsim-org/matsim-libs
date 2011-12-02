@@ -195,7 +195,7 @@ public class EventsTopology {
 		return this.events.subList(lowIndex, upperIndexUpperBound);
 	}
 
-	private class TimeComparator implements Comparator<Event> {
+	private static class TimeComparator implements Comparator<Event> {
 		public TimeComparator() {}
 
 		@Override

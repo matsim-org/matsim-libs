@@ -50,6 +50,7 @@ public class IdLeg implements Id {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) return false;
 		try {
 			return this.id == ((IdLeg) obj).id;
 		} catch (ClassCastException e) {

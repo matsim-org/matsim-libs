@@ -681,7 +681,7 @@ public class DurationOnTheFlyScorer implements FinalScorer {
 	/**
 	 * internal class, wrapping the int indices used to step through the plans.
 	 */
-	private class IndividualValuesWrapper {
+	private static class IndividualValuesWrapper {
 		private int indexInPlan = 0;
 		private int indexInChromosome = 0;
 		private double now = 0d;

@@ -64,11 +64,12 @@ public class PopulationOfCliquesFactory implements PopulationFactory {
 	}
 
 	/**
-	 * @return a Joint plan, with clique initialized to null
+	 * @throws UnsupportedOperationException always
 	 */
 	@Override
 	public Plan createPlan() {
-		return new JointPlan(null);
+		throw new UnsupportedOperationException( "cannot create a joint plan without clique" );
+		// return new JointPlan(null);
 	}
 
 	@Override

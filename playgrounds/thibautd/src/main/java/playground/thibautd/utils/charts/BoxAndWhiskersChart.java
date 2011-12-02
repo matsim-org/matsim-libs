@@ -204,7 +204,7 @@ public class BoxAndWhiskersChart extends ChartUtil {
 		if (plotStdDev) this.deviationBars.addElement( x , stdDevElement );
 	}
 
-	private class TupleComparator implements Comparator<Tuple<Double, ? extends Object>> {
+	private static class TupleComparator implements Comparator<Tuple<Double, ? extends Object>> {
 
 		@Override
 		public int compare(final Tuple<Double, ? extends Object> arg0,

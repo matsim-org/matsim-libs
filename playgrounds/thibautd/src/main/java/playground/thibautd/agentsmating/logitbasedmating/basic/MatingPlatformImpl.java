@@ -271,7 +271,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 		public class Edge {
 			// for "retro" edges in the residual graph
 			private final Edge realEdge;
-			private final int capacity = 1;
+			private static final int capacity = 1;
 			private int flow = 0;
 			private final double cost;
 
@@ -530,7 +530,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 		}
 	}
 
-	private class ResidualCapacityComparator implements Comparator<Graph.Edge> {
+	private static class ResidualCapacityComparator implements Comparator<Graph.Edge> {
 
 		@Override
 		public int compare(
@@ -540,7 +540,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 		}
 	}
 
-	private class FlowCounter {
+	private static class FlowCounter {
 		private final int maxFlow;
 		private int next;
 		private int step = 1;

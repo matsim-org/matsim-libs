@@ -151,7 +151,7 @@ public class CliquesXmlReader extends MatsimXmlParser {
 		if (name.equals(CliquesSchemaNames.CLIQUE)) {
 			//log.debug("adding members "+this.currentMembers+" to clique "+this.currentCliqueId);
 			this.cliques.put(
-					new String(this.currentCliqueId),
+					this.currentCliqueId,
 					new ArrayList<String>(this.currentMembers));
 			this.currentMembers.clear();
 		}

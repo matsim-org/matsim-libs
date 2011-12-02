@@ -514,21 +514,21 @@ public class JointPlan implements Plan {
 	 * separated by "-". No shared leg corresponds to the type "".
 	 */
 	public String getType() {
-		String type = "";
 		boolean notFirst = false;
 
+		StringBuffer type = new StringBuffer();
 		for (JointLeg currentJointLeg : this.legsMap.values()) {
 			if (currentJointLeg.getJoint()) {
 				if (notFirst) {
-					type += "-";
+					type.append( "-" );
 				} else {
 					notFirst = true;
 				}
-				type += currentJointLeg.getId();
+				type.append( currentJointLeg.getId() );
 			}
 		}
 
-		return type;
+		return type.toString();
 	}
 
 	public ScoresAggregatorFactory getScoresAggregatorFactory() {
@@ -540,7 +540,7 @@ public class JointPlan implements Plan {
 	 * plan synchronization helpers
 	 * =========================================================================
 	 */
-	private class IndividualValuesWrapper {
+	private static class IndividualValuesWrapper {
 		public int indexInPlan = 0;
 		public double now = 0d;
 		public boolean isFinished = false;

@@ -116,7 +116,7 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 			individualIndices = new ArrayList<Integer>();
 
 			for (; currentIndex < lastIndividualIndex; currentIndex++) {
-				individualIndices.add(new Integer(currentIndex));
+				individualIndices.add( currentIndex );
 			}
 
 			this.individualGenesIndices.put(

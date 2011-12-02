@@ -304,7 +304,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private class CliqueSizeInfo {
+	private static class CliqueSizeInfo {
 		public final List<Clique> cliques;
 		public final int cliqueSize;
 		public final BufferedWriter out;

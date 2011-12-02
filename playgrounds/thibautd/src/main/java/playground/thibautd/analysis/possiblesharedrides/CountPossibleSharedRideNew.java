@@ -77,8 +77,8 @@ public class CountPossibleSharedRideNew {
 
 	private static final double UPPER_X_BOUND = 30;
 
-	private final double eventInitialSearchWindow = 10*60d;
-	private final double eventSeachWindowIncr = 5*60d;
+	private static final double eventInitialSearchWindow = 10*60d;
+	private static final double eventSeachWindowIncr = 5*60d;
 
 	private final double acceptableDistance;
 	private final double timeWindowRadius;
@@ -770,7 +770,7 @@ public class CountPossibleSharedRideNew {
 	/**
 	 * stocks all relevant information related to a trip
 	 */
-	private class TripData {
+	private static class TripData {
 		public final double timeOfDay;
 		public final double distance;
 		public final int numberOfJoinableTrips;
@@ -808,7 +808,7 @@ public class CountPossibleSharedRideNew {
 		}
 	}
 
-	private class TripDataComparator implements Comparator<TripData> {
+	private static class TripDataComparator implements Comparator<TripData> {
 		public TripDataComparator() {};
 
 		@Override

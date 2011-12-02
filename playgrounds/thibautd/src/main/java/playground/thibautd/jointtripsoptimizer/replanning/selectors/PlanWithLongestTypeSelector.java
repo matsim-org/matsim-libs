@@ -60,7 +60,7 @@ public class PlanWithLongestTypeSelector implements PlanSelector {
 		return Collections.max(clique.getPlans(), comparator);
 	}
 
-	private class TypeComp implements Comparator<Plan> {
+	private static class TypeComp implements Comparator<Plan> {
 
 		@Override
 		public int compare(final Plan arg0, final Plan arg1) {

@@ -46,8 +46,8 @@ public class BoxAndWhiskerXYNumberDataset extends AbstractXYDataset implements B
 	private final List<String> seriesKeys = new ArrayList<String>();
 
 	// those are the (hard-coded) values of the BoxAndWhiskerCalculator
-	private final double faroutCoefficient = 2d;
-	private final double outlierCoefficient = 1.5d;
+	private static final double faroutCoefficient = 2d;
+	private static final double outlierCoefficient = 1.5d;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// add methods

@@ -35,7 +35,7 @@ import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
  */
 public abstract class LogitModel implements ChoiceModel {
 	private final Random random = new Random( 14325 );
-	private final double EPSILON = 1E-7;
+	private static final double EPSILON = 1E-7;
 	private final double scale;
 
 	public LogitModel() {

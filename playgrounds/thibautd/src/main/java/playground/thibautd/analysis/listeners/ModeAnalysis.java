@@ -197,7 +197,7 @@ public class ModeAnalysis implements
 		return output;
 	}
 	
-	private class Counter {
+	private static class Counter {
 		private int counter = 0;
 
 		public void increment() {

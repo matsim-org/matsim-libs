@@ -49,6 +49,7 @@ public class IdActivity implements Id {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null) return false;
 		try {
 			return this.id == ((IdActivity) obj).id;
 		} catch (ClassCastException e) {

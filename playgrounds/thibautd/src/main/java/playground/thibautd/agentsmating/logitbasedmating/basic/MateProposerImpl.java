@@ -183,7 +183,7 @@ public class MateProposerImpl implements MateProposer {
 	// /////////////////////////////////////////////////////////////////////////
 	// helper classes
 	// /////////////////////////////////////////////////////////////////////////
-	private class Wrapper<T extends TripRequest> {
+	private static class Wrapper<T extends TripRequest> {
 		public final double distance;
 		public final Coord origin;
 		public final Coord destination;

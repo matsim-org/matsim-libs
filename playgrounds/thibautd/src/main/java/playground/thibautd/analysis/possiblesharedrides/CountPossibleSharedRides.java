@@ -618,7 +618,7 @@ public class CountPossibleSharedRides {
 	/**
 	 * stocks all relevant information related to a trip
 	 */
-	private class TripData {
+	private static class TripData {
 		public final double timeOfDay;
 		public final double distance;
 		public final int numberOfJoinableTrips;
@@ -636,7 +636,7 @@ public class CountPossibleSharedRides {
 		}
 	}
 
-	private class TripDataComparator implements Comparator<TripData> {
+	private static class TripDataComparator implements Comparator<TripData> {
 		public TripDataComparator() {};
 
 		@Override
