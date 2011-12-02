@@ -273,7 +273,9 @@ public class DataPloter {
 		}
 
 		// log info on really possible passenger trips
-		log.info( "information for condition "+filter+"\n"+validator+"\n\n"+
+		log.info( "information for condition "+
+				filter.getConditionDescription()+"\n"+
+				validator.getConditionDescription()+"\n\n"+
 				potentialPassengersIds.size()+" filtered potential passengers, "+
 				passengersIds.size()+" have a joint trip opportunity" );
 
