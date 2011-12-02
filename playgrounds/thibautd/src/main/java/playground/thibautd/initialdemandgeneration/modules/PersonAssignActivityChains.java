@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.initialdemandgeneration;
+package playground.thibautd.initialdemandgeneration.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -27,6 +27,7 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
+import playground.thibautd.initialdemandgeneration.CAtts;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
 
 /**
