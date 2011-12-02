@@ -105,8 +105,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
-				if (a.getType().equals(CAtts.ACT_S1) || a.getType().equals(CAtts.ACT_S2) || a.getType().equals(CAtts.ACT_S3) ||
-				    a.getType().equals(CAtts.ACT_S4) || a.getType().equals(CAtts.ACT_S5) || a.getType().equals(CAtts.ACT_SOTHR)) {
+				if ( CAtts.ACTS_SHOP.contains( a.getType() ) ) {
 					acts.add(a);
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -139,7 +138,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
-				if (a.getType().equals(CAtts.ACT_LC) || a.getType().equals(CAtts.ACT_LG) || a.getType().equals(CAtts.ACT_LS)) {
+				if ( CAtts.ACTS_LEISURE.contains( a.getType() ) ) {
 					acts.add(a);
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -279,7 +278,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			double r = DEFAULT_RADIUS;
 			ActivityOptionImpl activity = (ActivityOptionImpl)
 				this.getActivity( c_start , r , act.getType());
-			act.setType(activity.getType());
+			act.setType( activity.getType() );
 			act.setFacilityId( activity.getFacility().getId() );
 			act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
 		}
