@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * copied-paste from balmermi
  */
@@ -45,10 +48,16 @@ public abstract class CAtts {
 	public static final String ACT_S4 = "shop_retail_get1000sqm";
 	public static final String ACT_S5 = "shop_retail_gt2500sqm";
 	public static final String ACT_SOTHR = "shop_other";
+	public static final String ACT_SO = "shop";
+	public static final List<String> ACTS_SHOP = Arrays.asList(
+			ACT_S1 , ACT_S2 , ACT_S3 , ACT_S4 , ACT_S5 , ACT_SOTHR , ACT_SO);
 	
 	public static final String ACT_LC = "leisure_culture";
 	public static final String ACT_LG = "leisure_gastro";
 	public static final String ACT_LS = "leisure_sports";
+	public static final String ACT_L = "leisure";
+	public static final List<String> ACTS_LEISURE = Arrays.asList(
+			ACT_LC , ACT_LG , ACT_LS , ACT_L );
 
 	//////////////////////////////////////////////////////////////////////
 	// household identifiers

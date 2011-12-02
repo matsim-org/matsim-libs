@@ -172,17 +172,10 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			final String act_type) {
 		ArrayList<String> act_types = new ArrayList<String>();
 		if (act_type.startsWith(S)) {
-			act_types.add(CAtts.ACT_S1);
-			act_types.add(CAtts.ACT_S2);
-			act_types.add(CAtts.ACT_S3);
-			act_types.add(CAtts.ACT_S4);
-			act_types.add(CAtts.ACT_S5);
-			act_types.add(CAtts.ACT_SOTHR);
+			act_types.addAll( CAtts.ACTS_SHOP );
 		}
 		else if (act_type.startsWith(L)) {
-			act_types.add(CAtts.ACT_LC);
-			act_types.add(CAtts.ACT_LG);
-			act_types.add(CAtts.ACT_LS);
+			act_types.addAll( CAtts.ACTS_LEISURE );
 		}
 		else {
 			Gbl.errorMsg("act_type="+act_type+" not allowed!");
@@ -293,8 +286,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		else {
 			// c_start and c_end different
 			double r = Math.sqrt( dx*dx + dy*dy ) / 3.0;
-			dx = dx/6.0;
-			dy = dy/6.0;
+			dx = dx / 6.0;
+			dy = dy / 6.0;
 			Coord c1 = new CoordImpl(
 					c_start.getX() + dx,
 					c_start.getY() + dy);
@@ -309,50 +302,15 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					this.facilities.getFacilities().get( act.getFacilityId() ).getCoord());
 		}
 	}
-	
-	//private final void assignRemainingLocations(PlanImpl plan, int start, int end) {
-	//	Coord c_start = this.facilities.getFacilities().get(((ActivityImpl)plan.getPlanElements().get(start)).getFacilityId()).getCoord();
-	//	Coord c_end   = this.facilities.getFacilities().get(((ActivityImpl)plan.getPlanElements().get(end)).getFacilityId()).getCoord();
-	//	
-	//	double dx = c_end.getX() - c_start.getX();
-	//	double dy = c_end.getX() - c_start.getX();
-	//	if ((dx == 0.0) && (dy == 0.0)) {
-	//		// c_start and c_end equal
-	//		double r = DEFAULT_RADIUS;
-	//		for (int i=start+2; i<end; i=i+2) {
-	//			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-	//			ActivityOptionImpl activity = (ActivityOptionImpl)
-	//				this.getActivity( c_start , r , act.getType() );
-	//			act.setType(activity.getType());
-	//			act.setFacilityId(activity.getFacility().getId());
-	//			act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
-	//		}
-	//	}
-	//	else {
-	//		// c_start and c_end different
-	//		double r = Math.sqrt(dx*dx+dy*dy)/3.0;
-	//		dx = dx/6.0;
-	//		dy = dy/6.0;
-	//		Coord c1 = new CoordImpl(c_start.getX()+dx,c_start.getY()+dy);
-	//		Coord c2 = new CoordImpl(c_end.getX()-dx,c_end.getY()+dy);
-	//		for (int i=start+2; i<end; i=i+2) {
-	//			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
-	//			ActivityOptionImpl activity = (ActivityOptionImpl)
-	//				this.getActivity( c1 , c2 , r , act.getType() );
-	//			act.setType(activity.getType());
-	//			act.setFacilityId(activity.getFacility().getId());
-	//			act.setCoord(this.facilities.getFacilities().get(act.getFacilityId()).getCoord());
-	//		}
-	//	}
-	//}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
-
 	@Override
 	public void run(final Person person) {
-		if (person.getPlans().size() != 1) { Gbl.errorMsg("pid="+person.getId()+": There must be exactly one plan."); }
+		if (person.getPlans().size() != 1) {
+			Gbl.errorMsg("pid="+person.getId()+": There must be exactly one plan.");
+		}
 		Plan plan = person.getSelectedPlan();
 		this.run(plan);
 	}
@@ -380,7 +338,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 						break;
 					}
 				}
-				if ((start == null) || (end == null)) { Gbl.errorMsg("That should not happen!"); }
+				if ( (start == null) || (end == null) ) {
+					Gbl.errorMsg("That should not happen!");
+				}
 				this.assignRemainingLocations( act , start , end );
 			}
 		}
