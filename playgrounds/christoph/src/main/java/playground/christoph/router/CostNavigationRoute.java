@@ -141,21 +141,34 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		/*
 		 * Calculate the probabilities for each path. We use inverse values to
 		 * give short travel times a higher probability.
+		 * If phi = 0.0 (which means gamma0 = 1.0), we automatically use the 
+		 * least cost link. Otherwise we would run into divide by zero problems.
 		 */
-		double inverseSumLeastCosts = 0.0;
-		for (Entry<Id, Double> entry : costs.entrySet()) {
-			// if it is the least cost link
-			if (entry.getKey().equals(leastCostLinkId)) inverseSumLeastCosts += 1 / (phi*entry.getValue());
-
-			// else
-			else inverseSumLeastCosts += 1 / entry.getValue();
+		if (phi == 0.0) {
+			for (Entry<Id, Double> entry : costs.entrySet()) {
+				// if it is the least cost link
+				if (entry.getKey().equals(leastCostLinkId)) probabilities.put(entry.getKey(), 1.0);
+				
+				// else
+				else probabilities.put(entry.getKey(), 0.0);
+			}
 		}
-		for (Entry<Id, Double> entry : costs.entrySet()) {
-			// if it is the least cost link
-			if (entry.getKey().equals(leastCostLinkId)) probabilities.put(entry.getKey(), (1 / (phi*entry.getValue())) / inverseSumLeastCosts);
-
-			// else
-			else probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
+		else {		
+			double inverseSumLeastCosts = 0.0;
+			for (Entry<Id, Double> entry : costs.entrySet()) {
+				// if it is the least cost link
+				if (entry.getKey().equals(leastCostLinkId)) inverseSumLeastCosts += 1 / (phi*entry.getValue());
+				
+				// else
+				else inverseSumLeastCosts += 1 / entry.getValue();
+			}
+			for (Entry<Id, Double> entry : costs.entrySet()) {
+				// if it is the least cost link
+				if (entry.getKey().equals(leastCostLinkId)) probabilities.put(entry.getKey(), (1 / (phi*entry.getValue())) / inverseSumLeastCosts);
+				
+				// else
+				else probabilities.put(entry.getKey(), (1 / entry.getValue()) / inverseSumLeastCosts);
+			}
 		}
 		
 		/*
