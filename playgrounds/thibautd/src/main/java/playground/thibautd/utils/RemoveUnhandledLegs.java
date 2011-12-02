@@ -71,10 +71,11 @@ public class RemoveUnhandledLegs {
 				scenario.getNetwork(),
 				((ScenarioImpl) scenario).getKnowledges());
 
+		String popFile = config.plans().getInputFile();
 		String outputFile =
-			configFile.matches(".*.xml.gz") ?
-			configFile.substring( 0 , configFile.length() - 7) + "-no-unhandled-leg.xml.gz" :
-			configFile.substring( 0 , configFile.length() - 4) + "-no-unhandled-leg.xml";
+			popFile.matches(".*.xml.gz") ?
+			popFile.substring( 0 , popFile.length() - 7) + "-no-unhandled-leg.xml.gz" :
+			popFile.substring( 0 , popFile.length() - 4) + "-no-unhandled-leg.xml";
 
 		popWriter.write( outputFile );
 	}
