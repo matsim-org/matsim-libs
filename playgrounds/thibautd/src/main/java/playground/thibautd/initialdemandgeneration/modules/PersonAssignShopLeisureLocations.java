@@ -220,7 +220,11 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					coord.getY(),
 					radius);
 		if (acts.isEmpty()) {
-			if (radius > 200000.0) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000.0) {
+				Gbl.errorMsg("radius>200'000 meters and still no facility found "+
+						"for acttype="+act_type+
+						" and coord="+coord);
+			}
 			return this.getActivity(coord , 2.0 * radius , act_type);
 		}
 		return this.getActivity( acts , act_type );
