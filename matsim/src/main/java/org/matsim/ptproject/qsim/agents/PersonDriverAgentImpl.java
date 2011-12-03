@@ -204,8 +204,13 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		} else if (pe instanceof Leg) {
 
 //			if ( ok ) {
-				this.simulation.arrangeAgentDeparture(this);
-				return ;
+
+//			    this.simulation.arrangeAgentDeparture(this);
+			this.state = MobsimAgent.State.LEG ;
+			this.simulation.arrangeNextAgentAction(this) ;
+
+			    
+			    return ;
 //			} else {
 //				throw new RuntimeException("should not be able to get here any more" ) ;
 ////				log.error("The agent " + this.getId() + " returned false from advancePlan.  Removing the ag from the mobsim ...");

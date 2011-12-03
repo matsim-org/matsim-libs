@@ -83,7 +83,11 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public void endActivityAndAssumeControl(double now) {
 		sendTransitDriverStartsEvent(now);
-		this.sim.arrangeAgentDeparture(this);
+
+//		this.sim.arrangeAgentDeparture(this);
+		
+		this.state = MobsimAgent.State.LEG ;
+		this.sim.arrangeNextAgentAction(this) ;
 	}
 
 	@Override

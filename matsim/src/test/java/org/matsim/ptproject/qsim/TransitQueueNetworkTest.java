@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.qsim;
+package org.matsim.ptproject.qsim;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,6 +47,13 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.fakes.FakeAgent;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.SimpleTransitStopHandler;
+import org.matsim.pt.qsim.TransitAgentFactory;
+import org.matsim.pt.qsim.TransitDriver;
+import org.matsim.pt.qsim.TransitQSimEngine;
+import org.matsim.pt.qsim.TransitQVehicle;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;

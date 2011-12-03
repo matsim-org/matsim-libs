@@ -229,6 +229,7 @@ public final class QSim implements VisMobsim, Netsim {
 	// "prepareSim" (triggered by "run"):
 
 	@Override
+	@Deprecated // use agent source instead.  kai/michaz, nov'11
 	public void setAgentFactory(final AgentFactory fac) {
 		throw new RuntimeException();
 	}
@@ -239,7 +240,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
-	protected final void prepareSim() {
+	 final void prepareSim() {
 		if (events == null) {
 			throw new RuntimeException(
 					"No valid Events Object (events == null)");
@@ -310,7 +311,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Close any files, etc.
 	 */
-	protected final void cleanupSim(final double seconds) {
+	 final void cleanupSim(final double seconds) {
 
 
 		if (this.netEngine != null) {
@@ -361,7 +362,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 *            the current time in seconds after midnight
 	 * @return true if the simulation needs to continue
 	 */
-	protected final boolean doSimStep(final double time) { // do not overwrite
+	 final boolean doSimStep(final double time) { // do not overwrite
 		// in inheritance.
 		// (network) change events engine:
 		if (this.changeEventsEngine != null) {
@@ -534,8 +535,7 @@ public final class QSim implements VisMobsim, Netsim {
 	 * 
 	 * @param agent
 	 */
-	@Override
-	public final void arrangeAgentDeparture(final MobsimAgent agent) {
+	private final void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId();
@@ -710,8 +710,8 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.simTimer;
 	}
 
-	// Just for one test. Not happy. michaz 11/11
-	public final MobsimEngine getNetsimEngine() {
+	/*package*/ final MobsimEngine getNetsimEngine() {
+		 // For a test
 		return this.netEngine;
 	}
 

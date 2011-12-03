@@ -92,7 +92,7 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
 public interface Mobsim extends ObservableSimulation {
 	void arrangeNextAgentAction( MobsimAgent agent ) ;
 	
-	void arrangeAgentDeparture(MobsimAgent planAgent);
+//	void arrangeAgentDeparture(MobsimAgent planAgent);
 
 	EventsManager getEventsManager();
 

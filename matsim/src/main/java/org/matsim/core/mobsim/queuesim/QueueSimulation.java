@@ -472,8 +472,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	 * @param agent
 	 * @param link the link where the agent departs
 	 */
-	@Override
-	public void arrangeAgentDeparture(final MobsimAgent agent) {
+	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;

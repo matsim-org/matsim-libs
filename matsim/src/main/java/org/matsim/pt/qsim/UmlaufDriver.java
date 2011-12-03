@@ -111,7 +111,10 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	public void endActivityAndAssumeControl(final double now) {
 		this.currentPlanElement = iPlanElement.next();
 		sendTransitDriverStartsEvent(now);	
-		this.sim.arrangeAgentDeparture(this);
+		
+//		this.sim.arrangeAgentDeparture(this);
+		this.state = MobsimAgent.State.LEG ;
+		this.sim.arrangeNextAgentAction(this) ;
 	}
 
 	@Override
@@ -127,6 +130,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 			}
 
 //			this.sim.arrangeActivityStart(this);
+			this.state = MobsimAgent.State.ACTIVITY ;
 			this.sim.arrangeNextAgentAction(this) ;
 
 		} else {

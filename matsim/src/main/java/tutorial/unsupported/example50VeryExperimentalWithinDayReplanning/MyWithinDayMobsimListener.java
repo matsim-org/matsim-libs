@@ -157,15 +157,11 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 				// (b) aborting a wait for pt:
 				TransitStopFacility stop = null;
 			//	((QSim)mobsim).getTransitEngine().getAgentTracker().removeAgentFromStop((PassengerAgent)withindayAgent, stop.getId());
-				// after this, it needs to start something else, e.g.:
-//				mobsim.arrangeActivityStart(withindayAgent);
-
+				// (don't know who commented this out. kai, nov'11)
+				
 				// (assuming that the state was set correctly inside the agent!!)
 				mobsim.arrangeNextAgentAction(withindayAgent) ;
 				
-				// or
-				mobsim.arrangeAgentDeparture(withindayAgent);
-
 				// (c) while inside vehicle and changing the desired stop to get off:
 				// can be done via reprogramming getExitAtStop();
 			}
