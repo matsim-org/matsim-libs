@@ -116,7 +116,11 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 						throw new RuntimeException();
 					}
 					AdapterAgent.this.mode = teleportTo.getMode() ;
-					simulation.arrangeAgentDeparture(AdapterAgent.this);
+
+//					simulation.arrangeAgentDeparture(AdapterAgent.this);
+					AdapterAgent.this.state = MobsimAgent.State.LEG ;
+					simulation.arrangeNextAgentAction(AdapterAgent.this) ;
+
 					AdapterAgent.this.teleportationBehavior = teleportTo;
 				}
 				
@@ -149,7 +153,11 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 					AdapterAgent.this.drivingBehavior = drivingBehavior;
 					AdapterAgent.this.mode = TransportMode.car ;
 					drivingBehavior.doSimStep(drivingWorld);
-					simulation.arrangeAgentDeparture(AdapterAgent.this);
+
+//					simulation.arrangeAgentDeparture(AdapterAgent.this);
+					AdapterAgent.this.state = MobsimAgent.State.LEG ;
+					simulation.arrangeNextAgentAction(AdapterAgent.this) ;
+					
 				}
 				
 			};

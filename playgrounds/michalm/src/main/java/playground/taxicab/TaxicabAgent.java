@@ -174,7 +174,9 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 			events.processEvent( evFac.createPersonEntersVehicleEvent(now, passenger.getId(), this.vehicle.getId(), this.getId() ) ) ;
 
-			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
+//			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
+			this.state = MobsimAgent.State.LEG ;
+			this.netsim.arrangeNextAgentAction(this);
 
 		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
 			// (= passenger on board, but having no request)
@@ -188,7 +190,9 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 			
 			this.destinationLinkId = NO_LINK ;
 			
-			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
+//			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
+			this.state = MobsimAgent.State.LEG ;
+			this.netsim.arrangeNextAgentAction(this) ;
 		
 		} else {
 			throw new RuntimeException("undefined state") ;
@@ -206,7 +210,10 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 	public void endActivityAndAssumeControl(double now) {
 		// this should, in theory, only happen at simulation start.
 
-		this.netsim.arrangeAgentDeparture(this) ;
+//		this.netsim.arrangeAgentDeparture(this) ;
+		this.state = MobsimAgent.State.LEG ;
+		this.netsim.arrangeNextAgentAction(this);
+		
 	}
 
 
