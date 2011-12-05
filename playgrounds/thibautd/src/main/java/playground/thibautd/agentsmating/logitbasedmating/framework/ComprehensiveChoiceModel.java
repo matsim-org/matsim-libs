@@ -109,9 +109,11 @@ public class ComprehensiveChoiceModel {
 			if (choice < currentBound) return entry.getKey();
 		}
 
-		// absolutely impossible to get here without bug
+		// should never reach this line
 		throw new RuntimeException( "choice procedure failed: sum of probabilities = "+currentBound+
-				" for agent "+plan.getPerson().getId());
+				" for agent "+plan.getPerson().getId()+
+				" with plan of length "+plan.getPlanElements().size()+
+				" and "+probs.size()+" possible mode chains" );
 	}
 
 	/**
@@ -154,14 +156,25 @@ public class ComprehensiveChoiceModel {
 	}
 
 	/**
+	 * Recursively constructs the possible mode chains, by explicitly
+	 * constructing the tree of possible mode chains: each node has as successors
+	 * the possible modes for the next leg.
+	 *
+	 * @param previousLeg the father node
+	 * @param decisionmaker the decision maker
+	 * @param fullChoiceSets a list of all possible modes for each coming leg,
+	 * or null if we reached the last leg.
 	 * @return the "leaves" nodes, ie, the full mode strings
 	 */
 	private List< LegChoiceNode > constructModeChains(
 			final LegChoiceNode previousLeg,
 			final DecisionMaker decisionMaker,
 			final List< List<Alternative> > fullChoiceSets) {
+		// if no more legs, return the previous leg in a list.
+		// it will be the last element of the list returned by the to call
 		if (fullChoiceSets == null) return Arrays.asList( previousLeg );
 
+		// construct the list of full choice sets for upcoming legs
 		List<Alternative> currentAlternatives = fullChoiceSets.get(0);
 		List< List<Alternative> > remainingAlternatives =
 			fullChoiceSets.size() > 1 ?
@@ -170,6 +183,7 @@ public class ComprehensiveChoiceModel {
 
 		List< LegChoiceNode > leaves = new ArrayList< LegChoiceNode >();
 		for (Alternative alt : currentAlternatives) {
+			// create the node corresponding to the current leg
 			LegChoiceNode currentNode = new LegChoiceNode(
 					decisionMaker,
 					previousLeg,
@@ -221,6 +235,12 @@ public class ComprehensiveChoiceModel {
 		return output;
 	}
 
+	/**
+	 * represents a node of the tree of possible mode chains.
+	 *
+	 * The interest of such a representation is that a node is
+	 * able to provide the restricted list of modes to its successors.
+	 */
 	private class LegChoiceNode {
 		private final LegChoiceNode previousLeg;
 		private final Alternative alt;
@@ -284,6 +304,25 @@ public class ComprehensiveChoiceModel {
 		}
 
 		/**
+		 * returns the list of possible modes for the next leg.
+		 * This list is computed in the following way:
+		 * <br>
+		 * <ul>
+		 * <li> if the leg is in the same subtour:
+		 * <ul>
+		 *     <li> if this node correspnds to a chain based mode, only the mode
+		 *     is possible.
+		 *     <li> otherwise, no chain based mode is possible
+		 * </ul>
+		 * <li> if the leg is in a direct "son" subtour
+		 * <ul>
+		 *     <li> if this node correspnds to a chain based mode, only this chain
+		 *     base mode is possible, in addition to all non-chain based modes
+		 *     <li> otherwise, no chain based mode is possible
+		 * </ul>
+		 * <li> otherwise, the procedure is repeated at the upper level of the tree
+		 * </ul>
+		 *
 		 * @return the list of possible modes for the next leg, given the subtour
 		 * it pertains
 		 */

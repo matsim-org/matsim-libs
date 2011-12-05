@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * The core class of the logit-based matings framework.
@@ -210,7 +211,9 @@ public class PlatformBasedModeChooser {
 			log.info( "mode choice is made at the trip level" );
 		}
 
+		Counter counter = new Counter( "executing choice procedure on plan # " );
 		for (Person person : population.getPersons().values()) {
+			counter.incCounter();
 			Plan plan = person.getSelectedPlan();
 			if ( !acceptPlan( plan ) ) continue;
 
@@ -246,6 +249,7 @@ public class PlatformBasedModeChooser {
 			}
 
 		}
+		counter.printCounter();
 
 		List<Mating> matings = platform.getMatings();
 		cliques = cliquesConstructor.processMatings(population, matings);
