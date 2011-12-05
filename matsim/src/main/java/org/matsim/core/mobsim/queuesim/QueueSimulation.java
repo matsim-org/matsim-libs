@@ -420,7 +420,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 	}
 
-	public final void arrangeNextAgentAction( MobsimAgent agent ) {
+	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		// yy the material of the methods could probably be inlined ... but this is not possible as 
 		// long as they are public.  kai, nov'11
 		

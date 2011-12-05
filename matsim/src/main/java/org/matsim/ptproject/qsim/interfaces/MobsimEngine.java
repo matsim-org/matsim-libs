@@ -20,6 +20,7 @@
 package org.matsim.ptproject.qsim.interfaces;
 
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.ptproject.qsim.InternalInterface;
 
 /**
  * Design thoughs:<ul>
@@ -42,5 +43,6 @@ public interface MobsimEngine extends Steppable {
    * Do some clean up.
    */
   public void afterSim();
+  public void setInternalInterface(InternalInterface internalInterface);
 
 }

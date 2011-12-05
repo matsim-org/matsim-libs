@@ -577,7 +577,7 @@ public class TransitQueueSimulationTest {
                     qSim.addParkedVehicle(veh, TestHandleStopSimulation.this.driver.getCurrentLeg().getRoute().getStartLinkId() );
 
 //                    qSim.arrangeActivityStart(TestHandleStopSimulation.this.driver);
-                    qSim.arrangeNextAgentAction(TestHandleStopSimulation.this.driver) ;
+                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver) ;
 
                     
                     qSim.getAgentCounter().incLiving();

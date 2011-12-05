@@ -137,6 +137,18 @@ public final class QSim implements VisMobsim, Netsim {
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
 
+	private InternalInterface internalInterface = new InternalInterface() {
+		@Override
+		public void arrangeNextAgentState(MobsimAgent agent) {
+			QSim.this.arrangeNextAgentAction(agent) ;
+		}
+
+		@Override
+		public Netsim getMobsim() {
+			return QSim.this ;
+		}
+	};
+
     // everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
 	// ============================================================================================================================
@@ -180,7 +192,6 @@ public final class QSim implements VisMobsim, Netsim {
 
 		// create the NetworkEngine ...
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
-
 
 
 
@@ -417,10 +428,12 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 	
-	public final void arrangeNextAgentAction( MobsimAgent agent ) {
-		// yy the material of the methods could probably be inlined ... but this is not possible as 
-		// long as they are public.  kai, nov'11
+	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		
+		arrangeNextAgentAction(agent);
+	}
+
+	private void arrangeNextAgentAction(MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY: 
 			this.arrangeActivityStart(agent) ; 
@@ -724,6 +737,7 @@ public final class QSim implements VisMobsim, Netsim {
         if (mobsimEngine instanceof TransitQSimEngine) {
             this.transitEngine = (TransitQSimEngine) mobsimEngine;
         }
+        mobsimEngine.setInternalInterface( this.internalInterface  ) ;
 		this.mobsimEngines.add(mobsimEngine);
 	}
 

@@ -88,7 +88,7 @@ public class TransitDriver extends AbstractTransitDriver {
 //		this.sim.arrangeAgentDeparture(this);
 		
 		this.state = MobsimAgent.State.LEG ;
-		this.sim.arrangeNextAgentAction(this) ;
+		this.sim.insertAgentIntoMobsim(this) ;
 	}
 
 	@Override

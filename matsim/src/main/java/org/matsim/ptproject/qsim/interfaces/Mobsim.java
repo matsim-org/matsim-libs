@@ -90,7 +90,11 @@ import org.matsim.ptproject.qsim.agents.AgentFactory;
  *
  */
 public interface Mobsim extends ObservableSimulation {
-	void arrangeNextAgentAction( MobsimAgent agent ) ;
+	/**
+	 * If you are not inserting (i.e. instantiating) an Agent, please try to use the 
+	 * InternalInterface .  kai, nov'11
+	 */
+	void insertAgentIntoMobsim( MobsimAgent agent ) ;
 	
 //	void arrangeAgentDeparture(MobsimAgent planAgent);
 

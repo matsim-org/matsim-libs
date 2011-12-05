@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
@@ -44,6 +45,12 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ Queue<MultiModalQNodeExtension> nodesToActivate;
 //	/*package*/ List<MultiModalQLinkExtension> linksToActivate;
 //	/*package*/ List<MultiModalQNodeExtension> nodesToActivate;
+
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
 	/*package*/ MultiModalSimEngine(Netsim qSim) {
 		this.qSim = qSim;

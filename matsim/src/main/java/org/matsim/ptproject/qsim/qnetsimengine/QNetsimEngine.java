@@ -36,12 +36,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -99,6 +99,12 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler ;
+	
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
 	public QNetsimEngine(final QSim sim, final Random random) {
 		this.random = random;

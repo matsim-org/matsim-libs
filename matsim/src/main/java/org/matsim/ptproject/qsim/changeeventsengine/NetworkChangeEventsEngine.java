@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
@@ -39,6 +40,12 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	private QSim qsim;
+
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
 	public NetworkChangeEventsEngine(QSim sim){
 		this.qsim = sim;

@@ -160,7 +160,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 				// (don't know who commented this out. kai, nov'11)
 				
 				// (assuming that the state was set correctly inside the agent!!)
-				mobsim.arrangeNextAgentAction(withindayAgent) ;
+				mobsim.insertAgentIntoMobsim(withindayAgent) ;
 				
 				// (c) while inside vehicle and changing the desired stop to get off:
 				// can be done via reprogramming getExitAtStop();

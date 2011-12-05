@@ -42,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -80,6 +81,12 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
 	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
+
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
 	public TransitQSimEngine(Netsim queueSimulation) {
 		this.qSim = queueSimulation;
@@ -151,7 +158,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		this.qSim.addParkedVehicle(veh, startLinkId);
 
 //		this.qSim.arrangeActivityStart(driver);
-		this.qSim.arrangeNextAgentAction(driver) ;
+		this.qSim.insertAgentIntoMobsim(driver) ;
 		
 		this.qSim.getAgentCounter().incLiving();
 		return driver;
@@ -176,7 +183,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 					this.qSim.addParkedVehicle(veh, startLinkId);
 
 //					this.qSim.arrangeActivityStart(driver);
-					this.qSim.arrangeNextAgentAction(driver) ;
+					this.qSim.insertAgentIntoMobsim(driver) ;
 
 					this.qSim.getAgentCounter().incLiving();
 					drivers.add(driver);

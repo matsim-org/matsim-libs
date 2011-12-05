@@ -50,6 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -69,6 +70,12 @@ public class TransitDriverTest extends MatsimTestCase {
 	static class FakeEngine implements MobsimEngine {
 		private Netsim netsim ;
 		
+		private InternalInterface internalInterface = null ;
+		@Override
+		public void setInternalInterface( InternalInterface internalInterface ) {
+			this.internalInterface = internalInterface ;
+		}
+
 		FakeEngine( Netsim netsim ) {
 			this.netsim = netsim ;
 		}
