@@ -38,7 +38,7 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 public class TransitDriver extends AbstractTransitDriver {
 
@@ -57,8 +57,9 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	// as long as all instance variables are final, it should be ok to leave "resetCaches" empty.  kai, oct'10
 
-	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, final TransitStopAgentTracker agentTracker, final Netsim sim) {
-		super(sim, agentTracker);
+	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
+			final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
+		super(trEngine, agentTracker);
 		PersonImpl driver = new PersonImpl(new IdImpl("ptDrvr_" + line.getId() + "_" + route.getId() + "_" + departure.getId().toString()));
 		this.carRoute = route.getRoute();
 		Plan plan = new PlanImpl();

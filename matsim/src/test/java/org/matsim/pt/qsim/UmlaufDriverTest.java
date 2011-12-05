@@ -56,6 +56,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.SingletonUmlaufBuilderImpl;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
@@ -106,10 +107,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, tracker, trEngine);
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
@@ -160,10 +163,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
 		TransitStopAgentTracker tracker = null;
 		QSim tqsim = null;
+		MobsimEngine trEngine = new TransitDriverTest.FakeEngine(tqsim) ;
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
@@ -188,10 +192,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -233,6 +239,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -243,7 +250,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -305,6 +312,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
@@ -316,7 +324,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -365,6 +373,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -375,7 +384,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.walk, tracker, trEngine);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -403,6 +412,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -413,7 +423,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -452,6 +462,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -462,7 +473,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -500,6 +511,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -510,7 +522,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
-		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, tqsim);
+		AbstractTransitDriver driver = new UmlaufDriver(umlauf, TransportMode.car, tracker, trEngine );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);

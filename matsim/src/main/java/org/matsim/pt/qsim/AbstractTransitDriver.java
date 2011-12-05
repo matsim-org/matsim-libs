@@ -45,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -78,9 +79,9 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriver(Netsim sim, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(MobsimEngine trEngine, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.sim = sim;
+		this.sim = trEngine.getMobsim() ;
 		this.agentTracker = agentTracker2;
 	}
 

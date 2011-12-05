@@ -1070,7 +1070,7 @@ public class TransitQueueNetworkTest extends TestCase {
             capacity.setStandingRoom(Integer.valueOf(0));
             vehicleType.setCapacity(capacity);
 
-            TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, qsim);
+            TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
             this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getId(), vehicleType), 1.0);
             this.qlink1.addParkedVehicle(this.transitVehicle);
             this.transitVehicle.setEarliestLinkExitTime(100);
@@ -1126,8 +1126,8 @@ public class TransitQueueNetworkTest extends TestCase {
     private static class FakeTransitDriver extends TransitDriver {
 
         public FakeTransitDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-                                 final TransitStopAgentTracker agentTracker, final QSim sim) {
-            super(line, route, departure, agentTracker, sim);
+                                 final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
+            super(line, route, departure, agentTracker, trEngine);
         }
 
         @Override

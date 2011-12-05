@@ -42,7 +42,7 @@ import org.matsim.pt.UmlaufStueckI;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 /**
  * @author michaz
@@ -89,8 +89,8 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	
 	public UmlaufDriver(Umlauf umlauf,
 			String transportMode,
-			TransitStopAgentTracker thisAgentTracker, Netsim transitQueueSimulation) {
-		super(transitQueueSimulation, thisAgentTracker);
+			TransitStopAgentTracker thisAgentTracker, MobsimEngine trEngine) {
+		super(trEngine, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		PersonImpl driverPerson = new PersonImpl(new IdImpl("pt_"+umlauf.getId()+"_line_"+umlauf.getLineId())); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.

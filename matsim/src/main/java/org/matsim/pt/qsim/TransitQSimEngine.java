@@ -142,7 +142,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private AbstractTransitDriver createAndScheduleVehicleAndDriver(Umlauf umlauf,
 			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle, 5);
-		AbstractTransitDriver driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this.qSim);
+		AbstractTransitDriver driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, this );
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
@@ -168,7 +168,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 						throw new NullPointerException("no vehicle id set for departure " + departure.getId() + " in route " + route.getId() + " from line " + line.getId());
 					}
 					TransitQVehicle veh = new TransitQVehicle(vehicles.getVehicles().get(departure.getVehicleId()), 5);
-					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this.qSim);
+					TransitDriver driver = new TransitDriver(line, route, departure, agentTracker, this );
 					veh.setDriver(driver);
 					veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 					driver.setVehicle(veh);

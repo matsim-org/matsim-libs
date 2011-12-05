@@ -89,6 +89,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
@@ -558,7 +559,9 @@ public class TransitQueueSimulationTest {
             qSim.addAgentSource(new AgentSource() {
                 @Override
                 public List<MobsimAgent> insertAgentsIntoMobsim() {
-                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, transitEngine.getAgentTracker(), qSim);
+                    TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, 
+                    		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
+                    		transitEngine.getAgentTracker(), transitEngine );
 
                     VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("transitVehicleType"));
                     VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -607,8 +610,8 @@ public class TransitQueueSimulationTest {
         public final List<SpyHandleStopData> spyData = new ArrayList<SpyHandleStopData>();
 
         public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-                         final TransitStopAgentTracker agentTracker, final QSim sim) {
-            super(line, route, departure, agentTracker, sim);
+                         final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
+            super(line, route, departure, agentTracker, trEngine);
         }
 
         @Override
