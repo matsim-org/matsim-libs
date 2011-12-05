@@ -117,7 +117,11 @@ public class FixedSizeGrid {
 			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
 			
 			// writing x coordinates (header)
-			for(int col = 0; (col < colPoints) && (col % Math.pow(2, coarseFactor)) == 0; col++ ){
+			for(int col = 0; (col < colPoints); col++ ){
+				
+				if(skipData(col, coarseFactor))
+					continue;
+				
 				
 				// determine x coord
 				double xCoord = this.minX + (col * currResolution);
@@ -128,7 +132,10 @@ public class FixedSizeGrid {
 			ttWriter.newLine();
 			
 			// writing accessibility values row by row with corresponding y-coordinates in first column (as header)
-			for(int row = rowPoints - 1; (row >= 0 ) && (row % Math.pow(2, coarseFactor)) == 0; row--){
+			for(int row = rowPoints - 1; row >= 0; row--){
+				
+				if(skipData(row, coarseFactor))
+					continue;
 				
 				//determine y coord
 				double yCoord = this.maxY - (row * currResolution);
@@ -136,7 +143,12 @@ public class FixedSizeGrid {
 				ttWriter.write( String.valueOf( yCoord ) );
 				
 				// writing a row (at yCoord)
-				for(int col = 0; (col < colPoints) && (col % Math.pow(2, coarseFactor)) == 0; col++ ){
+				for(int col = 0; col < colPoints; col++ ){
+					
+					if(skipData(col, coarseFactor))
+						continue;
+					
+					
 					ttWriter.write("\t");
 					ttWriter.write( String.valueOf( grid[row][col].getTravelTimeAccessibility() ));
 				}
@@ -151,6 +163,12 @@ public class FixedSizeGrid {
 		catch(IOException ioe){
 			ioe.printStackTrace();
 		}
+	}
+	
+	private boolean skipData(int row, int coarseFactor){
+		int mod = (int) (row % Math.pow(2, coarseFactor));
+		boolean b = (mod != 0);
+		return b;
 	}
 
 	/**
