@@ -40,7 +40,7 @@ import org.matsim.population.algorithms.PlanAnalyzeSubtours;
  */
 public class ComprehensiveChoiceModel {
 	private ChoiceModel tripLevelModel = null;
-	private PlanAnalyzeSubtours subtoursAnalyser = new PlanAnalyzeSubtours();
+	private final PlanAnalyzeSubtours subtoursAnalyser = new PlanAnalyzeSubtours();
 
 	private static final double EPSILON = 1E-7;
 	private static final int NO_FATHER_SUBTOUR = Integer.MIN_VALUE;
@@ -82,6 +82,10 @@ public class ComprehensiveChoiceModel {
 	// /////////////////////////////////////////////////////////////////////////
 	// choice methods
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * @return a list of {@link Alternative} instances, each corresponding to a
+	 * trip in the plan.
+	 */
 	public List<Alternative> performChoice(
 			final DecisionMaker decisionMaker,
 			final Plan plan) {
@@ -106,9 +110,13 @@ public class ComprehensiveChoiceModel {
 		}
 
 		// absolutely impossible to get here without bug
-		throw new RuntimeException( "choice procedure failed: sum of probabilities = "+currentBound );
+		throw new RuntimeException( "choice procedure failed: sum of probabilities = "+currentBound+
+				" for agent "+plan.getPerson().getId());
 	}
 
+	/**
+	 * @return a map linking mode sequences to choice probabilities
+	 */
 	public Map< List<Alternative> , Double > getChoiceProbabilities(
 			final DecisionMaker decisionMaker,
 			final Plan plan) {

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -34,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -51,14 +49,6 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  * @author thibautd
  */
 public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
-	// private static final double CAR_COST_PER_M = 0.06 / 1000; // CHF/m
-	// // consider a driver usually drives 10 minutes more when he picks up a passenger 
-	// private static final double SURPLUS_DRIVER = 10 * 60;
-	// // cost of pt, when GA, Halbtax or nothing
-	// private static final double GA_COST_PER_M = 0.08 / 1000; // 0.08 CHF/km
-	// private static final double HT_COST_PER_M = 0.15 / 1000; // 0.15 CHF/km
-	// private static final double PT_COST_PER_M = 0.28 / 1000; // 0.28 CHF/km
-
 	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 	private final Network network;
 	private final Population population;
