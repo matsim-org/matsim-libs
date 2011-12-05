@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.framework;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class PlatformBasedModeChooser {
 	private CliquesConstructor cliquesConstructor = null;
 	private ComprehensiveChoiceModel dayLevelChoiceModel =
 		new ComprehensiveChoiceModel();
+	private final List<PlanAcceptor> acceptors = new ArrayList<PlanAcceptor>();
 
 	private Population population = null;
 
@@ -66,6 +68,16 @@ public class PlatformBasedModeChooser {
 	private boolean isChanged = false;
 
 	private boolean useSubtourChoiceRestriction = true;
+
+	// /////////////////////////////////////////////////////////////////////////
+	// construction
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Initialises an instance, with null fields.
+	 */
+	public PlatformBasedModeChooser() {
+		acceptors.add( new BasicPlanAcceptor() );
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// public: getters and setters
@@ -159,6 +171,29 @@ public class PlatformBasedModeChooser {
 		return dayLevelChoiceModel != null;
 	}
 
+	/**
+	 * Adds an acceptibility condition for a plan to be eligible for mode
+	 * choice.
+	 *
+	 * @param acceptor the acceptor to add to the list
+	 */
+	public void addPlanAcceptor(final PlanAcceptor acceptor) {
+		acceptors.add( acceptor );
+	}
+
+	/**
+	 * Removes the first acceptor in the registered list wich is equals
+	 * to this acceptor, if it is present.
+	 * The equality condition considered is the one specified by the parameter
+	 * acceptor.
+	 *
+	 * @param acceptor the acceptor to remove from the list
+	 * @return true if an acceptor was actually removed
+	 */
+	public boolean removeAcceptor(final PlanAcceptor acceptor) {
+		return acceptors.remove( acceptor );
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// public: process data methods
 	// /////////////////////////////////////////////////////////////////////////
@@ -176,15 +211,17 @@ public class PlatformBasedModeChooser {
 		}
 
 		for (Person person : population.getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			if ( !acceptPlan( plan ) ) continue;
+
 			DecisionMaker decisionMaker;
+
 			try {
 				decisionMaker = getDecisionMakerFactory().createDecisionMaker(person);
 			} catch (DecisionMakerFactory.UnelectableAgentException e) {
 				// this agent cannot be handled: jump to the next one
 				continue;
 			}
-
-			Plan plan = person.getSelectedPlan();
 
 			if (person instanceof PersonImpl) {
 				((PersonImpl) person).removeUnselectedPlans();
@@ -280,5 +317,22 @@ public class PlatformBasedModeChooser {
 			}
 		}
 	}
+
+	private boolean acceptPlan(
+			final Plan plan) {
+		for (PlanAcceptor acceptor : acceptors) {
+			if ( !acceptor.accept( plan ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
 
+class BasicPlanAcceptor implements PlanAcceptor {
+
+	@Override
+	public boolean accept(final Plan plan) {
+		return plan.getPlanElements().size() > 1;
+	}
+}

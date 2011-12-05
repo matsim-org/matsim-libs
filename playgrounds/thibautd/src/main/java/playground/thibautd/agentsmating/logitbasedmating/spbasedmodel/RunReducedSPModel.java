@@ -172,6 +172,7 @@ public class RunReducedSPModel {
 				(ScenarioImpl) scenario,
 				model);
 
+		modeChooser.addPlanAcceptor( new NoFreightPlanAcceptor() );
 		modeChooser.process();
 		Map<Id, List<Id>> cliques = modeChooser.getCliques();
 		// //////////////////////// run the affectation... DONE
