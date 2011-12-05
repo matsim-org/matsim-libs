@@ -154,9 +154,9 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 					
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
-					// sum travel costs
+					// sum travel costs  (mention the beta)
 					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
-					// sum travel distances
+					// sum travel distances  (mention the beta)
 					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
 				
