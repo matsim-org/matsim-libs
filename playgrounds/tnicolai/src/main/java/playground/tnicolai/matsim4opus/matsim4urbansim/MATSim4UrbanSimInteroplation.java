@@ -102,7 +102,8 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/seattle_parcel_interpolation_config_quick.xml"});
+		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/psrc_parcel/results/ersa_after_submission/config/psrc_parcel_matsim_config_ERSA_Interploation.xml"});
+//		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/seattle_parcel_interpolation_config_quick.xml"});
 		m4ui.runMATSim();		
 	}
 	
