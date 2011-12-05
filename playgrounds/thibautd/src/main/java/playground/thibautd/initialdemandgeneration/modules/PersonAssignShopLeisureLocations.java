@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -40,7 +41,6 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.initialdemandgeneration.CAtts;
-
 
 /**
  * Taken from balmermi, and adapted fto be compatible with the current API.
@@ -83,12 +83,14 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignShopLeisureLocations(final ActivityFacilities facilities) {
+	public PersonAssignShopLeisureLocations(
+			final ActivityFacilities facilities,
+			final OpeningTime.DayType day) {
 		super();
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
-		this.buildShopActQuadTree();
-		this.buildLeisActQuadTree();
+		this.buildShopActQuadTree( day );
+		this.buildLeisActQuadTree( day );
 		log.info("    done.");
 	}
 
@@ -96,7 +98,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	// build methods
 	//////////////////////////////////////////////////////////////////////
 
-	private void buildShopActQuadTree() {
+	private void buildShopActQuadTree( final OpeningTime.DayType day ) {
 		log.info("      building shop activity quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
@@ -105,7 +107,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
-				if ( CAtts.ACTS_SHOP.contains( a.getType() ) ) {
+				if ( CAtts.ACTS_SHOP.contains( a.getType() ) ||
+						isCompatible( (ActivityOptionImpl) a , day ) ) {
 					acts.add(a);
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -129,7 +132,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		log.info("      done.");
 	}
 
-	private void buildLeisActQuadTree() {
+	private void buildLeisActQuadTree( final OpeningTime.DayType day ) {
 		log.info("      building leisure activity quad tree...");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
@@ -138,7 +141,8 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			for (ActivityOption a : f.getActivityOptions().values()) {
-				if ( CAtts.ACTS_LEISURE.contains( a.getType() ) ) {
+				if ( CAtts.ACTS_LEISURE.contains( a.getType() ) ||
+						isCompatible( (ActivityOptionImpl) a , day ) ) {
 					acts.add(a);
 					if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
 					if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
@@ -160,6 +164,25 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					a);
 		}
 		log.info("      done.");
+	}
+
+	private boolean isCompatible(
+			final ActivityOptionImpl option,
+			final OpeningTime.DayType day) {
+		for ( OpeningTime.DayType openingDay : option.getOpeningTimes().keySet() ) {
+			if ( openingDay.equals( day ) ) return true;
+			switch ( openingDay ) {
+				case wk: return true;
+				case wkday: return day.equals( OpeningTime.DayType.mon ) ||
+							day.equals( OpeningTime.DayType.tue ) ||
+							day.equals( OpeningTime.DayType.wed ) ||
+							day.equals( OpeningTime.DayType.thu ) ||
+							day.equals( OpeningTime.DayType.fri );
+				case wkend: return day.equals( OpeningTime.DayType.sat ) ||
+							day.equals( OpeningTime.DayType.sun ); 
+			}
+		}
+		return false;
 	}
 
 	//////////////////////////////////////////////////////////////////////

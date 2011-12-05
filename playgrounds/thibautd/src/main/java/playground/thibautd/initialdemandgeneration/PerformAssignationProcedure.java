@@ -90,6 +90,7 @@ public class PerformAssignationProcedure {
 			ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
 			Module configGroup = config.getModule( CONF_GROUP );
 			String outputDir = configGroup.getValue( OUT_FIELD );
+			PersonAssignActivityChains.DayOfWeek dow = getDay( configGroup );
 
 			MoreIOUtils.initOut( outputDir );
 
@@ -110,16 +111,17 @@ public class PerformAssignationProcedure {
 			ActivityFacilities facilities = scen.getActivityFacilities();
 			// first assign  act chains
 			algos.add( new PersonAssignActivityChains(
-					getDay( configGroup ),
-					mz,
-					knowledges));
+						dow,
+						mz,
+						knowledges));
 			// then, set location of primary activities
 			algos.add( new PersonSetLocationsFromKnowledge(
 						knowledges,
 						facilities) );
 			// then, search for close secondary activity locations, and assign them
 			algos.add( new PersonAssignShopLeisureLocations(
-						facilities ) );
+						facilities,
+						dow.toOpenningDay() ) );
 			// fill the knowledge (the class is badly named. see javadoc)
 			algos.add( new PersonAssignPrimaryActivities(
 						knowledges,

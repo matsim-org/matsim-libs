@@ -21,6 +21,7 @@ package playground.thibautd.initialdemandgeneration.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -38,7 +39,21 @@ import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
  */
 public class PersonAssignActivityChains extends AbstractPersonAlgorithm { 
 
-	public static enum DayOfWeek { week , saturday , sunday };
+	public static enum DayOfWeek {
+		week ,
+		saturday ,
+		sunday;
+	
+		public OpeningTime.DayType toOpenningDay() {
+			switch ( this ) {
+				case week: return OpeningTime.DayType.wkday;
+				case saturday: return OpeningTime.DayType.sat;
+				case sunday: return OpeningTime.DayType.sun;
+			}
+
+			return null;
+		}
+	};
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
