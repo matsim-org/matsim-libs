@@ -32,7 +32,7 @@ public class ScorAttrWriteTrigger implements IterationEndsListener {
 				.writeScoreAttrs(
 						controler.getControlerIO()
 						.getIterationFilename(iteration,
-								"scorAttr.log.gz"));
+						"scorAttr.log"));
 			}
 		}
 	}

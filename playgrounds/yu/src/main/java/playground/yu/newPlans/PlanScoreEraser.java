@@ -24,8 +24,8 @@ public class PlanScoreEraser extends NewPopulation implements PlanAlgorithm {
 		String networkFilename, populationFilename, outputPopulationFilename;
 		if (args.length < 3) {
 			networkFilename = "test/input/2car1ptRoutes/net2.xml";
-			populationFilename = "test/input/2car1ptRoutes/PC/200.pop100.xml.gz";
-			outputPopulationFilename = "test/output/planScoreEraser/outputPop.xml.gz";
+			populationFilename = "test/input/2car1ptRoutes/preparePop/pop100.xml";
+			outputPopulationFilename = "test/input/2car1ptRoutes/preparePop/pop100.erased.xml";
 		} else/* length >= 3 */{
 			networkFilename = args[0];
 			populationFilename = args[1];

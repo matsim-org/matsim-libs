@@ -42,10 +42,14 @@ import utilities.math.Vector;
  * 
  */
 public class Covariance2DfromParameters {
-	private class ParameterFileHandler implements TabularFileHandler {
-		private List<Integer> iterations = new ArrayList<Integer>();
-		private List<Double> travelingPts = new ArrayList<Double>(),
-				constantPts = new ArrayList<Double>();
+	public class ParameterFileHandler implements TabularFileHandler {
+		private final List<Integer> iterations = new ArrayList<Integer>();
+		private final List<Double> travelingPts = new ArrayList<Double>(),
+		constantPts = new ArrayList<Double>();
+
+		public List<Double> getConstantPts() {
+			return constantPts;
+		}
 
 		public List<Integer> getIterations() {
 			return iterations;
@@ -55,16 +59,12 @@ public class Covariance2DfromParameters {
 			return travelingPts;
 		}
 
-		public List<Double> getConstantPts() {
-			return constantPts;
-		}
-
 		@Override
 		public void startRow(String[] row) {
 			int size = row.length;
 			if (size != 3) {
 				throw new RuntimeException(
-						"Each line in parameter file should contains 3 columes");
+				"Each line in parameter file should contains 3 columes");
 			}
 
 			iterations.add(Integer.parseInt(row[0]));
@@ -77,17 +77,38 @@ public class Covariance2DfromParameters {
 	// -----------------------------NORMAL------------------------------
 	private static TabularFileParserConfig parserConfig = new TabularFileParserConfig();
 
-	private List<Integer> iterations;
-	private List<Double> travelingPts, constantPts;
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String paramFilename, outputFilename;
+		int width;
+		if (args.length != 3) {
+			//			paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
+			paramFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams.log";
+			outputFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
+			width = 500;
+		} else {
+			paramFilename = args[0];
+			outputFilename = args[1];
+			width = Integer.parseInt(args[2]);
+		}
+
+		Covariance2DfromParameters cfp = new Covariance2DfromParameters(
+				paramFilename, width, outputFilename);
+	}
+	private final List<Integer> iterations;
+
+	private final List<Double> travelingPts, constantPts;
 
 	private int windowWidth = 1000;
 
-	private SimpleWriter writer;
+	private final SimpleWriter writer;
 
 	public Covariance2DfromParameters(String filename, int windowWidth,
 			String outputFilename) {
 		this.windowWidth = windowWidth;
-
+		///////////////////////////////////////////////////////
 		parserConfig.setStartTag("iter");
 		parserConfig.setDelimiterTags(new String[] { "\t" });
 		parserConfig.setFileName(filename);
@@ -103,18 +124,9 @@ public class Covariance2DfromParameters {
 		iterations = fileHandler.getIterations();
 		travelingPts = fileHandler.getTravelingPts();
 		constantPts = fileHandler.getConstantPts();
-
+		/////////////////////////////////////////////////////////
 		createCovrainces();
 		writer.close();
-	}
-
-	private void createCovrainces() {
-		for (int idx = iterations.size() - 1; idx >= windowWidth - 1; idx--) {
-			int iteration = iterations.get(idx);
-			Matrix covariance = createCovariance(idx);
-			writer.writeln(iteration + "\t" + covariance.toSingleLineString());
-			writer.flush();
-		}
 	}
 
 	private Matrix createCovariance(int endIndex) {
@@ -127,25 +139,13 @@ public class Covariance2DfromParameters {
 		return cov.getCovariance();
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String paramFilename, outputFilename;
-		int width;
-		if (args.length != 3) {
-//			paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams.log";
-			outputFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
-			width = 500;
-		} else {
-			paramFilename = args[0];
-			outputFilename = args[1];
-			width = Integer.parseInt(args[2]);
+	private void createCovrainces() {
+		for (int idx = iterations.size() - 1; idx >= windowWidth - 1; idx--) {
+			int iteration = iterations.get(idx);
+			Matrix covariance = createCovariance(idx);
+			writer.writeln(iteration + "\t" + covariance.toSingleLineString());
+			writer.flush();
 		}
-
-		Covariance2DfromParameters cfp = new Covariance2DfromParameters(
-				paramFilename, width, outputFilename);
 	}
 
 }

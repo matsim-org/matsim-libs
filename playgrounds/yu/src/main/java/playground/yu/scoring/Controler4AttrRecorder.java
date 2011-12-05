@@ -17,9 +17,13 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class Controler4AttrRecorder extends Controler {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(
-				// args[0]
-		"test/input/2car1ptRoutes/writeScorAttrs/cfg-6_-3.xml");
+		Config config;
+		if (args.length < 1) {
+			config = ConfigUtils
+			.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfg-3_-1.xml");
+		} else/* args.length>=1 */{
+			config = ConfigUtils.loadConfig(args[0]);
+		}
 		Controler4AttrRecorder controler = new Controler4AttrRecorder(config);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
@@ -30,7 +34,9 @@ public class Controler4AttrRecorder extends Controler {
 
 	public Controler4AttrRecorder(Config config) {
 		super(config);
+		// ---------------------------------------------------
 		addControlerListener(new ScorAttrWriteTrigger());
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 
 	public PlansScoring4AttrRecorder getPlanScoring4AttrRecorder() {
@@ -41,17 +47,17 @@ public class Controler4AttrRecorder extends Controler {
 	protected void loadCoreListeners() {
 		addCoreControlerListener(new CoreControlerListener());
 
-		// ******DEACTIVATE SCORING & ROADPRICING IN MATSIM******
-		// the default handling of plans
+		// ------DEACTIVATE SCORING & ROADPRICING IN MATSIM------
 		planScoring4AttrRecorder = new PlansScoring4AttrRecorder();
 		addCoreControlerListener(planScoring4AttrRecorder);
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		// load road pricing, if requested
 		// if (this.config.roadpricing().getTollLinksFile() != null) {
 		// this.areaToll = new RoadPricing();
 		// this.addCoreControlerListener(areaToll);
 		// }
-		// ******************************************************
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		addCoreControlerListener(new PlansReplanning());
 		addCoreControlerListener(new PlansDumping());
@@ -61,7 +67,9 @@ public class Controler4AttrRecorder extends Controler {
 
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		// ---------------------------------------------------
 		return new CharyparNagelScoringFunctionFactory4AttrRecorder(
 				config.planCalcScore(), network);
+		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 }

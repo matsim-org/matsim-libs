@@ -50,19 +50,66 @@ import playground.yu.utils.io.DistributionCreator;
 import playground.yu.utils.math.SimpleStatistics;
 
 /**
+ * compares the Path size of the "selected" {@code Plan}s from 2
+ * {@code Population}s
+ * 
  * @author yu
  * 
  */
 public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
-		implements PlanAlgorithm {
-	private Population referencePopulation;
+implements PlanAlgorithm {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String networkFilename = args[0], referencePopulationFilename = args[1], currentPopulationFilename = args[2], outputFilenameBase = args[3];
+
+		Scenario referenceScenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		new MatsimNetworkReader(referenceScenario).readFile(networkFilename);
+		new MatsimPopulationReader(referenceScenario)
+		.readFile(referencePopulationFilename);
+		Population referencePopulation = referenceScenario.getPopulation();
+
+		PathSizeSummaryFrom2Populations pssf2p = new PathSizeSummaryFrom2Populations(
+				referencePopulation);
+
+		Network network = referenceScenario.getNetwork();
+		PathSizeFrom2Routes.setNetwork(network);
+
+		Scenario currentScenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		((ScenarioImpl) currentScenario).setNetwork((NetworkImpl) network);
+		// new MatsimNetworkReader(currentScenario).readFile(networkFilename);
+		new MatsimPopulationReader(currentScenario)
+		.readFile(currentPopulationFilename);
+		Population currentPopulation = currentScenario.getPopulation();
+
+		pssf2p.run(currentPopulation);
+		pssf2p.output(outputFilenameBase);
+	}
+
+	private final Population referencePopulation;
 	private Plan referenceSelectedPlan;
 	private Id personId;
-	private List<Double> pathSizes;
+
+	private final List<Double> pathSizes;
 
 	public PathSizeSummaryFrom2Populations(Population referencePopulation) {
 		this.referencePopulation = referencePopulation;
 		pathSizes = new ArrayList<Double>();
+	}
+
+	public void output(String outputFilenameBase) {
+		DistributionCreator distributionCreator = new DistributionCreator(
+				pathSizes, 0.005);
+		distributionCreator.createChartPercent(outputFilenameBase + "png",
+				"Distribution of path-sizes", "path-size [0.5, 1.0]",
+		"frequency of path-size");
+		distributionCreator.writePercent(outputFilenameBase + "log");
+
+		System.out.println("avg. pathSizes\t"
+				+ SimpleStatistics.average(pathSizes));
 	}
 
 	/*
@@ -83,8 +130,8 @@ public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
 	@Override
 	public void run(Plan currentPlan) {
 		List<PlanElement> referencePlanElements = referenceSelectedPlan
-				.getPlanElements(), currentPlanElements = currentPlan
-				.getPlanElements();
+		.getPlanElements(), currentPlanElements = currentPlan
+		.getPlanElements();
 		for (int i = 0; i < referencePlanElements.size(); i++) {
 			PlanElement referencePlanElement = referencePlanElements.get(i);
 			if (referencePlanElement instanceof Leg) {
@@ -95,16 +142,16 @@ public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
 						Leg currentLeg = (Leg) currentPlanElements.get(i);
 						if (currentLeg.getMode().equals(TransportMode.car)) {
 							NetworkRoute referenceRoute = (NetworkRoute) referenceLeg
-									.getRoute(), currentRoute = (NetworkRoute) currentLeg
-									.getRoute();
+							.getRoute(), currentRoute = (NetworkRoute) currentLeg
+							.getRoute();
 							double pathSize = new PathSizeFrom2Routes(
 									currentRoute, referenceRoute).getPathSize();
 							pathSizes.add(pathSize);
 						} else {// !newLeg.getMode().equals(TransportMode.car)
 							throw new RuntimeException(
 									"currentLeg with PlanElement index " + i
-											+ " should be a \"car\" Leg [["
-											+ currentLeg + "]]");
+									+ " should be a \"car\" Leg [["
+									+ currentLeg + "]]");
 						}// !newLeg.getMode().equals(TransportMode.car)
 
 					} else {// !currentPlanElements.get(i) instanceof Leg
@@ -119,47 +166,6 @@ public class PathSizeSummaryFrom2Populations extends AbstractPersonAlgorithm
 
 			}// referencePlanElement instanceof Leg
 		}
-	}
-
-	public void output(String outputFilenameBase) {
-		DistributionCreator distributionCreator = new DistributionCreator(
-				pathSizes, 0.005);
-		distributionCreator.createChartPercent(outputFilenameBase + "png",
-				"Distribution of path-sizes", "path-size [0.5, 1.0]",
-				"frequency of path-size");
-		distributionCreator.writePercent(outputFilenameBase + "log");
-
-		System.out.println("avg. pathSizes\t"
-				+ SimpleStatistics.average(pathSizes));
-	}
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		String networkFilename = args[0], referencePopulationFilename = args[1], currentPopulationFilename = args[2], outputFilenameBase = args[3];
-
-		Scenario referenceScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(referenceScenario).readFile(networkFilename);
-		new MatsimPopulationReader(referenceScenario)
-				.readFile(referencePopulationFilename);
-		Population referencePopulation = referenceScenario.getPopulation();
-
-		PathSizeSummaryFrom2Populations pssf2p = new PathSizeSummaryFrom2Populations(
-				referencePopulation);
-
-		Network network = referenceScenario.getNetwork();
-		PathSizeFrom2Routes.setNetwork(network);
-
-		Scenario currentScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl) currentScenario).setNetwork((NetworkImpl) network);
-		// new MatsimNetworkReader(currentScenario).readFile(networkFilename);
-		new MatsimPopulationReader(currentScenario)
-				.readFile(currentPopulationFilename);
-		Population currentPopulation = currentScenario.getPopulation();
-
-		pssf2p.run(currentPopulation);
-		pssf2p.output(outputFilenameBase);
 	}
 
 }
