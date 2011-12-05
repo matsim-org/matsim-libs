@@ -63,7 +63,8 @@ import playground.thibautd.utils.MoreIOUtils;
  * <br>
  * <br>
  * The config must be valid for a run, as an iteration is
- * lanched to get travel times estimates.
+ * lanched to get travel times estimates. File in the output directory
+ * will be overriden.
  * The population must correspond to the <u>converged</u> state,
  * as departure and arrival times from the population are interpreted as
  * <i>desired</i> departure and arrival.
@@ -141,6 +142,7 @@ public class RunReducedSPModel {
 		// ugly, and should be removed as soon as the scoring function
 		// works again.
 		controler.setScoringFunctionFactory( new FakeScoringFunctionFactory() );
+		controler.setOverwriteFiles( true );
 		controler.run();
 		// //////////////////////// run an iteration... DONE
 
