@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -249,7 +250,10 @@ class CommutersFilter implements PassengerFilter {
 				// check for distance
 				if (( (minDistance <= 0) || (minDistance <= record.getDistance(network)) ) &&
 				 ( (maxDistance <= 0) || (maxDistance >= record.getDistance(network)) )) {
-					filtered.add(record);
+					// check for mode (pt simulation makes results difficult to interpret otherwise)
+					if ( record.getMode().equals( TransportMode.car ) ) {
+						filtered.add(record);
+					 }
 				}
 			}
 		}
