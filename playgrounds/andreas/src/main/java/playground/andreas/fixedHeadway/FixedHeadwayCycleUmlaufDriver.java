@@ -7,7 +7,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.qsim.TransitStopAgentTracker;
 import org.matsim.pt.qsim.UmlaufDriver;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 
 /**
@@ -23,8 +23,8 @@ public class FixedHeadwayCycleUmlaufDriver extends UmlaufDriver {
 	private static int useageCnt = 0 ;
 
 	public FixedHeadwayCycleUmlaufDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTracker,
-			Netsim transitQueueSimulation) {
-		super(umlauf, TransportMode.car, thisAgentTracker, transitQueueSimulation);
+			MobsimEngine trEngine) {
+		super(umlauf, TransportMode.car, thisAgentTracker, trEngine);
 		if ( useageCnt <1 ) {
 			useageCnt++ ;
 			log.info(" will be used. " + Gbl.ONLYONCE );
