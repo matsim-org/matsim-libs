@@ -80,9 +80,9 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		// this calculates the workplace accessibility travel times
-		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
-		// this calculates the workplace accessibility distances
+		// this calculates a least cost path for (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance)   with marginalCostOfDistance = 0
+		LeastCostPathTree lcptTravelTimeDistance = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
+		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
 		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
@@ -105,7 +105,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				Node originNode = startNodeIterator.next();
 				assert(originNode != null);
 				// run dijkstra on network
-				lcptTravelTime.calculate(network, originNode, depatureTime);
+				lcptTravelTimeDistance.calculate(network, originNode, depatureTime);
 				lcptTravelDistance.calculate(network, originNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("originNode")
@@ -118,27 +118,27 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				// and calculate workplace accessibility for current start/origin node.
 				for ( int i = 0; i < this.aggregatedWorkplaces.length; i++ ) {
 					
-					// get stored network node (this is the nearest node next to an aggegated workplace)
+					// get stored network node (this is the nearest node next to an aggregated workplace)
 					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
-					// using number of aggegated workplaces as weight for log sum measure
+					// using number of aggregated workplaces as weight for log sum measure
 					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfJobs();
 
-					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
+					double arrivalTime = lcptTravelTimeDistance.getTree().get( nodeID ).getTime();
 					
 					// travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// travel costs in utils
-					double travelCosts = lcptTravelTime.getTree().get( nodeID ).getCost();
-					// travel distance by car in meter
-					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
+					double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
+					// travel distance by car in km (since distances in meter are very large values making the log sum -Infinity most of the time) 
+					double travelDistance_km = lcptTravelDistance.getTree().get( nodeID ).getCost() / 1000.;
 					
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
-					// sum travel costs
+					// sum travel costs  (mention the beta)
 					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
-					// sum travel distances
-					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
+					// sum travel distances  (mention the beta)
+					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_km ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
 				
 				// assign accessibility 
