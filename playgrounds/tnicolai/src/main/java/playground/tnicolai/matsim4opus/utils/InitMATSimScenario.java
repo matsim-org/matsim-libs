@@ -297,7 +297,7 @@ public class InitMATSimScenario {
 		
 		double popSampling = this.matsimConfig.getMatsim4Urbansim().getUrbansimParameter().getSamplingRate();
 		
-		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ".");
+		log.warn("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
 		
 		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
 		simulation.setFlowCapFactor( popSampling );	
