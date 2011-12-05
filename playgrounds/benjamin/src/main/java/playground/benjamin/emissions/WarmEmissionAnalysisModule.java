@@ -136,7 +136,6 @@ public class WarmEmissionAnalysisModule {
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 
-//		double freeFlowSpeed_kmh;
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -156,13 +155,11 @@ public class WarmEmissionAnalysisModule {
 				keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 				
 				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
-//					freeFlowSpeed_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
 
 				} else {
-//					freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 					stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
@@ -176,7 +173,6 @@ public class WarmEmissionAnalysisModule {
 					vehAttributesNotSpecified.add(personId);
 				}
 			} else {
-//				freeFlowSpeed_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 				stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
@@ -189,15 +185,24 @@ public class WarmEmissionAnalysisModule {
 			double freeFlowSpeed_kmh = freeVelocity * 3.6;
 			double averageSpeed_kmh = linkLength_km / travelTime_h;
 			
+			if (averageSpeed_kmh > freeFlowSpeed_kmh){
+				logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
+				throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
+			}
 			if (averageSpeed_kmh <= stopGoSpeed_kmh) {
 				generatedEmissions = linkLength_km * efStopGo_gpkm;
 				stopGoCounter++;
 				stopGoKmCounter = stopGoKmCounter + linkLength_km;
 			} else {
-				double timeStopGo_h = (linkLength_km / averageSpeed_kmh) - (linkLength_km / freeFlowSpeed_kmh);
-				double distanceStopGo_km = stopGoSpeed_kmh * timeStopGo_h;
+				/* first interpretation:*/
+//				double timeStopGo_h = (linkLength_km / averageSpeed_kmh) - (linkLength_km / freeFlowSpeed_kmh);
+//				double distanceStopGo_km = stopGoSpeed_kmh * timeStopGo_h;
+				
+				/* second interpretation:*/
+				double distanceStopGo_km = (linkLength_km * (freeFlowSpeed_kmh - averageSpeed_kmh)) / ((((averageSpeed_kmh * freeFlowSpeed_kmh) / stopGoSpeed_kmh) - averageSpeed_kmh));
+				
 				double distanceFreeFlow_km = linkLength_km - distanceStopGo_km;
-
+				
 				generatedEmissions = (distanceFreeFlow_km * efFreeFlow_gpkm) + (distanceStopGo_km * efStopGo_gpkm);
 				fractionCounter++;
 				stopGoKmCounter = stopGoKmCounter + distanceStopGo_km;

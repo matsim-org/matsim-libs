@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -53,9 +54,9 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	private static int linkLeaveWarnCnt = 0;
 	private static int maxLinkLeaveWarnCnt = 3;
 
-	private final Map<Id, Double> linkenter = new HashMap<Id, Double>();
-	private final Map<Id, Double> agentarrival = new HashMap<Id, Double>();
-	private final Map<Id, Double> agentdeparture = new HashMap<Id, Double>();
+	private final Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
+	private final Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
+	private final Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
 
 	public WarmEmissionHandler(Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
 		this.emissionVehicles = emissionVehicles;
@@ -67,7 +68,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 	public void handleEvent(AgentArrivalEvent event) {
 		if(event.getLegMode().equals("car")){
-			this.agentarrival.put(event.getPersonId(), event.getTime());
+			Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
+			this.agentarrival.put(event.getPersonId(), linkId2Time);
 		}
 		else{
 			// link travel time calcualtion not neccessary for other modes
@@ -76,7 +78,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 
 	public void handleEvent(AgentDepartureEvent event) {
 		if(event.getLegMode().equals("car")){
-			this.agentdeparture.put(event.getPersonId(), event.getTime());
+			Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
+			this.agentdeparture.put(event.getPersonId(), linkId2Time);
 		}
 		else{
 			// link travel time calcualtion not neccessary for other modes
@@ -84,7 +87,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 	}
 
 	public void handleEvent(LinkEnterEvent event) {
-		this.linkenter.put(event.getPersonId(), event.getTime());
+		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
+		this.linkenter.put(event.getPersonId(), linkId2Time);
 	}
 
 	public void handleEvent(LinkLeaveEvent event) {
@@ -95,7 +99,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		Double linkLength = link.getLength();
 		Double freeVelocity = link.getFreespeed();
 		String roadTypeString = link.getType();
-		Integer roadType = null;
+		Integer roadType;
 
 		try{
 			roadType = Integer.parseInt(roadTypeString);
@@ -104,27 +108,31 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 			logger.error("Roadtype missing in network information!");
 			throw new RuntimeException(e);
 		}
-		Double enterTime = 0.0;
-		Double travelTime = 0.0;
+		Double enterTime;
+		Double travelTime;
 
 		if(this.linkenter.containsKey(event.getPersonId())){
-			enterTime = this.linkenter.get(personId);
-			if (this.agentarrival.containsKey(personId)){
-				double arrivalTime = this.agentarrival.get(personId);		
-				double departureTime = this.agentdeparture.get(personId);	
-				travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
-				this.agentarrival.remove(personId);
-			}
-			else{
+			enterTime = this.linkenter.get(personId).getSecond();
+			if(this.agentarrival.containsKey(personId) && this.agentdeparture.containsKey(personId)){
+				if(this.agentarrival.get(personId).getFirst().equals(event.getLinkId()) && this.agentdeparture.get(personId).getFirst().equals(event.getLinkId())){
+					double arrivalTime = this.agentarrival.get(personId).getSecond();		
+					double departureTime = this.agentdeparture.get(personId).getSecond();	
+					travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
+				}
+				else{
+					travelTime = leaveTime - enterTime;
+				}
+			} else {
 				travelTime = leaveTime - enterTime;
 			}
 
 			Id vehicleId = personId;
-			String vehicleInformation = null;
+			String vehicleInformation;
 			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType();
 				vehicleInformation = vehicleType.getId().toString();
+				
 				warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 						linkId,
 						personId,
