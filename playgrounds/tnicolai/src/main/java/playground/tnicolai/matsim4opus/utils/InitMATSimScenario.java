@@ -24,6 +24,8 @@
 package playground.tnicolai.matsim4opus.utils;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -252,6 +254,11 @@ public class InitMATSimScenario {
 		controlerCG.setFirstIteration( firstIteration );	// controller (first, last iteration)
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
+		
+		HashSet<String> hs = new HashSet<String>();
+		hs.add("otfvis");
+		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
+		
 		log.info("... done!");
 		log.info("Controler FirstIteration: " + controlerCG.getFirstIteration() + " LastIteration: " + controlerCG.getLastIteration() + 
 				          " MATSim output directory: " +  controlerCG.getOutputDirectory());
