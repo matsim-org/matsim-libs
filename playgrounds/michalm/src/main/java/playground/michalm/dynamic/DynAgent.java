@@ -53,7 +53,7 @@ public class DynAgent
 
         if (activityEndTime != Time.UNDEFINED_TIME || activityEndTime != Double.POSITIVE_INFINITY) {
             state = MobsimAgent.State.ACTIVITY;
-            simulation.arrangeNextAgentAction(this);
+            simulation.insertAgentIntoMobsim(this);
 
             simulation.getAgentCounter().incLiving();
         }
@@ -106,7 +106,7 @@ public class DynAgent
         }
         else {
             state = MobsimAgent.State.ACTIVITY;
-            simulation.arrangeNextAgentAction(this);
+            simulation.insertAgentIntoMobsim(this);
         }
     }
 
@@ -117,7 +117,7 @@ public class DynAgent
         nextLinkId = leg.getNextLinkId();
 
         state = MobsimAgent.State.LEG;
-        simulation.arrangeNextAgentAction(this);
+        simulation.insertAgentIntoMobsim(this);
     }
 
 

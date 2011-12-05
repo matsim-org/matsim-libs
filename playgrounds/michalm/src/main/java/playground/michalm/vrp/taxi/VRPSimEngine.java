@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.swing.*;
 
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.*;
 
@@ -28,6 +29,12 @@ public class VRPSimEngine
     private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
+
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
     public VRPSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
     {

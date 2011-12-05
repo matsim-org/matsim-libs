@@ -71,7 +71,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 //		netsim.arrangeActivityStart(this) ;
 		this.state = MobsimAgent.State.ACTIVITY ;
-		netsim.arrangeNextAgentAction(this) ;
+		netsim.insertAgentIntoMobsim(this) ;
 		
 		
 	}
@@ -176,7 +176,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 //			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
 			this.state = MobsimAgent.State.LEG ;
-			this.netsim.arrangeNextAgentAction(this);
+			this.netsim.insertAgentIntoMobsim(this);
 
 		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
 			// (= passenger on board, but having no request)
@@ -192,7 +192,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 			
 //			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
 			this.state = MobsimAgent.State.LEG ;
-			this.netsim.arrangeNextAgentAction(this) ;
+			this.netsim.insertAgentIntoMobsim(this) ;
 		
 		} else {
 			throw new RuntimeException("undefined state") ;
@@ -212,7 +212,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 //		this.netsim.arrangeAgentDeparture(this) ;
 		this.state = MobsimAgent.State.LEG ;
-		this.netsim.arrangeNextAgentAction(this);
+		this.netsim.insertAgentIntoMobsim(this);
 		
 	}
 

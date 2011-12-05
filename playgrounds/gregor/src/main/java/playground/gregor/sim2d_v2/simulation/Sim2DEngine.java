@@ -21,6 +21,7 @@ package playground.gregor.sim2d_v2.simulation;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -42,6 +43,12 @@ public class Sim2DEngine implements MobsimEngine {
 	private final QSim sim;
 
 	private PhysicalFloor floor;
+
+	private InternalInterface internalInterface = null ;
+	@Override
+	public void setInternalInterface( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface ;
+	}
 
 	/**
 	 * @param sim
