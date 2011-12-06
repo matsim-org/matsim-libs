@@ -326,8 +326,8 @@ public class ReadFromUrbansimParcelModel {
 			log.info("Size of new population (" + mergePop.getPersons().size() + ") fits the target population size with samplingRate*NumberUrbansimPersons (" + targetPopSize + ")." );
 			printDetailedPopulationInfo(cnt);
 		}
-		// check if newPop contains less people than our target population size (less than sampleRate*NUrbansimPersons) and add additional persons from backupPop
-		else if(mergePop.getPersons().size() < targetPopSize){
+		// check if newPop contains too few people than our target population size (less than sampleRate*NUrbansimPersons). In this case add additional persons from backupPop
+		else if( mergePop.getPersons().size() < targetPopSize && !backupPop.getPersons().isEmpty() ){
 			log.info("Size of new population (" + mergePop.getPersons().size() + ") is smaller than samplingRate*NumberUrbansimPersons (" + targetPopSize + "). Adding persons, stored in bakPopSize ...");
 			List<Person> backupPopList = new ArrayList<Person>( backupPop.getPersons().values() ); // Population data structure not needed!
 			Collections.shuffle( backupPopList );	// pick random person
@@ -343,7 +343,7 @@ public class ReadFromUrbansimParcelModel {
 			printDetailedPopulationInfo(cnt);
 		}
 		// Check if newPop contain too many people than our target population size and remove persons from newPop if needed
-		else if(mergePop.getPersons().size() > targetPopSize){
+		else if( mergePop.getPersons().size() > targetPopSize && !backupPop.getPersons().isEmpty() ){
 			printDetailedPopulationInfo(cnt);
 			log.info("Size of new population (" +  mergePop.getPersons().size() + ") is larger than samplingRate*NumberUrbansimPersons (" + targetPopSize + "). Removing persons from newPop ...");
 			// Since no person can be removed from newPop a new, down sampled population is created ...
@@ -416,6 +416,7 @@ public class ReadFromUrbansimParcelModel {
 	private void mergePopulation(final Population oldPop,
 			final Population newPop, final NetworkImpl network,
 			Population backupPop, PopulationCounter cnt, Id personId, PersonImpl newPerson) {
+		
 		while ( true ) { // loop from which we can "break":
 
 			Person oldPerson ;
