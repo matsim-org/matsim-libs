@@ -305,7 +305,11 @@ public class ComprehensiveChoiceModel {
 					}
 				}
 
-				this.prob = previousLeg.getProbability() *
+				// P(t_1, ... , t_i) =
+				this.prob =
+					// P(t_1, ... , t_{i-1}) *
+					previousLeg.getProbability() *
+					// P(t_i | t_1, ... , t_{i-1})
 					tripLevelModel.getChoiceProbabilities(
 							decider, restrictedChoiceSet).get( alt );
 			}
@@ -368,11 +372,12 @@ public class ComprehensiveChoiceModel {
 			//List<String> possibleModes = previousLeg.getPossibleModes( subtour );
 			List<String> possibleModes = new ArrayList<String>( allModes );
 
+			String thisMode = extractMode( alt );
 			if ( subtourIndices[ getIndex() ] == subtour ) {
 				// the next leg is in the same subtour as us
-				if (chainBasedModes.contains( alt.getMode() )) {
+				if (chainBasedModes.contains( thisMode )) {
 					possibleModes.clear();
-					possibleModes.add( alt.getMode() );
+					possibleModes.add( thisMode );
 				}
 				else {
 					possibleModes.removeAll( chainBasedModes );
@@ -380,9 +385,9 @@ public class ComprehensiveChoiceModel {
 			}
 			else if ( subtourFatherTable[ subtour ] == subtourIndices[ getIndex() ]) {
 				// the requested subtour is a direct "son" of our: we influence it.
-				if (chainBasedModes.contains( alt.getMode() )) {
+				if (chainBasedModes.contains( thisMode )) {
 					for (String mode : chainBasedModes) {
-						if ( !mode.equals( alt.getMode() ) ) {
+						if ( !mode.equals( thisMode ) ) {
 							possibleModes.remove( mode );
 						}
 					}
@@ -397,11 +402,11 @@ public class ComprehensiveChoiceModel {
 				return previousLeg.getPossibleModes( subtour );
 			}
 
-			// handle car availability
-			if ( alt.getMode().equals( TransportMode.car ) ) {
+			// handle car availability: driver legs are car legs
+			if ( thisMode.equals( TransportMode.car ) ) {
 				possibleModes.add( DRIVER_MODE );
 			}
-			else if ( alt.getMode().equals( DRIVER_MODE ) ) {
+			else if ( thisMode.equals( DRIVER_MODE ) ) {
 				possibleModes.add( TransportMode.car );
 			}
 
