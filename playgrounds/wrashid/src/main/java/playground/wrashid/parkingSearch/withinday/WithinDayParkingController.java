@@ -27,7 +27,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -36,7 +35,6 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;

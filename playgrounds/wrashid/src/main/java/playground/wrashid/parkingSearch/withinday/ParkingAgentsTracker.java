@@ -134,10 +134,8 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 			Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
 			double d = CoordUtils.calcDistance(facility.getCoord(), coord);
 			
-			if (d <= distance) {
-				searchingAgents.add(event.getPersonId());
-//				System.out.println("searching...");
-			}
+			if (d <= distance) searchingAgents.add(event.getPersonId());
+
 			/*
 			 * If the agent enters the link where its next non-parking activity
 			 * is performed.
@@ -145,11 +143,6 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 			else if (facility.getLinkId().equals(event.getLinkId())) {
 				searchingAgents.add(event.getPersonId());
 			}
-			
-//			System.out.println(executedPlan.getPlanElements().get(planElementIndex).toString());
-//			System.out.println(executedPlan.getPlanElements().get(planElementIndex+1).toString());
-//			System.out.println(executedPlan.getPlanElements().get(planElementIndex+2).toString());
-//			System.out.println(executedPlan.getPlanElements().get(planElementIndex+3).toString());
 		}
 	}
 
@@ -163,30 +156,31 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (!searchingAgents.contains(event.getPersonId())) {
-			Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-			ActivityFacility facility = nextActivityFacilityMap.get(event.getPersonId());
-			double d = CoordUtils.calcDistance(facility.getCoord(), coord);
-			
-			/*
-			 * If the agent is within the parking radius
-			 */
-			if (d <= distance) {
-				searchingAgents.add(event.getPersonId());
-				linkEnteredAgents.add(event.getPersonId());
-//				System.out.println("searching...");
-			} 
-			/*
-			 * If the agent enters the link where its next non-parking activity
-			 * is performed.
-			 */
-			else if (facility.getLinkId().equals(event.getLinkId())) {
-				searchingAgents.add(event.getPersonId());
+		if (carLegAgents.contains(event.getPersonId())) {
+			if (!searchingAgents.contains(event.getPersonId())) {
+				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
+				ActivityFacility facility = nextActivityFacilityMap.get(event.getPersonId());
+				double d = CoordUtils.calcDistance(facility.getCoord(), coord);
+				
+				/*
+				 * If the agent is within the parking radius
+				 */
+				if (d <= distance) {
+					searchingAgents.add(event.getPersonId());
+					linkEnteredAgents.add(event.getPersonId());
+				} 
+				/*
+				 * If the agent enters the link where its next non-parking activity
+				 * is performed.
+				 */
+				else if (facility.getLinkId().equals(event.getLinkId())) {
+					searchingAgents.add(event.getPersonId());
+				}
 			}
-		}
-		// the agent is already searching: update its position
-		else {
-			linkEnteredAgents.add(event.getPersonId());
+			// the agent is already searching: update its position
+			else {
+				linkEnteredAgents.add(event.getPersonId());
+			}			
 		}
 	}
 	

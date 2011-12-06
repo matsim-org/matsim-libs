@@ -24,7 +24,22 @@
 		<param name="firstIteration" value="0" />
 		<param name="lastIteration" value="10" />
 		<param name= "writeEventsInterval" value="10" />
-		<param name= "mobsim" value="qsim" />
+		<param name= "mobsim" value="multimodalQSim" />
+	</module>
+
+	<module name="multimodal" >
+
+		<!-- Use this, if your network is not multi modal. Links with free speeds that are lower than the specified cutoff value will be usable for walk and bike trips. -->
+		<param name="createMultiModalNetwork" value="true" />
+
+		<!-- Only used, if createMultiModalNetwork is enabled (set value in m/s). -->
+		<param name="cuttoffValueForNonCarModes" value="22.22222222222222" />
+		<param name="dropNonCarRoutes" value="true" />
+		<param name="multiModalSimulationEnabled" value="true" />
+
+		<!-- Use number of threads > 1 for parallel version using the specified number of threads. -->
+		<param name="numberOfThreads" value="3" />
+		<param name="simulatedModes" value="walk" />
 	</module>
 
 	<module name="planCalcScore">
