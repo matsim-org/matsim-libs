@@ -240,7 +240,8 @@ public class ReadFromUrbansimParcelModel {
 
 				if ( !( compensationFlag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
 					continue ;
-
+				
+				// see reason of this flag below
 				compensationFlag = false;
 				
 				PersonImpl newPerson = new PersonImpl( personId ) ;

@@ -19,6 +19,7 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.FixedSizeGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -80,6 +81,8 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
+//		tnicolai: testing travel time calculator
+//		LeastCostPathTree lcptTravelTimeTest = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
 		// this calculates a least cost path for (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance)   with marginalCostOfDistance = 0
 		LeastCostPathTree lcptTravelTimeDistance = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
@@ -107,6 +110,8 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				// run dijkstra on network
 				lcptTravelTimeDistance.calculate(network, originNode, depatureTime);
 				lcptTravelDistance.calculate(network, originNode, depatureTime);
+//				tnicolai: testing travel time calculator
+//				lcptTravelTimeTest.calculate(network, originNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("originNode")
 				
@@ -128,6 +133,8 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 					
 					// travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
+//					tnicolai: testing travel time cost calculator
+//					double testTravelTime_min = lcptTravelTimeTest.getTree().get( nodeID ).getCost() / 60.;
 					// travel costs in utils
 					double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
 					// travel distance by car in km (since distances in meter are very large values making the log sum -Infinity most of the time) 
