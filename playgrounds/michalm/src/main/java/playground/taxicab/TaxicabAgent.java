@@ -72,6 +72,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 //		netsim.arrangeActivityStart(this) ;
 		this.state = MobsimAgent.State.ACTIVITY ;
 		netsim.insertAgentIntoMobsim(this) ;
+		// yyyyyy 000000
 		
 		
 	}
@@ -177,6 +178,8 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 //			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
 			this.state = MobsimAgent.State.LEG ;
 			this.netsim.insertAgentIntoMobsim(this);
+			// yyyyyy 000000
+
 
 		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
 			// (= passenger on board, but having no request)
@@ -213,6 +216,8 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 //		this.netsim.arrangeAgentDeparture(this) ;
 		this.state = MobsimAgent.State.LEG ;
 		this.netsim.insertAgentIntoMobsim(this);
+		// yyyyyy 000000
+
 		
 	}
 

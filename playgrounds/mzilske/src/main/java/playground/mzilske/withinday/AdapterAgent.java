@@ -99,6 +99,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 //					simulation.arrangeActivityStart(AdapterAgent.this);
 					AdapterAgent.this.state = MobsimAgent.State.ACTIVITY ;
 					simulation.insertAgentIntoMobsim(AdapterAgent.this) ;
+					// yyyyyy 000000
 					
 				}
 				
@@ -120,6 +121,8 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 //					simulation.arrangeAgentDeparture(AdapterAgent.this);
 					AdapterAgent.this.state = MobsimAgent.State.LEG ;
 					simulation.insertAgentIntoMobsim(AdapterAgent.this) ;
+					// yyyyyy 000000
+
 
 					AdapterAgent.this.teleportationBehavior = teleportTo;
 				}
@@ -157,6 +160,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 //					simulation.arrangeAgentDeparture(AdapterAgent.this);
 					AdapterAgent.this.state = MobsimAgent.State.LEG ;
 					simulation.insertAgentIntoMobsim(AdapterAgent.this) ;
+					// yyyyyy 000000
 					
 				}
 				
