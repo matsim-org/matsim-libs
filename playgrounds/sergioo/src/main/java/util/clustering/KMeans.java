@@ -28,13 +28,13 @@ public class KMeans<T> implements ClusteringAlgorithm<T> {
 		for(PointND<T> point:points) {
 			int nearestClusterKey = 0;
 			for(int i=0; i<size; i++)
-				if(clusters.get(i).getMean().getDistance(point)<clusters.get(nearestClusterKey).getMean().getDistance(point))
+				if(clusters.get(i).getMainPoint().getDistance(point)<clusters.get(nearestClusterKey).getMainPoint().getDistance(point))
 					nearestClusterKey = i;
 			clusters.get(nearestClusterKey).addPoint(point);
 		}
-		boolean changes = true;
-		while(changes) {
-			changes = false;
+		int changes = 1;
+		while(changes>0) {
+			changes = 0;
 			Map<Integer, Cluster<T>> newClusters = new HashMap<Integer, Cluster<T>>();
 			for(int i=0; i<size; i++)
 				newClusters.put(i,new ClusterImpl<T>());
@@ -42,13 +42,14 @@ public class KMeans<T> implements ClusteringAlgorithm<T> {
 				for(PointND<T> point:clusters.get(currentClusterKey).getPoints()) {
 					int nearestClusterKey = 0;
 					for(int i=0; i<size; i++)
-						if(clusters.get(i).getMean().getDistance(point)<clusters.get(nearestClusterKey).getMean().getDistance(point))
+						if(!clusters.get(i).isEmpty() && clusters.get(i).getMean().getDistance(point)<clusters.get(nearestClusterKey).getMean().getDistance(point))
 							nearestClusterKey = i;
 					newClusters.get(nearestClusterKey).addPoint(point);
 					if(currentClusterKey!=nearestClusterKey)
-						changes = true;
+						changes++;
 				}
 			clusters = newClusters;
+			System.out.println(changes);
 		}
 		return clusters;
 	}

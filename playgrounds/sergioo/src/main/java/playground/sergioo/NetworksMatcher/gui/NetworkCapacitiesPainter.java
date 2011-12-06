@@ -77,7 +77,7 @@ public class NetworkCapacitiesPainter extends NetworkPainter {
 				for(Entry<Link, Tuple<Link,Double>> linksE:linksChanged.entrySet()) {
 					Link link = isA?linksE.getValue().getFirst():linksE.getKey();
 					double fraction = 0.07+((linksE.getValue().getSecond()-link.getCapacity()-maxChangeCapacityDown)/(maxChangeCapacityUp-maxChangeCapacityDown))*0.93;
-					paintLink(g2, layersPanel, link, new BasicStroke(2f), 1.5, new Color(255-(int)(fraction*255),(int)(fraction*255),0));
+					paintLink(g2, layersPanel, link, new BasicStroke(2f), 1.5, new Color(0, 255-(int)(fraction*255),(int)(fraction*255)));
 				}
 				break;
 			}

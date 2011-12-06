@@ -2,7 +2,15 @@ package util.fitting;
 
 import util.algebra.MatrixND;
 
-public abstract class FittingControl {
+public abstract class FittingControl1D {
+	
+	//Attributes
+	protected MatrixND<Double> controlConstants;
+	
+	//Constructors
+	public FittingControl1D(MatrixND<Double> controlConstants) {
+		this.controlConstants = controlConstants;
+	}
 	
 	//Methods
 	public void iterate(MatrixND<Double> data, int dimension) {
@@ -24,15 +32,13 @@ public abstract class FittingControl {
 				applyRules(data, dim+1, position, positionSize, dimension);
 			}
 	}
-	protected int[] getMatrixPosition(int[] position, int dimension) {
-		int[] matrixPosition = new int[position.length+1];
+	protected void getMatrixPosition(int[] matrixPosition, int[] position, int dimension) {
 		int j=0;
 		for(int i=0; i<matrixPosition.length; i++)
 			if(i!=dimension) {
 				matrixPosition[i] = position[j];
 				j++;
 			}
-		return matrixPosition;
 	}
 	protected abstract void applyRule(MatrixND<Double> data, int[] position, int dimension);
 

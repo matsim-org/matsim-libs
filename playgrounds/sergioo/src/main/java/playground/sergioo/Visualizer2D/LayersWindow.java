@@ -1,5 +1,6 @@
 package playground.sergioo.Visualizer2D;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,6 +47,7 @@ public abstract class LayersWindow extends JFrame {
 	}
 	public void setCoords(double x, double y) {
 		NumberFormat nF = NumberFormat.getInstance();
+		//DecimalFormat dF = new DecimalFormat("#.#####E000");
 		nF.setMaximumFractionDigits(4);
 		nF.setMinimumFractionDigits(4);
 		lblCoords[0].setText(nF.format(x)+" ");

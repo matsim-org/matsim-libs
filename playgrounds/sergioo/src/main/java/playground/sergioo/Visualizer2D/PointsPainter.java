@@ -16,8 +16,19 @@ public class PointsPainter extends Painter {
 	//Attributes
 	private Collection<Coord> points = new ArrayList<Coord>();
 	private Coord selectedPoint;
+	private Color color = Color.BLACK;
 	
 	//Methods
+	public PointsPainter() {
+		super();
+	}
+	public PointsPainter(Color color) {
+		super();
+		this.color = color;
+	}
+	public Collection<Coord> getPoints() {
+		return points;
+	}
 	public void addPoint(Coord point) {
 		points.add(point);
 	}
@@ -27,7 +38,7 @@ public class PointsPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(Coord point:points)
-			paintX(g2, layersPanel, point, 5, Color.BLACK);
+			paintX(g2, layersPanel, point, 3, color);
 		if(selectedPoint!=null)
 			paintCircle(g2, layersPanel, selectedPoint, 4, Color.RED);
 	}

@@ -14,5 +14,6 @@ public interface Cluster<T> {
 	public PointND<T> getMainPoint();
 	public PointND<T> getRandomPoint();
 	public boolean isInCluster(PointND<T> point);
+	public boolean isEmpty();
 	
 }

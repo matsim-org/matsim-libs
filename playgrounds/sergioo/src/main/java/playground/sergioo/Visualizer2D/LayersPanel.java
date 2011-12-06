@@ -59,6 +59,9 @@ public abstract class LayersPanel extends JPanel {
 	protected Collection<Layer> getAllLayers() {
 		return layers;
 	}
+	protected int getNumLayers() {
+		return layers.size();
+	}
 	protected void addLayer(Layer layer) {
 		layers.add(layer);
 	}

@@ -2,18 +2,30 @@ package util.fitting;
 
 import util.algebra.MatrixND;
 
-public class TotalFittingControl extends FittingControl{
+public class TotalFittingControl1D extends FittingControl1D{
 
-	private MatrixND<Double> controlConstants;
-	
 	//Constructors
-	public TotalFittingControl(MatrixND<Double> controlConstants) {
-		this.controlConstants = controlConstants;
+	public TotalFittingControl1D(MatrixND<Double> controlConstants) {
+		super(controlConstants);
 	}
 	
 	//Methods
 	@Override
 	protected void applyRule(MatrixND<Double> data, int[] position, int dimension) {
+		int[] matrixPosition = new int[data.getNumDimensions()];
+		getMatrixPosition(matrixPosition, position, dimension);
+		double sum = 0;
+		for(int d=0; d<data.getDimensions()[dimension]; d++) {
+			matrixPosition[dimension]=d;
+			sum += data.getElement(matrixPosition);
+		}
+		if(!(controlConstants.getElement(position)==0 && sum==0))
+			for(int d=0; d<data.getDimensions()[dimension]; d++) {
+				matrixPosition[dimension]=d;
+				data.setElement(matrixPosition, data.getElement(matrixPosition)*controlConstants.getElement(position)/sum);
+			}
+	}
+	/*protected void applyRule(MatrixND<Double> data, int[] position, int dimension) {
 		int[] matrixPosition = getMatrixPosition(position, dimension);
 		double sum = 0;
 		for(int d=0; d<data.getDimensions()[dimension]; d++) {
@@ -48,7 +60,7 @@ public class TotalFittingControl extends FittingControl{
 			sum += data.getElement(matrixPosition);
 		}
 		if(sum-Math.round(controlConstants.getElement(position))!=0)
-			System.out.println("Puta");
-	}
+			System.out.println("Error");
+	}*/
 
 }

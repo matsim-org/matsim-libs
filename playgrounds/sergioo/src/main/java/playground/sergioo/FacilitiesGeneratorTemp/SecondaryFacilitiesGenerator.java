@@ -39,10 +39,10 @@ import util.algebra.MatrixND;
 import util.algebra.MatrixNDImpl;
 import util.dataBase.DataBaseAdmin;
 import util.dataBase.NoConnectionException;
-import util.fitting.FittingControl;
+import util.fitting.FittingControl1D;
 import util.fitting.FittingData;
-import util.fitting.ProportionFittingControl;
-import util.fitting.TotalFittingControl;
+import util.fitting.ProportionFittingControl1D;
+import util.fitting.TotalFittingControl1D;
 
 public class SecondaryFacilitiesGenerator {
 
@@ -176,11 +176,11 @@ public class SecondaryFacilitiesGenerator {
 			createFakeFacilities(postalSector, facilitiesPostalSector, areas, fractions);
 			int numURAPlaceTypes = URA_PLACE_TYPES.values().length;
 			int[] dimensions = new int[] {facilitiesPostalSector.size(), numURAPlaceTypes};
-			FittingControl[] fittingControls = new FittingControl[dimensions.length];
+			FittingControl1D[] fittingControls = new FittingControl1D[dimensions.length];
 			MatrixND<Double> controlConstants1=new MatrixNDImpl<Double>(new int[]{numURAPlaceTypes});
 			for(int i=0; i<controlConstants1.getDimensions()[0]; i++)
 				controlConstants1.setElement(new int[]{i}, URA_PLACE_TYPES.values()[i].getNumPositions(areas.get(URA_PLACE_TYPES.values()[i])));
-			fittingControls[0]=new TotalFittingControl(controlConstants1);
+			fittingControls[0]=new TotalFittingControl1D(controlConstants1);
 			MatrixND<Double> controlConstants2=new MatrixNDImpl<Double>(new int[]{facilitiesPostalSector.size(), numURAPlaceTypes});
 			Iterator<Tuple<String, Coord>> facilitiesI = facilitiesPostalSector.values().iterator();
 			for(int i=0; i<controlConstants2.getDimensions()[0]; i++) {
@@ -199,7 +199,7 @@ public class SecondaryFacilitiesGenerator {
 					else
 						controlConstants2.setElement(new int[]{i,j}, 0.0);
 			}
-			fittingControls[1]=new ProportionFittingControl(controlConstants2);
+			fittingControls[1]=new ProportionFittingControl1D(controlConstants2);
 			FittingData fittingData = new FittingData(dimensions, fittingControls);
 			MatrixND<Double> result=fittingData.run(NUM_FITTING_ITERATIONS);
 			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);

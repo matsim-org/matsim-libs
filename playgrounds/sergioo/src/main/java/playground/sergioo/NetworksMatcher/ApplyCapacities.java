@@ -33,7 +33,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
+import playground.sergioo.Visualizer2D.LayersWindow;
 
 public class ApplyCapacities {
 
@@ -112,8 +114,7 @@ public class ApplyCapacities {
 	 */
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader matsimNetworkReader = new MatsimNetworkReader(scenario);
-		matsimNetworkReader.readFile(args[0]);
+		new MatsimNetworkReader(scenario).readFile(args[0]);
 		Network networkLowResolution = getNetworkFromShapeFileLength(args[1]);
 		Network networkHighResolution = scenario.getNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
@@ -121,19 +122,19 @@ public class ApplyCapacities {
 			((NodeImpl)node).setCoord(coordinateTransformation.transform(node.getCoord()));
 		CrossingMatchingStep.CAPACITIES_FILE = new File("./data/matching/capacities/linksChanged.txt");
 		Map<Link, Tuple<Link,Double>> result = loadCapacities(CrossingMatchingStep.CAPACITIES_FILE, networkLowResolution, networkHighResolution);
-		for(Entry<Link, Tuple<Link,Double>> entry:result.entrySet()) {
-			entry.getKey().setCapacity(entry.getValue().getFirst().getCapacity());
-			entry.getKey().setFreespeed(entry.getValue().getFirst().getFreespeed());
-		}
-		new NetworkWriter(networkHighResolution).write(args[2]);
-		/*LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);
+		LayersWindow windowHR2 = new DoubleNetworkCapacitiesWindow("Networks capacities", networkLowResolution, networkHighResolution, result);
 		windowHR2.setVisible(true);
 		while(!windowHR2.isReadyToExit())
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}*/
+			}
+		for(Entry<Link, Tuple<Link,Double>> entry:result.entrySet()) {
+			entry.getKey().setCapacity(entry.getValue().getFirst().getCapacity());
+			entry.getKey().setFreespeed(entry.getValue().getFirst().getFreespeed());
+		}
+		new NetworkWriter(networkHighResolution).write(args[2]);
 	}
 	
 }
