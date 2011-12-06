@@ -68,8 +68,6 @@ public class PlatformBasedModeChooser {
 
 	private boolean isChanged = false;
 
-	private boolean useSubtourChoiceRestriction = true;
-
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
@@ -156,6 +154,10 @@ public class PlatformBasedModeChooser {
 		isChanged = true;
 	}
 
+	/**
+	 * sets whether the mode choice must be restricted by the subtour structure
+	 * or not
+	 */
 	public void setIsSubtourRestricted(final boolean isSubtourRestricted) {
 		if (isSubtourRestricted && dayLevelChoiceModel == null) {
 			dayLevelChoiceModel = new ComprehensiveChoiceModel();
@@ -168,6 +170,9 @@ public class PlatformBasedModeChooser {
 		}
 	}
 
+	/**
+	 * @return if the mode choice is restricted by the subtour structure
+	 */
 	public boolean getIsSubtourrestricted() {
 		return dayLevelChoiceModel != null;
 	}
@@ -204,7 +209,7 @@ public class PlatformBasedModeChooser {
 		boolean logRemoval = true;
 		boolean logPersonImpl = true;
 
-		if ( useSubtourChoiceRestriction ) {
+		if ( dayLevelChoiceModel != null ) {
 			log.info( "mode choice is made taking into account tour structure" );
 		}
 		else {
@@ -241,7 +246,7 @@ public class PlatformBasedModeChooser {
 				logPersonImpl = false;
 			}
 
-			if (useSubtourChoiceRestriction) {
+			if ( dayLevelChoiceModel != null ) {
 				performTourLevelChoice( decisionMaker , plan );
 			}
 			else {
@@ -257,6 +262,13 @@ public class PlatformBasedModeChooser {
 		isChanged = false;
 	}
 
+	/**
+	 * Performs the choice procedure, modifying back agents plans, and returns
+	 * the cliques corresponding to the car-pooling matings.
+	 *
+	 * @throws IllegalStateException if some of the components (platform, choice model,
+	 * clique constructor, population) were not set
+	 */
 	public Map<Id, List<Id>> getCliques() {
 		if (isChanged) {
 			process();
