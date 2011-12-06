@@ -32,7 +32,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 
 /*
@@ -45,7 +44,6 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 	
 	protected Id id;
 	protected Scenario scenario;
-	protected AgentCounterI agentCounter;
 	protected AbstractMultithreadedModule abstractMultithreadedModule;
 	protected PlanAlgorithm routeAlgo;
 	protected double time;
@@ -101,10 +99,6 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
-	public final void setAgentCounter(AgentCounterI agentCounter) {
-		this.agentCounter = agentCounter;
-	}
-	
 	public final boolean addAgentsToReplanIdentifier(T identifier) {
 		return this.identifiers.add(identifier);
 	}
@@ -133,6 +127,10 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 	@Override
 	public int compare(WithinDayReplanner<T> r1, WithinDayReplanner<T> r2)  {
 		return r1.getId().compareTo(r2.getId());
+	}
+	
+	public void reset() {
+		
 	}
 	
 	@SuppressWarnings("unchecked")

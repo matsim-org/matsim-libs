@@ -21,12 +21,11 @@
 package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 
 public abstract class WithinDayDuringLegReplannerFactory extends WithinDayReplannerFactory {
 
-	public WithinDayDuringLegReplannerFactory(AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public WithinDayDuringLegReplannerFactory(AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(abstractMultithreadedModule, replanningProbability);
 	}
 	
 	@Override

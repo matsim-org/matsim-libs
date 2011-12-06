@@ -36,6 +36,7 @@ import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 /**
  * This Class implements a SimulationBeforeSimStepListener.
@@ -179,6 +180,17 @@ public class ReplanningManager implements SimulationBeforeSimStepListener, Simul
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		if (isInitialReplanning()) {
 			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
+		}
+		
+		// reset all replanners
+		for (WithinDayReplanner<?> replanner : parallelInitialReplanner.getWithinDayReplanners()) {
+			replanner.reset();
+		}
+		for (WithinDayReplanner<?> replanner : parallelDuringActivityReplanner.getWithinDayReplanners()) {
+			replanner.reset();
+		}
+		for (WithinDayReplanner<?> replanner : parallelDuringLegReplanner.getWithinDayReplanners()) {
+			replanner.reset();
 		}
 	}
 

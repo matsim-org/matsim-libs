@@ -22,25 +22,23 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentsToReplanIdentifier;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
-
 
 public abstract class WithinDayReplannerFactory {
 
 	private Id id;
-	private AgentCounterI agentCounter;
 	private AbstractMultithreadedModule abstractMultithreadedModule;
 	private double replanningProbability = 1.0;
 	
 	/*
 	 * I don't think we need the agentCounter here anymore. Counter updates should
 	 * be triggered by calling QSim.rescheduleActivityEnd(...). There, the count
-	 * is in- or decreased, if necessary.	
+	 * is in- or decreased, if necessary.
+	 * 
+	 * Removed AgentCounter. cdobler, dec'11
 	 */
-	public WithinDayReplannerFactory(AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		this.agentCounter = agentCounter;
+	public WithinDayReplannerFactory(AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
 		this.abstractMultithreadedModule = abstractMultithreadedModule;
 		this.replanningProbability = replanningProbability;
 		this.id = ReplanningIdGenerator.getNextId();
@@ -54,7 +52,6 @@ public abstract class WithinDayReplannerFactory {
 	 */
 	public final void initNewInstance(WithinDayReplanner<? extends AgentsToReplanIdentifier> replanner) {
 		replanner.setReplannerFactory(this);
-		replanner.setAgentCounter(agentCounter);
 		replanner.setReplanningProbability(this.replanningProbability);
 		replanner.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
 		additionalParametersForNewInstance(replanner);
