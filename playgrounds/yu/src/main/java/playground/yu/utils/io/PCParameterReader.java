@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -41,32 +42,41 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
  * 
  */
 public class PCParameterReader implements TabularFileHandler {
-	private TabularFileParserConfig parserConfig;
+	private final TabularFileParserConfig parserConfig;
 
 	/**
 	 * @parameters {@code Map}<{@code String} parameterName,{@code List}<
 	 *             {@code Double}> parameter values>
 	 */
-	private Map<String, List<Double>> parameters;
+	private final Map<String, List<Double>> parameters;
 
 	public PCParameterReader() {
-		this.parserConfig = new TabularFileParserConfig();
+		parserConfig = new TabularFileParserConfig();
 		parserConfig.setDelimiterTags(new String[] { "\t" });
 
-		this.parameters = new TreeMap<String, List<Double>>();
+		parameters = new TreeMap<String, List<Double>>();
+	}
+
+	public List<Double> getParameter(String parameterName) {
+		return parameters.get(parameterName);
+	}
+
+	public Set<String> getParameterNames() {
+		Set<String> keySet = parameters.keySet();
+		Set<String> delegate = new TreeSet<String>();
+		int i = 0;
+		for (String key : keySet) {
+			if (i > 0) {
+				delegate.add(key);
+			}
+			i++;
+		}
+		return delegate;// first column
 	}
 
 	public void readFile(String filename) {
 		parserConfig.setFileName(filename);
 		new TabularFileParser().parse(parserConfig, this);
-	}
-
-	public List<Double> getParameter(String parameterName) {
-		return this.parameters.get(parameterName);
-	}
-
-	public Set<String> getParameterNames() {
-		return this.parameters.keySet();
 	}
 
 	@Override
@@ -75,14 +85,14 @@ public class PCParameterReader implements TabularFileHandler {
 
 		if (!row[0].startsWith("iter")) {
 			int i = 0;
-			for (Iterator<List<Double>> it = this.parameters.values()
-					.iterator(); it.hasNext();) {
+			for (Iterator<List<Double>> it = parameters.values().iterator(); it
+					.hasNext();) {
 				it.next().add(Double.parseDouble(row[i]));
 				i++;
 			}
 		} else/* start */{
 			for (int i = 0; i < size; i++) {
-				this.parameters.put(row[i], new ArrayList<Double>());
+				parameters.put(row[i], new ArrayList<Double>());
 			}
 		}
 	}
