@@ -256,8 +256,7 @@ public class ComprehensiveChoiceModel {
 	private class LegChoiceNode {
 		private final LegChoiceNode previousLeg;
 		private final Alternative alt;
-		private final List<Alternative> alternatives;
-		private final DecisionMaker decider;
+		private final double prob;
 
 		// /////////////////////////////////////////////////////////////////////
 		// construction
@@ -271,7 +270,6 @@ public class ComprehensiveChoiceModel {
 				final LegChoiceNode previousLeg,
 				final Alternative alt,
 				final List<Alternative> fullChoiceSet) {
-			this.decider = decider;
 			this.previousLeg = previousLeg;
 			this.alt = alt;
 
@@ -286,7 +284,8 @@ public class ComprehensiveChoiceModel {
 				// allowed?
 				if (!possibleModes.remove( extractMode( alt ) )) {
 					// this node is not possible: do not continue
-					this.alternatives = null;
+					//this.alternatives = null;
+					this.prob = 0d;
 					return;
 				}
 				else {
@@ -299,9 +298,14 @@ public class ComprehensiveChoiceModel {
 						restrictedChoiceSet.add( currentAlt );
 					}
 				}
-			}
 
-			this.alternatives = restrictedChoiceSet;
+				this.prob = previousLeg.getProbability() *
+					tripLevelModel.getChoiceProbabilities(
+							decider, restrictedChoiceSet).get( alt );
+			}
+			else {
+				prob = 1;
+			}
 		}
 
 		/**
@@ -399,20 +403,7 @@ public class ComprehensiveChoiceModel {
 		}
 
 		public double getProbability() {
-			// the root as "probability" 1
-			if (previousLeg == null) return 1;
-			// infeasible choices have probability 0
-			if (alternatives == null) return 0;
-
-			// otherwise, the probability of the current subchain
-			// is the probability of the current alternative times
-			// the probability of having choosen the subchain until now.
-			double prob = previousLeg.getProbability();
-			if (prob < EPSILON) return 0d;
-
-			return prob
-				* tripLevelModel.getChoiceProbabilities(
-						decider, alternatives).get( alt );
+			return prob;
 		}
 
 		public List<Alternative> getChainString() {
