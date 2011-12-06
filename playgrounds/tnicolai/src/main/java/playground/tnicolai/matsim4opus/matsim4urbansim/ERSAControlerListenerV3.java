@@ -169,7 +169,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		catch(Exception e){ e.printStackTrace(); }
 		finally{
 			// writing accessibility measures stored in a hash map as matrix
-			int coarseSteps = 10;
+			int coarseSteps = 8;
 			FixedSizeGrid grid = new FixedSizeGrid(resolutionMeter, network, resultMap, coarseSteps);
 			grid.writeGrid();
 			
