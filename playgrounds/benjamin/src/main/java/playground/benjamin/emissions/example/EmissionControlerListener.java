@@ -34,6 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import playground.benjamin.emissions.ColdEmissionAnalysisModule;
 import playground.benjamin.emissions.EmissionHandler;
 import playground.benjamin.emissions.WarmEmissionAnalysisModule;
+import playground.benjamin.emissions.WarmEmissionHandler;
 
 /**
  * @author benjamin
@@ -86,10 +87,14 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	public void notifyShutdown(ShutdownEvent event) {
 		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
 		emissionEventWriter.closeFile();
+		logger.info("Warm emissions were not calculated for " + WarmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
+				WarmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
 		logger.info("Emission calculation based on `Fractions' occured for " + WarmEmissionAnalysisModule.getFractionOccurences() + " of " +
 				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + WarmEmissionAnalysisModule.getStopGoOccurences() + " of " +
 				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Stop&Go occured on " + WarmEmissionAnalysisModule.getStopGoKmCounter() + " km of total " + 
+				WarmEmissionAnalysisModule.getKmCounter() + " km traveled, where emissions were calculated.");
 		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
 				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
 				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");

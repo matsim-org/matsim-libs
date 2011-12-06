@@ -91,20 +91,19 @@ public class WarmEmissionAnalysisModule {
 			String vehicleInformation) {
 
 		Map<WarmPollutant, Double> warmEmissions;
-
-		if(vehicleInformation != null){ // check if vehicle file provides vehicle description
-			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
-
-			if (vehicleInformationTuple.getFirst() != null){ // check if the required vehicle category could be interpreted
-				warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
-			} else throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
+		if(vehicleInformation == null){
+			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
+					"Please make sure that requirements for emission vehicles in "
+					+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+		}
+		
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
+		if (vehicleInformationTuple.getFirst() == null){
+			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
-		} else throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
-				"Please make sure that requirements for emission vehicles in "
-				+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
+		}
+		warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
@@ -194,13 +193,7 @@ public class WarmEmissionAnalysisModule {
 				stopGoCounter++;
 				stopGoKmCounter = stopGoKmCounter + linkLength_km;
 			} else {
-				/* first interpretation:*/
-//				double timeStopGo_h = (linkLength_km / averageSpeed_kmh) - (linkLength_km / freeFlowSpeed_kmh);
-//				double distanceStopGo_km = stopGoSpeed_kmh * timeStopGo_h;
-				
-				/* second interpretation:*/
-				double distanceStopGo_km = (linkLength_km * (freeFlowSpeed_kmh - averageSpeed_kmh)) / ((((averageSpeed_kmh * freeFlowSpeed_kmh) / stopGoSpeed_kmh) - averageSpeed_kmh));
-				
+				double distanceStopGo_km = (linkLength_km * stopGoSpeed_kmh * (freeFlowSpeed_kmh - averageSpeed_kmh)) / (averageSpeed_kmh * (freeFlowSpeed_kmh - stopGoSpeed_kmh));
 				double distanceFreeFlow_km = linkLength_km - distanceStopGo_km;
 				
 				generatedEmissions = (distanceFreeFlow_km * efFreeFlow_gpkm) + (distanceStopGo_km * efStopGo_gpkm);

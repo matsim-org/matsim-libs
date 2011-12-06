@@ -102,67 +102,66 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if(event.getLegMode().equals("car")){
-			Id personId= event.getPersonId();
-			Double stopEngineTime = event.getTime();
-			this.stopEngine.put(personId, stopEngineTime);
+		if(!event.getLegMode().equals("car")){ // no emissions to calculate...
+			return;
+		}
+		Id personId= event.getPersonId();
+		Double stopEngineTime = event.getTime();
+		this.stopEngine.put(personId, stopEngineTime);
 
-			double startEngineTime = this.startEngine.get(personId);
-			double parkingDuration = this.parkingDuration.get(personId);
-			Id coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
+		double startEngineTime = this.startEngine.get(personId);
+		double parkingDuration = this.parkingDuration.get(personId);
+		Id coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
 
-			Double accumulatedDistance;
-			if(this.accumulatedDistance.containsKey(personId)){
-				accumulatedDistance = this.accumulatedDistance.get(personId);
-			} else {
-				accumulatedDistance = 0.0;
-				this.accumulatedDistance.put(personId, 0.0);
-			}
+		Double accumulatedDistance;
+		if(this.accumulatedDistance.containsKey(personId)){
+			accumulatedDistance = this.accumulatedDistance.get(personId);
+		} else {
+			accumulatedDistance = 0.0;
+			this.accumulatedDistance.put(personId, 0.0);
+		}
 
-			Id vehicleId = personId;
-			String vehicleInformation = null;
-			if(this.emissionVehicles.getVehicles().containsKey(vehicleId)){
-				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-				VehicleType vehicleType = vehicle.getType();
-				vehicleInformation = vehicleType.getId().toString();
-				this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
-						coldEmissionEventLinkId,
-						personId,
-						startEngineTime,
-						parkingDuration,
-						accumulatedDistance,
-						vehicleInformation);
-			} else throw new RuntimeException("No vehicle defined for person " + personId + ". " +
+		Id vehicleId = personId;
+		String vehicleInformation = null;
+
+		if(!this.emissionVehicles.getVehicles().containsKey(vehicleId)){
+			throw new RuntimeException("No vehicle defined for person " + personId + ". " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
-			this.accumulatedDistance.remove(personId);
-		} else {
-			// no emissions to calculate...
 		}
+
+		Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+		VehicleType vehicleType = vehicle.getType();
+		vehicleInformation = vehicleType.getId().toString();
+		this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
+				coldEmissionEventLinkId,
+				personId,
+				startEngineTime,
+				parkingDuration,
+				accumulatedDistance,
+				vehicleInformation);
+		this.accumulatedDistance.remove(personId);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if(event.getLegMode().equals("car")){
-			Id linkId = event.getLinkId();
-			Id personId= event.getPersonId();
-			Double startEngineTime = event.getTime();
-			this.startEngine.put(personId, startEngineTime);
-			this.personId2coldEmissionEventLinkId.put(personId, linkId);
+		if(!event.getLegMode().equals("car")){ // no engine to start...
+			return;
+		}
+		Id linkId = event.getLinkId();
+		Id personId= event.getPersonId();
+		double startEngineTime = event.getTime();
+		this.startEngine.put(personId, startEngineTime);
+		this.personId2coldEmissionEventLinkId.put(personId, linkId);
 
-			Double parkingDuration;
-			if (this.stopEngine.containsKey(personId)){
-				double stopEngineTime = this.stopEngine.get(personId);
-				parkingDuration = startEngineTime - stopEngineTime;
+		double parkingDuration;
+		if (this.stopEngine.containsKey(personId)){
+			double stopEngineTime = this.stopEngine.get(personId);
+			parkingDuration = startEngineTime - stopEngineTime;
 
-			} else {
-				parkingDuration = 43200.0; //parking duration is assumed to be at least 12 hours when parking overnight
-			}
-			this.parkingDuration.put(personId, parkingDuration);
-			}
-			else{
-				// no engine to start...
-			}
+		} else { //parking duration is assumed to be at least 12 hours when parking overnight
+			parkingDuration = 43200.0;
+		}
+		this.parkingDuration.put(personId, parkingDuration);
 	}
 }

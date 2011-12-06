@@ -101,20 +101,19 @@ public class ColdEmissionAnalysisModule {
 			String vehicleInformation) {
 
 		Map<ColdPollutant, Double> coldEmissions;
+		if(vehicleInformation == null){
+			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
+					"Please make sure that requirements for emission vehicles in "
+					+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 
-		if(vehicleInformation != null){ // check if vehicle file provides vehicle description
-			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
-
-			if (vehicleInformationTuple.getFirst() != null){ // check if the required vehicle category could be interpreted
-				coldEmissions = calculateColdEmissions(personId, parkingDuration, accumulatedDistance, vehicleInformationTuple);
-			} else throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
+		}
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
+		if (vehicleInformationTuple.getFirst() != null){
+			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
-		} else throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
-				"Please make sure that requirements for emission vehicles in "
-				+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
+		}
+		coldEmissions = calculateColdEmissions(personId, parkingDuration, accumulatedDistance, vehicleInformationTuple);
 		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
