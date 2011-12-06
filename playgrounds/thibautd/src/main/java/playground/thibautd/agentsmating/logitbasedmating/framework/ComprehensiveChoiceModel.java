@@ -68,6 +68,9 @@ public class ComprehensiveChoiceModel {
 	private int[] subtourIndices = null;
 	private int[] subtourFatherTable = null;
 
+	// for logging
+	private int lastAlternativesCount = 0;
+
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
@@ -117,7 +120,8 @@ public class ComprehensiveChoiceModel {
 		throw new RuntimeException( "choice procedure failed: sum of probabilities = "+currentBound+
 				" for agent "+plan.getPerson().getId()+
 				" with plan of length "+plan.getPlanElements().size()+
-				" and "+probs.size()+" possible mode chains" );
+				" and "+probs.size()+" possible mode chains (non-0 probability), "+
+				lastAlternativesCount+" complete mode chains (including 0-prob)" );
 	}
 
 	/**
@@ -153,7 +157,9 @@ public class ComprehensiveChoiceModel {
 		Map< List<Alternative> , Double > probabilities =
 			new HashMap< List<Alternative> , Double >();
 
+		lastAlternativesCount = 0;
 		for (LegChoiceNode node : possibleStringsLeaves) {
+			lastAlternativesCount++;
 			double prob = node.getProbability();
 
 			if (prob > EPSILON) {
