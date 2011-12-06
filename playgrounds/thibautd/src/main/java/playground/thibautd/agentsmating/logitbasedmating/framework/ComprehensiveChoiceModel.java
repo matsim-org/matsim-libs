@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 /**
@@ -42,7 +43,7 @@ public class ComprehensiveChoiceModel {
 	private ChoiceModel tripLevelModel = null;
 	private final PlanAnalyzeSubtours subtoursAnalyser = new PlanAnalyzeSubtours();
 
-	private static final double EPSILON = 1E-7;
+	private static final double EPSILON = 1E-15;
 	private static final int NO_FATHER_SUBTOUR = Integer.MIN_VALUE;
 	private static final String PASSENGER_MODE = "cp_pass";
 	private static final String DRIVER_MODE = "cp_driver";
@@ -66,6 +67,13 @@ public class ComprehensiveChoiceModel {
 
 	private int[] subtourIndices = null;
 	private int[] subtourFatherTable = null;
+
+	// /////////////////////////////////////////////////////////////////////////
+	// /////////////////////////////////////////////////////////////////////////
+	public ComprehensiveChoiceModel() {
+		subtoursAnalyser.setTripStructureAnalysisLayer(
+				PlanomatConfigGroup.TripStructureAnalysisLayerOption.link );
+	}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// getters / setters
@@ -155,6 +163,9 @@ public class ComprehensiveChoiceModel {
 		return probabilities;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// choice set construction
+	// /////////////////////////////////////////////////////////////////////////
 	/**
 	 * Recursively constructs the possible mode chains, by explicitly
 	 * constructing the tree of possible mode chains: each node has as successors
@@ -170,8 +181,8 @@ public class ComprehensiveChoiceModel {
 			final LegChoiceNode previousLeg,
 			final DecisionMaker decisionMaker,
 			final List< List<Alternative> > fullChoiceSets) {
-		// if no more legs, return the previous leg in a list.
-		// it will be the last element of the list returned by the to call
+		// if no more legs,  the last leg was a "leaf" leg (ie a node corresponding
+		// to the full mode chain): return it in a list.
 		if (fullChoiceSets == null) return Arrays.asList( previousLeg );
 
 		// construct the list of full choice sets for upcoming legs
@@ -182,8 +193,8 @@ public class ComprehensiveChoiceModel {
 			null;
 
 		List< LegChoiceNode > leaves = new ArrayList< LegChoiceNode >();
+		// process child nodes
 		for (Alternative alt : currentAlternatives) {
-			// create the node corresponding to the current leg
 			LegChoiceNode currentNode = new LegChoiceNode(
 					decisionMaker,
 					previousLeg,
@@ -247,6 +258,9 @@ public class ComprehensiveChoiceModel {
 		private final List<Alternative> alternatives;
 		private final DecisionMaker decider;
 
+		// /////////////////////////////////////////////////////////////////////
+		// construction
+		// /////////////////////////////////////////////////////////////////////
 		public LegChoiceNode() {
 			this(null, null, null, null);
 		}
@@ -262,10 +276,13 @@ public class ComprehensiveChoiceModel {
 
 			List<Alternative> restrictedChoiceSet = new ArrayList<Alternative>();
 
+			// previousLeg == null for the root, which does not correspond to a leg
 			if (previousLeg != null) {
 				List<String> possibleModes = previousLeg.getPossibleModes(
 							subtourIndices[ getIndex() ] );
 
+				// first of all: is the alternative corresponding to this not
+				// allowed?
 				if (!possibleModes.remove( extractMode( alt ) )) {
 					// this node is not possible: do not continue
 					this.alternatives = null;
@@ -274,6 +291,8 @@ public class ComprehensiveChoiceModel {
 				else {
 					restrictedChoiceSet.add( alt );
 				}
+
+				// add all allowed alternatives
 				for (Alternative currentAlt : fullChoiceSet) {
 					if (possibleModes.remove( extractMode( currentAlt ) )) {
 						restrictedChoiceSet.add( currentAlt );
@@ -284,6 +303,9 @@ public class ComprehensiveChoiceModel {
 			this.alternatives = restrictedChoiceSet;
 		}
 
+		/**
+		 * @return the mode, including car pooling
+		 */
 		// TODO: put this in the TripRequest contract!
 		private String extractMode(
 				final Alternative alt) {
@@ -298,6 +320,9 @@ public class ComprehensiveChoiceModel {
 			return alt.getMode();
 		}
 
+		// /////////////////////////////////////////////////////////////////////
+		// interface
+		// /////////////////////////////////////////////////////////////////////
 		public int getIndex() {
 			if (previousLeg == null) return -1;
 			return previousLeg.getIndex() + 1;
@@ -373,9 +398,14 @@ public class ComprehensiveChoiceModel {
 		}
 
 		public double getProbability() {
+			// the root as "probability" 1
 			if (previousLeg == null) return 1;
+			// infeasible choices have probability 0
 			if (alternatives == null) return 0;
 
+			// otherwise, the probability of the current subchain
+			// is the probability of the current alternative times
+			// the probability of having choosen the subchain until now.
 			double prob = previousLeg.getProbability();
 			if (prob < EPSILON) return 0d;
 
