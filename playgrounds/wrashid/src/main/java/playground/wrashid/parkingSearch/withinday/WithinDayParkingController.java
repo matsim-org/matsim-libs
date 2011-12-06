@@ -82,8 +82,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 	
 		this.randomSearchReplanner = new RandomSearchReplannerFactory(router, 1.0, this.scenarioData, parkingAgentsTracker).createReplanner();
-		this.randomSearchReplanner.addAgentsToReplanIdentifier(this.randomSearchIdentifier);
-		new SearchParkingAgentsIdentifier(parkingAgentsTracker);		
+		this.randomSearchReplanner.addAgentsToReplanIdentifier(this.randomSearchIdentifier);		
 		this.getReplanningManager().addDuringLegReplanner(this.randomSearchReplanner);
 	}
 	
@@ -127,7 +126,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		/*
-		 * During the replanning the mode chain of the agents' selcted plans
+		 * During the replanning the mode chain of the agents' selected plans
 		 * might have been changed. Therefore, we have to ensure that the 
 		 * chains are still valid.
 		 */
