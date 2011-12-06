@@ -28,7 +28,6 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -44,8 +43,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
 
-public class WithinDayParkingController extends WithinDayController implements SimulationInitializedListener, 
-	StartupListener, ReplanningListener {
+public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -63,8 +61,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	public WithinDayParkingController(String[] args) {
 		super(args);
 		
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
+		// register this as a Controller Listener
 		super.addControlerListener(this);
 	}
 
@@ -78,12 +75,12 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	protected void initReplanners(QSim sim) {
+	protected void initReplanners() {
 
 		TravelTimeCollector travelTime = super.getTravelTimeCollector();
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 	
 		this.randomSearchReplanner = new RandomSearchReplannerFactory(router, 1.0, this.scenarioData, parkingAgentsTracker).createReplanner();
@@ -126,6 +123,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		this.setMobsimFactory(mobsimFactory);
 		
 		this.initIdentifiers();
+		this.initReplanners();
 	}
 
 	@Override
@@ -138,12 +136,6 @@ public class WithinDayParkingController extends WithinDayController implements S
 		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
 			legModeChecker.run(person.getSelectedPlan());			
 		}
-	}
-	
-	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		QSim sim = (QSim) e.getQueueSimulation();
-		initReplanners(sim);
 	}
 		
 	/*
