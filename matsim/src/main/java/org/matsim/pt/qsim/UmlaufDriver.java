@@ -115,6 +115,8 @@ public class UmlaufDriver extends AbstractTransitDriver {
 //		this.sim.arrangeAgentDeparture(this);
 		this.state = MobsimAgent.State.LEG ;
 		this.sim.insertAgentIntoMobsim(this) ;
+		// yyyyyy 000000
+
 	}
 
 	@Override
@@ -132,6 +134,8 @@ public class UmlaufDriver extends AbstractTransitDriver {
 //			this.sim.arrangeActivityStart(this);
 			this.state = MobsimAgent.State.ACTIVITY ;
 			this.sim.insertAgentIntoMobsim(this) ;
+			// yyyyyy 000000
+
 
 		} else {
 			this.getSimulation().getAgentCounter().decLiving();

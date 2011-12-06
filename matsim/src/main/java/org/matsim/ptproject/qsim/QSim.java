@@ -203,6 +203,8 @@ public final class QSim implements VisMobsim, Netsim {
 			// create MultiModalSimEngine
 			multiModalEngine = new MultiModalSimEngineFactory()
 			.createMultiModalSimEngine(this);
+			
+			multiModalEngine.setInternalInterface(internalInterface) ;
 
 			// add MultiModalDepartureHandler
 			this.addDepartureHandler(new MultiModalDepartureHandler(this,
@@ -289,6 +291,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		this.changeEventsEngine = new NetworkChangeEventsEngine(this);
+		this.changeEventsEngine.setInternalInterface(internalInterface) ;
 		if (this.changeEventsEngine != null) {
 			this.changeEventsEngine.onPrepareSim();
 		}
@@ -429,7 +432,9 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 	
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
-		
+		if ( this.agents.contains(agent) ) {
+//			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
+		}
 		arrangeNextAgentAction(agent);
 	}
 

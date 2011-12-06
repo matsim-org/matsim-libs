@@ -104,6 +104,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 //				this.simulation.arrangeActivityStart(this);
 				this.state = MobsimAgent.State.ACTIVITY ;
 				this.simulation.insertAgentIntoMobsim(this) ;
+				// yyyyyy 000000
+
 
 				this.simulation.getAgentCounter().incLiving();
 			}
@@ -193,6 +195,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 //				this.simulation.arrangeActivityStart(this);
 				this.state = MobsimAgent.State.ACTIVITY ;
 				this.simulation.insertAgentIntoMobsim(this);
+				// yyyyyy 000000
 				
 				return ;
 			} else {
