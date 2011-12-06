@@ -110,19 +110,19 @@ public class DemoController extends WithinDayController implements SimulationIni
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.initialReplanner = new CreateEvacuationPlanReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.initialReplanner = new CreateEvacuationPlanReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		this.getReplanningManager().addIntialReplanner(this.initialReplanner);
 		
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		this.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}

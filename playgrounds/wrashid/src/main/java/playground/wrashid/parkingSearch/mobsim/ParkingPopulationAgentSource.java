@@ -37,6 +37,7 @@ import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
 
 /**
  * Creates agents for the QSim. Agents' vehicles are add to the parking
@@ -51,13 +52,15 @@ public class ParkingPopulationAgentSource implements AgentSource {
     private final AgentFactory agentFactory;
 	private final QSim qsim;
 	private final InsertParkingActivities insertParkingActivities;
+	private final ParkingInfrastructure parkingInfrastructure;
 
     public ParkingPopulationAgentSource(Population population, AgentFactory agentFactory, 
-    		QSim qsim, InsertParkingActivities insertParkingActivities) {
+    		QSim qsim, InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure) {
         this.population = population;
         this.agentFactory = agentFactory;
         this.qsim = qsim;
         this.insertParkingActivities = insertParkingActivities;
+        this.parkingInfrastructure = parkingInfrastructure;
     }
 	
 	@Override
@@ -83,6 +86,8 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	    	
 			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), 
 					VehicleUtils.getDefaultVehicleType()), getParkingLinkId(plan));
+			
+			parkVehicle(plan);
 		}
         return agents;
 	}
@@ -93,7 +98,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	 * parked its car. If no parking activity is found, the agent does not perform 
 	 * a car trip. In that case we assume that the agent's car is at his home facility.
 	 * 
-	 * @param agent
+	 * @param plan agent's executed plan
 	 * @return id of the link where agent's home parking facility is attached to
 	 */
     private Id getParkingLinkId(Plan plan) {
@@ -104,5 +109,23 @@ public class ParkingPopulationAgentSource implements AgentSource {
     		}
     	}
     	return ((Activity) plan.getPlanElements().get(0)).getLinkId();
+    }
+    
+    /**
+     * Registers the agent's vehicle at the very first parking facility in the
+     * agent's plan. If the agent has no parking activities scheduled, its plan
+     * does not contain car legs and therefore no vehicles is required.
+     * 
+     * @param plan agent's executed plan
+     */
+    private void parkVehicle(Plan plan) {
+    	for (PlanElement planElement : plan.getPlanElements()) {
+    		if (planElement instanceof Activity) {
+    			Activity activity = (Activity) planElement;
+    			if (activity.getType().equals("parking")) {
+    				parkingInfrastructure.parkVehicle(activity.getFacilityId());
+    			}
+    		}
+    	}
     }
 }

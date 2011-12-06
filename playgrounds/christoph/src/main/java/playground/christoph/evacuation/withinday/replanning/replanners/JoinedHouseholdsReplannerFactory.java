@@ -22,7 +22,6 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 
@@ -35,10 +34,9 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final HouseholdsUtils householdsUtils; 
 	private final JoinedHouseholdsIdentifier identifier;
 	
-	public JoinedHouseholdsReplannerFactory(Scenario scenario, AgentCounterI agentCounter, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, 
-			HouseholdsUtils householdsUtils, JoinedHouseholdsIdentifier identifier) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public JoinedHouseholdsReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, 
+			double replanningProbability, HouseholdsUtils householdsUtils, JoinedHouseholdsIdentifier identifier) {
+		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 		this.householdsUtils = householdsUtils;
 		this.identifier = identifier;

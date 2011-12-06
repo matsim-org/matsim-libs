@@ -36,6 +36,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 
 import playground.wrashid.parkingSearch.withinday.InsertParkingActivities;
+import playground.wrashid.parkingSearch.withinday.ParkingInfrastructure;
 
 /**
  * This class is basically a copy of QSimFactory but instead of a
@@ -51,9 +52,11 @@ public class ParkingQSimFactory implements MobsimFactory {
     private final static Logger log = Logger.getLogger(ParkingQSimFactory.class);
 
     private final InsertParkingActivities insertParkingActivities;
+    private final ParkingInfrastructure parkingInfrastructure;
     
-    public ParkingQSimFactory(InsertParkingActivities insertParkingActivities) {
+    public ParkingQSimFactory(InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure) {
     	this.insertParkingActivities = insertParkingActivities;
+    	this.parkingInfrastructure = parkingInfrastructure;
     }
     
     @Override
@@ -76,7 +79,8 @@ public class ParkingQSimFactory implements MobsimFactory {
         }
         QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-        AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, insertParkingActivities);
+        AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
+        		insertParkingActivities, parkingInfrastructure);
         qSim.addAgentSource(agentSource);
         return qSim;
 

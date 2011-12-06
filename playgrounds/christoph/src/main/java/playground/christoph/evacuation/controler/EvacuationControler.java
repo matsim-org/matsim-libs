@@ -49,7 +49,6 @@ import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
@@ -301,7 +300,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected void initReplanners(QSim sim) {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		AgentCounterI agentCounter = sim.getAgentCounter();
 		
 		// without social costs
 		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCollector());
@@ -325,11 +323,11 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, agentCounter, router, 1.0, householdsUtils, modeAvailabilityChecker).createReplanner();
+		this.currentActivityToMeetingPointReplanner = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsUtils, modeAvailabilityChecker).createReplanner();
 		this.currentActivityToMeetingPointReplanner.addAgentsToReplanIdentifier(this.activityPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.currentActivityToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 		
-		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, agentCounter, router, 1.0, householdsUtils, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
+		this.joinedHouseholdsReplanner = new JoinedHouseholdsReplannerFactory(this.scenarioData, router, 1.0, householdsUtils, (JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier).createReplanner();
 		this.joinedHouseholdsReplanner.addAgentsToReplanIdentifier(joinedHouseholdsIdentifier);
 		this.getReplanningManager().addTimedDuringActivityReplanner(this.joinedHouseholdsReplanner, EvacuationConfig.evacuationTime + 1, Double.MAX_VALUE);
 		
@@ -350,7 +348,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, agentCounter, router, 1.0, householdsUtils).createReplanner();
+		this.currentLegToMeetingPointReplanner = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, router, 1.0, householdsUtils).createReplanner();
 		this.currentLegToMeetingPointReplanner.addAgentsToReplanIdentifier(this.legPerformingIdentifier);
 		this.getReplanningManager().addTimedDuringLegReplanner(this.currentLegToMeetingPointReplanner, EvacuationConfig.evacuationTime, EvacuationConfig.evacuationTime + 1);
 		

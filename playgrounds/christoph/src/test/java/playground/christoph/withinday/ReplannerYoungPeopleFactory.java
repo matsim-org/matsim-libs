@@ -22,7 +22,6 @@ package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -30,8 +29,8 @@ public class ReplannerYoungPeopleFactory extends WithinDayDuringLegReplannerFact
 
 	private Scenario scenario;
 	
-	public ReplannerYoungPeopleFactory(Scenario scenario, AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public ReplannerYoungPeopleFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 

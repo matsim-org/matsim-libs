@@ -22,7 +22,6 @@ package playground.christoph.oldenburg;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.ptproject.qsim.interfaces.AgentCounterI;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
@@ -30,8 +29,8 @@ public class CreateEvacuationPlanReplannerFactory extends WithinDayInitialReplan
 
 	private Scenario scenario;
 	
-	public CreateEvacuationPlanReplannerFactory(Scenario scenario, AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public CreateEvacuationPlanReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 

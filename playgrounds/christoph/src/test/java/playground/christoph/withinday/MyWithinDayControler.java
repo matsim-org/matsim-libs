@@ -92,7 +92,7 @@ class MyWithinDayControler extends Controler {
 
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner(); 
+		WithinDayDuringActivityReplanner duringActivityReplanner = new ReplannerOldPeopleFactory(this.scenarioData, router, 1.0).createReplanner(); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
@@ -106,7 +106,7 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayDuringLegReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		WithinDayDuringLegReplanner duringLegReplanner = new ReplannerYoungPeopleFactory(this.scenarioData, router, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route

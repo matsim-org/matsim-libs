@@ -29,21 +29,27 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 
-public class ParkingInfrastructure {
+public class ParkingInfrastructure implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private final QuadTree<ActivityFacility> parkingFacilities;
 	private final Map<Id, List<Id>> parkingFacilitiesOnLinkMapping; // <LinkId, List<FacilityId>>
 	private final Map<Id, Id> facilityToLinkMapping;	// <FacilityId, LinkId>
-	private final IntegerValueHashMap<Id> facilityCapacities;
+	private final IntegerValueHashMap<Id> reservedCapcities;	// number of reserved parkings
+	private final IntegerValueHashMap<Id> facilityCapacities;	// remaining capacity
 
 	public ParkingInfrastructure(Scenario scenario) {
 		facilityCapacities = new IntegerValueHashMap<Id>();
+		reservedCapcities = new IntegerValueHashMap<Id>();
 		facilityToLinkMapping = new HashMap<Id, Id>();
 		parkingFacilitiesOnLinkMapping = new HashMap<Id, List<Id>>();
 		
@@ -82,13 +88,25 @@ public class ParkingInfrastructure {
 				
 				// add the facility to the facilityToLinkMapping
 				facilityToLinkMapping.put(facility.getId(), facility.getLinkId());
-				
-				// set initial capacity
-				facilityCapacities.incrementBy(facility.getId(), 100);
 			}
 		}
 	}
 
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		if (event.getActType().equals("parking")) {
+			reservedCapcities.decrement(event.getFacilityId());
+			facilityCapacities.increment(event.getFacilityId());
+		}
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().equals("parking")) {
+			facilityCapacities.increment(event.getFacilityId());
+		}
+	}
+	
 	public int getFreeCapacity(Id facilityId) {
 		return facilityCapacities.get(facilityId);
 	}
@@ -100,11 +118,34 @@ public class ParkingInfrastructure {
 	public void unParkVehicle(Id facilityId) {
 		facilityCapacities.increment(facilityId);
 	}
+	
+	public void reserveParking(Id facilityId) {
+		reservedCapcities.decrement(facilityId);
+	}
+
+	public void unreserveParking(Id facilityId) {
+		reservedCapcities.increment(facilityId);
+	}
 
 	public List<Id> getParkingsOnLink(Id linkId) {
 		return parkingFacilitiesOnLinkMapping.get(linkId);
 	}
 
+	public Id getFreeParkingFacilityOnLink(Id linkId) {
+		List<Id> list = getParkingsOnLink(linkId);
+		if (list == null) return null;
+		else {
+			int maxCapacity = 0;
+			Id facilityId = null;
+			for (Id id : list) {
+				int capacity = facilityCapacities.get(id);
+				int reserved = reservedCapcities.get(id);
+				if ((capacity - reserved) > maxCapacity) facilityId = id;
+			}
+			return facilityId;
+		}
+	}
+	
 	public Id getClosestFreeParkingFacility(Coord coord) {
 		LinkedList<ActivityFacility> tmpList=new LinkedList<ActivityFacility>();
 		ActivityFacility parkingFacility=parkingFacilities.get(coord.getX(), coord.getY());
@@ -128,6 +169,16 @@ public class ParkingInfrastructure {
 	private void resetParkingFacilitiesQuadTree(LinkedList<ActivityFacility> tmpList) {
 		for (ActivityFacility parking:tmpList){
 			parkingFacilities.put(parking.getCoord().getX(), parking.getCoord().getX(), parking);
+		}
+	}
+
+	@Override
+	public void reset(int iteration) {
+		
+		for (Id facilityId : facilityToLinkMapping.keySet()) {
+			// set initial capacity
+			facilityCapacities.set(facilityId, 1000);
+			reservedCapcities.set(facilityId, 0);
 		}
 	}
 

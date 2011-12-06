@@ -133,7 +133,7 @@ public class WithinDayControler extends WithinDayController {
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
-		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.initialReplanner);
 
@@ -141,7 +141,7 @@ public class WithinDayControler extends WithinDayController {
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pActEndReplanning);
-		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		super.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 
@@ -149,7 +149,7 @@ public class WithinDayControler extends WithinDayController {
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pLeaveLinkReplanning);
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		super.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}

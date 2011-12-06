@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
@@ -76,11 +75,11 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		 * the simulation counter has been decreased by one. We re-enable the
 		 * agent so we have to increase the counter again.
 		 */
-		if (currentActivity.getEndTime() == Time.UNDEFINED_TIME) this.agentCounter.incLiving();
+//		if (currentActivity.getEndTime() == Time.UNDEFINED_TIME) this.agentCounter.incLiving();
 		
 		// Set the end time of the current activity to the current time.
 		currentActivity.setEndTime(this.time);
-
+		
 		// get the index of the currently performed activity in the selected plan
 		int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
 

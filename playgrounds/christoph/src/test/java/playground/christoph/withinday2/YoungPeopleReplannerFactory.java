@@ -30,8 +30,8 @@ public class YoungPeopleReplannerFactory extends WithinDayDuringLegReplannerFact
 
 	private Scenario scenario;
 	
-	public YoungPeopleReplannerFactory(Scenario scenario, AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public YoungPeopleReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 

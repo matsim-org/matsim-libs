@@ -30,8 +30,8 @@ public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActiv
 
 	private Scenario scenario;
 	
-	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, AgentCounterI agentCounter, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(agentCounter, abstractMultithreadedModule, replanningProbability);
+	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+		super(abstractMultithreadedModule, replanningProbability);
 		this.scenario = scenario;
 	}
 

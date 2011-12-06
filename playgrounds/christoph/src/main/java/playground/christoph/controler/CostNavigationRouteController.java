@@ -137,7 +137,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplanner = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, sim.getAgentCounter(), router, 1.0, costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory()).createReplanner();
+		this.duringLegReplanner = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, router, 1.0, costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory()).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}

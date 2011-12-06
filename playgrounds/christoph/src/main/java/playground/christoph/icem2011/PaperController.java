@@ -182,7 +182,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		this.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +41,9 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -48,15 +51,18 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
-		SimulationInitializedListener {
+		SimulationInitializedListener, SimulationAfterSimStepListener {
 
 	private final Scenario scenario;
 	private final double distance;
 	
 	private final Set<Id> carLegAgents;
 	private final Set<Id> searchingAgents;
+	private final Set<Id> linkEnteredAgents;
+	private final Set<Id> lastTimeStepsLinkEnteredAgents;
 	private final Map<Id, ActivityFacility> nextActivityFacilityMap;
 	private final Map<Id, ExperimentalBasicWithindayAgent> agents;
+	private final Map<Id, Id> selectedParkingsMap;
 	
 	/**
 	 * Tracks agents' car legs and check whether they have to start
@@ -70,6 +76,9 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		this.distance = distance;
 		
 		this.carLegAgents = new HashSet<Id>();
+		this.linkEnteredAgents = new HashSet<Id>();
+		this.selectedParkingsMap = new HashMap<Id, Id>();
+		this.lastTimeStepsLinkEnteredAgents = new TreeSet<Id>();	// This set has to be be deterministic!
 		this.searchingAgents = new HashSet<Id>();
 		this.nextActivityFacilityMap = new HashMap<Id, ActivityFacility>();
 		this.agents = new HashMap<Id, ExperimentalBasicWithindayAgent>();
@@ -84,6 +93,24 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
 			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
 		}
+	}
+	
+	@Override
+	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
+		lastTimeStepsLinkEnteredAgents.clear();
+		lastTimeStepsLinkEnteredAgents.addAll(linkEnteredAgents);
+		linkEnteredAgents.clear();
+	}
+	public Set<Id> getLinkEnteredAgents() {
+		return lastTimeStepsLinkEnteredAgents;
+	}
+	
+	public void setSelectedParking(Id agentId, Id parkingFacilityId) {
+		selectedParkingsMap.put(agentId, parkingFacilityId);
+	}
+	
+	public Id getSelectedParking(Id agentId) {
+		return selectedParkingsMap.get(agentId);
 	}
 	
 	@Override
@@ -130,6 +157,8 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 	public void handleEvent(AgentArrivalEvent event) {
 		this.carLegAgents.remove(event.getPersonId());
 		this.searchingAgents.remove(event.getPersonId());
+		this.linkEnteredAgents.remove(event.getPersonId());
+		this.selectedParkingsMap.remove(event.getPersonId());
 	}
 
 	@Override
@@ -144,6 +173,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 			 */
 			if (d <= distance) {
 				searchingAgents.add(event.getPersonId());
+				linkEnteredAgents.add(event.getPersonId());
 //				System.out.println("searching...");
 			} 
 			/*
@@ -154,6 +184,10 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 				searchingAgents.add(event.getPersonId());
 			}
 		}
+		// the agent is already searching: update its position
+		else {
+			linkEnteredAgents.add(event.getPersonId());
+		}
 	}
 	
 	@Override
@@ -161,7 +195,10 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrival
 		agents.clear();
 		carLegAgents.clear();
 		searchingAgents.clear();
+		linkEnteredAgents.clear();
+		selectedParkingsMap.clear();
 		nextActivityFacilityMap.clear();
+		lastTimeStepsLinkEnteredAgents.clear();
 	}
 
 }

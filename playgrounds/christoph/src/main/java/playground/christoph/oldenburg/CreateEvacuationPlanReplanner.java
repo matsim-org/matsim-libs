@@ -103,9 +103,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 			double newDepartureTime = withinDayAgent.getActivityEndTime();
 			
 			((PersonDriverAgentImpl) withinDayAgent).getMobsim().rescheduleActivityEnd(withinDayAgent, oldDepartureTime, newDepartureTime);
-			
-			this.agentCounter.incLiving();
-			
+						
 			return true;
 		}
 		else {

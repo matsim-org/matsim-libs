@@ -139,21 +139,21 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, travelTime, factory, routeFactory); 
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
-		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
 		super.getReplanningManager().addIntialReplanner(this.initialReplanner);	
 		
 		super.createAndInitActivityReplanningMap();
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringActivityReplanner = new NextLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringActivityReplanner.addAgentsToReplanIdentifier(this.duringActivityIdentifier);
 		super.getReplanningManager().addDuringActivityReplanner(this.duringActivityReplanner);
 		
 		super.createAndInitLinkReplanningMap();
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, sim.getAgentCounter(), router, 1.0).createReplanner();
+		this.duringLegReplanner = new CurrentLegReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
 		this.duringLegReplanner.addAgentsToReplanIdentifier(this.duringLegIdentifier);
 		super.getReplanningManager().addDuringLegReplanner(this.duringLegReplanner);
 	}

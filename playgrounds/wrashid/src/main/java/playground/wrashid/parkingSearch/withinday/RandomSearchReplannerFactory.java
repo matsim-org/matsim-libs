@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplannerOldPeopleFactory.java
+ * RandomSearchReplannerFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,25 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday2;
+package playground.wrashid.parkingSearch.withinday;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-public class OldPeopleReplannerFactory extends WithinDayDuringActivityReplannerFactory {
+public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
-	private Scenario scenario;
+	private final Scenario scenario;
+	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public OldPeopleReplannerFactory(Scenario scenario, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
+	public RandomSearchReplannerFactory(AbstractMultithreadedModule abstractMultithreadedModule,
+			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
 		super(abstractMultithreadedModule, replanningProbability);
+		
 		this.scenario = scenario;
+		this.parkingAgentsTracker = parkingAgentsTracker;
 	}
 
 	@Override
-	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new OldPeopleReplanner(super.getId(), scenario);
+	public RandomSearchReplanner createReplanner() {
+		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), scenario, parkingAgentsTracker);
 		super.initNewInstance(replanner);
 		return replanner;
 	}

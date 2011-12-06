@@ -103,7 +103,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplanner duringActivityReplanner = new OldPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
+		WithinDayDuringActivityReplanner duringActivityReplanner = new OldPeopleReplannerFactory(sc, routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.
 
@@ -118,7 +118,7 @@ public class MyMobsimFactory implements MobsimFactory {
 
 		// replanning while on leg:
 
-		WithinDayDuringLegReplanner duringLegReplanner = new YoungPeopleReplannerFactory(sc, mobsim.getAgentCounter(), routerModule, 1.0).createReplanner();
+		WithinDayDuringLegReplanner duringLegReplanner = new YoungPeopleReplannerFactory(sc, routerModule, 1.0).createReplanner();
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route
