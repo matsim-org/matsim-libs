@@ -29,11 +29,11 @@ public class OneSampleT_Test {
 
 		if (args.length < 4) {
 			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/input/bln2pct/run1536/base.log";
+			paramFilename = "D:/workspace/runs-svn/run1536/paramSyn3.log";
 			// outputFilename =
 			// "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
 			// width = 500;
-			window=50;
+			window=101;
 			mus[0] = -3;
 			mus[1] = 0;
 		} else {
@@ -50,8 +50,8 @@ public class OneSampleT_Test {
 
 		int i = 0;
 		for (String paramName : paramReader.getParameterNames()) {
-			if (i < 2) {
-				double mu = mus[i];
+			if (i > 1) {
+				double mu = mus[i-2];
 				System.out.println("One-sample t-test\tmu:\t" + mu);
 				System.out.println("One-sample t-test\tt-value:\t"
 						+ new OneSampleT_Test(paramReader
@@ -72,7 +72,7 @@ public class OneSampleT_Test {
 		double avgX = SimpleStatistics.average(sample);
 		System.out.println("One-sample t-test\taverage x:\t" + avgX);
 		double sampleStandardDeviation = SimpleStatistics
-				.sampleStandardDeviation(sample);
+		.sampleStandardDeviation(sample);
 		System.out
 		.println("One-sample t-test\ts (sample standard deviation):\t"
 				+ sampleStandardDeviation);
