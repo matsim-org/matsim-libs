@@ -69,6 +69,7 @@ public class ComprehensiveChoiceModel {
 	private int[] subtourFatherTable = null;
 
 	// /////////////////////////////////////////////////////////////////////////
+	// construction
 	// /////////////////////////////////////////////////////////////////////////
 	public ComprehensiveChoiceModel() {
 		subtoursAnalyser.setTripStructureAnalysisLayer(
@@ -97,11 +98,6 @@ public class ComprehensiveChoiceModel {
 	public List<Alternative> performChoice(
 			final DecisionMaker decisionMaker,
 			final Plan plan) {
-		// init internal information
-		subtoursAnalyser.run( plan );
-		subtourIndices = subtoursAnalyser.getSubtourIndexation();
-		subtourFatherTable = getFatherTable();
-
 		//perform choice
 		Map< List<Alternative> , Double > probs = getChoiceProbabilities(
 				decisionMaker , plan);
@@ -130,6 +126,11 @@ public class ComprehensiveChoiceModel {
 	public Map< List<Alternative> , Double > getChoiceProbabilities(
 			final DecisionMaker decisionMaker,
 			final Plan plan) {
+		// init internal information
+		subtoursAnalyser.run( plan );
+		subtourIndices = subtoursAnalyser.getSubtourIndexation();
+		subtourFatherTable = getFatherTable();
+
 		List< List<Alternative> > fullChoiceSets = new ArrayList< List<Alternative> >();
 
 		int count = 0;
