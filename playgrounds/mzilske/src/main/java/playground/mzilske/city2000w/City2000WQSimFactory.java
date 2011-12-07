@@ -75,7 +75,7 @@ public class City2000WQSimFactory implements MobsimFactory {
 		} else {
 			final QSim sim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
             Collection<Plan> plans = carrierAgentTracker.createPlans();
-            sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim)));
+            sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim), sim));
 			return sim;
 		}
     }

@@ -31,7 +31,9 @@ package org.matsim.contrib.freight.mobsim;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,9 +52,12 @@ public class QSimAgentSource implements AgentSource {
 
     private AgentFactory agentFactory;
 
-    public QSimAgentSource(Collection<Plan> plans, AgentFactory agentFactory) {
+	private QSim qsim;
+
+    public QSimAgentSource(Collection<Plan> plans, AgentFactory agentFactory, QSim qsim) {
         this.plans = plans;
         this.agentFactory = agentFactory;
+        this.qsim = qsim;
     }
 
     @Override
@@ -61,6 +66,7 @@ public class QSimAgentSource implements AgentSource {
         for (Plan plan : plans) {
             MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(plan.getPerson());
             agents.add(agent);
+            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
         }
         return agents;
     }
