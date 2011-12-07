@@ -43,6 +43,7 @@ import playground.thibautd.initialdemandgeneration.modules.PersonAssignActivityC
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignPrimaryActivities;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignShopLeisureLocations;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignToNetwork;
+import playground.thibautd.initialdemandgeneration.modules.PersonRemoveUnhandledModes;
 import playground.thibautd.initialdemandgeneration.modules.PersonSetLocationsFromKnowledge;
 import playground.thibautd.utils.MoreIOUtils;
 
@@ -114,6 +115,8 @@ public class PerformAssignationProcedure {
 						dow,
 						mz,
 						knowledges));
+			// correct the modes (mz contains ride an unknown legs)
+			algos.add( new PersonRemoveUnhandledModes() );
 			// then, set location of primary activities
 			algos.add( new PersonSetLocationsFromKnowledge(
 						knowledges,
@@ -149,6 +152,14 @@ public class PerformAssignationProcedure {
 					  scen.getNetwork(),
 					  scen.getKnowledges())).write(
 				  outputDir + "plans-"+getDay( configGroup ) +".xml.gz");
+
+			(new MonoActivityPlansPruner()).run( scen.getPopulation() );
+
+			(new PopulationWriter(
+					  scen.getPopulation(),
+					  scen.getNetwork(),
+					  scen.getKnowledges())).write(
+				  outputDir + "plans-"+getDay( configGroup ) +"-wo-mono-act.xml.gz");
 		} catch(Exception e) {
 			// Log the stack trace, and rethrow the exception.
 			// This allows the stack trace to be written to the logFile.
