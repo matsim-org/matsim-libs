@@ -22,10 +22,12 @@ package playground.droeder.eMobility;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -34,6 +36,10 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.utils.geometry.CoordUtils;
+
+import playground.droeder.eMobility.energy.ChargingProfiles;
+import playground.droeder.eMobility.energy.DisChargingProfiles;
 
 /**
  * @author droeder
@@ -47,12 +53,15 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 	private HashMap<Id, ActivityStartEvent> charging;
 	private ChargingProfiles chargingProfiles;
 	private Network net;
+	private DisChargingProfiles disChargingProfiles;
 
-	public ElectroVehicleHandler(Map<Id, ElectroVehicle> vehicles, ChargingProfiles profiles, Network net){
+	public ElectroVehicleHandler(Map<Id, ElectroVehicle> vehicles, ChargingProfiles charging, 
+			DisChargingProfiles discharging, Network net){
 		this.vehicles = vehicles;
 		this.disCharging = new HashMap<Id, LinkEnterEvent>();
 		this.charging = new HashMap<Id, ActivityStartEvent>();
-		this.chargingProfiles = profiles;
+		this.chargingProfiles = charging;
+		this.disChargingProfiles = discharging;
 		this.net = net;
 	}
 
@@ -88,14 +97,14 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 			// no eletroVehicle
 			return;
 		}else{
+			//TODO change to vehId
 			ElectroVehicle v = this.vehicles.get(e.getPersonId());
 			if(e instanceof ActivityEndEvent){
 				if(this.charging.containsKey(v.getId())){
 					// it is not the first activity, so charge the vehicle depending on the given data
-					double charge = this.chargingProfiles.getCharge(v.getChargingType(), 
-							e.getTime() - this.charging.remove(v.getId()).getTime(), 
+					double charge = this.chargingProfiles.getNewState(v.getChargingType(), e.getTime() - this.charging.get(v.getId()).getTime(), 
 							v.getChargeState());
-					v.charge(charge, e.getTime());
+					v.setNewCharge(charge, e.getTime());
 				}else{
 					/* it is the first activity of an agent, we don't know anything about the duration of it's activity,
 					 * so we can not charge here
@@ -103,7 +112,8 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 				}
 			}else if(e instanceof LinkLeaveEvent){
 				if(this.disCharging.containsKey(v.getId())){
-					v.disCharge(this.calcDischarge(v, this.disCharging.remove(v.getId()), e), e.getTime());
+					Link l = net.getLinks().get(((ActivityEvent) e).getLinkId());
+					v.disCharge(this.calcDischargeInkWh(v, this.disCharging.remove(v.getId()), e, l), e.getTime(), l.getLength());
 				}else{
 					/*  this must be a LinkLeaveEvent after an activity. 
 					 *  The activity is located at the end of the link, so the discharging should happen with the ActStartEvent
@@ -117,28 +127,33 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 				this.charging.put(v.getId(), (ActivityStartEvent) e);
 				/* discharge here for the last passed link otherwise the avSpeedCalculation will be wrong,
 				 * because the TT then includes the activityDuration 
-				 * we don't need to check if a LinkEnterEvent is stored, because it must be stored at this time
+				 * we don't need to check if a LinkEnterEvent is stored, because it _must_ be stored at this time
 				 */
-				v.disCharge(this.calcDischarge(v, this.disCharging.remove(v.getId()), e), e.getTime());
+				Link l = net.getLinks().get(((ActivityEvent) e).getLinkId());
+				v.disCharge(this.calcDischargeInkWh(v, this.disCharging.remove(v.getId()), e, l), e.getTime(), l.getLength());
 			}
 		}
 	}
 	
-	private Double calcDischarge(ElectroVehicle v, LinkEnterEvent enter, PersonEvent e) {
-		Link l = this.net.getLinks().get(enter.getLinkId());
-		double avSpeed = calculateAvSpeed(enter.getTime(), e.getTime(), l);
-		double gradient = calculateGradient(l) ;
-		return this.chargingProfiles.getCharge(v.getDisChargingType(), avSpeed, gradient);
+	private Double calcDischargeInkWh(ElectroVehicle v, LinkEnterEvent enter, PersonEvent e, Link l) {
+		Double disChargePerKmInJoule = this.disChargingProfiles.getJoulePerKm(v.getDisChargingType(), 
+				this.calculateAvSpeed(enter.getTime(), e.getTime(), l), 
+				this.calculateSlopeInPercent(l));
+		return (disChargePerKmInJoule * l.getLength() / 1000. /(3.6 * Math.pow(10, 6)));
 	}
 
 	private double calculateAvSpeed(double start, double end, Link l){
-		//TODO implement
-		return 1.0;
+		return (l.getLength()/(end-start));
 	}
 	
-	private double calculateGradient(Link l){
-		//TODO implement
-		return 1.0;
+	private double calculateSlopeInPercent(Link l){
+		// TODO z-coordinate?!
+//		Coord v = CoordUtils.minus(l.getToNode().getCoord(), l.getFromNode().getCoord());
+//		double xy = Math.sqrt(Math.pow(v.getX(), 2) + Math.pow(v.getY(), 2));
+//		double z = v.getZ();
+//		double slope = z/xy;
+		double slope = 0;
+		return slope*100;
 	}
 	
 }

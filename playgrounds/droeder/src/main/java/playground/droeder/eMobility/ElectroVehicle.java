@@ -20,13 +20,12 @@
 package playground.droeder.eMobility;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.Tuple;
 
 
 /**
@@ -41,23 +40,20 @@ public class ElectroVehicle {
 	private Id chargingType;
 	private Double maxCharge;
 	private Double currentCharge;
-	private Double chargeState;
-	private boolean warnEmptyAccu = true;
-	private List<Double> timeline;
-	private List<Double> charge;
+	private Double traveledDistance;
+	private ArrayList<Tuple<Double, Double>> time2charge;
+	private ArrayList<Tuple<Double, Double>> distance2charge;
+
 
 	public ElectroVehicle(Id id, Double maxCharge, Double currentCharge){
 		this.id = id;
 		this.maxCharge = maxCharge;
 		this.currentCharge = currentCharge;
-		this.chargeState = currentCharge/maxCharge;
 		this.chargingType = new IdImpl("default");
 		this.dischargingType = new IdImpl("default");
-		this.timeline = new ArrayList<Double>();
-		this.charge = new ArrayList<Double>();
-		if(chargeState > 1.0){
-			log.error("vehicle " + this.id + ": current charge exceeds maximum charge...");
-		}
+		this.time2charge = new ArrayList<Tuple<Double, Double>>();
+		this.distance2charge = new ArrayList<Tuple<Double,Double>>();
+		this.traveledDistance = 0.;
 	}
 	
 	public Id getId(){
@@ -65,42 +61,28 @@ public class ElectroVehicle {
 	}
 	
 	public double getChargeState(){
-		return this.chargeState;
+		return this.currentCharge;
 	}
 	
-	public void disCharge(Double kWh, Double time){
+	public void disCharge(Double kWh, Double time, Double distance){
 		double newCharge = this.currentCharge - kWh;
-		if(newCharge < 0.0){
-			this.currentCharge = 0.0;
-//			if(this.warnEmptyAccu){
-//				log.error("vehicle " + this.id + ": accu is empty. Veh still in Sim. Message thrown only once per Vehicle...");
-//				this.warnEmptyAccu = false;
-//			}
-		}else{
-			this.currentCharge = newCharge;
-		}
-		this.saveEnergyState(time, this.currentCharge);
-		this.chargeState = (this.currentCharge / this.maxCharge);
+		this.saveCharge(time, newCharge, distance);
 	}
 	
-	public void charge(Double kWh, Double time){
-		double newCharge = this.currentCharge + kWh;
-		if(newCharge > this.maxCharge ) {
-			this.currentCharge = maxCharge;
-		}else{
-			this.currentCharge = newCharge;
-		}
-		this.saveEnergyState(time, this.currentCharge);
-		this.chargeState = (this.currentCharge / this.maxCharge);
+	public void setNewCharge(Double newChargekWh, Double time){
+		this.saveCharge(time, newChargekWh, 0.);
 	}
 	
 	/**
 	 * @param time
+	 * @param distance 
 	 * @param currentCharge
 	 */
-	private void saveEnergyState(Double time, Double currentCharge) {
-		this.timeline.add(time);
-		this.charge.add(currentCharge);
+	private void saveCharge(Double time, Double newCharge, Double distance) {
+		this.currentCharge = newCharge;
+		this.time2charge.add(new Tuple<Double, Double>(time, this.currentCharge));
+		this.traveledDistance+= distance;
+		this.distance2charge.add(new Tuple<Double, Double>(this.traveledDistance, this.currentCharge));
 	}
 
 	public Id getDisChargingType(){
