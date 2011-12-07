@@ -66,14 +66,14 @@ public class SfAirScheduleBuilder {
 	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
 
-	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException {
+	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null);
 	}
 
 	
 	@SuppressWarnings("rawtypes")
 	public void filter(String inputOsmFile, String inputOagFile, String outputDirectory,
-			String[] countries) throws IOException, SAXException, ParserConfigurationException {
+			String[] countries) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
@@ -84,7 +84,11 @@ public class SfAirScheduleBuilder {
 		int counter = 0;
 
 		this.airportsInOsm = osmReader.airports;
-
+		
+//		new UTC Offset functionality, work in progress!
+		/**@todo check UTC offsets for errors **/ 
+		SfUtcOffset utcOffsetNew = new SfUtcOffset();
+		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
 
@@ -123,19 +127,7 @@ public class SfAirScheduleBuilder {
 
 					if (lineEntries[47].contains("O") || lineEntries[43].equalsIgnoreCase("")) {
 
-						String hours = lineEntries[13].substring(0, 3);
-						String minutes = lineEntries[13].substring(3);
-						double durationMinutes = Double.parseDouble(minutes) * 60; // convert flight dur minutes into seconds
-						double durationHours = Double.parseDouble(hours) * 3600;
-						double duration = durationHours + durationMinutes;
-						double departureInSec = Double.parseDouble(lineEntries[10].substring(2)) * 60
-								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
-						double utcOffset = getOffsetUTC(originCountry) * 3600;
-						departureInSec = departureInSec - utcOffset;
-						if (departureInSec < 0)
-							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
-						double stops = Double.parseDouble(lineEntries[15]);
-						String fullRouting = lineEntries[40];
+
 
 						String carrier = lineEntries[0];
 						String flightNumber = lineEntries[1].replaceAll(" ", "0");
@@ -145,7 +137,30 @@ public class SfAirScheduleBuilder {
 						String destinationAirport = lineEntries[7];
 						String route = originAirport + "_" + destinationAirport;
 						double flightDistance = Integer.parseInt(lineEntries[42]) * 1.609344; // statute miles to kilometers
+						
+						String hours = lineEntries[13].substring(0, 3);
+						String minutes = lineEntries[13].substring(3);
+						double durationMinutes = Double.parseDouble(minutes) * 60; // convert flight dur minutes into seconds
+						double durationHours = Double.parseDouble(hours) * 3600;
+						double duration = durationHours + durationMinutes;
+						double departureInSec = Double.parseDouble(lineEntries[10].substring(2)) * 60
+								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
+//					Getting UTC Offset of current airport's time zone
+//						worldwide version (gets offset from web service) 
+						System.out.println("Getting UTC offset for "+originAirport+" in coutry: "+originCountry);
+						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
+						departureInSec = departureInSec - utcOffset;
+						System.out.println("UTC offset was calculated as: "+utcOffset);
 
+//						version for Europe ONLY (based on manually entered offsets, see below)
+//						double utcOffset = getOffsetUTC(originCountry) * 3600;
+//						departureInSec = departureInSec - utcOffset;
+//					
+						if (departureInSec < 0)
+							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
+						double stops = Double.parseDouble(lineEntries[15]);
+						String fullRouting = lineEntries[40];
+						
 						this.missingAirports.put(originAirport, 1);
 						this.missingAirports.put(destinationAirport, 1);
 
@@ -375,7 +390,7 @@ public class SfAirScheduleBuilder {
 	}
 
 	public static void main(String[] args) throws IOException, SAXException,
-			ParserConfigurationException {
+			ParserConfigurationException, InterruptedException {
 
 		SfAirScheduleBuilder builder = new SfAirScheduleBuilder();
 
