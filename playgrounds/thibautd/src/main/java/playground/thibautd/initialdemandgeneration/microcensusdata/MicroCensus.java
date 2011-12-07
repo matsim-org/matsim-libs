@@ -83,6 +83,7 @@ public class MicroCensus {
 		Counter count = new Counter( "MicroCensus: import of activity chain #" );
 
 		int corrWork = 0;
+		int corrEduc = 0;
 		for (Population pop : pops) {
 			for (Person pp : pop.getPersons().values()) {
 				count.incCounter();
@@ -96,15 +97,17 @@ public class MicroCensus {
 				// education is defined by desires
 				boolean has_educ = p.getDesires() != null && p.getDesires().getActivityDuration( "e" ) > 0;
 
+				// moreover, correct if no educ or no work is set for plans with educ or work
 				for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
 					if (pe instanceof Activity) {
 						Activity a = (Activity) pe;
-						if (a.getType().equals(WORK) && !has_work) {
+						if ( a.getType().equals(WORK) && !has_work ) {
 							//log.warn( "found unemployed person with work activities with id "+p.getId()+". Setting employed flag to true." );
 							corrWork++;
 							has_work = true;
 						}
-						if (a.getType().equals(EDUC)) {
+						if ( a.getType().equals(EDUC) && !has_educ ) {
+							corrEduc++;
 							has_educ = true;
 						}
 					}
@@ -117,6 +120,7 @@ public class MicroCensus {
 		}
 		count.printCounter();
 		log.info( corrWork+" plans with work and unemployement were found. Employement set to true." );
+		log.info( corrEduc+" plans with educ and uneducation were found. Education set to true." );
 	}
 
 	//////////////////////////////////////////////////////////////////////

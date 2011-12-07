@@ -34,7 +34,7 @@ import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
-import playground.balmermi.census2000v2.data.CAtts;
+import playground.thibautd.initialdemandgeneration.CAtts;
 
 /**
  * For <u>primary</u> activities only.
