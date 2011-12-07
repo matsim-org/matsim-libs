@@ -19,7 +19,6 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.FixedSizeGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -28,6 +27,19 @@ import playground.tnicolai.matsim4opus.utils.io.writer.AccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
 
 public class ERSAControlerListenerV3 implements ShutdownListener{
+	
+	/**
+	 * Code improvements since first version (deadline ersa paper):
+	 * - aggregated workplaces: workplaces with same nearest_node are aggregated to a weighted job (see 
+	 * 							JobClusterObject). This means much less destinations need to be visited and 
+	 * 							results in much less iteration cycles.
+	 * - less time consuming look-ups: all workplaces are assigned to their nearest node in an pre-proscess step
+	 * 							(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
+	 * 							iteration cycle
+	 * - distance based accessibility: is now also computed with with LeastCostPathTree 
+	 * 							-> CHECK WITH KAI IF TRAVELDISTANCECOSTCALULATOR IS OK!
+	 * tnicolai: sep'11
+	 */
 	
 	private static final Logger log = Logger.getLogger(ERSAControlerListenerV3.class);
 	
@@ -58,7 +70,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		this.resultMap = new HashMap<Id, AccessibilityStorage>();
 		
 		AccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   "accessibility_indicators_v2" + 
+													   "accessibility_data" + 
 													   Constants.FILE_TYPE_CSV);
 		
 		log.info(".. done initializing ERSAControlerListenerV3!");
@@ -187,4 +199,35 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 			AccessibilityCSVWriter.close();
 		}
 	}
+	
+//	/**
+//	 * Experimental
+//	 * initialize betas for logsum cost function
+//	 * 
+//	 * @param scenario
+//	 */
+//	private void initCostfunctionParameter(Scenario scenario){
+//		
+//		// beta per hr should be -12 (by default configuration)
+//		double beta_per_hr = scenario.getConfig().planCalcScore().getTraveling_utils_hr() - scenario.getConfig().planCalcScore().getPerforming_utils_hr() ;
+//		this.beta_per_minute = beta_per_hr / 60.; // get utility per second
+//		
+//		try{
+//			beta = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA) );
+//			betaTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_TIMES) );
+//			betaLnTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_TIMES) );
+//			betaPowerTravelTimes = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_TIMES) );
+//			betaTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_COSTS) );
+//			betaLnTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_COSTS) );
+//			betaPowerTravelCosts = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_COSTS) );
+//			betaTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_TRAVEL_DISTANCE) );
+//			betaLnTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_LN_TRAVEL_DISTANCE) );
+//			betaPowerTravelDistance = Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BETA_POWER_TRAVEL_DISTANCE) );
+//		}
+//		catch(NumberFormatException e){
+//			e.printStackTrace();
+//			System.exit(-1);
+//		}
+//	}
+	
 }

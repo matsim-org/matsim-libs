@@ -226,7 +226,7 @@ public class MATSim4UrbanSim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3( zones, numberOfWorkplacesPerZone, parcels, scenario ) );
+		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3( zones, parcels, scenario ) );
 		
 		// tnicolai todo?: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)
@@ -338,7 +338,7 @@ public class MATSim4UrbanSim {
 			if(success)
 				log.info("Hot start preparation successful!");
 			else
-				log.error("Error while moving plans file. This is not fatal but hot start will not work!");
+				log.error("Error while moving plans file, i. e. hot start will not work!");
 		}
 	}
 	

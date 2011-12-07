@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.tnicolai.matsim4opus.matsim4urbansim;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;

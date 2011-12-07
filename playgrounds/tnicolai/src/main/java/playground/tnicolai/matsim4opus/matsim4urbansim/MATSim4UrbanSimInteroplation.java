@@ -82,8 +82,10 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		
 		//controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
 		controler.addControlerListener( new ERSAControlerListenerV3(aggregatedWorkplaces, resolutionMeter, benchmark));
+		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3(zones, parcels, scenario));
+		
 		controler.run();
-		// Controler done!
+		// Controller done!
 		
 		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
 			// saving results from current run

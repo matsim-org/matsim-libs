@@ -103,6 +103,8 @@ public class Constants {
 	public static final String OUTPUT_PARCEL_FILE_XML	= "parcels.xml";
 	public static final String OUTPUT_ZONES_FILE_GZ	 	= "zones.xml.gz";
 	public static final String OUTPUT_ZONES_FILE_XML	= "zones.xml";
+	public static final String TRAVEL_DATA_FILE_CSV		= "travel_data.csv";
+	public static final String ACCESSICBILITY_DATA_FILE_CSV = "accessibility_data.csv";
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";

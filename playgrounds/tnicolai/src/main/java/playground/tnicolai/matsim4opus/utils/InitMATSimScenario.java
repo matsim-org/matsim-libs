@@ -315,8 +315,9 @@ public class InitMATSimScenario {
 			popSampling = 0.01;
 			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
 		}
-		double fetchFactor = Math.pow(popSampling, -0.25);
-		double storageCap = popSampling * fetchFactor; // same as: 1. / Math.sqrt(Math.sqrt(sample))
+		// tnicolai: check storage cap fectch factor with kai!!! (dec'11)
+		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
+		double storageCap = popSampling * fetchFactor;
 		
 		// setting StorageCapFactor
 		simulation.setStorageCapFactor( storageCap );	
@@ -329,7 +330,7 @@ public class InitMATSimScenario {
 		
 		log.info("... done!");
 		
-		log.warn("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
+		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
 		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
 		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
