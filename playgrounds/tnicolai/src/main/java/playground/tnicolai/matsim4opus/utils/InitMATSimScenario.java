@@ -304,7 +304,7 @@ public class InitMATSimScenario {
 		
 		// Adapting the storageCapFactor has the following reason:
 		// Too low SorageCapacities especially with small sampling 
-		// rates can (eg 1%) lead to strong backlog on the traffic network. 
+		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
 		// This leads to an unstable behavior of the simulation (by breackdowns 
 		// during the learning progress).
 		// The correction fetch factor introduced here raises the 
