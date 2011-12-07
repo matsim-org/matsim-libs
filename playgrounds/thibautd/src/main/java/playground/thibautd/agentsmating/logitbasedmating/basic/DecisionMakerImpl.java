@@ -63,5 +63,11 @@ public class DecisionMakerImpl implements DecisionMaker {
 	public Id getPersonId() {
 		return personId;
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()+"={ personId="+personId+
+			" , "+attributes+" }";
+	}
 }
 

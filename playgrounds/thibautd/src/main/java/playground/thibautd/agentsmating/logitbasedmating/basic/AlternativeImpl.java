@@ -68,5 +68,10 @@ public class AlternativeImpl implements Alternative {
 	public int hashCode() {
 		return mode.hashCode() + attributesMap.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()+"{mode="+mode+", "+attributesMap+"}";
+	}
 }
 

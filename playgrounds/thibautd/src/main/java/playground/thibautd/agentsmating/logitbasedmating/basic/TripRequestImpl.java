@@ -172,5 +172,13 @@ public class TripRequestImpl implements TripRequest {
 	public int hashCode() {
 		return alternativeDelegate.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()+"={ type="+type+
+			" , decisionMaker="+decisionMaker+" , alternative="+alternativeDelegate+
+			" , choiceSet="+alternatives+" , indexInPlan="+indexInPlan+
+			" , origin="+origin+" , destination="+destination+" , arrivalTime="+arrivalTime+" }";
+	}
 }
 

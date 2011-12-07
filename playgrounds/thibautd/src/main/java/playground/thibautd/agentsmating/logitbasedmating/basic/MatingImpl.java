@@ -60,5 +60,11 @@ public class MatingImpl implements Mating {
 	public List<TripRequest> getPassengers() {
 		return passengers;
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName()+"={ "+
+			"driver="+driver+" , passengers="+passengers+" }";
+	}
 }
 

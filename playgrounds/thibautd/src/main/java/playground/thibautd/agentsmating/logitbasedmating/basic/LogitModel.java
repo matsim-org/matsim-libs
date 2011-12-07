@@ -37,13 +37,44 @@ public abstract class LogitModel implements ChoiceModel {
 	private final Random random = new Random( 14325 );
 	private static final double EPSILON = 1E-7;
 	private final double scale;
+	private final boolean selfChecking;
 
+	/**
+	 * Creates a self-checking logit model with scale parameter 1.
+	 */
 	public LogitModel() {
-		this( 1 );
+		this( 1 , true );
 	}
 
+	/**
+	 * Creates a logit model with scale parameter 1.
+	 *
+	 * @param selfCheking if true, the model will check
+	 * the validatiy of each utility value
+	 */
+	public LogitModel( final boolean selfChecking ) {
+		this( 1 , selfChecking );
+	}
+
+	/**
+	 * Creates a self-checking logit model.
+	 *
+	 * @param scale the scale parameter ("mu")
+	 */
 	public LogitModel( final double scale ) {
+		this( scale , true );
+	}
+
+	/**
+	 * Creates a logit model.
+	 *
+	 * @param selfCheking if true, the model will check
+	 * the validatiy of each utility value
+	 * @param scale the scale parameter ("mu")
+	 */
+	public LogitModel( final double scale , final boolean selfChecking ) {
 		this.scale = scale;
+		this.selfChecking = selfChecking;
 	}
 
 	@Override
@@ -80,7 +111,14 @@ public abstract class LogitModel implements ChoiceModel {
 
 		double cumul = 0;
 		for (Alternative alt : alternatives) {
-			double weight = Math.exp( scale * getSystematicUtility( decisionMaker , alt ) );
+			double utility = getSystematicUtility( decisionMaker , alt );
+
+			if (selfChecking && Double.isNaN( utility )) {
+				throw new RuntimeException( "got a NaN utility in "+this.getClass().getSimpleName()
+						+" for decision maker "+decisionMaker+" and alternative "+alt );
+			}
+
+			double weight = Math.exp( scale * utility );
 			cumul += weight;
 			probabilities.put( alt , weight );
 		}

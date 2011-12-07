@@ -79,5 +79,10 @@ public class AttributesMap implements EntityWithAttributes {
 	public int hashCode() {
 		return attributes.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return "attributes={"+attributes+"}";
+	}
 }
 
