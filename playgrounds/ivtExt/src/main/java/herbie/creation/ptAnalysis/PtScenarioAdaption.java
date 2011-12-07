@@ -74,6 +74,9 @@ public class PtScenarioAdaption {
 	private Bins old_hdwy_distrib;
 	private Bins new_hdwy_distrib;
 	
+	private int old_NrOfDepartures;
+	private int new_NrOfDepartures;
+	
 	public static void main(String[] args) {
 		if (args.length != 1) {
 			log.info("Specify config path."); 
@@ -149,6 +152,7 @@ public class PtScenarioAdaption {
 				departuresTimes = new TreeMap<Double, Departure>();
 				for(Departure departure : departures.values()){
 					departuresTimes.put(departure.getDepartureTime(), departure);
+					old_NrOfDepartures++;
 				}
 				
 				implDeparture = departuresTimes.firstKey();
@@ -190,14 +194,14 @@ public class PtScenarioAdaption {
 			if(departuresTimes.lastKey() == depTime) {
 				addNewDepartures(depTime + currentInterval * 60d - getNewInterval() * 60d);
 				
-				if(isElementOfRelevantInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
+				if(isElementOfConsideredInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 			else {
 				
 				addNewDepartures((depTime));
 				currentInterval = (departuresTimes.higherKey(depTime) - depTime) / 60d;
 				
-				if(isElementOfRelevantInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
+				if(isElementOfConsideredInterval(currentInterval)) old_hdwy_distrib.addVal(currentInterval, 1d);
 			}
 		}
 	}
@@ -224,25 +228,24 @@ public class PtScenarioAdaption {
 		
 		Stack<Id> stackId = new Stack<Id>();
 		
-		for(Id id : route.getDepartures().keySet()){
-			stackId.push(id);
-		}
-		
 		while(stackId.size() > 0){
 			route.removeDeparture(route.getDepartures().get(stackId.pop()));
 		}
 	}
 
 	private void copyNewDepartures(TransitRoute route) {
+		
+		
 		for(Departure departure : newDepartures.values()){
 			
 			route.addDeparture(departure);
+			new_NrOfDepartures++;
 		}
 	}
 	
 	private void addNewDepartures(Double upperThreshold) {
 		
-		if(currentInterval > relHeadwayClasses[0] && currentInterval <= relHeadwayClasses[relHeadwayClasses.length - 1]) 
+		if(currentIntervalIsRelevant())
 		{
 			double newInterval = getNewInterval();
 
@@ -252,13 +255,18 @@ public class PtScenarioAdaption {
 				
 				setNewDeparture();
 			}
-			if(isElementOfRelevantInterval(newInterval)) new_hdwy_distrib.addVal(newInterval, 1d);
+			if(isElementOfConsideredInterval(newInterval)) new_hdwy_distrib.addVal(newInterval, 1d);
 		}
 		else
 		{	
 			copyExistingDepartures(upperThreshold);
-			if(isElementOfRelevantInterval(currentInterval)) new_hdwy_distrib.addVal(currentInterval, 1d);
+			if(isElementOfConsideredInterval(currentInterval)) new_hdwy_distrib.addVal(currentInterval, 1d);
 		}
+	}
+
+	private boolean currentIntervalIsRelevant() {
+		 return (currentInterval > relHeadwayClasses[0] && 
+				 currentInterval <= relHeadwayClasses[relHeadwayClasses.length - 1]);
 	}
 
 	private void copyExistingDepartures(double upperThreshold) {
@@ -290,7 +298,7 @@ public class PtScenarioAdaption {
 		vehicleNumber++;
 	}
 
-	private boolean isElementOfRelevantInterval(double headway) {
+	private boolean isElementOfConsideredInterval(double headway) {
 		
 		if(headway > relevantBinInterval[0] 
 				&& headway < relevantBinInterval[1]) return true;
@@ -318,7 +326,14 @@ public class PtScenarioAdaption {
 	}
 	
 	private void evaluateSchedule() {
+		log.info("Statistics ...");
+		
 		old_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "#", "Number of departures with same headway");
 		new_hdwy_distrib.plotBinnedDistribution(this.outpath + "HeadwayDistribution", "Headway", "#", "Number of departures with same headway");
+		
+		log.info("Number of departures in the old schedule: " + old_NrOfDepartures);
+		log.info("Number of departures in the new schedule: " + new_NrOfDepartures);
+		
+		log.info("Statistics ... done");
 	}
 }
