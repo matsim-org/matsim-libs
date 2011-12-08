@@ -43,6 +43,9 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 	private final TravelCardModel travelCardModel = new TravelCardModel();
 	private final SpeaksGermanModel speaksGermanModel = new SpeaksGermanModel();
 
+	/**
+	 * @throws IllegalArgumentException if the argument is not an instance of {@link PersonImpl}
+	 */
 	@Override
 	public DecisionMaker createDecisionMaker(final Person agent) throws UnelectableAgentException {
 		PersonImpl pImpl;
@@ -50,7 +53,7 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 		try {
 			pImpl = (PersonImpl) agent;
 		} catch (ClassCastException e) {
-			throw new RuntimeException("can only handle PersonImpl agents", e);
+			throw new IllegalArgumentException(this.getClass().getSimpleName()+" can only handle PersonImpl agents", e);
 		};
 
 		return createDecisionMaker( pImpl );

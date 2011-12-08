@@ -43,7 +43,7 @@ public class ComprehensiveChoiceModel {
 	private ChoiceModel tripLevelModel = null;
 	private final PlanAnalyzeSubtours subtoursAnalyser = new PlanAnalyzeSubtours();
 
-	private static final double EPSILON = 1E-15;
+	private static final double EPSILON = 1E-7;
 	private static final int NO_FATHER_SUBTOUR = Integer.MIN_VALUE;
 	private static final String PASSENGER_MODE = "cp_pass";
 	private static final String DRIVER_MODE = "cp_driver";
@@ -67,9 +67,6 @@ public class ComprehensiveChoiceModel {
 
 	private int[] subtourIndices = null;
 	private int[] subtourFatherTable = null;
-
-	// for logging
-	private int lastAlternativesCount = 0;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
@@ -118,10 +115,7 @@ public class ComprehensiveChoiceModel {
 
 		// should never reach this line
 		throw new RuntimeException( "choice procedure failed: sum of probabilities = "+currentBound+
-				" for agent "+plan.getPerson().getId()+
-				" with plan of length "+plan.getPlanElements().size()+
-				" and "+probs.size()+" possible mode chains (non-0 probability), "+
-				lastAlternativesCount+" complete mode chains (including 0-prob)" );
+				". This should have raisen an exception earlier!" );
 	}
 
 	/**
@@ -157,14 +151,42 @@ public class ComprehensiveChoiceModel {
 		Map< List<Alternative> , Double > probabilities =
 			new HashMap< List<Alternative> , Double >();
 
-		lastAlternativesCount = 0;
+		int alternativesCount = 0;
+		int rejectedCount = 0;
+		int notRejectedNotAddedCount = 0;
+		double totalCumulatedProb = 0;
+		double addedCumulatedProb = 0;
 		for (LegChoiceNode node : possibleStringsLeaves) {
-			lastAlternativesCount++;
+			alternativesCount++;
 			double prob = node.getProbability();
+			totalCumulatedProb += prob;
 
-			if (prob > EPSILON) {
+			if (prob > 0) {
+				addedCumulatedProb += prob;
 				probabilities.put( node.getChainString() , prob );
 			}
+			else if (node.isRejected()) {
+				rejectedCount++;
+			}
+			else {
+				// really? a probability 0 (or less ???) alternative which is not due to
+				// a subtour-based reject? This can happen, but this is more
+				// probably due to a bug.
+				notRejectedNotAddedCount ++;
+			}
+		}
+
+		if (Math.abs( totalCumulatedProb - 1d ) > EPSILON ||
+				Math.abs( addedCumulatedProb - 1d ) > EPSILON ) {
+			throw new RuntimeException( "choice procedure failed: "+
+					"total sum of probabilities = "+totalCumulatedProb+
+					", added sum of probabilities = "+addedCumulatedProb+
+					" for agent "+plan.getPerson().getId()+
+					" with plan of length "+plan.getPlanElements().size()+
+					" and "+probabilities.size()+" possible mode chains (non-0 probability), "+
+					alternativesCount+" complete mode chains (including 0-prob), "+
+					rejectedCount+" alternative mode chains where rejected, "+
+					notRejectedNotAddedCount+" alternatives were not rejected but not added");
 		}
 
 		return probabilities;
@@ -182,6 +204,7 @@ public class ComprehensiveChoiceModel {
 	 * @param decisionmaker the decision maker
 	 * @param fullChoiceSets a list of all possible modes for each coming leg,
 	 * or null if we reached the last leg.
+	 *
 	 * @return the "leaves" nodes, ie, the full mode strings
 	 */
 	private List< LegChoiceNode > constructModeChains(
@@ -219,35 +242,11 @@ public class ComprehensiveChoiceModel {
 	private int[] getFatherTable() {
 		int nSubTours = this.subtoursAnalyser.getNumSubtours();
 		int[] output = new int[nSubTours];
-		List<Integer> alreadyHasFather = new ArrayList<Integer>(nSubTours);
-		int currentSubTour;
-		int count = 0;
 
-		//this.orderedSubtourIndices = new int[nSubTours];
-
-		// TODO: affect NO_FATHER to ALL home-based tours
-		output[ subtourIndices[0] ] = NO_FATHER_SUBTOUR;
-		//this.orderedSubtourIndices[count] = subtourStruct[0];
-		alreadyHasFather.add(subtourIndices[0]);
-		count++;
-
-		for (int i=1; i < subtourIndices.length; i++) {
-			if (count == nSubTours) {
-				//each subtour has been examined, we can stop
-				break;
-			}
-
-			currentSubTour = subtourIndices[ i ];
-
-			if (!(alreadyHasFather.contains(currentSubTour))) {
-				// As we go through legs in chronological order, the FATHER
-				// of a subtour is the one to which pertains the leg preceding
-				// this subtour.
-				output[ currentSubTour ] = subtourIndices[ i - 1 ];
-				//this.orderedSubtourIndices[count] = currentSubTour;
-				alreadyHasFather.add(currentSubTour);
-				count++;
-			}
+		int i = 0;
+		for (Integer father : subtoursAnalyser.getParentTours()) {
+			output[i] = father == null ? NO_FATHER_SUBTOUR : father;
+			i++;
 		}
 
 		return output;
@@ -263,6 +262,7 @@ public class ComprehensiveChoiceModel {
 		private final LegChoiceNode previousLeg;
 		private final Alternative alt;
 		private final double prob;
+		private final boolean rejected;
 
 		// /////////////////////////////////////////////////////////////////////
 		// construction
@@ -292,6 +292,7 @@ public class ComprehensiveChoiceModel {
 					// this node is not possible: do not continue
 					//this.alternatives = null;
 					this.prob = 0d;
+					this.rejected = true;
 					return;
 				}
 				else {
@@ -316,6 +317,8 @@ public class ComprehensiveChoiceModel {
 			else {
 				prob = 1;
 			}
+
+			this.rejected = false;
 		}
 
 		/**
@@ -362,6 +365,9 @@ public class ComprehensiveChoiceModel {
 		 * </ul>
 		 * <li> otherwise, the procedure is repeated at the upper level of the tree
 		 * </ul>
+		 *
+		 * car passenger is considered a specific non-chain based mode, car driver is
+		 * sonsidered as car mode.
 		 *
 		 * @return the list of possible modes for the next leg, given the subtour
 		 * it pertains
@@ -424,6 +430,14 @@ public class ComprehensiveChoiceModel {
 			string.add( alt );
 
 			return string;
+		}
+
+		/**
+		 * for debug: executed on leaves, is allows to count the number of total
+		 * mode chains which where rejected based on mode possibilities.
+		 */
+		public boolean isRejected() {
+			return rejected ? true : (previousLeg != null && previousLeg.isRejected());
 		}
 	}
 }
