@@ -61,11 +61,12 @@ public class DynAgent
     }
 
 
-    public void scheduleUpdated()
+    public void update()
     {
         // this agent is right now switching from one task (Act/Leg) to another (Act/Leg)
         // so he is the source of this schedule updating process and so he will not be handled here
         // TODO: verify this condition!!!
+        // TODO: should this condition be moved to AgentLogic?
         if (state == null) {
             return;
         }
@@ -133,8 +134,8 @@ public class DynAgent
                 currentLinkId, null, vrpActivity.getActivityType()));
 
         DynActivity oldActivity = vrpActivity;
-        vrpActivity = null;// !!!
-        state = null;// !!!
+        vrpActivity = null;// !!! this is important
+        state = null;// !!! this is important
 
         agentLogic.endActivityAndAssumeControl(oldActivity, now);
     }
@@ -147,8 +148,8 @@ public class DynAgent
                 currentLinkId, TransportMode.car));
 
         DynLeg oldLeg = vrpLeg;
-        vrpLeg = null;// !!!
-        state = null;// !!!
+        vrpLeg = null;// !!! this is important
+        state = null;// !!! this is important
 
         agentLogic.endLegAndAssumeControl(oldLeg, now);
     }

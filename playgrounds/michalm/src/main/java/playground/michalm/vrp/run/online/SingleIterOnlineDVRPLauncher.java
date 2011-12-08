@@ -29,7 +29,6 @@ import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
-import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
@@ -57,7 +56,9 @@ public class SingleIterOnlineDVRPLauncher
 
     private Scenario scenario;
     private MATSimVRPData data;
-    private VRPOptimizerFactory optimizerFactory;
+
+    private boolean optimisticOptimizer;
+    private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
     private PersonalizableTravelCost tcostCalc;
@@ -72,7 +73,7 @@ public class SingleIterOnlineDVRPLauncher
             netFileName = dirName + "network.xml";
             plansFileName = dirName + "plans.xml";
             depotsFileName = dirName + "depots.xml";
-            otfVis = true;
+            otfVis = !true;
         }
         else if (args.length == 5) {
             dirName = args[0];
@@ -92,6 +93,8 @@ public class SingleIterOnlineDVRPLauncher
 
         travelTimesFromEvents = true;
         eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
+
+        optimisticOptimizer = !true;
     }
 
 
@@ -103,8 +106,8 @@ public class SingleIterOnlineDVRPLauncher
         new MatsimNetworkReader(scenario).readFile(netFileName);
         new MatsimPopulationReader(scenario).readFile(plansFileName);
 
-        ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                scenario) : new FreeSpeedTravelTimeCalculator();
+        ttimeCalc = travelTimesFromEvents ? TravelTimeCalculators.createTravelTimeFromEvents(
+                eventsFileName, scenario) : new FreeSpeedTravelTimeCalculator();
         tcostCalc = new OnlyTimeDependentTravelCostCalculator(ttimeCalc);
 
         DijkstraFactory leastCostPathCalculatorFactory = new DijkstraFactory();
@@ -113,7 +116,8 @@ public class SingleIterOnlineDVRPLauncher
                 .getFactory()).getModeRouteFactory();
 
         final PlansCalcRoute routingAlgorithm = new PlansCalcRoute(config.plansCalcRoute(),
-                scenario.getNetwork(), tcostCalc, ttimeCalc, leastCostPathCalculatorFactory, routeFactory);
+                scenario.getNetwork(), tcostCalc, ttimeCalc, leastCostPathCalculatorFactory,
+                routeFactory);
 
         routingAlgorithm.addLegHandler("taxi", new NetworkLegRouter(scenario.getNetwork(),
                 routingAlgorithm.getLeastCostPathCalculator(), routingAlgorithm.getRouteFactory()));
@@ -144,8 +148,14 @@ public class SingleIterOnlineDVRPLauncher
 
 
     private void initOptimizerFactory()
+        throws IOException
     {
-        optimizerFactory = TaxiVRPOptimizer.FACTORY;
+        if (optimisticOptimizer) {
+            optimizerFactory = OptimisticTaxiOptimizer.FACTORY;
+        }
+        else {
+            optimizerFactory = PessimisticTaxiOptimizer.FACTORY;
+        }
     }
 
 
@@ -194,6 +204,8 @@ public class SingleIterOnlineDVRPLauncher
 
     private void generateVrpOutput()
     {
+        System.out.println(new VRPEvaluator().evaluateVRP(data.getVrpData()).toString());
+
         if (vrpOutFiles) {
             new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
                     .write();

@@ -63,9 +63,9 @@ public class TaxiAgentLogic
     }
 
 
-    public void scheduleUpdated()
+    public void schedulePossiblyChanged()
     {
-        agent.scheduleUpdated();
+        agent.update();
     }
 
 
@@ -82,11 +82,8 @@ public class TaxiAgentLogic
         int time = (int)now;
 
         if (status == ScheduleStatus.STARTED) {
-            // TODO: maybe in General DVRP but not here in simple TAXI...
-            // optimizer.optimize();
-            //
-            // however, here just a simple update of this schedule
             vrpSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
+            vrpSimEngine.optimize(now);//TODO: this may be optional (depending on the algorithm) 
         }
 
         Task task = schedule.nextTask();

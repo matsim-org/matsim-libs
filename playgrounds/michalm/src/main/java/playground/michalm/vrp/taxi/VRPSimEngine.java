@@ -4,7 +4,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import org.matsim.ptproject.qsim.InternalInterface;
+import org.matsim.ptproject.qsim.*;
 import org.matsim.ptproject.qsim.interfaces.*;
 import org.matsim.vis.otfvis.opengl.queries.*;
 
@@ -24,7 +24,7 @@ public class VRPSimEngine
     private Netsim netsim;
 
     private VRPOptimizerFactory optimizerFactory;
-    private TaxiVRPOptimizer optimizer;
+    private TaxiOptimizer optimizer;
 
     private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
@@ -64,7 +64,7 @@ public class VRPSimEngine
         // remove all existing requests
         vrpData.getRequests().clear();
 
-        optimizer = (TaxiVRPOptimizer)optimizerFactory.create(vrpData);
+        optimizer = (TaxiOptimizer)optimizerFactory.create(vrpData);
 
         optimize(0);// "0" should not be hard-coded
 
@@ -129,7 +129,7 @@ public class VRPSimEngine
     private void notifyAgents()
     {
         for (TaxiAgentLogic a : agentLogics) {
-            a.scheduleUpdated();
+            a.schedulePossiblyChanged();
         }
     }
 

@@ -53,7 +53,7 @@ public class TaxiModeDepartureHandler
 
             int duration = 120; // approx. 120 s for entering the taxi
             int t0 = (int)now;
-            int t1 = t0 + 3600; // hardcoded values!
+            int t1 = t0 + 0; // hardcoded values!
             Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
                     t0, t1, false);
 
