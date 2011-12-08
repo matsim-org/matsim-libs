@@ -1,0 +1,240 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.anhorni.parking;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.parkingSearch.ca.matlabInfra.Agent;
+
+public class CreateScenario {
+	private ScenarioImpl scenario = null;	
+	private double sideLength = 500.0;
+	private double spacing = 100.0;
+	
+	private final static Logger log = Logger.getLogger(CreateScenario.class);
+	
+	public static void main(final String[] args) {
+		CreateScenario creator = new CreateScenario();	
+		creator.run(args[0]);			
+		log.info("Scenario creation finished \n ----------------------------------------------------");
+	}
+	
+	public void run(String path) {
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(this.scenario.getNetwork());
+		this.addNodes(networkFactory);
+		this.addLinks(networkFactory);
+		this.write(path);
+	}
+						
+	private void addLinks(NetworkFactoryImpl networkFactory) {		
+		int linkCnt = 0;				
+		int stepsPerSide = (int)(sideLength / spacing);
+		
+		for (int i = 0; i <= stepsPerSide ; i++) {
+			for (int j = 0; j <= stepsPerSide; j++) {
+				Id fromNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j));
+							
+				if (j > 0) {
+					// create backward link
+					Id toNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j - 1));
+					
+					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNodeId, toNodeId);			
+					l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
+							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
+					this.scenario.getNetwork().addLink(l0);
+					linkCnt++;			
+					
+					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNodeId, fromNodeId);
+					l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(toNodeId).getCoord()).calcDistance(
+							scenario.getNetwork().getNodes().get(fromNodeId).getCoord()));
+					this.scenario.getNetwork().addLink(l1);
+					linkCnt++;
+				}				
+				
+				if (i > 0) {
+					// create downward link
+					Id toNodeId = new IdImpl(Integer.toString((i - 1) * (stepsPerSide + 1) + j));
+					
+					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNodeId, toNodeId);
+					l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
+							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
+					this.scenario.getNetwork().addLink(l0);
+					linkCnt++;
+															
+					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNodeId, fromNodeId);
+					l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(fromNodeId).getCoord()).calcDistance(
+							scenario.getNetwork().getNodes().get(toNodeId).getCoord()));
+					this.scenario.getNetwork().addLink(l1);
+					linkCnt++;
+				}				
+			}
+		}
+		Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), new IdImpl(-1), new IdImpl(0));			
+		l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(-1)).getCoord()).calcDistance(
+				scenario.getNetwork().getNodes().get(new IdImpl(0)).getCoord()));
+		this.scenario.getNetwork().addLink(l0);	
+		
+		int n = (stepsPerSide + 1) * (stepsPerSide + 1) - 1;
+		Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(9999999)), new IdImpl(n), new IdImpl(9999999));			
+		l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(-1)).getCoord()).calcDistance(
+				scenario.getNetwork().getNodes().get(new IdImpl(9999999)).getCoord()));
+		this.scenario.getNetwork().addLink(l1);	
+		
+		log.info("Created " + linkCnt + " links");
+	}
+				
+	private void addNodes(NetworkFactoryImpl networkFactory) {
+		int nodeCnt = 0;
+		int stepsPerSide = (int)(sideLength/ spacing);
+		for (int i = 0; i <= stepsPerSide ; i++) {
+			for (int j = 0; j <= stepsPerSide; j++) {
+				Node n = networkFactory.createNode(new IdImpl(Integer.toString(nodeCnt)), new CoordImpl(i * spacing, j * spacing));
+				this.scenario.getNetwork().addNode(n);
+				nodeCnt++;
+			}
+		}
+		Node nbegin = networkFactory.createNode(new IdImpl(Integer.toString(-1)), new CoordImpl(-100.0, -100.0));
+		this.scenario.getNetwork().addNode(nbegin);
+		
+		Node nend = networkFactory.createNode(new IdImpl(Integer.toString(9999999)), new CoordImpl(sideLength + 100.0, sideLength + 100.0));
+		this.scenario.getNetwork().addNode(nend);
+		
+		log.info("Created " + nodeCnt + " nodes");
+	}
+	
+	public void write(String path) {
+		this.writeNetwork(path);
+		this.writePopulation(path + "/population.xml");
+		this.writeParkingLots(path + "/parkingLots.xml");		
+	}
+	
+	private void writeNetwork(String path) {
+		this.writeLinks(path + "/links.xml");
+		this.writeNodes(path + "/nodes.xml");
+	}
+	
+	private void writePopulation(String file) {
+		LinkedList<Agent> agents = new LinkedList<Agent>();	
+		
+		for (int i = 1; i <= 10; i++) {
+			// Agent(Id id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway)
+			
+			// parking agent
+			String routeTo = "-1 0";
+			int stepsPerSide = (int)(sideLength/ spacing);
+			for (int ii = 1; ii <= stepsPerSide / 2; ii++) {
+				routeTo = routeTo + " " + Integer.toString((ii - 1) * (stepsPerSide + 1) + ii);
+				routeTo = routeTo + " " + Integer.toString(ii * (stepsPerSide + 1) + ii);
+			}
+			String routeAway = "9999999"; 
+			for (int ii = stepsPerSide; ii > stepsPerSide / 2; ii--) {
+				routeAway = Integer.toString(ii * (stepsPerSide + 1) + ii) + " " + routeAway ;
+				routeAway = Integer.toString((ii - 1) * (stepsPerSide + 1) + ii) + " " + routeAway ;
+			}
+			routeAway = Integer.toString(stepsPerSide / 2 * (stepsPerSide + 1) + stepsPerSide / 2) + " " + routeAway ; 
+			Agent agent = new Agent(new IdImpl(i), i * 10.0, routeTo, "s", 30.0 * 60.0, routeAway);	
+			agents.add(agent);
+			
+			// transit agent
+			// ...
+		}		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("<agents>");
+		for (Agent agent : agents) {
+			list.add(agent.getXMLString(scenario.getNetwork()));
+		}
+		list.add("</agents>");
+		GeneralLib.writeList(list, file);
+	}
+	
+	private void writeParkingLots(String file) {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("<parkinglots>");
+		long capacity = 1;		
+		int cnt = 0;
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {	
+			// only use every 2nd link
+			if (cnt % 2 == 0) {
+				list.add(this.getParkingString("sp-" + cnt, link.getCoord().getX(), link.getCoord().getY(), capacity));
+			}
+			cnt++;
+		}				
+		list.add("</parkinglots>");
+		GeneralLib.writeList(list, file);
+	}
+	
+	private String getParkingString(String id, double x, double y, double capacity) {
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("\t<parkinglot>\n");
+		stringBuffer.append("\t\t<id>" + id + "</id>\n");
+		stringBuffer.append("\t\t<x>" + x + "</x>\n");
+		stringBuffer.append("\t\t<y>" + y + "</y>\n");
+		stringBuffer.append("\t\t<size>" + capacity + "</size>\n");
+		stringBuffer.append("\t</parkinglot>\n");
+		return stringBuffer.toString();
+	}
+				
+	private void writeLinks(String file) {		
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("<links>");
+		
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {	
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append("\t<link>\n");
+			stringBuffer.append("\t\t<id>" + link.getId() + "</id>\n");
+			stringBuffer.append("\t\t<fromNode>" + link.getFromNode().getId() + "</fromNode>\n");
+			stringBuffer.append("\t\t<toNode>" + link.getToNode().getId() + "</toNode>\n");
+			stringBuffer.append("\t</link>\n");
+			list.add(stringBuffer.toString());
+		}
+		list.add("</links>\n");
+		GeneralLib.writeList(list, file);
+	}
+	
+	private void writeNodes(String file) {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("<nodes>");		
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
+			StringBuffer stringBuffer = new StringBuffer();
+			stringBuffer.append("\t<node>\n");
+			stringBuffer.append("\t\t<id>" + node.getId() + "</id>\n");
+			stringBuffer.append("\t\t<x>" + node.getCoord().getX() + "</x>\n");
+			stringBuffer.append("\t\t<y>" + node.getCoord().getY() + "</y>\n");
+			stringBuffer.append("\t</node>\n");
+			list.add(stringBuffer.toString());
+		}
+		list.add("</nodes>\n");
+		GeneralLib.writeList(list, file);
+	}
+}
