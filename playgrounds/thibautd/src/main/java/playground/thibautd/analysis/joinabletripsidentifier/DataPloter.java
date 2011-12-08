@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
+import java.awt.Font;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -36,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.title.TextTitle;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -60,6 +63,8 @@ import playground.thibautd.utils.charts.XYLineHistogramDataset;
 public class DataPloter {
 	private static final Logger log =
 		Logger.getLogger(DataPloter.class);
+
+	private static final float TITLE_FONT_SIZE = 17;
 
 	private final JoinableTrips trips;
 
@@ -100,6 +105,7 @@ public class DataPloter {
 			chart.add(trip.getDepartureTime() / 3600d, count);
 		}
 
+		formatChart( chart );
 		return chart;
 	}
 
@@ -136,6 +142,7 @@ public class DataPloter {
 			chart.add(tripLength / 1000d, count);
 		}
 
+		formatChart( chart );
 		return chart;
 	}
 
@@ -173,6 +180,7 @@ public class DataPloter {
 			chart.addItem(counts, validator.getFirstCriterion(), validator.getSecondCriterion());
 		}
 
+		formatChart( chart );
 		return chart;
 	}
 
@@ -208,6 +216,7 @@ public class DataPloter {
 				false, //no tooltips
 				false); // no URLS
 
+		formatChart( chart );
 		return new WrapperChartUtil(chart);
 	}
 
@@ -285,6 +294,7 @@ public class DataPloter {
 			chart.add(tripLength / 1000d, count.getValue());
 		}
 
+		formatChart( chart );
 		return chart;
 	}
 
@@ -341,6 +351,19 @@ public class DataPloter {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// helper methods
+	// /////////////////////////////////////////////////////////////////////////
+	private void formatChart(final ChartUtil chart) {
+		formatChart( chart.getChart() );
+	}
+
+	private void formatChart(final JFreeChart chart) {
+		TextTitle title = chart.getTitle();
+		Font font = title.getFont();
+		title.setFont( font.deriveFont( TITLE_FONT_SIZE ) );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
