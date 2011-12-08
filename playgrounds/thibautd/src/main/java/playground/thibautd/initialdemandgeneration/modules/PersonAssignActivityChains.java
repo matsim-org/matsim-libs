@@ -27,6 +27,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.KnowledgeImpl;
@@ -116,10 +118,13 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 		Plan newPlan = new PlanImpl( person );
 		for (PlanElement pe : mz_p.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Activity) {
-				newPlan.addActivity( (Activity) pe );
+				newPlan.addActivity( new ActivityImpl( (Activity) pe ) );
 			}
-			else if (pe instanceof Leg) {
-				newPlan.addLeg( (Leg) pe );
+			else if (pe instanceof LegImpl) {
+				newPlan.addLeg( new LegImpl( (LegImpl) pe ) );
+			}
+			else {
+				newPlan.addLeg( new LegImpl( ((Leg) pe).getMode() ) );
 			}
 		}
 

@@ -34,6 +34,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -140,11 +141,16 @@ public class PerformAssignationProcedure {
 
 			// apply the routine
 			// ---------------------------------------------------------------------
+			Counter count = new Counter( "processing person # " );
 			for ( Person person : scen.getPopulation().getPersons().values() ) {
+				count.incCounter();
+				//System.out.println("--");
 				for (PersonAlgorithm algo : algos) {
+					//System.out.println("exec "+algo.getClass().getSimpleName());
 					algo.run( person );
 				}
 			}
+			count.printCounter();
 
 			new PlansAnalyse().run(scen.getPopulation());
 			for ( Population pop : mz.getPopulations() ) {
