@@ -23,6 +23,15 @@ public class Agent {
 		this.id=id;
 	}
 	
+	public Agent(Id id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway){
+		this.id = id;
+		this.tripStartTime = tripStartTime;
+		this.routeTo = routeTo;
+		this.actType = actType;
+		this.actDur = actDur;
+		this.routeAway = routeAway;		
+	}
+	
 	public String getXMLString(NetworkImpl network){
 		Random rand=new Random();
 		
