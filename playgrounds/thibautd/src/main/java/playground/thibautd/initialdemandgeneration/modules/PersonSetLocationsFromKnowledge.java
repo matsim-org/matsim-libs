@@ -130,7 +130,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					prev_educ = null;
 				}
 				else if (act.getType().startsWith("w")) {
-					if (work_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'w' act but no location known!"); }
+					if (work_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains '"+act.getType()+"' act but no work location known!"); }
 					ActivityOptionImpl work_act = null;
 					if (prev_work != null) {
 						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(work_acts);
@@ -149,7 +149,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					prev_educ = null;
 				}
 				else if (act.getType().startsWith("e")) {
-					if (educ_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'e' act but no location known!"); }
+					if (educ_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains '"+act.getType()+"' act but no education location known!"); }
 					ActivityOptionImpl educ_act = null;
 					if (prev_educ != null) {
 						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(educ_acts);

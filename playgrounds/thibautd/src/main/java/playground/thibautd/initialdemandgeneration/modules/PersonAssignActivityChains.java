@@ -20,10 +20,15 @@
 package playground.thibautd.initialdemandgeneration.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.knowledges.KnowledgeImpl;
 import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -107,8 +112,19 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 				Gbl.errorMsg("No corresponding MZ record found for person "+person.getId());
 			}
 		}
-		person.addPlan(mz_p.getSelectedPlan());
-		person.setSelectedPlan(mz_p.getSelectedPlan());
+
+		Plan newPlan = new PlanImpl( person );
+		for (PlanElement pe : mz_p.getSelectedPlan().getPlanElements()) {
+			if (pe instanceof Activity) {
+				newPlan.addActivity( (Activity) pe );
+			}
+			else if (pe instanceof Leg) {
+				newPlan.addLeg( (Leg) pe );
+			}
+		}
+
+		person.addPlan( newPlan );
+		person.setSelectedPlan( newPlan );
 		person.removeUnselectedPlans();
 	}
 

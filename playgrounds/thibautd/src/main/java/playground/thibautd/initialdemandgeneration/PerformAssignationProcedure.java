@@ -83,17 +83,21 @@ public class PerformAssignationProcedure {
 
 	public static void main( final String[] args ) {
 		try{
+			log.info("################################## START #######################################");
 			String configFile = args[ 0 ];
 			MzGroupsModule groups = new MzGroupsModule();
 			Config config = ConfigUtils.createConfig( );
 			config.addModule( MzGroupsModule.NAME , groups );
 			ConfigUtils.loadConfig( config , configFile );
-			ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
 			Module configGroup = config.getModule( CONF_GROUP );
 			String outputDir = configGroup.getValue( OUT_FIELD );
-			PersonAssignActivityChains.DayOfWeek dow = getDay( configGroup );
 
+			// init out before loading the scenario, so that the
+			// resulting log msgs are recorded in the log file.
 			MoreIOUtils.initOut( outputDir );
+
+			ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.loadScenario( config );
+			PersonAssignActivityChains.DayOfWeek dow = getDay( configGroup );
 
 			List<String> popFiles = new ArrayList<String>();
 
@@ -160,11 +164,15 @@ public class PerformAssignationProcedure {
 					  scen.getNetwork(),
 					  scen.getKnowledges())).write(
 				  outputDir + "plans-"+getDay( configGroup ) +"-wo-mono-act.xml.gz");
-		} catch(Exception e) {
+		}
+		catch(Exception e) {
 			// Log the stack trace, and rethrow the exception.
 			// This allows the stack trace to be written to the logFile.
 			log.error( "got an uncaught exception", e );
 			throw new RuntimeException( e );
+		}
+		finally {
+			log.info("################################### END ########################################");
 		}
 	}
 
