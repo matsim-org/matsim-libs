@@ -10,11 +10,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class SfUtcOffset {
 	
-	public static void main(String args[]) throws Exception {
-		SfUtcOffset test = new SfUtcOffset();
-		test.getUtcOffset(new CoordImpl(52.8,8.08));
-		
-	}
+//	public static void main(String args[]) throws Exception {
+//		SfUtcOffset test = new SfUtcOffset();
+//		test.getUtcOffset(new CoordImpl(52.8,8.08));
+//		
+//	}
 	
 	public int getUtcOffset(Coord coord) throws IOException, InterruptedException {
 		
