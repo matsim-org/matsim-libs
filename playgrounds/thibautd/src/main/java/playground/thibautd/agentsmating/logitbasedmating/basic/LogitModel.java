@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
-import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
 
 /**
  * Abstract class to define easily a logit model.
@@ -43,6 +42,8 @@ public abstract class LogitModel implements ChoiceModel {
 
 	private final Random random = new Random( 14325 );
 	private static final double EPSILON = 1E-7;
+	private static final double overflowEscapeStep = 100;
+
 	private final double scale;
 	private final boolean selfChecking;
 
@@ -51,16 +52,6 @@ public abstract class LogitModel implements ChoiceModel {
 	 */
 	public LogitModel() {
 		this( 1 , true );
-	}
-
-	/**
-	 * Creates a logit model with scale parameter 1.
-	 *
-	 * @param selfCheking if true, the model will check
-	 * the validatiy of the results of the different operations
-	 */
-	public LogitModel( final boolean selfChecking ) {
-		this( 1 , selfChecking );
 	}
 
 	/**
@@ -73,11 +64,23 @@ public abstract class LogitModel implements ChoiceModel {
 	}
 
 	/**
+	 * Creates a logit model with scale parameter 1.
+	 *
+	 * @param selfChecking if true, computed probabilities will
+	 * be tested for consistency. Underflow and overflow prevention
+	 * (which happen quite easily with exponentials) is alway performed.
+	 */
+	public LogitModel( final boolean selfChecking ) {
+		this( 1 , selfChecking );
+	}
+
+	/**
 	 * Creates a logit model.
 	 *
-	 * @param selfCheking if true, the model will check
-	 * the validatiy of the results of the different operations
 	 * @param scale the scale parameter ("mu")
+	 * @param selfChecking if true, computed probabilities will
+	 * be tested for consistency. Underflow and overflow prevention
+	 * (which happen quite easily with exponentials) is alway performed.
 	 */
 	public LogitModel( final double scale , final boolean selfChecking ) {
 		this.scale = scale;
@@ -100,9 +103,6 @@ public abstract class LogitModel implements ChoiceModel {
 		for (Map.Entry<Alternative, Double> alt : probs.entrySet()) {
 			cumul += alt.getValue();
 			if (choice <= cumul) {
-				//if (alt.getKey() instanceof TripRequest) {
-				//	System.out.println( ((TripRequest) alt.getKey()).getTripType() );
-				//}
 				return alt.getKey();
 			}
 		}
@@ -111,58 +111,68 @@ public abstract class LogitModel implements ChoiceModel {
 	}
 
 	/**
+	 * Returns the choice probabilities, shifting all utilities if an over or 
+	 * underflow happens.
+	 *
 	 * @throws RuntimeException in case of floating point arithmetic problem
-	 * (overflow, underflow, illegal operations), and if the selfChecking
-	 * option is set to true.
+	 * resulting in a NaN value
 	 */
 	@Override
 	public Map<Alternative, Double> getChoiceProbabilities(
 			final DecisionMaker decisionMaker,
 			final List<Alternative> alternatives) {
+		return getChoiceProbabilities(decisionMaker , alternatives , 0);
+	}
+
+	/**
+	 * Recursive version of the probabilities computation: if an under- or overflow
+	 * happens, the function is called with a shift in the utility.
+	 *
+	 * @param shift a value by which to shift all utilities. This does not
+	 * change the probabilities, and can avoid under and overflows in case
+	 * of largely negative or positive utilities (in fact, not that large:
+	 * exp( -1000 ) results in an underflow).
+	 */
+	private Map<Alternative, Double> getChoiceProbabilities(
+			final DecisionMaker decisionMaker,
+			final List<Alternative> alternatives,
+			final double shift) {
 		Map<Alternative, Double> probabilities = new HashMap<Alternative, Double>();
 
 		double cumul = 0;
 		for (Alternative alt : alternatives) {
-			double utility = getSystematicUtility( decisionMaker , alt );
-
-			// unecessary: all possible results of such specifications, and more,
-			// are checked with the weight below.
-			// if (selfChecking) {
-			// 	if( Double.isNaN( utility ) || Double.isInfinite( utility ) ) {
-			// 		throw new RuntimeException( "got a wrong utility in "+this.getClass().getSimpleName()
-			// 				+" for decision maker "+decisionMaker+" and alternative "+alt+": utility="+utility );
-			// 	}
-			// }
+			double utility = shift + getSystematicUtility( decisionMaker , alt );
 
 			double weight = Math.exp( scale * utility );
 
-			if (selfChecking) {
-				if (weight == 0.0) {
-					throw new RuntimeException( "probable double underflow in "+this.getClass().getSimpleName()
-							+": got exp( "+scale+" * "+utility+" ) = "+weight
-							+" for decision maker "+decisionMaker+" and alternative "+alt );
-				}
-				if ( Double.isInfinite( weight ) ) {
-					throw new RuntimeException( "probable double overflow in "+this.getClass().getSimpleName()
-							+": got exp( "+scale+" * "+utility+" ) = "+weight
-							+" for decision maker "+decisionMaker+" and alternative "+alt );
-				}
-				if ( Double.isNaN( weight ) ) {
-					throw new RuntimeException( "probable utility mispecification in "+this.getClass().getSimpleName()
-							+": got NaN term for exp( "+scale+" * "+utility+" )"
-							+" for decision maker "+decisionMaker+" and alternative "+alt );
-				}
+			if (weight == 0.0 || Double.isInfinite( weight ) ) {
+				log.warn( "probable double under- or overflow in "+this.getClass().getSimpleName()
+						+": got exp( "+scale+" * "+utility+" ) = "+weight
+						+" for decision maker "+decisionMaker+" and alternative "+alt );
+
+				double newShift = (weight == 0) ?
+					// underflow: shift up
+					shift + overflowEscapeStep :
+					// overflow: shift down
+					shift - overflowEscapeStep;
+				log.warn( "utilities shifted by "+newShift);
+				// shift the utility so that the term for this alternative is one
+				return getChoiceProbabilities( decisionMaker , alternatives , newShift );
+			}
+
+			if ( selfChecking && Double.isNaN( weight ) ) {
+				throw new RuntimeException( "probable utility mispecification in "+this.getClass().getSimpleName()
+						+": got NaN term for exp( "+scale+" * "+utility+" )"
+						+" for decision maker "+decisionMaker+" and alternative "+alt );
 			}
 
 			cumul += weight;
 			probabilities.put( alt , weight );
 		}
 
-		if (selfChecking) {
-			if ( Double.isNaN( cumul )) {
-				throw new RuntimeException( "got a NaN denominator in "+this.getClass().getSimpleName()
-						+" for decision maker "+decisionMaker+" and alternatives "+alternatives );
-			}
+		if ( selfChecking && Double.isNaN( cumul )) {
+			throw new RuntimeException( "got a NaN denominator in "+this.getClass().getSimpleName()
+					+" for decision maker "+decisionMaker+" and alternatives "+alternatives );
 		}
 
 		double probSum = 0;
@@ -179,6 +189,7 @@ public abstract class LogitModel implements ChoiceModel {
 							// to round the results before printing, and thus check
 							// whether this is "truly" zero or if some digits are
 							// still non zero.
+							// This should not happen dure to underflow prevention
 							+": prob = "+new BigDecimal(entry.getValue())+" / "+new BigDecimal(cumul));
 				}
 				if ( prob < 0 || prob > 1 ) {
