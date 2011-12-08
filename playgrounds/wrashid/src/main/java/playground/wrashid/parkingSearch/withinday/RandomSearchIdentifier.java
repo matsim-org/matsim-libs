@@ -47,6 +47,10 @@ public class RandomSearchIdentifier extends DuringLegIdentifier implements Simul
 		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
 	}
 	
+	
+	/*
+	 * Put stuff here, which cannot run in parallel, the rest you can put in replanner. 
+	 */
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 
