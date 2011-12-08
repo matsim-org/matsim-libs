@@ -4,6 +4,7 @@
 package playground.yu.utils.math;
 
 import java.util.List;
+import java.util.Map;
 
 import playground.yu.utils.io.PCParameterReader;
 
@@ -29,18 +30,18 @@ public class OneSampleT_Test {
 
 		if (args.length < 4) {
 			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "D:/workspace/runs-svn/run1536/paramSyn3.log";
+			paramFilename = "D:/workspace/runs-svn/run1536/paramBase.log";
 			// outputFilename =
 			// "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
 			// width = 500;
-			window=101;
+			window = 101;
 			mus[0] = -3;
 			mus[1] = 0;
 		} else {
 			paramFilename = args[0];
 			// outputFilename = args[1];
 			// width = Integer.parseInt(args[2]);
-			window=Integer.parseInt(args[1]);
+			window = Integer.parseInt(args[1]);
 			mus[0] = Double.parseDouble(args[2]);
 			mus[1] = Double.parseDouble(args[3]);
 		}
@@ -48,16 +49,16 @@ public class OneSampleT_Test {
 		PCParameterReader paramReader = new PCParameterReader();
 		paramReader.readFile(paramFilename);
 
-		int i = 0;
-		for (String paramName : paramReader.getParameterNames()) {
-			if (i > 1) {
-				double mu = mus[i-2];
+		Map<Integer, String> paramNames = paramReader.getParameterNames();
+		for (Integer paramNameIdx : paramNames.keySet()) {
+			if (paramNameIdx > 1) {
+				double mu = mus[paramNameIdx - 2];
 				System.out.println("One-sample t-test\tmu:\t" + mu);
 				System.out.println("One-sample t-test\tt-value:\t"
 						+ new OneSampleT_Test(paramReader
-								.getParameter(paramName),window, mu).gettValue());
+								.getParameter(paramNames.get(paramNameIdx)),
+								window, mu).gettValue());
 			}
-			i++;
 		}
 	}
 

@@ -24,12 +24,10 @@
 package playground.yu.utils.io;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -49,29 +47,32 @@ public class PCParameterReader implements TabularFileHandler {
 	 *             {@code Double}> parameter values>
 	 */
 	private final Map<String, List<Double>> parameters;
+	private final Map<Integer, String> parameterNames;
 
 	public PCParameterReader() {
 		parserConfig = new TabularFileParserConfig();
 		parserConfig.setDelimiterTags(new String[] { "\t" });
 
 		parameters = new TreeMap<String, List<Double>>();
+		parameterNames = new TreeMap<Integer, String>();
 	}
 
 	public List<Double> getParameter(String parameterName) {
 		return parameters.get(parameterName);
 	}
 
-	public Set<String> getParameterNames() {
-		Set<String> keySet = parameters.keySet();
-		Set<String> delegate = new TreeSet<String>();
+	public Map<Integer, String> getParameterNames() {
+		Set<Integer> keySet = parameterNames.keySet();
+		Map<Integer, String> delegate = new TreeMap<Integer, String>();
 		int i = 0;
-		for (String key : keySet) {
-			if (i > 0) {
-				delegate.add(key);
+		for (Integer inte : keySet) {
+			if (inte > 0) {
+				delegate.put(i, parameterNames.get(inte));
+				i++;
 			}
-			i++;
+
 		}
-		return delegate;// first column
+		return delegate;// without first column (iteration)
 	}
 
 	public void readFile(String filename) {
@@ -84,15 +85,14 @@ public class PCParameterReader implements TabularFileHandler {
 		int size = row.length;
 
 		if (!row[0].startsWith("iter")) {
-			int i = 0;
-			for (Iterator<List<Double>> it = parameters.values().iterator(); it
-					.hasNext();) {
-				it.next().add(Double.parseDouble(row[i]));
-				i++;
+			for (int i = 0; i < size; i++) {
+				parameters.get(parameterNames.get(i)).add(
+						Double.parseDouble(row[i]));
 			}
 		} else/* start */{
 			for (int i = 0; i < size; i++) {
 				parameters.put(row[i], new ArrayList<Double>());
+				parameterNames.put(i, row[i]);
 			}
 		}
 	}
