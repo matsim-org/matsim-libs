@@ -32,9 +32,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -52,6 +54,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	private Random rnd = new Random();
 	private static double replanningShare = 0.1;
 	TreeMap<Id, FacilityPenalty> facilityPenalties;
+	TreeMap<Double, LinkCandidate> moveProbabilities;
 	
 	public RetailerRelocation(TreeMap<Id, FacilityPenalty> facilityPenalties) {
 		this.facilityPenalties = facilityPenalties;
@@ -62,7 +65,9 @@ public class RetailerRelocation implements IterationStartsListener {
 			this.initialize(event);
 			this.evaluatePotentialCustomers(event);
 			this.evaluateCompetitorsPower(event);
+			this.generateProbabilities(event);
 			this.relocateSomeRetailers(event, RetailerRelocation.replanningShare);
+			this.adaptAgents(event);
 		}
 	}
 	
@@ -106,7 +111,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private double getCompetitorsPowerInArea(Coord coord) {
-		double distance = 1000.0;
+		double distance = 1000.0; // TODO: make this dependent on location and business sectors
 		Collection<ActivityFacility> competitors = this.shoppingFacilities.get(coord.getX(), coord.getY(), distance);
 		return competitors.size() + 1; 	//TODO: weight with distance and size of competitors
 	}
@@ -125,25 +130,80 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private void relocateSomeRetailers(IterationStartsEvent event, double share) {
+		NetworkImpl network = event.getControler().getNetwork();
+		
 		TreeMap<Id,ActivityFacility> shoppingfacs = 
 			event.getControler().getScenario().getActivityFacilities().getFacilitiesForActivityType("s");
 		
 		for (ActivityFacility facility : shoppingfacs.values()) {
 			if (rnd.nextDouble() < share) {
-				this.evaluateAndMaybeMoveFacility(facility);
+				Id linkId = this.evaluateAndMaybeMoveFacility(facility);
+				if (linkId != null) {
+					this.move((ActivityFacilityImpl)facility, network.getLinks().get(linkId));
+				}
 			}
 		}
 	}
 	
-	private void evaluateAndMaybeMoveFacility(ActivityFacility facility) {
+	private void generateProbabilities(IterationStartsEvent event) {		
+		this.moveProbabilities = new TreeMap<Double, LinkCandidate>();
+		
+		NetworkImpl network = event.getControler().getNetwork();
+		double totalPower = 0.0;
+		for (LinkCandidate candidate : this.linkCandidates.values()) {
+			Link link = network.getLinks().get(candidate.getLinkId());
+			totalPower += this.getCompetitorsPowerInArea(link.getCoord());
+		}
+		double currentPower = 0.0;
+		for (LinkCandidate candidate : this.linkCandidates.values()) {
+			Link link = network.getLinks().get(candidate.getLinkId());
+			currentPower += this.getCompetitorsPowerInArea(link.getCoord());
+			this.moveProbabilities.put(currentPower, candidate);
+		}	
+	}
+	
+	private Id evaluateAndMaybeMoveFacility(ActivityFacility facility) {
 		// if load/competitors is better at new location -> move
 		// evaluate potential at old location
 		double currentLoad = this.facilityPenalties.get(facility.getId()).getFacilityLoad().getNumberOfVisitorsPerDay();
 		double competitorsPower = this.getCompetitorsPowerInArea(facility.getCoord());
 		double currentPotential = currentLoad / (competitorsPower + 1); //  + 1 is ego
 		
-		// evaluate potential at other locations and maybe chose
-		
+		// evaluate potential at other locations and maybe chose one with certain probability
+		Id choice = null;
+		double r = this.rnd.nextDouble() * this.moveProbabilities.lastEntry().getKey();
+		for (double key : this.moveProbabilities.keySet()) {
+			if (key > r) {
+				LinkCandidate candidate = this.moveProbabilities.get(key);
+				double potential = candidate.getPotential();
+				if (potential > currentPotential) {
+					choice = candidate.getLinkId();
+				}
+			}
+		}
+		return choice;
+	}
+	
+	private void adaptAgents(IterationStartsEvent event) {
+		ActivityFacilities facilities = event.getControler().getFacilities();
+		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+			PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+			for (PlanElement pe : selectedPlan.getPlanElements()) {				
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;
+					if (act.getType().startsWith("s")) {
+						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
+						act.setLinkId(facility.getLinkId());
+						act.setCoord(facility.getCoord());
+					}
+				}
+			}
+		}
+	}
+	
+	private void move(ActivityFacilityImpl facility, Link link) {
+		facility.setLinkId(link.getId());
+		facility.setCoord(link.getCoord());
 	}
 	
 	private QuadTree<ActivityFacility> builFacQuadTree(TreeMap<Id,ActivityFacility> facilities_of_type) {

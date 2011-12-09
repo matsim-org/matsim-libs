@@ -42,4 +42,8 @@ public class LinkCandidate {
 	public void increaseCompetitorsPower(double inc) {
 		this.competitorsPower += inc;
 	}
+	
+	public double getPotential() {
+		return this.potentialCustomersCount / (this.competitorsPower + 1);
+	}
 }
