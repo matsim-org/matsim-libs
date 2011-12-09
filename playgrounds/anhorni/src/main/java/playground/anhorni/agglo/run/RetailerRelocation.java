@@ -67,12 +67,14 @@ public class RetailerRelocation implements IterationStartsListener {
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {	
 		if (event.getIteration() % 2 == 0 && event.getIteration() > 0) {
+			log.info("start relocation of retailers ...");
 			this.initialize(event);
 			this.evaluatePotentialCustomers(event);
 			this.evaluateCompetitorsPower(event);
 			this.generateProbabilities(event);
 			this.relocateSomeRetailers(event, RetailerRelocation.replanningShare);
 			this.adaptAgents(event);
+			log.info("finished relocation of retailers ...");
 		}
 	}
 	

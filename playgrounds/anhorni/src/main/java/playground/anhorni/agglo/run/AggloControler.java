@@ -33,6 +33,8 @@ import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.ActivitiesHandler;
 
 public class AggloControler extends Controler {
+	
+	TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
 				
 	public AggloControler(final String[] args) {
 		super(args);	
@@ -60,8 +62,7 @@ public class AggloControler extends Controler {
 		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter));
 		
 			
-		// add retailer relocation choice
-		TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
+		// add retailer relocation choice		
 		this.addControlerListener(new FacilitiesLoadCalculator(facilityPenalties));
 		this.addControlerListener(new RetailerRelocation(facilityPenalties));
 	}    
