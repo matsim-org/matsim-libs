@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -99,7 +100,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 			Lane intermediateLane;
 			Id intermediateLaneId;
 			int intermediateLanesCounter = 1;
-			for (int i = sortedLanes.size() - 2; i >= 0; i--){
+			for (int i = sortedLanes.size() - 2; i >= 0; i--){ //sortedLanes.size() and sortedLanes.size()-1 are already used, so start at -2
 				secondLongestLane = sortedLanes.get(i);
 				if (longestLane.getStartsAtMeterFromLinkEnd() > secondLongestLane.getStartsAtMeterFromLinkEnd()){
 					//create intermediate lane
@@ -109,6 +110,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 					//intermdiateLane needs values as startsAt and represented number of lanes
 					intermediateLane.setStartsAtMeterFromLinkEnd(longestLane.getStartsAtMeterFromLinkEnd());
 					intermediateLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
+					intermediateLane.addToLaneId(secondLongestLane.getId());
 					l2lnew.addLane(intermediateLane);
 					lastLane.addToLaneId(intermediateLaneId);
 					lastLane = intermediateLane;
@@ -121,7 +123,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 				else {
 					throw new RuntimeException("Illegal sort order");
 				}
-			}
+			}	
 			
 			
 			//calculate the alignment and uturn
