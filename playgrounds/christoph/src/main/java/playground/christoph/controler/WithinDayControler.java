@@ -26,7 +26,8 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -125,11 +126,11 @@ public class WithinDayControler extends WithinDayController {
 		super.createAndInitTravelTimeCollector();
 		travelTime = super.getTravelTimeCollector();
 
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-
-//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, travelCost, travelTime);
+		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
+		
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, super.getTravelTimeCollectorFactory(), factory, routeFactory);
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);

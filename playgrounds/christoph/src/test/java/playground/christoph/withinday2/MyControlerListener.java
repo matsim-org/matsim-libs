@@ -9,7 +9,7 @@ public class MyControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler controler = event.getControler() ;
-		controler.setMobsimFactory(new MyMobsimFactory(controler.createTravelCostCalculator(), controler.getTravelTimeCalculator())) ;
+		controler.setMobsimFactory(new MyMobsimFactory(controler.getTravelCostCalculatorFactory(), controler.getTravelTimeCalculator()));
 	}
 
 }

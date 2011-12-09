@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -119,7 +120,9 @@ public class CostNavigationRouteController extends WithinDayController implement
 		
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory.createTravelCostCalculator(travelTime, this.config.planCalcScore()), travelTime, factory, routeFactory);
+		
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.car, this.getTravelTimeCollectorFactory());	
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory, this.getMultiModalTravelTimeWrapperFactory(), factory, routeFactory);
 		
 		if (agentsLearn) {
 			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime,

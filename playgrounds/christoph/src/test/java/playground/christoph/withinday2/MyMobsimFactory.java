@@ -29,14 +29,17 @@ import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.withinday.mobsim.ReplanningManager;
+import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -47,11 +50,11 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  */
 public class MyMobsimFactory implements MobsimFactory {
 	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
-	private PersonalizableTravelCost travCostCalc;
+	private TravelCostCalculatorFactory travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
 	private ReplanningManager replanningManager;
 	
-	MyMobsimFactory( PersonalizableTravelCost travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
+	MyMobsimFactory( TravelCostCalculatorFactory travelCostCalculator, PersonalizableTravelTime travelTimeCalculator ) {
 		this.travCostCalc = travelCostCalculator ;
 		this.travTimeCalc = travelTimeCalculator ;
 	}
@@ -60,11 +63,8 @@ public class MyMobsimFactory implements MobsimFactory {
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		int numReplanningThreads = 1;
 
-		Netsim mobsim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
-
-		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory( mobsim ) ;
-		mobsim.setAgentFactory(agentFactory) ;
-
+		QSim mobsim = new WithinDayQSimFactory().createMobsim(sc, eventsManager);
+		
 		replanningManager = new ReplanningManager(numReplanningThreads);
 
 		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
@@ -93,9 +93,9 @@ public class MyMobsimFactory implements MobsimFactory {
 	private void initReplanningRouter(Scenario sc, Netsim mobsim ) {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) mobsim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
+		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.travTimeCalc);
 		AbstractMultithreadedModule routerModule =
-			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, this.travTimeCalc, new DijkstraFactory(), routeFactory);
+			new ReplanningModule(sc.getConfig(), sc.getNetwork(), this.travCostCalc, wrapper, new DijkstraFactory(), routeFactory);
 		// (ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute)
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 

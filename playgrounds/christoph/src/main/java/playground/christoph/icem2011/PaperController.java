@@ -46,9 +46,8 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
@@ -62,7 +61,6 @@ import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByPr
 import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 /**
  * Controller for the simulation runs presented in the ICEM 2011 paper. 
@@ -148,13 +146,8 @@ public class PaperController extends WithinDayController implements StartupListe
 	protected void initReplanners(QSim sim) {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		
-		TravelTimeCollector travelTime = super.getTravelTimeCollector();
-		PersonalizableTravelCost travelCost = super.getTravelCostCalculatorFactory().createTravelCostCalculator(travelTime, this.config.planCalcScore());
-//		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
-//		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		LeastCostPathCalculatorFactory factory = new DijkstraFactory(); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
+		LeastCostPathCalculatorFactory factory = new FastDijkstraFactory();
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, super.getTravelCostCalculatorFactory(), this.getTravelTimeCollectorFactory(), factory, routeFactory);
 		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);

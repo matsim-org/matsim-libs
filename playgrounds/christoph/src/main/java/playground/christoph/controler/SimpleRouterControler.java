@@ -182,43 +182,45 @@ public class SimpleRouterControler extends WithinDayController implements Simula
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		AbstractMultithreadedModule router;
 
-		// BasicReplanners (Random, Tabu, Compass, ...)
-		// each replanner can handle an arbitrary number of persons
-		RandomRoute randomRoute = new RandomRoute(this.network);
-		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory(), routeFactory);
-		this.randomIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.randomReplanner);
-
-		TabuRoute tabuRoute = new TabuRoute(this.network);
-		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory(), routeFactory);
-		this.tabuIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.tabuReplanner);
-
-		CompassRoute compassRoute = new CompassRoute(this.network);
-		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory(), routeFactory);
-		this.compassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.compassReplanner);
-
-		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
-		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory(), routeFactory);
-		this.randomCompassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.randomCompassReplanner);
-
-		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, this.travelCostFactory, this.travelTime);
-		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
-		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory(), routeFactory);
-		this.dijkstraIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
-		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
-		super.getReplanningManager().addIntialReplanner(this.randomDijkstraReplanner);	
+		// TODO: fix this...
+		
+//		// BasicReplanners (Random, Tabu, Compass, ...)
+//		// each replanner can handle an arbitrary number of persons
+//		RandomRoute randomRoute = new RandomRoute(this.network);
+//		router = new ReplanningModule(config, network, randomRoute, null, new SimpleRouterFactory(), routeFactory);
+//		this.randomIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+//		this.randomReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.randomReplanner.addAgentsToReplanIdentifier(this.randomIdentifier);
+//		super.getReplanningManager().addIntialReplanner(this.randomReplanner);
+//
+//		TabuRoute tabuRoute = new TabuRoute(this.network);
+//		router = new ReplanningModule(config, network, tabuRoute, null, new SimpleRouterFactory(), routeFactory);
+//		this.tabuIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+//		this.tabuReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.tabuReplanner.addAgentsToReplanIdentifier(this.tabuIdentifier);
+//		super.getReplanningManager().addIntialReplanner(this.tabuReplanner);
+//
+//		CompassRoute compassRoute = new CompassRoute(this.network);
+//		router = new ReplanningModule(config, network, compassRoute, null, new SimpleRouterFactory(), routeFactory);
+//		this.compassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+//		this.compassReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.compassReplanner.addAgentsToReplanIdentifier(this.compassIdentifier);
+//		super.getReplanningManager().addIntialReplanner(this.compassReplanner);
+//
+//		RandomCompassRoute randomCompassRoute = new RandomCompassRoute(this.network);
+//		router = new ReplanningModule(config, network, randomCompassRoute, null, new SimpleRouterFactory(), routeFactory);
+//		this.randomCompassIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+//		this.randomCompassReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.randomCompassReplanner.addAgentsToReplanIdentifier(this.randomCompassIdentifier);
+//		super.getReplanningManager().addIntialReplanner(this.randomCompassReplanner);
+//
+//		RandomDijkstraRoute randomDijkstraRoute = new RandomDijkstraRoute(this.network, this.travelCostFactory, this.travelTime);
+//		randomDijkstraRoute.setDijsktraWeightFactor(randomDijsktraWeightFactor);
+//		router = new ReplanningModule(config, network, randomDijkstraRoute, null, new SimpleRouterFactory(), routeFactory);
+//		this.dijkstraIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+//		this.randomDijkstraReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();
+//		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
+//		super.getReplanningManager().addIntialReplanner(this.randomDijkstraReplanner);	
 	}
 
 	@Override

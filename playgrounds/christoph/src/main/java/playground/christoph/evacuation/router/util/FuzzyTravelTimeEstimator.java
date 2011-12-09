@@ -20,24 +20,11 @@
 
 package playground.christoph.evacuation.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -48,38 +35,27 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * 
  * @author cdobler
  */
-public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime, LinkEnterEventHandler, 
-	ActivityStartEventHandler, ActivityEndEventHandler {
+public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime {
+
+	private static final long hashCodeModFactor = 123456;
 
 	private final PersonalizableTravelTime travelTime;
-	private final Scenario scenario;
-	private final Map<Id, Coord> personLocations;
+	private final FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector;
 
-	private int pInt;
 	private Id pId;
+	private int pIdHashCode;
 	private double personFuzzyFactor;
 	
-	public FuzzyTravelTimeEstimator(PersonalizableTravelTime travelTime, Scenario scenario) {
+	/*package*/ FuzzyTravelTimeEstimator(PersonalizableTravelTime travelTime, FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector) {
 		this.travelTime = travelTime;
-		this.scenario = scenario;
-		
-		this.personLocations = new HashMap<Id, Coord>();
-		
-		/*
-		 * Get persons' coordinates when the simulation starts.
-		 */
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			Coord coord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId()).getCoord();
-			personLocations.put(person.getId(), coord);
-		}
+		this.fuzzyTravelTimeDataCollector = fuzzyTravelTimeDataCollector;
 	}
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
 			
 		double tt = this.travelTime.getLinkTravelTime(link, time);
-		
+				
 		double distanceFuzzyFactor = calcDistanceFuzzyFactor(link);
 		double linkFuzzyFactor = calcLinkFuzzyFactor(link);
 		
@@ -89,20 +65,18 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime, LinkE
 		 * between -0.50..0.50
 		 */
 		double factor = (personFuzzyFactor + distanceFuzzyFactor + linkFuzzyFactor - 1.5)/3;
+		double ttError = tt * factor;
 		
-		return tt * factor;
+		return tt + ttError;
 	}
 
 	@Override
 	public void setPerson(Person person) {
 		this.travelTime.setPerson(person);
-		this.pId = person.getId();
 		
-//		this.pInt = Integer.valueOf(this.pId.toString());
-		this.pInt = person.getId().toString().hashCode();
-		Random pRandom = new Random(pInt);
-		prepareRNG(pRandom);
-		this.personFuzzyFactor = pRandom.nextDouble();
+		this.pId = person.getId();
+		this.pIdHashCode = person.getId().toString().hashCode();
+		this.personFuzzyFactor = hashCodeToRandomDouble(pIdHashCode);
 	}
 
 	/*
@@ -110,7 +84,7 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime, LinkE
 	 * and 1.0 (distance ~ 15000.0).
 	 */
 	private double calcDistanceFuzzyFactor(Link link) {
-		double distance = CoordUtils.calcDistance(this.personLocations.get(pId), link.getCoord());
+		double distance = CoordUtils.calcDistance(fuzzyTravelTimeDataCollector.getAgentLocations().get(pId), link.getCoord());
 		
 		return (1 / (Math.exp(-distance/1500.0) + 4.0));
 	}
@@ -120,46 +94,40 @@ public class FuzzyTravelTimeEstimator implements PersonalizableTravelTime, LinkE
 	 * depends on the current person and the given link. 
 	 */
 	private double calcLinkFuzzyFactor(Link link) {		
-//		int lInt =  Integer.valueOf(link.getId().toString());
-		int lInt = link.getId().toString().hashCode();
-		Random lRandom = new Random(lInt + pInt);
-		prepareRNG(lRandom);
-		return lRandom.nextDouble();
+		int lIdHashCode = link.getId().toString().hashCode();
+		return hashCodeToRandomDouble(lIdHashCode + pIdHashCode);
+	}
+	
+	public static void main(String[] args) {
+		FuzzyTravelTimeEstimator ftte = new FuzzyTravelTimeEstimator(null, null);
+
+		Gbl.startMeasurement();
+		double sum = 0.0;
+		int iters = 10000000;
+		for (int i = 0; i < iters; i++) {
+			sum += ftte.hashCodeToRandomDouble(i);
+		}
+		Gbl.printElapsedTime();
 	}
 	
 	/*
-	 * Draw some random numbers to better initialize the pseudo-random number generator.
-	 *
-	 * @param rng the random number generator to initialize.
+	 * Creates a random double value between 0.0 and 1.0 based
+	 * on an integer hash value.
 	 */
-	private static void prepareRNG(final Random rng) {
-		for (int i = 0; i < 10; i++) {
-			rng.nextDouble();
-		}
+	private double hashCodeToRandomDouble(int hashCode) {
+		
+		/*
+		 *  Small numbers represented as a String return small hash values.
+		 *  By doing this operation, we create higher values that result
+		 *  in larger differences between two input String (e.g. "1" and "2").
+		 */
+		hashCode ^= (hashCode << 13);
+		hashCode ^= (hashCode >>> 17);
+		hashCode ^= (hashCode << 5);
+
+		Long modValue = hashCode % (hashCodeModFactor);
+		double value = modValue.doubleValue() / (hashCodeModFactor);
+		return Math.abs(value);
 	}
 
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-		personLocations.put(event.getPersonId(), coord);
-	}
-
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		Coord coord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord();
-		personLocations.put(event.getPersonId(), coord);
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-		personLocations.put(event.getPersonId(), coord);
-	}
-
-	
-	@Override
-	public void reset(int iteration) {
-		this.personLocations.clear();
-	}
 }

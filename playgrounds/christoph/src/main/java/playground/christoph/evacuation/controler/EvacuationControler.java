@@ -22,6 +22,7 @@ package playground.christoph.evacuation.controler;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
@@ -34,7 +35,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
@@ -42,14 +42,16 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
@@ -67,7 +69,8 @@ import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
-import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimator;
+import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
+import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -79,7 +82,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
 public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
-	StartupListener, AfterMobsimListener {
+		StartupListener, AfterMobsimListener {
 
 	protected boolean adaptOriginalPlans = false;
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
@@ -209,7 +212,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.passengerEventsCreator = new PassengerEventsCreator(this.events);
 		this.getEvents().addHandler(passengerEventsCreator);
-		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);		
+		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);
 		
 		/*
 		 * Create the set of analyzed modes.
@@ -300,15 +303,24 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected void initReplanners(QSim sim) {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		
-		// without social costs
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(this.getTravelTimeCollector());
-
+			
 		// use fuzzyTravelTimes
+		FuzzyTravelTimeDataCollector fuzzyTravelTimeDataCollector = new FuzzyTravelTimeDataCollector(this.scenarioData);
+		this.getEvents().addHandler(fuzzyTravelTimeDataCollector);
+		
+		FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.getTravelTimeCollectorFactory(), fuzzyTravelTimeDataCollector);
+		
+		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
+		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+		}
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, fuzzyTravelTimeEstimatorFactory);
+		
+		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
-		FuzzyTravelTimeEstimator fuzzyTravelTime = new FuzzyTravelTimeEstimator(this.getTravelTimeCollector(), this.scenarioData);
-		this.getEvents().addHandler(fuzzyTravelTime);
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, fuzzyTravelTime, factory, routeFactory);
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
 		
 		/*
 		 * Intial Replanners
@@ -380,14 +392,14 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		super.setUp();
 	}
 
-	/*
-	 * Always use a MultiModalMobsimFactory - it will return
-	 * a (Parallel)QSim using a MultiModalQNetwork.
-	 */
-	@Override
-	public MobsimFactory getMobsimFactory() {
-		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCollector());
-	}
+//	/*
+//	 * Always use a MultiModalMobsimFactory - it will return
+//	 * a (Parallel)QSim using a MultiModalQNetwork.
+//	 */
+//	@Override
+//	public MobsimFactory getMobsimFactory() {
+//		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCollector());
+//	}
 
 	/*
 	 * ===================================================================

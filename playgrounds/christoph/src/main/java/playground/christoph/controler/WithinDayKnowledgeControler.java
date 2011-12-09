@@ -133,10 +133,11 @@ public class WithinDayKnowledgeControler extends WithinDayControler {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-//		CloneablePlansCalcRoute dijkstraRouter = new CloneablePlansCalcRoute(new PlansCalcRouteConfigGroup(), network, 
-//				subNetworkDijkstraTravelCostWrapper, travelTime, new SubNetworkDijkstraFactory());		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore())); 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, travelTime, factory, routeFactory); 
+	
+		// TODO: fix this...
+		AbstractMultithreadedModule router = null;
+//		AbstractMultithreadedModule router = new ReplanningModule(config, network, subNetworkDijkstraTravelCostWrapper, super.getTravelTimeCollectorFactory(), factory, routeFactory); 
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.initialReplanner = new InitialReplannerFactory(this.scenarioData, router, 1.0).createReplanner();

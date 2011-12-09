@@ -28,6 +28,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 import org.matsim.withinday.mobsim.ReplanningManager;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
@@ -77,9 +78,8 @@ class MyWithinDayControler extends Controler {
 
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		
-		//		PlansCalcRoute dijkstraRouter = new PlansCalcRoute(new PlansCalcRouteConfigGroup(), network, this.createTravelCostCalculator(), travelTime, new DijkstraFactory());
-		AbstractMultithreadedModule router = 
-			new ReplanningModule(config, network, this.createTravelCostCalculator(), this.getTravelTimeCalculator(), new DijkstraFactory(), routeFactory);
+		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.getTravelCostCalculatorFactory(), wrapper, new DijkstraFactory(), routeFactory);
 		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
 		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
 

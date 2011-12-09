@@ -20,6 +20,8 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -31,13 +33,15 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.modules.ReplanningModule;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import playground.wrashid.parkingSearch.mobsim.ParkingQSimFactory;
 
@@ -75,11 +79,19 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 */
 	protected void initReplanners() {
 
-		TravelTimeCollector travelTime = super.getTravelTimeCollector();
-		OnlyTimeDependentTravelCostCalculator travelCost = new OnlyTimeDependentTravelCostCalculator(travelTime);
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCost, travelTime, factory, routeFactory);
+
+		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
+		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory().getPersonalizableTravelTimeFactories().entrySet()) {
+			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
+		}
+		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, super.getTravelTimeCollectorFactory());
+		
+		TravelCostCalculatorFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		
+		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory, routeFactory);
 	
 		this.randomSearchReplanner = new RandomSearchReplannerFactory(router, 1.0, this.scenarioData, parkingAgentsTracker).createReplanner();
 		this.randomSearchReplanner.addAgentsToReplanIdentifier(this.randomSearchIdentifier);		
