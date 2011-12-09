@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,12 +37,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
 public class CreatePopulation implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
+	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version5/network.xml";
+
 		
 	public static void main(String[] args) {
 		CreatePopulation potsdamPopulation = new CreatePopulation();
@@ -58,27 +62,24 @@ public class CreatePopulation implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version4/population.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version5/population.xml");
 	}
 
 	private void fillZoneData() {
-		zoneGeometries.put("node1", scenario.createCoord(1900, 0));
-		zoneGeometries.put("node2", scenario.createCoord(2000, 0));
-		zoneGeometries.put("node3", scenario.createCoord(4000, 0));
-		zoneGeometries.put("node4", scenario.createCoord(6000, 0));
-		zoneGeometries.put("node5", scenario.createCoord(8000, 0));
-		zoneGeometries.put("node6", scenario.createCoord(10000, 0));
-		zoneGeometries.put("node7", scenario.createCoord(12000, 0));
-		zoneGeometries.put("node8", scenario.createCoord(14000, 0));
-		zoneGeometries.put("node9", scenario.createCoord(16000, 0));
-		zoneGeometries.put("node10", scenario.createCoord(18000, 0));
-		zoneGeometries.put("node11", scenario.createCoord(18100, 0));
-
+		Config config = scenario.getConfig();
+		config.network().setInputFile(this.networkFile);
+		ScenarioUtils.loadScenario(scenario);
+		for (Node node : scenario.getNetwork().getNodes().values()){
+			zoneGeometries.put(node.getId().toString(), node.getCoord());
+		}
 	}
 	
 	private void generatePopulation() {
-		generateHomeWorkHomeTripsPt("node2", "node10", 120); // home, work, anzahl
-		generateHomeWorkHomeTripsPt("node10", "node2", 120); // home, work, anzahl
+		for (String zone1 : zoneGeometries.keySet()){
+			for (String zone2 : zoneGeometries.keySet()){
+				generateHomeWorkHomeTripsPt(zone1, zone2, 120); // home, work, anzahl
+			}
+		}
 	}
 
 	private void generateHomeWorkHomeTripsPt(String zone1, String zone2, int quantity) {
