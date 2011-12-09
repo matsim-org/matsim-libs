@@ -10,11 +10,17 @@ public class CCWPolygon {
 	private final Coordinate[] reflectedRing;
 	private final Coordinate refCoord;
 
-	public CCWPolygon(Coordinate [] coords, Coordinate refCoord) {
+	//Testing only
+	public double d;
+
+	public CCWPolygon(Coordinate [] coords, Coordinate refCoord, double d) {
 		Coordinate [] ccw = getCCWRing(coords);
 		this.ring = ccw;
 		this.reflectedRing = getReflectedRing(ccw, refCoord);
 		this.refCoord = refCoord;
+
+		//Testing olnly
+		this.d =d ;
 	}
 
 	public void translate(Coordinate c) {

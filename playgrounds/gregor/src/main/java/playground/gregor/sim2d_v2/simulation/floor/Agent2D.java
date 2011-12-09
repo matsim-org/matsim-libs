@@ -58,6 +58,7 @@ public class Agent2D  {
 	private final double b_min = .2;
 	private final double b_max = .25;
 	private final double tau_a = .53;
+	//	private final double tau_a = .3;
 	private QuadTree<CCWPolygon> geometryQuad;
 	private double v;
 	private double alpha = 0;
@@ -66,6 +67,9 @@ public class Agent2D  {
 
 	private boolean mentalSwitched = false;
 	private final LinkSwitcher mentalLinkSwitcher;
+
+
+	private double sensingRange = 5;
 
 	/**
 	 * @param p
@@ -76,7 +80,7 @@ public class Agent2D  {
 		this.pda = pda;
 		this.sc = sc;
 		// TODO think about this
-		this.desiredVelocity = 1.34;//+(MatsimRandom.getRandom().nextDouble() - 0.5) / 2;
+		this.desiredVelocity = 1.34; //1.29+(MatsimRandom.getRandom().nextDouble() - 0.5) / 5;
 		this.currentDesiredVelocity = this.desiredVelocity;
 		this.mentalLinkSwitcher = mlsw;
 		initGeometry();
@@ -101,7 +105,7 @@ public class Agent2D  {
 				tmp[c.length-1] = tmp[0];
 				double alpha = angle / 360. * 2 * Math.PI;
 				Algorithms.rotate(alpha, tmp);
-				CCWPolygon ccw = new CCWPolygon(tmp, new Coordinate(0,0));
+				CCWPolygon ccw = new CCWPolygon(tmp, new Coordinate(0,0), Math.max(a, b));
 				this.geometryQuad.put(v, angle, ccw);
 			}
 		}
@@ -227,4 +231,23 @@ public class Agent2D  {
 		return this.earliestUpdate;
 	}
 
+
+	public void setSensingRange(double sens) {
+		if (sens > 15) {
+			this.sensingRange = 15;
+		} else if (sens < .1) {
+			this.sensingRange = .1;
+		} else {
+			this.sensingRange = sens;
+		}
+	}
+	public double getSensingRange() {
+		return this.sensingRange;
+	}
+
+
+	@Override
+	public String toString() {
+		return this.currentPosition.toString();
+	}
 }

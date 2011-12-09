@@ -80,7 +80,7 @@ public class Controller2D extends Controler {
 		String configFile = args[0];
 		Config c = ConfigUtils.loadConfig(configFile);
 		c.addQSimConfigGroup(new QSimConfigGroup());
-		c.getQSimConfigGroup().setEndTime( 0 + 5* 60);
+		c.getQSimConfigGroup().setEndTime(  24*3600);
 
 		Scenario sc = ScenarioUtils.createScenario(c);
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());

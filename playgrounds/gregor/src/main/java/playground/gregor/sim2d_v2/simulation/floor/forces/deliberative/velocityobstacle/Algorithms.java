@@ -5,8 +5,11 @@ import java.util.TreeMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class Algorithms {
 
+//this class provides basic implementations of geometric algorithms
+public abstract class Algorithms {
+
+	private final static double epsilon = 0.00001;
 
 	private static final TreeMap<Double,Double> atans = new TreeMap<Double,Double>();
 	private static final double ATANS_LOOKUP_TABLE_RES = Math.PI/100.;
@@ -20,21 +23,26 @@ public class Algorithms {
 	 * @return
 	 */
 	public static int isAngleBigger(Coordinate s0, Coordinate s1, Coordinate t0, Coordinate t1) {
-		double x0 = s1.x - s0.x;
-		double y0 = s1.y - s0.y;
+		double x0 = (s1.x - s0.x);
+		double y0 =  (s1.y - s0.y);
+		double x1 = (t1.x - t0.x);
+		double y1 = (t1.y - t0.y);
 		int q0 = getQuadrant(x0,y0);
-		double x1 = t1.x - t0.x;
-		double y1 = t1.y - t0.y;
 		int q1 = getQuadrant(x1,y1);
 		if (q0 != q1) {
 			return q0 > q1 ? 1 : -1;
 		}
 
-		if (y0/x0 == y1/x1) {
-			return 0;
-		}
+		double por1 = y0/x0;
+		double por2 = y1/x1;
 
-		return y0/x0 > y1/x1 ? 1 : -1;
+		if (por1 > por2) {
+			return 1;
+		} else if (por2 > por1) {
+			return -1;
+		}
+		return 0;
+
 	}
 
 	private static int getQuadrant(double x1, double y1) {
@@ -166,6 +174,7 @@ public class Algorithms {
 
 	/**
 	 * Calculates the tangent indices from coordinate c to polygon p
+	 * @see see softSurfer (www.softsurfer.com) for more details on this algorithm
 	 * @param c
 	 * @param p
 	 * @return array with indices
@@ -307,5 +316,76 @@ public class Algorithms {
 		double y = refCoord.y + (coord.x - refCoord.x) * sin + (coord.y - refCoord.y)*cos;
 		coord.x = x;
 		coord.y = y;
+	}
+
+	/**
+	 * Tests whether a polygon (defined by an array of Coordinate) contains a Coordinate
+	 * @param coord
+	 * @param p
+	 * @return true if coord lays within p
+	 */
+	public static boolean contains(Coordinate coord, Coordinate[] p) {
+		int wn = getWindingNumber(coord,p);
+		return wn != 0;
+	}
+
+	//winding number algorithm
+	//see softSurfer (www.softsurfer.com) for more details
+	private static int getWindingNumber(Coordinate c, Coordinate[] p) {
+
+
+		int wn = 0;
+
+		for (int i=0; i<p.length-1; i++) {
+			if (p[i].y <= c.y) {
+				if (p[i+1].y > c.y)
+					if (isLeftOfLine( c,p[i], p[i+1]) > 0)
+						++wn;
+			}
+			else {
+				if (p[i+1].y <= c.y)
+					if (isLeftOfLine( c,p[i], p[i+1]) < 0)
+						--wn;
+			}
+
+			//test for early return here
+		}
+		return wn;
+	}
+
+
+	public static boolean computeLineIntersection(Coordinate a0, Coordinate a1, Coordinate b0, Coordinate b1, Coordinate intersectionCoordinate) {
+
+
+
+		double a = (b1.x - b0.x) * (a0.y - b0.y) - (b1.y - b0.y) * (a0.x - b0.x);
+		double b = (a1.x - a0.x) * (a0.y - b0.y) - (a1.y - a0.y) * (a0.x - b0.x);
+		double denom = (b1.y - b0.y) * (a1.x - a0.x) - (b1.x - b0.x) * (a1.y - a0.y);
+
+		//conincident
+		if (Math.abs(a) < epsilon && Math.abs(b) < epsilon && Math.abs(denom) < epsilon) {
+			intersectionCoordinate.x = (a0.x+a1.x) /2;
+			intersectionCoordinate.y = (a0.y+a1.y) /2;
+			return true;
+		}
+
+		//parallel
+		if (Math.abs(denom) < epsilon) {
+			return false;
+		}
+
+		double ua = a / denom;
+		double ub = b / denom;
+
+		if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+			return false;
+		}
+
+		double x = a0.x + ua * (a1.x - a0.x);
+		double y = a0.y + ua * (a1.y - a0.y);
+		intersectionCoordinate.x = x;
+		intersectionCoordinate.y = y;
+
+		return true;
 	}
 }

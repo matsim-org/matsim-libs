@@ -66,7 +66,7 @@ public class SegmentsFromGeometries {
 	}
 
 	private void handleSegment(Coordinate c0, Coordinate c1) {
-		CCWPolygon ccwp = new CCWPolygon(new Coordinate[]{c0,c1,c0},new Coordinate(0,0));
+		CCWPolygon ccwp = new CCWPolygon(new Coordinate[]{c0,c1,c0},new Coordinate(0,0),0);
 		double length = c0.distance(c1);
 		double dx = SUSPENSION_POINTS_MAX_DIST*(c1.x-c0.x)/length;
 		double dy = SUSPENSION_POINTS_MAX_DIST*(c1.y-c0.y)/length;

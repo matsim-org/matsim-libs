@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
 
 
@@ -28,7 +29,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 	NonRobustLineIntersector li = new NonRobustLineIntersector();
 
-	private Quadtree agentsQuad;
+	private final QuadTree<Agent2D> agentsQuad;
 	private final PhysicalFloor floor;
 
 	private static final double COS_PI_QUARTER = Math.cos(Math.PI/4);
@@ -40,8 +41,14 @@ public class VelocityObstacleForce implements DynamicForceModule{
 	private static final double COS_PI_EIGHT = Math.cos(Math.PI/8);
 	private static final double SIN_PI_EIGHT = Math.sin(Math.PI/8);
 
+	private static final double COS_PI_SIXTEENTH = Math.cos(Math.PI/16);
+	private static final double SIN_PI_SIXTEENTH = Math.sin(Math.PI/16);
+
 	private static final double COS_PI_EIGHT_RIGHT = Math.cos(-Math.PI/8);
 	private static final double SIN_PI_EIGHT_RIGHT = Math.sin(-Math.PI/8);
+
+	private static final double COS_PI_SIXTEENTH_RIGHT = Math.cos(-Math.PI/16);
+	private static final double SIN_PI_SIXTEENTH_RIGHT = Math.sin(-Math.PI/16);
 
 	private final double quadUpdateInterval = 0.1;
 	private double lastQuadUpdate = Double.NEGATIVE_INFINITY;
@@ -51,7 +58,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 	private final double timeHorizont = 5;
 
-	private final double w_i = 1;
+	private final double w_i = 0.15;
 
 	private final double tau = 0.5;
 
@@ -59,12 +66,17 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 	//Laemmel constant
-	private static final double neighborhoodSensingRange = 15;
+	private static final double neighborhoodSensingRange = 5;
 
 	public VelocityObstacleForce(PhysicalFloor floor, Scenario sc) {
 		this.floor = floor;
 		this.driver = new PathAndDrivingAcceleration(floor,sc);
 		this.sc = sc;
+		double maxX = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxEasting();
+		double minX = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinEasting();
+		double maxY = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxNorthing();
+		double minY = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
+		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 	}
 
 
@@ -73,22 +85,19 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 		Force f = agent.getForce();
 		double[] df = this.driver.getDesiredVelocity(agent);
-		//		if (agent.getEarliestUpdate() > time) {
-		//			double fx = Agent2D.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
-		//			double fy = Agent2D.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
-		//			f.incrementX(fx);
-		//			f.incrementY(fy);
-		//			return;
-		//		}
+		if (agent.getEarliestUpdate() > time) {
+			double fx = Agent2D.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
+			double fy = Agent2D.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
+			f.incrementX(fx);
+			f.incrementY(fy);
+			return;
+		}
 
 
 		CCWPolygon aGeo = agent.getGeometry();
 
 
-		//		//DEBUG
-		//		GeometryFactory geofac = new GeometryFactory();
-		//		LineString lr = geofac.createLineString(aGeo.getCCWRing());
-		//		GisDebugger.addGeometry(lr,"A");
+
 
 
 		List<VelocityObstacle> VOs = new ArrayList<VelocityObstacle>();
@@ -103,11 +112,13 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 		double ii = timeToCollision(VOs, c0, c1);
 		//		//DEBUG
+		//c1 = new Coordinate(c0.x+df[0],c0.y + df[1]);
 		//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
 		//		GisDebugger.addGeometry(lsdvA,"dvA");
 
 		if (ii <= this.timeHorizont) {
 			chooseAlternativeAccelerationForce(ii,VOs,c0,df,agent);
+			ii = 0;
 		}
 
 
@@ -117,8 +128,16 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		f.incrementX(fx);
 		f.incrementY(fy);
 
-		double timeToUpdate = Math.min(1, ii/20);
+		double timeToUpdate = Math.min(.5, ii/2);
 		agent.setEarliestUpdate(time+timeToUpdate);
+
+		//		//DEBUG
+		//		GeometryFactory geofac = new GeometryFactory();
+		//		LineString lr = geofac.createLineString(aGeo.getCCWRing());
+		//		GisDebugger.addGeometry(lr,"A");
+		//		c1 = new Coordinate(c0.x+df[0],c0.y + df[1]);
+		//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
+		//		GisDebugger.addGeometry(lsdvA,"dvA");
 		//		GisDebugger.dump("/Users/laemmel/tmp/vis/minkowski.shp");
 
 	}
@@ -127,53 +146,79 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			CCWPolygon aGeo) {
 		QuadTree<CCWPolygon> q = this.sc.getScenarioElement(MyDataContainer.class).getSegmentsQuadTree();
 
+
+		//		GeometryFactory geofac = new GeometryFactory();
+
 		Coordinate pos = agent.getPosition();
 		double dist = Math.max(4, this.timeHorizont*agent.getDesiredVelocity());
 		Collection<CCWPolygon> coords = new HashSet<CCWPolygon>();
 		q.get(pos.x-dist , pos.y-dist, pos.x+dist, pos.y+dist, coords);
 		for (CCWPolygon c : coords) {
 			Coordinate [] envObst = ConfigurationSpaceObstacle.getCObstacle(c, aGeo);
-			int [] idx = Algorithms.getTangentIndices(agent.getPosition(),envObst);
-			Coordinate [] tan = {new Coordinate(agent.getPosition()),new Coordinate(envObst[idx[0]]),new Coordinate(envObst[idx[1]])};
+
+			int [] idx;
+			double collTime = Double.POSITIVE_INFINITY;
+			if (Algorithms.contains(agent.getPosition(),envObst)) {
+				//TODO no magic numbers here!!
+				double move = 2*agent.getGeometry().d;
+				Coordinate cobst = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().get(agent.getPosition().x, agent.getPosition().y);
+
+				double x = move*(cobst.x - agent.getPosition().x)/dist;
+				double y = move*(cobst.y - agent.getPosition().y)/dist;
+				Coordinate agPos = new Coordinate(agent.getPosition().x-x,agent.getPosition().y-y);
+				idx = Algorithms.getTangentIndices(agPos,envObst);
+
+				//				//DEBUG
+				//				LineString lrO = geofac.createLineString(c.getCCWRing());
+				//				GisDebugger.addGeometry(lrO,"B");
+				//				LineString lrCso = geofac.createLineString(envObst);
+				//				GisDebugger.addGeometry(lrCso,"A(+)-B");
+				collTime = 0;
+				agent.getForce().setVx(.5*agent.getVx());
+				agent.getForce().setVy(.5*agent.getVy());
+
+			} else {
+				idx = Algorithms.getTangentIndices(agent.getPosition(),envObst);
+
+			}
+
+			Coordinate [] tan = new Coordinate []{new Coordinate(agent.getPosition()),new Coordinate(envObst[idx[0]]),new Coordinate(envObst[idx[1]])};
 			VelocityObstacle info = new VelocityObstacle();
 			info.cso = envObst;
 			info.vo = tan;
 			info.vBx = 0;
 			info.vBy = 0;
+			info.collTime = collTime;
 
 			VOs.add(info);
-		}
 
-		Coordinate c = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().get(agent.getPosition().x, agent.getPosition().y);
-		if (c.distance(agent.getPosition()) < Agent2D.AGENT_DIAMETER) {
-			VelocityObstacle info = new VelocityObstacle();
-			info.vBx = 0;
-			info.vBy = 0;
-			Coordinate [] tan = {new Coordinate(agent.getPosition()),
-					new Coordinate(agent.getPosition().x + (c.y-agent.getPosition().y),agent.getPosition().y - (c.x-agent.getPosition().x)),new Coordinate(agent.getPosition().x - (c.y-agent.getPosition().y),agent.getPosition().y + (c.x-agent.getPosition().x))};
-			info.collTime = 0;
-			info.vo = tan;
-			VOs.add(info);
+			//			//DEBUG
+			//			LineString ranR = geofac.createLineString(new Coordinate []{tan[1],tan[0],tan[2],tan[1]});
+			//			GisDebugger.addGeometry(ranR,"VO");
 		}
-
 	}
 
 
 	private void calcOtherAgentsVOs(List<VelocityObstacle> VOs, Agent2D agent, CCWPolygon aGeo) {
+		double sensingRange = agent.getSensingRange();
 
-
-		double minX = agent.getPosition().x - neighborhoodSensingRange;
-		double maxX = agent.getPosition().x + neighborhoodSensingRange;
-		double minY = agent.getPosition().y - neighborhoodSensingRange;
-		double maxY = agent.getPosition().y + neighborhoodSensingRange;
+		//		double minX = agent.getPosition().x - sensingRange;
+		//		double maxX = agent.getPosition().x + sensingRange;
+		//		double minY = agent.getPosition().y - sensingRange;
+		//		double maxY = agent.getPosition().y + sensingRange;
 
 
 
 		//		GeometryFactory geofac = new GeometryFactory();
 
-		Envelope e = new Envelope(minX, maxX, minY, maxY);
-		@SuppressWarnings("unchecked")
-		Collection<Agent2D> l = this.agentsQuad.query(e);
+		Collection<Agent2D> l = this.agentsQuad.get(agent.getPosition().x, agent.getPosition().y, sensingRange);
+
+		if (l.size() > 8) {
+			agent.setSensingRange(sensingRange*.9);
+		} else if (l.size() < 4) {
+			agent.setSensingRange(sensingRange *1.2);
+		}
+
 		for (Agent2D other : l) {
 			if (other == agent) {
 				continue;
@@ -203,22 +248,40 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			Coordinate [] tan = null;
 
 			double collTime = Double.POSITIVE_INFINITY;
-			//for now simple collision test - should be based on the "real" geometry
-			if (other.getPosition().distance(agent.getPosition()) < Agent2D.AGENT_DIAMETER) {
-				double x = other.getPosition().x - agent.getPosition().x;
-				double y = other.getPosition().y - agent.getPosition().y;
+			Coordinate agPos = agent.getPosition();
+			double dist = other.getPosition().distance(agent.getPosition());
+			if (dist < (other.getGeometry().d+agent.getGeometry().d) && Algorithms.contains(agent.getPosition(), cso)) {
+				//				//DEBUG
+				//				LineString lrO = geofac.createLineString(oGeo.getCCWRing());
+				//				GisDebugger.addGeometry(lrO,"B");
+				//				LineString lrCso = geofac.createLineString(cso);
+				//				GisDebugger.addGeometry(lrCso,"A(+)-B");
 
-				//90deg is not necessarily outside the VO TODO needs to be revised!!
-				Coordinate c0 = new Coordinate(agent.getPosition().x - y, agent.getPosition().y + x);
-				Coordinate c1 = new Coordinate(agent.getPosition().x + y, agent.getPosition().y - x);
-				tan = new Coordinate[]{new Coordinate(agent.getPosition()),c1,c0};
+				//TODO no magic numbers here!!
+				double move = other.getGeometry().d + agent.getGeometry().d;
+				double x = move*(other.getPosition().x - agent.getPosition().x)/dist;
+				double y = move*(other.getPosition().y - agent.getPosition().y)/dist;
+				agPos = new Coordinate(agent.getPosition().x-x,agent.getPosition().y-y);
+
+				//				double x = other.getPosition().x - agent.getPosition().x;
+				//				double y = other.getPosition().y - agent.getPosition().y;
+				//
+				//				//90deg is not necessarily outside the VO TODO needs to be revised!!
+				//				Coordinate c0 = new Coordinate(agent.getPosition().x - y, agent.getPosition().y + x);
+				//				Coordinate c1 = new Coordinate(agent.getPosition().x + y, agent.getPosition().y - x);
+				//				tan = new Coordinate[]{new Coordinate(agent.getPosition()),c1,c0};
+
+				//DEBUG
+				int [] idx = Algorithms.getTangentIndices(agPos,cso);
+				tan = new Coordinate[]{new Coordinate(agent.getPosition()),new Coordinate(cso[idx[0]]),new Coordinate(cso[idx[1]])};
+				//				LineString ranR = geofac.createLineString(new Coordinate []{tan[1],tan[0],tan[2]});
+				//				GisDebugger.addGeometry(ranR,"VO");
+
 				collTime = 0;
 			} else {
 				int [] idx = Algorithms.getTangentIndices(agent.getPosition(),cso);
 				tan = new Coordinate[]{new Coordinate(agent.getPosition()),new Coordinate(cso[idx[0]]),new Coordinate(cso[idx[1]])};
-
 			}
-
 			double mvX = .5*(agent.getVx() - other.getVx());
 			double mvY = .5*(agent.getVy() - other.getVy());
 
@@ -235,7 +298,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			VOs.add(info);
 
 
-
+			//
 			//			LineString ranR = geofac.createLineString(new Coordinate []{tan[1],tan[0],tan[2]});
 			//			GisDebugger.addGeometry(ranR,"VO");
 		}
@@ -259,8 +322,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//45 deg to the left
 		double nvx = COS_PI_QUARTER * dvx - SIN_PI_QUARTER * dvy;
 		double nvy = SIN_PI_QUARTER * dvx + COS_PI_QUARTER * dvy;
-		nvx *= 1.25;
-		nvy *= 1.25;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		Coordinate c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		double time = timeToCollision(vOs, c0, c1);
 		double diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
@@ -275,8 +338,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//22.5 deg to the left
 		nvx = COS_PI_EIGHT * dvx - SIN_PI_EIGHT * dvy;
 		nvy = SIN_PI_EIGHT * dvx + COS_PI_EIGHT * dvy;
-		nvx *= 1.25;
-		nvy *= 1.25;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
@@ -288,21 +351,39 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			retVy = nvy;
 		}
 
-
-		//90 deg to the left
-		nvx = dvy;
-		nvy = -dvx;
+		//11.125 deg to the left
+		nvx = COS_PI_SIXTEENTH * dvx - SIN_PI_SIXTEENTH * dvy;
+		nvy = SIN_PI_SIXTEENTH * dvx + COS_PI_SIXTEENTH * dvy;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
-		//		diff = 2*deltaVy;
 		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
 		penalty = this.w_i / time + diff;
 		if (penalty < minPenalty) {
 			minPenalty = penalty;
+			retTime = time;
 			retVx = nvx;
 			retVy = nvy;
-			retTime =time;
 		}
+
+		//		//90 deg to the left
+		//		nvx = dvy;
+		//		nvy = -dvx;
+		//		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		//		time = timeToCollision(vOs, c0, c1);
+		//		//		diff = 2*deltaVy;
+		//		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
+		//		penalty = this.w_i / time + diff;
+		//		if (penalty < minPenalty) {
+		//			minPenalty = penalty;
+		//			retVx = nvx;
+		//			retVy = nvy;
+		//			retTime =time;
+		//		}
+
+
+
 		//		//DEBUG
 		//		GeometryFactory geofac = new GeometryFactory();
 		//		LineString leftvA = geofac.createLineString(new Coordinate []{c0,c1});
@@ -311,8 +392,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//45 deg to the left
 		nvx = COS_PI_QUARTER_RIGHT * dvx - SIN_PI_QUARTER_RIGHT * dvy;
 		nvy = SIN_PI_QUARTER_RIGHT * dvx + COS_PI_QUARTER_RIGHT * dvy;
-		nvx *= 1.25;
-		nvy *= 1.25;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		//		diff = 2*deltaVy;
@@ -328,8 +409,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//22.5 deg to the left
 		nvx = COS_PI_EIGHT_RIGHT * dvx - SIN_PI_EIGHT_RIGHT * dvy;
 		nvy = SIN_PI_EIGHT_RIGHT * dvx + COS_PI_EIGHT_RIGHT * dvy;
-		nvx *= 1.25;
-		nvy *= 1.25;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		//		diff = 2*deltaVy;
@@ -342,9 +423,11 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			retTime = time;
 		}
 
-		//90 deg to the right
-		nvx = -dvy;
-		nvy = dvx;
+		//22.5 deg to the left
+		nvx = COS_PI_SIXTEENTH_RIGHT * dvx - SIN_PI_SIXTEENTH_RIGHT * dvy;
+		nvy = SIN_PI_SIXTEENTH_RIGHT * dvx + COS_PI_SIXTEENTH_RIGHT * dvy;
+		//		nvx *= 1.25;
+		//		nvy *= 1.25;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		//		diff = 2*deltaVy;
@@ -356,6 +439,21 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			retVy = nvy;
 			retTime = time;
 		}
+
+		//		//90 deg to the right
+		//		nvx = -dvy;
+		//		nvy = dvx;
+		//		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		//		time = timeToCollision(vOs, c0, c1);
+		//		//		diff = 2*deltaVy;
+		//		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
+		//		penalty = this.w_i / time + diff;
+		//		if (penalty < minPenalty) {
+		//			minPenalty = penalty;
+		//			retVx = nvx;
+		//			retVy = nvy;
+		//			retTime = time;
+		//		}
 
 		//accel
 		nvx = dvx*1.25;
@@ -379,7 +477,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		diff = 2*deltaVy;
 		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
 		penalty = this.w_i / time + diff;
-		if (penalty <= minPenalty) {
+		if (penalty < minPenalty) {
 			minPenalty = penalty;
 			retVx = nvx;
 			retVy = nvy;
@@ -394,7 +492,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		diff = 2*deltaVy;
 		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
 		penalty = this.w_i / time + diff;
-		if (penalty <= minPenalty) {
+		if (penalty < minPenalty) {
 			minPenalty = penalty;
 			retVx = nvx;
 			retVy = nvy;
@@ -408,7 +506,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		diff = 2*deltaVy;
 		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
 		penalty = this.w_i / time + diff;
-		if (penalty <= minPenalty) {
+		if (penalty < minPenalty) {
 			minPenalty = penalty;
 			retVx = nvx;
 			retVy = nvy;
@@ -420,6 +518,23 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		nvy = 0.5 * dvx;
 		nvx = 0.1 * dvx;
 		nvy = 0.1 * dvy;
+		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
+		time = timeToCollision(vOs, c0, c1);
+		//		diff = 2*deltaVy;
+		diff = Math.sqrt((nvx-dvx)*(nvx-dvx)+(nvy-dvy)*(nvy-dvy));
+		penalty = this.w_i / time + diff;
+		if (penalty < minPenalty) {
+			minPenalty = penalty;
+			retVx = nvx;
+			retVy = nvy;
+			retTime = time;
+		}
+
+		//break
+		//		nvx = 0.5 * dvx;
+		//		nvy = 0.5 * dvx;
+		nvx = 0.05 * dvx + (MatsimRandom.getRandom().nextDouble()-.5)/10;
+		nvy = 0.05 * dvy + (MatsimRandom.getRandom().nextDouble()-.5)/10;
 		c1 = new Coordinate(c0.x + nvx, c0.y + nvy);
 		time = timeToCollision(vOs, c0, c1);
 		//		diff = 2*deltaVy;
@@ -484,11 +599,13 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 		double ret = Double.POSITIVE_INFINITY;
 
+		Coordinate intersectionCoordinate = new Coordinate();
 		for (int i = 0; i < info.cso.length-1; i++) {
-			this.li.computeIntersection(c0, tmp, info.cso[i], info.cso[i+1]);
-			if (this.li.hasIntersection()) {
-				Coordinate it = this.li.getIntersection(0);
-				double time = it.distance(c0)/(Math.sqrt(relVx*relVx+relVy*relVy));
+			//			this.li.computeIntersection(c0, tmp, info.cso[i], info.cso[i+1]);
+
+			if (Algorithms.computeLineIntersection(c0, tmp, info.cso[i], info.cso[i+1], intersectionCoordinate)) {
+				//				Coordinate it = this.li.getIntersection(0);
+				double time = intersectionCoordinate.distance(c0)/(Math.sqrt(relVx*relVx+relVy*relVy));
 				if (time < ret) {
 					ret = time;
 				}
@@ -532,10 +649,10 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 	protected void updateAgentQuadtree() {
-		this.agentsQuad = new Quadtree();
+
+		this.agentsQuad.clear();
 		for (Agent2D agent : this.floor.getAgents()) {
-			Envelope e = new Envelope(agent.getPosition());
-			this.agentsQuad.insert(e, agent);
+			this.agentsQuad.put(agent.getPosition().x, agent.getPosition().y, agent);
 		}
 
 	}

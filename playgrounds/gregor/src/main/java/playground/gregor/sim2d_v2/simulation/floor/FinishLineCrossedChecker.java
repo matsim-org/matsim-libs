@@ -60,11 +60,9 @@ public class FinishLineCrossedChecker {
 			ArrivalArea a = new ArrivalArea();
 			this.arrivalAreas.put(link.getId(), a);
 			for (Link next : link.getToNode().getOutLinks().values()) {
-				LineString ls = null;
-				if (next.getToNode() == link.getFromNode()) {
-					ls = getPerpendicularLine(link);
-					this.perpendicularLines.put(link.getId(), ls);
-				} else{
+				LineString ls = getPerpendicularLine(link);
+				this.perpendicularLines.put(link.getId(), ls);
+				if (next.getToNode() != link.getFromNode()) {
 					ls = getBisectorialLine(link,next);
 					if (ls == null) { //collinear links
 						ls = getPerpendicularLine(link);

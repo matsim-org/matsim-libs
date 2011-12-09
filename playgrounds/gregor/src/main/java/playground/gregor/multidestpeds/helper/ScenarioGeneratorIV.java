@@ -33,6 +33,8 @@ import com.vividsolutions.jts.geom.LineString;
 public class ScenarioGeneratorIV {
 
 
+	private static int persId = 0;
+
 	public static void main(String [] args) {
 		String scDir = "/Users/laemmel/devel/counter/";
 		String inputDir = scDir + "/input/";
@@ -66,61 +68,49 @@ public class ScenarioGeneratorIV {
 	}
 
 
+	private static void createPersons(Scenario sc,PopulationFactory pb, Population pop,
+			double time, double timeSteps, double rho) {
+
+		double incr = 1/Math.sqrt(rho);
+		for (double t = 0; t < timeSteps; t++) {
+			time += t;
+			for (double x = -20; x < 0.; x += incr) {
+				for (double y = 2; y <= 2; y += incr) {
+					Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId ++)));
+					pop.addPerson(pers);
+					Plan plan = pb.createPlan();
+					NetworkImpl net = (NetworkImpl) sc.getNetwork();
+					Link l = net.getLinks().get(new IdImpl(0));
+					ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
+					act.setCoord(new CoordImpl(x,y));
+					act.setEndTime(time);
+					plan.addActivity(act);
+					Leg leg = pb.createLeg("walk2d");
+					plan.addLeg(leg);
+					Link l1 = net.getLinks().get(new IdImpl(4));
+					Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
+					act2.setEndTime(0);
+					plan.addActivity(act2);
+					plan.setScore(0.);
+					pers.addPlan(plan);
+				}
+			}
+		}
+
+	}
+
 	private static void createPop(Scenario sc, String inputDir) {
 		Population pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 
-		int persId = 0;
-		for (int i = 0; i < 100; i ++) {
-			double incr = 0;
-			if (i < 10) {
-				incr = 1;
-			} else if (i < 40) {
-				incr = .75;
-			} else {
-				incr = 4;
-			}
 
+		double time = 0;
+		for (double rho = .5; rho < 7; rho+=.5) {
+			double timeSteps = 1;
+			createPersons(sc,pb,pop,time,timeSteps,rho);
 
-			for (double y = .5; y <=3.5; y+=incr) {
-				Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId++)));
-				pop.addPerson(pers);
-				Plan plan = pb.createPlan();
-				NetworkImpl net = (NetworkImpl) sc.getNetwork();
-				Link l = net.getLinks().get(new IdImpl(0));
-				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
-				act.setCoord(new CoordImpl(1,y));
-				act.setEndTime(i);
-				plan.addActivity(act);
-				Leg leg = pb.createLeg("walk2d");
-				plan.addLeg(leg);
-				Link l1 = net.getLinks().get(new IdImpl(4));
-				Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
-				act2.setEndTime(0);
-				plan.addActivity(act2);
-				plan.setScore(0.);
-				pers.addPlan(plan);
-			}
+			time += 20*timeSteps;
 
-			//			for (double y = .5; y <= 3.5; y++) {
-			//				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
-			//				pop.addPerson(pers);
-			//				Plan plan = pb.createPlan();
-			//				NetworkImpl net = (NetworkImpl) sc.getNetwork();
-			//				Link l = net.getLinks().get(new IdImpl(5));
-			//				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
-			//				act.setCoord(new CoordImpl(13,y));
-			//				act.setEndTime(i);
-			//				plan.addActivity(act);
-			//				Leg leg = pb.createLeg("walk2d");
-			//				plan.addLeg(leg);
-			//				Link l1 = net.getLinks().get(new IdImpl(1));
-			//				Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
-			//				act2.setEndTime(0);
-			//				plan.addActivity(act2);
-			//				plan.setScore(0.);
-			//				pers.addPlan(plan);
-			//			}
 		}
 
 		String outputPopulationFile = inputDir + "/plans.xml";
@@ -148,6 +138,9 @@ public class ScenarioGeneratorIV {
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		//		sc.getConfig().planCalcScore().addActivityParams(post);
 	}
+
+
+
 
 
 	private static void createNetwork(Scenario sc, String dir) {
@@ -242,39 +235,39 @@ public class ScenarioGeneratorIV {
 		GeometryFactory geofac = new GeometryFactory();
 
 		//hallway 50m length 20m width
-		Coordinate c0 = new Coordinate(0,0);
-		Coordinate c1 = new Coordinate(6,0);
+		Coordinate c0 = new Coordinate(-100,1.5);
+		Coordinate c1 = new Coordinate(6,1.5);
 		LineString ls0 = geofac.createLineString(new Coordinate[]{c0,c1});
 		GisDebugger.addGeometry(ls0);
 
-		Coordinate c2 = new Coordinate(8,3);
-		Coordinate c3 = new Coordinate(14,3);
+		Coordinate c2 = new Coordinate(8,2.5);
+		Coordinate c3 = new Coordinate(14,2.5);
 		LineString ls1 = geofac.createLineString(new Coordinate[]{c2,c3});
 		GisDebugger.addGeometry(ls1);
 
 		//hallway 50m length 20m width
-		Coordinate c4 = new Coordinate(8,1);
-		Coordinate c5 = new Coordinate(14,1);
+		Coordinate c4 = new Coordinate(8,1.5);
+		Coordinate c5 = new Coordinate(14,1.5);
 		LineString ls3 = geofac.createLineString(new Coordinate[]{c4,c5});
 		GisDebugger.addGeometry(ls3);
 
-		Coordinate c6 = new Coordinate(0,4);
-		Coordinate c7 = new Coordinate(6,4);
+		Coordinate c6 = new Coordinate(-100,2.5);
+		Coordinate c7 = new Coordinate(6,2.5);
 		LineString ls4 = geofac.createLineString(new Coordinate[]{c6,c7});
 		GisDebugger.addGeometry(ls4);
 
 
 		//		Coordinate c8 = new Coordinate(6,1);
 		//		Coordinate c9 = new Coordinate(8,1);
-		Coordinate c8 = new Coordinate(6,0);
-		Coordinate c9 = new Coordinate(8,0);
+		Coordinate c8 = new Coordinate(6,1.5);
+		Coordinate c9 = new Coordinate(8,1.5);
 		LineString ls5 = geofac.createLineString(new Coordinate[]{c8,c9});
 		GisDebugger.addGeometry(ls5);
 
 		//		Coordinate c10 = new Coordinate(6,3);
 		//		Coordinate c11 = new Coordinate(8,3);
-		Coordinate c10 = new Coordinate(6,4);
-		Coordinate c11 = new Coordinate(8,4);
+		Coordinate c10 = new Coordinate(6,2.5);
+		Coordinate c11 = new Coordinate(8,2.5);
 		LineString ls6 = geofac.createLineString(new Coordinate[]{c10,c11});
 		GisDebugger.addGeometry(ls6);
 
@@ -283,13 +276,13 @@ public class ScenarioGeneratorIV {
 		//		LineString ls7 = geofac.createLineString(new Coordinate[]{c12,c13});
 		//		GisDebugger.addGeometry(ls7);
 
-		Coordinate c14 = new Coordinate(8,1);
-		Coordinate c15 = new Coordinate(8,0);
+		Coordinate c14 = new Coordinate(8,1.5);
+		Coordinate c15 = new Coordinate(7,1.5);
 		LineString ls8 = geofac.createLineString(new Coordinate[]{c14,c15});
 		GisDebugger.addGeometry(ls8);
 
-		Coordinate c16 = new Coordinate(8,3);
-		Coordinate c17 = new Coordinate(8,4);
+		Coordinate c16 = new Coordinate(8,2.5);
+		Coordinate c17 = new Coordinate(7,2.5);
 		LineString ls9 = geofac.createLineString(new Coordinate[]{c16,c17});
 		GisDebugger.addGeometry(ls9);
 

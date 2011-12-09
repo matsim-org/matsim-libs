@@ -110,7 +110,7 @@ public class PathAndDrivingAcceleration {
 
 		double fpx = 0;
 		double fpy = 0;
-		if (pathDist > 0.2) {
+		if (pathDist > 0.1) {
 			double bpath = Math.max(1, li.pathWidth-Agent2D.AGENT_DIAMETER);
 			double f = Apath * Math.exp(pathDist / bpath);
 

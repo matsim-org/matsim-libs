@@ -1,6 +1,5 @@
 package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
@@ -9,7 +8,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ConfigurationSpaceObstacle {
+public abstract class ConfigurationSpaceObstacle {
 
 
 	public static Coordinate[] getCObstacle(CCWPolygon p1, CCWPolygon p2) {
@@ -18,16 +17,17 @@ public class ConfigurationSpaceObstacle {
 		Coordinate[] v = p2.getReflectedCCWRing();
 
 
-		List<Coordinate>minkowskiCoords = new ArrayList<Coordinate>();
+		//		List<Coordinate>minkowskiCoords = new ArrayList<Coordinate>();
+		Coordinate [] minkis = new Coordinate[w.length+v.length];
 
 		int i = 0;
 		int j = 0;
 
-
+		int pos = 0;
 
 		do {
-			minkowskiCoords.add(new Coordinate(v[i].x + w[j].x, v[i].y + w[j].y));
-
+			//			minkowskiCoords.add(new Coordinate(v[i].x + w[j].x, v[i].y + w[j].y));
+			minkis[pos++] = new Coordinate(v[i].x + w[j].x, v[i].y + w[j].y);
 			if ( i == v.length-1) {
 				j++;
 			} else if (j == w.length-1) {
@@ -50,9 +50,18 @@ public class ConfigurationSpaceObstacle {
 
 		}while (i < v.length && j < w.length);
 
-		Coordinate[] a = getArray(minkowskiCoords);
+		//		Coordinate[] a = getArray(minkowskiCoords);
+		Coordinate[] a = getArray(minkis,pos);
 
 		return a;
+	}
+
+	private static Coordinate[] getArray(Coordinate[] minkis, int pos) {
+		Coordinate [] ret = new Coordinate[pos];
+		for (int i =0; i < pos; i++) {
+			ret[i] = minkis[i];
+		}
+		return ret;
 	}
 
 	private static Coordinate[] getArray(List<Coordinate> minkowskiCoords) {
@@ -81,8 +90,8 @@ public class ConfigurationSpaceObstacle {
 		cs2[numOfParts] = cs1[0];
 
 		Coordinate c = new Coordinate(0,0);
-		CCWPolygon ccwp1 = new CCWPolygon(cs1,c);
-		CCWPolygon ccwp2 = new CCWPolygon(cs2,new Coordinate(0,0));
+		CCWPolygon ccwp1 = new CCWPolygon(cs1,c,0);
+		CCWPolygon ccwp2 = new CCWPolygon(cs2,new Coordinate(0,0),0);
 		ccwp2.translate(new Coordinate(1,1));
 
 		GisDebugger.addGeometry(geofac.createPolygon(geofac.createLinearRing(ccwp1.getCCWRing()), null));
@@ -93,7 +102,7 @@ public class ConfigurationSpaceObstacle {
 		Polygon p =  geofac.createPolygon(geofac.createLinearRing(ConfigurationSpaceObstacle.getCObstacle(ccwp2, ccwp1)), null);
 		GisDebugger.addGeometry(p);
 
-		CCWPolygon obstacle = new CCWPolygon(p.getExteriorRing().getCoordinates(),new Coordinate(0,0));
+		CCWPolygon obstacle = new CCWPolygon(p.getExteriorRing().getCoordinates(),new Coordinate(0,0),0);
 		int[] indices = Algorithms.getTangentIndices(c, obstacle.getCCWRing());
 
 		Coordinate c1 = obstacle.getCCWRing()[indices[0]];

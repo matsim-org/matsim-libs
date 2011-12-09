@@ -187,7 +187,7 @@ public class NNGaussianKernelEstimator implements XYVxVyEventsHandler{
 
 	/*package*/ void setEnvelope(Envelope e) {
 		this.envelope = e;
-		this.particleQuadTree = new QuadTree<Coordinate>(this.envelope.getMinX(), this.envelope.getMinY(), this.envelope.getMaxX(), this.envelope.getMaxY());
+		this.particleQuadTree = new QuadTree<Coordinate>(this.envelope.getMinX()-1000, this.envelope.getMinY()-1000, this.envelope.getMaxX()+1000, this.envelope.getMaxY()+1000);
 	}
 
 	/*package*/ void setResolution(double res) {

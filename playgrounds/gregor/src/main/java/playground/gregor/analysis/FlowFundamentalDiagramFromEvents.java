@@ -21,68 +21,66 @@ import com.vividsolutions.jts.geom.Envelope;
 
 import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
 import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
-public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, DoubleValueStringKeyAtCoordinateEventHandler{
+public class FlowFundamentalDiagramFromEvents implements XYVxVyEventsHandler, DoubleValueStringKeyAtCoordinateEventHandler{
 
 	private double eventTime = 0;
 	private double densEventTime = 0;
 	private final Envelope e;
 
-	private final List<Double> velo = new ArrayList<Double>();
+	private double flow = 0;
 	private final List<Double> dens = new ArrayList<Double>();
 
-	private final Map<Double,Double> timeVelo = new TreeMap<Double,Double>();
+	private final Map<Double,Double> timeFlow = new TreeMap<Double,Double>();
 	private final TreeMap<Double,Double> timeDens = new TreeMap<Double,Double>();
+	private final double timeRes;
+	private final Coordinate fl0;
+	private final Coordinate fl1;
 
-	private double maxDens = 0;
 
-	public FundamentalDiagramFromEvents(Envelope e) {
+	public FlowFundamentalDiagramFromEvents(Envelope e) {
 		this.e = e;
+		this.timeRes = new Sim2DConfigGroup().getTimeStepSize();
+		this.fl0 = new Coordinate((e.getMinX()+e.getMaxX())/2,e.getMinY());
+		this.fl1 = new Coordinate((e.getMinX()+e.getMaxX())/2,e.getMaxY());
 	}
+
+
 
 	@Override
 	public void handleEvent(XYVxVyEvent event) {
 		if (event.getTime() > this.eventTime) {
-			double denom = this.velo.size();
-
-			double v = 0;
-			for (double d : this.velo){
-				v += d;
-			}
-			if (denom > 0) {
-				this.timeVelo.put(this.eventTime, v/denom);
-			} else {
-				this.timeVelo.put(this.eventTime, 0.);
-			}
-			this.velo.clear();
+			this.timeFlow.put(this.eventTime, this.flow*25);
+			this.flow = 0;
 			this.eventTime = event.getTime();
 		}
 
 		if (this.e.contains(event.getCoordinate())){
-			//			double v = Math.sqrt(event.getVX()*event.getVX()+event.getVY()*event.getVY());
-			this.velo.add(event.getVX());
+			Coordinate c0 = event.getCoordinate();
+			Coordinate c1 = new Coordinate();
+			c1.x = c0.x - event.getVX()*this.timeRes;
+			c1.y = c0.y - event.getVY()*this.timeRes;
+			if (Algorithms.isLeftOfLine(c1, this.fl0, this.fl1) >= 0  && Algorithms.isLeftOfLine(c0, this.fl0, this.fl1) < 0) {
+				this.flow ++;
+			}
 		}
+
 	}
+
 
 	@Override
 	public void handleEvent(DoubleValueStringKeyAtCoordinateEvent e) {
 		if (e.getTime() > this.densEventTime) {
-
-			double denom = this.dens.size();
-			double v = 0;
-			for (double d : this.dens){
-				v += d;
-			}
-			this.timeDens.put(v/denom,this.densEventTime);
-			if (v/denom > this.maxDens) {
-				this.maxDens = v/denom;
-			}
+			Collections.sort(this.dens);
+			this.timeDens.put(this.dens.get(this.dens.size()/2),this.densEventTime);
 			this.dens.clear();
 			this.densEventTime = e.getTime();
 		}
@@ -94,7 +92,7 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 
 	public void saveAsPng(String dir) {
 		List<Tuple<Double, Double>> l = smoothData();
-		XYLineChart chart = new XYLineChart("Fundamental diagram", "density p/m^2", "velocity in m/s");
+		XYLineChart chart = new XYLineChart("Fundamental diagram", "density p/m^2", "flow in (ms)^-1");
 		double [] xs = new double[l.size()];
 		double [] ys = new double[l.size()];
 		int pos = 0;
@@ -105,30 +103,33 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 		}
 
 		chart.addSeries("model", xs, ys);
-		chart.saveAsPng(dir + "/fnd.png", 800, 400);
+		chart.saveAsPng(dir + "/flowFnd.png", 800, 400);
 	}
 
 	private List<Tuple<Double, Double>> smoothData() {
-		double nextK = 0.5;
-		List<Double> v = new ArrayList<Double>();
+		double nextK = .25;
+
+		List<Double> flow = new ArrayList<Double>();
 		List<Double> rho = new ArrayList<Double>();
 		List<Tuple<Double,Double>> ret = new ArrayList<Tuple<Double,Double>>();
 		for (Entry<Double, Double> dens : this.timeDens.entrySet()) {
-			double velo = this.timeVelo.get(dens.getValue());
+			Double j = this.timeFlow.get(dens.getValue());
 			double d = dens.getKey();
-			if (d < nextK) {
+			if (d < nextK && j != null) {
 				rho.add(d);
-				v.add(velo);
-			} else{
+				flow.add(j);
+			} else if (d >= nextK){
 				Collections.sort(rho);
-				Collections.sort(v);
-				Tuple<Double, Double> t = new Tuple<Double,Double>(rho.get(rho.size()/2),v.get(v.size()/2));
+				double jj = 0;
+				for (double t : flow) {
+					jj += t;
+				}
+				jj /= flow.size();
+				Tuple<Double, Double> t = new Tuple<Double,Double>(rho.get(rho.size()/2),jj);
 				ret.add(t);
-				nextK += 0.1;
+				nextK += .25;
 				rho.clear();
-				v.clear();
-				rho.add(d);
-				v.add(velo);
+				flow.clear();
 			}
 		}
 		return ret;
@@ -140,7 +141,7 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 		StringBuffer sb = new StringBuffer();
 
 		for (Entry<Double, Double> dens : this.timeDens.entrySet()) {
-			double velo = this.timeVelo.get(dens.getValue());
+			double velo = this.timeFlow.get(dens.getValue());
 			sb.append(dens.getKey());
 			sb.append(' ');
 			sb.append(velo);
@@ -161,7 +162,7 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 		EventsManager em = EventsUtils.createEventsManager();
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
-		Envelope e = new Envelope(6,10,1.5,2.5);
+		Envelope e = new Envelope(5.5,6.5,2.5,3.5);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += .125 ) {
@@ -173,10 +174,12 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 		NNGaussianKernelEstimator est = new DensityEstimatorFactory(em, sc).createDensityEstimator(l);
 		em.addHandler(est);
 
-		FundamentalDiagramFromEvents fundi = new FundamentalDiagramFromEvents(e);
+		FlowFundamentalDiagramFromEvents fundi = new FlowFundamentalDiagramFromEvents(e);
 		em.addHandler(fundi);
 
 		r.parse(eventsFile);
+
+
 
 		fundi.saveAsPng(c.controler().getOutputDirectory());
 		//		System.out.println(fundi);
@@ -186,7 +189,13 @@ public class FundamentalDiagramFromEvents implements XYVxVyEventsHandler, Double
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 
+
+
+
 	}
+
+
+
 
 
 
