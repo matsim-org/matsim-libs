@@ -37,6 +37,8 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 
 /**
+ * For time dependent vehicle routing, it is assumed that vehicle starts at activity location as early as possible.
+ * 
  * @author stefan schroeder
  *
  */
@@ -72,7 +74,7 @@ public class TimeAndCapacityPickupsDeliveriesSequenceConstraint implements Const
 				lastAct = tourAct;
 			}
 			else{
-				time += costs.getTransportTime(lastAct.getLocation(), tourAct.getLocation(), 0.0);
+				time += costs.getTransportTime(lastAct.getLocation(), tourAct.getLocation(), lastAct.getEarliestArrTime() + lastAct.getServiceTime());
 			}
 			if(time > maxTime){
 				return false;

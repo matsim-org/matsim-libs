@@ -25,6 +25,10 @@ import org.matsim.contrib.freight.vrp.basics.TourActivity;
 
 
 /**
+ * It does not consider time dependent travel times. It does not make that much sense to 
+ * enable this with it, since if start time does not matter, one should conduct the tour at 
+ * night where we have no traffic. If start time matters, we have can formulate a vrp-problem 
+ * with time windows.
  * 
  * @author stefan schroeder
  *

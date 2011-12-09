@@ -31,7 +31,17 @@ import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 
 /**
+ * This class inserts a new shipment in a given tour such that insertion costs (based on 
+ * generalized costs) are minimal. Insertion is done subject to various constraints (e.g. time and capacity constraints).
  * 
+ * It is possible to consider time dependent costs.
+ * Depot [08:00 - 09:00] - Customer1 [10:00 - 11:00] - Customer2 [12:00 - 17:00] - Depot [13:00 - 18:00] 
+ * 
+ * Insertion of a new Shipment (NewCustomerFrom [00:00 - 18:00], New CustomerTo [00:00 - 18:00]) after Customer1 
+ * earliest: mc_earliest = cost(cust1,newCust,10:00) + cost(newCust,cust2,10:00+tt(cust1,newCust,earliest)+serviceTime) - cost(cust1,cust2,10:00)
+ * latest: mc_latest = cost(cust1,newCust,11:00) + cost(newCust,cust2,11:00+tt(cust1,newCust,earliest)+serviceTime) - cost(cust1,cust2,11:00)
+ * mc = mc_earliest 
+ *  
  * @author stefan schroeder
  *
  */
@@ -71,30 +81,61 @@ public class BestTourBuilder implements TourBuilder {
 		this.constraints = constraints;
 	}
 	
+	/*
+	 * Assumption: driver starts from customer as early as possible
+	 */
+	@Override
+	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment, double bestKnownPrice){
+		verify();
+		Tour newTour = null;
+		if(isDepot(tour,shipment.getFrom())){
+			newTour = buildTour(tour, shipment.getTo(), bestKnownPrice);
+		}
+		else if(isDepot(tour,shipment.getTo())){
+			newTour = buildTour(tour, shipment.getFrom(), bestKnownPrice);
+		}
+		else{
+			newTour = buildTourWithEnRoutePickupAndDelivery(tour,shipment,bestKnownPrice);
+		}
+		return newTour;
+	}
+
 	private Tour buildTour(Tour tour, Customer customer, double bestKnownPrice){
 		double bestMarginalCost = bestKnownPrice;
 		Tour bestTour = null;
-		for(int i=1;i<tour.getActivities().size();i++){	
-				double marginalCost = getCosts(getActLocation(tour, i-1), customer.getLocation()) + 
-					getCosts(customer.getLocation(), getActLocation(tour, i)) - getCosts(getActLocation(tour, i-1), getActLocation(tour, i));
-				if(marginalCost < bestMarginalCost){
-					Tour newTour = VrpUtils.createEmptyCustomerTour();
-					for(TourActivity tA : tour.getActivities()){
-						newTour.getActivities().add(VrpUtils.createTourActivity(tA.getCustomer()));
-					}
-					newTour.getActivities().add(i,VrpUtils.createTourActivity(customer));
-					assertCustomerIsOnlyOnceInTour(newTour,customer);
-					tourActivityUpdater.update(newTour);
-					if(this.constraints.judge(newTour,vehicle)){
-						bestMarginalCost = marginalCost; 
-						bestTour = newTour;
-					}
+		for(int i=1;i<tour.getActivities().size();i++){
+			TourActivity fromAct = getActivity(tour,i-1);
+			TourActivity toAct = getActivity(tour,i);
+			double marginalCost = getMarginalInsertionCosts(fromAct, toAct, customer);
+			if(marginalCost < bestMarginalCost){
+				Tour newTour = VrpUtils.createEmptyCustomerTour();
+				for(TourActivity tA : tour.getActivities()){
+					newTour.getActivities().add(VrpUtils.createTourActivity(tA.getCustomer()));
 				}
+				newTour.getActivities().add(i,VrpUtils.createTourActivity(customer));
+				assertCustomerIsOnlyOnceInTour(newTour,customer);
+				tourActivityUpdater.update(newTour);
+				if(this.constraints.judge(newTour,vehicle)){
+					bestMarginalCost = marginalCost; 
+					bestTour = newTour;
+				}
+			}
 		}
 		if(bestTour != null){
 			return bestTour;
 		}
 		return null;
+	}
+
+	private double getMarginalInsertionCosts(TourActivity fromAct, TourActivity toAct, Customer customer) {
+		double transportTime_fromAct2Customer = getTravelTime(fromAct.getLocation(), customer.getLocation(), fromAct.getEarliestArrTime() + fromAct.getServiceTime());
+		double earliestArrTimeFromCustomer = fromAct.getEarliestArrTime() + fromAct.getServiceTime() + transportTime_fromAct2Customer;
+	 
+		double marginalCost = getGeneralizedCosts(fromAct.getLocation(), customer.getLocation(), fromAct.getEarliestArrTime()+fromAct.getServiceTime()) +
+			getGeneralizedCosts(customer.getLocation(), toAct.getLocation(), earliestArrTimeFromCustomer + customer.getServiceTime()) -
+			getGeneralizedCosts(fromAct.getLocation(), toAct.getLocation(), fromAct.getEarliestArrTime() + fromAct.getServiceTime());
+		
+		return marginalCost;
 	}
 	
 	private void assertCustomerIsOnlyOnceInTour(Tour newTour, Customer customer) {
@@ -115,22 +156,6 @@ public class BestTourBuilder implements TourBuilder {
 		
 	}
 
-	@Override
-	public Tour addShipmentAndGetTour(Tour tour, Shipment shipment, double bestKnownPrice){
-		verify();
-		Tour newTour = null;
-		if(isDepot(tour,shipment.getFrom())){
-			newTour = buildTour(tour, shipment.getTo(), bestKnownPrice);
-		}
-		else if(isDepot(tour,shipment.getTo())){
-			newTour = buildTour(tour, shipment.getFrom(), bestKnownPrice);
-		}
-		else{
-			newTour = buildTourWithEnRoutePickupAndDelivery(tour,shipment,bestKnownPrice);
-		}
-		return newTour;
-	}
-	
 	private void verify() {
 		if(tourActivityUpdater == null){
 			throw new IllegalStateException("tourActivityStatusUpdater is not set. this cannot be.");
@@ -142,20 +167,30 @@ public class BestTourBuilder implements TourBuilder {
 	}
 
 	private Tour buildTourWithEnRoutePickupAndDelivery(Tour tour, Shipment shipment, double bestKnownPrice) {
-		Node fromLocation = shipment.getFrom().getLocation();
-		Node toLocation = shipment.getTo().getLocation();
+		Customer fromCustomer = shipment.getFrom();
+		Customer toCustomer = shipment.getTo();
 		Double bestMarginalCost = bestKnownPrice;
 		Tour bestTour = null;
 		for(int i=1;i<tour.getActivities().size();i++){
-			double marginalCostComp1 = getCosts(getActLocation(tour, i-1),fromLocation) + getCosts(fromLocation,getActLocation(tour, i)) - getCosts(getActLocation(tour, i-1),getActLocation(tour, i));
+			double marginalCostComp1 = getMarginalInsertionCosts(getActivity(tour,i-1), getActivity(tour,i), shipment.getFrom());
 			for(int j=i;j<tour.getActivities().size();j++){
 				double marginalCost;
 				if(i == j){
-					marginalCost = getCosts(getActLocation(tour, i-1),fromLocation) + getCosts(fromLocation,toLocation) + getCosts(toLocation,getActLocation(tour, i)) -
-						getCosts(getActLocation(tour, i-1),getActLocation(tour, i));
+					TourActivity fromAct = getActivity(tour,i-1);
+					TourActivity toAct = getActivity(tour,i);
+					double transportTime_fromAct2fromCustomer = getTravelTime(fromAct.getLocation(),fromCustomer.getLocation(),fromAct.getEarliestArrTime() + fromAct.getServiceTime()); 
+					double earliestArrTimeAtFromCustomer = fromAct.getEarliestArrTime() + fromAct.getServiceTime() + transportTime_fromAct2fromCustomer;
+					double transportTime_fromCustomer2toCustomer = getTravelTime(fromCustomer.getLocation(),toCustomer.getLocation(),earliestArrTimeAtFromCustomer + fromCustomer.getServiceTime()); 
+					double earliestArrTimeAtToCustomer = earliestArrTimeAtFromCustomer + fromCustomer.getServiceTime() + transportTime_fromCustomer2toCustomer;
+					
+					marginalCost = getGeneralizedCosts(fromAct.getLocation(), fromCustomer.getLocation(), fromAct.getEarliestArrTime() + fromAct.getServiceTime()) +
+						getGeneralizedCosts(fromCustomer.getLocation(), toCustomer.getLocation(), earliestArrTimeAtFromCustomer + fromCustomer.getServiceTime()) +
+						getGeneralizedCosts(toCustomer.getLocation(), toAct.getLocation(), earliestArrTimeAtToCustomer + toCustomer.getServiceTime()) -
+						getGeneralizedCosts(fromAct.getLocation(), toAct.getLocation(), fromAct.getEarliestArrTime() + fromAct.getServiceTime());
+					 
 				}
 				else{
-					double marginalCostComp2 = getCosts(getActLocation(tour, j-1),toLocation) + getCosts(toLocation,getActLocation(tour, j)) - getCosts(getActLocation(tour, j-1),getActLocation(tour, j));
+					double marginalCostComp2 = getMarginalInsertionCosts(getActivity(tour,j-1), getActivity(tour,j), toCustomer);
 					marginalCost = marginalCostComp1 + marginalCostComp2;
 				}
 				if(marginalCost < bestMarginalCost){
@@ -196,12 +231,16 @@ public class BestTourBuilder implements TourBuilder {
 		return newTour;
 	}
 
-	private double getCosts(Node from, Node to) {
-		return costs.getGeneralizedCost(from, to, 0.0);
+	private double getTravelTime(Node from, Node to, double time) {
+		return costs.getTransportTime(from, to, time);
 	}
 
-	private Node getActLocation(Tour tour, int i) {
-		return tour.getActivities().get(i).getLocation();
+	private double getGeneralizedCosts(Node from, Node to, double time) {
+		return costs.getGeneralizedCost(from, to, time);
+	}
+
+	private TourActivity getActivity(Tour tour, int i) {
+		return tour.getActivities().get(i);
 	}
 
 

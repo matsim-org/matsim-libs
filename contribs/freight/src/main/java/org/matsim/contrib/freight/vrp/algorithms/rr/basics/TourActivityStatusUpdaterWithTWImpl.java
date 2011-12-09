@@ -25,6 +25,13 @@ import org.matsim.contrib.freight.vrp.basics.TourActivity;
 
 
 /**
+ * Updates time windows of a given tour. Earliest arrival times are computed by starting the tour right from the beginning. 
+ * Latest arr. times are computed by starting computation from the end of a tour.
+ * 
+ * It is important to note that this class can consider time dependent cost. However, a conflict occurs when updating latest arrival time.
+ * Basically, computations is conducted by going back in time. For time dependent vehicle routing however, one requires a start time for travel
+ * time calculation. The start time is unfortunately exacly the variable, computation is done for. For now, travel time is thus calculated 
+ * based on the first time slice (assuming that we have approximately free flow speed in that slice).
  * 
  * @author stefan schroeder
  *
@@ -58,7 +65,12 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 			}
 			else{
 				TourActivity currentAct = tour.getActivities().get(j);
-				double late = Math.min(currentAct.getLatestArrTime(), nextCustomer.getLatestArrTime() - currentAct.getServiceTime() - getTime(currentAct,nextCustomer));
+				/*
+				 * hier beißt sich die katze in den schwanz
+				 * ich versuch ne startZeit zu bestimmen. dazu brauch ich die reisezeit. für die reisezeit benötige ich aber die startZeit.
+				 * deshalb berechne ich das erstmal mit freeFlowSpeed bzw. mit der ersten zeitscheibe. 
+				 */
+				double late = Math.min(currentAct.getLatestArrTime(), nextCustomer.getLatestArrTime() - currentAct.getServiceTime() - getTransportTime(currentAct,nextCustomer,0.0));
 				currentAct.setLatestArrTime(late);
 				nextCustomer = currentAct;
 			}
@@ -67,15 +79,16 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 				lastCustomer.setCurrentLoad(loadsAtDepot);
 			}
 			else{
-				TourActivity currentAct = tour.getActivities().get(i);	
-				double early = Math.max(currentAct.getEarliestArrTime(), lastCustomer.getEarliestArrTime() + lastCustomer.getServiceTime() + getTime(lastCustomer,currentAct));
+				TourActivity currentAct = tour.getActivities().get(i);
+				double earliestStartTime = lastCustomer.getEarliestArrTime() + lastCustomer.getServiceTime();
+				double early = Math.max(currentAct.getEarliestArrTime(), earliestStartTime + getTransportTime(lastCustomer,currentAct, earliestStartTime));
 				currentAct.setEarliestArrTime(early);
 				int currentLoad = lastCustomer.getCurrentLoad() + currentAct.getCustomer().getDemand();
 				currentAct.setCurrentLoad(currentLoad);
-				costs += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
-				tour.costs.generalizedCosts += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
-				tour.costs.distance += this.costs.getDistance(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
-				tour.costs.time  += this.costs.getTransportTime(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), 0.0);
+				costs += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), earliestStartTime);
+				tour.costs.generalizedCosts += this.costs.getGeneralizedCost(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), earliestStartTime);
+				tour.costs.distance += this.costs.getDistance(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), earliestStartTime);
+				tour.costs.time  += this.costs.getTransportTime(lastCustomer.getLocation(), currentAct.getCustomer().getLocation(), earliestStartTime);
 				lastCustomer = currentAct;
 			}
 			j--;
@@ -89,8 +102,8 @@ public class TourActivityStatusUpdaterWithTWImpl implements TourActivityStatusUp
 		
 	}
 
-	private double getTime(TourActivity act1, TourActivity act2) {
-		return costs.getTransportTime(act1.getLocation(), act2.getLocation(), 0.0);
+	private double getTransportTime(TourActivity act1, TourActivity act2, double time) {
+		return costs.getTransportTime(act1.getLocation(), act2.getLocation(), time);
 	}
 
 	private int getLoadAtDepot(Tour tour) {

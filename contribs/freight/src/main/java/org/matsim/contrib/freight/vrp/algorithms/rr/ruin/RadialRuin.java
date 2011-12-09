@@ -43,6 +43,7 @@ import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 /**
  * Radial ruin chooses a random customer and ruins current solution in its neighborhood. Thus, it supports local search for a better solution.
+ * However, this version does not consider time dependent tranport costs. It calculates nearest neighour by using the first time slice (0.0).
  * 
  * @author stefan schroeder
  *
