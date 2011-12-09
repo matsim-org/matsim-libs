@@ -57,9 +57,21 @@ public class ReducedModelParametersConfigGroup extends Module {
 	public static final String BETA_PARK_CPD = "betaParkCpd";
 	public static final String BETA_PARK_CAR = "betaParkCar";
 	public static final String BETA_COST = "betaCost";
+	/**
+	 * The parameter for times <b>in seconds</b>.
+	 */
 	public static final String BETA_TT_CPD = "betaTtCpd";
+	/**
+	 * The parameter for times <b>in seconds</b>.
+	 */
 	public static final String BETA_TT_CPP = "betaTtCpp";
+	/**
+	 * The parameter for times <b>in seconds</b>.
+	 */
 	public static final String BETA_TT_CAR = "betaTtCar";
+	/**
+	 * The parameter for times <b>in seconds</b>.
+	 */
 	public static final String BETA_TT_PT = "betaTtPt";
 	public static final String BETA_TRANSFERS_PT = "betaTransfersPt";
 	public static final String BETA_WAIT_PT = "betaWaitPt";
@@ -82,10 +94,11 @@ public class ReducedModelParametersConfigGroup extends Module {
 	private double betaParkCpd = -0.165;
 	private double betaParkCar = -0.0314;
 	private double betaCost = -0.0541;
-	private double betaTtCpd = -0.0378;
-	private double betaTtCpp = -0.0399;
-	private double betaTtCar = -0.0348;
-	private double betaTtPt = -0.00892;
+	// the parameters where estimated with time in minutes
+	private double betaTtCpd = -0.0378 / 60d;
+	private double betaTtCpp = -0.0399 / 60d;
+	private double betaTtCar = -0.0348 / 60d;
+	private double betaTtPt = -0.00892 / 60d;
 	private double betaTransfersPt = -0.118;
 	private double betaWaitPt = -0.0939;
 	private double betaCarAvail = 0.708;
