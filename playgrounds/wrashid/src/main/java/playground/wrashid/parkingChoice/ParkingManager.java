@@ -18,10 +18,13 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.geoGrid.QuadTreeInitializer;
+import playground.wrashid.lib.tools.network.obj.EnclosingRectangle;
+import playground.wrashid.lib.tools.network.obj.RectangularArea;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;
@@ -103,8 +106,17 @@ public class ParkingManager implements StartupListener {
 	}
 
 	public void addParkings(Collection<Parking> parkingCollection) {
+		RectangularArea rectangularArea=new RectangularArea(new CoordImpl(parkings.getMinEasting(),parkings.getMinNorthing()), new CoordImpl(parkings.getMaxEasting(),parkings.getMaxNorthing()));
+		
 		for (Parking parking : parkingCollection) {
-			addParking(parking);
+			
+			if (rectangularArea.isInArea(parking.getCoord())){
+				addParking(parking);
+			} else {
+				DebugLib.emptyFunctionForSettingBreakPoint();
+				DebugLib.stopSystemAndReportInconsistency("only add points, which are inside defined area.");
+			}
+			
 			//parkingOccupancy.put(parking, new int[numberOfMinuteBinsForParkingOccupancy]);
 		}
 		
@@ -115,6 +127,7 @@ public class ParkingManager implements StartupListener {
 	}
 
 	private void addParking(Parking parking) {
+		
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 		parkingsHashMap.put(parking.getId(), parking);
 	}
@@ -126,8 +139,8 @@ public class ParkingManager implements StartupListener {
 		
 	}
 
-	private void initializeQuadTree(NetworkImpl network) {
-		parkings=(new QuadTreeInitializer<Parking>()).getLinkQuadTree(network);
+	private void initializeQuadTree(Collection<Parking> parkingColl) {
+		//parkings=(new QuadTreeInitializer<Parking>()).getLinkQuadTree(network);
 		// double minX = Double.MAX_VALUE;
 		// double minY = Double.MAX_VALUE;
 		// double maxX = Double.MIN_VALUE;
@@ -152,11 +165,22 @@ public class ParkingManager implements StartupListener {
 		// }
 		//
 		// parkings = new QuadTree<Parking>(minX, minY, maxX + 1.0, maxY + 1.0);
+		
+		
+		//System.out.println();
+		
+		
+		EnclosingRectangle rect=new EnclosingRectangle();
+		
+		for (Parking parking:parkingColl){
+			rect.registerCoord(parking.getCoord());
+		}
+		parkings=(new QuadTreeInitializer<Parking>()).getQuadTree(rect);
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		initializeQuadTree(controler.getNetwork());
+		initializeQuadTree(parkingCollection);
 		addParkings(parkingCollection);
 		parkingCollection = null;
 

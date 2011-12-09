@@ -24,11 +24,11 @@ public class RectangularArea {
 	}
 	
 	private boolean isXCoordinateOk(Coord coordinateToCheck){
-		return GeneralLib.isNumberInBetween(rectangleCornerOne.getX(), oppoSiteCorner.getX(), coordinateToCheck.getX());
+		return GeneralLib.isNumberInBetween(rectangleCornerOne.getX(), oppoSiteCorner.getX(), coordinateToCheck.getX()) || coordinateToCheck.getX()==rectangleCornerOne.getX() || coordinateToCheck.getX()==oppoSiteCorner.getX();
 	}
 	
 	private boolean isYCoordinateOk(Coord coordinateToCheck){
-		return GeneralLib.isNumberInBetween(rectangleCornerOne.getY(), oppoSiteCorner.getY(), coordinateToCheck.getY());
+		return GeneralLib.isNumberInBetween(rectangleCornerOne.getY(), oppoSiteCorner.getY(), coordinateToCheck.getY()) || coordinateToCheck.getY()==rectangleCornerOne.getY() || coordinateToCheck.getY()==oppoSiteCorner.getY();
 	}
 	
 	

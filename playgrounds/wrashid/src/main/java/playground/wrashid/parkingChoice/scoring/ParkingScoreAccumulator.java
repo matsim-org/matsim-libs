@@ -131,9 +131,45 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		parkingWalkDistances=new HashMap<Id, Double>();
 		parkingWalkDistancesInZHCity=new LinkedList<Double>();
 		scores=new DoubleValueHashMap<Id>();
+		
+		if (controler.getIterationNumber()==0 || controler.getIterationNumber()%10==0){
+			logParkingUsed(controler);
+		}
+		
+	}
+
+	private void logParkingUsed(Controler controler) {
+		String iterationFilename = controler.getControlerIO().getIterationFilename(controler.getIterationNumber(),
+		"parkingLogInfo.txt");
+		
+		ArrayList<String> list=new ArrayList<String>();
+		
+		list.add("agentId\tparkingId\tstartParkingTime\tendParkingTime");
+		
+		StringBuffer sb=new StringBuffer();
+		
+		for (Id personId:parkingScoreCollector.parkingLog.getKeySet()){
+			 LinkedList<ParkingInfo>  parkingInfos=parkingScoreCollector.parkingLog.get(personId);
+			
+			for (ParkingInfo parkingInfo:parkingInfos){
+				sb.append(personId);
+				sb.append("\t");
+				sb.append(parkingInfo.getParkingId());
+				sb.append("\t");
+				sb.append(parkingInfo.getDepartureTime());
+				sb.append("\t");
+				sb.append(parkingInfo.getArrivalTime());
+			}
+			
+			list.add(sb.toString());
+		}
+		
+		GeneralLib.writeList(list, iterationFilename);
 	}
 
 	private void findLargestWalkingDistance(HashMap<Id, Double> parkingWalkDistances) {
+		
+		
 		int numberOfLongDistanceWalks=0;
 		for (Id personId:parkingWalkDistances.keySet()){
 			Double walkingDistance = parkingWalkDistances.get(personId);
