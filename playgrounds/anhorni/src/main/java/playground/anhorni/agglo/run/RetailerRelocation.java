@@ -42,6 +42,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.NetworkLegRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelCost;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
@@ -61,7 +66,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {	
-		if (event.getIteration() % 10 == 0) {
+		if (event.getIteration() % 2 == 0 && event.getIteration() > 0) {
 			this.initialize(event);
 			this.evaluatePotentialCustomers(event);
 			this.evaluateCompetitorsPower(event);
@@ -171,7 +176,10 @@ public class RetailerRelocation implements IterationStartsListener {
 		
 		// evaluate potential at other locations and maybe chose one with certain probability
 		Id choice = null;
-		double r = this.rnd.nextDouble() * this.moveProbabilities.lastEntry().getKey();
+		double r = 0.0;
+		if (this.moveProbabilities.size() > 0) {
+			r = this.rnd.nextDouble() * this.moveProbabilities.lastEntry().getKey();
+		}
 		for (double key : this.moveProbabilities.keySet()) {
 			if (key > r) {
 				LinkCandidate candidate = this.moveProbabilities.get(key);
@@ -185,16 +193,36 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private void adaptAgents(IterationStartsEvent event) {
+		NetworkImpl network = event.getControler().getNetwork();
 		ActivityFacilities facilities = event.getControler().getFacilities();
+		
+		LeastCostPathCalculator calculator = event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(network, 
+				(TravelCost)event.getControler().createTravelCostCalculator(),
+				(TravelTime)event.getControler().getTravelTimeCalculator());
+		
+		NetworkLegRouter router = new NetworkLegRouter(network, calculator, new ModeRouteFactory());
+		
 		for (Person person : event.getControler().getPopulation().getPersons().values()) {
 			PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
 			for (PlanElement pe : selectedPlan.getPlanElements()) {				
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
 					if (act.getType().startsWith("s")) {
-						ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
+						ActivityFacilityImpl facility = (ActivityFacilityImpl)facilities.getFacilities().get(act.getFacilityId());
+						if (facility.getLinkId() == null) {
+							facility.setLinkId(network.getNearestLink(facility.getCoord()).getId());
+						}
 						act.setLinkId(facility.getLinkId());
 						act.setCoord(facility.getCoord());
+						
+						LegImpl tripTo = (LegImpl)selectedPlan.getNextLeg(act);
+						LegImpl tripFrom = (LegImpl)selectedPlan.getPreviousLeg(act);
+						
+						router.routeLeg(selectedPlan.getPerson(), tripTo, selectedPlan.getPreviousActivity(tripTo), act, 
+								selectedPlan.getPreviousActivity(tripTo).getEndTime());
+						
+						router.routeLeg(selectedPlan.getPerson(), tripFrom, act, 
+								selectedPlan.getNextActivity(tripFrom), act.getEndTime());	
 					}
 				}
 			}
