@@ -50,7 +50,15 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 		this.facilityPenalties = facilityPenalties;
 
 		log.info("facilities size: " + facilities.getFacilities().values().size());
+				
+		int counter = 0;
+		int nextMsg = 1;
 		for (ActivityFacility f : facilities.getFacilities().values()) {
+			counter++;
+			if (counter % nextMsg == 0) {
+				nextMsg *= 2;
+				log.info(" facility # " + counter);
+			}
 			double capacity = Double.MAX_VALUE;
 			Iterator<? extends ActivityOption> iter_act = f.getActivityOptions().values().iterator();
 			while (iter_act.hasNext()){
@@ -61,6 +69,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 			}
 			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons, config));
 		}
+		log.info("finished init");
 	}
 
 	/**
@@ -88,12 +97,13 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 	}
 
 	public void finish() {
+		log.info("EventsToFacilityLoad start finish() method");
 		Iterator<? extends FacilityPenalty> iter_fp = this.facilityPenalties.values().iterator();
 		while (iter_fp.hasNext()){
 			FacilityPenalty fp = iter_fp.next();
 			fp.finish();
 		}
-		log.info("EventsToFacilityLoad finished");
+		log.info("EventsToFacilityLoad end finish() method");
 	}
 
 	@Override
