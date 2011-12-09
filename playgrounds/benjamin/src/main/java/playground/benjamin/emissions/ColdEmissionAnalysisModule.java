@@ -108,7 +108,7 @@ public class ColdEmissionAnalysisModule {
 
 		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
-		if (vehicleInformationTuple.getFirst() != null){
+		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
