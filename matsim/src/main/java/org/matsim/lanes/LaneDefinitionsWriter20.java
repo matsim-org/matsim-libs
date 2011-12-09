@@ -108,7 +108,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 				}
 				else {
 					throw new MarshalException("Either at least one toLinkId or (exclusive) one toLaneId must" +
-							"be set for a Lane! Cannot write according to XML grammar.");
+							"be set for Lane Id " + bl.getId() + " on link Id " + ltla.getLinkId() + "! Cannot write according to XML grammar.");
 				}
 				
 				if (bl.getToLinkIds() != null){
