@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -15,6 +16,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -34,11 +36,20 @@ import utils.Bins;
 
 public class QuickPlanAnalysisPt {
 	
-	private String PLANSFILE = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.150/herbie.150.plans.xml.gz";
 	private String NETWORKFILE = "P:/Projekte/matsim/data/switzerland/networks/ivtch-multimodal/zh/network.multimodal-wu.xml.gz";
-	private String transitScheduleFile = "P:/Projekte/matsim/data/switzerland/pt/zh/transitSchedule.networkOevModellZH.xml";
-	private String transitVehicleFile = "P:/Projekte/matsim/data/switzerland/pt/zh/vehicles.oevModellZH.xml";
 	private String outpath = "P:/Projekte/herbie/output/ptScenarioCreation/ptPlanAnalysis/";
+	
+	private String PLANSFILE;
+	private String transitScheduleFile;
+	private String transitVehicleFile;
+	
+	private String PLANSFILE0 = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.150/herbie.150.plans.xml.gz";
+	private String transitScheduleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/transitSchedule.networkOevModellZH.xml";
+	private String transitVehicleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/vehicles.oevModellZH.xml";
+	
+	private String PLANSFILE1 = "P:/Projekte/herbie/output/20111031/calibrun2/ITERS/it.150/herbie.150.plans.xml.gz";
+	private String transitScheduleFile1 = "X:/tempMATSimData/newTransitSchedule.xml.gz";
+	private String transitVehicleFile1 = "X:/tempMATSimData/newTransitVehicles.xml.gz";
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private static double[] relevantBinInterval_1h = new double[]{0.0, 70.0}; // relevant interval graphical output
@@ -57,6 +68,20 @@ public class QuickPlanAnalysisPt {
 	
 	private double totalTravelTime = 0d;
 	private double latestActivityEndTime;
+	
+	private String scenarioName;
+	private TreeMap<Id, Double> travelTimeSz0 = new TreeMap<Id, Double>();
+	private TreeMap<Id, Double> scoreSz0 = new TreeMap<Id, Double>();
+	private int numberOfAgentsGainedTT;
+	private double totalTTsaved;
+	private double totalMoreScore;
+	private int numberOfAgentsGainedScore;
+	private int numberOfAgentsLostScore;
+	private double totalGain;
+	private double totalLost;
+	private int numberOfAgentsLostTT;
+	private double totalTTgained;
+	private double totalTTlost;
 
 	/**
 	 * @param args
@@ -68,9 +93,34 @@ public class QuickPlanAnalysisPt {
 	
 	private void run(String[] args) {
 		readParams(args);
+		
+		setScenario(0);
 		inizialize();
 		analysePlanFile();
 		printResults();
+		
+		setScenario(1);
+		inizialize();
+		analysePlanFile();
+		printResults();
+	}
+
+	private void setScenario(int scenarioNr) {
+		
+		if(scenarioNr == 0){
+			scenarioName = "Sz0";
+			
+			PLANSFILE = PLANSFILE0;
+			transitScheduleFile = transitScheduleFile0;
+			transitVehicleFile = transitVehicleFile0;
+		}
+		else if(scenarioNr ==1){
+			scenarioName = "Sz1";
+			
+			PLANSFILE = PLANSFILE1;
+			transitScheduleFile = transitScheduleFile1;
+			transitVehicleFile = transitVehicleFile1;
+		}
 	}
 
 	private void readParams(String[] args) {
@@ -79,6 +129,7 @@ public class QuickPlanAnalysisPt {
 	public void inizialize(){
 		
 		log.info("inizialize ... ");
+		
 		
     	this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
@@ -110,6 +161,21 @@ public class QuickPlanAnalysisPt {
 		this.hdwy_distrib_24h = new Bins(1, relevantBinInterval2_24h[1], "Headway Distrib 2h TravelTime 24h");
 		this.transportMode = new Bins(1, 3, "Transport Mode");
 		
+		numberOfAgentsGainedTT = 0;
+		numberOfAgentsLostTT = 0;
+		totalTTlost = 0d;
+		totalTTgained = 0d;
+		
+		
+		numberOfAgentsGainedScore = 0;
+		numberOfAgentsLostScore = 0;
+		
+		totalTTsaved = 0d;
+		totalMoreScore = 0d;
+		totalGain = 0d;
+		totalLost = 0d;
+		
+		
 		log.info("inizialize ... done");
 	}
 	
@@ -130,17 +196,21 @@ public class QuickPlanAnalysisPt {
 				
 				
 				if(pE instanceof Activity){
-					Activity act = (Activity) pE;
-					if(act.equals("pt interaction")){
+					ActivityImpl act = (ActivityImpl) pE;
+					if(!act.getType().toString().equals("pt interaction")){
+						
+						if(!averageHeadway().equals(Double.NaN)){
+							
+							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
+						}
+						
 						recordPt.startRecord();
+						
+						headways = new ArrayList<Double>();
 					}
 					else {
 						latestActivityEndTime = act.getEndTime();
 						
-						if(recordPt.endRecord() != Double.NaN){
-							
-							addHeadwayToBins(recordPt);
-						}
 					}
 				}
 				
@@ -154,7 +224,7 @@ public class QuickPlanAnalysisPt {
 						
 						String[] description =  routeDescription.split(SEPARATOR);
 						
-						if(isElementOfLine(description[2])){
+						if(description.length > 2 && isElementOfLine(description[2])){
 							IdImpl idLine = new IdImpl(description[2]);
 							IdImpl idRoute = new IdImpl(description[3]);
 							
@@ -167,16 +237,21 @@ public class QuickPlanAnalysisPt {
 							
 							TransitRoute route = scenario.getTransitSchedule().getTransitLines().get(idLine).getRoutes().get(idRoute);
 							
-							headways.add(getHeadway(route, true));
+							double newHdwy = getHeadway(route, true);
+							
+							headways.add(newHdwy);
 						}
 						
 //						System.out.println();
 					}
 					else{
-						if(recordPt.endRecord() != Double.NaN){
+						if(!averageHeadway().equals(Double.NaN)){
 							
-							addHeadwayToBins(recordPt);
+							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
+							
 						}
+						headways = new ArrayList<Double>();
+						recordPt.startRecord();
 					}
 				}
 			}
@@ -202,14 +277,49 @@ public class QuickPlanAnalysisPt {
 		}
 	}
 
-	private void addHeadwayToBins(QuickPlanAnalysisPt recordPt) {
-		if(recordPt.getTravelTime() < 1d * 60d * 60d){
+	private void addHeadwayToBins(QuickPlanAnalysisPt recordPt, Id persId, Double score) {
+		
+		double actualTT = recordPt.getTravelTime();
+		
+		if(travelTimeSz0.containsKey(persId)){
+			double ttSz0 = travelTimeSz0.get(persId);
+			
+			if(actualTT < ttSz0) {
+				numberOfAgentsGainedTT++;
+				totalTTgained += (ttSz0 - actualTT);
+			}
+			else if(actualTT > ttSz0){
+				numberOfAgentsLostTT++;
+				totalTTlost += (actualTT - ttSz0);
+			}
+			
+			totalTTsaved = totalTTsaved - actualTT + ttSz0;
+			
+			double actualScore = score;
+			double score0 = scoreSz0.get(persId);
+			if(score0 > actualScore) {
+				numberOfAgentsLostScore++;
+				totalLost += (score0 - actualScore);
+			}
+			else if(score0 < actualScore) {
+				numberOfAgentsGainedScore++;
+				totalGain += (actualScore - score0);
+			}
+			
+			totalMoreScore = totalMoreScore + actualScore - score0;
+		}
+		else{
+			travelTimeSz0.put(persId, actualTT);
+			scoreSz0.put(persId, score);
+		}
+		
+		if(actualTT < 1d * 60d * 60d){
 			hdwy_distrib_1h.addVal(averageHeadway() / 60d, 1d);
 		}
-		else if(recordPt.getTravelTime() < 2d * 60d * 60d){
+		else if(actualTT < 2d * 60d * 60d){
 			hdwy_distrib_2h.addVal(averageHeadway() / 60d, 1d);
 		}
-		else if(recordPt.getTravelTime() >= 2d * 60d * 60d){
+		else if(actualTT >= 2d * 60d * 60d){
 			hdwy_distrib_24h.addVal(averageHeadway() / 60d, 1d);
 		}
 	}
@@ -263,32 +373,45 @@ public class QuickPlanAnalysisPt {
 		return schedule.getTransitLines().containsKey(id);
 	}
 
-	private double endRecord() {
+	private Double endRecord() {
 		return averageHeadway();
 	}
 
-	private double averageHeadway() {
+	private Double averageHeadway() {
 		
 		double sum = 0d;
 		
 		for(Double hdwy : headways) sum = sum + hdwy;
+		
+		double average = sum / headways.size();
 			
-		return (sum / headways.size());
+		return average;
 	}
 
 	private void startRecord() {
+		totalTravelTime = 0d;
 	}
 	
 	private void printResults() {
 		log.info("printResults ... ");
 		
-		hdwy_distrib_1h.plotBinnedDistribution(outpath + "HeadwayDistribution lower 1h", "Headway", "#", "Number of departures with same headway");
+		hdwy_distrib_1h.plotBinnedDistribution(outpath + scenarioName + "HeadwayDistribution lower 1h", "Headway", "#", "Number of departures with same headway");
 		
-		hdwy_distrib_2h.plotBinnedDistribution(outpath + "HeadwayDistribution between 1h and 2h", "Headway", "#", "Number of departures with same headway");
+		hdwy_distrib_2h.plotBinnedDistribution(outpath + scenarioName + "HeadwayDistribution between 1h and 2h", "Headway", "#", "Number of departures with same headway");
 		
-		hdwy_distrib_24h.plotBinnedDistribution(outpath + "HeadwayDistribution between 2h and 24h", "Headway", "#", "Number of departures with same headway");
+		hdwy_distrib_24h.plotBinnedDistribution(outpath + scenarioName + "HeadwayDistribution between 2h and 24h", "Headway", "#", "Number of departures with same headway");
 		
-		transportMode.plotBinnedDistribution(outpath + "TransportMode", "Bus  Tram  Train", "#", "Number of Trips");
+		transportMode.plotBinnedDistribution(outpath + scenarioName + "TransportMode", "Bus  Tram  Train", "#", "Number of Trips");
+		
+		System.out.println("NumberOfAgentsGainedTT: " + numberOfAgentsGainedTT + " averageTTgained [h]: " + (totalTTgained / (numberOfAgentsGainedTT * 3600d)));
+		System.out.println("NumberOfAgentsLostTT: " + numberOfAgentsLostTT + " averageTTlost [h]: " + (totalTTsaved / (numberOfAgentsLostTT * 3600d)));
+		
+		System.out.println("totalTTsaved [h]: " + (totalTTsaved / 3600d));
+		
+		System.out.println("NumberOfAgentsGainedScore: " + numberOfAgentsGainedScore + " with average gain: " + totalGain / numberOfAgentsGainedScore);
+		System.out.println("NumberOfAgentsLostScore: " + numberOfAgentsLostScore + " with average lost: " + totalLost / numberOfAgentsLostScore);
+		
+		System.out.println("totalMoreScore: " + (totalMoreScore));
 		
 		log.info("printResults ... done");
 	}
