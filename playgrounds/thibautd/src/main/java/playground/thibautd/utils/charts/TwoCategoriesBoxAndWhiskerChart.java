@@ -20,6 +20,8 @@
 package playground.thibautd.utils.charts;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.RectangularShape;
 
 import java.util.List;
 
@@ -27,10 +29,16 @@ import org.apache.log4j.Logger;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.DatasetRenderingOrder;
+import org.jfree.chart.renderer.category.BarPainter;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StatisticalBarRenderer;
 import org.jfree.chart.renderer.category.StatisticalLineAndShapeRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
+import org.jfree.ui.RectangleEdge;
 import org.matsim.core.utils.charts.ChartUtil;
 
 /**
@@ -56,9 +64,9 @@ public class TwoCategoriesBoxAndWhiskerChart extends ChartUtil {
 			final String yAxisLabel,
 			final boolean plotStdDev) {
 		super(title, xAxisLabel, yAxisLabel);
-		// this.plotStdDev = plotStdDev;
-		log.warn( this.getClass().getSimpleName()+" cannot yet draw error bars" );
-		this.plotStdDev = false;
+		this.plotStdDev = plotStdDev;
+		// log.warn( this.getClass().getSimpleName()+" cannot yet draw error bars" );
+		// this.plotStdDev = false;
 	}
 
 	public TwoCategoriesBoxAndWhiskerChart(
@@ -112,19 +120,26 @@ public class TwoCategoriesBoxAndWhiskerChart extends ChartUtil {
 				dataset,
 				true); // legend?
 
-
 		if (plotStdDev) {
 			CategoryPlot plot = chart.getCategoryPlot();
-			StatisticalLineAndShapeRenderer renderer =
-					new StatisticalLineAndShapeRenderer(
-						false,  // lines from average to average
-						false ); // shapes 
+			// StatisticalLineAndShapeRenderer renderer =
+			// 		new StatisticalLineAndShapeRenderer(
+			// 			false,  // lines from average to average
+			// 			false ); // shapes 
+			StatisticalBarRenderer renderer =
+				new NoLegendStatisticalBarRenderer();
+			// do not draw bars
+			renderer.setDrawBarOutline( false );
+			renderer.setShadowVisible( false );
+			renderer.setBasePaint( new Color( 0 , 0 , 0 , 0 ) );
+			renderer.setAutoPopulateSeriesPaint( false );
 			// draw all error bars in black
 			renderer.setErrorIndicatorPaint( Color.BLACK );
 			plot.setRenderer(
 					1, // index
 					renderer);
 			plot.setDataset( 1 , errorBarsDataset );
+			plot.setDatasetRenderingOrder( DatasetRenderingOrder.FORWARD );
 		}
 
 		this.addDefaultFormatting();
@@ -137,5 +152,16 @@ public class TwoCategoriesBoxAndWhiskerChart extends ChartUtil {
 	public JFreeChart getChart() {
 		if (this.chart == null) createChart();
 		return this.chart;
+	}
+}
+
+class NoLegendStatisticalBarRenderer extends StatisticalBarRenderer {
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public LegendItem getLegendItem(
+			final int datasetIndex,
+			final int series) {
+		return null;
 	}
 }

@@ -50,9 +50,10 @@ public class BoxAndWhiskersChart extends ChartUtil {
 		new BoxAndWhiskerXYNumberDataset();
 	private final StdDevDataset deviationBars =
 		new StdDevDataset();
+	private boolean datasetsAreCreated = false;
 
 	private final double binWidth;
-	private final boolean plotStdDev;
+	private boolean plotStdDev;
 
 	private final List<Tuple<Double,Double>> values = new ArrayList<Tuple<Double,Double>>();
 	private double maxX = Double.NEGATIVE_INFINITY;
@@ -112,6 +113,13 @@ public class BoxAndWhiskersChart extends ChartUtil {
 	// /////////////////////////////////////////////////////////////////////////
 	// specific methods
 	// /////////////////////////////////////////////////////////////////////////
+	public void setPlotStandardDeviation(final boolean bool) {
+		if (plotStdDev != bool) {
+			plotStdDev = bool;
+			this.chart = null;
+		}
+	}
+
 	/**
 	 * adds a value to the dataset.
 	 *
@@ -133,10 +141,6 @@ public class BoxAndWhiskersChart extends ChartUtil {
 				this.chartTitle, this.xAxisLabel, this.yAxisLabel,
 				this.boxes, legend);
 
-		this.formatChart();
-	}
-
-	private void formatChart() {
 		XYPlot plot = this.chart.getXYPlot();
 		plot.setDomainAxis(new NumberAxis(this.xAxisLabel));
 		plot.getDomainAxis().configure();
@@ -174,6 +178,7 @@ public class BoxAndWhiskersChart extends ChartUtil {
 	}
 
 	private void createDataSet() {
+		if (datasetsAreCreated) return;
 		Collections.sort(this.values, new TupleComparator());
 		List<Double> currentBox = new ArrayList<Double>();;
 		StdDevDataset.Element stdDevElement = new StdDevDataset.Element();
@@ -189,10 +194,10 @@ public class BoxAndWhiskersChart extends ChartUtil {
 				double x = currentUpperBound - (binWidth/2d);
 				this.boxes.add(x, currentBox);
 
-				if (plotStdDev) {
+				//if (plotStdDev) {
 					this.deviationBars.addElement( x , stdDevElement );
 					stdDevElement = new StdDevDataset.Element();
-				}
+				//}
 				currentBox = new ArrayList<Double>();
 				currentUpperBound += binWidth;
 			}
@@ -201,7 +206,9 @@ public class BoxAndWhiskersChart extends ChartUtil {
 
 		double x = currentUpperBound - (binWidth/2d);
 		this.boxes.add(x , currentBox);
-		if (plotStdDev) this.deviationBars.addElement( x , stdDevElement );
+		/*if (plotStdDev)*/ this.deviationBars.addElement( x , stdDevElement );
+
+		datasetsAreCreated = true;
 	}
 
 	private static class TupleComparator implements Comparator<Tuple<Double, ? extends Object>> {
