@@ -75,7 +75,7 @@
 		<module>evacuation</module>
 		<module>gtfs2matsimtransitschedule</module>
         <module>freight</module>
-		<module>matsim4urbansim_v1</module>
+        <module>matsim4urbansim</module>
 	</modules>
 	<repositories>
 		<repository>
