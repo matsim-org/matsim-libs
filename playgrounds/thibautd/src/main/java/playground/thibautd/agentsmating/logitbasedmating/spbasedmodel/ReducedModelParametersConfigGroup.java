@@ -21,6 +21,8 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.config.Module;
 
 /**
@@ -30,6 +32,14 @@ public class ReducedModelParametersConfigGroup extends Module {
 	private static final long serialVersionUID = 1L;
 
 	public static final String NAME = "ReducedSPModelParameters";
+
+	// not-really-model-parameters parameters: names
+	// -------------------------------------------------------------------------
+	public static final String LANG_FILE = "id2languageFile";
+
+	// not-really-model-parameters parameters: values
+	// -------------------------------------------------------------------------
+	private String langFile = null;
 
 	// parameters of the model: names
 	// -------------------------------------------------------------------------
@@ -190,6 +200,9 @@ public class ReducedModelParametersConfigGroup extends Module {
 		else if (param_name.equals( PT_COST_PER_M )) {
 			setPtCostPerM( value );
 		}
+		else if (param_name.equals( LANG_FILE )) {
+			setLanguageFile( value );
+		}
 	}
 
 	@Override
@@ -228,11 +241,14 @@ public class ReducedModelParametersConfigGroup extends Module {
 		map.put( GA_COST_PER_M, ""+gaCostPerM );
 		map.put( HT_COST_PER_M, ""+htCostPerM );
 		map.put( PT_COST_PER_M, ""+ptCostPerM );
+		map.put( LANG_FILE, ""+langFile );
 
 		return map;
 	}
 
-
+	// /////////////////////////////////////////////////////////////////////////
+	// model parameters
+	// /////////////////////////////////////////////////////////////////////////
 	public double ascCpd() {
 		return ascCpd;
 	}
@@ -300,6 +316,9 @@ public class ReducedModelParametersConfigGroup extends Module {
 		return betaMaleCar;
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// cost parameters
+	// /////////////////////////////////////////////////////////////////////////
 	public double getCarCostPerM() {
 		return carCostPerM;
 	}
@@ -340,5 +359,15 @@ public class ReducedModelParametersConfigGroup extends Module {
 		this.ptCostPerM = Double.parseDouble( value );
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// language map
+	// /////////////////////////////////////////////////////////////////////////
+	private void setLanguageFile(final String file) {
+		langFile = file;
+	}
+
+	public String getLanguageFile() {
+		return langFile;
+	}
 }
 

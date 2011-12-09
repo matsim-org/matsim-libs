@@ -41,7 +41,12 @@ import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.population
 public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory {
 
 	private final TravelCardModel travelCardModel = new TravelCardModel();
-	private final SpeaksGermanModel speaksGermanModel = new SpeaksGermanModel();
+	private final SpeaksGermanModel speaksGermanModel;
+
+	public ReducedSPModelDecisionMakerFactory(
+			final ReducedModelParametersConfigGroup configGroup) {
+		speaksGermanModel = new SpeaksGermanModel( configGroup );
+	}
 
 	/**
 	 * @throws IllegalArgumentException if the argument is not an instance of {@link PersonImpl}

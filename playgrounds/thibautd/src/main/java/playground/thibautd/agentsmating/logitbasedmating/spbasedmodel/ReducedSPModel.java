@@ -44,11 +44,9 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  * @author thibautd
  */
 public class ReducedSPModel extends LogitModel {
-	private static final double BEE_FLY_SPEED = 20d / 3.6d;
-
 	// factories
-	private final DecisionMakerFactory decisionMakerFactory = new ReducedSPModelDecisionMakerFactory();
-	private final ChoiceSetFactory choiceSetFactory; //new ReducedSPModelChoiceSetFactory();
+	private final DecisionMakerFactory decisionMakerFactory;
+	private final ChoiceSetFactory choiceSetFactory;
 
 	private final LeastCostPathCalculator leastCostAlgo;
 	private final ReducedModelParametersConfigGroup params;
@@ -70,6 +68,7 @@ public class ReducedSPModel extends LogitModel {
 				parameters,
 				scenario,
 				estimatorFactory);
+		decisionMakerFactory = new ReducedSPModelDecisionMakerFactory( parameters );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
