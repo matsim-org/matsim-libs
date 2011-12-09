@@ -8,16 +8,4 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>matsim4urbansim</artifactId>
   <name>matsim4urbansim</name>
-  <dependencies>
-  	<dependency>
-  		<groupId>javax.xml.bind</groupId>
-  		<artifactId>jaxb-api</artifactId>
-  		<version>2.2.2</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>trove</groupId>
-  		<artifactId>trove</artifactId>
-  		<version>2.0.3</version>
-  	</dependency>
-  </dependencies>
 </project>
