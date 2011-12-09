@@ -26,14 +26,15 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.QNode;
 
@@ -42,8 +43,6 @@ public class MultiModalQLinkExtension {
 	private final NetsimLink qLink;
 	private final MultiModalQNodeExtension toNode;
 	private MultiModalSimEngine simEngine;
-	private final PlansCalcRouteConfigGroup configGroup;
-//	private final MultiModalTravelTime multiModalTravelTime;
 
 	/*
 	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
@@ -58,10 +57,6 @@ public class MultiModalQLinkExtension {
 		this.qLink = qLink;
 		this.simEngine = simEngine;
 		this.toNode = simEngine.getMultiModalQNodeExtension(toNode);
-		PlansCalcRouteConfigGroup configGroup = simEngine.getMobsim().getScenario().getConfig().plansCalcRoute();
-
-		if (configGroup == null) configGroup = new PlansCalcRouteConfigGroup();
-		this.configGroup = configGroup;
 	}
 
 	/*package*/ void setMultiModalSimEngine(MultiModalSimEngine simEngine) {
@@ -89,7 +84,12 @@ public class MultiModalQLinkExtension {
 	}
 
 	private void addAgent(MobsimAgent personAgent, double now) {
-		double travelTime = simEngine.getMultiModalTravelTime().getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode());
+
+		MultiModalTravelTime multiModalTravelTime = simEngine.getMultiModalTravelTime();
+		if (personAgent instanceof HasPerson) {
+			multiModalTravelTime.setPerson(((HasPerson) personAgent).getPerson());			
+		}
+		double travelTime = multiModalTravelTime.getModalLinkTravelTime(qLink.getLink(), now, personAgent.getMode());
 		double departureTime = now + travelTime;
 
 		departureTime = Math.round(departureTime);

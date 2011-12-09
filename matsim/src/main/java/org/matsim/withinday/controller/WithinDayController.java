@@ -50,6 +50,7 @@ public class WithinDayController extends Controler {
 
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
 	
+	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
 	private TravelTimeCollector travelTime;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
@@ -85,7 +86,7 @@ public class WithinDayController extends Controler {
 			return;
 		}
 		if (travelTime == null) {
-			travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(this.scenarioData, analyzedModes);
+			travelTime = travelTimeCollectorFactory.createTravelTimeCollector(this.scenarioData, analyzedModes);
 			fosl.addSimulationInitializedListener((TravelTimeCollector)travelTime);
 			fosl.addSimulationBeforeSimStepListener((TravelTimeCollector)travelTime);
 			fosl.addSimulationAfterSimStepListener((TravelTimeCollector)travelTime);
@@ -95,6 +96,10 @@ public class WithinDayController extends Controler {
 	
 	public TravelTimeCollector getTravelTimeCollector() {
 		return this.travelTime;
+	}
+	
+	public TravelTimeCollectorFactory getTravelTimeCollectorFactory() {
+		return this.travelTimeCollectorFactory;
 	}
 	
 	public void createAndInitActivityReplanningMap() {

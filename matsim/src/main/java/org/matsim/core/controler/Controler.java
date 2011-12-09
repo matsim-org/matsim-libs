@@ -61,6 +61,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -97,6 +98,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.InvertedNetworkLegRouter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
@@ -137,8 +139,15 @@ import org.matsim.pt.router.PlansCalcTransitRoute;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalMobsimFactory;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBufferFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegRouter;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.BikeTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.ptproject.qsim.multimodalsimengine.tools.NonCarRouteDropper;
@@ -154,7 +163,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
  * The Controler is responsible for complete simulation runs, including the
  * initialization of all required data, running the iterations and the
  * replanning, analyses, etc.
- *
+ * 
  * @author mrieser
  */
 public class Controler {
@@ -179,7 +188,8 @@ public class Controler {
 
 	private String outputPath = null;
 
-	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout("%d{ISO8601} %5p %C{1}:%L %m%n");
+	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
+			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private boolean overwriteFiles = false;
 	private Integer iteration = null;
@@ -202,8 +212,7 @@ public class Controler {
 	/**
 	 * Defines in which iterations the events should be written. <tt>1</tt> is
 	 * in every iteration, <tt>2</tt> in every second, <tt>10</tt> in every
-	 * 10th, and so forth. <tt>0</tt> disables the writing of events
-	 * completely.
+	 * 10th, and so forth. <tt>0</tt> disables the writing of events completely.
 	 */
 	/* package */int writeEventsInterval = -1;
 	/* package */int writePlansInterval = -1;
@@ -238,7 +247,8 @@ public class Controler {
 	 * This instance encapsulates all behavior concerning the
 	 * ControlerEvents/Listeners
 	 */
-	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(this);
+	private final ControlerListenerManager controlerListenerManager = new ControlerListenerManager(
+			this);
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
@@ -252,6 +262,7 @@ public class Controler {
 	};
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
+	private MultiModalTravelTimeWrapperFactory multiModalTravelTimeFactory = new MultiModalTravelTimeWrapperFactory();
 
 	private TravelCostCalculatorFactory travelCostCalculatorFactory = new TravelCostCalculatorFactoryImpl();
 	private ControlerIO controlerIO;
@@ -262,7 +273,8 @@ public class Controler {
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
 	private TransitRouterFactory transitRouterFactory = null;
 
-	/*package*/ volatile Throwable uncaughtException = null; // package-private for tests
+	/* package */volatile Throwable uncaughtException = null; // package-private
+																// for tests
 
 	/** initializes Log4J */
 	static {
@@ -287,13 +299,13 @@ public class Controler {
 
 	/**
 	 * Initializes a new instance of Controler with the given arguments.
-	 *
+	 * 
 	 * @param args
 	 *            The arguments to initialize the controler with.
 	 *            <code>args[0]</code> is expected to contain the path to a
-	 *            configuration file, <code>args[1]</code>, if set, is
-	 *            expected to contain the path to a local copy of the DTD file
-	 *            used in the configuration file.
+	 *            configuration file, <code>args[1]</code>, if set, is expected
+	 *            to contain the path to a local copy of the DTD file used in
+	 *            the configuration file.
 	 */
 	public Controler(final String[] args) {
 		this(args.length > 0 ? args[0] : null, args.length > 1 ? args[1] : null, null, null);
@@ -321,7 +333,8 @@ public class Controler {
 		this.configFileName = configFileName;
 		this.dtdFileName = dtdFileName;
 
-		// make sure we know about any exceptions that lead to abortion of the program
+		// make sure we know about any exceptions that lead to abortion of the
+		// program
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 			@Override
@@ -340,8 +353,7 @@ public class Controler {
 		} else {
 			if (configFileName == null) {
 				if (config == null) {
-					throw new IllegalArgumentException(
-							"Either the config or the filename of a configfile must be set to initialize the Controler.");
+					throw new IllegalArgumentException("Either the config or the filename of a configfile must be set to initialize the Controler.");
 				}
 				this.config = config;
 			} else {
@@ -358,7 +370,7 @@ public class Controler {
 		this.addMobsimFactory("qsim", new QSimFactory());
 		this.addMobsimFactory("queueSimulation", new QueueSimulationFactory());
 		this.addMobsimFactory("jdeqsim", new JDEQSimulationFactory());
-		this.addMobsimFactory("multimodalQSim", new MultiModalMobsimFactory(new QSimFactory(), this));
+		this.addMobsimFactory("multimodalQSim", new MultiModalMobsimFactory(new QSimFactory(), this.multiModalTravelTimeFactory));
 	}
 
 	/**
@@ -383,7 +395,7 @@ public class Controler {
 			setupMultiModalSimulation();
 		}
 		if (this.config.scenario().isUseTransit()) {
-			log.warn("setting up the transit config _after_ the config dump :-( ...") ;
+			log.warn("setting up the transit config _after_ the config dump :-( ...");
 			setupTransitSimulation();
 		}
 		initEvents();
@@ -397,12 +409,10 @@ public class Controler {
 	private final void setupMultiModalSimulation() {
 		log.info("setting up multi modal simulation");
 
-		// Use a TravelTimeCalculator that buffers the TravelTimes form the previous Iteration.
-		setTravelTimeCalculatorFactory(new TravelTimeCalculatorWithBufferFactory());
-
-		//		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCalculator());
-		//		setMobsimFactory(mobsimFactory)
-
+		// Use a TravelTimeCalculator that buffers TravelTimes from the previous Iteration.
+		TravelTimeCalculatorWithBufferFactory timeFactory = new TravelTimeCalculatorWithBufferFactory();
+		setTravelTimeCalculatorFactory(timeFactory);
+		
 		// set Route Factories
 		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
@@ -423,8 +433,9 @@ public class Controler {
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
-		
-		// the QSim reads the config by itself, and configures itself as a transit-enabled mobsim.  kai, nov'11
+
+		// the QSim reads the config by itself, and configures itself as a
+		// transit-enabled mobsim. kai, nov'11
 	}
 
 	/**
@@ -455,11 +466,11 @@ public class Controler {
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
-			}
-		});
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new PersonPrepareForSim(createRoutingAlgorithm(), Controler.this.scenarioData);
+					}
+				});
 
 		int firstIteration = this.config.controler().getFirstIteration();
 		int lastIteration = this.config.controler().getLastIteration();
@@ -467,7 +478,8 @@ public class Controler {
 		String divider = "###################################################";
 		String marker = "### ";
 
-		for (this.iteration = firstIteration; (this.iteration <= lastIteration) && (this.state == ControlerState.Running); this.iteration++) {
+		for (this.iteration = firstIteration; (this.iteration <= lastIteration)
+				&& (this.state == ControlerState.Running); this.iteration++) {
 			log.info(divider);
 			log.info(marker + "ITERATION " + this.iteration + " BEGINS");
 			this.stopwatch.setCurrentIteration(this.iteration);
@@ -475,7 +487,8 @@ public class Controler {
 			makeIterationPath(this.iteration);
 			resetRandomNumbers();
 
-			this.controlerListenerManager.fireControlerIterationStartsEvent(this.iteration);
+			this.controlerListenerManager
+					.fireControlerIterationStartsEvent(this.iteration);
 			if (this.iteration > firstIteration) {
 				this.stopwatch.beginOperation("replanning");
 				this.controlerListenerManager.fireControlerReplanningEvent(this.iteration);
@@ -510,12 +523,15 @@ public class Controler {
 				log.info("S H U T D O W N   ---   start regular shutdown.");
 			}
 			if (this.uncaughtException != null) {
-				log.warn("Shutdown probably caused by the following Exception.", this.uncaughtException);
+				log.warn(
+						"Shutdown probably caused by the following Exception.", this.uncaughtException);
 			}
-			this.controlerListenerManager.fireControlerShutdownEvent(unexpected);
+			this.controlerListenerManager
+					.fireControlerShutdownEvent(unexpected);
 			if (this.dumpDataAtEnd) {
 				// dump plans
-				new PopulationWriter(this.population, this.network, (this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
+				new PopulationWriter(this.population, this.network, 
+						(this.getScenario()).getKnowledges()).write(this.controlerIO.getOutputFilename(FILENAME_POPULATION));
 				// dump network
 				new NetworkWriter(this.network).write(this.controlerIO.getOutputFilename(FILENAME_NETWORK));
 				// dump config
@@ -523,21 +539,25 @@ public class Controler {
 				// dump facilities
 				ActivityFacilities facilities = this.getFacilities();
 				if (facilities != null) {
-					new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
+					new FacilitiesWriter((ActivityFacilitiesImpl) facilities)
+						.write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 				}
 				if (this.network.getFactory().isTimeVariant()) {
-					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"), this.network.getNetworkChangeEvents());
+					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"),
+							this.network.getNetworkChangeEvents());
 				}
-				if (this.config.scenario().isUseHouseholds()){
-					new HouseholdsWriterV10(this.scenarioData.getHouseholds()).writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
+				if (this.config.scenario().isUseHouseholds()) {
+					new HouseholdsWriterV10(this.scenarioData.getHouseholds())
+							.writeFile(this.controlerIO.getOutputFilename(FILENAME_HOUSEHOLDS));
 				}
-				if (this.config.scenario().isUseLanes()){
-					new LaneDefinitionsWriter20(this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
+				if (this.config.scenario().isUseLanes()) {
+					new LaneDefinitionsWriter20(
+							this.scenarioData.getLaneDefinitions()).write(this.controlerIO.getOutputFilename(FILENAME_LANES));
 				}
-				if ( !unexpected && this.getConfig().vspExperimental().isWritingOutputEvents() ) {
-					File toFile = new File(this.controlerIO.getOutputFilename("output_events.xml.gz")) ;
-					File fromFile = new File( this.controlerIO.getIterationFilename(this.getLastIteration(), "events.xml.gz")) ;
-					IOUtils.copyFile( fromFile , toFile) ;
+				if (!unexpected	&& this.getConfig().vspExperimental().isWritingOutputEvents()) {
+					File toFile = new File(	this.controlerIO.getOutputFilename("output_events.xml.gz"));
+					File fromFile = new File(this.controlerIO.getIterationFilename(this.getLastIteration(), "events.xml.gz"));
+					IOUtils.copyFile(fromFile, toFile);
 				}
 			}
 			if (unexpected) {
@@ -550,7 +570,8 @@ public class Controler {
 			} catch (IllegalStateException e) {
 				log.info("Cannot remove shutdown hook. " + e.getMessage());
 			}
-			this.shutdownHook = null; // important for test cases to free the memory
+			this.shutdownHook = null; // important for test cases to free the
+										// memory
 			this.collectLogMessagesAppender = null;
 			IOUtils.closeOutputDirLogging();
 		}
@@ -565,12 +586,10 @@ public class Controler {
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) multiModalSetUp();
 
 		if (this.travelTimeCalculator == null) {
-			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config
-					.travelTimeCalculator());
+			this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		}
 		if (this.travelCostCalculator == null) {
-			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config
-					.planCalcScore());
+			this.travelCostCalculator = this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.planCalcScore());
 		}
 		this.events.addHandler(this.travelTimeCalculator);
 
@@ -580,11 +599,13 @@ public class Controler {
 			if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
 				this.leastCostPathCalculatorFactory = new DijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
+						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
 				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
 			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
+				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
+						this.network, new FreespeedTravelTimeCost(this.config.planCalcScore()));
 			} else {
 				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
 			}
@@ -624,6 +645,20 @@ public class Controler {
 			log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
 			new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
 		}
+		
+		// pre-initialize the travel time calculator to be able to use it in the wrapper
+		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		TravelTimeFactoryWrapper wrapper = new TravelTimeFactoryWrapper(this.getTravelTimeCalculator());
+
+		PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, wrapper);
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.walk, new WalkTravelTimeFactory(configGroup));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.bike, new BikeTravelTimeFactory(configGroup,
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.ride, new RideTravelTimeFactory(wrapper, 
+				new WalkTravelTimeFactory(configGroup)));
+		multiModalTravelTimeFactory.setPersonalizableTravelTimeFactory(TransportMode.pt, new PTTravelTimeFactory(configGroup, 
+				wrapper, new WalkTravelTimeFactory(configGroup)));
 	}
 
 	/*
@@ -638,8 +673,8 @@ public class Controler {
 	private void initLogging() {
 		Logger.getRootLogger().removeAppender(this.collectLogMessagesAppender);
 		try {
-			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), this.collectLogMessagesAppender
-					.getLogEvents(), this.config.controler().getRunId());
+			IOUtils.initOutputDirLogging(this.config.controler().getOutputDirectory(), 
+					this.collectLogMessagesAppender.getLogEvents(), this.config.controler().getRunId());
 			this.collectLogMessagesAppender.close();
 			this.collectLogMessagesAppender = null;
 		} catch (IOException e) {
@@ -653,27 +688,37 @@ public class Controler {
 	 */
 	private void loadConfig() {
 		if (this.configFileName != null) {
-			new MatsimConfigReader(this.config).readFile(this.configFileName, this.dtdFileName);
+			new MatsimConfigReader(this.config).readFile(this.configFileName,
+					this.dtdFileName);
 		}
-		checkConfigConsistencyAndWriteToLog( "Complete config dump after reading the config file:");
+		checkConfigConsistencyAndWriteToLog("Complete config dump after reading the config file:");
 
-		/* use writeEventsInterval from config file, only if not already
-		 * initialized programmatically */
+		/*
+		 * use writeEventsInterval from config file, only if not already
+		 * initialized programmatically
+		 */
 		if (this.writeEventsInterval == -1) {
-			this.writeEventsInterval = this.config.controler().getWriteEventsInterval();
+			this.writeEventsInterval = this.config.controler()
+					.getWriteEventsInterval();
 		}
-		if ( this.writePlansInterval == -1 ) {
-			this.writePlansInterval = this.config.controler().getWritePlansInterval();
+		if (this.writePlansInterval == -1) {
+			this.writePlansInterval = this.config.controler()
+					.getWritePlansInterval();
 		}
 	}
 
-	/**Design decisions:<ul>
-	 * <li> I extracted this method since it is now called <i>twice</i>: once directly after reading, and once
-	 * before the iterations start.  The second call seems more important, but I wanted to leave the first one
-	 * there in case the program fails before that config dump.  Might be put into the "unexpected shutdown hook"
-	 * instead. kai, dec'10
+	/**
+	 * Design decisions:
+	 * <ul>
+	 * <li>I extracted this method since it is now called <i>twice</i>: once
+	 * directly after reading, and once before the iterations start. The second
+	 * call seems more important, but I wanted to leave the first one there in
+	 * case the program fails before that config dump. Might be put into the
+	 * "unexpected shutdown hook" instead. kai, dec'10
 	 * </ul>
-	 * @param message the message that is written just before the config dump
+	 * 
+	 * @param message
+	 *            the message that is written just before the config dump
 	 */
 	private void checkConfigConsistencyAndWriteToLog(final String message) {
 		log.info(message);
@@ -693,18 +738,17 @@ public class Controler {
 			this.outputPath = this.outputPath.substring(0, this.outputPath.length() - 1);
 		}
 		if (this.config.controler().getRunId() != null) {
-			this.controlerIO =  new ControlerIO(this.outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
-		}
-		else {
-			this.controlerIO =  new ControlerIO(this.outputPath);
+			this.controlerIO = new ControlerIO(this.outputPath, this.scenarioData.createId(this.config.controler().getRunId()));
+		} else {
+			this.controlerIO = new ControlerIO(this.outputPath);
 		}
 
 		// make the tmp directory
 		File outputDir = new File(this.outputPath);
 		if (outputDir.exists()) {
 			if (outputDir.isFile()) {
-				throw new RuntimeException("Cannot create output directory. " + this.outputPath
-						+ " is a file and cannot be replaced by a directory.");
+				throw new RuntimeException("Cannot create output directory. "
+						+ this.outputPath + " is a file and cannot be replaced by a directory.");
 			}
 			if (outputDir.list().length > 0) {
 				if (this.overwriteFiles) {
@@ -713,37 +757,39 @@ public class Controler {
 					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
 					log.warn("### " + this.outputPath);
 					log.warn("###########################################################");
-					System.err.flush() ;
+					System.err.flush();
 				} else {
 					// the directory is not empty, we do not overwrite any
 					// files!
 					throw new RuntimeException(
-							"The output directory "
-									+ this.outputPath
+							"The output directory " + this.outputPath
 									+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
 				}
 			}
 		} else {
 			if (!outputDir.mkdirs()) {
-				throw new RuntimeException("The output directory path " + this.outputPath
-						+ " could not be created. Check pathname and permissions!");
+				throw new RuntimeException(
+						"The output directory path " + this.outputPath
+								+ " could not be created. Check pathname and permissions!");
 			}
 		}
 
 		File tmpDir = new File(this.controlerIO.getTempPath());
 		if (!tmpDir.mkdir() && !tmpDir.exists()) {
-			throw new RuntimeException("The tmp directory " + this.controlerIO.getTempPath() + " could not be created.");
+			throw new RuntimeException("The tmp directory "
+					+ this.controlerIO.getTempPath() + " could not be created.");
 		}
 		File itersDir = new File(this.outputPath + "/" + DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
-			throw new RuntimeException("The iterations directory " + (this.outputPath + "/" + DIRECTORY_ITERS)
+			throw new RuntimeException("The iterations directory "
+					+ (this.outputPath + "/" + DIRECTORY_ITERS)
 					+ " could not be created.");
 		}
 	}
 
 	/**
-	 * Load all the required data. Currently, this only loads the Scenario if it was
-	 * not given in the Constructor.
+	 * Load all the required data. Currently, this only loads the Scenario if it
+	 * was not given in the Constructor.
 	 */
 	protected void loadData() {
 		if (!this.scenarioLoaded) {
@@ -768,19 +814,20 @@ public class Controler {
 	 * This method will only be called if the user has not yet manually set a
 	 * custom scoring function with
 	 * {@link #setScoringFunctionFactory(ScoringFunctionFactory)}.
-	 *
+	 * 
 	 * @return The ScoringFunctionFactory to be used for plans-scoring.
 	 */
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-		return new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
+		return new CharyparNagelScoringFunctionFactory(
+				this.config.planCalcScore(), this.getNetwork());
 	}
 
 	/**
-	 * Loads a default set of
-	 * {@link org.matsim.core.controler.listener ControlerListener} to provide
-	 * basic functionality. <b>Note:</b> Be very careful if you overwrite this
-	 * method! The order how the listeners are added is very important. Check
-	 * the comments in the source file before overwriting this method!
+	 * Loads a default set of {@link org.matsim.core.controler.listener
+	 * ControlerListener} to provide basic functionality. <b>Note:</b> Be very
+	 * careful if you overwrite this method! The order how the listeners are
+	 * added is very important. Check the comments in the source file before
+	 * overwriting this method!
 	 */
 	protected void loadCoreListeners() {
 
@@ -790,9 +837,9 @@ public class Controler {
 		 * and write to common variables, the order is important. Example: The
 		 * RoadPricing-Listener modifies the scoringFunctionFactory, which in
 		 * turn is used by the PlansScoring-Listener.
-		 *
-		 * IMPORTANT:
-		 * The execution order is reverse to the order the listeners are added to the list.
+		 * 
+		 * IMPORTANT: The execution order is reverse to the order the listeners
+		 * are added to the list.
 		 */
 
 		this.addCoreControlerListener(new CoreControlerListener());
@@ -814,23 +861,23 @@ public class Controler {
 	}
 
 	/**
-	 * Loads the default set of
-	 * {@link org.matsim.core.controler.listener ControlerListener} to provide
-	 * some more basic functionality. Unlike the core ControlerListeners the
-	 * order in which the listeners of this method are added must not affect the
-	 * correctness of the code.
+	 * Loads the default set of {@link org.matsim.core.controler.listener
+	 * ControlerListener} to provide some more basic functionality. Unlike the
+	 * core ControlerListeners the order in which the listeners of this method
+	 * are added must not affect the correctness of the code.
 	 */
 	protected void loadControlerListeners() {
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
 
 		// optional: score stats
-		this.scoreStats = new ScoreStats(this.population, this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+		this.scoreStats = new ScoreStats(this.population,
+				this.controlerIO.getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 		this.addControlerListener(this.scoreStats);
 
 		// optional: travel distance stats
 		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
-				this.controlerIO.getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
+				this.controlerIO .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
 		this.addControlerListener(this.travelDistanceStats);
 
 		// load counts, if requested
@@ -847,50 +894,58 @@ public class Controler {
 		if (this.config.scenario().isUseTransit()) {
 			addControlerListener(new TransitControlerListener());
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
-				// only works when all three files are defined!  kai, oct'10
+				// only works when all three files are defined! kai, oct'10
 				addPtCountControlerListener();
 			}
 		}
 
-		if (this.config.scenario().isUseSignalSystems()){
+		if (this.config.scenario().isUseSignalSystems()) {
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
 
-		if ( ! this.config.vspExperimental().getActivityDurationInterpretation()
-				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME) ) {
-			addControlerListener( new VspPlansCleaner() ) ;
+		if (!this.config
+				.vspExperimental().getActivityDurationInterpretation()
+				.equals(VspExperimentalConfigGroup.MIN_OF_DURATION_AND_END_TIME)) {
+			addControlerListener(new VspPlansCleaner());
 		}
 
 	}
 
 	private void addPtCountControlerListener() {
-		// yyyy seems to me that in the following the OccupancyAnalyser could be completely pushed into the PtCountControlerListener.
+		// yyyy seems to me that in the following the OccupancyAnalyser could be
+		// completely pushed into the PtCountControlerListener.
 		// kai, oct'10
 
-		//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+		// OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24
+		// * 3600 - 1);
 		log.info("Using pt counts.");
-		//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
+		// addControlerListener(new
+		// OccupancyAnalyzerListener(occupancyAnalyzer));
 		addControlerListener(new PtCountControlerListener(this.config));
 	}
 
 	/**
 	 * Creates the path where all iteration-related data should be stored.
-	 *
+	 * 
 	 * @param iteration
 	 */
 	private void makeIterationPath(final int iteration) {
 		File dir = new File(this.controlerIO.getIterationPath(iteration));
 		if (!dir.mkdir()) {
 			if (this.overwriteFiles && dir.exists()) {
-				log.info("Iteration directory " + this.controlerIO.getIterationPath(iteration) + " exists already.");
+				log.info("Iteration directory "
+						+ this.controlerIO.getIterationPath(iteration)
+						+ " exists already.");
 			} else {
-				log.warn("Could not create iteration directory " + this.controlerIO.getIterationPath(iteration) + ".");
+				log.warn("Could not create iteration directory "
+						+ this.controlerIO.getIterationPath(iteration) + ".");
 			}
 		}
 	}
 
 	private void resetRandomNumbers() {
-		MatsimRandom.reset(this.config.global().getRandomSeed() + this.iteration);
+		MatsimRandom.reset(this.config.global().getRandomSeed()
+				+ this.iteration);
 		MatsimRandom.getRandom().nextDouble(); // draw one because of strange
 		// "not-randomness" is the first
 		// draw...
@@ -904,9 +959,10 @@ public class Controler {
 	 * ===================================================================
 	 */
 
-	/*package*/ Simulation getNewMobsim() {
+	/* package */Simulation getNewMobsim() {
 		if (this.mobsimFactory != null) {
-			Simulation simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
+			Simulation simulation = this.mobsimFactory.createMobsim(
+					this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		}
@@ -914,14 +970,16 @@ public class Controler {
 		if (mobsim != null) {
 			MobsimFactory f = this.mobsimFactories.get(mobsim);
 			if (f == null) {
-				throw new IllegalArgumentException("There is no MobsimFactory registered for the name " + mobsim);
+				throw new IllegalArgumentException(
+						"There is no MobsimFactory registered for the name " + mobsim);
 			}
-			Simulation simulation = f.createMobsim(this.getScenario(), this.getEvents());
+			Simulation simulation = f.createMobsim(this.getScenario(),
+					this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		} else {
 			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). Now trying to detect which mobsim to use from other parameters...");
-			if ( this.config.simulation()==null || this.config.simulation().getExternalExe() == null) {
+			if (this.config.simulation() == null || this.config.simulation().getExternalExe() == null) {
 				Simulation simulation = this.getMobsimFactory().createMobsim(this.getScenario(), this.getEvents());
 				enrichSimulation(simulation);
 				return simulation;
@@ -937,7 +995,8 @@ public class Controler {
 	private void enrichSimulation(final Simulation simulation) {
 		if (simulation instanceof ObservableSimulation) {
 			for (SimulationListener l : this.getQueueSimulationListener()) {
-				((ObservableSimulation)simulation).addQueueSimulationListeners(l);
+				((ObservableSimulation) simulation)
+						.addQueueSimulationListeners(l);
 			}
 		}
 		if (simulation instanceof VisMobsim) {
@@ -967,7 +1026,7 @@ public class Controler {
 
 	/**
 	 * Add a core ControlerListener to the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	protected final void addCoreControlerListener(final ControlerListener l) {
@@ -982,7 +1041,7 @@ public class Controler {
 
 	/**
 	 * Add a ControlerListener to the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	public final void addControlerListener(final ControlerListener l) {
@@ -991,7 +1050,7 @@ public class Controler {
 
 	/**
 	 * Removes a ControlerListener from the Controler instance
-	 *
+	 * 
 	 * @param l
 	 */
 	public final void removeControlerListener(final ControlerListener l) {
@@ -1011,8 +1070,9 @@ public class Controler {
 	 * or does not yet exist, so no files will be overwritten (default setting).
 	 * While useful in a productive environment, this security feature may be
 	 * interfering in test cases or while debugging. <br>
-	 * <strong>Use this setting with caution, as it can result in data loss!</strong>
-	 *
+	 * <strong>Use this setting with caution, as it can result in data
+	 * loss!</strong>
+	 * 
 	 * @param overwrite
 	 *            whether files and directories should be overwritten (true) or
 	 *            not (false)
@@ -1024,7 +1084,7 @@ public class Controler {
 	/**
 	 * Returns whether the Controler is currently allowed to overwrite files in
 	 * the output directory.
-	 *
+	 * 
 	 * @return true if the Controler is currently allowed to overwrite files in
 	 *         the output directory, false if not.
 	 */
@@ -1036,10 +1096,9 @@ public class Controler {
 	 * Sets in which iterations events should be written to a file. If set to
 	 * <tt>1</tt>, the events will be written in every iteration. If set to
 	 * <tt>2</tt>, the events are written every second iteration. If set to
-	 * <tt>10</tt>, the events are written in every 10th iteration. To
-	 * disable writing of events completely, set the interval to <tt>0</tt>
-	 * (zero).
-	 *
+	 * <tt>10</tt>, the events are written in every 10th iteration. To disable
+	 * writing of events completely, set the interval to <tt>0</tt> (zero).
+	 * 
 	 * @param interval
 	 *            in which iterations events should be written
 	 */
@@ -1057,7 +1116,7 @@ public class Controler {
 	 * small amount of time that does not have any weight in big simulations,
 	 * but add a significant overhead in smaller runs or in test cases where the
 	 * graphical output is not even requested.
-	 *
+	 * 
 	 * @param createGraphs
 	 *            true if graphs showing analyses' output should be generated.
 	 */
@@ -1073,7 +1132,9 @@ public class Controler {
 	}
 
 	/**
-	 * @param dumpData <code>true</code> if at the end of a run, plans, network, config etc should be dumped to a file.
+	 * @param dumpData
+	 *            <code>true</code> if at the end of a run, plans, network,
+	 *            config etc should be dumped to a file.
 	 */
 	public final void setDumpDataAtEnd(final boolean dumpData) {
 		this.dumpDataAtEnd = dumpData;
@@ -1086,7 +1147,8 @@ public class Controler {
 	 */
 
 	public final PersonalizableTravelCost createTravelCostCalculator() {
-		return this.travelCostCalculatorFactory.createTravelCostCalculator(this.travelTimeCalculator, this.config.planCalcScore());
+		return this.travelCostCalculatorFactory.createTravelCostCalculator(
+				this.travelTimeCalculator, this.config.planCalcScore());
 	}
 
 	public final PersonalizableTravelTime getTravelTimeCalculator() {
@@ -1095,13 +1157,14 @@ public class Controler {
 
 	/**
 	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
-	 * <strong>Note:</strong> This will reset all scores calculated so far!
-	 * Only call this before any events are generated in an iteration.
-	 *
+	 * <strong>Note:</strong> This will reset all scores calculated so far! Only
+	 * call this before any events are generated in an iteration.
+	 * 
 	 * @param factory
 	 *            The new ScoringFunctionFactory to be used.
 	 */
-	public final void setScoringFunctionFactory(final ScoringFunctionFactory factory) {
+	public final void setScoringFunctionFactory(
+			final ScoringFunctionFactory factory) {
 		this.scoringFunctionFactory = factory;
 	}
 
@@ -1126,7 +1189,8 @@ public class Controler {
 		return this.leastCostPathCalculatorFactory;
 	}
 
-	public void setLeastCostPathCalculatorFactory(final LeastCostPathCalculatorFactory factory) {
+	public void setLeastCostPathCalculatorFactory(
+			final LeastCostPathCalculatorFactory factory) {
 		this.leastCostPathCalculatorFactory = factory;
 	}
 
@@ -1143,7 +1207,8 @@ public class Controler {
 	 *         single thread, use multiple instances for multiple threads!
 	 */
 	public PlanAlgorithm createRoutingAlgorithm() {
-		return createRoutingAlgorithm(this.createTravelCostCalculator(), this.getTravelTimeCalculator());
+		return createRoutingAlgorithm(this.createTravelCostCalculator(),
+				this.getTravelTimeCalculator());
 	}
 
 	/**
@@ -1162,34 +1227,47 @@ public class Controler {
 
 		if (this.getScenario().getConfig().scenario().isUseRoadpricing()
 				&& (RoadPricingScheme.TOLL_TYPE_AREA.equals(this.scenarioData.getRoadPricingScheme().getType()))) {
-			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-					.getLeastCostPathCalculatorFactory(), routeFactory, this.scenarioData.getRoadPricingScheme());
-			log.warn("As roadpricing with area toll is enabled a leg router for area tolls is used. Other features, e.g. transit or multimodal simulation may not work" +
-					"as expected.");
-		} 	else if (this.config.scenario().isUseTransit()) {
-			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes,
-					this.getLeastCostPathCalculatorFactory(), routeFactory, this.config.transit(), this.transitRouterFactory.createTransitRouter());
-			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, e.g. multimodal simulation, may not work" +
-					"as expected.");
+			plansCalcRoute = new PlansCalcAreaTollRoute(this.config.plansCalcRoute(), this.network, travelCosts,
+					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.scenarioData.getRoadPricingScheme());
+			log.warn("As roadpricing with area toll is enabled a leg router for area tolls is used. Other features, " +
+					"e.g. transit or multimodal simulation may not work as expected.");
+		} else if (this.config.scenario().isUseTransit()) {
+			plansCalcRoute = new PlansCalcTransitRoute(this.config.plansCalcRoute(), this.network, travelCosts,
+					travelTimes, this.getLeastCostPathCalculatorFactory(),routeFactory, this.config.transit(),
+					this.transitRouterFactory.createTransitRouter());
+			log.warn("As simulation of public transit is enabled a leg router for area tolls is used. Other features, " +
+					"e.g. multimodal simulation, may not work as expected.");
 		} else if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts,
-					travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory);
+			// Note: we don't use the given TravelTime object! Instead we use a MultiModalTravelTime object!
+			MultiModalTravelTime travelTime = multiModalTravelTimeFactory.createTravelTime();
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTime,
+					this.getLeastCostPathCalculatorFactory(), routeFactory);
 
-			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, travelTimes,
-					this.getLeastCostPathCalculatorFactory());
+			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) 
+					this.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCosts, travelTime);
+			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, travelTime, travelCosts, routeAlgo);
 
+			/*
+			 * A MultiModalTravelTime calculator is used. Before creating a route for a given
+			 * leg, the leg's mode has to be set in the travel time and travel cost objects.
+			 * This is not done by the LegHandler used by default in PlansCalcRoute. Therefore,
+			 * we have to use a multiModalLegHandler.
+			 */
+			plansCalcRoute.addLegHandler(TransportMode.car, multiModalLegHandler);
+			
 			for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
 				plansCalcRoute.addLegHandler(mode, multiModalLegHandler);
 			}
 		} else {
-			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this
-					.getLeastCostPathCalculatorFactory(), routeFactory);
+			plansCalcRoute = new PlansCalcRoute(this.config.plansCalcRoute(),
+					this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), routeFactory);
 		}
 
-		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()){
-			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network, ((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(),
-					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), this.getConfig().planCalcScore(), travelTimes);
-			plansCalcRoute.addLegHandler(TransportMode.car, invertedNetLegRouter);
+		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
+			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network,
+					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(), this.getLeastCostPathCalculatorFactory(), 
+					this.getTravelCostCalculatorFactory(), this.getConfig().planCalcScore(), travelTimes);
+			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
 
@@ -1243,7 +1321,8 @@ public class Controler {
 	}
 
 	/**
-	 * @deprecated Do not use this, as it may not contain values in every iteration
+	 * @deprecated Do not use this, as it may not contain values in every
+	 *             iteration
 	 * @return
 	 */
 	@Deprecated
@@ -1287,7 +1366,8 @@ public class Controler {
 	 */
 	protected static class CoreControlerListener implements StartupListener {
 
-		//		private final List<EventWriter> eventWriters = new LinkedList<EventWriter>();
+		// private final List<EventWriter> eventWriters = new
+		// LinkedList<EventWriter>();
 
 		public CoreControlerListener() {
 			// empty public constructor for protected class
@@ -1312,26 +1392,31 @@ public class Controler {
 						event.getControler().setMobsimFactory(new QSimFactory());
 
 						/*
-						 * cdobler:
-						 * If a multi modal simulation should be run, we use a MultiModalMobsimFactory
-						 * which is only a wrapper. It hands over the TravelTimeCalculator to the
-						 * MultiModalSimEngine.
-						 * I do not like this - but at the moment I see no better way to do so...
+						 * cdobler: If a multi modal simulation should be run,
+						 * we use a MultiModalMobsimFactory which is only a
+						 * wrapper. It hands over the TravelTimeCalculator to
+						 * the MultiModalSimEngine. I do not like this - but at
+						 * the moment I see no better way to do so...
 						 */
 						if (c.multiModal().isMultiModalSimulationEnabled()) {
 							MobsimFactory factory = event.getControler().getMobsimFactory();
-							MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, event.getControler().getTravelTimeCalculator());
+
+							MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
+
+							MobsimFactory multiModalFactory = new MultiModalMobsimFactory(factory, timeFactory);
 							event.getControler().setMobsimFactory(multiModalFactory);
 						}
 					} else if (c.getModule("JDEQSim") != null) {
-						event.getControler().setMobsimFactory(new JDEQSimulationFactory());
-					} else if ( c.getModule(SimulationConfigGroup.GROUP_NAME) != null ) {
-						event.getControler().setMobsimFactory(new QueueSimulationFactory());
+						event.getControler().setMobsimFactory(
+								new JDEQSimulationFactory());
+					} else if (c.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
+						event.getControler().setMobsimFactory(
+								new QueueSimulationFactory());
 					} else {
-						log.warn("There is no configuration for a mobility simulation in the config. The Controler " +
-								"uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file " +
-								"to avoid this warning");
-						c.addSimulationConfigGroup(new SimulationConfigGroup()) ;
+						log.warn("There is no configuration for a mobility simulation in the config. The Controler "
+								+ "uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file "
+								+ "to avoid this warning");
+						c.addSimulationConfigGroup(new SimulationConfigGroup());
 						event.getControler().setMobsimFactory(new QueueSimulationFactory());
 					}
 				}
@@ -1359,34 +1444,36 @@ public class Controler {
 		return this.plansScoring;
 	}
 
-
 	public TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
 		return this.travelTimeCalculatorFactory;
 	}
 
-
-	public void setTravelTimeCalculatorFactory(final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
+	public void setTravelTimeCalculatorFactory(
+			final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
 		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
-
 
 	public TravelCostCalculatorFactory getTravelCostCalculatorFactory() {
 		return this.travelCostCalculatorFactory;
 	}
 
-
-	public void setTravelCostCalculatorFactory(final TravelCostCalculatorFactory travelCostCalculatorFactory) {
+	public void setTravelCostCalculatorFactory(
+			final TravelCostCalculatorFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
+	public MultiModalTravelTimeWrapperFactory getMultiModalTravelTimeWrapperFactory() {
+		return this.multiModalTravelTimeFactory;
+	}
 
 	public ControlerIO getControlerIO() {
 		return this.controlerIO;
 	}
 
 	/**
-	 * @return the iteration number of the current iteration when the Controler is iterating,
-	 * null if the Controler is in the startup/shutdown process
+	 * @return the iteration number of the current iteration when the Controler
+	 *         is iterating, null if the Controler is in the startup/shutdown
+	 *         process
 	 */
 	public Integer getIterationNumber() {
 		return this.iteration;
@@ -1402,14 +1489,16 @@ public class Controler {
 
 	/**
 	 * Register a {@link MobsimFactory} with a given name.
-	 *
+	 * 
 	 * @param mobsimName
 	 * @param mobsimFactory
-	 * @return the mobsim factory previously registered with that name, or <code>null</code> if none was registered before with that name
-	 *
+	 * @return the mobsim factory previously registered with that name, or
+	 *         <code>null</code> if none was registered before with that name
+	 * 
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
-	public MobsimFactory addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
+	public MobsimFactory addMobsimFactory(final String mobsimName,
+			final MobsimFactory mobsimFactory) {
 		return this.mobsimFactories.put(mobsimName, mobsimFactory);
 	}
 
@@ -1417,7 +1506,8 @@ public class Controler {
 		return this.signalsFactory;
 	}
 
-	public void setSignalsControllerListenerFactory(final SignalsControllerListenerFactory signalsFactory) {
+	public void setSignalsControllerListenerFactory(
+			final SignalsControllerListenerFactory signalsFactory) {
 		this.signalsFactory = signalsFactory;
 	}
 
@@ -1425,7 +1515,8 @@ public class Controler {
 		return this.transitRouterFactory;
 	}
 
-	public void setTransitRouterFactory(final TransitRouterFactory transitRouterFactory) {
+	public void setTransitRouterFactory(
+			final TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
 	}
 

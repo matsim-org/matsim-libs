@@ -23,64 +23,40 @@ package org.matsim.ptproject.qsim.multimodalsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.BufferedTravelTime;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.TravelTimeCalculatorWithBuffer;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 
 public class MultiModalMobsimFactory implements MobsimFactory {
 
 	private static final Logger log = Logger.getLogger(MultiModalMobsimFactory.class);
 
-	private MobsimFactory delegate = null;
-	private TravelTime travelTime = null;
-	private Controler controler = null;
+	private final MobsimFactory delegate;
+	private final MultiModalTravelTimeFactory timeFactory;
 
-	public MultiModalMobsimFactory(MobsimFactory mobsimFactory, final Controler controler) {
+	public MultiModalMobsimFactory(MobsimFactory mobsimFactory, MultiModalTravelTimeFactory timeFactory) {
 		this.delegate = mobsimFactory;
-		this.controler = controler;
-	}
-
-	public MultiModalMobsimFactory(MobsimFactory mobsimFactory, TravelTime travelTime) {
-		this.delegate = mobsimFactory;
-		this.travelTime = travelTime;
+		this.timeFactory = timeFactory;
 	}
 
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
 		Simulation sim = delegate.createMobsim(sc, eventsManager);
-		if (this.travelTime == null) {
-			this.travelTime = this.controler.getTravelTimeCalculator();
-		}
-
+		
 		if (sim instanceof QSim) {
 			log.info("Using MultiModalMobsim...");
 
 			QSim qSim = (QSim) sim;
-
-			TravelTime tt = this.travelTime;
-
-			if (tt instanceof TravelTimeCalculatorWithBuffer) {
-				BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-				tt = bufferedTravelTime;
-			} else {
-				log.warn("TravelTime is not instance of TravelTimeCalculatorWithBuffer!");
-				log.warn("No BufferedTravelTime Object could be created. Using TravelTimeCalculator as it is... (should return free speed travel times).");
-			}
-
-			MultiModalTravelTime modalTravelTime = qSim.getMultiModalSimEngine().getMultiModalTravelTime();
-			if (modalTravelTime instanceof MultiModalTravelTimeCost) {
-				((MultiModalTravelTimeCost) modalTravelTime).setTravelTime(tt);
-			} else {
-				log.error("TravelTimeCalculator is not instance of MultiModalTravelTime. " +
-					"TravelTimeCalculator cannot be handed over to the MultiModalMobsim - " +
-					"free speed travel times will be used.");
-			}
+        	
+        	// create MultiModalSimEngine
+        	MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, timeFactory);
+        	
+        	// add MultiModalSimEngine to qSim
+        	qSim.addMobsimEngine(multiModalEngine);
+        	
+        	// add MultiModalDepartureHandler
+        	qSim.addDepartureHandler(new MultiModalDepartureHandler(qSim, multiModalEngine, sc.getConfig().multiModal()));
 		}
 		else {
 			log.error("Simulation Object is not from type QSim - cannot use MultiModalMobsim!");

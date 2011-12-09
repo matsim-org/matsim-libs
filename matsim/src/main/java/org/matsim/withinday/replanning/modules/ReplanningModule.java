@@ -27,43 +27,59 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegHandler;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.MultiModalLegRouter;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 
 public class ReplanningModule extends AbstractMultithreadedModule {
 
 	protected Config config;
 	protected Network network;
-	protected PersonalizableTravelCost costCalculator;
-	protected PersonalizableTravelTime timeCalculator;
-	protected LeastCostPathCalculatorFactory factory;
+	protected TravelCostCalculatorFactory travelCostFactory;
+	protected PersonalizableTravelTimeFactory travelTimeFactory;
+	protected LeastCostPathCalculatorFactory pathFactory;
 	private final ModeRouteFactory routeFactory;
-
+	
 	public ReplanningModule(Config config, Network network,
-			PersonalizableTravelCost costCalculator, PersonalizableTravelTime timeCalculator,
-			LeastCostPathCalculatorFactory factory, ModeRouteFactory routeFactory) {
+			TravelCostCalculatorFactory costFactory, PersonalizableTravelTimeFactory timeFactory,
+			LeastCostPathCalculatorFactory pathFactory, ModeRouteFactory routeFactory) {
 		super(config.global());
 
 		this.config = config;
 		this.network = network;
-		this.costCalculator = costCalculator;
-		this.timeCalculator = timeCalculator;
-		this.factory = factory;
+		this.travelCostFactory = costFactory;
+		this.travelTimeFactory = timeFactory;
+		this.pathFactory = pathFactory;
 		this.routeFactory = routeFactory;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-
-		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, costCalculator, timeCalculator, factory, this.routeFactory);
+		PersonalizableTravelTime travelTime = travelTimeFactory.createTravelTime();
+		PersonalizableTravelCost travelCost = travelCostFactory.createTravelCostCalculator(travelTime, config.planCalcScore());
+		
+		PlansCalcRoute plansCalcRoute = new PlansCalcRoute(config.plansCalcRoute(), network, travelCost, travelTime, pathFactory, this.routeFactory);
 
 		if (config.multiModal().isMultiModalSimulationEnabled()) {
-			MultiModalLegHandler multiModalLegHandler = new MultiModalLegHandler(this.network, timeCalculator, factory);
+			MultiModalTravelTime multiModalTravelTime = (MultiModalTravelTime) travelTime;
+			IntermodalLeastCostPathCalculator routeAlgo = (IntermodalLeastCostPathCalculator) pathFactory.createPathCalculator(network, travelCost, travelTime);
+			MultiModalLegRouter multiModalLegHandler = new MultiModalLegRouter(this.network, multiModalTravelTime, travelCost, routeAlgo);
 
+			/*
+			 * A MultiModalTravelTime calculator is used. Before creating a route for a given
+			 * leg, the leg's mode has to be set in the travel time and travel cost objects.
+			 * This is not done by the LegHandler used by default in PlansCalcRoute. Therefore,
+			 * we have to use a multiModalLegHandler.
+			 */
+			plansCalcRoute.addLegHandler(TransportMode.car, multiModalLegHandler);
+			
 			String simulatedModes = this.config.multiModal().getSimulatedModes().toLowerCase(Locale.ROOT);
 			if (simulatedModes.contains(TransportMode.walk)) plansCalcRoute.addLegHandler(TransportMode.walk, multiModalLegHandler);
 			if (simulatedModes.contains(TransportMode.bike)) plansCalcRoute.addLegHandler(TransportMode.bike, multiModalLegHandler);

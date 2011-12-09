@@ -25,12 +25,15 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
-	private int numOfThreads;
+	private final MultiModalTravelTimeFactory timeFactory;
+	private final int numOfThreads;
+	
 	private Thread[] threads;
 	private MultiModalSimEngineRunner[] engines;
 	private CyclicBarrier startBarrier;
@@ -38,27 +41,34 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
 	private CyclicBarrier reactivateLinksBarrier;
 	private CyclicBarrier endBarrier;
-
-	ParallelMultiModalSimEngine(Netsim sim) {
-		super(sim);
+	
+	/**
+	 * Since MultiModalTravelTime is personalizable, every thread needs its own instance
+	 * to avoid running into race conditions. Therefore, we need a factory object to create
+	 * those instances.
+	 * 
+	 * @param sim
+	 * @param multiModalTravelTimeFactory
+	 */
+	// use the factory
+	/*package*/ ParallelMultiModalSimEngine(Netsim sim, MultiModalTravelTimeFactory multiModalTravelTimeFactory) {
+		super(sim, multiModalTravelTimeFactory.createTravelTime());
+		this.timeFactory = multiModalTravelTimeFactory;
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 
 	@Override
 	public void onPrepareSim() {
 		super.onPrepareSim();
-		initMultiModalSimEngineRunners(this.numOfThreads);
+		initMultiModalSimEngineRunners();
 	}
 	
 	/*
-	 * The Threads are waiting at the startBarrier.
-	 * We trigger them by reaching this Barrier. Now the
-	 * Threads will start moving the Nodes and Links. We wait
-	 * until all of them reach the endBarrier to move
-	 * on. We should not have any Problems with Race Conditions
-	 * because even if the Threads would be faster than this
-	 * Thread, means the reach the endBarrier before
-	 * this Method does, it should work anyway.
+	 * The Threads are waiting at the startBarrier. We trigger them by reaching this Barrier.
+	 * Now the Threads will start moving the Nodes and Links. We wait until all of them reach 
+	 * the endBarrier to move on. We should not have any Problems with Race Conditions because 
+	 * even if the Threads would be faster than this Thread, means they reach the endBarrier 
+	 * before this Method does, it should work anyway.
 	 */
 	@Override
 	public void doSimStep(final double time) {
@@ -156,8 +166,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		return numNodes;
 	}
 	
-	private void initMultiModalSimEngineRunners(int numOfThreads) {
-		this.numOfThreads = numOfThreads;
+	private void initMultiModalSimEngineRunners() {
 
 		this.threads = new Thread[numOfThreads];
 		this.engines = new MultiModalSimEngineRunner[numOfThreads];
@@ -170,13 +179,14 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
+			multiModalTravelTime = timeFactory.createTravelTime();
 			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
 					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTime);
 
 			Thread thread = new Thread(engine);
 			thread.setName("MultiModalSimEngineRunner" + i);
 
-//			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			this.threads[i] = thread;
 			this.engines[i] = engine;
 

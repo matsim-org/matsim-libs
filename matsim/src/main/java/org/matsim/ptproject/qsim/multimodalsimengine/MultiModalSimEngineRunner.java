@@ -25,7 +25,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.core.gbl.Gbl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 
 public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
 
@@ -37,11 +37,11 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier reactivateLinksBarrier;
 	private final CyclicBarrier endBarrier;
-		
+	
 	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
 			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
 			Netsim sim, MultiModalTravelTime multiModalTravelTime) {
-		super(sim);
+		super(sim, multiModalTravelTime);
 		this.startBarrier = startBarrier;
 		this.reactivateNodesBarrier = reactivateNodesBarrier;
 		this.separationBarrier = separationBarrier;
@@ -95,17 +95,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	      	Gbl.errorMsg(e);
 		}
 	}
-	
-//	/*
-//	 * This method might be called simultaneously from multiple
-//	 * Threads therefore we have to synchronize it. Another solution would
-//	 * be to use a data structure that is thread-safe to collect the nodes.
-//	 */
-//	@Override
-//	public synchronized void activateNode(MultiModalQNodeExtension node) {
-//		super.activateNode(node);
-//	}
-	
+		
 	/*
 	 * Changed behavior here:
 	 * Only the current Time is set. Afterwards the ParallelMultiModalSimEngine

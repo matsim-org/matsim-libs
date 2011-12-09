@@ -65,10 +65,8 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 	
 	private void handleMultiModalDeparture(double now, MobsimDriverAgent personAgent, Id linkId) {
 		
-//		Route route = leg.getRoute();
 		MultiModalQLinkExtension extension = simEngine.getMultiModalQLinkExtension(qSim.getNetsimNetwork().getNetsimLink(linkId));
 		
-//		if ((route.getEndLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndAssumeControl(now);
 		} else {

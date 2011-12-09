@@ -24,41 +24,41 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelCost;
+import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.TravelMinCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 
-
 /**
  *  A Travel Cost Calculator that uses the travel times as travel costs.
+ *  
  * @author cdobler
  */
 public class OnlyTimeDependentTravelCostCalculator implements TravelMinCost, PersonalizableTravelCost {
 
 	private static final Logger log = Logger.getLogger(OnlyTimeDependentTravelCostCalculator.class);
 	
-	protected final TravelTime timeCalculator;
+	protected final PersonalizableTravelTime travelTime;
 
-	public OnlyTimeDependentTravelCostCalculator(final TravelTime timeCalculator) {
-		if (timeCalculator == null) {
+	public OnlyTimeDependentTravelCostCalculator(final PersonalizableTravelTime travelTime) {
+		if (travelTime == null) {
 			log.warn("TimeCalculator is null so FreeSpeedTravelTimes will be calculated!");
-			this.timeCalculator = new FreeSpeedTravelTimeCalculator();
-		} else this.timeCalculator = timeCalculator;
+			this.travelTime = new FreeSpeedTravelTimeCalculator();
+		} else this.travelTime = travelTime;
 	}
 
 	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-		return this.timeCalculator.getLinkTravelTime(link, time);
+		return this.travelTime.getLinkTravelTime(link, time);
 	}
 
 	@Override
 	public double getLinkMinimumTravelCost(final Link link) {
-		return this.timeCalculator.getLinkTravelTime(link, Time.UNDEFINED_TIME);
+		return this.travelTime.getLinkTravelTime(link, Time.UNDEFINED_TIME);
 	}
 	
 	@Override
 	public void setPerson(Person person) {
-		// nothing to do here
+		travelTime.setPerson(person);
 	}
 }

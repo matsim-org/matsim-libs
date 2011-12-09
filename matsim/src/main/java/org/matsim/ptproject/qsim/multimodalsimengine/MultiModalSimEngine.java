@@ -29,8 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTime;
-import org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator.MultiModalTravelTimeCost;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTime;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
 
@@ -43,26 +42,23 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ List<MultiModalQNodeExtension> activeNodes;
 	/*package*/ Queue<MultiModalQLinkExtension> linksToActivate;
 	/*package*/ Queue<MultiModalQNodeExtension> nodesToActivate;
-//	/*package*/ List<MultiModalQLinkExtension> linksToActivate;
-//	/*package*/ List<MultiModalQNodeExtension> nodesToActivate;
 
-	private InternalInterface internalInterface = null ;
+	private InternalInterface internalInterface = null;
+	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 	}
 
-	/*package*/ MultiModalSimEngine(Netsim qSim) {
+	/*package*/ MultiModalSimEngine(Netsim qSim, MultiModalTravelTime multiModalTravelTime) {
 		this.qSim = qSim;
 		
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
 		activeNodes = new ArrayList<MultiModalQNodeExtension>();
 		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
-//		linksToActivate = new ArrayList<MultiModalQLinkExtension>();
-//		nodesToActivate = new ArrayList<MultiModalQNodeExtension>();
 		
-		multiModalTravelTime = new MultiModalTravelTimeCost(qSim.getScenario().getConfig().plansCalcRoute());
+		this.multiModalTravelTime = multiModalTravelTime; 
 	}
 	
 	@Override

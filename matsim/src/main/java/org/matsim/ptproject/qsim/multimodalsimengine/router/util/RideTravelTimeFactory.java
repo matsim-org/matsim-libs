@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCollectorFactory.java
+ * RideTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmonitoring;
+package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
 
-public class TravelTimeCollectorFactory implements PersonalizableTravelTimeFactory {
+public class RideTravelTimeFactory implements PersonalizableTravelTimeFactory {
 
-	private TravelTimeCollector travelTime;
+	private final TravelTimeFactory carTravelTimeFactory;	// PT speed does not depend on a passenger, therefore not personalizable
+	private final PersonalizableTravelTimeFactory walkTravelTimeFactory;
 	
-	public TravelTimeCollector createTravelTimeCollector(final Scenario scenario, Set<String> analyzedModes) {
-		travelTime = new TravelTimeCollector(scenario, analyzedModes);
-		return travelTime;
+	public RideTravelTimeFactory(TravelTimeFactory carTravelTimeFactory, PersonalizableTravelTimeFactory walkTravelTimeFactory) {
+		this.carTravelTimeFactory = carTravelTimeFactory;
+		this.walkTravelTimeFactory = walkTravelTimeFactory;
 	}
 	
-	public TravelTimeCollector createTravelTimeCollector(final Network network, int numThreads, Set<String> analyzedModes) {
-		travelTime = new TravelTimeCollector(network, numThreads, analyzedModes);
-		return travelTime;
-	}
-	
-	/**
-	 * Since the TravelTimeCollector is not *really* personalizable (travel time
-	 * calculation is not person specific so far), we can reuse one instance multiple
-	 * times.
-	 */
 	@Override
 	public PersonalizableTravelTime createTravelTime() {
-		return travelTime;
+		return new RideTravelTime(carTravelTimeFactory.createTravelTime(), walkTravelTimeFactory.createTravelTime());
 	}
+	
 }

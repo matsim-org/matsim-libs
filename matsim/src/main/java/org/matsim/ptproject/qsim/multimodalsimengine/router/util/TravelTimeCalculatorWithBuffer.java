@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
+package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
 import java.io.File;
 import java.util.HashSet;
@@ -41,11 +41,12 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
-public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements AgentDepartureEventHandler {
+public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements BufferedTravelTime, AgentDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCalculatorWithBuffer.class);
 
@@ -84,8 +85,13 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		eventsManager.addHandler(this);
 
 		log.info("Processing events file to get initial travel times...");
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
-		reader.readFile(eventsFile);
+		if (eventsFile.toLowerCase().endsWith(".txt") || eventsFile.toLowerCase().endsWith(".txt.gz")) {
+			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
+			reader.readFile(eventsFile);		
+		} else if (eventsFile.toLowerCase().endsWith(".xml") || eventsFile.toLowerCase().endsWith(".xml.gz")) {
+			EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
+			reader.parse(eventsFile);
+		}
 
 		eventsManager.removeHandler(this);
 	}

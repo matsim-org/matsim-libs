@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
+package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -31,5 +31,6 @@ public class TravelTimeCalculatorWithBufferFactory implements TravelTimeCalculat
 	public TravelTimeCalculator createTravelTimeCalculator(Network network, TravelTimeCalculatorConfigGroup group) {
 		return new TravelTimeCalculatorWithBuffer(network, group);
 	}
+
 
 } 

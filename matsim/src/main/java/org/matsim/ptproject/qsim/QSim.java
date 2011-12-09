@@ -43,7 +43,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.scoring.OnlyTimeDependentScoringFunction;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.*;
@@ -59,9 +58,7 @@ import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.ptproject.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
@@ -196,22 +193,6 @@ public final class QSim implements VisMobsim, Netsim {
 
 
 		this.addDepartureHandler(this.netEngine.getDepartureHandler());
-
-		// configuring multiModalEngine ...
-		if (sc.getConfig().multiModal().isMultiModalSimulationEnabled()) {
-
-			// create MultiModalSimEngine
-			multiModalEngine = new MultiModalSimEngineFactory()
-			.createMultiModalSimEngine(this);
-			
-			multiModalEngine.setInternalInterface(internalInterface) ;
-
-			// add MultiModalDepartureHandler
-			this.addDepartureHandler(new MultiModalDepartureHandler(this,
-					multiModalEngine, scenario.getConfig().multiModal()));
-
-		}
-
 	}
 
 	// ============================================================================================================================
@@ -262,9 +243,7 @@ public final class QSim implements VisMobsim, Netsim {
 		if (this.netEngine != null) {
 			this.netEngine.onPrepareSim();
 		}
-		if (this.multiModalEngine != null) {
-			this.multiModalEngine.onPrepareSim();
-		}
+
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.onPrepareSim();
 		}
@@ -332,9 +311,6 @@ public final class QSim implements VisMobsim, Netsim {
 			this.netEngine.afterSim();
 		}
 
-		if (this.multiModalEngine != null) {
-			this.multiModalEngine.afterSim();
-		}
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
 			mobsimEngine.afterSim();
 		}
@@ -391,11 +367,6 @@ public final class QSim implements VisMobsim, Netsim {
 		// network engine:
 		if (this.netEngine != null) {
 			this.netEngine.doSimStep(time);
-		}
-
-		// multi modal engine:
-		if (this.multiModalEngine != null) {
-			this.multiModalEngine.doSimStep(time);
 		}
 
 		// "added" engines
@@ -665,13 +636,10 @@ public final class QSim implements VisMobsim, Netsim {
 					+ (diffsim / (diffreal + Double.MIN_VALUE)));
 
 			if (this.multiModalEngine != null) {
-				nofActiveLinks = this.multiModalEngine
-						.getNumberOfSimulatedLinks();
-				nofActiveNodes = this.multiModalEngine
-						.getNumberOfSimulatedNodes();
-				log.info("SIMULATION (MultiModalSim) AT "
-						+ Time.writeTime(time) + " #links=" + nofActiveLinks
-						+ " #nodes=" + nofActiveNodes);
+				nofActiveLinks = this.multiModalEngine.getNumberOfSimulatedLinks();
+				nofActiveNodes = this.multiModalEngine.getNumberOfSimulatedNodes();
+				log.info("SIMULATION (MultiModalSim) AT " + Time.writeTime(time) 
+						+ " #links=" + nofActiveLinks + " #nodes=" + nofActiveNodes);
 			}
 
 			Gbl.printMemoryUsage();
@@ -719,10 +687,6 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.scenario;
 	}
 
-	public final MultiModalSimEngine getMultiModalSimEngine() {
-		return this.multiModalEngine;
-	}
-
 	@Override
 	public final MobsimTimer getSimTimer() {
 		return this.simTimer;
@@ -733,6 +697,11 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.netEngine;
 	}
 
+	// For a test
+	public final MultiModalSimEngine getMultiModalSimEngine() {
+		return this.multiModalEngine;
+	}
+	
 	@Override
 	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
 		this.snapshotWriters.add(snapshotWriter);
@@ -741,8 +710,11 @@ public final class QSim implements VisMobsim, Netsim {
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
         if (mobsimEngine instanceof TransitQSimEngine) {
             this.transitEngine = (TransitQSimEngine) mobsimEngine;
+        } if (mobsimEngine instanceof MultiModalSimEngine) {
+        	this.multiModalEngine = (MultiModalSimEngine) mobsimEngine;
         }
-        mobsimEngine.setInternalInterface( this.internalInterface  ) ;
+        
+        mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 	}
 

@@ -23,6 +23,7 @@ package org.matsim.ptproject.qsim.multimodalsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimLink;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNode;
@@ -32,17 +33,17 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 
 	final private static Logger log = Logger.getLogger(MultiModalSimEngineFactory.class);
 	
-	public MultiModalSimEngine createMultiModalSimEngine(Netsim sim) {
+	public MultiModalSimEngine createMultiModalSimEngine(Netsim sim, MultiModalTravelTimeFactory multiModalTravelTimeFactory) {
 		
 		MultiModalSimEngine simEngine;
 		
 		int numOfThreads = sim.getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads(); 
 		if (numOfThreads > 1) {
-			simEngine = new ParallelMultiModalSimEngine(sim);
+			simEngine = new ParallelMultiModalSimEngine(sim, multiModalTravelTimeFactory);
 			log.info("Using ParallelMultiModalSimEngine with " + numOfThreads + " threads.");
 		}
 		else {
-			simEngine = new MultiModalSimEngine(sim);			
+			simEngine = new MultiModalSimEngine(sim, multiModalTravelTimeFactory.createTravelTime());
 		}
 		
 		addMultiModalToQNetwork(sim.getNetsimNetwork(), simEngine);

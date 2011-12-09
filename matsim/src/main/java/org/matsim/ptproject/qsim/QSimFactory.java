@@ -68,6 +68,7 @@ public class QSimFactory implements MobsimFactory {
         }
         QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
         AgentFactory agentFactory;
+        
         if (sc.getConfig().scenario().isUseTransit()) {
             agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
@@ -78,10 +79,10 @@ public class QSimFactory implements MobsimFactory {
         } else {
             agentFactory = new DefaultAgentFactory(qSim);
         }
+        
         PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
         qSim.addAgentSource(agentSource);
         return qSim;
-
     }
 
 }

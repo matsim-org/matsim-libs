@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BufferedTravelTime.java
+ * MultiModalTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,28 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.ptproject.qsim.multimodalsimengine.router.costcalculator;
+package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 
-public class BufferedTravelTime implements PersonalizableTravelTime {
+public interface MultiModalTravelTimeFactory extends PersonalizableTravelTimeFactory {
 
-	private TravelTimeCalculatorWithBuffer buffer;
-	
-	public BufferedTravelTime (TravelTimeCalculatorWithBuffer buffer) {
-		this.buffer = buffer;
-	}
-	
-	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		return buffer.getBufferedLinkTravelTime(link, time);
-	}
-
-	@Override
-	public void setPerson(Person person) {
-		buffer.setPerson(person);
-	}
-
+	public MultiModalTravelTime createTravelTime();
 }

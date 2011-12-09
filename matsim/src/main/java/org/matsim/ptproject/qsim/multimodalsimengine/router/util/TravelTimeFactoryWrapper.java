@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCollectorFactory.java
+ * TravelTimeFactoryWrapper.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,36 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.withinday.trafficmonitoring;
+package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTime;
 
-public class TravelTimeCollectorFactory implements PersonalizableTravelTimeFactory {
+/**
+ * Wraps a PersonalizableTravelTime around a TravelTime object.
+ */
+public class TravelTimeFactoryWrapper implements PersonalizableTravelTimeFactory {
 
-	private TravelTimeCollector travelTime;
+	private final PersonalizableTravelTime travelTime;
 	
-	public TravelTimeCollector createTravelTimeCollector(final Scenario scenario, Set<String> analyzedModes) {
-		travelTime = new TravelTimeCollector(scenario, analyzedModes);
-		return travelTime;
+	public TravelTimeFactoryWrapper(TravelTime travelTime) {
+		this.travelTime = new Wrapper(travelTime);
 	}
 	
-	public TravelTimeCollector createTravelTimeCollector(final Network network, int numThreads, Set<String> analyzedModes) {
-		travelTime = new TravelTimeCollector(network, numThreads, analyzedModes);
-		return travelTime;
-	}
-	
-	/**
-	 * Since the TravelTimeCollector is not *really* personalizable (travel time
-	 * calculation is not person specific so far), we can reuse one instance multiple
-	 * times.
-	 */
 	@Override
 	public PersonalizableTravelTime createTravelTime() {
 		return travelTime;
+	}
+
+	private class Wrapper implements PersonalizableTravelTime {
+
+		private final TravelTime travelTime;
+		
+		public Wrapper(TravelTime travelTime) {
+			this.travelTime = travelTime;
+		}
+		
+		@Override
+		public double getLinkTravelTime(Link link, double time) {
+			return travelTime.getLinkTravelTime(link, time);
+		}
+
+		@Override
+		public void setPerson(Person person) {
+			// nothing to do here
+		}
+		
 	}
 }
