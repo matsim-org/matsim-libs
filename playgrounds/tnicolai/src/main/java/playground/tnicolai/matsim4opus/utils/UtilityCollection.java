@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -40,6 +41,7 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 
 
 /**
@@ -175,6 +177,36 @@ public class UtilityCollection {
 		System.out.println("Determining network extend with " + network.getNodes().size() + " nodes took " + time + " seconds");
 		
 		return new NetworkBoundary(xmin, xmax, ymin, ymax);
+	}
+	
+	/**
+	 * Initializing an array with zone information like:
+	 * zone id, zone coordinate (centroid) and its nearest node 
+	 * 
+	 * @param network
+	 */
+	public static ZoneObject[] preProcessZoneData(final ActivityFacilitiesImpl zones, final NetworkImpl network) {
+		
+		assert( network != null );
+		assert( zones != null );
+		int numberOfZones = zones.getFacilities().values().size();
+		ZoneObject zoneArray[] = new ZoneObject[numberOfZones];
+		Iterator<ActivityFacility> zonesIterator = zones.getFacilities().values().iterator();
+
+		int counter = 0;
+		while( zonesIterator.hasNext() ){
+
+			ActivityFacility zone = zonesIterator.next();
+			assert (zone != null );
+			assert( zone.getCoord() != null );
+			Coord zoneCoordinate = zone.getCoord();
+			Node networkNode = network.getNearestNode( zoneCoordinate );
+			assert( networkNode != null );
+				
+			zoneArray[counter] = new ZoneObject(zone.getId(), zoneCoordinate, networkNode);
+			counter++;
+		}
+		return zoneArray;
 	}
 	
 	/**

@@ -9,10 +9,10 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
-public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
+public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 
 	// logger
-	private static final Logger log = Logger.getLogger(MATSim4UrbanSimInteroplation.class);
+	private static final Logger log = Logger.getLogger(MATSim4UrbanSimGridBasedAccessibility.class);
 	
 	// resolution
 	private static int resolutionMeter = -1;
@@ -24,7 +24,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	 * constructor
 	 * @param args
 	 */
-	public MATSim4UrbanSimInteroplation(String args[]){
+	public MATSim4UrbanSimGridBasedAccessibility(String args[]){
 		super(args);
 		initResolutionAndJobSample();
 	}
@@ -37,15 +37,15 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 				
 				if(params[i].startsWith("resolution")){
 					String s[] = params[i].split("=");
-					MATSim4UrbanSimInteroplation.resolutionMeter = Integer.parseInt(s[1]);
-					log.info("Detected resolution in meter: " + MATSim4UrbanSimInteroplation.resolutionMeter);
-					MATSim4UrbanSimInteroplation.resolutionFeet = (int)(MATSim4UrbanSimInteroplation.resolutionMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR);
-					log.info("Converted resolution into feet (used for goolge maps output): " + MATSim4UrbanSimInteroplation.resolutionFeet);
+					MATSim4UrbanSimGridBasedAccessibility.resolutionMeter = Integer.parseInt(s[1]);
+					log.info("Detected resolution in meter: " + MATSim4UrbanSimGridBasedAccessibility.resolutionMeter);
+					MATSim4UrbanSimGridBasedAccessibility.resolutionFeet = (int)(MATSim4UrbanSimGridBasedAccessibility.resolutionMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR);
+					log.info("Converted resolution into feet (used for goolge maps output): " + MATSim4UrbanSimGridBasedAccessibility.resolutionFeet);
 				}
 				else if(params[i].startsWith("jobsample")){
 					String s[] = params[i].split("=");
-					MATSim4UrbanSimInteroplation.jobSample = Double.parseDouble(s[1]);
-					log.info("Detected job sample size: " + MATSim4UrbanSimInteroplation.jobSample);
+					MATSim4UrbanSimGridBasedAccessibility.jobSample = Double.parseDouble(s[1]);
+					log.info("Detected job sample size: " + MATSim4UrbanSimGridBasedAccessibility.jobSample);
 				}	
 			}
 		}
@@ -54,7 +54,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 
 	void runMATSim(){
 		
-		log.info("Starting MATSim from Urbansim");
+		log.info("Starting MATSim from UrbanSim");
 		int benchmarkID = this.benchmark.addMeasure("MATSim4UrbanSimInteroplation Run");
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
@@ -81,8 +81,8 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		//controler.addControlerListener( new ERSAControlerListenerV2(aggregatedWorkplaces, resolutionFeet, resolutionMeter, this.benchmark) );
-		controler.addControlerListener( new ERSAControlerListenerV3(aggregatedWorkplaces, resolutionMeter, benchmark));
-		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3(zones, parcels, scenario));
+		controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, resolutionMeter, benchmark));
+		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener(zones, parcels));
 		
 		controler.run();
 		// Controller done!
@@ -104,7 +104,7 @@ public class MATSim4UrbanSimInteroplation extends MATSim4UrbanSim{
 	 * @param args
 	 */
 	public static void main(String[] args) {		
-		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/psrc_parcel/results/ersa_after_submission/config/psrc_parcel_matsim_config_ERSA_Interploation.xml"});
+		MATSim4UrbanSimGridBasedAccessibility m4ui = new MATSim4UrbanSimGridBasedAccessibility(new String[]{"/Users/thomas/Development/opus_home/data/psrc_parcel/results/ersa_after_submission/config/psrc_parcel_matsim_config_ERSA_Interploation.xml"});
 //		MATSim4UrbanSimInteroplation m4ui = new MATSim4UrbanSimInteroplation(new String[]{"/Users/thomas/Development/opus_home/data/seattle_parcel/results/interpolationQuickTest/seattle_parcel_interpolation_config_quick.xml"});
 		m4ui.runMATSim();		
 	}

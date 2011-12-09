@@ -141,7 +141,7 @@ public class ReadFromUrbansimParcelModel {
 				}
 				pseudoZone.sumXCoordinate += coord.getX();
 				pseudoZone.sumYCoordinate += coord.getY() ;
-				pseudoZone.count ++ ; // tnicolai: weights from urbansim parcels for homes and workplaces
+				pseudoZone.count ++ ;
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

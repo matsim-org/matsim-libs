@@ -56,7 +56,7 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityHelperObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneInfoObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 
 /**
  *
@@ -127,7 +127,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 			AccessibilityHelperObject workplaceAccessibility = new AccessibilityHelperObject(this.numberOfWorkplacesPerZone);
 
 			// init array with zone informations
-			ZoneInfoObject[] zones = preProcessZoneData(network);
+			ZoneObject[] zones = preProcessZoneData(network);
 			// init progress bar
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");
@@ -222,11 +222,11 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 	 * 2-point accessibilities (from zone / to zone) 
 	 * @param network
 	 */
-	private ZoneInfoObject[] preProcessZoneData(NetworkImpl network) {
+	private ZoneObject[] preProcessZoneData(NetworkImpl network) {
 		
 		assert( network != null );
 		int numberOfZones = zones.getFacilities().values().size();
-		ZoneInfoObject zoneArray[] = new ZoneInfoObject[numberOfZones];
+		ZoneObject zoneArray[] = new ZoneObject[numberOfZones];
 		Iterator<ActivityFacility> zonesIterator = zones.getFacilities().values().iterator();
 
 		int counter = 0;
@@ -244,7 +244,7 @@ public class MATSim4UrbanSimControlerListenerV2 implements ShutdownListener {
 				System.exit(-1);
 			}
 				
-			zoneArray[counter] = new ZoneInfoObject(zone.getId(), zoneCoordinate, networkNode);
+			zoneArray[counter] = new ZoneObject(zone.getId(), zoneCoordinate, networkNode);
 			counter++;
 		}
 		return zoneArray;

@@ -23,10 +23,10 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.AccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
 
-public class ERSAControlerListenerV3 implements ShutdownListener{
+public class GridBasedAccessibilityControlerListener implements ShutdownListener{
 	
 	/**
 	 * Code improvements since first version (deadline ersa paper):
@@ -41,7 +41,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 	 * tnicolai: sep'11
 	 */
 	
-	private static final Logger log = Logger.getLogger(ERSAControlerListenerV3.class);
+	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListener.class);
 	
 	private JobClusterObject[] aggregatedWorkplaces;
 	private int resolutionMeter;
@@ -56,9 +56,9 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 	 * @param resolutionMeter
 	 * @param benchmark
 	 */
-	public ERSAControlerListenerV3(JobClusterObject[] aggregatedWorkplaces, int resolutionMeter, Benchmark benchmark){
+	public GridBasedAccessibilityControlerListener(JobClusterObject[] aggregatedWorkplaces, int resolutionMeter, Benchmark benchmark){
 		
-		log.info("Initializing ERSAControlerListenerV3 ...");
+		log.info("Initializing GridBasedAccessibilityControlerListener ...");
 		
 		assert(aggregatedWorkplaces != null);
 		this.aggregatedWorkplaces = aggregatedWorkplaces;
@@ -67,18 +67,18 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		
+		// this stores all accessibility measures (feeding the grid matrix)
 		this.resultMap = new HashMap<Id, AccessibilityStorage>();
 		
-		AccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   "accessibility_data" + 
-													   Constants.FILE_TYPE_CSV);
+		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
+													   			Constants.ZONES_FILE_CSV);
 		
-		log.info(".. done initializing ERSAControlerListenerV3!");
+		log.info(".. done initializing GridBasedAccessibilityControlerListener!");
 	}
 	
 	
 	/**
-	 * calculating accessibility indicators
+	 * calculating accessibility indicators from each network node to each "aggregated workplace"
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
@@ -89,7 +89,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 		Scenario sc = controler.getScenario();
 		NetworkImpl network = controler.getNetwork();
 		
-		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");
+		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation");
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
@@ -161,18 +161,16 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 				}
 				
 				// assign accessibility 
-				double tTimeAccessibility = Math.log( accessibilityTravelTimes );
-				double tCostAccessibility = Math.log( accessibilityTravelTimeCosts );
-				double tDistanceAccessibility = Math.log( accessibilityTravelDistanceCosts );
-				
-				// storing accessibility measures of different cost functions (log sums) in a storage
-				AccessibilityStorage as = new AccessibilityStorage(tTimeAccessibility, tCostAccessibility, tDistanceAccessibility);
-				
+				double travelTimeAccessibility = Math.log( accessibilityTravelTimes );
+				double travelCostAccessibility = Math.log( accessibilityTravelTimeCosts );
+				double travelDistanceAccessibility = Math.log( accessibilityTravelDistanceCosts );
+
 				// assigning each storage object with its corresponding node id
-				this.resultMap.put(originNode.getId(), as);
+				this.resultMap.put(originNode.getId(), 
+						new AccessibilityStorage(travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility));
 				
 				// writing accessibility measures of current node in csv format
-				AccessibilityCSVWriter.write(originNode, tTimeAccessibility, tCostAccessibility, tDistanceAccessibility);
+				GridBasedAccessibilityCSVWriter.write(originNode, travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);
@@ -196,7 +194,7 @@ public class ERSAControlerListenerV3 implements ShutdownListener{
 			AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedWorkplaces );
 			
 			// finalizing/closing csv file containing accessibility measures
-			AccessibilityCSVWriter.close();
+			GridBasedAccessibilityCSVWriter.close();
 		}
 	}
 	

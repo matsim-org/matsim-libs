@@ -85,7 +85,7 @@ public class MATSim4UrbanSim {
 		// loading and initializing MATSim config
 		MatsimConfigType matsimConfig = unmarschal(matsimConfiFile);
 		
-		// 
+		// get default scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		if( !(new InitMATSimScenario(scenario, matsimConfig)).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
@@ -93,7 +93,7 @@ public class MATSim4UrbanSim {
 		}			
 		// init Benchmark as default
 		benchmark = new Benchmark();
-		// init loader
+
 		ScenarioUtils.loadScenario(scenario);
 	}
 	
@@ -118,7 +118,7 @@ public class MATSim4UrbanSim {
 		// read urbansim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		
+		// initializing parcels and zones from UrbanSim input
 		readUrbansimParcelModel(readFromUrbansim, parcels, zones);
 		int pc = benchmark.addMeasure("Population construction");
 		Population newPopulation = readUrbansimPersons(readFromUrbansim, parcels, network);
@@ -130,11 +130,10 @@ public class MATSim4UrbanSim {
 
 		// set population in scenario
 		scenario.setPopulation(newPopulation);
-		// scenario.setFacilities(facilities); // tnicolai: suggest to implement method
 
-		runControler(zones, numberOfWorkplacesPerZone, parcels, readFromUrbansim);
+		runControler(zones, parcels, numberOfWorkplacesPerZone, readFromUrbansim);
 		
-		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){ // tnicolai: Experimental, comment out for MATSim4UrbanSim release
+		if( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.BACKUP_RUN_DATA_PARAM).equalsIgnoreCase("TRUE") ){
 			// saving results from current run
 			saveRunOutputs();			
 			cleanUrbanSimOutput();
@@ -218,7 +217,7 @@ public class MATSim4UrbanSim {
 	 * run simulation
 	 * @param zones
 	 */
-	void runControler( ActivityFacilitiesImpl zones, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, ActivityFacilitiesImpl parcels, 
+	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Map<Id,WorkplaceObject> numberOfWorkplacesPerZone, 
 			ReadFromUrbansimParcelModel readFromUrbansim){
 		
 		Controler controler = new Controler(scenario);
@@ -226,7 +225,10 @@ public class MATSim4UrbanSim {
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
 		// The following lines register what should be done _after_ the iterations were run:
-		controler.addControlerListener( new MATSim4UrbanSimControlerListenerV3( zones, parcels, scenario ) );
+		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
+		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
+																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., scenario.getNetwork()), 
+																					benchmark));
 		
 		// tnicolai todo?: count number of cars per h on a link
 		// write ControlerListener that implements AfterMobsimListener (notifyAfterMobsim)

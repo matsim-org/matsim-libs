@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
-public class ZoneInfoObject {
+public class ZoneObject {
 	
 	private Coord zoneCoodrdinate;
 	private Node nearestNode;
@@ -16,7 +16,7 @@ public class ZoneInfoObject {
 	 * @param nearestNode
 	 * @param zone
 	 */
-	public ZoneInfoObject(Id zoneID, Coord zoneCoodrdinate, Node nearestNode){
+	public ZoneObject(Id zoneID, Coord zoneCoodrdinate, Node nearestNode){
 		this.zoneID = zoneID;
 		this.nearestNode = nearestNode;
 		this.zoneCoodrdinate = zoneCoodrdinate;		

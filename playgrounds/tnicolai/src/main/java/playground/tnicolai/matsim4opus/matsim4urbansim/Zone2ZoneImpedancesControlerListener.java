@@ -22,11 +22,9 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -43,7 +41,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -51,31 +48,31 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneInfoObject;
+import playground.tnicolai.matsim4opus.utils.UtilityCollection;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 
 /**
  * This controller version is designed for the sustaincity mile stone (Month 18).
- * This versrion dosn't contain experimental code such as workplace accessibility 
- * computation (which is available in version V2)!
  * 
  * @author nagel
  * @author thomas
  *
  */
-public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
-	private static final Logger log = Logger.getLogger(MATSim4UrbanSimControlerListenerV3.class);
+public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
+	private static final Logger log = Logger.getLogger(Zone2ZoneImpedancesControlerListener.class);
 
 	private ActivityFacilitiesImpl zones;
-	private ActivityFacilitiesImpl facilities;
+	private ActivityFacilitiesImpl parcels;
 	private String travelDataPath;
 
 	/**
 	 * constructor	
 	 * @param zones 
+	 * @param parcels
 	 */
-	MATSim4UrbanSimControlerListenerV3( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl facilities, ScenarioImpl scenario ) {
+	Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels) {
 		this.zones = zones;
-		this.facilities = facilities;
+		this.parcels = parcels;
 		this.travelDataPath = Constants.MATSIM_4_OPUS_TEMP + Constants.TRAVEL_DATA_FILE_CSV;
 	}
 	
@@ -112,7 +109,7 @@ public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
 			log.info("Computing and writing travel_data ..." );
 
 			// init array with zone informations
-			ZoneInfoObject[] zones = preProcessZoneData(network);
+			ZoneObject[] zones = UtilityCollection.preProcessZoneData(this.zones, network);
 			// init progress bar
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");
@@ -146,9 +143,9 @@ public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
 					if(travelTime_min < 1.2)
 						travelTime_min = 1.2;
 					
-					// get travel cost
-					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
-					
+					// get travel cost (marginal cost of time * travel time)
+//					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
+					// get travel distance (link lengths in meter)
 //					double distance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
 					
 					// query trips in OD Matrix
@@ -187,39 +184,6 @@ public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
 		}
 		
 		log.info("... done with notifyShutdown.") ;
-	}
-
-	/**
-	 * Initializing an array with zone information for computing 
-	 * 2-point accessibilities (from zone / to zone) 
-	 * @param network
-	 */
-	private ZoneInfoObject[] preProcessZoneData(NetworkImpl network) {
-		
-		assert( network != null );
-		int numberOfZones = zones.getFacilities().values().size();
-		ZoneInfoObject zoneArray[] = new ZoneInfoObject[numberOfZones];
-		Iterator<ActivityFacility> zonesIterator = zones.getFacilities().values().iterator();
-
-		int counter = 0;
-		while( zonesIterator.hasNext() ){
-
-			ActivityFacility zone = zonesIterator.next();
-			assert (zone != null );
-			assert( zone.getCoord() != null );
-			Coord zoneCoordinate = zone.getCoord();
-			Node networkNode = network.getNearestNode( zoneCoordinate );
-			assert( networkNode != null );
-			
-			if(counter >= numberOfZones){
-				log.error("Error while generating array of \"ZoneInfoObject\" ...");
-				System.exit(-1);
-			}
-				
-			zoneArray[counter] = new ZoneInfoObject(zone.getId(), zoneCoordinate, networkNode);
-			counter++;
-		}
-		return zoneArray;
 	}
 
 	/**
@@ -269,7 +233,7 @@ public class MATSim4UrbanSimControlerListenerV3 implements ShutdownListener {
 					if( id == null) // that person plan doesn't contain any activity, continue with next person
 						continue;
 					
-					Map<Id, ActivityFacility> allFacilities = facilities.getFacilities();
+					Map<Id, ActivityFacility> allFacilities = parcels.getFacilities();
 					ActivityFacility fac = allFacilities.get(id);
 					if(fac == null)
 						continue;

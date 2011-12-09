@@ -27,7 +27,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
-import playground.tnicolai.matsim4opus.utils.io.writer.AccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
@@ -77,7 +77,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		this.travelTimeAccessibilityMap = new HashMap<Id, Double>();
 		this.travelDistanceAccessibilityMap = new HashMap<Id, Double>();
 		
-		AccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
+		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
 													   "accessibility_indicators_v2" + 
 													   Constants.FILE_TYPE_CSV);
 		
@@ -170,7 +170,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 				this.travelTimeAccessibilityMap.put(originNode.getId(), travelTimeLogSum );
 				
 				// using hash maps to dump out log sum of current node in csv format
-				AccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
+				GridBasedAccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
 			}
 			this.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with " + numberOfStartNodes
@@ -194,7 +194,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		SpatialGrid2KMZWriter.writeKMZFiles(travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid);
 		AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
 		// accessibility measure were written while computing, just closing file now .
-		AccessibilityCSVWriter.close();
+		GridBasedAccessibilityCSVWriter.close();
 	}
 	
 	private void initSpatialGirds(NetworkImpl network){
