@@ -41,6 +41,7 @@ import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.Passenger
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
+import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.charts.ChartsAxisUnifier;
 
@@ -125,7 +126,7 @@ public class PlotData {
 					condition);
 			perTimeUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+count+"-TimePlot.png",
+						outputDir+count+"-TimePlot",
 						chart) );
 
 			chart = ploter.getBoxAndWhiskerChartPerTripLength(
@@ -134,7 +135,7 @@ public class PlotData {
 					network);
 			perDistanceUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+count+"-DistancePlot.png",
+						outputDir+count+"-DistancePlot",
 						chart) );
 
 			chart = ploter.getBoxAndWhiskerChartPerTripLength(
@@ -143,7 +144,7 @@ public class PlotData {
 					network);
 			perDistanceUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+count+"-DistancePlot-short.png",
+						outputDir+count+"-DistancePlot-short",
 						chart) );
 
 			// Number of possible passenger per driver
@@ -154,7 +155,7 @@ public class PlotData {
 					network);
 			passengersPerDriverUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+count+"-nPassengers-per-drivers.png",
+						outputDir+count+"-nPassengers-per-drivers",
 						chart) );
 
 			shortDriverTripValidator.setValidator( condition );
@@ -164,7 +165,7 @@ public class PlotData {
 					network);
 			passengersPerDriverUnifier.addChart( chart );
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+count+"-nPassengers-per-drivers-short.png",
+						outputDir+count+"-nPassengers-per-drivers-short",
 						chart) );
 
 			// VIA: home and work locations of passengers and drivers
@@ -194,22 +195,35 @@ public class PlotData {
 						+condition.getSecondCriterion()+"-workLocations.xy");
 		}
 
+
+		{
+			ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+"comparisonPlot.png",
+						chart) );
+			chart = ploter.getTripsForCondition(filter);
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+"departuresPerTimeSlotPlot.png",
+						chart) );
+		}
+
 		// format and save
 		// ---------------------------------------------------------------------
 		for (ChartsAxisUnifier unifier : unifiers) {
 			unifier.applyUniformisation();
 		}
 		for (Tuple<String, ChartUtil> chart : charts) {
-			chart.getSecond().saveAsPng(
-					chart.getFirst(),
+			ChartUtil chartUtil = chart.getSecond();
+			chartUtil.saveAsPng(
+					chart.getFirst()+".png",
+					WIDTH,
+					HEIGHT);
+			chartUtil.getChart().setTitle( "" );
+			chartUtil.saveAsPng(
+					chart.getFirst()+"-no-title.png",
 					WIDTH,
 					HEIGHT);
 		}
-
-		ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
-		chart.saveAsPng(outputDir+"comparisonPlot.png", WIDTH, HEIGHT);
-		chart = ploter.getTripsForCondition(filter);
-		chart.saveAsPng(outputDir+"departuresPerTimeSlotPlot.png", WIDTH, HEIGHT);
 	}
 }
 
