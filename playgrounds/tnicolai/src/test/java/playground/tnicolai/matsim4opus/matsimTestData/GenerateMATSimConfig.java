@@ -18,15 +18,15 @@ import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.org.matsim.config.ConfigType;
-import playground.tnicolai.matsim4opus.org.matsim.config.ControlerType;
-import playground.tnicolai.matsim4opus.org.matsim.config.InputPlansFileType;
-import playground.tnicolai.matsim4opus.org.matsim.config.Matsim4UrbansimType;
-import playground.tnicolai.matsim4opus.org.matsim.config.MatsimConfigType;
-import playground.tnicolai.matsim4opus.org.matsim.config.NetworkType;
-import playground.tnicolai.matsim4opus.org.matsim.config.ObjectFactory;
-import playground.tnicolai.matsim4opus.org.matsim.config.PlanCalcScoreType;
-import playground.tnicolai.matsim4opus.org.matsim.config.UrbansimParameterType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ControlerType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.InputPlansFileType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.Matsim4UrbansimType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.NetworkType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ObjectFactory;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.PlanCalcScoreType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.UrbansimParameterType;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 

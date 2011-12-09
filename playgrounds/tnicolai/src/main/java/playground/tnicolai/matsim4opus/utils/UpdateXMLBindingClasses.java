@@ -170,7 +170,7 @@ public class UpdateXMLBindingClasses {
 		Package pack = c.getPackage();
 		String name = pack.getName();
 		int dot = name.lastIndexOf(".");
-		name = name.substring(0, dot+1) + "org.matsim.config";
+		name = name.substring(0, dot+1) + Constants.JAXB_PARSER_PACKAGE_NAME;
 		
 		return name;
 	}

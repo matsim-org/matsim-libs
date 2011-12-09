@@ -37,9 +37,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.org.matsim.config.ConfigType;
-import playground.tnicolai.matsim4opus.org.matsim.config.Matsim4UrbansimType;
-import playground.tnicolai.matsim4opus.org.matsim.config.MatsimConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.Matsim4UrbansimType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import playground.tnicolai.matsim4opus.utils.ids.IdFactory;
 
 /**

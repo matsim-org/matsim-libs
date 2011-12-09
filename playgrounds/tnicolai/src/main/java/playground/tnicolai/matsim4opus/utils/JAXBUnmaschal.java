@@ -40,8 +40,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.org.matsim.config.MatsimConfigType;
-import playground.tnicolai.matsim4opus.org.matsim.config.ObjectFactory;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ObjectFactory;
 import playground.tnicolai.matsim4opus.utils.io.LoadFile;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 

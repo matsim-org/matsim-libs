@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.org.matsim.config.MatsimConfigType;
+import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import playground.tnicolai.matsim4opus.utils.DateUtil;
 import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
 import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;

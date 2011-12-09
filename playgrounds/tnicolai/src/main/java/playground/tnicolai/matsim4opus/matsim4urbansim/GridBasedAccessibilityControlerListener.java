@@ -71,7 +71,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 		this.resultMap = new HashMap<Id, AccessibilityStorage>();
 		
 		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   			Constants.ZONES_FILE_CSV);
+													   			Constants.GRID_DATA_FILE_CSV);
 		
 		log.info(".. done initializing GridBasedAccessibilityControlerListener!");
 	}
