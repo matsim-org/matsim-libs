@@ -46,28 +46,24 @@ import playground.benjamin.emissions.WarmEmissionHandler;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-//	final static String runNumber = "985";
-//	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-//	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
-//	static final Integer lastIteration = getLastIteration(configFile);
-//	
-//	static String eventsFile = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration + ".events.xml.gz";
-//	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-
-//	static String eventsFile = runDirectory + "ITERS/it.500/500.events.txt.gz";
-//	static String netFile = runDirectory + "output_network.xml.gz";
+	final static String runNumber = "981";
+	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+	static final Integer lastIteration = getLastIteration(configFile);
 	
-//	static String eventsFile = runDirectory + "ITERS/it.300/300.events.txt.gz";
-//	static String netFile = runDirectory + "output_network.xml.gz";
+	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
+	static String eventsFile = eventsPath + ".events.xml.gz";
+	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
+	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 	
-	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
-	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
-	
-	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
+//	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
+//	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
+//	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_1pct.xml.gz";
+//	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_1pct.xml.gz";
 	
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";

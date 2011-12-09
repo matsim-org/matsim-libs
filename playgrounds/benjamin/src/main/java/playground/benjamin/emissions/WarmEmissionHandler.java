@@ -143,6 +143,18 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		VehicleType vehicleType = vehicle.getType();
 		vehicleInformation = vehicleType.getId().toString();
 
+		
+		double linkLength_km = linkLength / 1000;
+		double travelTime_h = travelTime / 3600;
+		double freeFlowSpeed_kmh = freeVelocity * 3.6;
+		double averageSpeed_kmh = linkLength_km / travelTime_h;
+		if (averageSpeed_kmh > freeFlowSpeed_kmh){
+			logger.info("departureTime_h: " + this.agentdeparture.get(personId).getSecond() / 3600);
+			logger.info("arrivalTime_h: " + this.agentarrival.get(personId).getSecond() / 3600);
+			logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
+			throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
+		}
+		
 		warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 				linkId,
 				personId,
