@@ -29,7 +29,7 @@ public class DemandGenerator
 {
     private static final Logger log = Logger.getLogger(DemandGenerator.class);
 
-    private Uniform uniform = new Uniform(new MersenneTwister(new Date()));
+    protected Uniform uniform = new Uniform(new MersenneTwister());
 
     Scenario scenario;
     private PopulationFactory pf;

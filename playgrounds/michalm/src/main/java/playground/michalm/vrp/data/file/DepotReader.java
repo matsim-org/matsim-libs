@@ -97,7 +97,7 @@ public class DepotReader
 
         int t0 = getInt(atts, "t0", 0);
         int t1 = getInt(atts, "t1", 86400); // default: 24 * 3600
-        int tLimit = getInt(atts, "tLimit", 86400); // default: 24 * 3600
+        int tLimit = getInt(atts, "tLimit", t1 - t0); // default: t1-t0
 
         vehicles.add(new VehicleImpl(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }
