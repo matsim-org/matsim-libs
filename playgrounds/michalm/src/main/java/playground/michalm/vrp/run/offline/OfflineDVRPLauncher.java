@@ -12,11 +12,15 @@ import org.matsim.core.scenario.*;
 
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
+import pl.poznan.put.vrp.cvrp.data.*;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.file.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.evolutionary.*;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
 import playground.michalm.vrp.data.*;
@@ -151,7 +155,11 @@ public class OfflineDVRPLauncher
         // ================================================== ABOVE: only for comparison reasons...
 
         // now can run the optimizer or simulated optimizer...
-        Simulator simulator = new Simulator(vrpData, vrpDirName, algParamsFileName, 24 * 60 * 60);
+        
+        VRPOptimizer optimizer = new EvolutionaryVRPOptimizer(new AlgorithmParams(new File(dirName
+                + "\\" + algParamsFileName)), data.getVrpData());
+
+        DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60, optimizer);
 
         // simulator.addListener(new ConsoleSimulationListener());
 
@@ -159,14 +167,14 @@ public class OfflineDVRPLauncher
         new File(vrpOutDirName).mkdir();
 
         if (VRP_OUT_FILES) {
-            simulator.addOptimizerListener(new ChartFileSimulationListener(new ChartCreator() {
+            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
-            simulator.addOptimizerListener(new ChartFileSimulationListener(new ChartCreator() {
+            optimizer.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);

@@ -18,12 +18,12 @@ public class TaxiModeDepartureHandler
     private static final String TAXI_MODE = "taxi";
 
     private MATSimVRPData data;
-    private VRPSimEngine vrpEngine;
+    private TaxiSimEngine taxiSimEngine;
 
 
-    public TaxiModeDepartureHandler(VRPSimEngine vrpEngine, MATSimVRPData data)
+    public TaxiModeDepartureHandler(TaxiSimEngine taxiSimEngine, MATSimVRPData data)
     {
-        this.vrpEngine = vrpEngine;
+        this.taxiSimEngine = taxiSimEngine;
         this.data = data;
     }
 
@@ -60,14 +60,13 @@ public class TaxiModeDepartureHandler
             customers.add(customer);
             requests.add(request);
 
-            vrpEngine.getMobsim().registerAdditionalAgentOnLink(agent);
-            vrpEngine.taxiRequestSubmitted(request, now);
-
+            taxiSimEngine.getMobsim().registerAdditionalAgentOnLink(agent);
+            taxiSimEngine.taxiRequestSubmitted(request, now);
+            
             return true;
         }
         else {
             return false;
         }
     }
-
 }

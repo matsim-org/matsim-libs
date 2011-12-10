@@ -1,7 +1,6 @@
 package playground.michalm.vrp.run.online;
 
 import java.io.*;
-import java.util.*;
 
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
@@ -29,8 +28,8 @@ import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.simulator.*;
 import playground.michalm.util.gis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
@@ -47,7 +46,6 @@ public class SingleIterOnlineDVRPLauncher
     private String netFileName;
     private String plansFileName;
     private String depotsFileName;
-    private boolean otfVis;
     private boolean vrpOutFiles;
     private String vrpOutDirName;
 
@@ -63,38 +61,27 @@ public class SingleIterOnlineDVRPLauncher
     private PersonalizableTravelTime ttimeCalc;
     private PersonalizableTravelCost tcostCalc;
 
+    private boolean otfVis;
     public static OTFQueryControl queryControl;
 
 
-    public void processArgs(String... args)
+    private void processArgs()
     {
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\mielec\\";
-            netFileName = dirName + "network.xml";
-            plansFileName = dirName + "plans.xml";
-            depotsFileName = dirName + "depots.xml";
-            otfVis = !true;
-        }
-        else if (args.length == 5) {
-            dirName = args[0];
-            netFileName = dirName + args[1];
-            plansFileName = dirName + args[2];
-            depotsFileName = dirName + args[3];
-            otfVis = Boolean.parseBoolean(args[4]);
-        }
-        else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
-        }
-
-        vrpOutFiles = !true;
-        vrpOutDirName = dirName + "\\vrp_output";
-        new File(vrpOutDirName).mkdir();
+        dirName = "D:\\PP-rad\\taxi\\mielec\\";
+        netFileName = dirName + "network.xml";
+        plansFileName = dirName + "plans.xml";
+        depotsFileName = dirName + "depots.xml";
 
         travelTimesFromEvents = true;
         eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
         optimisticOptimizer = !true;
+
+        otfVis = !true;
+
+        vrpOutFiles = !true;
+        vrpOutDirName = dirName + "\\vrp_output";
+        new File(vrpOutDirName).mkdir();
     }
 
 
@@ -159,7 +146,7 @@ public class SingleIterOnlineDVRPLauncher
     }
 
 
-    private void runQSim()
+    private void runSim()
     {
         QSimConfigGroup qSimConfig = new QSimConfigGroup();
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
@@ -169,22 +156,22 @@ public class SingleIterOnlineDVRPLauncher
 
         QSim sim = new QSim(scenario, events, new DefaultQSimEngineFactory());
 
-        VRPSimEngine vrpSimEngine = new VRPSimEngine(sim, data.getVrpData(), optimizerFactory);
-        sim.addMobsimEngine(vrpSimEngine);
+        TaxiSimEngine taxiSimEngine = new TaxiSimEngine(sim, data.getVrpData(), optimizerFactory);
+        sim.addMobsimEngine(taxiSimEngine);
         sim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(sim), sim));
-        sim.addAgentSource(new TaxiAgentSource(data, vrpSimEngine));
-        sim.addDepartureHandler(new TaxiModeDepartureHandler(vrpSimEngine, data));
+        sim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
+        sim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
         if (vrpOutFiles) {
-            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+            taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return RouteChartUtils.chartRoutesByStatus(data);
                 }
             }, OutputType.PNG, vrpOutDirName + "\\routes_", 800, 800));
 
-            vrpSimEngine.addListener(new ChartFileSimulationListener(new ChartCreator() {
+            taxiSimEngine.addListener(new ChartFileOptimizerListener(new ChartCreator() {
                 public JFreeChart createChart(VRPData data)
                 {
                     return ScheduleChartUtils.chartSchedule(data);
@@ -216,14 +203,14 @@ public class SingleIterOnlineDVRPLauncher
     }
 
 
-    public void go(String... args)
+    private void go()
         throws IOException
     {
-        processArgs(args);
+        processArgs();
         prepareMATSimData();
         initMATSimVRPData();
         initOptimizerFactory();
-        runQSim();
+        runSim();
         generateVrpOutput();
     }
 
@@ -231,6 +218,6 @@ public class SingleIterOnlineDVRPLauncher
     public static void main(String... args)
         throws IOException
     {
-        new SingleIterOnlineDVRPLauncher().go(args);
+        new SingleIterOnlineDVRPLauncher().go();
     }
 }

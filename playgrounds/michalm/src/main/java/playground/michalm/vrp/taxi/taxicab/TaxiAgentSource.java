@@ -7,7 +7,6 @@ import org.matsim.core.mobsim.framework.*;
 import org.matsim.ptproject.qsim.*;
 import org.matsim.vehicles.*;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.*;
@@ -20,20 +19,20 @@ public class TaxiAgentSource
     implements AgentSource
 {
     private MATSimVRPData data;
-    private VRPSimEngine vrpSimEngine;
+    private TaxiSimEngine taxiSimEngine;
     private boolean isAgentWithPlan;
 
 
-    public TaxiAgentSource(MATSimVRPData data, VRPSimEngine vrpSimEngine)
+    public TaxiAgentSource(MATSimVRPData data, TaxiSimEngine vrpSimEngine)
     {
         this(data, vrpSimEngine, false);
     }
 
 
-    public TaxiAgentSource(MATSimVRPData data, VRPSimEngine vrpSimEngine, boolean isAgentWithPlan)
+    public TaxiAgentSource(MATSimVRPData data, TaxiSimEngine taxiSimEngine, boolean isAgentWithPlan)
     {
         this.data = data;
-        this.vrpSimEngine = vrpSimEngine;
+        this.taxiSimEngine = taxiSimEngine;
         this.isAgentWithPlan = isAgentWithPlan;
     }
 
@@ -41,19 +40,19 @@ public class TaxiAgentSource
     @Override
     public List<MobsimAgent> insertAgentsIntoMobsim()
     {
-        QSim qSim = (QSim)vrpSimEngine.getMobsim();
+        QSim qSim = (QSim)taxiSimEngine.getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
         List<MobsimAgent> taxiAgents = new ArrayList<MobsimAgent>(vehicles.size());
 
         for (Vehicle vrpVeh : vehicles) {
             TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph()
-                    .getShortestPaths(), vrpSimEngine);
-            vrpSimEngine.addAgentLogic(taxiAgentLogic);
+                    .getShortestPaths(), taxiSimEngine);
+            taxiSimEngine.addAgentLogic(taxiAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MATSimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId, vrpSimEngine.getMobsim(),
+            DynAgent taxiAgent = new DynAgent(id, startLinkId, taxiSimEngine.getMobsim(),
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {

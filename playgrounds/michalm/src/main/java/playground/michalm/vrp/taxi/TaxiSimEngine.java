@@ -11,12 +11,13 @@ import org.matsim.vis.otfvis.opengl.queries.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
+import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.taxi.taxicab.*;
 
 
-public class VRPSimEngine
+public class TaxiSimEngine
     implements MobsimEngine
 {
     private VRPData vrpData;
@@ -36,7 +37,7 @@ public class VRPSimEngine
 		this.internalInterface = internalInterface ;
 	}
 
-    public VRPSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
+    public TaxiSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
     {
         this.netsim = netsim;
         this.optimizerFactory = optimizerFactory;

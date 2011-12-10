@@ -28,6 +28,8 @@ public class VRPSchedulePlan
 
     private List<PlanElement> actsLegs;
     private List<PlanElement> unmodifiableActsLegs;
+    
+    private Person person;
 
 
     public VRPSchedulePlan(Vehicle vehicle, MATSimVRPData data)
@@ -174,7 +176,7 @@ public class VRPSchedulePlan
     @Override
     public Person getPerson()
     {
-        return null;
+        return person;
     }
 
 
@@ -209,6 +211,6 @@ public class VRPSchedulePlan
     @Override
     public void setPerson(Person person)
     {
-        throw new UnsupportedOperationException("This plan is read-only");
+        this.person = person;
     }
 }

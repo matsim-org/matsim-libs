@@ -19,7 +19,7 @@ import playground.michalm.vrp.taxi.*;
 public class TaxiAgentLogic
     implements DynAgentLogic
 {
-    private VRPSimEngine vrpSimEngine;
+    private TaxiSimEngine taxiSimEngine;
     private ShortestPath[][] shortestPaths;
 
     private Vehicle vrpVehicle;
@@ -29,11 +29,11 @@ public class TaxiAgentLogic
 
 
     public TaxiAgentLogic(Vehicle vrpVehicle, ShortestPath[][] shortestPaths,
-            VRPSimEngine vrpSimEngine)
+            TaxiSimEngine taxiSimEngine)
     {
         this.vrpVehicle = vrpVehicle;
         this.shortestPaths = shortestPaths;
-        this.vrpSimEngine = vrpSimEngine;
+        this.taxiSimEngine = taxiSimEngine;
     }
 
 
@@ -82,8 +82,8 @@ public class TaxiAgentLogic
         int time = (int)now;
 
         if (status == ScheduleStatus.STARTED) {
-            vrpSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
-            vrpSimEngine.optimize(now);//TODO: this may be optional (depending on the algorithm) 
+            taxiSimEngine.updateScheduleBeforeNextTask(vrpVehicle, now);
+            taxiSimEngine.optimize(now);// TODO: this may be optional (depending on the algorithm)
         }
 
         Task task = schedule.nextTask();
@@ -185,14 +185,14 @@ public class TaxiAgentLogic
             throw new IllegalStateException("Passanger and taxi on different links!");
         }
 
-        if (vrpSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),
+        if (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),
                 currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()
                     + "is not waiting for taxi");
         }
 
         // event handling
-        EventsManager events = vrpSimEngine.getMobsim().getEventsManager();
+        EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
         EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
         events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
                 agent.getId(), agent.getId()));
@@ -218,7 +218,7 @@ public class TaxiAgentLogic
                 MobsimAgent passenger = ((TaxiCustomer)request.getCustomer()).getPassanger();
 
                 // deliver the passenger
-                EventsManager events = vrpSimEngine.getMobsim().getEventsManager();
+                EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
                 EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
                         agent.getId(), agent.getId()));
