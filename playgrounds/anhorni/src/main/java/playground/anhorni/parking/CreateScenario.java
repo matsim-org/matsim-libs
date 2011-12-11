@@ -20,8 +20,12 @@
 package playground.anhorni.parking;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -147,25 +151,76 @@ public class CreateScenario {
 	private void writePopulation(String file) {
 		LinkedList<Agent> agents = new LinkedList<Agent>();	
 		
-		for (int i = 1; i <= 10; i++) {
+		
+		int cnt = -1;
+		for (int i = 1; i <= 2; i++) {
 			// Agent(Id id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway)
 			
-			// parking agent
-			String routeTo = "-1 0";
+			// agent from bottom left
+			cnt++;
+			List<Integer> routeTo = new Vector<Integer>();
+			routeTo.add(-1);
+			routeTo.add(0);
 			int stepsPerSide = (int)(sideLength/ spacing);
 			for (int ii = 1; ii <= stepsPerSide / 2; ii++) {
-				routeTo = routeTo + " " + Integer.toString((ii - 1) * (stepsPerSide + 1) + ii);
-				routeTo = routeTo + " " + Integer.toString(ii * (stepsPerSide + 1) + ii);
+				routeTo.add((ii - 1) * (stepsPerSide + 1) + ii);
+				routeTo.add((ii * (stepsPerSide + 1) + ii));
 			}
-			String routeAway = "9999999"; 
-			for (int ii = stepsPerSide; ii > stepsPerSide / 2; ii--) {
-				routeAway = Integer.toString(ii * (stepsPerSide + 1) + ii) + " " + routeAway ;
-				routeAway = Integer.toString((ii - 1) * (stepsPerSide + 1) + ii) + " " + routeAway ;
-			}
-			routeAway = Integer.toString(stepsPerSide / 2 * (stepsPerSide + 1) + stepsPerSide / 2) + " " + routeAway ; 
-			Agent agent = new Agent(new IdImpl(i), i * 10.0, routeTo, "s", 30.0 * 60.0, routeAway);	
-			agents.add(agent);
+			String routeToString = routeTo.toString();
+			routeToString = StringUtils.remove(routeToString, ',' );
+			routeToString = StringUtils.remove(routeToString, '[' );
+			routeToString = StringUtils.remove(routeToString, ']' );
 			
+			List<Integer> routeAway = new Vector<Integer>();
+			routeAway.add(9999999); 
+			for (int ii = stepsPerSide; ii > stepsPerSide / 2; ii--) {
+				routeAway.add(ii * (stepsPerSide + 1) + ii);
+				routeAway.add((ii - 1) * (stepsPerSide + 1) + ii) ;
+			}
+			routeAway.add((stepsPerSide / 2 * (stepsPerSide + 1) + stepsPerSide / 2)); 
+			
+			Collections.reverse(routeAway);
+			String routeAwayString = routeAway.toString();
+			routeAwayString = StringUtils.remove(routeAwayString, ',' );
+			routeAwayString = StringUtils.remove(routeAwayString, '[' );
+			routeAwayString = StringUtils.remove(routeAwayString, ']' );
+ 
+			Agent agent0 = new Agent(new IdImpl(cnt), cnt * 5, routeToString, "s", 30.0 * 60.0, routeAwayString);	
+			agents.add(agent0);
+			
+			
+			// agent from bottom left
+			cnt++;
+			routeTo = new Vector<Integer>();
+			routeTo.add(-1);
+			routeTo.add(0);
+			for (int ii = 1; ii <= stepsPerSide / 2; ii++) {
+				routeTo.add((ii - 1) * (stepsPerSide + 1) + ii);
+				routeTo.add((ii * (stepsPerSide + 1) + ii));
+			}
+			Collections.reverse(routeTo);
+			routeToString = routeTo.toString();
+			routeToString = StringUtils.remove(routeToString, ',' );
+			routeToString = StringUtils.remove(routeToString, '[' );
+			routeToString = StringUtils.remove(routeToString, ']' );
+			
+			routeAway = new Vector<Integer>();
+			routeAway.add(9999999); 
+			for (int ii = stepsPerSide; ii > stepsPerSide / 2; ii--) {
+				routeAway.add(ii * (stepsPerSide + 1) + ii);
+				routeAway.add((ii - 1) * (stepsPerSide + 1) + ii) ;
+			}
+			routeAway.add((stepsPerSide / 2 * (stepsPerSide + 1) + stepsPerSide / 2)); 
+			
+			routeAwayString = routeAway.toString();
+			routeAwayString = StringUtils.remove(routeAwayString, ',' );
+			routeAwayString = StringUtils.remove(routeAwayString, '[' );
+			routeAwayString = StringUtils.remove(routeAwayString, ']' );
+ 
+			Agent agent1 = new Agent(new IdImpl(cnt), cnt * 5.0, routeAwayString, "s", 30.0 * 60.0, routeToString);	
+			agents.add(agent1);
+			
+						
 			// transit agent
 			// ...
 		}		
@@ -185,9 +240,9 @@ public class CreateScenario {
 		int cnt = 0;
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {	
 			// only use every 2nd link
-			if (cnt % 2 == 0) {
+			//if (cnt % 2 == 0) {
 				list.add(this.getParkingString("sp-" + cnt, link.getCoord().getX(), link.getCoord().getY(), capacity));
-			}
+			//}
 			cnt++;
 		}				
 		list.add("</parkinglots>");
