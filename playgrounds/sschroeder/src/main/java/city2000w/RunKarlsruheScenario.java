@@ -16,6 +16,7 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
 import org.matsim.contrib.freight.trade.Service;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
@@ -149,7 +150,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void createCarrierPlans() {
 		for(Carrier carrier : carriers.getCarriers().values()){
-			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
@@ -185,7 +186,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		for(Carrier carrier : carriers.getCarriers().values()){
 			if(!carrier.getNewContracts().isEmpty()){
 				logger.info("hohohohoh. obviously, i have to plan a new contract");
-				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);
@@ -193,7 +194,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 			}
 			if(!carrier.getExpiredContracts().isEmpty()){
 				logger.info("outsch. a contract was canceled and i must adapt my plan");
-				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);

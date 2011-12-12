@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.vrp.VRPSolver;
 import org.matsim.contrib.freight.vrp.VRPSolverFactory;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +80,10 @@ public class RRWithTimeClusterCarrierPlanBuilder {
 				continue;
 			}
 			Map<CarrierShipment,Collection<CarrierShipment>> aggregatedShipments = greedyShipmentAggregator.aggregateShipments(shipments);
-			VRPSolver vrpSolver = solverFactory.createSolver(aggregatedShipments.keySet(), carrierCapabilities.getCarrierVehicles(), network);
+			CrowFlyCosts crowFlyDistance = new CrowFlyCosts();
+			crowFlyDistance.speed = 18;
+			crowFlyDistance.detourFactor = 1.2;
+			VRPSolver vrpSolver = solverFactory.createSolver(aggregatedShipments.keySet(), carrierCapabilities.getCarrierVehicles(), network, crowFlyDistance);
 			Collection<Tour> tours = vrpSolver.solve();
 			Collection<ScheduledTour> myScheduledTours = tourScheduler.getScheduledTours(tours, aggregatedShipments);
 			scheduledTours.addAll(myScheduledTours);

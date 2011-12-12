@@ -1,6 +1,10 @@
 package org.matsim.contrib.freight.vrp;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -13,11 +17,9 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
-import org.matsim.contrib.freight.vrp.ShipmentBasedSingleDepotVRPSolver;
-import org.matsim.contrib.freight.vrp.VRPSolver;
-import org.matsim.contrib.freight.vrp.VRPSolverFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityConstraint;
+import org.matsim.contrib.freight.vrp.api.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;
@@ -27,18 +29,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 public class RRSingleDepotVRPSolverTest extends TestCase{
 	
 	class MyVRPSolverFactory implements VRPSolverFactory{
 
 		@Override
-		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network) {
+		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 			ShipmentBasedSingleDepotVRPSolver solver = new ShipmentBasedSingleDepotVRPSolver(shipments, carrierVehicles, network);
-			CrowFlyCosts costs = new CrowFlyCosts();
-			costs.speed = 1;
 			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
@@ -56,12 +53,17 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 	Collection<CarrierShipment> shipments;
 	
 	Scenario scenario;
+
+	private CrowFlyCosts costs;
 	
 	public void setUp(){
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
 		shipments = new ArrayList<CarrierShipment>();
 		vehicles = new ArrayList<CarrierVehicle>();
+		costs = new CrowFlyCosts();
+		costs.speed = 18;
+		costs.detourFactor = 1.2;
 		createTestNetwork();
 		RandomNumberGeneration.reset();
 	}
@@ -99,14 +101,14 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("vehicleLocation"));
 		vehicle.setCapacity(10);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		assertTrue(tours.isEmpty());
 	}
 	
 	public void testSolveWithNoVehicles(){
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation","customerLocation",20));
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		assertTrue(tours.isEmpty());
 	}
 	
@@ -118,7 +120,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		assertEquals(1, tours.size());
 	}
 	
@@ -130,7 +132,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getStartLinkId(), makeId("1"));
 		assertEquals(tour.getEndLinkId(), makeId("1"));
@@ -144,7 +146,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getShipments().size(), 2);
 	}
@@ -157,7 +159,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getTourElements().size(), 4);
 	}
@@ -170,7 +172,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getTourElements().get(0).getClass(),Pickup.class);
 		assertEquals(tour.getTourElements().get(0).getLocation(),makeId("1"));
@@ -190,7 +192,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getTourElements().get(0).getClass(),Pickup.class);
 		assertEquals(tour.getTourElements().get(0).getLocation(),makeId("3"));
@@ -209,7 +211,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getTourElements().get(0).getClass(),Pickup.class);
 		assertEquals(tour.getTourElements().get(0).getLocation(),makeId("2"));
@@ -225,7 +227,7 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		CarrierVehicle vehicle = new CarrierVehicle(makeId("vehicle"), makeId("1"));
 		vehicle.setCapacity(20);
 		vehicles.add(vehicle);
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork()).solve();
+		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
 		Tour tour = tours.iterator().next();
 		assertEquals(tour.getTourElements().get(0).getClass(),Pickup.class);
 		assertEquals(tour.getTourElements().get(0).getLocation(),makeId("2"));

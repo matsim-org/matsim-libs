@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+  ~ /* *********************************************************************** *
+  ~  * project: org.matsim.*
+  ~  * ${file_name}
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  * copyright       : (C) ${year} by the members listed in the COPYING,        *
+  ~  *                   LICENSE and WARRANTY file.                            *
+  ~  * email           : info at matsim dot org                                *
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  *   This program is free software; you can redistribute it and/or modify  *
+  ~  *   it under the terms of the GNU General Public License as published by  *
+  ~  *   the Free Software Foundation; either version 2 of the License, or     *
+  ~  *   (at your option) any later version.                                   *
+  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
+  ~  *                                                                         *
+  ~  * *********************************************************************** */
+  ~
+  ~ ${filecomment}
+  ~ ${package_declaration}
+  ~
+  ~ ${typecomment}
+  ~ ${type_declaration}
+  -->
+
+<carriers>
+		<carrier id="carrier1" linkId="1">
+			<vehicles>
+				<vehicle id="vehicle_c1" linkId="1" cap="30"/>
+			</vehicles>
+			<shipments>
+				<shipment id="s1" from="6" to="22" size="10" startPickup="21660.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0"/>
+				<shipment id="s2" from="21" to="22" size="10" startPickup="21660.0" endPickup="72000.0" startDelivery="0.0" endDelivery="72000.0"/>
+			</shipments>
+<!-- 			<tours> -->
+<!-- 				<tour vehicleId="vehicle_c1" linkId="1" start="21660.0"> -->
+<!-- 					<act type="start" /> -->
+<!-- 					<act type="pickup" shipmentId="s1"/> -->
+<!-- 					<act type="delivery" shipmentId="s1"/> -->
+<!-- 					<act type="pickup" shipmentId="s2"/> -->
+<!-- 					<act type="delivery" shipmentId="s2"/> -->
+<!-- 					<act type="end"/> -->
+<!-- 				</tour> -->
+<!-- 			</tours> -->
+		</carrier>
+	</carriers>

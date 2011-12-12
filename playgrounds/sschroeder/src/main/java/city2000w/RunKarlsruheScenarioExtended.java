@@ -17,6 +17,7 @@ import org.matsim.contrib.freight.replanning.PlanStrategyManager;
 import org.matsim.contrib.freight.replanning.ReRouteVehicles;
 import org.matsim.contrib.freight.vrp.RRPDTWSolverFactory;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
@@ -189,8 +190,10 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 	}
 
 	private void createInitialCarrierPlans() {
+
+		CrowFlyCosts costs = new CrowFlyCosts();
 		for(Carrier carrier : carriers.getCarriers().values()){
-			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork());
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), costs);
 			planBuilder.setVrpSolverFactory(new RRPDTWSolverFactory());
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);
@@ -257,12 +260,13 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 	}
 
 	private void replanCarrier() {
+		CrowFlyCosts costs = new CrowFlyCosts();
 		CarrierPlanStrategy planStrat = new CarrierPlanStrategy();
-		CarrierContractLandscapeChangedResponder contractChangedResponder = new CarrierContractLandscapeChangedResponder(scenario.getNetwork(),new RRPDTWSolverFactory());
+		CarrierContractLandscapeChangedResponder contractChangedResponder = new CarrierContractLandscapeChangedResponder(scenario.getNetwork(), costs, new RRPDTWSolverFactory());
 		planStrat.addModule(contractChangedResponder);
 		CarrierPlanStrategy planStrat2 = new CarrierPlanStrategy();
 		planStrat2.addModule(contractChangedResponder);
-		planStrat2.addModule(new ReRouteVehicles(scenario.getNetwork(), new RRPDTWSolverFactory()));
+		planStrat2.addModule(new ReRouteVehicles(scenario.getNetwork(), costs, new RRPDTWSolverFactory()));
 		
 		PlanStrategyManager<Carrier> stratManager = new PlanStrategyManager<Carrier>();
 		stratManager.addStrategy(planStrat, 0.5);

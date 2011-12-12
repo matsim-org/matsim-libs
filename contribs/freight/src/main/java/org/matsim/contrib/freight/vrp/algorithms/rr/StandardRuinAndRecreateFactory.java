@@ -82,7 +82,6 @@ public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 		ruinAndRecreateAlgo.setRuinStrategyManager(new RuinStrategyManager());
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
-		recreationStrategy.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		

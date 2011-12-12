@@ -64,7 +64,6 @@ public class BestInsertionTest extends VRPTestCase{
 		makeSolutionWithoutC1andC2();
 		
 		bestInsertion = new BestInsertion(vrp);
-		bestInsertion.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		bestInsertion.setTourAgentFactory(new RRTourAgentFactory(vrp));
 		
 		shipmentWithoutService = new ArrayList<Shipment>();

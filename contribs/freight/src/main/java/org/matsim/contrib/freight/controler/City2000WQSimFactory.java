@@ -28,6 +28,8 @@
 
 package org.matsim.contrib.freight.controler;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -37,13 +39,13 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-
-import java.util.Collection;
+import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -78,6 +80,8 @@ public class City2000WQSimFactory implements MobsimFactory {
             final QSim sim = QSim.createQSimAndAddAgentSource(sc, eventsManager, new DefaultQSimEngineFactory());
             Collection<Plan> plans = carrierAgentTracker.createPlans();
             sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim), sim));
+//            OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, sim);
+//    		OTFClientLive.run(sc.getConfig(), server);
 			return sim;
 		}
     }

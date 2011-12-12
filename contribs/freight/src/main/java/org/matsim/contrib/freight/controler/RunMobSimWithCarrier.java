@@ -29,23 +29,39 @@
 package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanReader;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.mobsim.PickupAndDeliveryConsoleWriter;
 import org.matsim.contrib.freight.mobsim.SimpleCarrierAgentFactory;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategy;
+import org.matsim.contrib.freight.replanning.PlanStrategyManager;
+import org.matsim.contrib.freight.replanning.ReRouteVehicles;
+import org.matsim.contrib.freight.vrp.RRPDTWSolverFactory;
+import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.api.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 
-public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener {
+public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener {
 
     private static Logger logger = Logger.getLogger(RunMobSimWithCarrier.class);
 
@@ -68,6 +84,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		SimpleCarrierAgentFactory agentFactory = new SimpleCarrierAgentFactory();
 		agentFactory.setRouter(router);
 		carrierAgentTracker = new CarrierAgentTracker(carriers, router, event.getControler().getNetwork(), agentFactory);
+		carrierAgentTracker.getEventsManager().addHandler(new PickupAndDeliveryConsoleWriter());
         City2000WQSimFactory mobsimFactory = new City2000WQSimFactory(carrierAgentTracker);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
@@ -83,6 +100,63 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
     @Override
 	public void notifyScoring(ScoringEvent event) {
 		carrierAgentTracker.calculateCosts();
+	}
+
+	@Override
+	public void notifyReplanning(final ReplanningEvent event) {
+		CarrierPlanStrategy planStrat2 = new CarrierPlanStrategy();
+//		CrowFlyCosts crowFlyDistance = new CrowFlyCosts();
+//		crowFlyDistance.speed = 18;
+//		crowFlyDistance.detourFactor = 1.2;
+		
+		final LeastCostPathCalculator router = event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(event.getControler().getScenario().getNetwork(), event.getControler().createTravelCostCalculator(), event.getControler().getTravelTimeCalculator());
+		
+		
+		Costs costs = new Costs() {
+
+			@Override
+			public Double getGeneralizedCost(Node from, Node to, double time) {
+				Id fromLinkId = new IdImpl(from.getId());
+				Id toLinkId = new IdImpl(to.getId());
+				Network network = event.getControler().getNetwork();
+				Link fromLink = network.getLinks().get(fromLinkId);
+				Link toLink = network.getLinks().get(toLinkId);
+				Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
+				return path.travelCost;
+			}
+
+			@Override
+			public Double getDistance(Node from, Node to, double time) {
+				Id fromLinkId = new IdImpl(from.getId());
+				Id toLinkId = new IdImpl(to.getId());
+				Network network = event.getControler().getNetwork();
+				Link fromLink = network.getLinks().get(fromLinkId);
+				Link toLink = network.getLinks().get(toLinkId);
+				Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
+				return path.travelCost;
+			}
+
+			@Override
+			public Double getTransportTime(Node from, Node to, double time) {
+				Id fromLinkId = new IdImpl(from.getId());
+				Id toLinkId = new IdImpl(to.getId());
+				Network network = event.getControler().getNetwork();
+				Link fromLink = network.getLinks().get(fromLinkId);
+				Link toLink = network.getLinks().get(toLinkId);
+				Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
+				return path.travelTime;
+			}
+			
+		};
+		
+		planStrat2.addModule(new ReRouteVehicles(event.getControler().getNetwork(), costs, new RRPDTWSolverFactory()));
+		
+		PlanStrategyManager<Carrier> stratManager = new PlanStrategyManager<Carrier>();
+		stratManager.addStrategy(planStrat2, 1.0);
+		
+		for(Carrier carrier : carriers.getCarriers().values()){
+			stratManager.nextStrategy().run(carrier);
+		}
 	}
 
 }

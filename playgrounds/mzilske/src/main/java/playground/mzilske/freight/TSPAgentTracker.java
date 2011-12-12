@@ -19,12 +19,13 @@ import org.matsim.contrib.freight.carrier.Shipment;
 import playground.mzilske.freight.api.TSPAgentFactory;
 import playground.mzilske.freight.events.QueryTSPOffersEvent;
 import playground.mzilske.freight.events.QueryTSPOffersEventHandler;
-import playground.mzilske.freight.events.ShipmentDeliveredEventHandler;
-import playground.mzilske.freight.events.ShipmentPickedUpEventHandler;
 import playground.mzilske.freight.events.ShipperTSPContractAcceptEvent;
 import playground.mzilske.freight.events.ShipperTSPContractAcceptEventHandler;
 import playground.mzilske.freight.events.ShipperTSPContractCanceledEvent;
 import playground.mzilske.freight.events.ShipperTSPContractCanceledEventHandler;
+
+import org.matsim.contrib.freight.events.ShipmentDeliveredEventHandler;
+import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
 import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
 import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEventHandler;
 import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
@@ -127,11 +128,6 @@ public class TSPAgentTracker implements ShipmentPickedUpEventHandler, ShipmentDe
 		eventsManager.processEvent(event);
 	}
 
-	@Override
-	public void finish() {
-		
-		
-	}
 
 	@Override
 	public void reset(int iteration) {

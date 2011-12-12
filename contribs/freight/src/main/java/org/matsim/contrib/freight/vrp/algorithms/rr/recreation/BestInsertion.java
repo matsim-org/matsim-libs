@@ -35,6 +35,7 @@ import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactory;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 
 
@@ -54,8 +55,6 @@ public class BestInsertion implements RecreationStrategy{
 	
 	private TourAgentFactory tourAgentFactory;
 	
-	private SingleDepotInitialSolutionFactory initialSolutionFactory;
-	
 	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
 	private Random random = RandomNumberGeneration.getRandom();
@@ -71,10 +70,6 @@ public class BestInsertion implements RecreationStrategy{
 	public BestInsertion(SingleDepotVRP vrp) {
 		super();
 		this.vrp = vrp;
-	}
-	
-	public void setInitialSolutionFactory(SingleDepotInitialSolutionFactory initialSolutionFactory) {
-		this.initialSolutionFactory = initialSolutionFactory;
 	}
 
 	public void setTourAgentFactory(TourAgentFactory tourAgentFactory) {
@@ -141,8 +136,8 @@ public class BestInsertion implements RecreationStrategy{
 	}
 
 	private TourAgent createTourAgent(Shipment shipmentWithoutService) {
-		Tour tour = initialSolutionFactory.createRoundTour(vrp, shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
-		Vehicle vehicle = initialSolutionFactory.createVehicle(vrp, tour);
+		Tour tour = VrpUtils.createRoundTour(vrp, shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
+		Vehicle vehicle = VrpUtils.createVehicle(vrp.getVehicleType());
 		TourAgent agent = tourAgentFactory.createTourAgent(tour, vehicle);
 		return agent;
 	}

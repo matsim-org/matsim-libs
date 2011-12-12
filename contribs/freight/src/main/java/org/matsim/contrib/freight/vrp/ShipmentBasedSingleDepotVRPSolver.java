@@ -250,15 +250,15 @@ public class ShipmentBasedSingleDepotVRPSolver implements VRPSolver{
 	}
 
 	private void addShipmentToVRP(CarrierShipment s,MatSimSingleDepotVRPBuilder vrpBuilder) {
-		if(s.getFrom().equals(depotLocation)){
-			vrpBuilder.addDeliveryFromDepotShipment(s);
-		}
-		else if(s.getTo().equals(depotLocation)){
-			vrpBuilder.addPickupForDepotShipment(s);
-		}
-		else{
+//		if(s.getFrom().equals(depotLocation)){
+//			vrpBuilder.addDeliveryFromDepotShipment(s);
+//		}
+//		else if(s.getTo().equals(depotLocation)){
+//			vrpBuilder.addPickupForDepotShipment(s);
+//		}
+//		else{
 			vrpBuilder.addEnRoutePickupAndDeliveryShipment(s);
-		}
+//		}
 	}
 
 	private Id makeDepotId() {

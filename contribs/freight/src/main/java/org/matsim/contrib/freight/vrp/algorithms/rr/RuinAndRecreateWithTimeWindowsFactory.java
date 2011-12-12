@@ -60,7 +60,6 @@ public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFac
 		
 		BestInsertion recreationStrategy = new BestInsertion(vrp);
 		recreationStrategy.setTourAgentFactory(tourAgentFactory);
-		recreationStrategy.setInitialSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
 		ruinAndRecreateAlgo.setRecreationStrategy(recreationStrategy);
 		
 		RadialRuin radialRuin = new RadialRuin(vrp);

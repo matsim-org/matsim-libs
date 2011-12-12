@@ -1,4 +1,4 @@
-package city2000w;
+package org.matsim.contrib.freight.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
@@ -9,7 +9,7 @@ import org.matsim.contrib.freight.events.ShipmentPickedUpEventHandler;
 public class PickupAndDeliveryConsoleWriter implements ShipmentPickedUpEventHandler, ShipmentDeliveredEventHandler{
 
 	private static Logger logger = Logger.getLogger(PickupAndDeliveryConsoleWriter.class);
-
+	
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub

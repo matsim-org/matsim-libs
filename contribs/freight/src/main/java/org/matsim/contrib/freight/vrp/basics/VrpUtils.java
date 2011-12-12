@@ -27,6 +27,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
 import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
 import org.matsim.contrib.freight.vrp.api.Customer;
 import org.matsim.contrib.freight.vrp.api.Node;
+import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
 import org.matsim.contrib.freight.vrp.api.VRP;
 
 
@@ -129,6 +130,13 @@ public class VrpUtils {
 		return new Tour();
 	}
 	
+	public static Tour createEmptyRoundTour(Customer depot){
+		Tour tour = createEmptyCustomerTour();
+		tour.getActivities().add(createTourActivity(depot));
+		tour.getActivities().add(createTourActivity(depot));
+		return tour;
+	}
+	
 	public static Solution copySolution(Solution solution, VRP vrp, TourAgentFactory tourAgentFactory){
 		List<TourAgent> agents = new ArrayList<TourAgent>();
 		for(TourAgent agent : solution.getTourAgents()){
@@ -174,6 +182,33 @@ public class VrpUtils {
 	
 	public static Relation createRelation(Customer customer){
 		return new Relation(customer);
+	}
+	
+	public static Tour createRoundTour(SingleDepotVRP vrp, Customer from, Customer to){
+		Tour tour = null;
+		Customer depot = vrp.getDepot();
+		if(vrp.getDepot().getId().equals(from.getId())){
+			tour = VrpUtils.createRoundTour(depot, to);
+		}
+		else if(vrp.getDepot().getId().equals(to.getId())){
+			tour = VrpUtils.createRoundTour(depot, from);
+		}
+		else {
+			tour = VrpUtils.createRoundTour(depot, from, to);
+		}
+		return tour;
+	}
+	
+	private static void assertNotNull(Vehicle vehicle) {
+		if(vehicle == null){
+			throw new IllegalStateException("vehicle is null. this cannot be");
+		}
+	}
+
+	private static void assertNotNull(String depotId) {
+		if(depotId == null){
+			throw new IllegalStateException("id null. this cannot be.");
+		}
 	}
 	
 }

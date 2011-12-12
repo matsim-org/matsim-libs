@@ -13,6 +13,8 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 
 public class VRPCarrierPlanBuilder {
 	
@@ -20,9 +22,11 @@ public class VRPCarrierPlanBuilder {
 	private Collection<CarrierContract> contracts;
 	private Network network;
 	private VRPSolverFactory vrpSolverFactory;
+	private Costs costs;
 
-	public VRPCarrierPlanBuilder(CarrierCapabilities caps,Collection<CarrierContract> contracts,Network network) {
+	public VRPCarrierPlanBuilder(CarrierCapabilities caps, Collection<CarrierContract> contracts, Network network, Costs costs) {
 		super();
+		this.costs = costs;
 		this.caps=caps;
 		this.contracts=contracts;
 		this.network=network;
@@ -39,7 +43,7 @@ public class VRPCarrierPlanBuilder {
 		if(contracts.isEmpty()){
 			return null;
 		}
-		VRPSolver vrpSolver = vrpSolverFactory.createSolver(getShipments(contracts), getVehicles(caps), network);
+		VRPSolver vrpSolver = vrpSolverFactory.createSolver(getShipments(contracts), getVehicles(caps), network, costs);
 		Collection<Tour> tours = vrpSolver.solve();
 		Collection<ScheduledTour> scheduledTours = makeScheduledTours(tours);
 		return new CarrierPlan(scheduledTours);

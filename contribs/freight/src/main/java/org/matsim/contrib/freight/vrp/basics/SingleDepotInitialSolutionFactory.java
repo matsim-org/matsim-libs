@@ -27,9 +27,5 @@ import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
 public interface SingleDepotInitialSolutionFactory {
 	
 	public Collection<Tour> createInitialSolution(SingleDepotVRP vrp);
-	
-	public Tour createRoundTour(SingleDepotVRP vrp, Customer from, Customer to);
-
-	public Vehicle createVehicle(SingleDepotVRP vrp, Tour tour);
 
 }
