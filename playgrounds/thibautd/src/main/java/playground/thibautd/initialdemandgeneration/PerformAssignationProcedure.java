@@ -41,6 +41,7 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MicroCensus;
 import playground.thibautd.initialdemandgeneration.microcensusdata.MzGroupsModule;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignActivityChains;
+import playground.thibautd.initialdemandgeneration.modules.PersonAssignAndNormalizeTimes;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignPrimaryActivities;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignShopLeisureLocations;
 import playground.thibautd.initialdemandgeneration.modules.PersonAssignToNetwork;
@@ -134,6 +135,8 @@ public class PerformAssignationProcedure {
 			algos.add( new PersonAssignPrimaryActivities(
 						knowledges,
 						facilities) );
+			// create desires structure (among other things)
+			algos.add( new PersonAssignAndNormalizeTimes() );
 			// finally, make facility / activity link information consistent
 			algos.add( new PersonAssignToNetwork(
 						scen.getNetwork(),
