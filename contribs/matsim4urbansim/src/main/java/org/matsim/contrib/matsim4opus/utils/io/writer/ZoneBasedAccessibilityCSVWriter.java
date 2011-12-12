@@ -23,7 +23,7 @@ public class ZoneBasedAccessibilityCSVWriter {
 			
 			// create header
 			accessibilityDataWriter.write( Constants.ERSA_ZONE_ID + "," +
-											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + ",");
+											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY);
 											// Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," +
 											// Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
 			accessibilityDataWriter.newLine();
@@ -50,7 +50,7 @@ public class ZoneBasedAccessibilityCSVWriter {
 		try{
 			assert(ZoneBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( zoneID + "," + 
-										   travelTimeAccessibility + ","); 
+										   travelTimeAccessibility); 
 										   // travelCostAccessibility + "," +
 										   // travelDistanceAccessibility );
 			accessibilityDataWriter.newLine();
