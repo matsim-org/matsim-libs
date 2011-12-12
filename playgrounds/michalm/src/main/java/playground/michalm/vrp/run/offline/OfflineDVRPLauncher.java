@@ -155,11 +155,12 @@ public class OfflineDVRPLauncher
         // ================================================== ABOVE: only for comparison reasons...
 
         // now can run the optimizer or simulated optimizer...
-        
+
         VRPOptimizer optimizer = new EvolutionaryVRPOptimizer(new AlgorithmParams(new File(dirName
                 + "\\" + algParamsFileName)), data.getVrpData());
 
-        DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60, optimizer);
+        DeterministicSimulator simulator = new DeterministicSimulator(vrpData, 24 * 60 * 60,
+                optimizer);
 
         // simulator.addListener(new ConsoleSimulationListener());
 
@@ -220,13 +221,13 @@ public class OfflineDVRPLauncher
             graph.setArcTimes(simulatedArcTimes);
 
             new ScheduleUpdater(vrpData).updateSchedule();
-            vrpData.evaluateVRP();
+            VRPEvaluation eval = new VRPEvaluator().evaluateVRP(vrpData);
 
             // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(vrpData));
             ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(vrpData));
 
             System.out.println("################################################");
-            DebugPrint.printDynamicData(vrpData);
+            DebugPrint.printDynamicData(vrpData, eval);
         }
 
         // ================================================== ABOVE: only for comparison reasons...

@@ -68,17 +68,17 @@ public class SingleIterOfflineDVRPLauncher
         AVG_TRAFFIC_MODE = false;
         STATIC_MODE = false;
 
-        dirName = "D:\\PP-rad\\taxi\\mielec\\";
+        dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
 
         travelTimesFromEvents = true;
-        eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
+        eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
-        optimisticOptimizer = true;
+        optimisticOptimizer = !true;
 
-        vrpOutFiles = true;
+        vrpOutFiles = !true;
         vrpOutDirName = dirName + "\\vrp_output";
         new File(vrpOutDirName).mkdir();
     }
@@ -192,7 +192,7 @@ public class SingleIterOfflineDVRPLauncher
     private void runSim()
         throws IOException
     {
-        VRPOptimizer optimizer = optimizerFactory.create(data.getVrpData());
+        TaxiOptimizer optimizer = optimizerFactory.create(data.getVrpData());
 
         DeterministicSimulator simulator = new DeterministicSimulator(data.getVrpData(),
                 24 * 60 * 60, optimizer, new Comparator<CustomerAction>() {
@@ -230,7 +230,7 @@ public class SingleIterOfflineDVRPLauncher
 
     private void generateVrpOutput()
     {
-        System.out.println(new VRPEvaluator().evaluateVRP(data.getVrpData()).toString());
+        System.out.println(new TaxiEvaluator().evaluateVRP(data.getVrpData()).toString());
 
         if (vrpOutFiles) {
             List<Vehicle> vehicles = data.getVrpData().getVehicles();

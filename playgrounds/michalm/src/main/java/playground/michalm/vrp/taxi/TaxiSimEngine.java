@@ -26,16 +26,20 @@ public class TaxiSimEngine
 
     private VRPOptimizerFactory optimizerFactory;
     private TaxiOptimizer optimizer;
+    private TaxiEvaluator taxiEvaluator = new TaxiEvaluator();
 
     private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
+    private InternalInterface internalInterface = null;
 
-	private InternalInterface internalInterface = null ;
-	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
-	}
+
+    @Override
+    public void setInternalInterface(InternalInterface internalInterface)
+    {
+        this.internalInterface = internalInterface;
+    }
+
 
     public TaxiSimEngine(Netsim netsim, VRPData data, VRPOptimizerFactory optimizerFactory)
     {
@@ -91,7 +95,8 @@ public class TaxiSimEngine
         System.err.println("Optimization @simTime=" + vrpData.getTime());
 
         notifyAgents();
-        notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData));
+        notifyOptimizerListeners(new OptimizerEvent((int)now, vrpData,
+                taxiEvaluator.evaluateVRP(vrpData)));
     }
 
 

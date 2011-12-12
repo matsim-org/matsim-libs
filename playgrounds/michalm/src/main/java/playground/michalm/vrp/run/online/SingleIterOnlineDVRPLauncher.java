@@ -67,13 +67,13 @@ public class SingleIterOnlineDVRPLauncher
 
     private void processArgs()
     {
-        dirName = "D:\\PP-rad\\taxi\\mielec\\";
+        dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
 
         travelTimesFromEvents = true;
-        eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
+        eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
         optimisticOptimizer = !true;
 
@@ -191,7 +191,7 @@ public class SingleIterOnlineDVRPLauncher
 
     private void generateVrpOutput()
     {
-        System.out.println(new VRPEvaluator().evaluateVRP(data.getVrpData()).toString());
+        System.out.println(new TaxiEvaluator().evaluateVRP(data.getVrpData()).toString());
 
         if (vrpOutFiles) {
             new Schedules2GIS(data.getVrpData().getVehicles(), data, vrpOutDirName + "\\route_")
