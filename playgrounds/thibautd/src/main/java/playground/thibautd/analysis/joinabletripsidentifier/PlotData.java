@@ -41,7 +41,6 @@ import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.Passenger
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.TripRecord;
-import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.charts.ChartsAxisUnifier;
 
@@ -54,8 +53,11 @@ public class PlotData {
 	private static final Logger log =
 		Logger.getLogger(PlotData.class);
 
+	// for lisibility, charts per distance with a maximal
+	// distance are produced. For Zürich, distances longer than 30km
+	// do not make sense due to the way the population is defined.
 	private static double LONGER_DIST = 25 * 1000;
-	private static double LONGER_DRIVER_DIST = 100 * 1000;
+	private static double LONGER_DRIVER_DIST = 25 * 1000;
 
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
