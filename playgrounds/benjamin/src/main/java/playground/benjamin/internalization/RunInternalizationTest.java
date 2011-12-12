@@ -60,7 +60,6 @@ public class RunInternalizationTest {
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
 	static boolean isUsingDetailedEmissionCalculation = false;
@@ -160,6 +159,9 @@ public class RunInternalizationTest {
 		for(int i=0; i<10; i++){
 			PersonImpl person = new PersonImpl (new IdImpl(i));
 			PlanImpl plan = person.createAndAddPlan(true);
+			ActivityImpl home = plan.createAndAddActivity("home", new IdImpl("11"));
+			home.setEndTime(6 * 3600);
+			
 			plan.createAndAddActivity("home", new IdImpl("11"));
 			
 			this.scenario.getPopulation().addPerson(person);

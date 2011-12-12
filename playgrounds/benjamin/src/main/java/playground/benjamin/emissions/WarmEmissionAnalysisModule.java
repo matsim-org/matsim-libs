@@ -21,6 +21,7 @@
  * *********************************************************************** */
 package playground.benjamin.emissions;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -56,16 +57,20 @@ public class WarmEmissionAnalysisModule {
 
 	private final EventsManager eventsManager;
 
+
+
 	private static int vehAttributesNotSpecifiedCnt = 0;
 	private static int maxWarnCnt = 3;
 	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
 	private static Set<Id> vehicleIdSet = new HashSet<Id>();
 
+	static int freeFlowCounter = 0;
 	static int stopGoCounter = 0;
 	static int fractionCounter = 0;
 	static int emissionEventCounter = 0;
 	
 	static double kmCounter = 0.0;
+	static double freeFlowKmCounter = 0.0;
 	static double stopGoKmCounter = 0.0;
 
 	public WarmEmissionAnalysisModule(
@@ -181,24 +186,31 @@ public class WarmEmissionAnalysisModule {
 
 			double linkLength_km = linkLength / 1000;
 			double travelTime_h = travelTime / 3600;
-			double freeFlowSpeed_kmh = freeVelocity * 3.6;
-			double averageSpeed_kmh = linkLength_km / travelTime_h;
+			int freeFlowSpeed_kmh = (int) (freeVelocity * 3.6);
+			int averageSpeed_kmh = (int) (linkLength_km / travelTime_h);
+			
+			logger.info(averageSpeed_kmh + "; " + freeFlowSpeed_kmh);
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
 				logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
 				throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
 			}
-			if (averageSpeed_kmh <= stopGoSpeed_kmh) {
+			if(averageSpeed_kmh == freeFlowSpeed_kmh) {
+				generatedEmissions = linkLength_km * efFreeFlow_gpkm;
+				freeFlowCounter++;
+				freeFlowKmCounter = freeFlowKmCounter + linkLength_km;
+			} else if (averageSpeed_kmh <= stopGoSpeed_kmh) {
 				generatedEmissions = linkLength_km * efStopGo_gpkm;
 				stopGoCounter++;
 				stopGoKmCounter = stopGoKmCounter + linkLength_km;
 			} else {
 				double distanceStopGo_km = (linkLength_km * stopGoSpeed_kmh * (freeFlowSpeed_kmh - averageSpeed_kmh)) / (averageSpeed_kmh * (freeFlowSpeed_kmh - stopGoSpeed_kmh));
 				double distanceFreeFlow_km = linkLength_km - distanceStopGo_km;
-				
+
 				generatedEmissions = (distanceFreeFlow_km * efFreeFlow_gpkm) + (distanceStopGo_km * efStopGo_gpkm);
 				fractionCounter++;
 				stopGoKmCounter = stopGoKmCounter + distanceStopGo_km;
+				freeFlowKmCounter = freeFlowKmCounter + distanceFreeFlow_km;
 			}
 			kmCounter = kmCounter + linkLength_km;
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
@@ -241,6 +253,10 @@ public class WarmEmissionAnalysisModule {
 		return vehicleIdSet;
 	}
 
+	public static int getFreeFlowOccurences() {
+		return freeFlowCounter / WarmPollutant.values().length;
+	}
+
 	public static int getFractionOccurences() {
 		return fractionCounter / WarmPollutant.values().length;
 	}
@@ -249,15 +265,26 @@ public class WarmEmissionAnalysisModule {
 		return stopGoCounter / WarmPollutant.values().length;
 	}
 
+	public static double getKmCounter() {
+		return roundDouble((kmCounter / WarmPollutant.values().length), 3);
+	}
+
+	public static double getFreeFlowKmCounter() {
+		return roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
+	}
+
+	public static double getStopGoKmCounter() {
+		return roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
+	}
+
 	public static int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
 	}
 
-	public static double getKmCounter() {
-		return Math.round(kmCounter / WarmPollutant.values().length);
+	public static double roundDouble(double dd, int decimalPlace){
+	BigDecimal bd = new BigDecimal(Double.toString(dd));
+	bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+	return bd.doubleValue();
 	}
-
-	public static double getStopGoKmCounter() {
-		return Math.round(stopGoKmCounter / WarmPollutant.values().length);
-	}
+	
 }
