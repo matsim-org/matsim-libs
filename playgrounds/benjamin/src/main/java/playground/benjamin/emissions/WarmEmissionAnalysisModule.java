@@ -186,10 +186,8 @@ public class WarmEmissionAnalysisModule {
 
 			double linkLength_km = linkLength / 1000;
 			double travelTime_h = travelTime / 3600;
-			int freeFlowSpeed_kmh = (int) (freeVelocity * 3.6);
-			int averageSpeed_kmh = (int) (linkLength_km / travelTime_h);
-			
-			logger.info(averageSpeed_kmh + "; " + freeFlowSpeed_kmh);
+			int freeFlowSpeed_kmh = (int) Math.round(freeVelocity * 3.6);
+			int averageSpeed_kmh = (int) Math.round(linkLength_km / travelTime_h);
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
 				logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
