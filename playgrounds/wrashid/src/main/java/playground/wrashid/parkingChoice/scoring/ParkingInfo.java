@@ -2,6 +2,8 @@ package playground.wrashid.parkingChoice.scoring;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.wrashid.lib.GeneralLib;
+
 public class ParkingInfo {
 
 	private Id parkingId;
@@ -20,8 +22,8 @@ public class ParkingInfo {
 	public ParkingInfo( Id parkingId, double arrivalTime, double departureTime) {
 		super();
 		this.parkingId = parkingId;
-		this.arrivalTime = arrivalTime;
-		this.departureTime = departureTime;
+		this.arrivalTime = GeneralLib.projectTimeWithin24Hours(arrivalTime);
+		this.departureTime = GeneralLib.projectTimeWithin24Hours(departureTime);
 	}
 
 	

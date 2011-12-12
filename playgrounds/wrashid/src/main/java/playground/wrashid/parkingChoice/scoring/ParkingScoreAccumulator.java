@@ -158,9 +158,9 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				sb.append("\t");
 				sb.append(parkingInfo.getParkingId());
 				sb.append("\t");
-				sb.append(parkingInfo.getDepartureTime());
-				sb.append("\t");
 				sb.append(parkingInfo.getArrivalTime());
+				sb.append("\t");
+				sb.append(parkingInfo.getDepartureTime());
 				
 				list.add(sb.toString());
 			}
