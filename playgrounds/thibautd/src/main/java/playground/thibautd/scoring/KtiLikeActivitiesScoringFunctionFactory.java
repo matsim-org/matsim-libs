@@ -24,6 +24,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
@@ -35,6 +36,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
+
+import herbie.running.config.HerbieConfigGroup;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with
@@ -53,22 +56,24 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	private final CharyparNagelScoringParameters params;
     private final Scenario scenario;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+	private final Config config;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public KtiLikeActivitiesScoringFunctionFactory(
-			final PlanCalcScoreConfigGroup config,
+			final Config config,
 			final Scenario scenario) {
 		this( config , new TreeMap<Id, FacilityPenalty>() , scenario );
 	}
 
     public KtiLikeActivitiesScoringFunctionFactory(
-			final PlanCalcScoreConfigGroup config,
+			final Config config,
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final Scenario scenario) {
-		this.params = new CharyparNagelScoringParameters(config);
+		this.params = new CharyparNagelScoringParameters(config.planCalcScore());
 		this.scenario = scenario;
+		this.config = config;
 		this.facilityPenalties = facilityPenalties;
 	}
 
@@ -83,9 +88,13 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					facilityPenalties,
 					((ScenarioImpl) scenario).getActivityFacilities() ));
 		scoringFunctionAccumulator.addScoringFunction(
-				new CarPoolingLegScoringFunction(
+				//new CarPoolingLegScoringFunction(
+				new herbie.running.scoring.LegScoringFunction(
+					plan,
 					params,
-					scenario.getNetwork()));
+					config,
+					scenario.getNetwork(),
+					(HerbieConfigGroup) config.getModule( HerbieConfigGroup.GROUP_NAME ) ));
 		scoringFunctionAccumulator.addScoringFunction(
 				new MoneyScoringFunction( params ));
 		scoringFunctionAccumulator.addScoringFunction(
