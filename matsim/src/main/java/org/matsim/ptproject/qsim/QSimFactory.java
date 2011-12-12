@@ -76,6 +76,7 @@ public class QSimFactory implements MobsimFactory {
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);
+            qSim.addMobsimEngine(transitEngine);
         } else {
             agentFactory = new DefaultAgentFactory(qSim);
         }
