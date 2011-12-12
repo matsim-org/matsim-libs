@@ -170,6 +170,7 @@ public class PlotData {
 						outputDir+count+"-nPassengers-per-drivers-short",
 						chart) );
 
+
 			// VIA: home and work locations of passengers and drivers
 			// -----------------------------------------------------------------
 			List<Coord> locations = ploter.getMatchingLocations(
@@ -198,14 +199,27 @@ public class PlotData {
 		}
 
 
+		// "global" (multicondition) charts
 		{
+			// number of joint trips per condition
+			// -----------------------------------------------------------------
 			ChartUtil chart = ploter.getTwofoldConditionComparisonChart(filter, conditions);
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+"comparisonPlot.png",
+						outputDir+"comparisonPlot",
 						chart) );
+
+			// departure histogram for the filtered passenger trips
+			// -----------------------------------------------------------------
 			chart = ploter.getTripsForCondition(filter);
 			charts.add( new Tuple<String, ChartUtil>(
-						outputDir+"departuresPerTimeSlotPlot.png",
+						outputDir+"departuresPerTimeSlotPlot",
+						chart) );
+
+			// Proportion of passengers with joint trip
+			// -----------------------------------------------------------------
+			chart = ploter.getTwoFoldConditionProportionOfPassengers(filter, conditions);
+			charts.add( new Tuple<String, ChartUtil>(
+						outputDir+"proportionOfPotentialRideSharers",
 						chart) );
 		}
 

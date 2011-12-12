@@ -37,8 +37,12 @@ import org.apache.log4j.Logger;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.title.TextTitle;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -294,6 +298,57 @@ public class DataPloter {
 			chart.add(tripLength / 1000d, count.getValue());
 		}
 
+		formatChart( chart );
+		return chart;
+	}
+
+	public ChartUtil getTwoFoldConditionProportionOfPassengers(
+			final PassengerFilter filter,
+	 		final List<? extends TwofoldTripValidator> conditions) {
+		String title = "proportion of passenger trips really having a joint trip opportunity";
+		String xLabel = "condition";
+		String yLabel = "proportion";
+
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+		Collections.sort(conditions, new ConditionComparator());
+		
+		for (TwofoldTripValidator validator : conditions) {
+			List<JoinableTrips.TripRecord> filteredTrips =
+				filter.filterRecords(trips);
+			validator.setJoinableTrips(trips);
+
+			// step through the passenger trips, and count the number of trips
+			// for which at least one joint trip is possible.
+			int count = 0;
+			passengerLoop:
+			for (JoinableTrips.TripRecord trip : filteredTrips) {
+				for (JoinableTrips.JoinableTrip driverTrip : trip.getJoinableTrips()) { 
+					if (validator.isValid(driverTrip)) {
+						count++;
+						continue passengerLoop;
+					}
+				}
+			}
+			dataset.addValue(
+					((double) count) / filteredTrips.size(),
+					validator.getFirstCriterion(),
+					validator.getSecondCriterion());
+		}
+
+		JFreeChart jFreeChart = ChartFactory.createBarChart(
+					title,
+					xLabel,
+					yLabel,
+					dataset,
+					PlotOrientation.VERTICAL,
+					true,		// legend
+					false,		// tooltips
+					false);		// urls
+		BarRenderer renderer = (BarRenderer) ((CategoryPlot) jFreeChart.getPlot()).getRenderer();
+		renderer.setShadowVisible( false );
+		renderer.setBarPainter( new StandardBarPainter() );
+		ChartUtil chart = new WrapperChartUtil( jFreeChart );
 		formatChart( chart );
 		return chart;
 	}
