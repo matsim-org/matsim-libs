@@ -146,12 +146,14 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		
 		list.add("agentId\tparkingId\tstartParkingTime\tendParkingTime");
 		
-		StringBuffer sb=new StringBuffer();
+		StringBuffer sb=null;
 		
 		for (Id personId:parkingScoreCollector.parkingLog.getKeySet()){
 			 LinkedList<ParkingInfo>  parkingInfos=parkingScoreCollector.parkingLog.get(personId);
 			
 			for (ParkingInfo parkingInfo:parkingInfos){
+				sb=new StringBuffer();
+				
 				sb.append(personId);
 				sb.append("\t");
 				sb.append(parkingInfo.getParkingId());
@@ -159,9 +161,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				sb.append(parkingInfo.getDepartureTime());
 				sb.append("\t");
 				sb.append(parkingInfo.getArrivalTime());
+				
+				list.add(sb.toString());
 			}
 			
-			list.add(sb.toString());
+			
 		}
 		
 		GeneralLib.writeList(list, iterationFilename);
