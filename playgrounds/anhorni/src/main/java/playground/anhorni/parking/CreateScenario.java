@@ -108,12 +108,26 @@ public class CreateScenario {
 		l0.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(-1)).getCoord()).calcDistance(
 				scenario.getNetwork().getNodes().get(new IdImpl(0)).getCoord()));
 		this.scenario.getNetwork().addLink(l0);	
+		linkCnt++;
+		
+		Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), new IdImpl(0), new IdImpl(-1));			
+		l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(0)).getCoord()).calcDistance(
+				scenario.getNetwork().getNodes().get(new IdImpl(-1)).getCoord()));
+		this.scenario.getNetwork().addLink(l1);
+		linkCnt++;
 		
 		int n = (stepsPerSide + 1) * (stepsPerSide + 1) - 1;
-		Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(9999999)), new IdImpl(n), new IdImpl(9999999));			
-		l1.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(-1)).getCoord()).calcDistance(
+		Link l2 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), new IdImpl(n), new IdImpl(9999999));			
+		l2.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(n)).getCoord()).calcDistance(
 				scenario.getNetwork().getNodes().get(new IdImpl(9999999)).getCoord()));
-		this.scenario.getNetwork().addLink(l1);	
+		this.scenario.getNetwork().addLink(l2);
+		linkCnt++;
+		
+		Link l3 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), new IdImpl(9999999), new IdImpl(n));			
+		l3.setLength(((CoordImpl)scenario.getNetwork().getNodes().get(new IdImpl(9999999)).getCoord()).calcDistance(
+				scenario.getNetwork().getNodes().get(new IdImpl(n)).getCoord()));
+		this.scenario.getNetwork().addLink(l3);
+		
 		
 		log.info("Created " + linkCnt + " links");
 	}
