@@ -1,8 +1,13 @@
 package playground.sergioo.FacilitiesGenerator;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,8 +50,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.sergioo.FacilitiesGenerator.gui.ClustersWindow;
@@ -66,6 +69,7 @@ public class WorkFacilitiesGeneration {
 	private static final int SIZE = 20;
 	private static final String HIERACHY_FILE = "../../Dendogram/files/distancesWorkSchedules.txt";
 	private static final String NETWORK_FILE = "./data/currentSimulation/singapore2.xml";
+	private static final String LINKS_FILE = "./data/facilities/auxiliar/links.map";
 	private static final double WALKING_SPEED = 4/3.6;
 	private static final double PRIVATE_BUS_SPEED = 40/3.6;
 	private static final double MAX_TRAVEL_TIME = 15*60;
@@ -76,14 +80,42 @@ public class WorkFacilitiesGeneration {
 
 	//Methods
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, BadStopException {
-		//writeHierachicalClustersFile(clusterWorkActivities(getWorkActivityTimes()));
-		/*MatrixND<Double> weights = new MatrixNDImpl<Double>(new int[]{5,4}, 0.5);
+		fittingCapacities();
+		/*createTripsTables();
+		writeHierachicalClustersFile(clusterWorkActivities(getWorkActivityTimes()));
+		MatrixND<Double> weights = new MatrixNDImpl<Double>(new int[]{5,4}, 0.5);
 		MatrixND<Double> quantities = new MatrixNDImpl<Double>(new int[]{3,4}, 20.0);
 		MatrixND<Double> proportions = new MatrixNDImpl<Double>(new int[]{5,3}, 0.3333);
 		MatrixND<Double> maxs = new MatrixNDImpl<Double>(new int[]{5}, 60.0);
 		new FittingCapacities(new int[]{5,3,4}, weights, quantities, proportions, maxs).run(20);*/
 	}
-	public static Map<String, PointPerson> getWorkActivityTimes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static void createTripsTables() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
+		ResultSet tripsResult = dataBaseAux.executeQuery("SELECT * FROM work_pt_trips_full");
+		Map<String, Integer> users = new HashMap<String, Integer>();
+		int i=0;
+		while(tripsResult.next()) {
+			ResultSet stopResult = dataBaseAux.executeQuery("SELECT * FROM stops where id='"+tripsResult.getString(2)+"'");
+			if(!stopResult.next())
+				dataBaseAux.executeStatement("INSERT INTO stops VALUES ('"+tripsResult.getString(2)+"',"+tripsResult.getDouble(3)+","+tripsResult.getDouble(4)+")");
+			stopResult.close();
+			stopResult = dataBaseAux.executeQuery("SELECT * FROM stops where id='"+tripsResult.getString(6)+"'");
+			if(!stopResult.next())
+				dataBaseAux.executeStatement("INSERT INTO stops VALUES ('"+tripsResult.getString(6)+"',"+tripsResult.getDouble(7)+","+tripsResult.getDouble(8)+")");
+			stopResult.close();
+			Integer num = users.get(tripsResult.getString(1));
+			if(num==null)
+				num = 0;
+			users.put(tripsResult.getString(1), ++num);
+			dataBaseAux.executeStatement("INSERT INTO work_pt_trips VALUES ('"+tripsResult.getString(1)+"_"+num+"','"+tripsResult.getString(2)+"',"+((tripsResult.getTime(5).getTime()/1000)+27000)+",'"+tripsResult.getString(6)+"',"+((tripsResult.getTime(9).getTime()/1000)+27000)+")");
+			if(i%100==0)
+				System.out.println(i);
+			i++;
+		}
+		tripsResult.close();
+		dataBaseAux.close();
+	}
+	private static Map<String, PointPerson> getWorkActivityTimes() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseHits  = new DataBaseAdmin(new File("./data/hits/DataBase.properties"));
 		ResultSet timesResult = dataBaseHits.executeQuery("SELECT pax_idx,trip_id,t6_purpose,t3_starttime,t4_endtime,p6_occup FROM hits.hitsshort");
 		Map<String, PersonSchedule> times = new HashMap<String, PersonSchedule>();
@@ -159,7 +191,7 @@ public class WorkFacilitiesGeneration {
 		}*/
 		return points;
 	}
-	public static List<Cluster<PointPerson>> clusterWorkActivities(Map<String,PointPerson> points) {
+	private static List<Cluster<PointPerson>> clusterWorkActivities(Map<String,PointPerson> points) {
 		Set<PointPerson> pointsC = getPCATransformation(points.values());
 		Random r = new Random();
 		List<Cluster<PointPerson>> clusters = new KMeansPlusPlusClusterer<PointPerson>(r).cluster(pointsC, SIZE, 100);
@@ -170,7 +202,7 @@ public class WorkFacilitiesGeneration {
 				for(int d=0; d<pointPersonT.getDimension(); d++)
 					pointPersonT.setElement(d, pointPerson.getElement(d));
 			}
-		new ClustersWindow("Work times cluster PCA back: "+getClustersDeviations(clusters)+" "+getWeightedClustersDeviations(clusters), clusters, pointsC.size()).setVisible(true);
+		/*new ClustersWindow("Work times cluster PCA back: "+getClustersDeviations(clusters)+" "+getWeightedClustersDeviations(clusters), clusters, pointsC.size()).setVisible(true);
 		List<Cluster<PointPerson>> clusters2 = new KMeansPlusPlusClusterer<PointPerson>(new Random()).cluster(points.values(), SIZE, 100);
 		new ClustersWindow("Work times cluster: "+getClustersDeviations(clusters2)+" "+getWeightedClustersDeviations(clusters2), clusters2, points.size()).setVisible(true);
 		for(Cluster<PointPerson> clusterE:clusters) {
@@ -182,10 +214,10 @@ public class WorkFacilitiesGeneration {
 				System.out.println("    ("+(int)startTime/3600+":"+((int)startTime%3600)/60+","+(int)endTime/3600+":"+((int)endTime%3600)/60+")");
 				System.out.println("    ("+((int)startTime/(15*60))*(15*60)/3600+":"+(((int)startTime/(15*60))*(15*60)%3600)/60+","+((int)endTime/(15*60))*(15*60)/3600+":"+(((int)endTime/(15*60))*(15*60)%3600)/60+")");
 				System.out.println("    "+clusterE.getPoints().size());
-		}
+		}*/
 		return clusters;
 	}
-	/*public static Map<Integer, util.clustering.Cluster<Double>> clusterWorkActivities(Set<PointND<Double>> points) {
+	/*private static Map<Integer, util.clustering.Cluster<Double>> clusterWorkActivities(Set<PointND<Double>> points) {
 		Map<Integer, util.clustering.Cluster<Double>> clusters = new KMeans<Double>().getClusters(SIZE, points);
 		new ClustersWindow("Work times cluster", clusters, points.size()).setVisible(true);
 		for(Entry<Integer, util.clustering.Cluster<Double>> clusterE:clusters.entrySet())
@@ -292,26 +324,36 @@ public class WorkFacilitiesGeneration {
 		}
 		return pointsC;
 	}
-	private static Map<Tuple<Id, Id>,Double> calculateAreaStopWeights(Map<String, Coord> stopsBase, ActivityFacilitiesImpl facilities, Map<Id, Tuple<String,Double>> typeAndMaxCapacityFacilities) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static Map<Tuple<Id, Id>,Double> calculateAreaStopWeights(Map<String, Coord> stopsBase, Map<Id, Double> stops, Map<String, Double> workerAreas, ActivityFacilitiesImpl facilities, Map<Id, BuildingData> dataFacilities) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
 		Network network = scenario.getNetwork();
-		List<Map<String, Id>> linksStops = new ArrayList<Map<String,Id>>();
-		for(int n=0; n<NUM_NEAR; n++) {
-			linksStops.add(new HashMap<String, Id>());
-			for(Entry<String, Coord> stopBase: stopsBase.entrySet()) {
-				Id nearest = network.getLinks().values().iterator().next().getId();
-				for(Link link:network.getLinks().values()) {
-					boolean selected = false;
-					for(int p=0; p<n; p++)
-						if(linksStops.get(p).get(stopBase.getKey()).equals(link.getId()))
-							selected=true;
-					if(!selected && CoordUtils.calcDistance(link.getCoord(), stopBase.getValue())<CoordUtils.calcDistance(network.getLinks().get(nearest).getCoord(), stopBase.getValue()))
-						nearest = link.getId();
+		List<Map<String, Id>> linksStops;
+		try {
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(LINKS_FILE));
+			linksStops = (List<Map<String, Id>>) ois.readObject();
+			ois.close();
+		} catch (EOFException e) {
+			linksStops = new ArrayList<Map<String,Id>>();
+			for(int n=0; n<NUM_NEAR; n++) {
+				linksStops.add(new HashMap<String, Id>());
+				for(Entry<String, Coord> stopBase: stopsBase.entrySet()) {
+					Id nearest = network.getLinks().values().iterator().next().getId();
+					for(Link link:network.getLinks().values()) {
+						boolean selected = false;
+						for(int p=0; p<n; p++)
+							if(linksStops.get(p).get(stopBase.getKey()).equals(link.getId()))
+								selected=true;
+						if(!selected && CoordUtils.calcDistance(link.getCoord(), stopBase.getValue())<CoordUtils.calcDistance(network.getLinks().get(nearest).getCoord(), stopBase.getValue()))
+							nearest = link.getId();
+					}
+					linksStops.get(n).put(stopBase.getKey(), nearest);
 				}
-				linksStops.get(n).put(stopBase.getKey(), nearest);
 			}
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(LINKS_FILE));
+			oos.writeObject(linksStops);
+			oos.close();
 		}
 		TravelMinCost travelMinCost = new TravelMinCost() {
 			public double getLinkGeneralizedTravelCost(Link link, double time) {
@@ -333,19 +375,16 @@ public class WorkFacilitiesGeneration {
 		ResultSet buildingsR = dataBaseAuxiliar.executeQuery("SELECT * FROM buildings");
 		while(buildingsR.next()) {
 			facilities.createFacility(new IdImpl(buildingsR.getString(1)),new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5)));
-			typeAndMaxCapacityFacilities.put(new IdImpl(buildingsR.getString(1)), new Tuple<String, Double>(buildingsR.getString(2), buildingsR.getDouble(3)));
+			dataFacilities.put(new IdImpl(buildingsR.getString(1)), new BuildingData(buildingsR.getInt(1),buildingsR.getString(2), buildingsR.getDouble(3), buildingsR.getDouble(6)));
 		}
 		buildingsR.close();
-		ResultSet stopsR = dataBaseAuxiliar.executeQuery("SELECT * FROM stops");
-		Map<Id, Tuple<Integer,Double>> stops = new HashMap<Id, Tuple<Integer,Double>>();
-		while(stopsR.next())
-			stops.put(new IdImpl(stopsR.getString(1)), new Tuple<Integer, Double>(stopsR.getInt(2), stopsR.getDouble(3)));
-		stopsR.close();
 		dataBaseAuxiliar.close();
 		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (NetworkImpl)scenario.getNetwork());
 		Map<Tuple<Id, Id>,Double> weights = new HashMap<Tuple<Id,Id>, Double>();
 		double totalTimeFromStop = 0;
+		int i=0;
 		for(String stopKey: stopsBase.keySet()) {
+			System.out.println(i+++" of "+stopsBase.size());
 			Id link=null;
 			Id[] links = new Id[NUM_NEAR];
 			for(int n=0; n<NUM_NEAR; n++)
@@ -364,10 +403,11 @@ public class WorkFacilitiesGeneration {
 				if(walkingTime<=MAX_TRAVEL_TIME) {
 					weights.put(new Tuple<Id, Id>(stopId, facility.getId()), walkingTime);
 					totalTimeFromStop += walkingTime;
-					maxCapacityNearFacilities += typeAndMaxCapacityFacilities.get(facility.getId()).getSecond();
+					BuildingData buildingData = dataFacilities.get(facility.getId());
+					maxCapacityNearFacilities += (buildingData.getMaxArea()/workerAreas.get(buildingData.getType()))*buildingData.getModeShare();
 				}
 			}
-			if(stops.get(stopId).getFirst()/stops.get(stopId).getSecond()>maxCapacityNearFacilities) {
+			if(stops.get(stopId)>maxCapacityNearFacilities) {
 				double maxCapacityNear2Facilities = maxCapacityNearFacilities;
 				for(ActivityFacility facility:facilities.getFacilities().values()) {
 					double walkingTime = aStarLandmarks.calcLeastCostPath(network.getLinks().get(link).getToNode(), network.getLinks().get(facility.getLinkId()).getFromNode(), 0).travelCost;
@@ -375,9 +415,10 @@ public class WorkFacilitiesGeneration {
 					if(walkingTime>MAX_TRAVEL_TIME && privateBusTime<=MAX_TRAVEL_TIME) {
 						weights.put(new Tuple<Id, Id>(stopId, facility.getId()), privateBusTime);
 						totalTimeFromStop += privateBusTime;
-						maxCapacityNear2Facilities += typeAndMaxCapacityFacilities.get(facility.getId()).getSecond();
+						BuildingData buildingData = dataFacilities.get(facility.getId());
+						maxCapacityNear2Facilities += (buildingData.getMaxArea()/workerAreas.get(buildingData.getType()))*buildingData.getModeShare();
 					}
-					if(stops.get(stopId).getFirst()/stops.get(stopId).getSecond()>maxCapacityNear2Facilities)
+					if(stops.get(stopId)>maxCapacityNear2Facilities)
 						throw new BadStopException(stopId);
 				}
 			}
@@ -386,11 +427,21 @@ public class WorkFacilitiesGeneration {
 			weights.put(weight.getKey(), weight.getValue()/totalTimeFromStop);
 		return weights;
 	}
-	private static Map<String, Double> calculateStopClustersQuantities(List<Cluster<PointPerson>> clusters) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static Map<String, Double> calculateStopClustersQuantities(List<Cluster<PointPerson>> clusters, Map<Id, Double> stops) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		Map<String, Double> quantities = new HashMap<String, Double>();
-		ResultSet tripsResult = dataBaseAux.executeQuery("SELECT * FROM work_stops_activities");
+		ResultSet tripsResult = dataBaseAux.executeQuery("SELECT * FROM work_pt_trips");
 		while(tripsResult.next()) {
+			Id stopId = new IdImpl(tripsResult.getString(2));
+			Double quantity = stops.get(stopId);
+			if(quantity==null)
+				quantity = 0.0;
+			stops.put(stopId, quantity+0.5);
+			stopId = new IdImpl(tripsResult.getString(4));
+			quantity = stops.get(stopId);
+			if(quantity==null)
+				quantity = 0.0;
+			stops.put(stopId, quantity+0.5);
 			int nearestCluster = 0;
 			PointPerson time = new PointPerson(tripsResult.getString(1), "", new Double[]{(double) tripsResult.getInt(3), (double) (tripsResult.getInt(5)-tripsResult.getInt(3))});
 			for(int c=0; c<clusters.size(); c++) {
@@ -398,7 +449,7 @@ public class WorkFacilitiesGeneration {
 					nearestCluster = c;
 			}
 			String key = tripsResult.getString(2)+SEPARATOR+nearestCluster;
-			Double quantity = quantities.get(key);
+			quantity = quantities.get(key);
 			if(quantity==null)
 				quantity = 0.0;
 			quantities.put(key, quantity+0.5);
@@ -412,7 +463,7 @@ public class WorkFacilitiesGeneration {
 		dataBaseAux.close();
 		return quantities;
 	}
-	public static Map<String, List<Double>> calculateTypeBuildingOptionWeights(List<Cluster<PointPerson>> clusters) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static Map<String, List<Double>> calculateTypeBuildingOptionWeights(List<Cluster<PointPerson>> clusters) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
 		ResultSet typesResult = dataBaseAux.executeQuery("SELECT paxid,uraType FROM types");
 		Map<String, List<Double>> proportions = new HashMap<String, List<Double>>();
@@ -439,18 +490,34 @@ public class WorkFacilitiesGeneration {
 		dataBaseAux.close();
 		return proportions;
 	}
-	public static void fittingCapacities() throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static void fittingCapacities() throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		List<Cluster<PointPerson>> clusters = clusterWorkActivities(getWorkActivityTimes());
+		System.out.println("Clustering done!");
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Map<String, Coord> stopsBase = new HashMap<String, Coord>();
 		ResultSet stopsResult = dataBaseAux.executeQuery("SELECT * FROM stops");
 		while(stopsResult.next())
-			stopsBase.put(stopsResult.getString(1), coordinateTransformation.transform(new CoordImpl(stopsResult.getDouble(3), stopsResult.getDouble(2))));
+			stopsBase.put(stopsResult.getString(1), new CoordImpl(stopsResult.getDouble(3), stopsResult.getDouble(2)));
 		stopsResult.close();
-		Map<Id, Tuple<String,Double>> typeAndMaxCapacityFacilities = new HashMap<Id, Tuple<String,Double>>();
+		System.out.println("Stops done!");
+		Map<Id, Double> stops = new HashMap<Id, Double>();
+		Map<String, Double> quantitiesMap = calculateStopClustersQuantities(clusters, stops);
+		MatrixND<Double> quantities = new MatrixNDImpl<Double>(new int[]{clusters.size(),stopsBase.size()});
+		for(int c=0; c<quantities.getDimensions()[0]; c++) {
+			Iterator<String> stopsI = stopsBase.keySet().iterator();
+			for(int s=0; s<quantities.getDimensions()[1]; s++)
+				quantities.setElement(new int[]{c,s},quantitiesMap.get(stopsI.next()+SEPARATOR+c));
+		}
+		System.out.println("Quantities done!");
+		Map<String, Double> workerAreas = new HashMap<String, Double>();
+		ResultSet typesResult = dataBaseAux.executeQuery("SELECT * FROM building_types");
+		while(typesResult.next())
+			workerAreas.put(typesResult.getString(1), typesResult.getDouble(2));
+		typesResult.close();
+		Map<Id, BuildingData> dataFacilities = new HashMap<Id, BuildingData>();
 		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		Map<Tuple<Id, Id>,Double> weightsMap = calculateAreaStopWeights(stopsBase, facilities, typeAndMaxCapacityFacilities);
+		Map<Tuple<Id, Id>,Double> weightsMap = calculateAreaStopWeights(stopsBase, stops, workerAreas, facilities, dataFacilities);
+		System.out.println("Facilities done!");
 		MatrixND<Double> weights = new MatrixNDImpl<Double>(new int[]{facilities.getFacilities().size(),stopsBase.size()});
 		Iterator<Id> facilityI = facilities.getFacilities().keySet().iterator();
 		for(int f=0; f<weights.getDimensions()[0]; f++) {
@@ -459,33 +526,26 @@ public class WorkFacilitiesGeneration {
 			for(int s=0; s<weights.getDimensions()[1]; s++)
 				weights.setElement(new int[]{f,s}, weightsMap.get(new Tuple<Id, Id>(new IdImpl(stopsI.next()), facilityId)));
 		}
-		Map<String, Double> quantitiesMap = calculateStopClustersQuantities(clusters);
-		MatrixND<Double> quantities = new MatrixNDImpl<Double>(new int[]{clusters.size(),stopsBase.size()});
-		for(int c=0; c<quantities.getDimensions()[0]; c++) {
-			Iterator<String> stopsI = stopsBase.keySet().iterator();
-			for(int s=0; s<quantities.getDimensions()[1]; s++)
-				quantities.setElement(new int[]{c,s},quantitiesMap.get(stopsI.next()+SEPARATOR+c));
-		}
+		System.out.println("Weights done!");
 		MatrixND<Double> proportions = new MatrixNDImpl<Double>(new int[]{facilities.getFacilities().size(),clusters.size()});
 		Map<String, List<Double>> proportionsMap = calculateTypeBuildingOptionWeights(clusters);
 		facilityI = facilities.getFacilities().keySet().iterator();
 		for(int f=0; f<proportions.getDimensions()[0]; f++) {
 			Id facilityId = facilityI.next();
 			for(int c=0; c<proportions.getDimensions()[1]; c++)
-				proportions.setElement(new int[]{f,c},proportionsMap.get(typeAndMaxCapacityFacilities.get(facilityId).getFirst()).get(c));
+				proportions.setElement(new int[]{f,c},proportionsMap.get(dataFacilities.get(facilityId).getType()).get(c));
 		}
+		System.out.println("Proportions done!");
 		MatrixND<Double> maxs = new MatrixNDImpl<Double>(new int[]{5}, 60.0);
-		Map<String, Double> workerAreas = new HashMap<String, Double>();
-		ResultSet typesResult = dataBaseAux.executeQuery("SELECT * FROM building_types");
-		while(typesResult.next())
-			workerAreas.put(typesResult.getString(1), typesResult.getDouble(2));
-		typesResult.close();
 		dataBaseAux.close();
 		facilityI = facilities.getFacilities().keySet().iterator();
 		for(int f=0; f<maxs.getDimensions()[0]; f++) {
-			Tuple<String, Double> typeMaxCapacity = typeAndMaxCapacityFacilities.get(facilityI.next());
-			maxs.setElement(new int[]{f}, typeMaxCapacity.getSecond()/workerAreas.get(typeMaxCapacity.getFirst()));
+			BuildingData dataBuilding = dataFacilities.get(facilityI.next());
+			maxs.setElement(new int[]{f}, (dataBuilding.getMaxArea()/workerAreas.get(dataBuilding.getType()))*dataBuilding.getModeShare());
 		}
+		System.out.println("Max areas done!");
 		MatrixND<Double> capacities = new FittingCapacities(new int[]{5,3,4}, weights, quantities, proportions, maxs).run(20);
+		System.out.println("Fitting done!");
 	}
+	
 }
