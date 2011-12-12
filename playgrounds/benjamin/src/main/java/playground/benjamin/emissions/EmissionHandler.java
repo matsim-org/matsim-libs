@@ -80,6 +80,11 @@ public class EmissionHandler {
 	public EmissionHandler(Scenario scenario) {
 		this.scenario = scenario;
 	}
+	
+	public EmissionHandler(Scenario scenario, Vehicles emissionVehicles) {
+		this.scenario = scenario;
+		this.emissionVehicles = emissionVehicles;
+	}
 
 	public void createLookupTables() {
 		logger.info("entering createLookupTables");
@@ -87,7 +92,9 @@ public class EmissionHandler {
 		getInputFiles();
 		
 		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
-		emissionVehicles = createEmissionVehicles(emissionVehicleFile);
+		if(this.emissionVehicles == null){
+			emissionVehicles = createEmissionVehicles(emissionVehicleFile);
+		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
