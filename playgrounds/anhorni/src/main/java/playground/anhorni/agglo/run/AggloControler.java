@@ -20,22 +20,15 @@
 
 package playground.anhorni.agglo.run;
 
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.locationchoice.analysis.DistanceStats;
 import org.matsim.locationchoice.bestresponse.scoring.MixedScoringFunctionFactory;
 import org.matsim.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.utils.ActTypeConverter;
 import org.matsim.locationchoice.utils.ActivitiesHandler;
 
 public class AggloControler extends Controler {
-	
-	TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
-				
+					
 	public AggloControler(final String[] args) {
 		super(args);	
 	}
@@ -63,7 +56,6 @@ public class AggloControler extends Controler {
 		
 			
 		// add retailer relocation choice		
-		this.addControlerListener(new FacilitiesLoadCalculator(facilityPenalties));
-		this.addControlerListener(new RetailerRelocation(facilityPenalties));
+		this.addControlerListener(new RetailerRelocation());
 	}    
 }

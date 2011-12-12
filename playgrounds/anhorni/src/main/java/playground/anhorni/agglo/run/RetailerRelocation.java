@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
@@ -48,7 +49,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.locationchoice.facilityload.FacilityPenalty;
 
 
 public class RetailerRelocation implements IterationStartsListener {	
@@ -58,12 +58,9 @@ public class RetailerRelocation implements IterationStartsListener {
 	private QuadTree<ActivityFacility> shoppingFacilities;
 	private Random rnd = new Random();
 	private static double replanningShare = 0.1;
-	TreeMap<Id, FacilityPenalty> facilityPenalties;
-	TreeMap<Double, LinkCandidate> moveProbabilities;
+	private TreeMap<Double, LinkCandidate> moveProbabilities;
+	private TreeMap<Id, Integer> load = new TreeMap<Id, Integer>();
 	
-	public RetailerRelocation(TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		this.facilityPenalties = facilityPenalties;
-	}
 	
 	public void notifyIterationStarts(IterationStartsEvent event) {	
 		if (event.getIteration() % 2 == 0 && event.getIteration() > 0) {
@@ -71,6 +68,7 @@ public class RetailerRelocation implements IterationStartsListener {
 			this.initialize(event);
 			this.evaluatePotentialCustomers(event);
 			this.evaluateCompetitorsPower(event);
+			this.evaluateLoad(event);
 			this.generateProbabilities(event);
 			this.relocateSomeRetailers(event, RetailerRelocation.replanningShare);
 			this.adaptAgents(event);
@@ -114,6 +112,30 @@ public class RetailerRelocation implements IterationStartsListener {
 			Link link = network.getLinks().get(candidate.getLinkId());
 			double power = this.getCompetitorsPowerInArea(link.getCoord());
 			candidate.increaseCompetitorsPower(power);
+		}
+	}
+	
+	private void evaluateLoad(IterationStartsEvent event) {
+		ActivityFacilitiesImpl facilities = event.getControler().getScenario().getActivityFacilities();
+		
+		
+		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+			PlanImpl selectedPlan = (PlanImpl)person.getSelectedPlan();
+			for (PlanElement pe : selectedPlan.getPlanElements()) {				
+				if (pe instanceof Activity) {
+					ActivityImpl act = (ActivityImpl)pe;
+					if (act.getType().startsWith("s")) {
+						ActivityFacilityImpl facility = (ActivityFacilityImpl)facilities.getFacilities().get(act.getFacilityId());
+						if (!load.containsKey(facility.getId())) {
+							load.put(facility.getId(), 1);
+						}
+						else {
+							int nCustomers = load.get(facility.getId());
+							load.put(facility.getId(), nCustomers + 1);
+						}	
+					}
+				}
+			}
 		}
 	}
 	
@@ -172,7 +194,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	private Id evaluateAndMaybeMoveFacility(ActivityFacility facility) {
 		// if load/competitors is better at new location -> move
 		// evaluate potential at old location
-		double currentLoad = this.facilityPenalties.get(facility.getId()).getFacilityLoad().getNumberOfVisitorsPerDay();
+		double currentLoad = this.load.get(facility.getId());
 		double competitorsPower = this.getCompetitorsPowerInArea(facility.getCoord());
 		double currentPotential = currentLoad / (competitorsPower + 1); //  + 1 is ego
 		
