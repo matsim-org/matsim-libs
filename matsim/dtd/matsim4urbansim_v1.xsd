@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<!-- Editor: Thomas Nicolai, VSP, Berlin Institute of Technology -->
-	<!-- This xml schema contains xml definitions used in the MATSim4UrbanSim -->
+	<!-- This xml schema contains xml definitions used for MATSim4UrbanSim -->
 	
 	<!-- root element -->
 	<xs:element name="matsim_config" type="matsim_configType"/>
