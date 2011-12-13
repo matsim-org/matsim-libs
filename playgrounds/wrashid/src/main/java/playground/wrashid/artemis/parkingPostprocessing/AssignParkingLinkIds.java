@@ -144,34 +144,8 @@ public class AssignParkingLinkIds {
 		return parkingHashmap;
 	}
 
-	private static void makeChecks() {
-		DebugLib.stopSystemAndReportInconsistency();
 
-	}
 
-	private static void writeChargigLongWithNewLinks() {
-		// TODO Auto-generated method stub
 
-	}
-
-	private static void writeParkingTimesWithNewLinks() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private static void readParkingTimes() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private static void readChargingIds() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private static void assignLinkIdsToParkingIds() {
-		// TODO Auto-generated method stub
-
-	}
 
 }
