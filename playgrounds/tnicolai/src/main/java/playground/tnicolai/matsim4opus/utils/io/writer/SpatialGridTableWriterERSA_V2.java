@@ -6,16 +6,16 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class SpatialGridTableWriterERSA_V2 {
 
 	private static final Logger log = Logger.getLogger(SpatialGridTableWriterERSA_V2.class);
-	
+
 	public static void writeTableAndCSV(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
 										final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
 										final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid,
@@ -23,17 +23,17 @@ public class SpatialGridTableWriterERSA_V2 {
 										final Map<Id, Double>travelCostAccessibilityMap,
 										final Map<Id, Double>travelDistanceAccessibilityMap,
 										final double resolutionMeter){
-		
+
 		assert (travelTimeAccessibilityGrid != null);
 		assert (travelDistanceAccessibilityGrid != null);
 		assert (travelCostAccessibilityGrid != null);
 		assert (travelTimeAccessibilityMap != null);
 		assert (travelDistanceAccessibilityMap != null);
 		assert (travelCostAccessibilityMap != null);
-		
+
 		initSpatialGridsAndDumpCSV(travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid,
 						 travelTimeAccessibilityMap, travelCostAccessibilityMap, travelDistanceAccessibilityMap);
-		
+
 		log.info("Writing spatial grid tables ...");
 
 		try {
@@ -58,9 +58,9 @@ public class SpatialGridTableWriterERSA_V2 {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		log.info("... done writing spatial grid tables!");		
+		log.info("... done writing spatial grid tables!");
 	}
-	
+
 	private static void initSpatialGridsAndDumpCSV(final SpatialGrid<SquareLayer> travelTimeAccessibilityGrid,
 											final SpatialGrid<SquareLayer> travelCostAccessibilityGrid,
 											final SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid,
@@ -77,9 +77,9 @@ public class SpatialGridTableWriterERSA_V2 {
 
 		log.info("...done filling spatial grids!");
 	}
-	
-	private static void initAndDump(SpatialGrid<SquareLayer> grid, Map<Id, Double> map, String type) {
-		
+
+	private static void initAndDump(final SpatialGrid<SquareLayer> grid, final Map<Id, Double> map, final String type) {
+
 		try{
 			BufferedWriter csvWriter = IOUtils
 					.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + type
@@ -96,24 +96,24 @@ public class SpatialGridTableWriterERSA_V2 {
 			int rows = grid.getNumRows();
 			int cols = grid.getNumCols(0);
 			log.info("Grid Rows: " + rows + " Grid Columns: " + cols);
-			
+
 			int total = 0;
 			int skipped = 0;
-			
+
 			for (int r = 0; r < rows; r++) {
 				for (int c = 0; c < cols; c++) {
 					total++;
 					SquareLayer layer = grid.getValue(r, c);
-					
+
 					if (layer != null) {
 						// init
 						layer.computeDerivation(map);
-						
+
 						if(layer.getSquareCentroidCoord() != null){
 							csvWriter.write(layer.getCentroidAccessibility() + ","
 										+ layer.getMeanAccessibility() + ","
-										+ layer.getAccessibilityDerivation() + "," 
-										+ layer.getSquareCentroidCoord().getX() + "," 
+										+ layer.getAccessibilityDerivation() + ","
+										+ layer.getSquareCentroidCoord().getX() + ","
 										+ layer.getSquareCentroidCoord().getY());
 							csvWriter.newLine();
 						}
@@ -130,13 +130,13 @@ public class SpatialGridTableWriterERSA_V2 {
 			e.printStackTrace();
 		}
 	}
-	
-	private static void writeTable(SpatialGrid<SquareLayer> grid, String fileName) throws IOException {
-		
+
+	private static void writeTable(final SpatialGrid<SquareLayer> grid, final String fileName) throws IOException {
+
 		BufferedWriter layer1 = IOUtils.getBufferedWriter(fileName + "_Centroid" + Constants.FILE_TYPE_TXT);
 		BufferedWriter layer2 = IOUtils.getBufferedWriter(fileName + "_Interpolated" + Constants.FILE_TYPE_TXT);
 		BufferedWriter layer3 = IOUtils.getBufferedWriter(fileName + "_Derivation" + Constants.FILE_TYPE_TXT);
-		
+
 		for(int j = 0; j < grid.getNumCols(0); j++) {
 			layer1.write("\t");
 			layer1.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
@@ -148,12 +148,12 @@ public class SpatialGridTableWriterERSA_V2 {
 		layer1.newLine();
 		layer2.newLine();
 		layer3.newLine();
-		
+
 		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
 			layer1.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
 			layer2.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
 			layer3.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
-			
+
 			for(int j = 0; j < grid.getNumCols(i); j++) {
 				layer1.write("\t");
 				Double centroid = grid.getValue(i, j).getCentroidAccessibility();
@@ -161,14 +161,14 @@ public class SpatialGridTableWriterERSA_V2 {
 					layer1.write(String.valueOf(centroid));
 				else
 					layer1.write("NA");
-				
+
 				layer2.write("\t");
 				Double interpolation = grid.getValue(i, j).getMeanAccessibility();
 				if(interpolation != null)
 					layer2.write(String.valueOf(interpolation));
 				else
 					layer2.write("NA");
-								
+
 				layer3.write("\t");
 				Double derivation = grid.getValue(i, j).getAccessibilityDerivation();
 				if(derivation != null)

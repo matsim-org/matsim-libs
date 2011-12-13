@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import java.util.HashMap;
@@ -9,7 +28,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -20,6 +38,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
@@ -27,8 +46,8 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
-import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
 
@@ -39,31 +58,31 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class ERSAControlerListenerV2 implements ShutdownListener{
-	
+
 	private static final Logger log = Logger.getLogger(ERSAControlerListenerV2.class);
 
-	private JobClusterObject[] aggregatedJobArray;
-	private int resolutionFeet;
-	private int resolutionMeter;
-	
+	private final JobClusterObject[] aggregatedJobArray;
+	private final int resolutionFeet;
+	private final int resolutionMeter;
+
 	private SpatialGrid<SquareLayer> travelTimeAccessibilityGrid;
 	private SpatialGrid<SquareLayer> travelCostAccessibilityGrid;
 	private SpatialGrid<SquareLayer> travelDistanceAccessibilityGrid;
-	
-	private Map<Id, Double>travelTimeAccessibilityMap;
-	private Map<Id, Double>travelCostAccessibilityMap;
-	private Map<Id, Double>travelDistanceAccessibilityMap;
-	
-	private Benchmark benchmark;
-	
+
+	private final Map<Id, Double>travelTimeAccessibilityMap;
+	private final Map<Id, Double>travelCostAccessibilityMap;
+	private final Map<Id, Double>travelDistanceAccessibilityMap;
+
+	private final Benchmark benchmark;
+
 	/**
 	 * constructor
 	 * @param aggregatedJobArray
 	 */
-	public ERSAControlerListenerV2(JobClusterObject[] aggregatedJobArray, int resolutionFeet, int resolutionMeter, Benchmark benchmark){
-		
+	public ERSAControlerListenerV2(final JobClusterObject[] aggregatedJobArray, final int resolutionFeet, final int resolutionMeter, final Benchmark benchmark){
+
 		log.info("Initializing ERSAControlerListenerV2 ...");
-		
+
 		assert(aggregatedJobArray != null);
 		this.aggregatedJobArray = aggregatedJobArray;
 		assert(resolutionFeet > 0);
@@ -72,86 +91,86 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		this.resolutionMeter = resolutionMeter;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
-		
+
 		this.travelCostAccessibilityMap = new HashMap<Id, Double>();
 		this.travelTimeAccessibilityMap = new HashMap<Id, Double>();
 		this.travelDistanceAccessibilityMap = new HashMap<Id, Double>();
-		
+
 		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   "accessibility_indicators_v2" + 
+													   "accessibility_indicators_v2" +
 													   Constants.FILE_TYPE_CSV);
-		
+
 		log.info(".. done initializing ERSAControlerListenerV2!");
 	}
-	
-	
+
+
 	/**
 	 * calculating accessibility indicators
 	 */
 	@Override
-	public void notifyShutdown(ShutdownEvent event) {
+	public void notifyShutdown(final ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
-		
+
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		NetworkImpl network = controler.getNetwork();
 		initSpatialGirds(network);
-		
+
 		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");
-		
+
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		// this calculates the workplace accessibility travel times
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates the workplace accessibility distances
 		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
-		
+
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
-		
+
 		try{
 			log.info("Computing and writing accessibility measures ..." );
 			Iterator<Node> startNodeIterator = network.getNodes().values().iterator();
 			int numberOfStartNodes = network.getNodes().values().size();
 			log.info("Calculating " + numberOfStartNodes + " starting points ...");
-			
+
 			ProgressBar bar = new ProgressBar( numberOfStartNodes );
-			
+
 			// iterates through all starting points (fromZone) and calculates their workplace accessibility
 			while( startNodeIterator.hasNext() ){
-				
+
 				bar.update();
-				
+
 				Node originNode = startNodeIterator.next();
 				assert(originNode != null);
 				// run dijkstra on network
 				lcptTravelTime.calculate(network, originNode, depatureTime);
 				lcptTravelDistance.calculate(network, originNode, depatureTime);
-				
+
 				// from here: accessibility computation for current starting point ("originNode")
-				
+
 				double accessibilityTravelTimes = 0.;
 				double accessibilityTravelTimeCosts = 0.;
 				double accessibilityTravelDistanceCosts = 0.;
-				
+
 				// go through all jobs (nearest network node) and calculate workplace accessibility
 				for ( int i = 0; i < this.aggregatedJobArray.length; i++ ) {
-					
+
 					Node destinationNode = this.aggregatedJobArray[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					int jobWeight = this.aggregatedJobArray[i].getNumberOfJobs();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
-					
+
 					// travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// travel costs in utils
 					double travelCosts = lcptTravelTime.getTree().get( nodeID ).getCost();
 					// travel distance by car in meter
 					double travelDistance_meter = lcptTravelDistance.getTree().get( nodeID ).getCost();
-					
+
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
 					// sum travel costs  (mention the beta)
@@ -159,16 +178,16 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 					// sum travel distances  (mention the beta)
 					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
-				
+
 				double travelCostLogSum = Math.log( accessibilityTravelTimeCosts );
 				double travelDistanceLogSum = Math.log( accessibilityTravelDistanceCosts );
 				double travelTimeLogSum = Math.log( accessibilityTravelTimes );
-				
+
 				// assigning each accessibility value with current node id (as key) to corresponding hash map
 				this.travelCostAccessibilityMap.put(originNode.getId(), travelCostLogSum );
 				this.travelDistanceAccessibilityMap.put(originNode.getId(), travelDistanceLogSum );
 				this.travelTimeAccessibilityMap.put(originNode.getId(), travelTimeLogSum );
-				
+
 				// using hash maps to dump out log sum of current node in csv format
 				GridBasedAccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
 			}
@@ -187,35 +206,35 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 			dumpData();
 		}
 	}
-	
+
 	private void dumpData(){
 //		writeSpatialGridTables();
-		SpatialGridTableWriterERSA_V2.writeTableAndCSV(travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid, travelTimeAccessibilityMap, travelCostAccessibilityMap, travelDistanceAccessibilityMap, resolutionMeter);
-		SpatialGrid2KMZWriter.writeKMZFiles(travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid);
+		SpatialGridTableWriterERSA_V2.writeTableAndCSV(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid, this.travelTimeAccessibilityMap, this.travelCostAccessibilityMap, this.travelDistanceAccessibilityMap, this.resolutionMeter);
+		SpatialGrid2KMZWriter.writeKMZFiles(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid);
 		AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
 		// accessibility measure were written while computing, just closing file now .
 		GridBasedAccessibilityCSVWriter.close();
 	}
-	
-	private void initSpatialGirds(NetworkImpl network){
-		
+
+	private void initSpatialGirds(final NetworkImpl network){
+
 		log.info("Initializing Spatial Grids ...");
 		NetworkBoundary nb = UtilityCollection.getNetworkBoundary(network);
-		
+
 		double xmin = nb.getMinX();
 		double xmax = nb.getMaxX();
 		double ymin = nb.getMinY();
 		double ymax = nb.getMaxY();
-		
+
 		log.info("Detected network size: MinX=" + xmin + " MinY=" + ymin + " MaxX=" + xmax + " MaxY=" + ymax );
-		
+
 		// creating spatial grids, one for each accessibility measure ...
 		this.travelTimeAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
 		this.travelCostAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
 		this.travelDistanceAccessibilityGrid = new SpatialGrid<SquareLayer>(xmin, ymin, xmax, ymax, this.resolutionFeet);
-		
+
 		GeometryFactory factory = new GeometryFactory();
-		
+
 		// create/init squares
 		int rows = this.travelTimeAccessibilityGrid.getNumRows();
 		int cols = this.travelTimeAccessibilityGrid.getNumCols(0);
@@ -226,12 +245,12 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 				this.travelDistanceAccessibilityGrid.setValue(r, c, new SquareLayer());
 			}
 		}
-		
+
 		log.warn("Spatial Reference ID (SRID) is set for WASHINGTON_NORTH: " + Constants.SRID_WASHINGTON_NORTH);
 		// determine square + square centroid + nearest node
 		for(double x = xmin; x <= xmax; x += this.resolutionFeet){
 			for(double y = ymin; y <= ymax; y += this.resolutionFeet){
-				
+
 				// point points to lower left corner of a square
 				Point point = factory.createPoint( new Coordinate(x, y));
 				// create a square (for google maps kmz writer)
@@ -244,13 +263,13 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 				// Linear Ring defines an artificial zone
 				LinearRing linearRing = factory.createLinearRing(coords);
 				Polygon polygon = factory.createPolygon(linearRing, null);
-				polygon.setSRID( Constants.SRID_WASHINGTON_NORTH ); 
-				
+				polygon.setSRID( Constants.SRID_WASHINGTON_NORTH );
+
 				// centroid determines the center of a square
 				Coord squareCentroid = new CoordImpl(x + (this.resolutionFeet/2), y + (this.resolutionFeet/2));
-				// nearestNode lies next to the square centroid 
+				// nearestNode lies next to the square centroid
 				Node nearestNode = network.getNearestNode( squareCentroid );
-				
+
 				// set square centroid and the node id of its nearest node
 				this.travelTimeAccessibilityGrid.getValue( point ).setSquareCentroid(nearestNode.getId(), polygon, squareCentroid);
 				this.travelCostAccessibilityGrid.getValue( point ).setSquareCentroid(nearestNode.getId(), polygon, squareCentroid);
@@ -258,24 +277,24 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 			}
 		}
 		// assigns all nodes that are located within the according square boundary
-		// this is only relevant for interpolation computations 
+		// this is only relevant for interpolation computations
 		Iterator<Node> nodeIterator = network.getNodes().values().iterator();
 		for(;nodeIterator.hasNext();){
 			Node node = nodeIterator.next();
 			Point point = factory.createPoint( new Coordinate(node.getCoord().getX(), node.getCoord().getY()));
-			
+
 			// add nodes to square that are located within square boundaries ...
 			this.travelTimeAccessibilityGrid.getValue( point ).addNode( node );
 			this.travelCostAccessibilityGrid.getValue( point ).addNode( node );
 			this.travelDistanceAccessibilityGrid.getValue( point ).addNode( node );
 		}
 		log.info(".. done initializing Spatial Grids!");
-	}	
-	
+	}
+
 //	private void writeSpatialGridTables() {
-//		
+//
 //		fillSpatialGrids();
-//		
+//
 //		log.info("Writing spatial grid tables ...");
 //
 //		assert (travelTimeAccessibilityGrid != null);
@@ -311,7 +330,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 //		}
 //		log.info("... done writing spatial grid tables!");
 //	}
-//	
+//
 //	private void fillSpatialGrids() {
 //
 //		log.info("Filling spatial grid tables ...");
@@ -331,7 +350,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 //
 //		log.info("...done filling spatial grids!");
 //	}
-//	
+//
 //	private void fill(SpatialGrid<SquareLayer> grid, Map<Id, Double> map) {
 //		int rows = grid.getNumRows();
 //		int cols = grid.getNumCols(0);
