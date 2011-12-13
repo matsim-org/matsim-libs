@@ -24,16 +24,19 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -46,7 +49,8 @@ import playground.droeder.eMobility.energy.DisChargingProfiles;
  *
  */
 public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-												ActivityStartEventHandler, ActivityEndEventHandler{
+												ActivityStartEventHandler, ActivityEndEventHandler,
+												AgentArrivalEventHandler{
 
 	private Map<Id, ElectroVehicle> vehicles;
 	private HashMap<Id, LinkEnterEvent> disCharging;
@@ -54,6 +58,7 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 	private ChargingProfiles chargingProfiles;
 	private Network net;
 	private DisChargingProfiles disChargingProfiles;
+	private Map<Id, String> lastMode;
 
 	public ElectroVehicleHandler(Map<Id, ElectroVehicle> vehicles, ChargingProfiles charging, 
 			DisChargingProfiles discharging, Network net){
@@ -63,6 +68,7 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 		this.chargingProfiles = charging;
 		this.disChargingProfiles = discharging;
 		this.net = net;
+		this.lastMode = new HashMap<Id, String>();
 	}
 
 	@Override
@@ -90,6 +96,10 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 	public void handleEvent(LinkEnterEvent event) {
 		this.processEvent(event);
 	}
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		this.lastMode.put(event.getPersonId(), event.getLegMode()); 
+	}
 	
 	private void processEvent(PersonEvent e){
 		//TODO change to vehId
@@ -112,7 +122,7 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 				}
 			}else if(e instanceof LinkLeaveEvent){
 				if(this.disCharging.containsKey(v.getId())){
-					Link l = net.getLinks().get(((ActivityEvent) e).getLinkId());
+					Link l = net.getLinks().get(((LinkLeaveEvent)e).getLinkId());
 					v.disCharge(this.calcDischargeInkWh(v, this.disCharging.remove(v.getId()), e, l), e.getTime(), l.getLength());
 				}else{
 					/*  this must be a LinkLeaveEvent after an activity. 
@@ -124,13 +134,17 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 				this.disCharging.put(v.getId(), (LinkEnterEvent) e);
 			}else if(e instanceof ActivityStartEvent){
 				// store the event to process it later
-				this.charging.put(v.getId(), (ActivityStartEvent) e);
+				if(this.lastMode.containsKey(e.getPersonId()) && this.lastMode.get(e.getPersonId()).equals(TransportMode.car)){
+					this.charging.put(v.getId(), (ActivityStartEvent) e);
+				}
 				/* discharge here for the last passed link otherwise the avSpeedCalculation will be wrong,
 				 * because the TT then includes the activityDuration 
 				 * we don't need to check if a LinkEnterEvent is stored, because it _must_ be stored at this time
 				 */
-				Link l = net.getLinks().get(((ActivityEvent) e).getLinkId());
-				v.disCharge(this.calcDischargeInkWh(v, this.disCharging.remove(v.getId()), e, l), e.getTime(), l.getLength());
+				if(this.disCharging.containsKey(v.getId())){
+					Link l = net.getLinks().get(((ActivityEvent) e).getLinkId());
+					v.disCharge(this.calcDischargeInkWh(v, this.disCharging.remove(v.getId()), e, l), e.getTime(), l.getLength());
+				}
 			}
 		}
 	}
@@ -139,7 +153,7 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 		Double disChargePerKmInJoule = this.disChargingProfiles.getJoulePerKm(v.getDisChargingType(), 
 				this.calculateAvSpeed(enter.getTime(), e.getTime(), l), 
 				this.calculateSlopeInPercent(l));
-		return (disChargePerKmInJoule * l.getLength() / 1000. /(3.6 * Math.pow(10, 6)));
+		return (disChargePerKmInJoule * l.getLength() / 1000. * 2.778 * Math.pow(10, -7));
 	}
 
 	private double calculateAvSpeed(double start, double end, Link l){
@@ -155,5 +169,4 @@ public class ElectroVehicleHandler implements LinkEnterEventHandler, LinkLeaveEv
 		double slope = 0;
 		return slope*100;
 	}
-	
 }

@@ -20,10 +20,13 @@
 package playground.droeder.eMobility;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -41,8 +44,11 @@ public class ElectroVehicle {
 	private Double maxCharge;
 	private Double currentCharge;
 	private Double traveledDistance;
-	private ArrayList<Tuple<Double, Double>> time2charge;
-	private ArrayList<Tuple<Double, Double>> distance2charge;
+	private List<Tuple<Double, Double>> time2charge;
+	private List<Tuple<Double, Double>> distance2charge;
+
+
+
 
 
 	public ElectroVehicle(Id id, Double maxCharge, Double currentCharge){
@@ -89,7 +95,23 @@ public class ElectroVehicle {
 		return this.dischargingType;
 	}
 	
+	public void setDischargingType(Id type){
+		this.dischargingType = type;
+	}
+	
 	public Id getChargingType(){
 		return this.chargingType;
 	}
-}
+	
+	public void setChargingType(Id type){
+		this.chargingType = type;
+	}
+	
+	public List<Tuple<Double, Double>> getTime2Charge(){
+		return this.time2charge;
+	}
+	
+	public List<Tuple<Double, Double>> getDist2Charge(){
+		return this.distance2charge;
+	}
+ }
