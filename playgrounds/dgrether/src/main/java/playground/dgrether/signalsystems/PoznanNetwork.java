@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,12 +43,13 @@ import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.signalsystems.data.ambertimes.v10.*;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signalsystems.data.signalgroups.v20.*;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -76,10 +78,10 @@ public class PoznanNetwork
      Node n11 = netFactory.createNode(scenario.createId("11"), scenario.createCoord(800, 400));
      Node n12 = netFactory.createNode(scenario.createId("12"), scenario.createCoord(400, 0));
      Node n13 = netFactory.createNode(scenario.createId("13"), scenario.createCoord(0, 400));
-     Node n14 = netFactory.createNode(scenario.createId("14"), scenario.createCoord(400, 300));
+//     Node n14 = netFactory.createNode(scenario.createId("14"), scenario.createCoord(400, 300));//??
      
-     Node n20 = netFactory.createNode(scenario.createId("20"), scenario.createCoord(400, 420));
-     Node n21 = netFactory.createNode(scenario.createId("21"), scenario.createCoord(500, 420));
+     Node n20 = netFactory.createNode(scenario.createId("20"), scenario.createCoord(400, 460));
+     Node n21 = netFactory.createNode(scenario.createId("21"), scenario.createCoord(500, 460));
 
      Node n30 = netFactory.createNode(scenario.createId("30"), scenario.createCoord(400, 620));
      Node n31 = netFactory.createNode(scenario.createId("31"), scenario.createCoord(300, 620));
@@ -95,7 +97,7 @@ public class PoznanNetwork
      Node n72 = netFactory.createNode(scenario.createId("72"), scenario.createCoord(100, 830));
      
      Node n80 = netFactory.createNode(scenario.createId("80"), scenario.createCoord(400, 1040));
-     Node n81 = netFactory.createNode(scenario.createId("81"), scenario.createCoord(400, 970));
+     Node n81 = netFactory.createNode(scenario.createId("81"), scenario.createCoord(300, 1040));
      
      Node n90 = netFactory.createNode(scenario.createId("90"), scenario.createCoord(400, 1150));
      Node n91 = netFactory.createNode(scenario.createId("91"), scenario.createCoord(700, 1150));
@@ -105,7 +107,7 @@ public class PoznanNetwork
      network.addNode(n11);
      network.addNode(n12);
      network.addNode(n13);
-     network.addNode(n14);
+//     network.addNode(n14);
      network.addNode(n20);
      network.addNode(n21);
      network.addNode(n30);
@@ -134,19 +136,19 @@ public class PoznanNetwork
      l10_13.setLength(length);
      network.addLink(l10_13);
      
-     Link l12_14 = netFactory.createLink(scenario.createId("12_14"), n12, n14);
-     l12_14.setLength(300.0);
-     l12_14.setNumberOfLanes(1.0);
-     l12_14.setFreespeed(freespeed);
-     l12_14.setCapacity(capacity);
-     network.addLink(l12_14);
+     Link l12_10 = netFactory.createLink(scenario.createId("12_10"), n12, n10);
+     l12_10.setLength(400.0);
+     l12_10.setNumberOfLanes(1.0);
+     l12_10.setFreespeed(freespeed);
+     l12_10.setCapacity(capacity);
+     network.addLink(l12_10);
      
-     Link l14_10 = netFactory.createLink(scenario.createId("14_10"), n14, n10);
-     l14_10.setLength(100);
-     l14_10.setNumberOfLanes(2.0);
-     l14_10.setFreespeed(freespeed);
-     l14_10.setCapacity(capacity);
-     network.addLink(l14_10);
+//     Link l14_10 = netFactory.createLink(scenario.createId("14_10"), n14, n10);
+//     l14_10.setLength(100);
+//     l14_10.setNumberOfLanes(2.0);
+//     l14_10.setFreespeed(freespeed);
+//     l14_10.setCapacity(capacity);
+//     network.addLink(l14_10);
      
      Link l10_12 = netFactory.createLink(scenario.createId("10_12"), n10, n12);
      l10_12.setLength(length);
@@ -327,21 +329,21 @@ public class PoznanNetwork
      LaneDefinitions lanes = scenario.getLaneDefinitions();
      LaneDefinitionsFactory laneFactory = lanes.getFactory();
      //lanes for link 12_10 will not work with current network -> modified the network -> tutorial
-     LanesToLinkAssignment l2l = laneFactory.createLanesToLinkAssignment(l14_10.getId());
-     Lane lane = laneFactory.createLane(scenario.createId("14_10_1"));
+     LanesToLinkAssignment l2l = laneFactory.createLanesToLinkAssignment(l12_10.getId());
+     Lane lane = laneFactory.createLane(scenario.createId("12_10_1"));
      lane.addToLinkId(l10_13.getId());
      lane.setStartsAtMeterFromLinkEnd(90.0);
      l2l.addLane(lane);
 
-     lane = laneFactory.createLane(scenario.createId("14_10_2"));
+     lane = laneFactory.createLane(scenario.createId("12_10_2"));
      lane.addToLinkId(l10_20.getId());
      lane.setStartsAtMeterFromLinkEnd(90.0);
      l2l.addLane(lane);
      
-     lane = laneFactory.createLane(scenario.createId("14_10_3"));
+     lane = laneFactory.createLane(scenario.createId("12_10_3"));
      lane.addToLinkId(l10_20.getId());
      lane.addToLinkId(l10_11.getId());
-     lane.setStartsAtMeterFromLinkEnd(90.0);
+     lane.setStartsAtMeterFromLinkEnd(100.0);
      l2l.addLane(lane);
      
      lanes.addLanesToLinkAssignment(l2l);
@@ -500,25 +502,25 @@ public class PoznanNetwork
      lanes.addLanesToLinkAssignment(l2l);
      
      //create the traffic signal infrastructure
-			SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
-			SignalSystemsData signals = signalsData.getSignalSystemsData();
-			SignalGroupsData groups = signalsData.getSignalGroupsData();
+     SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+     SignalSystemsData signals = signalsData.getSignalSystemsData();
+     SignalGroupsData groups = signalsData.getSignalGroupsData();
 
-			SignalSystemsDataFactory sf = signals.getFactory();
+     SignalSystemsDataFactory sf = signals.getFactory();
      
      //signals at node 10
      SignalSystemData system = sf.createSignalSystemData(scenario.createId("ss10"));
      signals.addSignalSystemData(system);
 
-     SignalData signal = sf.createSignalData(scenario.createId("s14_10_1"));
-     signal.setLinkId(scenario.createId("14_10"));
-     signal.addLaneId(scenario.createId("14_10_1"));
+     SignalData signal = sf.createSignalData(scenario.createId("s12_10_1"));
+     signal.setLinkId(scenario.createId("12_10"));
+     signal.addLaneId(scenario.createId("12_10_1"));
      system.addSignalData(signal);
      
-     signal = sf.createSignalData(scenario.createId("s14_10_2"));
-     signal.setLinkId(scenario.createId("14_10"));
-     signal.addLaneId(scenario.createId("14_10_2"));
-     signal.addLaneId(scenario.createId("14_10_3"));
+     signal = sf.createSignalData(scenario.createId("s12_10_2"));
+     signal.setLinkId(scenario.createId("12_10"));
+     signal.addLaneId(scenario.createId("12_10_2"));
+     signal.addLaneId(scenario.createId("12_10_3"));
      system.addSignalData(signal);
      
      signal = sf.createSignalData(scenario.createId("s11_10_1"));
@@ -582,8 +584,66 @@ public class PoznanNetwork
      system.addSignalData(signal);
 
      //finally create a SignalGroup per signal
-     SignalUtils.createAndAddSignalGroups4Signals(groups, system);
+     SignalGroupsDataFactory gf = groups.getFactory();
+     SignalGroupData group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_1"));
+     group.addSignalId(scenario.createId("s30_10_1"));
+     group.addSignalId(scenario.createId("s30_40_2"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_0"));
+     group.addSignalId(scenario.createId("s30_10_3"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_2"));
+     group.addSignalId(scenario.createId("s11_10_3"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_3"));
+     group.addSignalId(scenario.createId("s11_10_1"));
+     group.addSignalId(scenario.createId("s11_10_2"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_4_1"));
+     group.addSignalId(scenario.createId("s12_10_3"));
+     groups.addSignalGroupData(group);
 
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_4_2"));
+     group.addSignalId(scenario.createId("s12_10_3"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_5"));
+     group.addSignalId(scenario.createId("s12_10_1"));
+     group.addSignalId(scenario.createId("s12_10_2"));
+     groups.addSignalGroupData(group);
+
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_6_1"));
+     group.addSignalId(scenario.createId("s13_10_3"));
+     groups.addSignalGroupData(group);
+
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_6_2"));
+     group.addSignalId(scenario.createId("s13_10_3"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_7"));
+     group.addSignalId(scenario.createId("s13_10_2"));
+     groups.addSignalGroupData(group);
+     
+     group = gf.createSignalGroupData(scenario.createId("ss10"), 
+             scenario.createId("sg_8"));
+     group.addSignalId(scenario.createId("s13_10_1"));
+     groups.addSignalGroupData(group);
+     
+     
      //TODO signal system for next node
      
      
@@ -602,80 +662,104 @@ public class PoznanNetwork
 			ssController.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER); 
 			SignalPlanData plan = scf.createSignalPlanData(scenario.createId("ss10_p1"));
 			ssController.addSignalPlanData(plan);
-			plan.setCycleTime(60);
+			plan.setCycleTime(113);
 			plan.setOffset(0); //coordination offset
 			//now the single signals (signal groups)
-			SignalGroupSettingsData settings = scf.createSignalGroupSettingsData(scenario.createId("s14_10_1"));
+			SignalGroupSettingsData settings = scf.createSignalGroupSettingsData(scenario.createId("sg_0"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(25);
+			settings.setDropping(20); 
 			plan.addSignalGroupSettings(settings);
 			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s14_10_2"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_1"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
-			plan.addSignalGroupSettings(settings);
+			settings.setOnset(112);
+			settings.setDropping(20); 
+//			plan.addSignalGroupSettings(settings);
 			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s11_10_1"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_2"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(1);
+			settings.setDropping(88); 
 			plan.addSignalGroupSettings(settings);
 
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s11_10_2"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_3"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(50);
+			settings.setDropping(88); 
 			plan.addSignalGroupSettings(settings);
 
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s11_10_3"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_1"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
-			plan.addSignalGroupSettings(settings);
-			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s30_10_1"));
-			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(67);
+			settings.setDropping(16);
 			plan.addSignalGroupSettings(settings);
 
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s30_10_2"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_2"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(25);
+			settings.setDropping(44);
 			plan.addSignalGroupSettings(settings);
 			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s30_10_3"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_5"));
 			//green from second 0 to 30 in cycle
-			settings.setOnset(0);
-			settings.setDropping(30); 
+			settings.setOnset(25);
+			settings.setDropping(44); 
+			plan.addSignalGroupSettings(settings);
+
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_1"));
+			//green from second 0 to 30 in cycle
+			settings.setOnset(15);
+			settings.setDropping(44); 
+			plan.addSignalGroupSettings(settings);
+
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_2"));
+            //green from second 0 to 30 in cycle
+            settings.setOnset(50);
+            settings.setDropping(88); 
+            plan.addSignalGroupSettings(settings);
+			
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_7"));
+			//green from second 0 to 30 in cycle
+			settings.setOnset(50);
+			settings.setDropping(88); 
 			plan.addSignalGroupSettings(settings);
 			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s13_10_1"));
+			settings = scf.createSignalGroupSettingsData(scenario.createId("sg_8"));
 			//green from second 30 to 55 in cycle
-			settings.setOnset(30);
-			settings.setDropping(55); 
+			settings.setOnset(93);
+			settings.setDropping(110); 
 			plan.addSignalGroupSettings(settings);
 
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s13_10_2"));
-			//green from second 30 to 55 in cycle
-			settings.setOnset(30);
-			settings.setDropping(55); 
-			plan.addSignalGroupSettings(settings);
-			
-			settings = scf.createSignalGroupSettingsData(scenario.createId("s13_10_3"));
-			//green from second 30 to 55 in cycle
-			settings.setOnset(30);
-			settings.setDropping(55); 
-			plan.addSignalGroupSettings(settings);
-			
-			
 }
 
+		private static void createAmbertimes(SignalsData signalsData) {
+		    AmberTimesData amberTimes = signalsData.getAmberTimesData();
+		    amberTimes.setDefaultAmber(3);
+		    amberTimes.setDefaultRedAmber(1);
+		}
+		
     
-	 
+	    private static void createPopulation(ScenarioImpl scenario)
+	    {
+	        Population pop = scenario.getPopulation();
+	        PopulationFactory pf = pop.getFactory();
+	        for (int i = 1; i <= 100; i++) {
+	            Person person = pf.createPerson(scenario.createId(Integer.toString(i)));
+	            pop.addPerson(person);
+	            Plan plan = pf.createPlan();
+	            Activity homeAct = pf.createActivityFromLinkId("home", scenario.createId("91_90"));
+	            homeAct.setEndTime(120 + i * 5);
+	            plan.addActivity(homeAct);
+	            Leg leg = pf.createLeg(TransportMode.car);
+	            plan.addLeg(leg);
+	            homeAct = pf.createActivityFromLinkId("home", scenario.createId("10_12"));
+	            plan.addActivity(homeAct);
+	            person.addPlan(plan);
+	        }
+	    }
+
+		
 	 
     public static void main(String[] args)
     {
@@ -698,10 +782,14 @@ public class PoznanNetwork
         SignalControlDataConsistencyChecker sccc = new SignalControlDataConsistencyChecker(scenario);
         sccc.checkConsistency();
         
+        createAmbertimes(scenario.getScenarioElement(SignalsData.class));
+        
+        createPopulation(scenario);
+        
 //        System.exit(0);
         
         //output
-        String baseDir = "/media/data/work/matsim/examples/poznan/";
+        String baseDir = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\";
         
         SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
         String signalSystemsFile = baseDir + "signal_systems.xml";
@@ -713,6 +801,9 @@ public class PoznanNetwork
     		String signalControlFile = baseDir + "signal_control.xml";
     		signalsWriter.setSignalControlOutputFilename(signalControlFile);
     		config.signalSystems().setSignalControlFile(signalControlFile);
+    		String amberTimesFile = baseDir + "amber_times.xml";
+    		signalsWriter.setAmberTimesOutputFilename(amberTimesFile);
+    		config.signalSystems().setAmberTimesFile(amberTimesFile);
     		signalsWriter.writeSignalsData(scenario.getScenarioElement(SignalsData.class));
         
         String lanesOutputFile = baseDir + "lanes.xml";
@@ -724,6 +815,10 @@ public class PoznanNetwork
 //        String lanes20OutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes20.xml";        
         new LaneDefinitionsWriter20(lanes20).write(lanes20OutputFile);
         config.network().setLaneDefinitionsFile(lanes20OutputFile);
+
+        String popFilename = baseDir + "population.xml";
+        new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(popFilename);
+        config.plans().setInputFile(popFilename);
         
         String networkFilename = baseDir + "network.xml";
 //        String networkFilename = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\network.xml";
@@ -739,10 +834,5 @@ public class PoznanNetwork
         OTFVis.playConfig(configFilename);
     }
 
-
-
-
-    
-    
 
 }
