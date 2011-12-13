@@ -1,5 +1,6 @@
 package playground.wrashid.lib.obj;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
@@ -11,7 +12,7 @@ public class StringMatrixTest extends TestCase{
 		
 		assertEquals(0, matrix.getNumberOfRows());
 		
-		LinkedList<String> row=new LinkedList<String>();
+		ArrayList<String> row=new ArrayList<String>();
 		row.add("1");
 		
 		matrix.addRow(row);
