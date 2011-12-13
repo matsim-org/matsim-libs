@@ -144,7 +144,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 		
 		ArrayList<String> list=new ArrayList<String>();
 		
-		list.add("agentId\tparkingId\tstartParkingTime[\tendParkingTime]");
+		list.add("agentId\tparkingId\tstartParkingTime\tendParkingTime");
 		
 		StringBuffer sb=null;
 		
@@ -159,10 +159,11 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				sb.append(parkingInfo.getParkingId());
 				sb.append("\t");
 				sb.append(parkingInfo.getArrivalTime());
-				//sb.append("\t");
-				//sb.append(parkingInfo.getDepartureTime());
-				//TODO: there is some bug in the departure time, therefore it is left out at the
-				// moment (it is also needed for the application here, if needed, turn it on).
+				sb.append("\t");
+				sb.append(0.0);
+				
+				//TODO: there is some bug in the departure time, therefore it is set to zero at the
+				// moment (it is also not needed for the application here, if needed, turn it on).
 				
 				list.add(sb.toString());
 			}

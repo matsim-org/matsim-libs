@@ -1,5 +1,6 @@
 package playground.wrashid.artemis.lav;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import playground.wrashid.lib.DebugLib;
@@ -34,7 +35,7 @@ public class LAVLib {
 				if (ignoreFirstLine){
 					ignoreFirstLine=false;
 				} else {
-					LinkedList<String> rowList = GeneralLib.convertStringArrayToList(columns);
+					ArrayList<String> rowList = GeneralLib.convertStringArrayToArrayList(columns);
 					stringMatrix.addRow(rowList);
 				}
 			} else {

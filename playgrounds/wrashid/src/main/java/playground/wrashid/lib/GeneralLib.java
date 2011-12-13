@@ -699,6 +699,7 @@ public class GeneralLib {
 		return list;
 	}
 	
+	// TODO: move implementation to String matrix class...
 	public static StringMatrix readStringMatrix(String fileName, String delim) {
 		StringMatrix matrix = new StringMatrix();
 
@@ -717,7 +718,7 @@ public class GeneralLib {
 			StringTokenizer tokenizer;
 			line = br.readLine();
 			while (line != null) {
-				LinkedList<String> row = new LinkedList<String>();
+				ArrayList<String> row = new ArrayList<String>();
 
 				if (delim==null){
 					tokenizer = new StringTokenizer(line);
@@ -834,5 +835,16 @@ public class GeneralLib {
 		}
 		return list;
 	}
+	
+	public static ArrayList<String> convertStringArrayToArrayList(String[] array){
+		ArrayList<String> list=new ArrayList<String>();
+		for (int i=0;i<array.length;i++){
+			String trimedString = array[i].trim();
+			if (trimedString.length()>0){
+				list.add(trimedString);
+			}
+		}
+		return list;
+	} 
 	
 }
