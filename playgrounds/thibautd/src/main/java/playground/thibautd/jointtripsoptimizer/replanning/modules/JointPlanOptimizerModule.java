@@ -79,14 +79,21 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 		PlansCalcRoute routingAlgorithm = (PlansCalcRoute) this.controler.createRoutingAlgorithm(
 				this.travelCost, this.travelTime);
 
+		// if the module is called outside the iterations, 
+		// the path for the graphs is set to the tmp path
+		Integer it = controler.getIterationNumber();
+		String iterationOutNumber =
+			it != null ?
+			controler.getControlerIO().getIterationPath( it ) :
+			controler.getControlerIO().getTempPath();
+
 		return new JointPlanOptimizer(
 					this.configGroup,
 					controler.getScoringFunctionFactory(),
 					this.legTravelTimeEstimatorFactory,
 					routingAlgorithm,
 					this.network,
-					controler.getControlerIO().getIterationPath(
-						controler.getIterationNumber())
+					iterationOutNumber
 					);
 	}
 }
