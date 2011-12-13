@@ -31,9 +31,9 @@ import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
  * @deprecated is only valid for the  1.1 model
  */
 @Deprecated
-public class SignalSystemsConsistencyChecker implements ConsistencyChecker {
+public class SignalSystems11ConsistencyChecker implements ConsistencyChecker {
 	
-	private static final Logger log = Logger.getLogger(SignalSystemsConsistencyChecker.class);
+	private static final Logger log = Logger.getLogger(SignalSystems11ConsistencyChecker.class);
 	
 	private Network network;
 	private LaneDefinitions lanes;
