@@ -27,8 +27,6 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.config.ConfigUtils;
 
-import herbie.running.config.HerbieConfigGroup;
-
 import playground.thibautd.jointtripsoptimizer.population.CliquesXmlReader;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsReader;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
@@ -106,20 +104,16 @@ public class JointControlerUtils {
 	 * @return a loaded config, including proper setting of joint trips specific groups
 	 */
 	public static Config createConfig(final String configFile) {
+		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
+		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
+
 		Config config = ConfigUtils.createConfig();
 
 		// /////////////////////////////////////////////////////////////////////
 		// initialize the config before passing it to the controler
 		config.addCoreModules();
-		config.addModule(
-				JointReplanningConfigGroup.GROUP_NAME,
-				new JointReplanningConfigGroup());
-		config.addModule(
-				CliquesConfigGroup.GROUP_NAME,
-				new CliquesConfigGroup());
-		config.addModule(
-				HerbieConfigGroup.GROUP_NAME,
-				new HerbieConfigGroup());
+		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
+		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
 
 		//read the config file
 		ConfigUtils.loadConfig(config, configFile);
@@ -137,18 +131,18 @@ public class JointControlerUtils {
 
 		if (nFacilities > 0) {
 			Config config = controler.getConfig();
-			// PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
-			// 	config.planCalcScore();
+			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = 
+				config.planCalcScore();
 
 			// TODO: choose from some config group?
 			ScoringFunctionFactory factory =
 				// new CharyparNagelOpenTimesScoringFunctionFactory(
-				//		planCalcScoreConfigGroup,
-				//		controler.getScenario());
 				new KtiLikeActivitiesScoringFunctionFactory(
-				//new HerbieBasedScoringFunctionFactory(
-						config,
+						planCalcScoreConfigGroup,
 						controler.getScenario());
+				//new HerbieBasedScoringFunctionFactory(
+				//		config,
+				//		controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
 			controler.addControlerListener( CarPoolingLegScoringFunction.getInformationLogger() );
 		}
