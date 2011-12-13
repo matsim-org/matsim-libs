@@ -19,12 +19,19 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,17 +46,18 @@ import org.matsim.lanes.LaneDefinitionsWriter11;
 import org.matsim.lanes.LaneDefinitionsWriter20;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.run.OTFVis;
-import org.matsim.signalsystems.SignalUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.data.ambertimes.v10.*;
+import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signalsystems.data.signalgroups.v20.*;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataFactory;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -58,6 +66,7 @@ import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
 import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
+import playground.dgrether.signalsystems.data.consistency.SignalGroupsDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalSystemsDataConsistencyChecker;
 
 /**
@@ -522,6 +531,11 @@ public class PoznanNetwork
      signal.addLaneId(scenario.createId("12_10_2"));
      signal.addLaneId(scenario.createId("12_10_3"));
      system.addSignalData(signal);
+
+     signal = sf.createSignalData(scenario.createId("s12_10_3"));
+     signal.setLinkId(scenario.createId("12_10"));
+     signal.addLaneId(scenario.createId("12_10_3"));
+     system.addSignalData(signal);
      
      signal = sf.createSignalData(scenario.createId("s11_10_1"));
      signal.setLinkId(scenario.createId("11_10"));
@@ -583,12 +597,12 @@ public class PoznanNetwork
      signal.addLaneId(scenario.createId("13_10_3"));
      system.addSignalData(signal);
 
-     //finally create a SignalGroup per signal
+     //create SignalGroups 
      SignalGroupsDataFactory gf = groups.getFactory();
      SignalGroupData group = gf.createSignalGroupData(scenario.createId("ss10"), 
              scenario.createId("sg_1"));
      group.addSignalId(scenario.createId("s30_10_1"));
-     group.addSignalId(scenario.createId("s30_40_2"));
+     group.addSignalId(scenario.createId("s30_10_2"));
      groups.addSignalGroupData(group);
      
      group = gf.createSignalGroupData(scenario.createId("ss10"), 
@@ -777,6 +791,10 @@ public class PoznanNetwork
         lcc.checkConsistency();
         SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario);
         sscc.checkConsistency();
+        
+        SignalGroupsDataConsistencyChecker sgcc = new SignalGroupsDataConsistencyChecker(scenario);
+        sgcc.checkConsistency();
+        
         //create the signal control
         createSignalControl(scenario);
         SignalControlDataConsistencyChecker sccc = new SignalControlDataConsistencyChecker(scenario);
@@ -789,7 +807,8 @@ public class PoznanNetwork
 //        System.exit(0);
         
         //output
-        String baseDir = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\";
+//        String baseDir = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\";
+        String baseDir = "/media/data/work/matsim/examples/poznan/";
         
         SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
         String signalSystemsFile = baseDir + "signal_systems.xml";
