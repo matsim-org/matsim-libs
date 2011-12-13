@@ -6,7 +6,7 @@ x	x
 parkingTimesInputFileName	#szenarioFolder#output/parkingTimesAndLegEnergyConsumption.txt
 parkingTimesOutputFileName	#szenarioFolder#output/parkingTimesAndLegEnergyConsumption_n.txt
 chargingLogInputFileName	#szenarioFolder#output/chargingLog.txt
-chargingLogOutputFileName	#szenarioFolder#output/chargingLog_o.txt
+chargingLogOutputFileName	#szenarioFolder#output/chargingLog_n.txt
 x	x
 parkingDataBase	H:/data/experiments/TRBAug2011/parkings/flat/
 parkingFileFlatFormat_1	#parkingDataBase#privateParkings_v1_kti.xml
