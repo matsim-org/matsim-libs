@@ -167,7 +167,7 @@ public class CreateScenario {
 		
 		
 		int cnt = -1;
-		for (int i = 1; i <= 2; i++) {
+		for (int i = 1; i <= 100; i++) {
 			// Agent(Id id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway)
 			
 			// agent from bottom left
