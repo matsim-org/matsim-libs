@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -41,6 +42,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import playground.benjamin.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+
 /**
  * @author benjamin
  *
@@ -49,32 +52,43 @@ public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 AgentArrivalEventHandler, AgentDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
-	private final Vehicles emissionVehicles;
-	private final Network network;
-	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+	Vehicles emissionVehicles;
+	Network network;
+	ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
-	private final Map<Id, Double> linkenter = new TreeMap<Id, Double>();
-	private final Map<Id, Double> linkleave = new TreeMap<Id, Double>();
-	private final Map<Id, Double> startEngine = new TreeMap<Id, Double>();
-	private final Map<Id, Double> stopEngine = new TreeMap<Id, Double>();
+	Map<Id, Double> linkenter = new TreeMap<Id, Double>();
+	Map<Id, Double> linkleave = new TreeMap<Id, Double>();
+	Map<Id, Double> startEngine = new TreeMap<Id, Double>();
+	Map<Id, Double> stopEngine = new TreeMap<Id, Double>();
 
-	private final Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
-	private final Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
-	private final Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
+	Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
+	Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
+	Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
 
 
 	public ColdEmissionHandler(
 			Vehicles emissionVehicles,
 			Network network,
-			ColdEmissionAnalysisModule coldEmissionAnalysisModule ){
+			ColdEmissionAnalysisModuleParameter parameterObject2,
+			EventsManager emissionEventsManager ){
 		
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.coldEmissionAnalysisModule = coldEmissionAnalysisModule;
+		this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager);
 	}
 
 	@Override
 	public void reset(int iteration) {
+		linkenter.clear();
+		linkleave.clear();
+		startEngine.clear();
+		stopEngine.clear();
+		
+		accumulatedDistance.clear();
+		parkingDuration.clear();
+		personId2coldEmissionEventLinkId.clear();
+		
+		coldEmissionAnalysisModule.reset();
 	}
 
 	@Override
@@ -163,5 +177,9 @@ AgentArrivalEventHandler, AgentDepartureEventHandler{
 			parkingDuration = 43200.0;
 		}
 		this.parkingDuration.put(personId, parkingDuration);
+	}
+	
+	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule(){
+		return coldEmissionAnalysisModule;
 	}
 }

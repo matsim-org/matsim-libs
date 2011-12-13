@@ -31,12 +31,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import playground.benjamin.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+import playground.benjamin.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.HbefaColdEmissionFactor;
 import playground.benjamin.emissions.types.HbefaColdEmissionFactorKey;
@@ -51,11 +53,13 @@ import playground.benjamin.emissions.types.WarmPollutant;
  * @author benjamin
  *
  */
-public class EmissionHandler {
-	private static final Logger logger = Logger.getLogger(EmissionHandler.class);
+public class EmissionModule {
+	private static final Logger logger = Logger.getLogger(EmissionModule.class);
 	
 	final Scenario scenario;
-	static EventWriterXML emissionEventWriter;
+	WarmEmissionHandler warmEmissionHandler;
+	ColdEmissionHandler coldEmissionHandler;
+	EventsManager emissionEventsManager;
 
 	//===
 	static String roadTypeMappingFile;
@@ -77,11 +81,11 @@ public class EmissionHandler {
 	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
-	public EmissionHandler(Scenario scenario) {
+	public EmissionModule(Scenario scenario) {
 		this.scenario = scenario;
 	}
 	
-	public EmissionHandler(Scenario scenario, Vehicles emissionVehicles) {
+	public EmissionModule(Scenario scenario, Vehicles emissionVehicles) {
 		this.scenario = scenario;
 		this.emissionVehicles = emissionVehicles;
 	}
@@ -113,7 +117,7 @@ public class EmissionHandler {
 		
 		roadTypeMappingFile = scenario.getConfig().vspExperimental().getEmissionRoadTypeMappingFile();
 		emissionVehicleFile = scenario.getConfig().vspExperimental().getEmissionVehicleFile();
-
+	
 		averageFleetWarmEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageWarmEmissionFactorsFile();
 		averageFleetColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getAverageColdEmissionFactorsFile();
 		
@@ -121,42 +125,18 @@ public class EmissionHandler {
 		detailedColdEmissionFactorsFile = scenario.getConfig().vspExperimental().getDetailedColdEmissionFactorsFile();
 	}
 
-	public void installEmissionEventHandler(EventsManager eventsManager, String emissionEventOutputFile) {
-		logger.info("entering installEmissionsEventHandler") ;
+	public void createEmissionHandler() {
+		logger.info("entering createEmissionHandler");
 		
-		EventsManager emissionEventsManager = EventsUtils.createEventsManager();
+		emissionEventsManager = EventsUtils.createEventsManager();
 		Network network = scenario.getNetwork() ;
 
-		// instantiate analysis modules
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(
-				roadTypeMapping,
-				avgHbefaWarmTable,
-				detailedHbefaWarmTable,
-				emissionEventsManager);
-		ColdEmissionAnalysisModule coldEmissionAnalysisModule = new ColdEmissionAnalysisModule (
-				avgHbefaColdTable,
-				detailedHbefaColdTable,
-				emissionEventsManager);
+		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable);
 		
-		// create different emission handler
-		WarmEmissionHandler warmEmissionHandler = new WarmEmissionHandler(
-				emissionVehicles,
-				network,
-				warmEmissionAnalysisModule);
-		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler(
-				emissionVehicles,
-				network,
-				coldEmissionAnalysisModule);
-		
-		// create the writer for emission events
-		emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-		emissionEventsManager.addHandler(emissionEventWriter);
-		
-		// add the handler
-		eventsManager.addHandler(warmEmissionHandler);
-		eventsManager.addHandler(coldEmissionHandler);
-		
-		logger.info("leaving installEmissionsEventHandler") ;
+		warmEmissionHandler = new WarmEmissionHandler(emissionVehicles,	network, parameterObject, emissionEventsManager);
+		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager);
+		logger.info("leaving createEmissionHandler");
 	}
 
 	private Map<Integer, String> createRoadTypeMapping(String filename){
@@ -425,7 +405,44 @@ public class EmissionHandler {
 		return hbefaTrafficSituation;
 	}
 
-	public EventWriterXML getEmissionEventWriter() {
-		return emissionEventWriter;
+	public EventHandler getWarmEmissionsHandler() {
+		return warmEmissionHandler;	
+	}
+
+	public EventHandler getColdEmissionsHandler() {
+		return coldEmissionHandler;
+	}
+
+	public EventsManager getEmissionEventsManager() {
+		return emissionEventsManager;
+	}
+
+	public void writeEmissionInformation(String emissionEventOutputFile) {
+		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
+				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+		
+		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
+		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
+		
+		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
+				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		
+		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
+				wam.getKmCounter() + " km, where emissions were calculated.");
+		logger.info("Stop&Go orrured on " + wam.getStopGoKmCounter() + " km of total " +
+				wam.getKmCounter() + " km, where emissions were calculated.");
+		
+		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
+				+ wam.getVehAttributesNotSpecified().size() + " of "
+				+ wam.getVehicleIdSet().size() + " vehicles.");
+		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
+				+ cam.getVehAttributesNotSpecified().size() + " of "
+				+ cam.getVehicleIdSet().size() + " vehicles.");
+		
+		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 }

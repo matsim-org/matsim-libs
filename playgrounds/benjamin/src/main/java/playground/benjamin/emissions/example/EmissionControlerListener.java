@@ -31,10 +31,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import playground.benjamin.emissions.ColdEmissionAnalysisModule;
-import playground.benjamin.emissions.EmissionHandler;
-import playground.benjamin.emissions.WarmEmissionAnalysisModule;
-import playground.benjamin.emissions.WarmEmissionHandler;
+import playground.benjamin.emissions.EmissionModule;
 
 /**
  * @author benjamin
@@ -46,9 +43,11 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 	Controler controler;
 	String emissionEventOutputFile;
 	Integer lastIteration;
-	EmissionHandler emissionHandler;
+	EmissionModule emissionModule;
+	EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
+		
 	}
 
 	@Override
@@ -58,53 +57,33 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		logger.info("emissions will be calculated for iteration " + lastIteration);
 		
 		Scenario scenario = controler.getScenario() ;
-		emissionHandler = new EmissionHandler(scenario);
-		emissionHandler.createLookupTables();
+		emissionModule = new EmissionModule(scenario);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+		
+		EventsManager eventsManager = controler.getEvents();
+		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Integer iteration = event.getIteration();
-		
+
 		if(lastIteration.equals(iteration)){
-			computeEmissions(iteration);
+			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
+			logger.info("creating new emission events writer...");
+			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+			logger.info("adding emission events writer to emission events stream...");
+			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 		}
 	}
 
-	private void computeEmissions(Integer iteration) {
-		logger.info("entering computeEmissions ...") ;
-		
-		EventsManager eventsManager = controler.getEvents();
-		
-		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-		
-		emissionHandler.installEmissionEventHandler(eventsManager, emissionEventOutputFile);
-
-		logger.info("leaving computeEmissions ...") ;
-}
-
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
+		logger.info("closing emission events file...");
 		emissionEventWriter.closeFile();
-		logger.info("Warm emissions were not calculated for " + WarmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				WarmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
-		logger.info("Emission calculation based on `Free flow only' occured for " + WarmEmissionAnalysisModule.getFreeFlowOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + WarmEmissionAnalysisModule.getStopGoOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + WarmEmissionAnalysisModule.getFractionOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Free flow occured on " + WarmEmissionAnalysisModule.getFreeFlowKmCounter() + " km of total " + 
-				WarmEmissionAnalysisModule.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + WarmEmissionAnalysisModule.getStopGoKmCounter() + " km of total " + 
-				WarmEmissionAnalysisModule.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
-				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
-				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
-		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
-				+ ColdEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
-				+ ColdEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
-		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
+	
 }

@@ -34,10 +34,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.benjamin.emissions.ColdEmissionAnalysisModule;
-import playground.benjamin.emissions.EmissionHandler;
-import playground.benjamin.emissions.WarmEmissionAnalysisModule;
-import playground.benjamin.emissions.WarmEmissionHandler;
+import playground.benjamin.emissions.EmissionModule;
 
 /**
  * @author benjamin
@@ -46,21 +43,21 @@ import playground.benjamin.emissions.WarmEmissionHandler;
 public class RunEmissionToolOffline {
 	private static final Logger logger = Logger.getLogger(RunEmissionToolOffline.class);
 
-	final static String runNumber = "981";
-	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
-	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
-	static final Integer lastIteration = getLastIteration(configFile);
+//	final static String runNumber = "981";
+//	final static String runDirectory = "../../runs-svn/run" + runNumber + "/";
+//	static String configFile = runDirectory + runNumber + ".output_config.xml.gz";
+//	static final Integer lastIteration = getLastIteration(configFile);
+//	
+//	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
+//	static String eventsFile = eventsPath + ".events.xml.gz";
+//	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
+//	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
+//	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
 	
-	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" + runNumber + "." + lastIteration;
-	static String eventsFile = eventsPath + ".events.xml.gz";
-	private static String netFile = runDirectory + runNumber + ".output_network.xml.gz";
-	static String emissionVehicleFile = "../../detailedEval/pop/merged/emissionVehicles_10pct.xml.gz";
-	static String emissionEventOutputFile = eventsPath + ".emission.events.xml.gz";
-	
-//	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
-//	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
-//	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_1pct.xml.gz";
-//	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
+	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
+	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
+	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_1pct.xml.gz";
+	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
@@ -87,36 +84,22 @@ public class RunEmissionToolOffline {
 		
 		setInputFiles();
 		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionModule emissionModule = new EmissionModule(scenario);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
 		
-		EmissionHandler emissionHandler = new EmissionHandler(scenario);
-		emissionHandler.createLookupTables();
-		emissionHandler.installEmissionEventHandler(eventsManager, emissionEventOutputFile);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
 		
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
 		
-		EventWriterXML emissionEventWriter = emissionHandler.getEmissionEventWriter();
+		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 		emissionEventWriter.closeFile();
-		logger.info("Warm emissions were not calculated for " + WarmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				WarmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
-		logger.info("Emission calculation based on `Free flow only' occured for " + WarmEmissionAnalysisModule.getFreeFlowOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + WarmEmissionAnalysisModule.getStopGoOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + WarmEmissionAnalysisModule.getFractionOccurences() + " of " +
-				WarmEmissionAnalysisModule.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Free flow occured on " + WarmEmissionAnalysisModule.getFreeFlowKmCounter() + " km of total " + 
-				WarmEmissionAnalysisModule.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + WarmEmissionAnalysisModule.getStopGoKmCounter() + " km of total " + 
-				WarmEmissionAnalysisModule.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
-				+ WarmEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
-				+ WarmEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
-		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
-				+ ColdEmissionAnalysisModule.getVehAttributesNotSpecified().size() + " of "
-				+ ColdEmissionAnalysisModule.getVehicleIdSet().size() + " vehicles.");
-		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+
+		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
 
 	private void setInputFiles() {

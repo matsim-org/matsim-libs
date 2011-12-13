@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -41,6 +42,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import playground.benjamin.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+
 /**
  * @author benjamin
  *
@@ -48,25 +51,42 @@ import org.matsim.vehicles.Vehicles;
 public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
-	private final Network network;
-	private final Vehicles emissionVehicles;
-	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
-	private static int linkLeaveCnt = 0;
-	private static int linkLeaveWarnCnt = 0;
-	private static int maxLinkLeaveWarnCnt = 3;
+	Network network;
+	Vehicles emissionVehicles;
+	WarmEmissionAnalysisModule warmEmissionAnalysisModule;
+	
+	int linkLeaveCnt = 0;
+	int linkLeaveWarnCnt = 0;
+	final int maxLinkLeaveWarnCnt = 3;
 
-	private final Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
-	private final Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
-	private final Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
+	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
+	Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
+	Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
 
-	public WarmEmissionHandler(Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
+	public WarmEmissionHandler(
+			Vehicles emissionVehicles,
+			final Network network, 
+			WarmEmissionAnalysisModuleParameter parameterObject,
+			EventsManager emissionEventsManager) {
+		
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
+		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager);	
 	}
+	
+	@Override
 	public void reset(int iteration) {
+		linkLeaveCnt = 0;
+		linkLeaveWarnCnt = 0;
+		
+		linkenter.clear();
+		agentarrival.clear();
+		agentdeparture.clear();
+		
+		warmEmissionAnalysisModule.reset();
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
 			return;
@@ -75,6 +95,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		this.agentarrival.put(event.getPersonId(), linkId2Time);
 	}
 
+	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
 			return;
@@ -83,11 +104,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		this.agentdeparture.put(event.getPersonId(), linkId2Time);
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
 		this.linkenter.put(event.getPersonId(), linkId2Time);
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		linkLeaveCnt++;
 		Id personId= event.getPersonId();
@@ -143,22 +166,24 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 		VehicleType vehicleType = vehicle.getType();
 		vehicleInformation = vehicleType.getId().toString();
 
-		//TODO: remove this after debuging
-		double linkLength_km = linkLength / 1000;
-		double travelTime_h = travelTime / 3600;
-		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
-		double averageSpeed_kmh_double = (linkLength_km / travelTime_h);
-		int freeFlowSpeed_kmh_int = (int) Math.round(freeFlowSpeed_kmh_double);
-		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
-		
-		logger.info(linkId + "| " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + "| " + freeFlowSpeed_kmh_double + " ;" + freeFlowSpeed_kmh_int);
-		
-		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
-			logger.info("departureTime_h: " + this.agentdeparture.get(personId).getSecond() / 3600);
-			logger.info("arrivalTime_h: " + this.agentarrival.get(personId).getSecond() / 3600);
-			logger.info("averageSpeed_kmh: " + averageSpeed_kmh_int + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh_int);
-			throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
-		}
+		// ===
+		// TODO: remove this after debuging
+//		double linkLength_km = linkLength / 1000;
+//		double travelTime_h = travelTime / 3600;
+//		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
+//		double averageSpeed_kmh_double = (linkLength_km / travelTime_h);
+//		int freeFlowSpeed_kmh_int = (int) Math.round(freeFlowSpeed_kmh_double);
+//		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
+//		
+//		logger.info(linkId + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
+//		
+//		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
+//			logger.info("departureTime_h: " + this.agentdeparture.get(personId).getSecond() / 3600);
+//			logger.info("arrivalTime_h: " + this.agentarrival.get(personId).getSecond() / 3600);
+//			logger.info("averageSpeed_kmh: " + averageSpeed_kmh_int + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh_int);
+//			throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
+//		}
+		// ===
 		
 		warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
 				linkId,
@@ -171,11 +196,14 @@ public class WarmEmissionHandler implements LinkEnterEventHandler,LinkLeaveEvent
 				vehicleInformation);
 	}
 
-	public static int getLinkLeaveCnt() {
+	public int getLinkLeaveCnt() {
 		return linkLeaveCnt;
 	}
-	public static int getLinkLeaveWarnCnt() {
+	public int getLinkLeaveWarnCnt() {
 		return linkLeaveWarnCnt;
 	}
 
+	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
+		return warmEmissionAnalysisModule;
+	}
 }

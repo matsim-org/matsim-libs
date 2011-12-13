@@ -26,7 +26,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -44,7 +48,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -91,7 +94,7 @@ public class RunInternalizationTest {
 	}
 
 	private void specifyControler() {
-		// controler settings	
+	// controler settings	
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		
@@ -99,7 +102,7 @@ public class RunInternalizationTest {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(0);
+		ccg.setLastIteration(10);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
@@ -156,70 +159,83 @@ public class RunInternalizationTest {
 	}
 
 	private void createPassiveAgents() {
+		// TODO: make code homogeneous by using factories!
 		for(int i=0; i<10; i++){
 			PersonImpl person = new PersonImpl (new IdImpl(i));
 			PlanImpl plan = person.createAndAddPlan(true);
-			ActivityImpl home = plan.createAndAddActivity("home", new IdImpl("11"));
+			
+			ActivityImpl home = plan.createAndAddActivity("home", scenario.createId("11"));
 			home.setEndTime(6 * 3600);
+			home.setCoord(scenario.createCoord(0.0, 0.0));
 			
-			plan.createAndAddActivity("home", new IdImpl("11"));
+			plan.createAndAddLeg(TransportMode.walk);
 			
-			this.scenario.getPopulation().addPerson(person);
+			ActivityImpl home2 = plan.createAndAddActivity("home", scenario.createId("11"));
+			home2.setCoord(scenario.createCoord(0.0, 0.0));
+			
+			scenario.getPopulation().addPerson(person);
 		}
 	}
 
 	private void createActiveAgents() {
-		PersonImpl person = new PersonImpl (new IdImpl("worker"));
-		PlanImpl plan = person.createAndAddPlan(true);
+		PopulationFactory pFactory = scenario.getPopulation().getFactory();
+		Person person = pFactory.createPerson(scenario.createId("worker"));
+		Plan plan = pFactory.createPlan();
 		
-		ActivityImpl home = plan.createAndAddActivity("home", new IdImpl("1"));
+		Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("1"));
 		home.setEndTime(6 * 3600);
-		plan.createAndAddLeg(TransportMode.car);
+		plan.addActivity(home);
 		
-		ActivityImpl work = plan.createAndAddActivity("work", new IdImpl("4"));
+		Leg leg1 = pFactory.createLeg(TransportMode.car);
+		plan.addLeg(leg1);
+		
+		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("4"));
 		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
-		plan.createAndAddLeg(TransportMode.car);
+		plan.addActivity(work);
 		
-		plan.createAndAddActivity("home", new IdImpl("1"));
+		Leg leg2 = pFactory.createLeg(TransportMode.car);
+		plan.addLeg(leg2);
 		
-		this.scenario.getPopulation().addPerson(person);
+		plan.addActivity(home);
+		
+		person.addPlan(plan);
+		scenario.getPopulation().addPerson(person);
 	}
 
 	private void createVehicles() {
 		this.emissionVehicles = VehicleUtils.createVehiclesContainer();
-		Id vehTypeId = new IdImpl(HbefaVehicleCategory.PASSENGER_CAR.toString());
+		Id vehTypeId = scenario.createId(HbefaVehicleCategory.PASSENGER_CAR.toString());
 		VehicleType vehicleType = this.emissionVehicles.getFactory().createVehicleType(vehTypeId);
-		for(Person person : this.scenario.getPopulation().getPersons().values()){
+		for(Person person : scenario.getPopulation().getPersons().values()){
 			Vehicle vehicle = this.emissionVehicles.getFactory().createVehicle(person.getId(), vehicleType);
 			this.emissionVehicles.getVehicles().put(vehicle.getId(), vehicle);
 		}
-		
 	}
 
 	private void createNetwork() {
-		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(-20000.0,     0.0));
-        Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(-17500.0,     0.0));
-        Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(-10000.0,     0.0));
-        Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl( -5000.0,     0.0));
-        Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(     0.0,     0.0));
-        Node node6 = network.createAndAddNode(new IdImpl("6"), new CoordImpl( -5000.0, -8660.0));
-        Node node7 = network.createAndAddNode(new IdImpl("7"), new CoordImpl(-15000.0, -8660.0));
-        Node node8 = network.createAndAddNode(new IdImpl("8"), new CoordImpl( -7500.0,  2500.0));
-        Node node9 = network.createAndAddNode(new IdImpl("9"), new CoordImpl( -7500.0, -2500.0));
+		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-20000.0,     0.0));
+        Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(-17500.0,     0.0));
+        Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(-15500.0,     0.0));
+        Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( -2500.0,     0.0));
+        Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(     0.0,     0.0));
+        Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord( -5000.0, -8660.0));
+        Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-15000.0, -8660.0));
+        Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord( -7500.0,  2500.0));
+        Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord( -7500.0, -2500.0));
         
-        network.createAndAddLink(new IdImpl("1"), node1, node2, 2500, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("2"), node2, node3, 2000, 27.78, 3600, 1, null, "22");
-//      network.createAndAddLink(new IdImpl("3"), node3, node4, 75000, 10.42, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("4"), node4, node5, 2500, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("5"), node5, node6, 10000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("6"), node6, node7, 10000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("7"), node7, node1, 10000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("8"), node3, node8, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("10"), node3, node9, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(new IdImpl("11"), node9, node4, 4999, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("1"), node1, node2, 1000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("2"), node2, node3, 2000, 27.78, 3600, 1, null, "22");
+//      network.createAndAddLink(scenario.createId("3"), node3, node4, 75000, 10.42, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("4"), node4, node5, 2000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("5"), node5, node6, 1000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("6"), node6, node7, 1000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("8"), node3, node8, 5000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("10"), node3, node9, 5000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("11"), node9, node4, 4970, 27.78, 3600, 1, null, "22");
 	}
 
 	public static void main(String[] args) {

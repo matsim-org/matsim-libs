@@ -71,25 +71,44 @@ import playground.benjamin.emissions.types.HbefaVehicleCategory;
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
 	
-	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+	final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+	final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 	
-	private final EventsManager eventsManager;
+	final EventsManager eventsManager;
 	
-	private static int vehInfoWarnHDVCnt = 0;
-	private static int vehAttributesNotSpecifiedCnt = 0;
-	private static int maxWarnCnt = 3;
-	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
-	private static Set<Id> vehicleIdSet = new HashSet<Id>();
+	int vehInfoWarnHDVCnt = 0;
+	int vehAttributesNotSpecifiedCnt = 0;
+	final int maxWarnCnt = 3;
+	Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
+	Set<Id> vehicleIdSet = new HashSet<Id>();
+
+	public static class ColdEmissionAnalysisModuleParameter {
+		public Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+		public Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+
+		public ColdEmissionAnalysisModuleParameter(
+				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
+				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable) {
+			this.avgHbefaColdTable = avgHbefaColdTable;
+			this.detailedHbefaColdTable = detailedHbefaColdTable;
+		}
+	}
 
 	public ColdEmissionAnalysisModule(
-			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
+			ColdEmissionAnalysisModuleParameter parameterObject,
 			EventsManager emissionEventsManager) {
 
-		this.avgHbefaColdTable = avgHbefaColdTable;
-		this.detailedHbefaColdTable = detailedHbefaColdTable;
+		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
+		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
 		this.eventsManager = emissionEventsManager;
+	}
+
+	public void reset() {
+		logger.info("resetting counters...");
+		vehInfoWarnHDVCnt = 0;
+		vehAttributesNotSpecifiedCnt = 0;
+		vehAttributesNotSpecified.clear();
+		vehicleIdSet.clear();
 	}
 
 	public void calculateColdEmissionsAndThrowEvent(
@@ -105,7 +124,6 @@ public class ColdEmissionAnalysisModule {
 			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-
 		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
 		if (vehicleInformationTuple.getFirst() == null){
@@ -213,11 +231,11 @@ public class ColdEmissionAnalysisModule {
 		return vehicleInformationTuple;
 	}
 
-	public static Set<Id> getVehAttributesNotSpecified() {
+	public Set<Id> getVehAttributesNotSpecified() {
 		return vehAttributesNotSpecified;
 	}
 
-	public static Set<Id> getVehicleIdSet() {
+	public Set<Id> getVehicleIdSet() {
 		return vehicleIdSet;
 	}
 }

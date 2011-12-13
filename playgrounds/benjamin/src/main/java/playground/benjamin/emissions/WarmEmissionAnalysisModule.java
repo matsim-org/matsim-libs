@@ -50,39 +50,67 @@ import playground.benjamin.emissions.types.WarmPollutant;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-	private final Map<Integer, String> roadTypeMapping;
+	final Map<Integer, String> roadTypeMapping;
 
-	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 
-	private final EventsManager eventsManager;
+	final EventsManager eventsManager;
 
+	int vehAttributesNotSpecifiedCnt = 0;
+	final int maxWarnCnt = 3;
+	Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
+	Set<Id> vehicleIdSet = new HashSet<Id>();
 
-
-	private static int vehAttributesNotSpecifiedCnt = 0;
-	private static int maxWarnCnt = 3;
-	private static Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
-	private static Set<Id> vehicleIdSet = new HashSet<Id>();
-
-	static int freeFlowCounter = 0;
-	static int stopGoCounter = 0;
-	static int fractionCounter = 0;
-	static int emissionEventCounter = 0;
+	int freeFlowCounter = 0;
+	int stopGoCounter = 0;
+	int fractionCounter = 0;
+	int emissionEventCounter = 0;
 	
-	static double kmCounter = 0.0;
-	static double freeFlowKmCounter = 0.0;
-	static double stopGoKmCounter = 0.0;
+	double kmCounter = 0.0;
+	double freeFlowKmCounter = 0.0;
+	double stopGoKmCounter = 0.0;
+
+	public static class WarmEmissionAnalysisModuleParameter {
+
+		public Map<Integer, String> roadTypeMapping;
+		public Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+		public Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+
+		public WarmEmissionAnalysisModuleParameter(
+				Map<Integer, String> roadTypeMapping,
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+			this.roadTypeMapping = roadTypeMapping;
+			this.avgHbefaWarmTable = avgHbefaWarmTable;
+			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+		}
+	}
 
 	public WarmEmissionAnalysisModule(
-			Map<Integer, String> roadTypeMapping,
-			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
+			WarmEmissionAnalysisModuleParameter parameterObject,
 			EventsManager emissionEventsManager) {
 
-		this.roadTypeMapping = roadTypeMapping;
-		this.avgHbefaWarmTable = avgHbefaWarmTable;
-		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+		this.roadTypeMapping = parameterObject.roadTypeMapping;
+		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
+		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
+	}
+
+	public void reset() {
+		logger.info("resetting counters...");
+		vehAttributesNotSpecifiedCnt = 0;
+		vehAttributesNotSpecified.clear();
+		vehicleIdSet.clear();
+	
+		freeFlowCounter = 0;
+		stopGoCounter = 0;
+		fractionCounter = 0;
+		emissionEventCounter = 0;
+		
+		kmCounter = 0.0;
+		freeFlowKmCounter = 0.0;
+		stopGoKmCounter = 0.0;
 	}
 
 	public void calculateWarmEmissionsAndThrowEvent(
@@ -243,39 +271,39 @@ public class WarmEmissionAnalysisModule {
 		return vehicleInformationTuple;
 	}
 
-	public static Set<Id> getVehAttributesNotSpecified() {
+	public Set<Id> getVehAttributesNotSpecified() {
 		return vehAttributesNotSpecified;
 	}
 
-	public static Set<Id> getVehicleIdSet() {
+	public Set<Id> getVehicleIdSet() {
 		return vehicleIdSet;
 	}
 
-	public static int getFreeFlowOccurences() {
+	public int getFreeFlowOccurences() {
 		return freeFlowCounter / WarmPollutant.values().length;
 	}
 
-	public static int getFractionOccurences() {
+	public int getFractionOccurences() {
 		return fractionCounter / WarmPollutant.values().length;
 	}
 	
-	public static int getStopGoOccurences() {
+	public int getStopGoOccurences() {
 		return stopGoCounter / WarmPollutant.values().length;
 	}
 
-	public static double getKmCounter() {
+	public double getKmCounter() {
 		return roundDouble((kmCounter / WarmPollutant.values().length), 3);
 	}
 
-	public static double getFreeFlowKmCounter() {
+	public double getFreeFlowKmCounter() {
 		return roundDouble((freeFlowKmCounter / WarmPollutant.values().length), 3);
 	}
 
-	public static double getStopGoKmCounter() {
+	public double getStopGoKmCounter() {
 		return roundDouble((stopGoKmCounter / WarmPollutant.values().length), 3);
 	}
 
-	public static int getWarmEmissionEventCounter() {
+	public int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
 	}
 
