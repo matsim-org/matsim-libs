@@ -250,7 +250,7 @@ public class CreateScenario {
 	private void writeParkingLots(String file) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("<parkinglots>");
-		long capacity = 2;		
+		long capacity = 4;		
 		int cnt = 0;
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {	
 			// only use every 2nd link
