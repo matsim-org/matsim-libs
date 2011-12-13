@@ -25,12 +25,18 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
 import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
 import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
+import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.JointControler;
 import playground.thibautd.utils.RemoveJointTrips;
@@ -53,6 +59,7 @@ public class EquilibriumOptimalPlansGenerator {
 
 	private final JointControler controler;
 	private final JointReplanningConfigGroup configGroup;
+	private final Config config;
 
 	/**
 	 * @param controler a controler, after it has been run. Parameters for the
@@ -61,6 +68,7 @@ public class EquilibriumOptimalPlansGenerator {
 	public EquilibriumOptimalPlansGenerator(
 			final JointControler controler) {
 		this.controler = controler;
+		this.config = controler.getConfig();
 		this.configGroup = (JointReplanningConfigGroup)
 			controler.getConfig().getModule( JointReplanningConfigGroup.GROUP_NAME );
 	}
@@ -68,23 +76,59 @@ public class EquilibriumOptimalPlansGenerator {
 	/**
 	 * generates and writes plan files with plans optimal according to
 	 * the last state of traffic.
-	 * Three files are generated: with all joint trips enforced, with
+	 * Three plans files are generated: with all joint trips enforced, with
 	 * toggle otimised, and without joint trips.
+	 * Config files containing the information to load the related scenario are
+	 * also produced.
 	 *
 	 * @param directory the outptut directory
 	 */
 	public void writePopulations(final String directory) {
 		String file = directory+"/plans-with-all-joint-trips.xml.gz";
+		String configFile = directory+"/untoggledConfig.xml.gz";
 		log.info( "creating untoggled plans. Output to: "+file );
 		writeUntoggledOptimalJointTrips( file );
+		log.info( "writing corresponding config file to: "+configFile );
+		writeConfigFile( configFile , file );
 
 		file = directory+"/plans-with-best-joint-trips.xml.gz";
+		configFile = directory+"/toggledConfig.xml.gz";
 		log.info( "creating toggled plans. Output to: "+file );
 		writeToggledOptimalJointTrips( file );
+		log.info( "writing corresponding config file to: "+configFile );
+		writeConfigFile( configFile , file );
 
 		file = directory+"/plans-with-no-joint-trips.xml.gz";
+		configFile = directory+"/individualConfig.xml.gz";
 		log.info( "creating individual plans. Output to: "+file );
 		writeIndividualTrips( file );
+		log.info( "writing corresponding config file to: "+configFile );
+		writeConfigFile( configFile , file );
+	}
+
+	private void writeConfigFile(
+			final String configFile,
+			final String plansFile) {
+		Config newConfig = new Config();
+
+		PlansConfigGroup plans = new PlansConfigGroup();
+		plans.setInputFile( plansFile );
+		plans.setNetworkRouteType( config.plans().getNetworkRouteType() );
+
+		newConfig.addModule(
+				CliquesConfigGroup.GROUP_NAME,
+				config.getModule( CliquesConfigGroup.GROUP_NAME ) );
+		newConfig.addModule(
+				NetworkConfigGroup.GROUP_NAME,
+				config.network());
+		newConfig.addModule(
+				FacilitiesConfigGroup.GROUP_NAME,
+				config.facilities());
+		newConfig.addModule(
+				PlansConfigGroup.GROUP_NAME,
+				plans);
+
+		(new ConfigWriter( newConfig )).write( configFile );
 	}
 
 	private void writeUntoggledOptimalJointTrips(final String file) {
