@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.aposteriorianalysis;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationWriter;
 
@@ -43,6 +48,9 @@ import playground.thibautd.utils.RemoveJointTrips;
  * @author thibautd
  */
 public class EquilibriumOptimalPlansGenerator {
+	private static final Logger log =
+		Logger.getLogger(EquilibriumOptimalPlansGenerator.class);
+
 	private final JointControler controler;
 	private final JointReplanningConfigGroup configGroup;
 
@@ -57,10 +65,26 @@ public class EquilibriumOptimalPlansGenerator {
 			controler.getConfig().getModule( JointReplanningConfigGroup.GROUP_NAME );
 	}
 
+	/**
+	 * generates and writes plan files with plans optimal according to
+	 * the last state of traffic.
+	 * Three files are generated: with all joint trips enforced, with
+	 * toggle otimised, and without joint trips.
+	 *
+	 * @param directory the outptut directory
+	 */
 	public void writePopulations(final String directory) {
-		writeUntoggledOptimalJointTrips( directory+"/plans-with-all-joint-trips.xml.gz" );
-		writeToggledOptimalJointTrips( directory+"/plans-with-best-joint-trips.xml.gz" );
-		writeIndividualTrips( directory+"/plans-with-no-joint-trips.xml.gz" );
+		String file = directory+"/plans-with-all-joint-trips.xml.gz";
+		log.info( "creating untoggled plans. Output to: "+file );
+		writeUntoggledOptimalJointTrips( file );
+
+		file = directory+"/plans-with-best-joint-trips.xml.gz";
+		log.info( "creating toggled plans. Output to: "+file );
+		writeToggledOptimalJointTrips( file );
+
+		file = directory+"/plans-with-no-joint-trips.xml.gz";
+		log.info( "creating individual plans. Output to: "+file );
+		writeIndividualTrips( file );
 	}
 
 	private void writeUntoggledOptimalJointTrips(final String file) {
@@ -71,7 +95,10 @@ public class EquilibriumOptimalPlansGenerator {
 			Plan plan = selector.selectPlan( clique );
 			clique.setSelectedPlan( plan );
 
-			for (Plan currentPlan : clique.getPlans()) {
+			List<Plan> unselectedPlans = new ArrayList<Plan>( clique.getPlans() );
+			unselectedPlans.remove( plan );
+
+			for ( Plan currentPlan : unselectedPlans ) {
 				if (currentPlan != plan) {
 					clique.removePlan( currentPlan );
 				}
