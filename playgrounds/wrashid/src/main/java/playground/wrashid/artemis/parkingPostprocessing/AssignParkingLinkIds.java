@@ -14,38 +14,41 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.MathLib;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
+import playground.wrashid.lib.tools.txtConfig.TxtConfig;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.scoring.ParkingInfo;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class AssignParkingLinkIds {
 
-	private static String parkingLogInfoFileName;
 	// key: personId
 	private static LinkedListValueHashMap<Id, ParkingInfo> parkingInfo;
 	private static NetworkImpl network;
 	private static HashMap<Id, Parking> parkings;
+	private static TxtConfig config;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
-		parkingLogInfoFileName = "H:/data/experiments/TRBAug2011/runs/ktiRun45/output/ITERS/it.50/50.parkingLogInfo.txt";
+		config = new TxtConfig(args[0]);
+		
+		String parkingLogInfoFileName= config.getParameterValue("parkingLogInfoFileName");
 		parkingInfo = ParkingInfo.readParkingInfo(parkingLogInfoFileName);
 
-		network = GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
+		String networkFilePath = config.getParameterValue("networkFilePath");
+		network = GeneralLib.readNetwork(networkFilePath);
 
 		parkings = readParkings();
 
-		String parkingTimesInputFileName = "H:/data/experiments/ARTEMIS/nov2011/szenario28/output/parkingTimesAndLegEnergyConsumption.txt";
-		String parkingTimesOutputFileName = "H:/data/experiments/ARTEMIS/nov2011/szenario28/output/parkingTimesAndLegEnergyConsumption_o.txt";
+		String parkingTimesInputFileName = config.getParameterValue("parkingTimesInputFileName");
+		String parkingTimesOutputFileName = config.getParameterValue("parkingTimesOutputFileName");
 		replaceLinkIdsInParkingTimesLog(parkingTimesInputFileName, parkingTimesOutputFileName);
 
-		String chargingLogInputFileName = "H:/data/experiments/ARTEMIS/nov2011/szenario28/output/chargingLog.txt";
-		String chargingLogOutputFileName = "H:/data/experiments/ARTEMIS/nov2011/szenario28/output/chargingLog_o.txt";
+		String chargingLogInputFileName = config.getParameterValue("chargingLogInputFileName");
+		String chargingLogOutputFileName = config.getParameterValue("chargingLogOutputFileName");
+		
 		replaceLinkIdsInLogChargigLong(chargingLogInputFileName, chargingLogOutputFileName);
-
 	}
 
 	private static void replaceLinkIdsInLogChargigLong(String chargingLogInputFileName, String chargingLogOutputFileName) {
@@ -123,12 +126,14 @@ public class AssignParkingLinkIds {
 
 	private static HashMap<Id, Parking> readParkings() {
 		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
-		String parkingDataBase = "H:/data/experiments/TRBAug2011/parkings/flat/";
-		ParkingHerbieControler.readParkings(1.0, parkingDataBase + "privateParkings_v1_kti.xml", parkingCollection);
-		ParkingHerbieControler.readParkings(1.0, parkingDataBase + "streetParkings.xml", parkingCollection);
-		ParkingHerbieControler.readParkings(1.0, parkingDataBase + "garageParkings.xml", parkingCollection);
-		ParkingHerbieControler.readParkings(1.0, parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml",
-				parkingCollection);
+		
+		int i=1;
+		String parkingFileFlatFormat = config.getParameterValue("parkingFileFlatFormat_" + i);
+		while (parkingFileFlatFormat!=null){
+			ParkingHerbieControler.readParkings(1.0, parkingFileFlatFormat, parkingCollection);
+			i++;
+			parkingFileFlatFormat=config.getParameterValue("parkingFileFlatFormat_" + i);
+		}
 
 		HashMap<Id, Parking> parkingHashmap = new HashMap<Id, Parking>();
 
