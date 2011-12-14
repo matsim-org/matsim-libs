@@ -468,76 +468,75 @@ public class PoznanNetwork
         ssController.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
         SignalPlanData plan = scf.createSignalPlanData(scenario.createId("ss10_p1"));
         ssController.addSignalPlanData(plan);
-        plan.setCycleTime(113);
+        plan.setCycleTime(120);
         plan.setOffset(0); // coordination offset
         // now the single signals (signal groups)
         SignalGroupSettingsData settings = scf.createSignalGroupSettingsData(scenario
                 .createId("sg_0"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(25);
-        settings.setDropping(20);
+        settings.setOnset(0);
+        settings.setDropping(5);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_1"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(112);
-        settings.setDropping(20);
+        settings.setOnset(10);
+        settings.setDropping(15);
         // plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_2"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(1);
-        settings.setDropping(88);
+        settings.setOnset(20);
+        settings.setDropping(25);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_3"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(50);
-        settings.setDropping(88);
+        settings.setOnset(30);
+        settings.setDropping(35);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_1"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(67);
-        settings.setDropping(16);
+        settings.setOnset(40);
+        settings.setDropping(45);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_2"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(25);
-        settings.setDropping(44);
+        settings.setOnset(50);
+        settings.setDropping(55);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_5"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(25);
-        settings.setDropping(44);
+        settings.setOnset(60);
+        settings.setDropping(65);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_1"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(15);
-        settings.setDropping(44);
+        settings.setOnset(70);
+        settings.setDropping(75);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_2"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(50);
-        settings.setDropping(88);
+        settings.setOnset(80);
+        settings.setDropping(85);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_7"));
         // green from second 0 to 30 in cycle
-        settings.setOnset(50);
-        settings.setDropping(88);
+        settings.setOnset(90);
+        settings.setDropping(95);
         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_8"));
         // green from second 30 to 55 in cycle
-        settings.setOnset(93);
-        settings.setDropping(110);
+        settings.setOnset(100);
+        settings.setDropping(105);
         plan.addSignalGroupSettings(settings);
-
     }
 
 
