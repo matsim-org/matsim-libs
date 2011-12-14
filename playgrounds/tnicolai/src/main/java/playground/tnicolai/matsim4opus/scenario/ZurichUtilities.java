@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
 public class ZurichUtilities {
@@ -89,14 +90,14 @@ public class ZurichUtilities {
 			{
 				add(new IdImpl(109024));
 				add(new IdImpl(65583));
-				add(new IdImpl(65582));
-				add(new IdImpl(17692));
-				add(new IdImpl(128604));
+				//add(new IdImpl(65582));
+				//add(new IdImpl(17692));
+				//add(new IdImpl(128604));
 				add(new IdImpl(113201));
 				add(new IdImpl(109059));
-				add(new IdImpl(109060));
-				add(new IdImpl(109061));
-				add(new IdImpl(109021));
+				//add(new IdImpl(109060));
+				//add(new IdImpl(109061));
+				//add(new IdImpl(109021));
 			}
 		};
 		// remove links from network
@@ -114,11 +115,9 @@ public class ZurichUtilities {
 		// check whether all links exist in network
 		existsInNetwork(network, linkList);
 		// remove links
-		removeLinks(network, linkList);
-		// check if links were actually removed
-		boolean linksRemoved = !existsInNetwork(network, linkList);
+		closeLinks(network, linkList);
 		
-		return linksRemoved;
+		return true;
 	}
 	
 	/**
@@ -128,6 +127,8 @@ public class ZurichUtilities {
 	 * @return true if all links exist in the network
 	 */
 	private static boolean existsInNetwork(final NetworkImpl network, final ArrayList<IdImpl> linkList){
+		
+		log.info("Looking whether all links for road closure exist in network ...");
 		
 		boolean linksExist = true;
 		
@@ -147,18 +148,28 @@ public class ZurichUtilities {
 	}
 
 	/**
-	 * Removes links from the network
+	 * this closes a link by setting the free speed and capacity to zero 
+	 * and the link length to Double.MAX_VALUE
+	 * 
 	 * @param network
 	 * @param linkList
 	 */
-	private static void removeLinks(final NetworkImpl network, final ArrayList<IdImpl> linkList){
+	private static void closeLinks(final NetworkImpl network, final ArrayList<IdImpl> linkList){
 		
 		Iterator<IdImpl> linkIterator = linkList.iterator();
 		
 		while(linkIterator.hasNext()){
 			IdImpl id = linkIterator.next();
-			network.removeLink( id );
-			log.info("Removing link: " + id.toString());
+			// get link from network
+			LinkImpl link = (LinkImpl)network.getLinks().get(id);
+			
+			link.setFreespeed( 0. );
+			link.setCapacity( 0. );
+			link.setLength( Double.MAX_VALUE );
+			
+			log.info("Closing link " + id.toString() + " by setting freespeed and capacity to 0. and lenth to " + Double.MAX_VALUE);
+			
+			//network.removeLink( id ); // tnicolai: removing links causing exceptions during mobsim
 		}
 	}
 	
@@ -166,7 +177,6 @@ public class ZurichUtilities {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
 	}
 
 }
