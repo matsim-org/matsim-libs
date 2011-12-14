@@ -43,6 +43,7 @@ import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
 import playground.thibautd.utils.charts.WrapperChartUtil;
@@ -87,28 +88,33 @@ public class EquilibriumOptimalPlansAnalyser {
 		Map<Id, ? extends Person> individualPersons = new HashMap<Id, Person>(individualPopulation.getPersons());
 
 		Counter counter = new Counter( this.getClass().getSimpleName()+": processing info for agent # " );
-		for (Map.Entry<Id, ? extends Person> untoggledPerson :
-				untoggledPopulation.getPersons().entrySet()) {
-			counter.incCounter();
-			Person toggledPerson = toggledPersons.remove( untoggledPerson.getKey() );
-			Person individualPerson = individualPersons.remove( untoggledPerson.getKey() );
+		for (Clique clique : untoggledPopulation.getCliques().getCliques().values()) {
+			int cliqueSize = clique.getMembers().size();
+			for (Map.Entry<Id, ? extends Person> untoggledPerson :
+					clique.getMembers().entrySet()) {
+				counter.incCounter();
+				Person toggledPerson = toggledPersons.remove( untoggledPerson.getKey() );
+				Person individualPerson = individualPersons.remove( untoggledPerson.getKey() );
 
-			plans.put(
-					untoggledPerson.getKey(),
-					createComparativePlan(
-						untoggledPerson.getValue(),
-						toggledPerson,
-						individualPerson) );
+				plans.put(
+						untoggledPerson.getKey(),
+						createComparativePlan(
+							cliqueSize,
+							untoggledPerson.getValue(),
+							toggledPerson,
+							individualPerson) );
 
+			}
 		}
 		counter.printCounter();
 	}
 
 	private ComparativePlan createComparativePlan(
+			final int cliqueSize,
 			final Person untoggledPerson,
 			final Person toggledPerson,
 			final Person individualPerson) {
-		ComparativePlan plan = new ComparativePlan( untoggledPerson );
+		ComparativePlan plan = new ComparativePlan( cliqueSize , untoggledPerson );
 
 		for(List<Leg> trip : extractLegsWithJointTrips( untoggledPerson )) {
 			plan.addUntoggledLeg( trip );
@@ -205,6 +211,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		plan.setScore(fitnessFunction.getScore());
 		return plan.getScore();
 	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// analysis elements getters
 	// /////////////////////////////////////////////////////////////////////////
@@ -222,7 +229,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		DefaultBoxAndWhiskerCategoryDataset dataset =
 			new DefaultBoxAndWhiskerCategoryDataset();
 
-		List<Double> improvements = new ArrayList<Double>();
+		Map<Integer , List<Double>> improvements = new HashMap<Integer , List<Double>>();
 		for (ComparativePlan plan : plans.values()) {
 			for (ComparativeLeg leg : plan) {
 				if (leg.isToggledPassenger()) {
@@ -230,15 +237,26 @@ public class EquilibriumOptimalPlansAnalyser {
 					double individualTravelTime = leg.getIndividualTravelTime();
 					double improvement = 100d *
 						(-jointTravelTime + individualTravelTime) / individualTravelTime;
-					improvements.add( improvement );
+
+					List<Double> improvementsForSize = improvements.get( plan.getCliqueSize() );
+
+					if (improvementsForSize == null) {
+						improvementsForSize = new ArrayList<Double>();
+						improvements.put( plan.getCliqueSize() , improvementsForSize );
+					}
+
+					improvementsForSize.add( improvement );
 				}
 			}
 		}
 
-		dataset.add(improvements, "", "");
+		for (Map.Entry<Integer, List<Double>> improvement : improvements.entrySet()) {
+			dataset.add(improvement.getValue(), "", improvement.getKey());
+		}
+
 		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
 				"travel time improvements implied by passenger trips",
-				"",
+				"clique size",
 				"relative improvement (%)",
 				dataset,
 				true);
@@ -258,7 +276,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		DefaultBoxAndWhiskerCategoryDataset dataset =
 			new DefaultBoxAndWhiskerCategoryDataset();
 
-		List<Double> improvements = new ArrayList<Double>();
+		Map<Integer , List<Double>> improvements = new HashMap<Integer , List<Double>>();
 		planLoop:
 		for (ComparativePlan plan : plans.values()) {
 			double improvement = Double.NaN;
@@ -278,13 +296,25 @@ public class EquilibriumOptimalPlansAnalyser {
 					}
 				}
 			}
-			if (isPassenger) improvements.add( improvement );
+			if (isPassenger) {
+				List<Double> improvementsForSize = improvements.get( plan.getCliqueSize() );
+
+					if (improvementsForSize == null) {
+						improvementsForSize = new ArrayList<Double>();
+						improvements.put( plan.getCliqueSize() , improvementsForSize );
+					}
+
+					improvementsForSize.add( improvement );
+			}
 		}
 
-		dataset.add(improvements, "", "");
+		for (Map.Entry<Integer, List<Double>> improvement : improvements.entrySet()) {
+			dataset.add(improvement.getValue(), "", improvement.getKey());
+		}
+
 		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
 				"score improvements implied by passenger trips",
-				"",
+				"clique size",
 				"improvement",
 				dataset,
 				true);
@@ -316,6 +346,7 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 	private double untoggledScore = Double.NaN;
 	private double toggledScore = Double.NaN;
 	private double individualScore = Double.NaN;
+	private final int cliqueSize;
 
 	private boolean isLocked = false;
 
@@ -323,7 +354,9 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 	// construction
 	// /////////////////////////////////////////////////////////////////////////
 	public ComparativePlan(
+			final int cliqueSize,
 			final Person person) {
+		this.cliqueSize = cliqueSize;
 		this.person = person;
 	}
 
@@ -392,6 +425,10 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 		return person;
 	}
 
+	public int getCliqueSize() {
+		return cliqueSize;
+	}
+
 	public double getUntoggledScore() {
 		return untoggledScore;
 	}
@@ -435,6 +472,10 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 	}
 }
 
+/**
+ * gives access to information on the corresponding legs in the
+ * three plans
+ */
 class ComparativeLeg {
 	private final List< Leg > untoggledLeg;
 	private final List< Leg > toggledLeg;
