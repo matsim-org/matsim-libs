@@ -24,6 +24,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -43,13 +44,21 @@ public class QuickPlanAnalysisPt {
 	private String transitScheduleFile;
 	private String transitVehicleFile;
 	
-	private String PLANSFILE0 = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.150/herbie.150.plans.xml.gz";
+//	private String PLANSFILE0 = "P:/Projekte/herbie/output/20111031/calibrun1/ITERS/it.150/herbie.150.plans.xml.gz";
+//	private String transitScheduleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/transitSchedule.networkOevModellZH.xml";
+//	private String transitVehicleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/vehicles.oevModellZH.xml";
+//	
+//	private String PLANSFILE1 = "P:/Projekte/herbie/output/20111031/calibrun2/ITERS/it.150/herbie.150.plans.xml.gz";
+//	private String transitScheduleFile1 = "P:/Projekte/herbie/output/ptScenarioCreation/newTransitSchedule.xml.gz";
+//	private String transitVehicleFile1 = "P:/Projekte/herbie/output/ptScenarioCreation/newTransitVehicles.xml.gz";
+	
+	private String PLANSFILE0 = "P:/Projekte/herbie/output/20111213/calibrun2/ITERS/it.150/herbie.150.plans.xml.gz";
 	private String transitScheduleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/transitSchedule.networkOevModellZH.xml";
 	private String transitVehicleFile0 = "P:/Projekte/matsim/data/switzerland/pt/zh/vehicles.oevModellZH.xml";
 	
-	private String PLANSFILE1 = "P:/Projekte/herbie/output/20111031/calibrun2/ITERS/it.150/herbie.150.plans.xml.gz";
-	private String transitScheduleFile1 = "X:/tempMATSimData/newTransitSchedule.xml.gz";
-	private String transitVehicleFile1 = "X:/tempMATSimData/newTransitVehicles.xml.gz";
+	private String PLANSFILE1 = "P:/Projekte/herbie/output/20111213/calibrun3/ITERS/it.150/herbie.150.plans.xml.gz";
+	private String transitScheduleFile1 = "P:/Projekte/herbie/output/ptScenarioCreation/newTransitSchedule.xml.gz";
+	private String transitVehicleFile1 = "P:/Projekte/herbie/output/ptScenarioCreation/newTransitVehicles.xml.gz";
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private static double[] relevantBinInterval_1h = new double[]{0.0, 70.0}; // relevant interval graphical output
@@ -72,16 +81,54 @@ public class QuickPlanAnalysisPt {
 	private String scenarioName;
 	private TreeMap<Id, Double> travelTimeSz0 = new TreeMap<Id, Double>();
 	private TreeMap<Id, Double> scoreSz0 = new TreeMap<Id, Double>();
-	private int numberOfAgentsGainedTT;
+	private TreeMap<Id, Double> totalActDurations = new TreeMap<Id, Double>();
+	private TreeMap<Id, Double> totalTransitWalkTimes = new TreeMap<Id, Double>();
+	private TreeMap<Id, Double> totalAccessTimePtWalks = new TreeMap<Id, Double>();
+	private TreeMap<Id, Double> totalFirstAccessWalkTimes = new TreeMap<Id, Double>();
+	private TreeMap<Id, Double> totalEgressWalkTimes = new TreeMap<Id, Double>();
+	private TreeMap<Id, String> firstPtRouteSz0 = new TreeMap<Id, String>();
+	private TreeMap<Id, String> firstPtRouteSz1 = new TreeMap<Id, String>();
+	private int numberOfAgentsDecreasedTT;
 	private double totalTTsaved;
 	private double totalMoreScore;
 	private int numberOfAgentsGainedScore;
 	private int numberOfAgentsLostScore;
 	private double totalGain;
 	private double totalLost;
-	private int numberOfAgentsLostTT;
-	private double totalTTgained;
-	private double totalTTlost;
+	private int numberOfAgentsIncreasedTT;
+	private double totalTTDecreased;
+	private double totalTTIncreased;
+	private double totalActivityDuration;
+	private int numberOfAgentsGainedActTime;
+	private int numberOfAgentsLostActTime;
+	private double totalGainOfActTime;
+	private double totalLostOfActTime;
+	private int totalNrOfAgents;
+	private double totalTransitWalkTime;
+	private double totalIncreasedWalkTime;
+	private int numberOfAgentsIncreasedWalkTime;
+	private int numberOfAgentsReducedWalkTime;
+	private double totalReducedWalkTime;
+	private boolean activityPerformed;
+	private double totalFirstAccessPtWalk;
+	private double totalEgressPtWalk;
+	private int numberOfAgentsReducedFirstAccessWalkTime;
+	private int numberOfAgentsIncreasedFirstAccessWalkTime;
+	private double totalReducedFirstAccessWalkTime;
+	private double totalIncreasedFirstAccessWalkTime;
+	private int numberOfAgentsReducedEgressWalkTime;
+	private int numberOfAgentsIncreasedEgressWalkTime;
+	private double totalReducedEgressWalkTime;
+	private double totalIncreasedEgressWalkTime;
+	private int numberOfAgentsDecreasedAccessWalkTimeWithSameRoute;
+	private int numberOfAgentsIncreasedAccessWalkTimeWithSameRoute;
+	private double totalDecreasedWalkTimeWithSameRoute;
+	private double totalIncreasedWalkTimeWithSameRoute;
+	private double totalAccessTimePtWalk;
+	private int numberOfAgentsDecreasedTotalAccessTime;
+	private double totalIncreasedAccessTime;
+	private int numberOfAgentsIncreasedTotalAccessTime;
+	private double totalDecreasedAccessTime;
 
 	/**
 	 * @param args
@@ -161,10 +208,10 @@ public class QuickPlanAnalysisPt {
 		this.hdwy_distrib_24h = new Bins(1, relevantBinInterval2_24h[1], "Headway Distrib 2h TravelTime 24h");
 		this.transportMode = new Bins(1, 3, "Transport Mode");
 		
-		numberOfAgentsGainedTT = 0;
-		numberOfAgentsLostTT = 0;
-		totalTTlost = 0d;
-		totalTTgained = 0d;
+		numberOfAgentsDecreasedTT = 0;
+		numberOfAgentsIncreasedTT = 0;
+		totalTTIncreased = 0d;
+		totalTTDecreased = 0d;
 		
 		
 		numberOfAgentsGainedScore = 0;
@@ -175,6 +222,37 @@ public class QuickPlanAnalysisPt {
 		totalGain = 0d;
 		totalLost = 0d;
 		
+		numberOfAgentsGainedActTime = 0;
+		numberOfAgentsLostActTime = 0;
+		totalGainOfActTime = 0d;
+		totalLostOfActTime = 0d;
+		
+		totalIncreasedWalkTime = 0d;
+		numberOfAgentsIncreasedWalkTime = 0;
+		totalReducedWalkTime = 0d;
+		numberOfAgentsReducedWalkTime = 0;
+		
+		numberOfAgentsReducedFirstAccessWalkTime = 0;
+		totalReducedFirstAccessWalkTime = 0d;
+		numberOfAgentsIncreasedFirstAccessWalkTime = 0;
+		totalIncreasedFirstAccessWalkTime = 0d;
+		
+		numberOfAgentsReducedEgressWalkTime = 0;
+		numberOfAgentsIncreasedEgressWalkTime = 0;
+		totalReducedEgressWalkTime = 0d;
+		totalIncreasedEgressWalkTime = 0d;
+		
+		numberOfAgentsDecreasedAccessWalkTimeWithSameRoute = 0;
+		numberOfAgentsIncreasedAccessWalkTimeWithSameRoute = 0;
+		totalDecreasedWalkTimeWithSameRoute = 0d;
+		totalIncreasedWalkTimeWithSameRoute = 0d;
+		
+		numberOfAgentsDecreasedTotalAccessTime = 0;
+		totalIncreasedAccessTime = 0d;
+		numberOfAgentsIncreasedTotalAccessTime = 0;
+		totalDecreasedAccessTime = 0d;
+		
+		totalNrOfAgents = 0;
 		
 		log.info("inizialize ... done");
 	}
@@ -184,29 +262,49 @@ public class QuickPlanAnalysisPt {
 		log.info("analysePlanFile ... ");
 		
 		for(Person p : pop.getPersons().values()){
+			
+			totalNrOfAgents++;
+			Id persId = p.getId();
+			
 			Plan plan = p.getSelectedPlan();
 			
 			QuickPlanAnalysisPt recordPt = new QuickPlanAnalysisPt();
 			
+			recordPt.startRecord();
+			
+			headways = new ArrayList<Double>();
+			
+			totalActivityDuration = 0d;
+			totalTransitWalkTime = 0d;
+			totalFirstAccessPtWalk = 0d;
+			totalAccessTimePtWalk = 0d;
+			totalEgressPtWalk = 0d;
 			
 			List<PlanElement> planElements = plan.getPlanElements();
 
 			for (PlanElement pE : planElements) {
-//				System.out.println();
-				
 				
 				if(pE instanceof Activity){
+					
 					ActivityImpl act = (ActivityImpl) pE;
 					if(!act.getType().toString().equals("pt interaction")){
 						
-						if(!averageHeadway().equals(Double.NaN)){
-							
-							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
+						Double actDuration = act.getEndTime() - act.getStartTime();
+						
+						if(actDuration != Time.UNDEFINED_TIME){
+							totalActivityDuration += actDuration;
 						}
 						
-						recordPt.startRecord();
+						if(!averageHeadway().equals(Double.NaN)){
+							
+//							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
+						}
 						
-						headways = new ArrayList<Double>();
+//						recordPt.startRecord();
+//						
+//						headways = new ArrayList<Double>();
+						
+						activityPerformed = true;
 					}
 					else {
 						latestActivityEndTime = act.getEndTime();
@@ -217,7 +315,6 @@ public class QuickPlanAnalysisPt {
 				if (pE instanceof Leg) {
 					LegImpl leg = (LegImpl) pE;
 					if(leg.getMode().equals("pt") && leg.getRoute() instanceof GenericRoute){
-//					if(leg.getMode().equals("pt")){
 						
 						String routeDescription = ((GenericRoute)leg.getRoute()).getRouteDescription();
 						
@@ -228,6 +325,12 @@ public class QuickPlanAnalysisPt {
 							IdImpl idLine = new IdImpl(description[2]);
 							IdImpl idRoute = new IdImpl(description[3]);
 							
+							if(PLANSFILE.equals(PLANSFILE0) && !firstPtRouteSz0.containsKey(persId)) {
+								firstPtRouteSz0.put(persId, idRoute.toString());
+							}
+							else if (PLANSFILE.equals(PLANSFILE1) && !firstPtRouteSz1.containsKey(persId)) {
+								firstPtRouteSz1.put(persId, idRoute.toString());
+							}
 							
 							recordPt.addTraveltime(getTravelTime(leg));
 							
@@ -242,19 +345,39 @@ public class QuickPlanAnalysisPt {
 							headways.add(newHdwy);
 						}
 						
-//						System.out.println();
+					}
+					else if(leg.getMode().equals("transit_walk")){
+						
+						totalTransitWalkTime += leg.getTravelTime();
+						
+						if(activityPerformed){
+							totalAccessTimePtWalk += leg.getTravelTime();
+							
+							if(PLANSFILE.equals(PLANSFILE0) && !firstPtRouteSz0.containsKey(persId)) {
+								totalFirstAccessPtWalk += leg.getTravelTime();
+							}
+							else if(PLANSFILE.equals(PLANSFILE1) && !firstPtRouteSz1.containsKey(persId)) {
+								totalFirstAccessPtWalk += leg.getTravelTime();
+							}
+						}
+						else totalEgressPtWalk += leg.getTravelTime();
+						
 					}
 					else{
 						if(!averageHeadway().equals(Double.NaN)){
 							
-							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
+//							addHeadwayToBins(recordPt, p.getId(), plan.getScore());
 							
 						}
-						headways = new ArrayList<Double>();
-						recordPt.startRecord();
+//						headways = new ArrayList<Double>();
+//						recordPt.startRecord();
 					}
+					
+					activityPerformed = false;
 				}
 			}
+			
+			addHeadwayToBins(recordPt, p.getId(), plan.getScore());
 		}
 		log.info("analysePlanFile ... done");
 	}
@@ -281,16 +404,16 @@ public class QuickPlanAnalysisPt {
 		
 		double actualTT = recordPt.getTravelTime();
 		
-		if(travelTimeSz0.containsKey(persId)){
+		if(travelTimeSz0.containsKey(persId) && actualTT != 0d){
 			double ttSz0 = travelTimeSz0.get(persId);
 			
 			if(actualTT < ttSz0) {
-				numberOfAgentsGainedTT++;
-				totalTTgained += (ttSz0 - actualTT);
+				numberOfAgentsDecreasedTT++;
+				totalTTDecreased += (ttSz0 - actualTT);
 			}
 			else if(actualTT > ttSz0){
-				numberOfAgentsLostTT++;
-				totalTTlost += (actualTT - ttSz0);
+				numberOfAgentsIncreasedTT++;
+				totalTTIncreased += (actualTT - ttSz0);
 			}
 			
 			totalTTsaved = totalTTsaved - actualTT + ttSz0;
@@ -306,26 +429,96 @@ public class QuickPlanAnalysisPt {
 				totalGain += (actualScore - score0);
 			}
 			
+			double actDur0 = totalActDurations.get(persId);
+			
+			if(totalActivityDuration > actDur0){
+				numberOfAgentsGainedActTime++;
+				totalGainOfActTime += (totalActivityDuration - actDur0);
+			}
+			else if(totalActivityDuration < actDur0){
+				numberOfAgentsLostActTime++;
+				totalLostOfActTime += (actDur0 - totalActivityDuration);
+			}
+			
+			double totalTransitWalkTime0 = totalTransitWalkTimes.get(persId);
+			if(totalTransitWalkTime0 > totalTransitWalkTime){
+				numberOfAgentsReducedWalkTime++;
+				totalReducedWalkTime += (totalTransitWalkTime0 - totalTransitWalkTime);
+			}
+			else if(totalTransitWalkTime0 < totalTransitWalkTime){
+				numberOfAgentsIncreasedWalkTime++;
+				totalIncreasedWalkTime += (totalTransitWalkTime - totalTransitWalkTime0);
+			}
+			
+			double totalAccessTimePtWalk0 = totalAccessTimePtWalks.get(persId);
+			if(totalAccessTimePtWalk0 > totalAccessTimePtWalk){
+				numberOfAgentsDecreasedTotalAccessTime++;
+				totalDecreasedAccessTime += (totalAccessTimePtWalk0 - totalAccessTimePtWalk);
+			}
+			else if(totalAccessTimePtWalk0 < totalAccessTimePtWalk){
+				numberOfAgentsIncreasedTotalAccessTime++;
+				totalIncreasedAccessTime += (totalAccessTimePtWalk - totalAccessTimePtWalk0);
+			}
+			
+			double totalFirstAccessPtWalk0 = totalFirstAccessWalkTimes.get(persId);
+			if(totalFirstAccessPtWalk0 > totalFirstAccessPtWalk){
+				numberOfAgentsReducedFirstAccessWalkTime++;
+				totalReducedFirstAccessWalkTime += (totalFirstAccessPtWalk0 - totalFirstAccessPtWalk);
+			}
+			else if(totalFirstAccessPtWalk0 < totalFirstAccessPtWalk){
+				numberOfAgentsIncreasedFirstAccessWalkTime++;
+				totalIncreasedFirstAccessWalkTime += (totalFirstAccessPtWalk - totalFirstAccessPtWalk0);
+			}
+			
+			double totalEgressPtWalk0 = totalEgressWalkTimes.get(persId);
+			if(totalEgressPtWalk0 > totalEgressPtWalk){
+				numberOfAgentsReducedEgressWalkTime++;
+				totalReducedEgressWalkTime += (totalEgressPtWalk0 - totalEgressPtWalk);
+			}
+			else if(totalEgressPtWalk0 < totalEgressPtWalk){
+				numberOfAgentsIncreasedEgressWalkTime++;
+				totalIncreasedEgressWalkTime += (totalEgressPtWalk - totalEgressPtWalk0);
+			}
+			
+			if(firstPtRouteSz0.containsKey(persId) && firstPtRouteSz1.containsKey(persId)){
+				
+				if(firstPtRouteSz0.get(persId).equals(firstPtRouteSz1.get(persId))){
+					
+					if(totalFirstAccessPtWalk0 > totalFirstAccessPtWalk){
+						numberOfAgentsDecreasedAccessWalkTimeWithSameRoute++;
+						totalDecreasedWalkTimeWithSameRoute += (totalFirstAccessPtWalk0 - totalFirstAccessPtWalk);
+					}
+					else if(totalFirstAccessPtWalk0 < totalFirstAccessPtWalk){
+						numberOfAgentsIncreasedAccessWalkTimeWithSameRoute++;
+						totalIncreasedWalkTimeWithSameRoute += (totalFirstAccessPtWalk - totalFirstAccessPtWalk0);
+					}
+				}
+			}
+			
 			totalMoreScore = totalMoreScore + actualScore - score0;
 		}
 		else{
 			travelTimeSz0.put(persId, actualTT);
 			scoreSz0.put(persId, score);
+			totalActDurations.put(persId, totalActivityDuration);
+			totalTransitWalkTimes.put(persId, totalTransitWalkTime);
+			totalAccessTimePtWalks.put(persId, totalAccessTimePtWalk);
+			totalFirstAccessWalkTimes.put(persId, totalFirstAccessPtWalk);
+			totalEgressWalkTimes.put(persId, totalEgressPtWalk);
 		}
 		
-		if(actualTT < 1d * 60d * 60d){
-			hdwy_distrib_1h.addVal(averageHeadway() / 60d, 1d);
+		if(actualTT != 0d){
+			if(actualTT < 1d * 60d * 60d){
+				hdwy_distrib_1h.addVal(averageHeadway() / 60d, 1d);
+			}
+			else if(actualTT < 2d * 60d * 60d){
+				hdwy_distrib_2h.addVal(averageHeadway() / 60d, 1d);
+			}
+			else if(actualTT >= 2d * 60d * 60d){
+				hdwy_distrib_24h.addVal(averageHeadway() / 60d, 1d);
+			}
 		}
-		else if(actualTT < 2d * 60d * 60d){
-			hdwy_distrib_2h.addVal(averageHeadway() / 60d, 1d);
-		}
-		else if(actualTT >= 2d * 60d * 60d){
-			hdwy_distrib_24h.addVal(averageHeadway() / 60d, 1d);
-		}
-	}
-
-	private double getTravelTime() {
-		return this.totalTravelTime;
+		
 	}
 	
 	private double getHeadway(TransitRoute route, boolean takeNxtHdwy) {
@@ -357,7 +550,11 @@ public class QuickPlanAnalysisPt {
 		
 		return (headway / (departuresTimes.size() - 1));
 	}
-
+	
+	private double getTravelTime() {
+		
+		return this.totalTravelTime;
+	}
 
 	private void addTraveltime(double newtraveltime) {
 		
@@ -395,6 +592,8 @@ public class QuickPlanAnalysisPt {
 	private void printResults() {
 		log.info("printResults ... ");
 		
+		System.out.println("TotalNumberOfAgents: "+ totalNrOfAgents);
+		
 		hdwy_distrib_1h.plotBinnedDistribution(outpath + scenarioName + "HeadwayDistribution lower 1h", "Headway", "#", "Number of departures with same headway");
 		
 		hdwy_distrib_2h.plotBinnedDistribution(outpath + scenarioName + "HeadwayDistribution between 1h and 2h", "Headway", "#", "Number of departures with same headway");
@@ -403,13 +602,50 @@ public class QuickPlanAnalysisPt {
 		
 		transportMode.plotBinnedDistribution(outpath + scenarioName + "TransportMode", "Bus  Tram  Train", "#", "Number of Trips");
 		
-		System.out.println("NumberOfAgentsGainedTT: " + numberOfAgentsGainedTT + " averageTTgained [h]: " + (totalTTgained / (numberOfAgentsGainedTT * 3600d)));
-		System.out.println("NumberOfAgentsLostTT: " + numberOfAgentsLostTT + " averageTTlost [h]: " + (totalTTsaved / (numberOfAgentsLostTT * 3600d)));
+		System.out.println("NumberOfAgentsDecreasedTT: " + numberOfAgentsDecreasedTT + " averageTTDecreased [h]: " + (totalTTDecreased / (numberOfAgentsDecreasedTT * 3600d)));
+		System.out.println("NumberOfAgentsIncreasedTT: " + numberOfAgentsIncreasedTT + " averageTTIncreased [h]: " + (totalTTIncreased / (numberOfAgentsIncreasedTT * 3600d)));
 		
 		System.out.println("totalTTsaved [h]: " + (totalTTsaved / 3600d));
+		System.out.println();
 		
-		System.out.println("NumberOfAgentsGainedScore: " + numberOfAgentsGainedScore + " with average gain: " + totalGain / numberOfAgentsGainedScore);
-		System.out.println("NumberOfAgentsLostScore: " + numberOfAgentsLostScore + " with average lost: " + totalLost / numberOfAgentsLostScore);
+		System.out.println("NumberOfAgentsReducedWalkTime: " + numberOfAgentsReducedWalkTime + 
+				" averageWalkTimeReduced [h]: " + (totalReducedWalkTime / (numberOfAgentsReducedWalkTime * 3600d)));
+		System.out.println("NumberOfAgentsIncreasedWalkTime: " + numberOfAgentsIncreasedWalkTime + 
+				" averageWalkTimeIncreased [h]: " + (totalIncreasedWalkTime / (numberOfAgentsIncreasedWalkTime * 3600d)));
+		System.out.println();
+		
+		System.out.println("NumberOfAgentsDecreasedTotalAccessWalkTime: " + numberOfAgentsDecreasedTotalAccessTime + 
+				" averageAccessWalkTimeReduced [h]: " + (totalDecreasedAccessTime / (numberOfAgentsDecreasedTotalAccessTime * 3600d)));
+		System.out.println("NumberOfAgentsIncreasedTotalAccessWalkTime: " + numberOfAgentsIncreasedTotalAccessTime + 
+				" averageFirstAccessWalkTimeIncreased [h]: " + (totalIncreasedAccessTime / (numberOfAgentsIncreasedTotalAccessTime * 3600d)));
+		System.out.println();
+		
+		System.out.println("NumberOfAgentsReducedFirstAccessWalkTime: " + numberOfAgentsReducedFirstAccessWalkTime + 
+				" averageFirstAccessWalkTimeReduced [h]: " + (totalReducedFirstAccessWalkTime / (numberOfAgentsReducedFirstAccessWalkTime * 3600d)));
+		System.out.println("NumberOfAgentsIncreasedFirstAccessWalkTime: " + numberOfAgentsIncreasedFirstAccessWalkTime + 
+				" averageFirstAccessWalkTimeIncreased [h]: " + (totalIncreasedFirstAccessWalkTime / (numberOfAgentsIncreasedFirstAccessWalkTime * 3600d)));
+		System.out.println();
+		
+		System.out.println("numberOfAgentsDecreasedAccessWalkTimeWithSameRoute: " + numberOfAgentsDecreasedAccessWalkTimeWithSameRoute + 
+				" averageDecreasedAccessWalkTimeWithSameRoute [h]: " + (totalDecreasedWalkTimeWithSameRoute / (numberOfAgentsDecreasedAccessWalkTimeWithSameRoute * 3600d)));
+		System.out.println("numberOfAgentsIncreasedAccessWalkTimeWithSameRoute: " + numberOfAgentsIncreasedAccessWalkTimeWithSameRoute + 
+				" averageIncreasedAccessWalkTimeWithSameRoute [h]: " + (totalIncreasedWalkTimeWithSameRoute / (numberOfAgentsIncreasedAccessWalkTimeWithSameRoute * 3600d)));
+		System.out.println();
+		
+		System.out.println("NumberOfAgentsReducedEgressWalkTime: " + numberOfAgentsReducedEgressWalkTime + 
+				" averageEgressWalkTimeReduced [h]: " + (totalReducedEgressWalkTime / (numberOfAgentsReducedEgressWalkTime * 3600d)));
+		System.out.println("NumberOfAgentsIncreasedEgressWalkTime: " + numberOfAgentsIncreasedEgressWalkTime + 
+				" averageEgressWalkTimeIncreased [h]: " + (totalIncreasedEgressWalkTime / (numberOfAgentsIncreasedEgressWalkTime * 3600d)));
+		System.out.println();
+		
+		System.out.println("NumberOfAgentsGainedActTime: " + numberOfAgentsGainedActTime + 
+				" averageActTimeGained [h]: " + (totalGainOfActTime / (numberOfAgentsGainedActTime * 3600d)));
+		System.out.println("NumberOfAgentsLostActTime: " + numberOfAgentsLostActTime + 
+				" averageActTimeLost [h]: " + (totalLostOfActTime / (numberOfAgentsLostActTime * 3600d)));
+		System.out.println();
+		
+		System.out.println("NumberOfAgentsGainedScore: " + numberOfAgentsGainedScore + " averageScoreGain []: " + totalGain / numberOfAgentsGainedScore);
+		System.out.println("NumberOfAgentsLostScore: " + numberOfAgentsLostScore + " averageScoreLost []: " + totalLost / numberOfAgentsLostScore);
 		
 		System.out.println("totalMoreScore: " + (totalMoreScore));
 		
