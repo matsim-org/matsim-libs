@@ -189,6 +189,10 @@ public class JointReplanningConfigGroup extends Module {
 	 * Stopping criterion for the duration optimizer, in case no score stagnation occurs
 	 */
 	public static final String N_MAX_SIMPLEX_ITERS = "nMaxMultidirectionnalSearchIterations";
+	/**
+	 * if true, the population size will be multiplied by (1 + n_jointTrips).
+	 */
+	public static final String MULTIPLICATIVE_POP_SIZE = "isMultiplicativePopSize";
 
 	//parameter values, initialized to defaults.
 	private double populationCoef = 1;
@@ -226,6 +230,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double durationMemeticFitnessWeight = 0.25;
 	private double toggleMemeticFitnessWeight = 3.75;
 	private int nMaxSimplexIters = 200;
+	private boolean isMultiplicative = false;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -238,7 +243,7 @@ public class JointReplanningConfigGroup extends Module {
 	 * =========================================================================
 	 */
 	@Override
-	public void addParam(String param_name, String value) {
+	public void addParam(final String param_name, final String value) {
 		if (param_name.equals(MUTATION_PROB)) {
 			this.setMutationProbability(value);
 		}
@@ -332,6 +337,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_POP_SIZE)) {
 			this.setMaxPopulationSize(value);
 		}
+		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
+			this.setIsMultiplicativePopulationSize(value);
+		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -339,7 +347,7 @@ public class JointReplanningConfigGroup extends Module {
 	}
 
 	@Override
-	public String getValue(String param_name) {
+	public String getValue(final String param_name) {
 		if (param_name.equals(MUTATION_PROB)) {
 			return String.valueOf(this.getMutationProbability());
 		}
@@ -433,6 +441,9 @@ public class JointReplanningConfigGroup extends Module {
 		}
 		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
 			return ""+this.getMaxSimplexIterations();
+		}
+		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
+			return ""+this.getIsMultiplicativePopulationSize();
 		}
 		return null;
 	}
@@ -826,6 +837,14 @@ public class JointReplanningConfigGroup extends Module {
 
 	public int getMaxSimplexIterations() {
 		return this.nMaxSimplexIters;
+	}
+
+	public void setIsMultiplicativePopulationSize(final String value) {
+		this.isMultiplicative = Boolean.parseBoolean( value );
+	}
+
+	public boolean getIsMultiplicativePopulationSize() {
+		return isMultiplicative;
 	}
 
 	// allow setting of GA params "directly"
