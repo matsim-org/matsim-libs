@@ -322,6 +322,57 @@ public class EquilibriumOptimalPlansAnalyser {
 		return new WrapperChartUtil( chart );
 	}
 
+	/**
+	 * Creates a box and whisker chart of score improvements when toggle is enabled.
+	 * The score improvements are computed between the toggled and the
+	 * untoggled plans, when the untoggled plan has at least one joint trip.
+	 * This is more of a "debugging" chart: better untoggled scores clearly
+	 * indicates convergence issues.
+	 *
+	 * @return the chart
+	 */
+	public ChartUtil getScoreAbsoluteImprovementsToggleChart() {
+		DefaultBoxAndWhiskerCategoryDataset dataset =
+			new DefaultBoxAndWhiskerCategoryDataset();
+
+		Map<Integer , List<Double>> improvements = new HashMap<Integer , List<Double>>();
+		planLoop:
+		for (ComparativePlan plan : plans.values()) {
+			double improvement = Double.NaN;
+			for (ComparativeLeg leg : plan) {
+				if (leg.isUntoggledJoint()) {
+					double toggledScore = plan.getToggledScore();
+					double untoggledScore = plan.getIndividualScore();
+					improvement = toggledScore - untoggledScore;
+
+					List<Double> improvementsForSize = improvements.get( plan.getCliqueSize() );
+
+					if (improvementsForSize == null) {
+						improvementsForSize = new ArrayList<Double>();
+						improvements.put( plan.getCliqueSize() , improvementsForSize );
+					}
+
+					improvementsForSize.add( improvement );
+					continue planLoop;
+				}
+			}
+		}
+
+		for (Map.Entry<Integer, List<Double>> improvement : improvements.entrySet()) {
+			dataset.add(improvement.getValue(), "", improvement.getKey());
+		}
+
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				"score improvements implied by toggle",
+				"clique size",
+				"improvement",
+				dataset,
+				true);
+		formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
+
+
 	private static void formatCategoryChart(final JFreeChart chart) {
 		((NumberAxis) chart.getCategoryPlot().getRangeAxis()).setAutoRangeIncludesZero( true );
 		// limit the width of the bar to 15% of the available space
