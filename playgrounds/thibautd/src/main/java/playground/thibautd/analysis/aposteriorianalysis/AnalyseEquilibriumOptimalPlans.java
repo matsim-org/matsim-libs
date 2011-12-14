@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.aposteriorianalysis;
 
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
 
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
@@ -59,21 +61,34 @@ public class AnalyseEquilibriumOptimalPlans {
 
 		MoreIOUtils.initOut( outputDir );
 
-		PopulationWithCliques popUntoggled = (PopulationWithCliques)
-			JointControlerUtils.createScenario( untoggledConfigFile ).getPopulation();
-		PopulationWithCliques popToggled = (PopulationWithCliques)
+		PopulationWithCliques popUntoggled;
+		PopulationWithCliques popToggled;
+		PopulationWithCliques popIndividual;
+		ScoringFunctionFactory scoringFunctionFactory;
+
+		{
+			Controler controler = JointControlerUtils.createControler( untoggledConfigFile );
+			popUntoggled = (PopulationWithCliques) controler.getScenario().getPopulation();
+			scoringFunctionFactory = controler.getScoringFunctionFactory();
+		}
+
+		popToggled = (PopulationWithCliques)
 			JointControlerUtils.createScenario( toggledConfigFile ).getPopulation();
-		PopulationWithCliques popIndividual = (PopulationWithCliques)
+		popIndividual = (PopulationWithCliques)
 			JointControlerUtils.createScenario( individualConfigFile ).getPopulation();
 
 		EquilibriumOptimalPlansAnalyser analyser =
 			new EquilibriumOptimalPlansAnalyser(
 					popUntoggled,
 					popToggled,
-					popIndividual );
+					popIndividual,
+					scoringFunctionFactory);
 
 		ChartUtil chart = analyser.getTravelTimeRelativeImprovementsChart();
 		chart.saveAsPng( outputDir+"/travelTimeImprovements.png", WIDTH, HEIGHT );
+
+		chart = analyser.getScoreAbsoluteImprovementsChart();
+		chart.saveAsPng( outputDir+"/scoreImprovements.png", WIDTH, HEIGHT );
 	}
 }
 

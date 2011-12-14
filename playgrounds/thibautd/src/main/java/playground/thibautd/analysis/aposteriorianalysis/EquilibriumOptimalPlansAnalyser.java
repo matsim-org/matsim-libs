@@ -35,9 +35,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
@@ -49,7 +53,8 @@ import playground.thibautd.utils.charts.WrapperChartUtil;
  * @author thibautd
  */
 public class EquilibriumOptimalPlansAnalyser {
-	private Map<Id, ComparativePlan> plans = new HashMap<Id, ComparativePlan>();
+	private final Map<Id, ComparativePlan> plans = new HashMap<Id, ComparativePlan>();
+	private final ScoringFunctionFactory scoringFunctionFactory;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// construction
@@ -58,11 +63,14 @@ public class EquilibriumOptimalPlansAnalyser {
 	 * @param untoggledPopulation
 	 * @param toggledPopulation
 	 * @param individualPopulation
+	 * @param scoringFunctionFactory 
 	 */
 	public EquilibriumOptimalPlansAnalyser(
 			final PopulationWithCliques untoggledPopulation,
 			final PopulationWithCliques toggledPopulation,
-			final PopulationWithCliques individualPopulation) {
+			final PopulationWithCliques individualPopulation,
+			final ScoringFunctionFactory scoringFunctionFactory) {
+		this.scoringFunctionFactory = scoringFunctionFactory;
 		run(untoggledPopulation,
 			toggledPopulation,
 			individualPopulation);
@@ -104,12 +112,15 @@ public class EquilibriumOptimalPlansAnalyser {
 
 		for(List<Leg> trip : extractLegsWithJointTrips( untoggledPerson )) {
 			plan.addUntoggledLeg( trip );
+			plan.setUntoggledScore( getScore( untoggledPerson ) );
 		}
 		for(List<Leg> trip : extractLegsWithJointTrips( toggledPerson )) {
 			plan.addToggledLeg( trip );
+			plan.setToggledScore( getScore( toggledPerson ) );
 		}
 		for(Leg leg : extractLegsWithoutJointTrips( individualPerson )) {
 			plan.addIndividualLeg( leg );
+			plan.setIndividualScore( getScore( individualPerson ) );
 		}
 
 		plan.lock();
@@ -154,6 +165,46 @@ public class EquilibriumOptimalPlansAnalyser {
 		return out ;
 	}
 
+	private double getScore(final Person person) {
+		Plan plan = person.getSelectedPlan();
+		ScoringFunction fitnessFunction;
+		Activity currentActivity;
+		Leg currentLeg;
+		//double now;
+
+		fitnessFunction =
+			this.scoringFunctionFactory.createNewScoringFunction(plan);
+		//now = 0d;
+
+		// step through plan and score it
+		List<PlanElement> elements = plan.getPlanElements();
+		Activity lastActivity = (Activity) elements.get(elements.size() - 1);
+		for (PlanElement pe : elements) {
+			if (pe instanceof Activity) {
+				currentActivity = (Activity) pe;
+
+				// Quick and dirty fix to have everithing working with the
+				// changed ScoringFunction interface: if last activity has an
+				// end time defined, the last activity is counted twice
+				// ---------------------------------------------------------
+				if ( currentActivity == lastActivity ) {
+					currentActivity.setEndTime( Time.UNDEFINED_TIME );
+				}
+				fitnessFunction.handleActivity( currentActivity );
+			}
+			else if (pe instanceof Leg) {
+				currentLeg = (Leg) pe;
+				fitnessFunction.handleLeg( currentLeg );
+			}
+			else {
+				throw new IllegalArgumentException("unrecognized plan element type");
+			}
+		}
+
+		fitnessFunction.finish();
+		plan.setScore(fitnessFunction.getScore());
+		return plan.getScore();
+	}
 	// /////////////////////////////////////////////////////////////////////////
 	// analysis elements getters
 	// /////////////////////////////////////////////////////////////////////////
@@ -186,18 +237,70 @@ public class EquilibriumOptimalPlansAnalyser {
 
 		dataset.add(improvements, "", "");
 		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
-				"travel time improvements implied by joint trips",
+				"travel time improvements implied by passenger trips",
 				"",
 				"relative improvement (%)",
 				dataset,
 				true);
+		formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
+
+	/**
+	 * Creates a box and whisker chart of score improvements.
+	 * The score improvements are computed between the toggled and the
+	 * individual plans, when the toggled plan has at least one passenger trip
+	 * and no driver trip.
+	 *
+	 * @return the chart
+	 */
+	public ChartUtil getScoreAbsoluteImprovementsChart() {
+		DefaultBoxAndWhiskerCategoryDataset dataset =
+			new DefaultBoxAndWhiskerCategoryDataset();
+
+		List<Double> improvements = new ArrayList<Double>();
+		planLoop:
+		for (ComparativePlan plan : plans.values()) {
+			double improvement = Double.NaN;
+			boolean isPassenger = false;
+			for (ComparativeLeg leg : plan) {
+				if (leg.isToggledJoint()) {
+					if (leg.isToggledPassenger()) {
+						double jointScore = plan.getToggledScore();
+						double individualScore = plan.getIndividualScore();
+						improvement = jointScore - individualScore;
+						isPassenger = true;
+					}
+					else {
+						// there is a driver leg: score improvements cannot
+						// be interpreted easily anymore
+						continue planLoop;
+					}
+				}
+			}
+			if (isPassenger) improvements.add( improvement );
+		}
+
+		dataset.add(improvements, "", "");
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				"score improvements implied by passenger trips",
+				"",
+				"improvement",
+				dataset,
+				true);
+		formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
+
+	private static void formatCategoryChart(final JFreeChart chart) {
 		((NumberAxis) chart.getCategoryPlot().getRangeAxis()).setAutoRangeIncludesZero( true );
 		// limit the width of the bar to 15% of the available space
 		((BoxAndWhiskerRenderer) chart.getCategoryPlot().getRenderer()).setMaximumBarWidth( 0.15 );
 		// due to the ChartUtil formating procedure, we have to put the
 		// legend at creation, but here it is just empty
 		((BoxAndWhiskerRenderer) chart.getCategoryPlot().getRenderer()).setBaseSeriesVisibleInLegend( false );
-		return new WrapperChartUtil( chart );
+		// draw a line at the 0.
+		chart.getCategoryPlot().setRangeZeroBaselineVisible( true );
 	}
 }
 
@@ -209,6 +312,10 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 		new ArrayList< List<Leg> >();
 	private final List< Leg > individualLegs =
 		new ArrayList< Leg >();
+
+	private double untoggledScore = Double.NaN;
+	private double toggledScore = Double.NaN;
+	private double individualScore = Double.NaN;
 
 	private boolean isLocked = false;
 
@@ -241,6 +348,18 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 		individualLegs.add( leg );
 	}
 
+	public void setUntoggledScore( final double score ) {
+		untoggledScore = score;
+	}
+
+	public void setToggledScore( final double score ) {
+		toggledScore = score;
+	}
+
+	public void setIndividualScore( final double score ) {
+		individualScore = score;
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// processing methods
 	// /////////////////////////////////////////////////////////////////////////
@@ -263,6 +382,7 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 		}
 	}
 
+	@Override
 	public Iterator<ComparativeLeg> iterator() {
 		lock();
 		return new LegIterator();
@@ -270,6 +390,18 @@ class ComparativePlan implements Iterable<ComparativeLeg> {
 
 	public Person getPerson() {
 		return person;
+	}
+
+	public double getUntoggledScore() {
+		return untoggledScore;
+	}
+
+	public double getToggledScore() {
+		return toggledScore;
+	}
+
+	public double getIndividualScore() {
+		return individualScore;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

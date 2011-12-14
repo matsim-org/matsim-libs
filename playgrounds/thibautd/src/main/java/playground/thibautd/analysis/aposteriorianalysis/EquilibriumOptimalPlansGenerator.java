@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 
@@ -127,6 +128,9 @@ public class EquilibriumOptimalPlansGenerator {
 		newConfig.addModule(
 				PlansConfigGroup.GROUP_NAME,
 				plans);
+		newConfig.addModule(
+				PlanCalcScoreConfigGroup.GROUP_NAME,
+				config.planCalcScore());
 
 		(new ConfigWriter( newConfig )).write( configFile );
 	}
