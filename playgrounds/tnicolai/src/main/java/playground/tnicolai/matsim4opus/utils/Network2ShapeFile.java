@@ -47,8 +47,6 @@ public class Network2ShapeFile {
 
 		// WGS84 isn't correct and may affects the transformation, but this isn't important to see the link id's
 		new Links2ESRIShape(net, "/Users/thomas/Downloads/merged-network.shp", TransformationFactory.WGS84).write();
-		
-		
 	}
 
 }

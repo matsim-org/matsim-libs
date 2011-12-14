@@ -47,7 +47,7 @@ public class ZurichUtilities {
 	 */
 	private static void removeUetliBergTunnel(final NetworkImpl network) {
 
-		log.info("Removing Uetlibertunnel from network ...");
+		log.info("Closing Uetlibertunnel from network ...");
 		
 		ArrayList<IdImpl> uetlibergTunnelLinkList = new ArrayList<IdImpl>() {
 			private static final long serialVersionUID = 1L;
@@ -58,7 +58,7 @@ public class ZurichUtilities {
 		};
 		// remove links from network
 		applyScenario(network, uetlibergTunnelLinkList);
-		log.info("Done removing Uetlibertunnel!");
+		log.info("Done closing Uetlibertunnel!");
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class ZurichUtilities {
 	 */
 	private static void removeBirmensdorferstrasse(final NetworkImpl network) {
 
-		log.info("Removing Birmensdorferstrasse from network ...");
+		log.info("Closing Birmensdorferstrasse from network ...");
 		
 		ArrayList<IdImpl> birmensdorferStrasseLinkList = new ArrayList<IdImpl>() {
 			private static final long serialVersionUID = 1L;
@@ -79,11 +79,11 @@ public class ZurichUtilities {
 		};
 		// remove links from network
 		applyScenario(network, birmensdorferStrasseLinkList);
-		log.info("Done removing Birmensdorferstrasse!");
+		log.info("Done closing Birmensdorferstrasse!");
 	}
 
 	private static void removeSchwamendingerTunnel(final NetworkImpl network) {
-		log.info("Removing Schwamendingertunnel from network ...");
+		log.info("Closing Schwamendingertunnel from network ...");
 
 		ArrayList<IdImpl> schwamendingerTunnelLinkList = new ArrayList<IdImpl>() {
 			private static final long serialVersionUID = 1L;
@@ -102,7 +102,7 @@ public class ZurichUtilities {
 		};
 		// remove links from network
 		applyScenario(network, schwamendingerTunnelLinkList);
-		log.info("Done removing Schwamendingertunnel!");
+		log.info("Done closing Schwamendingertunnel!");
 	}
 	
 	/**
