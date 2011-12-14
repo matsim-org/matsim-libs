@@ -343,7 +343,7 @@ public class ReadFromUrbansimParcelModel {
 			printDetailedPopulationInfo(cnt);
 		}
 		// Check if newPop contain too many people than our target population size and remove persons from newPop if needed
-		else if( mergePop.getPersons().size() > targetPopSize && !backupPop.getPersons().isEmpty() ){
+		else if( mergePop.getPersons().size() > targetPopSize ){
 			printDetailedPopulationInfo(cnt);
 			log.info("Size of new population (" +  mergePop.getPersons().size() + ") is larger than samplingRate*NumberUrbansimPersons (" + targetPopSize + "). Removing persons from newPop ...");
 			// Since no person can be removed from newPop a new, down sampled population is created ...
