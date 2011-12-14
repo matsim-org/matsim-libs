@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.config.ConfigUtils;
 
@@ -145,6 +146,12 @@ public class JointControlerUtils {
 				//		controler.getScenario());
 			controler.setScoringFunctionFactory(factory);
 			controler.addControlerListener( CarPoolingLegScoringFunction.getInformationLogger() );
+		}
+		else {
+			controler.setScoringFunctionFactory(
+					new CharyparNagelScoringFunctionFactory(
+						controler.getConfig().planCalcScore(),
+						controler.getScenario().getNetwork()) );
 		}
 	}
 }
