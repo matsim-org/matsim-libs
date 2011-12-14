@@ -21,6 +21,7 @@
 package playground.thibautd.initialdemandgeneration.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -96,6 +97,13 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
+	private static final void removeRoutes(final Plan plan) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg) {
+				((Leg) pe).setRoute( null );
+			}
+		}
+	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// run methods
@@ -116,6 +124,9 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 		}
 		if ( router != null ) {
 			router.run(plan);
+		}
+		else {
+			removeRoutes( plan );
 		}
 	}
 }
