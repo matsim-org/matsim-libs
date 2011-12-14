@@ -45,7 +45,6 @@ import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.LaneDefinitionsWriter11;
 import org.matsim.lanes.LaneDefinitionsWriter20;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.run.OTFVis;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -64,6 +63,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
+import playground.dgrether.DgOTFVis;
 import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalGroupsDataConsistencyChecker;
@@ -850,7 +850,7 @@ public class PoznanNetwork
         
         
         //visualization
-        OTFVis.playConfig(configFilename);
+        new DgOTFVis().playAndRouteConfig(configFilename);
     }
 
 
