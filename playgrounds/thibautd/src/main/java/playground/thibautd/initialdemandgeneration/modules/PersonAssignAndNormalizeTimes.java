@@ -104,7 +104,8 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				dur += prev_ttime;
 				if (dur < 5*60.0) {
 					dur = 5*60.0;
-				} // NOTE: Sometimes the mz act duration is 0 sec.
+				}
+				// NOTE: Sometimes the mz act duration is 0 sec.
 
 				a.setStartTime(tod);
 				a.setMaximumDuration(dur);
@@ -196,6 +197,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	 */
 	private final void assignDesires(final Plan p) {
 		Desires d = ((PersonImpl) p.getPerson()).createDesires(null);
+		// The method .createDesires does create desires ONLY IF no desires
+		// exist! Thus need to clean them.
+		// The choosen way to do it will work only if the desires return the internal
+		// reference to the duration map. This is currently the case, but nothing in
+		// the (lack of) documentation indicates that it should not change...
+		// => if a bug pops up here, check for a change in this behaviour.
+		d.getActivityDurations().clear();
 		double othr_dur = 0.0;
 		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
 			ActivityImpl a = (ActivityImpl) p.getPlanElements().get(i);
