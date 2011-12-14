@@ -13,7 +13,7 @@ public class SimLauncher
         String cfgFileName;
 
         if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-rad\\taxi\\orig-mielec\\";
+            dirName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\";
             cfgFileName = "siec-config.xml";
         }
         else if (args.length == 2) {

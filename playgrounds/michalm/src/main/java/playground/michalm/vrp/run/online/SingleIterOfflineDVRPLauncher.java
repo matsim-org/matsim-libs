@@ -21,9 +21,9 @@ import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.*;
 import pl.poznan.put.vrp.dynamic.simulator.*;
 import pl.poznan.put.vrp.dynamic.simulator.customer.*;
 import playground.michalm.util.gis.*;
@@ -37,16 +37,11 @@ import playground.michalm.vrp.driver.*;
 
 public class SingleIterOfflineDVRPLauncher
 {
-    // means: ArcTravelTimes and ArcTravelCosts are averaged for optimization
-    private static boolean AVG_TRAFFIC_MODE = false;// default: false
-
-    // means: all requests are known a priori (in advance/static)
-    private static boolean STATIC_MODE = false;// default: false
-
     private String dirName;
     private String netFileName;
     private String plansFileName;
     private String depotsFileName;
+    private String reqIdToVehIdFileName;
     private boolean vrpOutFiles;
     private String vrpOutDirName;
 
@@ -56,7 +51,7 @@ public class SingleIterOfflineDVRPLauncher
     private Scenario scenario;
     private MATSimVRPData data;
 
-    private boolean optimisticOptimizer;
+    private AlgorithmType algorithmType;
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
@@ -65,18 +60,17 @@ public class SingleIterOfflineDVRPLauncher
 
     private void processArgs()
     {
-        AVG_TRAFFIC_MODE = false;
-        STATIC_MODE = false;
-
         dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
-
+        reqIdToVehIdFileName = dirName + "reqIdToVehId";
+        
         travelTimesFromEvents = true;
         eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
-        optimisticOptimizer = !true;
+        algorithmType = AlgorithmType.NO_RE_ASSIGNMENT;
+        //algorithmType = AlgorithmType.RE_ASSIGNMENT;
 
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "\\vrp_output";
@@ -151,9 +145,7 @@ public class SingleIterOfflineDVRPLauncher
             Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
                     t0, t1, false);
 
-            if (!STATIC_MODE) {
-                request.deactivate(t0);
-            }
+            request.deactivate(t0);
 
             customers.add(customer);
             requests.add(request);
@@ -180,11 +172,17 @@ public class SingleIterOfflineDVRPLauncher
     private void initOptimizerFactory()
         throws IOException
     {
-        if (optimisticOptimizer) {
-            optimizerFactory = OptimisticTaxiOptimizer.FACTORY;
-        }
-        else {
-            optimizerFactory = PessimisticTaxiOptimizer.FACTORY;
+        switch (algorithmType) {
+            case NO_RE_ASSIGNMENT:
+                optimizerFactory = TaxiOptimizerWithoutReassignment.FACTORY;
+                break;
+
+            case RE_ASSIGNMENT:
+                optimizerFactory = TaxiOptimizerWithReassignment.FACTORY;
+                break;
+
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -229,6 +227,7 @@ public class SingleIterOfflineDVRPLauncher
 
 
     private void generateVrpOutput()
+        throws IOException
     {
         System.out.println(new TaxiEvaluator().evaluateVRP(data.getVrpData()).toString());
 
@@ -259,6 +258,17 @@ public class SingleIterOfflineDVRPLauncher
 
         ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+
+        // ============================== for PreAssignment ==============================
+
+        File reqIdToVehIdFile = new File(reqIdToVehIdFileName);
+        Writer w = new BufferedWriter(new FileWriter(reqIdToVehIdFile));
+
+        for (Request req : data.getVrpData().getRequests()) {
+            w.write(req.getServeTask().getSchedule().getVehicle().getId() + "\n");
+        }
+
+        w.close();
     }
 
 

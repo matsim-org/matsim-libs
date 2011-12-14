@@ -1,6 +1,7 @@
 package playground.michalm.vrp.run.online;
 
 import java.io.*;
+import java.util.*;
 
 import org.jfree.chart.*;
 import org.matsim.api.core.v01.*;
@@ -24,18 +25,22 @@ import org.matsim.run.*;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.otfvis.gui.*;
 
+import pl.poznan.put.util.array2d.*;
 import pl.poznan.put.util.jfreechart.*;
 import pl.poznan.put.util.jfreechart.ChartUtils.OutputType;
 import pl.poznan.put.vrp.dynamic.chart.*;
 import pl.poznan.put.vrp.dynamic.data.*;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer.*;
 import playground.michalm.util.gis.*;
 import playground.michalm.vrp.data.*;
 import playground.michalm.vrp.data.file.*;
 import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.sparse.*;
 import playground.michalm.vrp.otfvis.*;
+import playground.michalm.vrp.run.online.SingleIterOfflineDVRPLauncher.*;
 import playground.michalm.vrp.taxi.*;
 import playground.michalm.vrp.taxi.taxicab.*;
 
@@ -46,6 +51,7 @@ public class SingleIterOnlineDVRPLauncher
     private String netFileName;
     private String plansFileName;
     private String depotsFileName;
+    private String reqIdToVehIdFileName;
     private boolean vrpOutFiles;
     private String vrpOutDirName;
 
@@ -55,7 +61,7 @@ public class SingleIterOnlineDVRPLauncher
     private Scenario scenario;
     private MATSimVRPData data;
 
-    private boolean optimisticOptimizer;
+    private AlgorithmType algorithmType;
     private TaxiOptimizerFactory optimizerFactory;
 
     private PersonalizableTravelTime ttimeCalc;
@@ -71,11 +77,12 @@ public class SingleIterOnlineDVRPLauncher
         netFileName = dirName + "network.xml";
         plansFileName = dirName + "plans.xml";
         depotsFileName = dirName + "depots.xml";
+        reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
         travelTimesFromEvents = true;
         eventsFileName = "d:\\PP-rad\\taxi\\orig-mielec-nowe-OD\\output\\std\\ITERS\\it.10\\10.events.xml.gz";
 
-        optimisticOptimizer = !true;
+        algorithmType = AlgorithmType.PRE_ASSIGNMENT;
 
         otfVis = !true;
 
@@ -137,11 +144,31 @@ public class SingleIterOnlineDVRPLauncher
     private void initOptimizerFactory()
         throws IOException
     {
-        if (optimisticOptimizer) {
-            optimizerFactory = OptimisticTaxiOptimizer.FACTORY;
-        }
-        else {
-            optimizerFactory = PessimisticTaxiOptimizer.FACTORY;
+        switch (algorithmType) {
+            case NO_RE_ASSIGNMENT:
+                optimizerFactory = TaxiOptimizerWithoutReassignment.FACTORY;
+                break;
+
+            case RE_ASSIGNMENT:
+                optimizerFactory = TaxiOptimizerWithReassignment.FACTORY;
+                break;
+
+            case PRE_ASSIGNMENT:
+                File reqIdToVehIdFile = new File(reqIdToVehIdFileName);
+                Scanner scanner = new Scanner(reqIdToVehIdFile);
+
+                List<Vehicle> vehicles = data.getVrpData().getVehicles();
+                Vehicle[] reqIdToVehMapping = new Vehicle[scanner.nextInt()];
+                
+                for (int i = 0; i < reqIdToVehMapping.length; i++) {
+                    reqIdToVehMapping[i] = vehicles.get(scanner.nextInt());
+                }
+
+                optimizerFactory = TaxiOptimizerWithPreassignment.createFactory(reqIdToVehMapping);
+                break;
+
+            default:
+                throw new IllegalStateException();
         }
     }
 
