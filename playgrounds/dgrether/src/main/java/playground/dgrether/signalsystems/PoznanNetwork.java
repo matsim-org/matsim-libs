@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.Lane;
@@ -63,7 +64,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
-import playground.dgrether.*;
+import playground.dgrether.DgOTFVis;
 import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalGroupsDataConsistencyChecker;
@@ -289,6 +290,7 @@ public class PoznanNetwork
         signal = sf.createSignalData(scenario.createId("s12_10_3"));
         signal.setLinkId(scenario.createId("12_10"));
         signal.addLaneId(scenario.createId("12_10_3"));
+        signal.addTurningMoveRestriction(scenario.createId("10_11"));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(scenario.createId("s11_10_1"));
@@ -321,20 +323,20 @@ public class PoznanNetwork
         signal.addLaneId(scenario.createId("30_10_3"));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s30_10_1"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_1"));
-        sys10.addSignalData(signal);
-
-        signal = sf.createSignalData(scenario.createId("s30_10_2"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_2"));
-        sys10.addSignalData(signal);
-
-        signal = sf.createSignalData(scenario.createId("s30_10_3"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_3"));
-        sys10.addSignalData(signal);
+//        signal = sf.createSignalData(scenario.createId("s30_10_1"));
+//        signal.setLinkId(scenario.createId("30_10"));
+//        signal.addLaneId(scenario.createId("30_10_1"));
+//        sys10.addSignalData(signal);
+//
+//        signal = sf.createSignalData(scenario.createId("s30_10_2"));
+//        signal.setLinkId(scenario.createId("30_10"));
+//        signal.addLaneId(scenario.createId("30_10_2"));
+//        sys10.addSignalData(signal);
+//
+//        signal = sf.createSignalData(scenario.createId("s30_10_3"));
+//        signal.setLinkId(scenario.createId("30_10"));
+//        signal.addLaneId(scenario.createId("30_10_3"));
+//        sys10.addSignalData(signal);
 
         signal = sf.createSignalData(scenario.createId("s13_10_1"));
         signal.setLinkId(scenario.createId("13_10"));
@@ -482,7 +484,7 @@ public class PoznanNetwork
         // green from second 0 to 30 in cycle
         settings.setOnset(10);
         settings.setDropping(15);
-        // plan.addSignalGroupSettings(settings);
+         plan.addSignalGroupSettings(settings);
 
         settings = scf.createSignalGroupSettingsData(scenario.createId("sg_2"));
         // green from second 0 to 30 in cycle
@@ -572,6 +574,9 @@ public class PoznanNetwork
     {
         // general setup
         Config config = ConfigUtils.createConfig();
+        config.addQSimConfigGroup(new QSimConfigGroup());
+        config.getQSimConfigGroup().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+        config.getQSimConfigGroup().setStartTime(0.0);
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
@@ -601,8 +606,8 @@ public class PoznanNetwork
         // System.exit(0);
 
         // output
-        String baseDir = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\";
-        // String baseDir = "/media/data/work/matsim/examples/poznan/";
+//        String baseDir = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\";
+         String baseDir = "/media/data/work/matsim/examples/poznan/";
 
         SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
         String signalSystemsFile = baseDir + "signal_systems.xml";
