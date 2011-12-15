@@ -22,6 +22,8 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -79,10 +81,25 @@ import playground.thibautd.utils.MoreIOUtils;
  * @author thibautd
  */
 public class RunReducedSPModel {
+	private static final Logger log =
+		Logger.getLogger(RunReducedSPModel.class);
+
 	private static enum ControlerType {
 		CORE, HERBIE};
 
 	public static void main(final String[] args) {
+		try {
+			exec( args );
+		}
+		catch (Exception e) {
+			log.error( "got an exception: ", e );
+		}
+		finally {
+			MoreIOUtils.closeOutputDirLogging();
+		}
+	}
+
+	private static void exec(final String[] args) {
 		String configFileName = args[0];
 		String outputPath = args[1];
 		ControlerType controlerType = ControlerType.CORE;
