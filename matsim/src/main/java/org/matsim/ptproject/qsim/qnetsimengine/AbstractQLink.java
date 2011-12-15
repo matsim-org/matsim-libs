@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
@@ -75,6 +76,9 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 			agent.endLegAndAssumeControl(now);
 			this.addParkedVehicle(vehicle);
 		} else {
+			Id transitRouteId = null;
+			EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
+			eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, agent.getId(), vehicle.getId(), transitRouteId));
 			this.addDepartingVehicle(vehicle);
 		}
 	}

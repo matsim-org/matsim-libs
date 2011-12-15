@@ -212,7 +212,7 @@ class ParallelQNetsimEngine extends QNetsimEngine {
 		// setup threads
 		for (int i = 0; i < numOfThreads; i++) {
 			QSimEngineRunner engine = new QSimEngineRunner(simulateAllNodes, simulateAllLinks, this.startBarrier, this.separationBarrier, 
-					this.endBarrier, this.getMobsim(), this.getAgentSnapshotInfoBuilder());
+					this.endBarrier);
 
 			if (useNodeArray) {
 				engine.setQNodeArray(this.parallelNodesArrays[i]);

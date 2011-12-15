@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
@@ -51,6 +52,14 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavi
  * @author dstrippgen
  */
 public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
+
+	private static final class NodeIdComparator implements Comparator<QNode> {
+		@Override
+		public int compare(final QNode o1, final QNode o2) {
+			return o1.getNode().getId().compareTo(o2.getNode().getId());
+		}
+	}
+
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
@@ -180,20 +189,10 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			this.simNodesArray = network.getNetsimNodes().values().toArray(new QNode[network.getNetsimNodes().values().size()]);
 			//dg[april08] as the order of nodes has an influence on the simulation
 			//results they are sorted to avoid indeterministic simulations
-			Arrays.sort(this.simNodesArray, new Comparator<QNode>() {
-				@Override
-				public int compare(final QNode o1, final QNode o2) {
-					return o1.getNode().getId().compareTo(o2.getNode().getId());
-				}
-			});			
+			Arrays.sort(this.simNodesArray, new NodeIdComparator());			
 		} else {
 			simNodesList = new ArrayList<QNode>();
-			Collections.sort(simNodesList, new Comparator<QNode>() {
-				@Override
-				public int compare(final QNode o1, final QNode o2) {
-					return o1.getNode().getId().compareTo(o2.getNode().getId());
-				}
-			});
+			Collections.sort(simNodesList, new NodeIdComparator());
 		}
 		if (simulateAllLinks) {
 			this.simLinksList.addAll(this.allLinks);
@@ -220,11 +219,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		moveLinks(time);
 	}
 
-	public void beforeSimStep( final double time ) {
-		// nothing to do here
-	}
-
-	protected void moveNodes(final double time) {
+	private void moveNodes(final double time) {
 		if (useNodeArray) {
 			for (QNode node : this.simNodesArray) {
 				if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
@@ -251,7 +246,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		}
 	}
 
-	protected void moveLinks(final double time) {
+	private void moveLinks(final double time) {
 		reactivateLinks();
 		ListIterator<AbstractQLink> simLinks = this.simLinksList.listIterator();
 		AbstractQLink link;
@@ -310,12 +305,10 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		return this.qsim;
 	}
 
-	@Override
-	protected AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
+	AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
 		return this.positionInfoBuilder;
 	}
 
-	@Override
 	public NetsimNetwork getNetsimNetwork() {
 		return this.network ;
 	}
@@ -341,10 +334,17 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		qLink.registerAdditionalAgentOnLink(planAgent);
 	}
 
-
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
 		AbstractQLink qLink = network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
+	}
+
+	void letAgentArrive(QVehicle veh) {
+		double now = qsim.getSimTimer().getTimeOfDay();
+		MobsimDriverAgent driver = veh.getDriver();
+		Id transitRouteId = null;
+		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId(), transitRouteId));		
+		driver.endLegAndAssumeControl(now);
 	}
 
 }

@@ -219,11 +219,12 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 15, events.size());
+		Assert.assertEquals("wrong number of events", 17, events.size());
 		int idx = 0;
 		Assert.assertTrue(events.get(idx++) instanceof AgentDepartureEvent); // passenger
 		Assert.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
 		Assert.assertTrue(events.get(idx++) instanceof AgentDepartureEvent); // pt-driver
+		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
 		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
 		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent);
 		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
@@ -235,6 +236,7 @@ public class QSimIntegrationTest {
 		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 3
 		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 4
 		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
+		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
 		Assert.assertTrue(events.get(idx++) instanceof AgentArrivalEvent);
 	}
 
@@ -299,11 +301,12 @@ public class QSimIntegrationTest {
 		coll.printEvents();
 
 		List<Event> events = coll.getEvents();
-		Assert.assertEquals("wrong number of events", 15, events.size());
+		Assert.assertEquals("wrong number of events", 17, events.size());
 		int idx = 0;
 		Assert.assertTrue(events.get(idx++) instanceof AgentDepartureEvent); // passenger
 		Assert.assertTrue(events.get(idx++) instanceof TransitDriverStartsEvent);
 		Assert.assertTrue(events.get(idx++) instanceof AgentDepartureEvent); // pt-driver
+		Assert.assertTrue(events.get(idx++) instanceof PersonEntersVehicleEvent); // pt-driver
 		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 1
 		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 1
 		Assert.assertTrue(events.get(idx++) instanceof VehicleArrivesAtFacilityEvent); // stop 2
@@ -315,6 +318,7 @@ public class QSimIntegrationTest {
 		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent);
 		Assert.assertTrue(events.get(idx++) instanceof AgentArrivalEvent); // passenger
 		Assert.assertTrue(events.get(idx++) instanceof VehicleDepartsAtFacilityEvent); // stop 4
+		Assert.assertTrue(events.get(idx++) instanceof PersonLeavesVehicleEvent); // pt-driver
 		Assert.assertTrue(events.get(idx++) instanceof AgentArrivalEvent);
 	}
 

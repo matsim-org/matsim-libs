@@ -346,7 +346,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				// Check if veh has reached destination:
 				if ((this.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					this.addParkedVehicle(veh);
-					driver.endLegAndAssumeControl(now);
+					network.simEngine.letAgentArrive(veh);
 					this.makeVehicleAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
@@ -376,7 +376,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// so allow them to return some non-null link id in chooseNextLink() in order to be
 						// placed on the link, and here we'll remove them again if needed...
 						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
-						driver.endLegAndAssumeControl(now);
+						network.simEngine.letAgentArrive(veh);
 						this.addParkedVehicle(veh);
 						this.makeVehicleAvailableToNextDriver(veh, now);
 						// remove _after_ processing the arrival to keep link active

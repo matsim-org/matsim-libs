@@ -31,7 +31,6 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.ptproject.qsim.QSim;
 
 public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 
@@ -64,18 +63,13 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<AbstractQLink> linksToActivate = new ArrayList<AbstractQLink>();
-	private final QSim qsim;
-	private final AgentSnapshotInfoBuilder positionInfoBuilder;
-
-	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier,
-			QSim sim, AgentSnapshotInfoBuilder positionInfoBuilder) {
+	
+	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
 		this.simulateAllNodes = simulateAllNodes;
 		this.simulateAllLinks = simulateAllLinks;
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
-		this.qsim = sim;
-		this.positionInfoBuilder = positionInfoBuilder;
 	}
 
 	/*package*/ void setQNodeArray(QNode[] nodes) {
@@ -218,21 +212,6 @@ public class QSimEngineRunner extends QSimEngineInternalI implements Runnable {
 	public int getNumberOfSimulatedNodes() {
 		if (useNodeArray) return nodesArray.length;
 		else return nodesList.size();
-	}
-
-	@Override
-	public QSim getMobsim() {
-		return this.qsim;
-	}
-
-	@Override
-	public AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() {
-		return this.positionInfoBuilder;
-	}
-
-	@Override
-	public QNetwork getNetsimNetwork() {
-		throw new UnsupportedOperationException("should never be called this way since this is just the runner");
 	}
 
 	public NetsimNetworkFactory<QNode,AbstractQLink> getNetsimNetworkFactory() {

@@ -45,7 +45,12 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.qsim.*;
+import org.matsim.pt.qsim.AbstractTransitDriver;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitAgentFactory;
+import org.matsim.pt.qsim.TransitDriver;
+import org.matsim.pt.qsim.TransitQSimEngine;
+import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
@@ -102,8 +107,6 @@ public final class QSim implements VisMobsim, Netsim {
 	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
 
 	private MobsimTimer simTimer;
-
-	private Collection<MobsimAgent> transitAgents;
 
 	/**
 	 * Includes all agents that have transportation modes unknown to the

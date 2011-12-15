@@ -22,6 +22,8 @@ package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 
 /**
@@ -54,5 +56,9 @@ public interface EventsFactory extends MatsimFactory {
 	ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, final Id facilityId, String acttype);
 
 	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
+
+	PersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId, Id transitRouteId);
+
+	PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId, Id transitRouteId);
 
 }

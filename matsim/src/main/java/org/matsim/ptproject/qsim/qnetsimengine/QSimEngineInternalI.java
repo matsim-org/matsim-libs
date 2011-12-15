@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
-import org.matsim.ptproject.qsim.QSim;
 
 /**
  * @author nagel
@@ -28,9 +27,6 @@ import org.matsim.ptproject.qsim.QSim;
  */
 abstract class QSimEngineInternalI extends NetElementActivator {
 	
-	abstract AgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder() ;
 	
-	abstract public NetsimNetwork getNetsimNetwork() ;
 
-	abstract public QSim getMobsim() ;
 }
