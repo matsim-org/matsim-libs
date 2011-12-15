@@ -22,8 +22,16 @@ package playground.thibautd.utils;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import java.util.List;
 
+import org.apache.log4j.Appender;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -33,6 +41,12 @@ import org.matsim.core.utils.io.IOUtils;
  * @author thibautd
  */
 public class MoreIOUtils {
+	private static final Logger log =
+		Logger.getLogger(MoreIOUtils.class);
+
+	private static final String LOGFILE = "MyLogFile.log";
+	private static final String WARNLOGFILE = "MyWarnLogFile.log";
+
 	private MoreIOUtils() {
 		//no instanciation 
 	}
@@ -64,6 +78,53 @@ public class MoreIOUtils {
 		}
 	}
 
+	/**
+	 * Redefine the IOUtils method, with a different file and appender name.
+	 * Otherwise, runing a controler in a borader context stops the logging at
+	 * the end of the controler shutdown.
+	 */
+	public static void initOutputDirLogging(
+			final String outputDirectory,
+			final List<LoggingEvent> logEvents) throws IOException {
+		Logger root = Logger.getRootLogger();
+		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
+				System.getProperty("file.separator") + LOGFILE);
+		appender.setName(LOGFILE);
+		root.addAppender(appender);
+		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputDirectory +
+				System.getProperty("file.separator") +  WARNLOGFILE);
+		warnErrorAppender.setName(WARNLOGFILE);
+		warnErrorAppender.setThreshold(Level.WARN);
+//		LevelRangeFilter filter = new LevelRangeFilter();
+//		filter.setLevelMax(Level.ALL);
+//		filter.setAcceptOnMatch(true);
+//		filter.setLevelMin(Level.WARN);
+//		warnErrorAppender.addFilter(filter);
+		root.addAppender(warnErrorAppender);
+		if (logEvents != null) {
+			for (LoggingEvent e : logEvents) {
+				appender.append(e);
+				if (e.getLevel().isGreaterOrEqual(Level.WARN)) {
+					warnErrorAppender.append(e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Redefine the IOUtils method, with a different file and appender name.
+	 * Otherwise, runing a controler in a borader context stops the logging at
+	 * the end of the controler shutdown.
+	 */
+	public static void closeOutputDirLogging() {
+		Logger root = Logger.getRootLogger();
+		Appender app = root.getAppender(LOGFILE);
+		root.removeAppender(app);
+		app.close();
+		app = root.getAppender(WARNLOGFILE);
+		root.removeAppender(app);
+		app.close();
+	}
 
 }
 
