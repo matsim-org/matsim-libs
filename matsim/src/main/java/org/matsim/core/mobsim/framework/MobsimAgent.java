@@ -67,7 +67,8 @@ import org.matsim.api.core.v01.Identifiable;
  * Memory considerations could be addressed by lazily delaying this plans copying to the point where the modifiable
  * plan is needed.
  * <p/>
- * DONE Should add Identifiable to this interface; could then replace many PersonAgent by PlanAgent.  done.  kai, dec'10
+ * <strike>DONE Should add Identifiable to this interface; could then replace many PersonAgent by PlanAgent.  
+ * done.  kai, dec'10</strike>
  *
  * @author dgrether
  * @author nagel
