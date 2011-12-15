@@ -23,7 +23,6 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,8 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.events.AgentStuckEventImpl;
 import org.matsim.core.events.AgentWait2LinkEventImpl;
 import org.matsim.core.events.LinkEnterEventImpl;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneMeterFromLinkEndComparator;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
@@ -131,10 +128,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 	private List<QLane> toNodeQueueLanes = null;
 
 	private boolean active = false;
-
-	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
-
-	private final Map<Id, MobsimAgent> agentsInActivities = new LinkedHashMap<Id, MobsimAgent>();
 
 	private VisData visdata = this.new VisDataImpl();
 
@@ -265,38 +258,10 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	void clearVehicles() {
-		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		this.parkedVehicles.clear();
-		for (QVehicle veh : this.waitingList) {
-			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-		}
-		this.network.simEngine.getMobsim().getAgentCounter().decLiving(this.waitingList.size());
-		this.network.simEngine.getMobsim().getAgentCounter().incLost(this.waitingList.size());
-		this.waitingList.clear();
-
+		super.clearVehicles();
 		for (QLane lane : this.queueLanes){
 			lane.clearVehicles();
 		}
-	}
-
-	@Override
-	public void addParkedVehicle(MobsimVehicle vehicle) {
-		QVehicle qveh = (QVehicle) vehicle ; // cast ok: when it gets here, it needs to have a runtime type of QVehicle. kai, nov'11
-		this.parkedVehicles.put(qveh.getId(), qveh);
-		qveh.setCurrentLink(this.link);
-	}
-
-	@Override
-	public QVehicle removeParkedVehicle(Id vehicleId) {
-		return this.parkedVehicles.remove(vehicleId);
-	}
-
-	@Override
-	public void addDepartingVehicle(MobsimVehicle mvehicle) {
-		QVehicle vehicle = (QVehicle) mvehicle ;
-		this.waitingList.add(vehicle);
-		this.activateLink();
 	}
 
 	@Override
@@ -335,13 +300,14 @@ public class QLinkLanesImpl extends AbstractQLink {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
+			
 			if (!handled) {
 				this.originalLane.addToBuffer(veh, now);
 			}
 		}
 		return movedAtLeastOne;
 	}
-
+	
 	@Override
 	boolean bufferIsEmpty() {
 		//if there is only one lane...
@@ -369,8 +335,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 		}
 	}
 
+	@Override
 	QVehicle getVehicle(Id vehicleId) {
-		QVehicle ret = this.parkedVehicles.get(vehicleId);
+		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
 		}
@@ -385,13 +352,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 			}
 		}
 		return ret;
-	}
-
-	@Override
-	public final Collection<MobsimVehicle> getAllVehicles() {
-		Collection<MobsimVehicle> ret = getAllNonParkedVehicles() ;
-		ret.addAll(this.parkedVehicles.values());
-		return ret ;
 	}
 
 	@Override
@@ -488,22 +448,11 @@ public class QLinkLanesImpl extends AbstractQLink {
 					QLinkLanesImpl.this.waitingList);
 			cnt2 = QLinkLanesImpl.this.waitingList.size();
 			agentSnapshotInfoBuilder.positionAgentsInActivities(positions, QLinkLanesImpl.this.link,
-					QLinkLanesImpl.this.agentsInActivities.values(), cnt2);
+					QLinkLanesImpl.this.getUnmodifiableAdditionalAgentsOnLink(), cnt2);
 
 			return positions;
 		}
 	}
-
-	@Override
-	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
-		agentsInActivities.put(planAgent.getId(), planAgent);
-	}
-
-	@Override
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
-		return agentsInActivities.remove(mobsimAgentId);
-	}
-	
 
 	// The following contains a number of methods that are defined in the upstream interfaces but not needed here. 
 	// In principle, one would need two separate interfaces, one for the "QLane" and one for the "QLink".  They would be

@@ -61,8 +61,6 @@ abstract class AbstractQLane extends VisLane {
 	
 	abstract boolean hasSpace();
 	
-	abstract void clearVehicles();
-	
 	abstract boolean moveLane(double now) ;
 	
 	/**

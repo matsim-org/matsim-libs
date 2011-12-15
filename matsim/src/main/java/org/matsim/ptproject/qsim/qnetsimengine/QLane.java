@@ -651,7 +651,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.storageCapacity;
 	}
 
-	@Override
 	void clearVehicles() {
 		double now = this.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
@@ -663,6 +662,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		this.queueLink.network.simEngine.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 		this.vehQueueEnterTimeMap.clear();
+		
 		for (QVehicle veh : this.buffer) {
 			this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEventImpl(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
