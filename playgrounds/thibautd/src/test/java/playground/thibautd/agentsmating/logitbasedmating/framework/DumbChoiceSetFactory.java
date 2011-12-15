@@ -36,6 +36,15 @@ class DumbChoiceSetFactory implements ChoiceSetFactory {
 					12 * 3600d,
 					decisionMaker,
 					alts) );
+		alts.add( new TripRequestImpl( 
+					TripRequestImpl.PASSENGER_MODE,
+					new HashMap<String, Object>(),
+					indexOfLeg,
+					(Activity) plan.getPlanElements().get( indexOfLeg - 1 ),
+					(Activity) plan.getPlanElements().get( indexOfLeg + 1 ),
+					12 * 3600d,
+					decisionMaker,
+					alts) );
 
 		return alts;
 	}

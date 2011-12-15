@@ -43,6 +43,14 @@ public class TestComprehensiveChoiceModel {
 	private static final Id id1 = new IdImpl( 1 );
 	private static final Id id2 = new IdImpl( 2 );
 	private static final Id id3 = new IdImpl( 3 );
+	private static final Id id4 = new IdImpl( 4 );
+	private static final Id id5 = new IdImpl( 5 );
+	private static final Id id6 = new IdImpl( 6 );
+	private static final Id id7 = new IdImpl( 7 );
+	private static final Id id8 = new IdImpl( 8 );
+	private static final Id id9 = new IdImpl( 9 );
+	private static final Id id10 = new IdImpl( 10 );
+	private static final Id id11 = new IdImpl( 11 );
 
 	private List<? extends Plan> plans ;
 
@@ -122,24 +130,42 @@ public class TestComprehensiveChoiceModel {
 		plan5.createAndAddActivity( "w" , id2 );
 		plan5.createAndAddLeg( "bike" );
 		plan5.createAndAddActivity( "h" , id1 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "pt" );
-		plan5.createAndAddActivity( "s" , id3 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "bike" );
-		plan5.createAndAddActivity( "h" , id1 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "pt" );
-		plan5.createAndAddActivity( "s" , id3 );
-		plan5.createAndAddLeg( "car" );
-		plan5.createAndAddActivity( "w" , id2 );
-		plan5.createAndAddLeg( "bike" );
-		plan5.createAndAddActivity( "h" , id1 );
 
-		plans = Arrays.asList( plan1 , plan2 , plan3 , plan4 );
+		// plan with complicated subtour structure
+		PlanImpl plan6 = new PlanImpl( person );
+		plan6.createAndAddActivity( "h" , id1 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id2 );
+		plan6.createAndAddLeg( "pt" );
+		plan6.createAndAddActivity( "s" , id5 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id2 );
+		plan6.createAndAddLeg( "bike" );
+		plan6.createAndAddActivity( "s" , id3 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id6 );
+		plan6.createAndAddLeg( "pt" );
+		plan6.createAndAddActivity( "s" , id8 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id9 );
+		plan6.createAndAddLeg( "bike" );
+		plan6.createAndAddActivity( "s" , id10 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id11 );
+		plan6.createAndAddLeg( "pt" );
+		plan6.createAndAddActivity( "s" , id9 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id6 );
+		plan6.createAndAddLeg( "bike" );
+		plan6.createAndAddActivity( "s" , id7 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "w" , id3 );
+		plan6.createAndAddLeg( "pt" );
+		plan6.createAndAddActivity( "s" , id4 );
+		plan6.createAndAddLeg( "car" );
+		plan6.createAndAddActivity( "h" , id1 );
+
+		plans = Arrays.asList( plan1 , plan2 , plan3 /*, plan5 , plan6*/ );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
