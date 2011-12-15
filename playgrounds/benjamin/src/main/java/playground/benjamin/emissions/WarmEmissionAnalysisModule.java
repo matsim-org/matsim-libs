@@ -168,6 +168,20 @@ public class WarmEmissionAnalysisModule {
 		keyFreeFlow.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
 		keyStopAndGo.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
 
+		if(this.detailedHbefaWarmTable != null){ // check if detailed emission factors file is set in config
+			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+			keyFreeFlow.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+			keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+		}
+		
+		double linkLength_km = linkLength / 1000;
+		double travelTime_h = travelTime / 3600;
+		int freeFlowSpeed_kmh = (int) Math.round(freeVelocity * 3.6);
+		int averageSpeed_kmh = (int) Math.round(linkLength_km / travelTime_h);
+
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -177,16 +191,9 @@ public class WarmEmissionAnalysisModule {
 
 			keyFreeFlow.setHbefaComponent(warmPollutant);
 			keyStopAndGo.setHbefaComponent(warmPollutant);
-
-			if(this.detailedHbefaWarmTable != null){ // check if detailed emission factors file is set in config
-				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-				hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-				hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
-				hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
-				keyFreeFlow.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-				keyStopAndGo.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-				
-				if(this.detailedHbefaWarmTable.containsKey(keyFreeFlow) && this.detailedHbefaWarmTable.containsKey(keyStopAndGo)){
+			
+			if(this.detailedHbefaWarmTable != null){
+				if(this.detailedHbefaWarmTable.get(keyFreeFlow) != null && this.detailedHbefaWarmTable.get(keyStopAndGo) != null){
 					stopGoSpeed_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
@@ -211,15 +218,10 @@ public class WarmEmissionAnalysisModule {
 
 				vehAttributesNotSpecified.add(personId);
 			}
-
-			double linkLength_km = linkLength / 1000;
-			double travelTime_h = travelTime / 3600;
-			int freeFlowSpeed_kmh = (int) Math.round(freeVelocity * 3.6);
-			int averageSpeed_kmh = (int) Math.round(linkLength_km / travelTime_h);
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
 				logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
-				throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
+				throw new RuntimeException("Average speed was higher than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 			if(averageSpeed_kmh == freeFlowSpeed_kmh) {
 				generatedEmissions = linkLength_km * efFreeFlow_gpkm;
