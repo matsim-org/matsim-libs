@@ -210,7 +210,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 //			    this.simulation.arrangeAgentDeparture(this);
 			this.state = MobsimAgent.State.LEG ;
-			this.simulation.insertAgentIntoMobsim(this) ;
+			this.simulation.reInsertAgentIntoMobsim(this) ;
 
 			    
 			    return ;

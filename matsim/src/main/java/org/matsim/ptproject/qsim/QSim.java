@@ -141,7 +141,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public void arrangeNextAgentState(MobsimAgent agent) {
-			QSim.this.arrangeNextAgentAction(agent) ;
+//			QSim.this.arrangeNextAgentAction(agent) ;
 		}
 
 		@Override
