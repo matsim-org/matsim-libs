@@ -350,9 +350,10 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 			if (!handled) {
 				// Check if veh has reached destination:
-				if ((driver.getDestinationLinkId().equals(this.queueLink.getLink().getId())) && (driver.chooseNextLinkId() == null)) {
-					driver.endLegAndAssumeControl(now);
+				if ((this.queueLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 					this.queueLink.addParkedVehicle(veh);
+					this.queueLink.network.simEngine.letAgentArrive(veh);
+					this.queueLink.makeVehicleAvailableToNextDriver(veh, now);
 					// remove _after_ processing the arrival to keep link active
 					this.vehQueue.poll();
 					this.usedStorageCapacity -= veh.getSizeInEquivalents();
