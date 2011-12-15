@@ -20,7 +20,10 @@
 package playground.benjamin.internalization;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -44,10 +47,12 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
 	
 	Vehicles emissionVehicles;
+	Scenario scenario;
 	Controler controler;
 	EmissionModule emissionModule;
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
+	EmissionInternalizationHandler emissionInternalizationHandler;
 
 
 	public InternalizeEmissionsControlerListener(Vehicles emissionVehicles) {
@@ -58,7 +63,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
 		
-		Scenario scenario = controler.getScenario() ;
+		scenario = controler.getScenario() ;
 		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
@@ -73,6 +78,11 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		Integer iteration = event.getIteration();
 		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 		
+		logger.info("creating new emission internalization handler...");
+		emissionInternalizationHandler = new EmissionInternalizationHandler();
+		logger.info("adding emission internalization module to emission events stream...");
+		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
+		
 		logger.info("creating new emission events writer...");
 		emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		logger.info("adding emission events writer to emission events stream...");
@@ -81,7 +91,13 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		logger.info("removing emisssion events writer from emission events stream...");
+		
+		calculateNewScore();
+		
+		logger.info("removing emission internalization module from emission events stream...");
+		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
+		
+		logger.info("removing emission events writer from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
 		logger.info("closing emission events file...");
 		emissionEventWriter.closeFile();
@@ -90,6 +106,21 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+	}
+
+	private void calculateNewScore() {
+		logger.info("entering calculateNewScore...");
+		
+		Population pop = scenario.getPopulation();
+		for(Person person : pop.getPersons().values()){
+			Id personId = person.getId();
+			double score = person.getSelectedPlan().getScore();
+			double scoreFromInternalization = emissionInternalizationHandler.getScore(personId);
+			double newScore = score + scoreFromInternalization;
+			person.getSelectedPlan().setScore(newScore);
+		}
+		
+		logger.info("leaving calculateNewScore...");
 	}
 	
 }

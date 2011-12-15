@@ -89,7 +89,7 @@ public class RunInternalizationTest {
 		
 		this.controler = new Controler(this.scenario);
 		specifyControler();
-		
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles));
 		this.controler.run();
 	}
 
@@ -130,12 +130,18 @@ public class RunInternalizationTest {
 		ActivityParams act2Params = new ActivityParams("work");
 		act2Params.setTypicalDuration(8 * 3600);
 		pcs.addActivityParams(act2Params);
+		
+		pcs.setBrainExpBeta(1.0);
+		pcs.setTraveling_utils_hr(-6.0);
+		pcs.setMarginalUtilityOfMoney(0.6);
+		pcs.setMonetaryDistanceCostRateCar(-0.0001);
 
-	// strategy
+	// strategyConfigGroup
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		
 		StrategySettings changePlan = new StrategySettings(new IdImpl("1"));
 		changePlan.setModuleName("BestScore");
+//		changePlan.setModuleName("ChangeExpBeta");
 		changePlan.setProbability(0.7);
 		
 		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
@@ -144,7 +150,7 @@ public class RunInternalizationTest {
 		
 		scg.addStrategySettings(changePlan);
 		scg.addStrategySettings(reRoute);
-		
+
 	// define emission tool input files	
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;
 		vcg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
@@ -154,8 +160,6 @@ public class RunInternalizationTest {
 		
 	// TODO: the following does not work yet. Need to force controler to always write events in the last iteration.
 		vcg.setWritingOutputEvents(false) ;
-		
-		controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles));
 	}
 
 	private void createPassiveAgents() {
@@ -233,9 +237,10 @@ public class RunInternalizationTest {
         network.createAndAddLink(scenario.createId("6"), node6, node7, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("8"), node3, node8, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
         network.createAndAddLink(scenario.createId("10"), node3, node9, 5000, 27.78, 3600, 1, null, "22");
-        network.createAndAddLink(scenario.createId("11"), node9, node4, 4970, 27.78, 3600, 1, null, "22");
+
+        network.createAndAddLink(scenario.createId("9"), node8, node4, 5000, 27.78, 3600, 1, null, "22");
+        network.createAndAddLink(scenario.createId("11"), node9, node4, 2500, 13.89, 3600, 1, null, "22");
 	}
 
 	public static void main(String[] args) {

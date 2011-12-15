@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdEmissionEventHandler.java
+ * EmissionInternalizationModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,16 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.benjamin.internalization;
 
-import org.matsim.core.events.handler.EventHandler;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+
+import playground.benjamin.emissions.events.ColdEmissionEvent;
+import playground.benjamin.emissions.events.ColdEmissionEventHandler;
+import playground.benjamin.emissions.events.WarmEmissionEvent;
+import playground.benjamin.emissions.events.WarmEmissionEventHandler;
+
 
 /**
- * Implement this to get notified when ColdEmissionEvents are thrown
- * 
  * @author benjamin
+ *
  */
+public class EmissionInternalizationHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
 
-public interface ColdEmissionEventHandler extends EventHandler {
-	public void handleEvent (ColdEmissionEvent event);
+	private Map<Id, Double> personId2score;
+
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(WarmEmissionEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleEvent(ColdEmissionEvent event) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public double getScore(Id personId){
+		return personId2score.get(personId);
+	}
+
 }
