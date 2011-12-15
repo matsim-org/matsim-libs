@@ -103,7 +103,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 //				this.simulation.arrangeActivityStart(this);
 				this.state = MobsimAgent.State.ACTIVITY ;
-				this.simulation.insertAgentIntoMobsim(this) ;
+				this.simulation.insertAgentIntoMobsim(this) ; // ini!
 				// yyyyyy 000000
 
 
@@ -194,7 +194,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 //				this.simulation.arrangeActivityStart(this);
 				this.state = MobsimAgent.State.ACTIVITY ;
-				this.simulation.insertAgentIntoMobsim(this);
+				this.simulation.reInsertAgentIntoMobsim(this);
 				// yyyyyy 000000
 				
 				return ;
@@ -259,7 +259,15 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 			return this.cachedNextLinkId;
 		}
 		if (this.cachedRouteLinkIds == null) {
-			this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
+			if ( this.currentLeg.getRoute() instanceof NetworkRoute ) {
+				this.cachedRouteLinkIds = ((NetworkRoute) this.currentLeg.getRoute()).getLinkIds();
+			} else {
+				// (seems that this can happen if an agent is a DriverAgent, but wants to start a pt leg. 
+				// A situation where Marcel's ``wrapping approach'' may have an advantage.  On the other hand,
+				// DriverAgent should be a NetworkAgent, i.e. including pedestrians, and then this function
+				// should always be answerable.  kai, nov'11)
+				return null ;
+			}
 		}
 
 		if (this.currentLinkIdIndex >= this.cachedRouteLinkIds.size() ) {

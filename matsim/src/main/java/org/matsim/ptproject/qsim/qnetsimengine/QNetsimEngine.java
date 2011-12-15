@@ -114,6 +114,9 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 	}
+	/* package */ void arrangeNextAgentAction( MobsimAgent agent ) {
+		this.internalInterface.arrangeNextAgentState(agent) ;
+	}
 
 	public QNetsimEngine(final QSim sim, final Random random) {
 		this.random = random;

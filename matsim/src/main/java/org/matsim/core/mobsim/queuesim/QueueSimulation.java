@@ -419,6 +419,10 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			}
 		}
 	}
+	
+	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
+		this.insertAgentIntoMobsim(agent) ;
+	}
 
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		// yy the material of the methods could probably be inlined ... but this is not possible as 

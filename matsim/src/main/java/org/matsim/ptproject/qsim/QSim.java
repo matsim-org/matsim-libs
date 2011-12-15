@@ -38,6 +38,7 @@ import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -148,6 +149,12 @@ public final class QSim implements VisMobsim, Netsim {
 			return QSim.this ;
 		}
 	};
+	
+	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
+	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
+		this.arrangeNextAgentAction( agent) ;
+	}
+
 
     // everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
@@ -192,6 +199,8 @@ public final class QSim implements VisMobsim, Netsim {
 
 		// create the NetworkEngine ...
 		this.netEngine = netsimEngFactory.createQSimEngine(this, MatsimRandom.getRandom());
+		this.netEngine.setInternalInterface(this.internalInterface) ;
+		// (the netEngine is never ``added'', thus this needs to be done manually. kai, dec'11)
 
 
 
@@ -307,7 +316,7 @@ public final class QSim implements VisMobsim, Netsim {
 	/**
 	 * Close any files, etc.
 	 */
-	 final void cleanupSim(final double seconds) {
+	 final void cleanupSim(@SuppressWarnings("unused") final double seconds) {
 
 
 		if (this.netEngine != null) {
@@ -333,10 +342,13 @@ public final class QSim implements VisMobsim, Netsim {
 				log.error("this does not terminate correctly for UmlaufDrivers; needs to be "
 						+ "fixed but for the time being we skip the next couple of lines.  kai, dec'10");
 			} else {
-				if (agent.getDestinationLinkId() != null) {
-					events.processEvent(events.getFactory()
-							.createAgentStuckEvent(now, agent.getId(),
-									agent.getDestinationLinkId(), null));
+				if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
+						|| agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
+					if (agent.getDestinationLinkId() != null) {
+						events.processEvent(events.getFactory()
+								.createAgentStuckEvent(now, agent.getId(),
+										agent.getDestinationLinkId(), null));
+					}
 				}
 			}
 		}
@@ -411,7 +423,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 		arrangeNextAgentAction(agent);
 	}
-
+	
 	private void arrangeNextAgentAction(MobsimAgent agent) {
 		switch( agent.getState() ) {
 		case ACTIVITY: 
@@ -534,17 +546,23 @@ public final class QSim implements VisMobsim, Netsim {
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now,
 				agent.getId(), linkId, mode));
 
-		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
-		// for a hike, or driving a bus).  kai, nov'11
-		//		if ( linkId.equals(agent.getDestinationLinkId())) {
-		//			// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
-		//			// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
-		//			// consistently implemented.  One could also decide to not have these departure/arrival events here
-		//			// (we would still have actEnd/actStart events).  kai, nov'11
-		//			events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
-		//			agent.endLegAndAssumeControl(now) ;
-		//			return ;
-		//		}
+//		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
+//		// for a hike, or driving a bus).  kai, nov'11
+//		if ( linkId.equals(agent.getDestinationLinkId())) {
+//			if ( agent instanceof DriverAgent ) {
+//				if ( ((DriverAgent)agent).chooseNextLinkId() == null ) {
+//
+//					// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
+//					// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
+//					// consistently implemented.  One could also decide to not have these departure/arrival events here
+//					// (we would still have actEnd/actStart events).  kai, nov'11
+//					events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
+//					agent.endLegAndAssumeControl(now) ;
+//					arrangeNextAgentAction(agent) ;
+//					return ;
+//				}
+//			}
+//		}
 
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;

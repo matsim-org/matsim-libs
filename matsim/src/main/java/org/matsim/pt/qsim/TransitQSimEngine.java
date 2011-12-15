@@ -158,7 +158,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		this.qSim.addParkedVehicle(veh, startLinkId);
 
 //		this.qSim.arrangeActivityStart(driver);
-		this.qSim.insertAgentIntoMobsim(driver) ;
+		this.qSim.insertAgentIntoMobsim(driver) ; // ini
 		// yyyyyy 000000
 		
 		this.qSim.getAgentCounter().incLiving();
@@ -184,7 +184,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 					this.qSim.addParkedVehicle(veh, startLinkId);
 
 //					this.qSim.arrangeActivityStart(driver);
-					this.qSim.insertAgentIntoMobsim(driver) ;
+					this.qSim.insertAgentIntoMobsim(driver) ; // ini
 					// yyyyyy 000000
 
 					this.qSim.getAgentCounter().incLiving();
