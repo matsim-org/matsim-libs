@@ -54,7 +54,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 	
-	private static final double nodeOffsetMeter = 50.0;
+	private static final double nodeOffsetMeter = 10.0;
 
 	private final transient VisNetwork network;
 

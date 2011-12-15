@@ -130,11 +130,11 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 		}
 	}
 	
-	private void drawSignals(GL gl, List<OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
+	private void drawSignals(GL gl, Map<String, OTFSignal> signals, Point2D.Double point, Point2D.Double ortho, List<OTFLinkWLanes> toLinks){
 		double dist = signals.size() - 1;
 		Point2D.Double startPoint = this.calcPoint(point, ortho, (quadSizeLinkEnd * -dist));
 		int i = 0;
-		for (OTFSignal signal : signals){
+		for (OTFSignal signal : signals.values()){
 			i++;
 			if (SignalGroupState.GREEN.equals(signal.getSignalGroupState())) {
 				setColor(gl, Color.GREEN);

@@ -32,7 +32,9 @@ import org.matsim.api.core.v01.Id;
 public class SignalGroupsDataImpl implements SignalGroupsData {
 
 	private Map<Id, Map<Id, SignalGroupData>> signalGroupsDataBySystemId = new HashMap<Id, Map<Id, SignalGroupData>>();
-	SignalGroupsDataFactory factory;
+	
+	private SignalGroupsDataFactory factory;
+	
 	public SignalGroupsDataImpl(){
 		this.factory=new SignalGroupsDataFactoryImpl();
 	}

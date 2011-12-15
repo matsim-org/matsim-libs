@@ -46,7 +46,7 @@ public class OTFLinkWLanes {
 	private double linkWidth;
 	private Point2D.Double linkStartCenterPoint = null;
 	private Point2D.Double linkEndCenterPoint = null;
-	private List<OTFSignal> signals = null;
+	private Map<String, OTFSignal> signals = null;
 	private List<OTFLinkWLanes> toLinks = null;
 	
 	
@@ -123,12 +123,12 @@ public class OTFLinkWLanes {
 
 	public void addSignal(OTFSignal signal) {
 		if (this.signals == null){
-			this.signals = new ArrayList<OTFSignal>();
+			this.signals = new HashMap<String, OTFSignal>();
 		}
-		this.signals.add(signal);
+		this.signals.put(signal.getId(), signal);
 	}
 	
-	public List<OTFSignal> getSignals(){
+	public Map<String, OTFSignal> getSignals(){
 		return this.signals;
 	}
 	

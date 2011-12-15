@@ -21,7 +21,9 @@ package org.matsim.lanes.otfvis.io;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
@@ -41,7 +43,7 @@ public class OTFLane {
 	private SignalGroupState state = null;
 	private Point2D.Double startPoint = null;
 	private Point2D.Double endPoint = null;
-	private List<OTFSignal> signals = null;
+	private Map<String, OTFSignal> signals = null;
 	
 	public OTFLane(String id) {
 		this.id = id;
@@ -133,12 +135,12 @@ public class OTFLane {
 
 	public void addSignal(OTFSignal signal) {
 		if (this.signals == null){
-			this.signals = new ArrayList<OTFSignal>();
+			this.signals = new HashMap<String, OTFSignal>();
 		}
-		this.signals.add(signal);
+		this.signals.put(signal.getId(), signal);
 	}
 	
-	public List<OTFSignal> getSignals(){
+	public Map<String, OTFSignal> getSignals(){
 		return this.signals;
 	}
 

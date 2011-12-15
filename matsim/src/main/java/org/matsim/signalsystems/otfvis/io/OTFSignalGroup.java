@@ -54,8 +54,8 @@ public class OTFSignalGroup {
 		}
 	}
 
-	public void addSignal(OTFSignal pos) {
-		this.signalPositions.put(pos.getId(), pos);
+	public void addSignal(OTFSignal signal) {
+		this.signalPositions.put(signal.getId(), signal);
 	}
 
 	public Map<String, OTFSignal> getSignals() {
