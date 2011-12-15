@@ -1,6 +1,7 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
@@ -49,6 +50,15 @@ public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 			log.info("Done modifying network.");
 			log.info("");
 		}
+	}
+	
+	/**
+	 * This removes plan elements from existing plans that
+	 * contain a removed link
+	 */
+	@Override
+	void modifyPopulation(Population population){
+		ZurichUtilities.deleteRoutesContainingRemovedLinks(population);
 	}
 	
 	/**

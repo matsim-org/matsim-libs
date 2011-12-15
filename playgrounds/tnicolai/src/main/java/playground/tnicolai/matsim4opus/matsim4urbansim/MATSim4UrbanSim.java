@@ -32,13 +32,20 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.core.config.ConfigUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
@@ -122,6 +129,7 @@ public class MATSim4UrbanSim {
 		readUrbansimParcelModel(readFromUrbansim, parcels, zones);
 		int pc = benchmark.addMeasure("Population construction");
 		Population newPopulation = readUrbansimPersons(readFromUrbansim, parcels, network);
+		modifyPopulation(newPopulation);
 		benchmark.stoppMeasurement(pc);
 		System.out.println("Population construction took: " + benchmark.getDurationInSeconds( pc ) + " seconds.");
 		Map<Id,WorkplaceObject> numberOfWorkplacesPerZone = ReadUrbansimJobs(readFromUrbansim);
@@ -282,6 +290,17 @@ public class MATSim4UrbanSim {
 	 * @param network
 	 */
 	void modifyNetwork(NetworkImpl network){
+		// this is just a stub and does nothing. 
+		// This needs to be implemented/overwritten by another class
+	}
+	
+	/**
+	 * This method allows to modify the population
+	 * This needs to be implemented by another class
+	 * 
+	 * @param population
+	 */
+	void modifyPopulation(Population population){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by another class
 	}
