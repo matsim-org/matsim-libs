@@ -75,6 +75,7 @@ public class PlatformBasedModeChooser {
 	 * Initialises an instance, with null fields.
 	 */
 	public PlatformBasedModeChooser() {
+		log.debug( "init "+getClass().getSimpleName() );
 		acceptors.add( new BasicPlanAcceptor() );
 	}
 
@@ -203,9 +204,17 @@ public class PlatformBasedModeChooser {
 	// /////////////////////////////////////////////////////////////////////////
 	// public: process data methods
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * performs the choice procedure.
+	 */
 	public void process() {
 		if (!isChanged) return;
 		checkProcessingState();
+		log.info( "performing mode choice with"+
+				" platform="+platform.getClass().getSimpleName()+
+				", trip-level model="+model.getClass().getSimpleName()+
+				", cliques constructor="+cliquesConstructor.getClass().getSimpleName()+
+				", subtourRestricted="+(dayLevelChoiceModel != null) );
 		boolean logRemoval = true;
 		boolean logPersonImpl = true;
 
@@ -216,6 +225,7 @@ public class PlatformBasedModeChooser {
 			log.info( "mode choice is made at the trip level" );
 		}
 
+		log.info( "[STEP 1] INDIVIDUAL MODE CHOICE" );
 		Counter counter = new Counter( "executing choice procedure on plan # " );
 		for (Person person : population.getPersons().values()) {
 			counter.incCounter();
@@ -255,11 +265,15 @@ public class PlatformBasedModeChooser {
 
 		}
 		counter.printCounter();
+		log.info( "[STEP 1] INDIVIDUAL MODE CHOICE: DONE" );
 
+		log.info( "[STEP 2] PLATFORM-BASED AFFECTATION" );
 		List<Mating> matings = platform.getMatings();
 		cliques = cliquesConstructor.processMatings(population, matings);
+		log.info( "[STEP 2] PLATFORM-BASED AFFECTATION: DONE" );
 
 		isChanged = false;
+		log.info( "mode choice completed." );
 	}
 
 	/**

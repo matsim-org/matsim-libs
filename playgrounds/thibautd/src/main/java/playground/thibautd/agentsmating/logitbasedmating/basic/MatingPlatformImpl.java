@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.agentsmating.logitbasedmating.framework.Alternative;
 import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
@@ -56,6 +57,7 @@ public class MatingPlatformImpl extends MatingPlatform {
 	public MatingPlatformImpl(
 			final ChoiceModel model,
 			final MateProposer proposer) {
+		log.debug( "init "+getClass().getSimpleName()+" with proposer "+proposer.getClass().getSimpleName()+" and model "+model.getClass().getSimpleName() );
 		this.proposer = proposer;
 		this.model = model;
 	}
@@ -72,18 +74,23 @@ public class MatingPlatformImpl extends MatingPlatform {
 	 */
 	@Override
 	public List<Mating> getMatings() {
+		log.debug( "creating mating graph" );
 		graph.createEdges();
+		log.debug( "running mating algorithm" );
 		successiveShortestPaths();
 
 		List<Mating> matings = new ArrayList<Mating>();
 
+		Counter count = new Counter( "return list: adding mating # " );
 		for ( Graph.Edge edge : graph.getEdges() ) {
 			if ( edge.isSelectedMating() ) {
+				count.incCounter();
 				matings.add( new MatingImpl(
 							edge.getStart().getRequest(), // driver
 							edge.getEnd().getRequest()) ); // passenger
 			}
 		}
+		count.printCounter();
 
 		return matings;
 	}

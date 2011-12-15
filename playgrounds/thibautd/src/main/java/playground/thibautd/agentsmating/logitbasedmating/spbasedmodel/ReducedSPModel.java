@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.pt.router.TransitRouter;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.LogitModel;
 import playground.thibautd.agentsmating.logitbasedmating.basic.TripRequestImpl;
@@ -56,18 +57,43 @@ public class ReducedSPModel extends LogitModel {
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * short for <tt>ReducedSPModel( parameters, scenario, estimatorFactory, leastCostAlgo, null) </tt>
+	 * @param parameters
+	 * @param scenario
+	 * @param estimatorFactory
+	 * @param leastCostAlgo
+	 */
 	public ReducedSPModel(
 			final ReducedModelParametersConfigGroup parameters,
 			final Scenario scenario,
 			final SimpleLegTravelTimeEstimatorFactory estimatorFactory,
 			final LeastCostPathCalculator leastCostAlgo) {
+		this( parameters, scenario, estimatorFactory, leastCostAlgo, null);
+	}
+
+	/**
+	 * Creates a choice model 
+	 * @param parameters
+	 * @param scenario
+	 * @param estimatorFactory
+	 * @param leastCostAlgo
+	 * @param transitRouter
+	 */
+	public ReducedSPModel(
+			final ReducedModelParametersConfigGroup parameters,
+			final Scenario scenario,
+			final SimpleLegTravelTimeEstimatorFactory estimatorFactory,
+			final LeastCostPathCalculator leastCostAlgo,
+			final TransitRouter transitRouter) {
 		this.params = parameters;
 		this.network = scenario.getNetwork();
 		this.leastCostAlgo = leastCostAlgo;
 		choiceSetFactory = new ReducedSPModelChoiceSetFactory(
 				parameters,
 				scenario,
-				estimatorFactory);
+				estimatorFactory,
+				transitRouter);
 		decisionMakerFactory = new ReducedSPModelDecisionMakerFactory( parameters );
 	}
 

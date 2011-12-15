@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,6 +39,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
+import org.matsim.pt.router.TransitRouter;
 
 import playground.thibautd.agentsmating.logitbasedmating.basic.AlternativeImpl;
 import playground.thibautd.agentsmating.logitbasedmating.basic.TripRequestImpl;
@@ -49,22 +52,57 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  * @author thibautd
  */
 public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
+	private static final Logger log =
+		Logger.getLogger(ReducedSPModelChoiceSetFactory.class);
+
 	private final SimpleLegTravelTimeEstimatorFactory estimatorFactory;
 	private final Network network;
 	private final Population population;
 	private final  ReducedModelParametersConfigGroup configGroup;
+	private final TransitRouter transitRouter;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * short for <tt>ReducedSPModelChoiceSetFactory( configGroup, scenario, estimatorFactory, null )</tt>
+	 * @param configGroup 
+	 * @param scenario 
+	 * @param estimatorFactory 
+	 */
 	public ReducedSPModelChoiceSetFactory(
 			final ReducedModelParametersConfigGroup configGroup,
 			final Scenario scenario,
 			final SimpleLegTravelTimeEstimatorFactory estimatorFactory) {
+		this( configGroup, scenario, estimatorFactory, null );
+	}
+
+	/**
+	 * @param configGroup the parameters
+	 * @param scenario A scenario containing the population of interest, at
+	 * equilibrium (the departure and arrival times from the plans will be considered
+	 * as the "desired" ones)
+	 * @param estimatorFactory a factory for travel time estimators for non-pt legs
+	 * @param transitRouter a router for detailed pt travel time estimation. Can be null,
+	 * an than the estimator from <tt>transitRouter</tt> will be used
+	 */
+	public ReducedSPModelChoiceSetFactory(
+			final ReducedModelParametersConfigGroup configGroup,
+			final Scenario scenario,
+			final SimpleLegTravelTimeEstimatorFactory estimatorFactory,
+			final TransitRouter transitRouter) {
 		this.configGroup = configGroup;
 		this.estimatorFactory = estimatorFactory;
 		this.network = scenario.getNetwork();
 		this.population = scenario.getPopulation();
+		this.transitRouter = transitRouter;
+
+		if (transitRouter == null) {
+			log.debug("init "+getClass().getSimpleName()+" without fine PT travel time estimation.");
+		}
+		else {
+			log.debug("init "+getClass().getSimpleName()+" with fine PT travel time estimation.");
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -128,20 +166,34 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		nonCpAlternatives.add( currentAlternative );
 
 		// pt
-		leg.setMode( TransportMode.pt );
-		ptTravelTime = ttEstimator.getLegTravelTimeEstimation(
-				personId,
-				departureTime,
-				origin,
-				destination,
-				leg,
-				true);
-		//distance = RouteUtils.calcDistance(
-		//		(NetworkRoute) leg.getRoute(),
-		//		network);
-		distance = CoordUtils.calcDistance(
-				origin.getCoord(),
-				destination.getCoord() );
+		if (transitRouter != null) {
+			List<Leg> ptLegs = transitRouter.calcRoute(
+					origin.getCoord(),
+					destination.getCoord(),
+					departureTime,
+					population.getPersons().get( personId ) );
+
+			ptTravelTime = 0;
+			for (Leg ptLeg : ptLegs) {
+				ptTravelTime += ptLeg.getRoute().getTravelTime();
+			}
+
+			nTransfers = ptLegs.size() - 1;
+		}
+		else {
+			leg.setMode( TransportMode.pt );
+			ptTravelTime = ttEstimator.getLegTravelTimeEstimation(
+					personId,
+					departureTime,
+					origin,
+					destination,
+					leg,
+					true);
+
+			distance = CoordUtils.calcDistance(
+					origin.getCoord(),
+					destination.getCoord() );
+		}
 		ptTravelCost = distance * getPtTravelCostPerM( decisionMaker );
 		walkingTime = 0d;
 		waitingTime = 0d;
@@ -206,7 +258,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	// actual creation methods
 	// /////////////////////////////////////////////////////////////////////////
-	private Alternative createCarAlternative(
+	private static Alternative createCarAlternative(
 			final double travelTime,
 			final double travelCost,
 			final double parkingCost,
@@ -221,7 +273,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		return new AlternativeImpl( TransportMode.car , attributes );
 	}
 
-	private Alternative createCppAlternative(
+	private static Alternative createCppAlternative(
 			final double travelTime,
 			final double travelCost,
 			final double walkingTime) {
@@ -234,7 +286,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		return new AlternativeImpl( TripRequestImpl.PASSENGER_MODE , attributes );
 	}
 
-	private Alternative createCpdAlternative(
+	private static Alternative createCpdAlternative(
 			final double travelTime,
 			final double travelCost,
 			final double parkingCost,
@@ -249,7 +301,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		return new AlternativeImpl( TripRequestImpl.DRIVER_MODE , attributes );
 	}
 
-	private Alternative createPtAlternative(
+	private static Alternative createPtAlternative(
 			final double travelTime,
 			final double travelCost,
 			final double walkingTime,

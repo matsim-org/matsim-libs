@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 
@@ -39,12 +41,16 @@ import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.population
  * @author thibautd
  */
 public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory {
+	private static final Logger log =
+		Logger.getLogger(ReducedSPModelDecisionMakerFactory.class);
+
 
 	private final TravelCardModel travelCardModel = new TravelCardModel();
 	private final SpeaksGermanModel speaksGermanModel;
 
 	public ReducedSPModelDecisionMakerFactory(
 			final ReducedModelParametersConfigGroup configGroup) {
+		log.info( "init "+getClass().getSimpleName() );
 		speaksGermanModel = new SpeaksGermanModel( configGroup );
 	}
 
