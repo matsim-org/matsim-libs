@@ -22,7 +22,6 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populatio
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.ReducedModelParametersConfigGroup;
 
@@ -48,22 +48,35 @@ public class SpeaksGermanModel {
 	private static final String GERMAN = "g";
 	private final Map<Id, Boolean> map = new HashMap<Id, Boolean>();
 
+	/**
+	 * @param configGroup the config group, used to get the id2lang file
+	 */
 	public SpeaksGermanModel(
 			final ReducedModelParametersConfigGroup configGroup) {
+		this( configGroup.getLanguageFile() );
+	}
 
-		String file = configGroup.getLanguageFile();
+	/**
+	 * @param file the name of the file
+	 */
+	public SpeaksGermanModel( final String file ) {
 		log.info( "reading id2language file: "+file+"..." );
 		BufferedReader reader = IOUtils.getBufferedReader( file );
 
 		try {
+			Counter count = new Counter( "language info: reading line # " );
 			for ( String line = reader.readLine();
 					line != null;
 					line = reader.readLine() ) {
+				count.incCounter();
 				String[] array = line.split( "\t" );
 				map.put(
 						new IdImpl( array[ 0 ].trim() ) , 
 						GERMAN.equals( array[ 1 ] ) );
 			}
+			count.printCounter();
+
+			reader.close();
 		} catch (IOException e) {
 			throw new UncheckedIOException( e );
 		}
@@ -71,15 +84,28 @@ public class SpeaksGermanModel {
 	}
 
 	/**
+	 * @param person the person for which to retrieve language information
+	 * @return true if the person's language matches "german"
 	 * @throws IllegalArgumentException if the person is unknown
 	 */
 	public boolean speaksGerman(final Person person) {
-		Boolean b = map.get( person.getId() );
+		return speaksGerman( person.getId() );
+	}
+
+	public boolean speaksGerman( final Id id ) {
+		Boolean b = map.get( id );
 
 		if (b == null) {
-			throw new IllegalArgumentException( "no language value for id"+person.getId() ); 
+			throw new IllegalArgumentException( "no language value for id "+id ); 
 		}
 		return b;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// for tests
+	// /////////////////////////////////////////////////////////////////////////
+	int size() {
+		return map.size();
 	}
 }
 
