@@ -39,14 +39,14 @@ public class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version5b/network.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version5b/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version5b/population2.xml"; // for first iteration
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version5b2";
-	static int numberOfExternalIterations = 30;
-	static int lastInternalIteration = 20 ; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 17
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_test/network.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
+	static int numberOfExternalIterations = 0;
+	static int lastInternalIteration = 0 ; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 17
 	
-	private int numberOfBuses = 1; // at least one bus! for first iteration!
+	private int numberOfBuses = 2; // at least one bus! for first iteration!
 	private int extItNr;
 	private String directoryExtIt;
 	
