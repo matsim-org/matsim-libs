@@ -32,7 +32,6 @@ import org.apache.log4j.spi.LoggingEvent;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Defines some useful i/o related methods, which are not part of the
@@ -65,7 +64,7 @@ public class MoreIOUtils {
 			CollectLogMessagesAppender appender = new CollectLogMessagesAppender();
 			Logger.getRootLogger().addAppender(appender);
 
-			IOUtils.initOutputDirLogging(
+			initOutputDirLogging(
 				outputDir,
 				appender.getLogEvents());
 		} catch (IOException e) {
