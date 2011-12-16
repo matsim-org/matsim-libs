@@ -43,12 +43,6 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 	public void handleEvent(AgentMoneyEvent event) {
 		
 		this.earnings = this.earnings + (-1 * event.getAmount());
-		
-//		Id personId = event.getPersonId();
-//		double amount = event.getAmount();
-// 		Das läuft automatisch irgendwo im Hintergrund:
-//		this.controler.getPlansScoring().getPlanScorer().getScoringFunctionForAgent(personId).addMoney(amount);
-		
 	}
 
 	/**
