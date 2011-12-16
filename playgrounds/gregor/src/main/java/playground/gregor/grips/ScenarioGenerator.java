@@ -59,7 +59,7 @@ public class ScenarioGenerator {
 		this.configFile = config;
 	}
 
-	private void run() {
+	public void run() {
 		log.info("loading config file");
 		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
 		this.em.processEvent(e);
