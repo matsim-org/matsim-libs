@@ -7,12 +7,15 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
@@ -23,6 +26,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
 import playground.gregor.grips.config.GripsConfigModule;
+import playground.gregor.grips.events.InfoEvent;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
@@ -42,25 +46,41 @@ public class ScenarioGenerator {
 	private static final Logger log = Logger.getLogger(ScenarioGenerator.class);
 	private final String configFile;
 	private Id safeLinkId;
+	private final EventsManager em;
 
 	public ScenarioGenerator(String config) {
+		this.em = EventsUtils.createEventsManager();
+		this.configFile = config;
+	}
+
+	public ScenarioGenerator(String config, EventHandler handler) {
+		this.em = EventsUtils.createEventsManager();
+		this.em.addHandler(handler);
 		this.configFile = config;
 	}
 
 	private void run() {
 		log.info("loading config file");
+		InfoEvent e = new InfoEvent(System.currentTimeMillis(), "loading config file");
+		this.em.processEvent(e);
 		Config c = ConfigUtils.loadConfig(this.configFile);
 		c.addSimulationConfigGroup(new SimulationConfigGroup());
 		Scenario sc = ScenarioUtils.createScenario(c);
 		this.safeLinkId = sc.createId("el1");
 
 		log.info("generating network file");
+		e = new InfoEvent(System.currentTimeMillis(), "generating network file");
+		this.em.processEvent(e);
 		generateAndSaveNetwork(sc);
 
 		log.info("generating population file");
+		e = new InfoEvent(System.currentTimeMillis(), "generating population file");
+		this.em.processEvent(e);
 		generateAndSavePopulation(sc);
 
 		log.info("saving simulation config file");
+		e = new InfoEvent(System.currentTimeMillis(), "simulation config file");
+		this.em.processEvent(e);
 
 		c.global().setCoordinateSystem("EPSG:32632");
 
@@ -76,6 +96,8 @@ public class ScenarioGenerator {
 		c.strategy().addParam("ModuleProbability_2", "0.9");
 
 		new ConfigWriter(c).write(getGripsConfig(c).getOutputDir() + "/config.xml");
+		e = new InfoEvent(System.currentTimeMillis(), "scenario generation finished.");
+		this.em.processEvent(e);
 
 	}
 
@@ -199,6 +221,7 @@ public class ScenarioGenerator {
 			printUsage();
 			System.exit(-1);
 		}
+
 		new ScenarioGenerator(args[0]).run();
 
 	}
