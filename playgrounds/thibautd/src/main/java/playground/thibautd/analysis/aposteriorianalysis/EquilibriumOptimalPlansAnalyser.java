@@ -373,6 +373,75 @@ public class EquilibriumOptimalPlansAnalyser {
 		return new WrapperChartUtil( chart );
 	}
 
+	/**
+	 * @return the chart
+	 */
+	public ChartUtil getScoreDistributionsChart() {
+		DefaultBoxAndWhiskerCategoryDataset dataset =
+			new DefaultBoxAndWhiskerCategoryDataset();
+
+		Map<Integer , List<Double>> toggled = new HashMap<Integer , List<Double>>();
+		Map<Integer , List<Double>> untoggled = new HashMap<Integer , List<Double>>();
+		Map<Integer , List<Double>> individual = new HashMap<Integer , List<Double>>();
+
+		planLoop:
+		for (ComparativePlan plan : plans.values()) {
+			double improvement = Double.NaN;
+			for (ComparativeLeg leg : plan) {
+				if (leg.isUntoggledJoint()) {
+					double toggledScore = plan.getToggledScore();
+					double untoggledScore = plan.getUntoggledScore();
+					double individualScore = plan.getIndividualScore();
+
+					List<Double> toggledScores = toggled.get( plan.getCliqueSize() );
+					List<Double> untoggledScores = untoggled.get( plan.getCliqueSize() );
+					List<Double> individualScores = individual.get( plan.getCliqueSize() );
+
+					if (toggledScores == null) {
+						toggledScores = new ArrayList<Double>();
+						toggled.put( plan.getCliqueSize() , toggledScores );
+
+						untoggledScores = new ArrayList<Double>();
+						untoggled.put( plan.getCliqueSize() , untoggledScores );
+
+						individualScores = new ArrayList<Double>();
+						individual.put( plan.getCliqueSize() , individualScores );
+					}
+
+					toggledScores.add( toggledScore );
+					untoggledScores.add( untoggledScore );
+					individualScores.add( individualScore );
+					continue planLoop;
+				}
+			}
+		}
+
+		for (Map.Entry<Integer, List<Double>> toggledEntry : toggled.entrySet()) {
+			Integer cliqueSize = toggledEntry.getKey();
+
+			dataset.add(
+					individual.get( cliqueSize ),
+					"individual",
+					cliqueSize);
+			dataset.add(
+					untoggled.get( cliqueSize ),
+					"no toggle",
+					cliqueSize);
+			dataset.add(
+					toggledEntry.getValue(),
+					"toggle",
+					cliqueSize);
+		}
+
+		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
+				"score distributions",
+				"clique size",
+				"score",
+				dataset,
+				true);
+		// formatCategoryChart( chart );
+		return new WrapperChartUtil( chart );
+	}
 
 
 	private static void formatCategoryChart(final JFreeChart chart) {

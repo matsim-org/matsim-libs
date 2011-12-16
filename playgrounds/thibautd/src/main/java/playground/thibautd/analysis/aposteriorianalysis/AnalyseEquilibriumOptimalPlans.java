@@ -92,6 +92,9 @@ public class AnalyseEquilibriumOptimalPlans {
 
 		chart = analyser.getScoreAbsoluteImprovementsToggleChart();
 		chart.saveAsPng( outputDir+"/toggleScoreImprovements.png", WIDTH, HEIGHT );
+
+		chart = analyser.getScoreDistributionsChart();
+		chart.saveAsPng( outputDir+"/scoreDistributions.png", WIDTH, HEIGHT );
 	}
 }
 
