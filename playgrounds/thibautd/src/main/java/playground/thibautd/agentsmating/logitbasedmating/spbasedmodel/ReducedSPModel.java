@@ -24,6 +24,8 @@ import java.lang.Override;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.Scenario;
@@ -45,9 +47,12 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
  * @author thibautd
  */
 public class ReducedSPModel extends LogitModel {
+	private static final Logger log =
+		Logger.getLogger(ReducedSPModel.class);
+
 	// factories
-	private final DecisionMakerFactory decisionMakerFactory;
-	private final ChoiceSetFactory choiceSetFactory;
+	private final ReducedSPModelDecisionMakerFactory decisionMakerFactory;
+	private final ReducedSPModelChoiceSetFactory choiceSetFactory;
 
 	private final LeastCostPathCalculator leastCostAlgo;
 	private final ReducedModelParametersConfigGroup params;
@@ -273,6 +278,16 @@ public class ReducedSPModel extends LogitModel {
 		catch (UnexistingAttributeException e) {
 			throw new IllegalArgumentException("trip request does not have required attributes", e);
 		}
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// information logging
+	// /////////////////////////////////////////////////////////////////////////
+	public void notifyAffectationProcedureEnd() {
+		log.info( "########### AFFECTATION PROCEDURE FINISHED: STATS ##############" );
+		decisionMakerFactory.notifyAffectationProcedureEnd();
+		choiceSetFactory.notifyAffectationProcedureEnd();
+		log.info( "######## AFFECTATION PROCEDURE FINISHED: END OF STATS ###########" );
 	}
 }
 

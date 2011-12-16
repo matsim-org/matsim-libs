@@ -61,6 +61,8 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 	private final  ReducedModelParametersConfigGroup configGroup;
 	private final TransitRouter transitRouter;
 
+	private int callCount = 0;
+
 	// /////////////////////////////////////////////////////////////////////////
 	// constructor
 	// /////////////////////////////////////////////////////////////////////////
@@ -113,6 +115,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			final DecisionMaker decisionMaker,
 			final Plan plan,
 			final int indexOfLeg) {
+		callCount++;
 		List<Alternative> nonCpAlternatives = new ArrayList<Alternative>(2);
 		List<Alternative> allAlternatives = new ArrayList<Alternative>(4);
 		Alternative currentAlternative;
@@ -316,6 +319,11 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		attributes.put( ReducedModelConstants.A_N_TRANSFERS , nTransfers );
 
 		return new AlternativeImpl( TransportMode.pt , attributes );
+	}
+
+	public void notifyAffectationProcedureEnd() {
+		log.info( "########### post-affectation procedure statistics: ##########" );
+		log.info( "number of calls to createChoiceSet(): "+callCount );
 	}
 }
 

@@ -164,7 +164,7 @@ public class RunReducedSPModel {
 		// //////////////////////// run an iteration... DONE
 
 		// //////////////////////// run the affectation...
-		ChoiceModel model = new ReducedSPModel(
+		ReducedSPModel model = new ReducedSPModel(
 				configGroup,
 				scenario,
 				new SimpleLegTravelTimeEstimatorFactory(
@@ -192,6 +192,8 @@ public class RunReducedSPModel {
 		modeChooser.addPlanAcceptor( new NoFreightPlanAcceptor() );
 		modeChooser.process();
 		Map<Id, List<Id>> cliques = modeChooser.getCliques();
+
+		model.notifyAffectationProcedureEnd();
 		// //////////////////////// run the affectation... DONE
 
 		// //////////////////////// output files.

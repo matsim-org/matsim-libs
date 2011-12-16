@@ -48,6 +48,10 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 	private final TravelCardModel travelCardModel = new TravelCardModel();
 	private final SpeaksGermanModel speaksGermanModel;
 
+	private int callCount = 0;
+	private int creationCount = 0;
+	private int unknownLanguageCount = 0;
+
 	public ReducedSPModelDecisionMakerFactory(
 			final ReducedModelParametersConfigGroup configGroup) {
 		log.info( "init "+getClass().getSimpleName() );
@@ -71,7 +75,9 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 	}
 
 	public DecisionMaker createDecisionMaker(final PersonImpl agent) throws UnelectableAgentException {
+		callCount++;
 		checkEligible( agent );
+		creationCount++;
 
 		Map<String, Object> attributes = new HashMap<String, Object>();
 
@@ -101,6 +107,7 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 			attributes.put(
 					ReducedModelConstants.A_SPEAKS_GERMAN ,
 					true );
+			unknownLanguageCount++;
 		}
 		attributes.put(
 				ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL ,
@@ -116,6 +123,13 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 		if ( agent.getCarAvail().equals("never") ) {
 			throw new UnelectableAgentException("agent has a driving license but no car");
 		}
+	}
+
+	public void notifyAffectationProcedureEnd() {
+		log.info( "########### post-affectation procedure statistics: ##########" );
+		log.info( "number of calls to createDecisionMaker(): "+callCount );
+		log.info( "number of calls to createDecisionMaker() corresponding to electable agents: "+creationCount );
+		log.info( "number of electable agents with unknown language (set to german): "+unknownLanguageCount );
 	}
 }
 
