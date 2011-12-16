@@ -38,6 +38,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.SpeaksGermanModel.UnknownPersonException;
+
 /**
  * Tests the good behaviour of the german language "model"
  * @author thibautd
@@ -108,7 +110,7 @@ public class SpeaksGermanTest {
 			try {
 				modelValue = model.speaksGerman( entry.getKey() );
 			}
-			catch (IllegalArgumentException e) {
+			catch (UnknownPersonException e) {
 				Assert.fail( "while reading "+count+"th value got exception "+e.getClass().getSimpleName()+" saying: "+e.getMessage() );
 				return;
 			}

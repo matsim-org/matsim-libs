@@ -86,17 +86,22 @@ public class SpeaksGermanModel {
 	/**
 	 * @param person the person for which to retrieve language information
 	 * @return true if the person's language matches "german"
-	 * @throws IllegalArgumentException if the person is unknown
+	 * @throws UnknownPersonException if the person is unknown. several ways to handle this may be valid.
 	 */
-	public boolean speaksGerman(final Person person) {
+	public boolean speaksGerman(final Person person) throws UnknownPersonException {
 		return speaksGerman( person.getId() );
 	}
 
-	public boolean speaksGerman( final Id id ) {
+	/**
+	 * @param id the id of the person
+	 * @return true if the person's language matches "german"
+	 * @throws UnknownPersonException if the person is unknown. several ways to handle this may be valid.
+	 */
+	public boolean speaksGerman( final Id id ) throws UnknownPersonException {
 		Boolean b = map.get( id );
 
 		if (b == null) {
-			throw new IllegalArgumentException( "no language value for id "+id ); 
+			throw new UnknownPersonException( "no language value for id "+id ); 
 		}
 		return b;
 	}
@@ -106,6 +111,15 @@ public class SpeaksGermanModel {
 	// /////////////////////////////////////////////////////////////////////////
 	int size() {
 		return map.size();
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// Informative Exception
+	// /////////////////////////////////////////////////////////////////////////
+	public static class UnknownPersonException extends Exception {
+		private UnknownPersonException(final String message) {
+			super( message );
+		}
 	}
 }
 

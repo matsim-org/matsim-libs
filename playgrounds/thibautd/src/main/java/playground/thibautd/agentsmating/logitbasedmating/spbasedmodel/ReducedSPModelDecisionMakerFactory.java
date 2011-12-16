@@ -34,6 +34,7 @@ import playground.thibautd.agentsmating.logitbasedmating.basic.DecisionMakerImpl
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMaker;
 import playground.thibautd.agentsmating.logitbasedmating.framework.DecisionMakerFactory;
 import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.SpeaksGermanModel;
+import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.SpeaksGermanModel.UnknownPersonException;
 import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.TravelCardModel;
 import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populationenrichingmodels.TravelCardModel.TravelCard;
 
@@ -43,7 +44,6 @@ import playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.population
 public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory {
 	private static final Logger log =
 		Logger.getLogger(ReducedSPModelDecisionMakerFactory.class);
-
 
 	private final TravelCardModel travelCardModel = new TravelCardModel();
 	private final SpeaksGermanModel speaksGermanModel;
@@ -90,9 +90,18 @@ public class ReducedSPModelDecisionMakerFactory implements DecisionMakerFactory 
 		attributes.put(
 				ReducedModelConstants.A_HAS_HALBTAX ,
 				cards.contains( TravelCard.HALBTAX ) );
-		attributes.put(
-				ReducedModelConstants.A_SPEAKS_GERMAN ,
-				speaksGermanModel.speaksGerman( agent ) );
+		try {
+			attributes.put(
+					ReducedModelConstants.A_SPEAKS_GERMAN ,
+					speaksGermanModel.speaksGerman( agent ) );
+		} catch (UnknownPersonException e) {
+			// this should normally happen only for cross-border traffic.
+			// just consider the person speaks german (reasonnable assumption on
+			// the zurich diluted scenario)
+			attributes.put(
+					ReducedModelConstants.A_SPEAKS_GERMAN ,
+					true );
+		}
 		attributes.put(
 				ReducedModelConstants.A_IS_CAR_ALWAYS_AVAIL ,
 				agent.getCarAvail().equals("always") );
