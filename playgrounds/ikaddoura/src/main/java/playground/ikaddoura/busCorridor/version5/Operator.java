@@ -43,10 +43,12 @@ import org.matsim.core.config.ConfigUtils;
 public class Operator {
 	
 	private final static Logger log = Logger.getLogger(Operator.class);
-	private final double COSTS_PER_VEH_DAY = 158; // anzupassen in Abh. von der Kapazität!!!
-	private final double COSTS_PER_VEH_KM = 0.313;
-	private final double COSTS_PER_VEH_HOUR = 49.58;
-	private final double COSTS_PER_ROUTELENGTH = 1000;
+	private final double COSTS_PER_VEH_DAY = 126; // anzupassen in Abh. von der Kapazität!!!
+	private final double COSTS_PER_VEH_KM = 0.9;
+	private final double COSTS_PER_VEH_HOUR = 33;
+	private final double OVERHEAD_PERCENTAGE = 1.21; // on top of direct operating costs
+
+//	private final double COSTS_PER_ROUTE_KM = 1000;
 
 	private int extItNr;
 	private int numberOfBuses;
@@ -88,20 +90,19 @@ public class Operator {
 		double vehicleKm = linksHandler.getVehicleKm(); // vehicle-km aus den Events!
 		double vehicleHours = departureArrivalEventHandler.getVehicleHours(); // vehicle-hours aus den Events, nicht aus dem Fahrplan!
 		
-		double routeLength = getRouteLength(network);
+//		double routeLength = getRouteLength(network);
 		
-		double fixCosts = (numberOfBuses * COSTS_PER_VEH_DAY) + (routeLength * COSTS_PER_ROUTELENGTH);
-		double varCosts = (vehicleKm * COSTS_PER_VEH_KM) + (vehicleHours * COSTS_PER_VEH_HOUR) ;
-		double operatorScore = earnings - fixCosts - varCosts;
-		
+		double operatingCosts = ((numberOfBuses * COSTS_PER_VEH_DAY) + (vehicleKm * COSTS_PER_VEH_KM) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
+		double operatorScore = earnings - operatingCosts;
+
 		this.setScore(operatorScore);
-		log.info("OperatorScore calculated.");
+		log.info("OperatorScore calculated: "+operatorScore);
 	}
 
-	private double getRouteLength(Network network) {
+	public double getRouteLength(Network network) {
 		double routeLength = 0;
 		for (Link link : network.getLinks().values()){
-			routeLength = routeLength + link.getLength();
+			routeLength = routeLength + link.getLength()/1000;
 		}
 		return routeLength;
 	}
