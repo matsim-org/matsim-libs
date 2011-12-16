@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
@@ -342,7 +343,7 @@ public class EquilibriumOptimalPlansAnalyser {
 			for (ComparativeLeg leg : plan) {
 				if (leg.isUntoggledJoint()) {
 					double toggledScore = plan.getToggledScore();
-					double untoggledScore = plan.getIndividualScore();
+					double untoggledScore = plan.getUntoggledScore();
 					improvement = toggledScore - untoggledScore;
 
 					List<Double> improvementsForSize = improvements.get( plan.getCliqueSize() );
@@ -371,6 +372,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		formatCategoryChart( chart );
 		return new WrapperChartUtil( chart );
 	}
+
 
 
 	private static void formatCategoryChart(final JFreeChart chart) {
