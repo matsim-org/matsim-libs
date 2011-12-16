@@ -28,7 +28,6 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 import org.matsim.core.controler.Controler;
@@ -41,9 +40,6 @@ import org.matsim.core.utils.io.IOUtils;
  * @author thibautd
  */
 public class MoreIOUtils {
-	private static final Logger log =
-		Logger.getLogger(MoreIOUtils.class);
-
 	private static final String LOGFILE = "MyLogFile.log";
 	private static final String WARNLOGFILE = "MyWarnLogFile.log";
 
