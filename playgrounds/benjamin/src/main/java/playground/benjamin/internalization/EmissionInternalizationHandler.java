@@ -19,14 +19,19 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 
 import playground.benjamin.emissions.events.ColdEmissionEvent;
 import playground.benjamin.emissions.events.ColdEmissionEventHandler;
 import playground.benjamin.emissions.events.WarmEmissionEvent;
 import playground.benjamin.emissions.events.WarmEmissionEventHandler;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 
 /**
@@ -34,29 +39,75 @@ import playground.benjamin.emissions.events.WarmEmissionEventHandler;
  *
  */
 public class EmissionInternalizationHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
+	private static final Logger logger = Logger.getLogger(EmissionInternalizationHandler.class);
 
-	private Map<Id, Double> personId2score;
+	Scenario scenario;
+	Map<Id, Double> personId2emissionCosts = new HashMap<Id, Double>();
+
+	public EmissionInternalizationHandler(Scenario scenario) {
+		this.scenario = scenario;
+	}
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+		personId2emissionCosts.clear();
 	}
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		// TODO Auto-generated method stub
+		Id personId = event.getVehicleId();
+		double emissionCosts = calculateWarmEmissionCosts(event);
 		
+		if(personId2emissionCosts.get(personId) != null){
+			double emissionCostsSoFar = personId2emissionCosts.get(personId);
+			emissionCosts = emissionCostsSoFar + emissionCosts;
+			logger.info("setting emission costs for person " + personId + " from " + emissionCostsSoFar + " to " + emissionCosts);
+			personId2emissionCosts.put(personId, emissionCosts);
+		} else {
+			logger.info("initialising emission account for person " + personId + " with " + emissionCosts);
+			personId2emissionCosts.put(personId, emissionCosts);
+		}
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		// TODO Auto-generated method stub
+		Id personId = event.getVehicleId();
+		double emissionCosts = calculateColdEmissionCosts(event);
+		
+		if(personId2emissionCosts.get(personId) != null){
+			double emissionCostsSoFar = personId2emissionCosts.get(personId);
+			emissionCosts = emissionCostsSoFar + emissionCosts;
+			logger.info("setting emission costs for person " + personId + " from " + emissionCostsSoFar + " to " + emissionCosts);
+			personId2emissionCosts.put(personId, emissionCosts);
+		} else {
+			logger.info("initialising emission account for person " + personId + " with " + emissionCosts);
+			personId2emissionCosts.put(personId, emissionCosts);
+		}
 		
 	}
 	
-	public double getScore(Id personId){
-		return personId2score.get(personId);
+	private double calculateColdEmissionCosts(ColdEmissionEvent event) {
+		double coldEmissionCosts = 5.0;
+		
+		for(ColdPollutant cp : event.getColdEmissions().keySet()){
+			
+		}
+		
+		return coldEmissionCosts;
+	}
+
+	private double calculateWarmEmissionCosts(WarmEmissionEvent event) {
+		double warmEmissionCosts = 10.0;
+		
+		for(WarmPollutant wp : event.getWarmEmissions().keySet()){
+			
+		}
+		
+		return warmEmissionCosts;
+	}
+
+	public Map<Id, Double> getPersonId2EmissionCosts(){
+		return personId2emissionCosts;
 	}
 
 }

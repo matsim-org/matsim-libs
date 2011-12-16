@@ -79,7 +79,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 		
 		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler();
+		emissionInternalizationHandler = new EmissionInternalizationHandler(scenario);
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 		
@@ -114,12 +114,18 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		Population pop = scenario.getPopulation();
 		for(Person person : pop.getPersons().values()){
 			Id personId = person.getId();
-			double score = person.getSelectedPlan().getScore();
-			double scoreFromInternalization = emissionInternalizationHandler.getScore(personId);
-			double newScore = score + scoreFromInternalization;
+			double oldScore = person.getSelectedPlan().getScore();
+			double emissionCosts;
+			double newScore;
+			if(emissionInternalizationHandler.getPersonId2EmissionCosts().get(personId) != null){
+				emissionCosts = emissionInternalizationHandler.getPersonId2EmissionCosts().get(personId);
+				newScore = oldScore - emissionCosts;
+				logger.info("setting score for person " + personId + " from " + oldScore + " to " + newScore + "...");
+			} else {
+				newScore = oldScore;
+			}
 			person.getSelectedPlan().setScore(newScore);
 		}
-		
 		logger.info("leaving calculateNewScore...");
 	}
 	

@@ -102,7 +102,7 @@ public class RunInternalizationTest {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(10);
+		ccg.setLastIteration(1);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
