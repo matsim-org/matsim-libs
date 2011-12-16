@@ -51,9 +51,22 @@ public class SizeFilter {
 	private static final Log log =
 		LogFactory.getLog(SizeFilter.class);
 
-	private final static int MAX_SIZE = 10;
+	private final static int DEFAULT_MIN_SIZE = 1;
+	private final static int DEFAULT_MAX_SIZE = 10;
+
 	public static void main(final String[] args) {
 		String configFile = args[0];
+
+		int minSize, maxSize;
+
+		if (args.length >= 3) {
+			minSize = Integer.parseInt( args[ 1 ] );
+			maxSize = Integer.parseInt( args[ 2 ] );
+		}
+		else {
+			minSize = DEFAULT_MIN_SIZE;
+			maxSize = DEFAULT_MAX_SIZE;
+		}
 		
 		Config config = JointControlerUtils.createConfig(configFile);
 		ScenarioWithCliques scenario = JointControlerUtils.createScenario(config);
@@ -66,7 +79,8 @@ public class SizeFilter {
 		Map<Id, List<Id>> cliquesToWrite = new HashMap<Id, List<Id>>();
 		int count = 0;
 		for (Clique clique : cliques.values()) {
-			if (clique.getMembers().size() <= MAX_SIZE) {
+			int size = clique.getMembers().size();
+			if (size <= maxSize && size >= minSize) {
 				cliquesToWrite.put(clique.getId(), new ArrayList<Id>(clique.getMembers().keySet()));
 
 				for (Person person : clique.getMembers().values()) {
@@ -79,12 +93,12 @@ public class SizeFilter {
 		}
 		log.info(count+" cliques removed");
 
-		String popFile = config.controler().getOutputDirectory() + "individuals-less-than-10.xml.gz";
+		String popFile = config.controler().getOutputDirectory() + "individuals-more-than"+minSize+"-less-than-"+maxSize+".xml.gz";
 		PopulationWriter writer = (new PopulationWriter(population, scenario.getNetwork(), scenario.getKnowledges())) ;
 		writer.setWriterHandler(new PopulationWithJointTripsWriterHandler(scenario.getNetwork(), scenario.getKnowledges()));
 		writer.write(popFile);
 
-		String cliqueFile = config.controler().getOutputDirectory() + "cliques-less-than-10.xml.gz";
+		String cliqueFile = config.controler().getOutputDirectory() + "cliques-more-than"+minSize+"-less-than-"+maxSize+".xml.gz";
 		(new CliquesWriter(cliquesToWrite)).writeFile(cliqueFile);
 	}
 }
