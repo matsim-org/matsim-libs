@@ -44,7 +44,7 @@ public class CreatePopulation implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
-	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version5/network.xml";
+	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version5b/network.xml";
 
 		
 	public static void main(String[] args) {
@@ -62,7 +62,7 @@ public class CreatePopulation implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version5/population.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version5b/population2.xml");
 	}
 
 	private void fillZoneData() {
@@ -75,11 +75,49 @@ public class CreatePopulation implements Runnable {
 	}
 	
 	private void generatePopulation() {
-		for (String zone1 : zoneGeometries.keySet()){
-			for (String zone2 : zoneGeometries.keySet()){
-				generateHomeWorkHomeTripsPt(zone1, zone2, 120); // home, work, anzahl
-			}
-		}
+		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "0", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "0", 8*60); // home, work, anzahl
+
+		generateHomeWorkHomeTripsPt("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
+		
+		generateHomeWorkHomeTripsPt("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
+		
+		generateHomeWorkHomeTripsPt("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
+		
+		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
+		
+		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
+		
+		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
+		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
+		
+//		for (String zone1 : zoneGeometries.keySet()){
+//			for (String zone2 : zoneGeometries.keySet()){
+//				if (zone1 != zone2){ // no one stays in home-zone
+//					generateHomeWorkHomeTripsPt(zone1, zone2, 120); // home, work, anzahl
+//				}
+//				else {}
+//			}
+//		}
 	}
 
 	private void generateHomeWorkHomeTripsPt(String zone1, String zone2, int quantity) {
@@ -107,6 +145,32 @@ public class CreatePopulation implements Runnable {
 			population.addPerson(person);
 		}
 	}
+	
+	private void generateHomeWorkHomeTripsCar(String zone1, String zone2, int quantity) {
+		for (int i=0; i<quantity; ++i) {
+			
+//			Coord homeLocation = blur(zone1);
+//			Coord workLocation = blur(zone2);
+			
+			Coord homeLocation = zoneGeometries.get(zone1);
+			Coord workLocation = zoneGeometries.get(zone2);
+			
+			Person person = population.getFactory().createPerson(createId(zone1, zone2, i, TransportMode.car));
+			Plan plan = population.getFactory().createPlan();
+			
+			plan.addActivity(createHome(homeLocation, i));
+			plan.addLeg(createDriveLegCar());
+			plan.addActivity(createWork(workLocation, i));
+			plan.addLeg(createDriveLegCar());
+			Activity homeActivity1 = (Activity) plan.getPlanElements().get(0);
+			double homeEndTime = homeActivity1.getEndTime();
+			Activity homeActivity2 = homeActivity1;
+			homeActivity2.setEndTime(homeEndTime);
+			plan.addActivity(homeActivity2);
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
+	}
 		
 //	private Coord blur(String zone) {
 //		Random rnd = new Random();
@@ -118,6 +182,11 @@ public class CreatePopulation implements Runnable {
 	
 	private Leg createDriveLegPt() {
 		Leg leg = population.getFactory().createLeg(TransportMode.pt);
+		return leg;
+	}
+	
+	private Leg createDriveLegCar() {
+		Leg leg = population.getFactory().createLeg(TransportMode.car);
 		return leg;
 	}
 
