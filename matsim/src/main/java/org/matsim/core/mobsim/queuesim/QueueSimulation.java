@@ -129,7 +129,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 	private final Set<String> notTeleportedModes = new HashSet<String>();
 
-	//	private final List<MobsimFeature> queueSimulationFeatures = new ArrayList<MobsimFeature>() ;
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private MobsimTimer simTimer ;
 
@@ -155,13 +154,9 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 
 		this.listenerManager = new SimulationListenerManager(this);
-		//		AbstractSimulation.reset(this.config.simulation().getStuckTime());
 
-		//		this.agentCounter.setLiving(0);
-		//		this.agentCounter.setLost(0);
 		this.agentCounter.reset();
 
-		//		SimulationTimer.resetStatic(this.config.simulation().getTimeStepSize());
 		simTimer = new MobsimTimer(this.config.simulation().getTimeStepSize()) ;
 
 		setEvents(events);
@@ -301,7 +296,14 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		this.teleportationList.clear();
 
 		for (MobsimAgent agent : this.activityEndsList) {
-			events.processEvent(new AgentStuckEventImpl(now, agent.getId(), agent.getDestinationLinkId(), null));
+			if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
+					&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
+				if (agent.getDestinationLinkId() != null) {
+					events.processEvent(events.getFactory()
+							.createAgentStuckEvent(now, agent.getId(),
+									agent.getDestinationLinkId(), null));
+				}
+			}
 		}
 		this.activityEndsList.clear();
 
@@ -456,6 +458,9 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 //	@Override
 	private void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
+		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
+			this.agentCounter.decLiving() ;
+		}
 	}
 
 	private void handleActivityEnds(final double time) {

@@ -200,7 +200,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 				return ;
 			} else {
 				// this is the last activity
-				this.simulation.getAgentCounter().decLiving();
+//				this.simulation.getAgentCounter().decLiving();
+				this.state = MobsimAgent.State.ACTIVITY ;
+				this.activityEndTime = Double.POSITIVE_INFINITY ;
+				this.simulation.reInsertAgentIntoMobsim(this);
 				return ;
 			}
 

@@ -137,11 +137,16 @@ public final class QSim implements VisMobsim, Netsim {
 	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
+    
+    static boolean NEW = false ;
 
 	private InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public void arrangeNextAgentState(MobsimAgent agent) {
-//			QSim.this.arrangeNextAgentAction(agent) ;
+			if ( NEW ) {
+				QSim.this.arrangeNextAgentAction(agent) ;
+			} else {
+			}
 		}
 
 		@Override
@@ -152,7 +157,10 @@ public final class QSim implements VisMobsim, Netsim {
 	
 	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
 	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
-		this.arrangeNextAgentAction( agent) ;
+		if ( NEW ) {
+		} else {
+			this.arrangeNextAgentAction( agent) ;
+		}
 	}
 
 
@@ -343,7 +351,7 @@ public final class QSim implements VisMobsim, Netsim {
 						+ "fixed but for the time being we skip the next couple of lines.  kai, dec'10");
 			} else {
 				if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
-						|| agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
+						&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
 					if (agent.getDestinationLinkId() != null) {
 						events.processEvent(events.getFactory()
 								.createAgentStuckEvent(now, agent.getId(),
@@ -419,7 +427,7 @@ public final class QSim implements VisMobsim, Netsim {
 	
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		if ( this.agents.contains(agent) ) {
-//			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
+			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
 		}
 		arrangeNextAgentAction(agent);
 	}
@@ -454,6 +462,9 @@ public final class QSim implements VisMobsim, Netsim {
 		this.activityEndsList.add(agent);
 		if (!(agent instanceof AbstractTransitDriver)) {
 			netEngine.registerAdditionalAgentOnLink(agent);
+		}
+		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
+			this.agentCounter.decLiving() ;
 		}
 	}
 
