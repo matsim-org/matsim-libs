@@ -1078,6 +1078,9 @@ public class TransitQueueNetworkTest extends TestCase {
             this.transitVehicle.setStopHandler(new SimpleTransitStopHandler());
             tDriver.setVehicle(this.transitVehicle);
             tDriver.endActivityAndAssumeControl(100);
+            // (might be better to officially insert the driver into the mobsim. kai, dec'11)
+            this.qsim.internalInterface.arrangeNextAgentState(tDriver) ;
+            // (not great, but is a test. kai, dec'11)
 
             this.normalVehicle = new QVehicle(new VehicleImpl(id2, vehicleType));
             this.qlink1.addParkedVehicle(this.normalVehicle);
@@ -1086,6 +1089,8 @@ public class TransitQueueNetworkTest extends TestCase {
             this.normalVehicle.setDriver(nDriver);
             nDriver.setVehicle(this.normalVehicle);
             nDriver.endActivityAndAssumeControl(100);
+            this.qsim.internalInterface.arrangeNextAgentState(nDriver) ;
+            // (not great, but is a test. kai, dec'11)
 
             if (stop2 != null) {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,

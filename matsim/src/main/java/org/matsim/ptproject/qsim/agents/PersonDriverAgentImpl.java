@@ -117,7 +117,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void endActivityAndAssumeControl(final double now) {
-//		Boolean flag = 
 		endActivityAndComputeNextState(now);
 		scheduleAgentInMobsim( );
 	}
@@ -127,7 +126,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 				this.simulation.getEventsManager().getFactory().createActivityEndEvent(
 						now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		// note that when we are here we don't know if next is another leg, or an activity.  Therefore, we go to a general method:
-//		Boolean flag = 
 		advancePlan() ;
 		return ;
 	}
@@ -136,12 +134,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public final void endLegAndAssumeControl(final double now) {
-//		Boolean ok = 
-			endLegAndComputeNextState(now);
+		endLegAndComputeNextState(now);
 		scheduleAgentInMobsim( );
 	}
 	private void endLegAndComputeNextState(final double now) {
-//		Boolean ok = true ;
 		
 		// creating agent arrival event ... ok
 		this.simulation.getEventsManager().processEvent(
@@ -149,17 +145,11 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 						now, this.getPerson().getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 
 		if(!this.currentLinkId.equals(this.cachedDestinationLinkId)) {
-			// yyyyyy needs to throw a stuck/abort event
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
-//			this.simulation.getAgentCounter().decLiving();
-//			this.simulation.getAgentCounter().incLost();
-			
-//			ok = false ;
 			this.state = MobsimAgent.State.ABORT ;
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-//			ok = 
 			advancePlan() ;
 		}
 		return ;

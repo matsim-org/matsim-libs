@@ -348,6 +348,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		Id transitRouteId = null;
 		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId(), transitRouteId));		
 		driver.endLegAndAssumeControl(now);
+		this.internalInterface.arrangeNextAgentState(driver) ;
 	}
 
 }

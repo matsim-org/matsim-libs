@@ -82,7 +82,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private AbstractTransitDriverFactory transitDriverFactory = new UmlaufDriverFactory();
 
-	private InternalInterface internalInterface = null ;
+	/*package*/ InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;

@@ -32,6 +32,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
@@ -140,7 +141,7 @@ public final class QSim implements VisMobsim, Netsim {
     
     static boolean NEW = false ;
 
-	private InternalInterface internalInterface = new InternalInterface() {
+	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public void arrangeNextAgentState(MobsimAgent agent) {
 			if ( NEW ) {
@@ -419,6 +420,7 @@ public final class QSim implements VisMobsim, Netsim {
 				personAgent.notifyTeleportToLink(personAgent
 						.getDestinationLinkId());
 				personAgent.endLegAndAssumeControl(now);
+				this.internalInterface.arrangeNextAgentState(personAgent) ;
 			} else {
 				break;
 			}
@@ -535,8 +537,7 @@ public final class QSim implements VisMobsim, Netsim {
 				this.activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndAssumeControl(time);
-				// gives control to agent; comes back via "agentDeparts" or
-				// "scheduleActivityEnd"
+				this.internalInterface.arrangeNextAgentState(agent) ;
 			} else {
 				return;
 			}
@@ -557,23 +558,31 @@ public final class QSim implements VisMobsim, Netsim {
 		events.processEvent(events.getFactory().createAgentDepartureEvent(now,
 				agent.getId(), linkId, mode));
 
-//		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
-//		// for a hike, or driving a bus).  kai, nov'11
-//		if ( linkId.equals(agent.getDestinationLinkId())) {
-//			if ( agent instanceof DriverAgent ) {
-//				if ( ((DriverAgent)agent).chooseNextLinkId() == null ) {
-//
-//					// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
-//					// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
-//					// consistently implemented.  One could also decide to not have these departure/arrival events here
-//					// (we would still have actEnd/actStart events).  kai, nov'11
-//					events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
-//					agent.endLegAndAssumeControl(now) ;
-//					arrangeNextAgentAction(agent) ;
-//					return ;
-//				}
-//			}
-//		}
+		// The following seems like a good idea, but it does not work when agents have round trips (such as cruising, going
+		// for a hike, or driving a bus).  kai, nov'11
+		// I think now it works.  kai, dec'11
+		if ( ! (agent instanceof UmlaufDriver) ) {
+			// (UmlaufDriver somehow is different. kai, dec'11)
+			if ( mode.equals(TransportMode.car) && linkId.equals(agent.getDestinationLinkId())) {
+				// (yyyy "car" is the current convention; there is a test that checks if "walk" goes through. :-( kai, dec'11)
+				if ( agent instanceof DriverAgent ) {
+					if ( ((DriverAgent)agent).chooseNextLinkId() == null ) {
+
+						// no physical travel is necessary.  We still treat this as a departure and an arrival, since there is a 
+						// "leg".  Some of the design allows to have successive activities without invervening legs, but this is not 
+						// consistently implemented.  One could also decide to not have these departure/arrival events here
+						// (we would still have actEnd/actStart events).  kai, nov'11
+
+						//					events.processEvent(events.getFactory().createAgentArrivalEvent(now, agent.getId(), linkId, mode)) ;
+						// (arrival event currently in agent.  kai, dec'11)
+
+						agent.endLegAndAssumeControl(now) ;
+						this.internalInterface.arrangeNextAgentState(agent) ;
+						return ;
+					}
+				} 
+			}
+		}
 
 		if (handleKnownLegModeDeparture(now, agent, linkId)) {
 			return;
