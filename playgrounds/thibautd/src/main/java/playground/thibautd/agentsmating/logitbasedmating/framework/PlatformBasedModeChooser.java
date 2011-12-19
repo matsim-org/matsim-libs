@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * The core class of the logit-based matings framework.
@@ -61,6 +62,8 @@ public class PlatformBasedModeChooser {
 	private ComprehensiveChoiceModel dayLevelChoiceModel =
 		new ComprehensiveChoiceModel();
 	private final List<PlanAcceptor> acceptors = new ArrayList<PlanAcceptor>();
+	private final List<PlanAlgorithm> preChoiceAlgos = new ArrayList<PlanAlgorithm>();
+	private final List<PlanAlgorithm> postChoiceAlgos = new ArrayList<PlanAlgorithm>();
 
 	private Population population = null;
 
@@ -201,6 +204,31 @@ public class PlatformBasedModeChooser {
 		return acceptors.remove( acceptor );
 	}
 
+	/**
+	 * adds an algorithm to run on each plan before the mode choice.
+	 * This can be used to remove transit trips or produce statistics,
+	 * for example.
+	 * It will be ran AFTER the acceptation test and before the mode choice
+	 */
+	public void addPreChoiceAlgo(final PlanAlgorithm algo) {
+		preChoiceAlgos.add( algo );
+	}
+
+	public boolean removePreChoiceAlgo(final PlanAlgorithm algo) {
+		return preChoiceAlgos.remove( algo );
+	}
+
+	/**
+	 * adds an algorithm to run on each plan after the mode choice.
+	 */
+	public void addPostChoiceAlgo(final PlanAlgorithm algo) {
+		postChoiceAlgos.add( algo );
+	}
+
+	public boolean removePostChoiceAlgo(final PlanAlgorithm algo) {
+		return postChoiceAlgos.remove( algo );
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// public: process data methods
 	// /////////////////////////////////////////////////////////////////////////
@@ -231,6 +259,10 @@ public class PlatformBasedModeChooser {
 			counter.incCounter();
 			Plan plan = person.getSelectedPlan();
 			if ( !acceptPlan( plan ) ) continue;
+
+			for (PlanAlgorithm algo : preChoiceAlgos) {
+				algo.run( plan );
+			}
 
 			DecisionMaker decisionMaker;
 
@@ -263,6 +295,9 @@ public class PlatformBasedModeChooser {
 				performTripLevelChoice( decisionMaker , plan );
 			}
 
+			for (PlanAlgorithm algo : postChoiceAlgos) {
+				algo.run( plan );
+			}
 		}
 		counter.printCounter();
 		log.info( "[STEP 1] INDIVIDUAL MODE CHOICE: DONE" );
