@@ -49,11 +49,11 @@ public class InternalControler {
 	private String networkFile;
 	private double fare;
 	
-	private final double TRAVEL_PT_UTILS_PER_HOUR = -2.22;
-	private final double TRAVEL_CAR_UTILS_PER_HOUR = -2.08;
-	private final double TRAVEL_WALK_UTILS_PER_HOUR = -6.01;
-	private final double MONEY_UTILS_PER_EURO = 0.0556;
-	private final double CONSTANT_CAR = -1.58;
+	private final double TRAVEL_PT_UTILS_PER_HOUR = -3;
+	private final double TRAVEL_CAR_UTILS_PER_HOUR = -6;
+	private final double TRAVEL_WALK_UTILS_PER_HOUR = -2;
+	private final double MONEY_UTILS_PER_EURO = 1;
+	private final double CONSTANT_CAR = 0;
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare) {
 		this.configFile = configFile;

@@ -108,8 +108,8 @@ public class ExternalControler {
 			
 			// settings for next external iteration
 //			this.setNumberOfBuses(operator.strategy(this.iteration2numberOfBuses, this.iteration2operatorScore));
-			this.setNumberOfBuses(operator.increaseNumberOfBuses(1)); // absolute value
-			this.setFare(operator.increaseFare(this.getFare(), -0.2)); // absolute value
+//			this.setNumberOfBuses(operator.increaseNumberOfBuses(1)); // absolute value
+//			this.setFare(operator.increaseFare(this.getFare(), -0.2)); // absolute value
 			this.setCapacity(operator.increaseCapacity(5)); // absolute value
 			
 
@@ -120,17 +120,14 @@ public class ExternalControler {
 		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorEarnings, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 
 		ChartFileWriter chartWriter = new ChartFileWriter();
-		chartWriter.writeChart_LegModes(outputExternalIterationDirPath , "NumberOfBuses", this.iteration2numberOfBuses, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, "NumberOfBuses", this.iteration2numberOfBuses, this.iteration2userScore);
-		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, "NumberOfBuses", this.iteration2numberOfBuses, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
-	
-		chartWriter.writeChart_LegModes(outputExternalIterationDirPath , "Fare", this.iteration2fare, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, "Fare", this.iteration2fare, this.iteration2userScore);
-		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, "Fare", this.iteration2fare, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
-	
-		chartWriter.writeChart_LegModes(outputExternalIterationDirPath , "Capacity", this.iteration2capacity, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, "Capacity", this.iteration2capacity, this.iteration2userScore);
-		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, "Capacity", this.iteration2capacity, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
+		
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
+
+		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
+		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
+		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
 
 	}
 
