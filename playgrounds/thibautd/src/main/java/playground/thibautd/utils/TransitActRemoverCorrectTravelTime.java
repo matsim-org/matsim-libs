@@ -94,4 +94,8 @@ public class TransitActRemoverCorrectTravelTime implements PlanAlgorithm {
 		leg.setTravelTime( tt + ttSurplus );
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
 }

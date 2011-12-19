@@ -243,6 +243,8 @@ public class PlatformBasedModeChooser {
 				", trip-level model="+model.getClass().getSimpleName()+
 				", cliques constructor="+cliquesConstructor.getClass().getSimpleName()+
 				", subtourRestricted="+(dayLevelChoiceModel != null) );
+		log.info( "the following algorithms will be ran before the choice procedure: "+preChoiceAlgos );
+		log.info( "the following algorithms will be ran after the choice procedure: "+postChoiceAlgos );
 		boolean logRemoval = true;
 		boolean logPersonImpl = true;
 
