@@ -23,6 +23,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
 
+/**
+ * A TravelEvent replaces, for teleported trips, the LinkLeave-LinkEnter-Event-Chain.  It contains a field for the
+ * distance, which may be necessary for scoring. 
+ * 
+ * @author zilske
+ *
+ */
 public interface TravelEvent extends Event {
 
     public Id getPersonId();
