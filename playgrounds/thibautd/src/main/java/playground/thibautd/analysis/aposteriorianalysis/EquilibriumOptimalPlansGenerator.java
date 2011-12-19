@@ -128,6 +128,10 @@ public class EquilibriumOptimalPlansGenerator {
 		newConfig.addModule(
 				PlansConfigGroup.GROUP_NAME,
 				plans);
+		// to remember the replanning parameters
+		newConfig.addModule(
+				JointReplanningConfigGroup.GROUP_NAME,
+				config.getModule( JointReplanningConfigGroup.GROUP_NAME ));
 		newConfig.addModule(
 				PlanCalcScoreConfigGroup.GROUP_NAME,
 				config.planCalcScore());
