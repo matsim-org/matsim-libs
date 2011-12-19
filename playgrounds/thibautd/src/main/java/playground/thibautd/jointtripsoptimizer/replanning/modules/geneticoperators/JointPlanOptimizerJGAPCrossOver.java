@@ -61,6 +61,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	private final double WHOLE_CO_RATE;
 	private final double SIMPLE_CO_RATE;
 	private final double SINGLE_CO_RATE;
+	private final double DISCRETE_CO_RATE;
 	private final int N_BOOL;
 	private final int N_DOUBLE;
 	private final int N_MODE;
@@ -85,6 +86,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		this.WHOLE_CO_RATE = configGroup.getWholeCrossOverProbability();
 		this.SIMPLE_CO_RATE = configGroup.getSimpleCrossOverProbability();
 		this.SINGLE_CO_RATE = configGroup.getSingleCrossOverProbability();
+		this.DISCRETE_CO_RATE = configGroup.getDiscreteCrossOverProbability();
 		this.N_BOOL = numBooleanGenes;
 		this.N_DOUBLE = numDoubleGenes;
 		this.N_MODE = numModeGenes;
@@ -103,12 +105,14 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		int numOfWholeCo;
 		int numOfSimpleCo;
 		int numOfSingleCo;
+		int numOfDiscreteCo;
 
 		numOfWholeCo = getNumberOfOperations(this.WHOLE_CO_RATE, populationSize);
 		numOfSimpleCo = getNumberOfOperations(this.SIMPLE_CO_RATE, populationSize);
 		numOfSingleCo = getNumberOfOperations(this.SINGLE_CO_RATE, populationSize);
+		numOfDiscreteCo = getNumberOfOperations(this.DISCRETE_CO_RATE, populationSize);
 
-		int numOfCo = numOfWholeCo + numOfSimpleCo + numOfSingleCo;
+		int numOfCo = numOfWholeCo + numOfSimpleCo + numOfSingleCo + numOfDiscreteCo;
 		int index1;
 		IChromosome parent1;
 		IChromosome mate1;
@@ -133,9 +137,10 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			else if (i < numOfWholeCo + numOfSimpleCo) {
 				doDoubleSimpleCrossOver(mate1, mate2);
 			}
-			else {
+			else if (i < numOfWholeCo + numOfSimpleCo + numOfSingleCo) {
 				doDoubleSingleCrossOver(mate1, mate2);
 			}
+			// else: discrete only CO: nothing to do.
 
 			a_candidateChromosome.add(mate1);
 			a_candidateChromosome.add(mate2);
@@ -198,7 +203,6 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			}
 		}
 	}
-
 
 	/**
 	 * Performs a "GENOCOP-like" "Whole arithmetical cross-over" on the double

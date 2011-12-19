@@ -66,6 +66,11 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	public static final String SINGLE_CO_PROB = "SingleArithmeticalCrossOverRate";
 	/**
+	 * rate of the CO letting continuous dimensions untouched: rate * populationSize couples will be
+	 * mated.
+	 */
+	public static final String DISCRETE_CO_PROB = "discreteOnlyCrossOverRate";
+	/**
 	 * non-unifority parameter: the higher it is, the quicker the mutation of
 	 * double values becomes small.
 	 */
@@ -204,6 +209,7 @@ public class JointReplanningConfigGroup extends Module {
 	private double wholeCrossOverProb = 0.3;
 	private double simpleCrossOverProb = 0.3;
 	private double singleCrossOverProb = 0.1;
+	private double discreteCrossOverProb = 0.0;
 	private int numberOfIterations = 50;
 	private double betaNonUniformity = 25;
 	private boolean optimizeToggle = true;
@@ -255,6 +261,9 @@ public class JointReplanningConfigGroup extends Module {
 		}
 		else if (param_name.equals(SINGLE_CO_PROB)) {
 			this.setSingleCrossOverProbability(value);
+		}
+		else if (param_name.equals(DISCRETE_CO_PROB)) {
+			this.setDiscreteCrossOverProbability(value);
 		}
 		else if (param_name.equals(ITER_NUM)) {
 			this.setMaxIterations(value);
@@ -346,6 +355,7 @@ public class JointReplanningConfigGroup extends Module {
 		}
 	}
 
+
 	@Override
 	public String getValue(final String param_name) {
 		if (param_name.equals(MUTATION_PROB)) {
@@ -359,6 +369,9 @@ public class JointReplanningConfigGroup extends Module {
 		}
 		else if (param_name.equals(SINGLE_CO_PROB)) {
 			return String.valueOf(this.getSingleCrossOverProbability());
+		}
+		else if (param_name.equals(DISCRETE_CO_PROB)) {
+			return String.valueOf(this.getDiscreteCrossOverProbability());
 		}
 		else if (param_name.equals(ITER_NUM)) {
 			return String.valueOf(this.getMaxIterations());
@@ -376,8 +389,7 @@ public class JointReplanningConfigGroup extends Module {
 			return String.valueOf(this.getModeToOptimize());
 		}
 		else if (param_name.equals(AVAIL_MODES)) {
-			//TODO: do not produce an "inputable" value
-			return String.valueOf(this.getAvailableModes());
+			return getAvailableModesString();
 		}
 		else if (param_name.equals(ITER_MIN_NUM)) {
 			return String.valueOf(this.getMinIterations());
@@ -455,6 +467,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, WHOLE_CO_PROB);
 		this.addParameterToMap(map, SIMPLE_CO_PROB);
 		this.addParameterToMap(map, SINGLE_CO_PROB);
+		this.addParameterToMap(map, DISCRETE_CO_PROB);
 		this.addParameterToMap(map, ITER_NUM);
 		this.addParameterToMap(map, NON_UNIFORMITY_PARAM);
 		this.addParameterToMap(map, OPTIMIZE_TOGGLE);
@@ -607,6 +620,19 @@ public class JointReplanningConfigGroup extends Module {
 			this.setAvailableModes(defaultModes);
 		}
 		return this.availableModes;
+	}
+
+	private String getAvailableModesString() {
+		List<String> modes = this.getAvailableModes();
+
+		StringBuffer buff = new StringBuffer();
+
+		for (String mode : modes) {
+			buff.append( "," );
+			buff.append( mode );
+		}
+
+		return buff.substring( 1 );
 	}
 
 	public void setAvailableModes(String value) {
@@ -845,6 +871,15 @@ public class JointReplanningConfigGroup extends Module {
 
 	public boolean getIsMultiplicativePopulationSize() {
 		return isMultiplicative;
+	}
+
+
+	public void setDiscreteCrossOverProbability(final String value) {
+		discreteCrossOverProb = Double.parseDouble( value );
+	}
+
+	public double getDiscreteCrossOverProbability() {
+		return discreteCrossOverProb;
 	}
 
 	// allow setting of GA params "directly"
