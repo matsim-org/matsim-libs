@@ -67,7 +67,7 @@ public class CorridorNetworkWriter {
 		setLinks();
 		
 		NetworkWriter networkWriter = new NetworkWriter(network);
-		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version5b/network.xml");
+		networkWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version6/network.xml");
 	}
 	
 	private void createLinks(int linkNr) {

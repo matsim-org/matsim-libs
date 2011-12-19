@@ -44,7 +44,7 @@ public class CreatePopulation implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
-	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version5b/network.xml";
+	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version6/network.xml";
 
 		
 	public static void main(String[] args) {
@@ -62,7 +62,7 @@ public class CreatePopulation implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version5b/population2.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_version6/population.xml");
 	}
 
 	private void fillZoneData() {
@@ -80,35 +80,35 @@ public class CreatePopulation implements Runnable {
 		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
 		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "0", 8*60); // home, work, anzahl
 
-		generateHomeWorkHomeTripsPt("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
-		
-		generateHomeWorkHomeTripsPt("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
-		
-		generateHomeWorkHomeTripsPt("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
-		
-		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
-		
-		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
-		
-		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
-		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("1", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "1", 8*60); // home, work, anzahl
+//		
+//		generateHomeWorkHomeTripsPt("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("2", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "2", 8*60); // home, work, anzahl
+//		
+//		generateHomeWorkHomeTripsPt("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("3", Integer.toString(zoneGeometries.size()-1), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-1), "3", 8*60); // home, work, anzahl
+//		
+//		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-2), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-2), "0", 8*60); // home, work, anzahl
+//		
+//		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-3), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-3), "0", 8*60); // home, work, anzahl
+//		
+//		generateHomeWorkHomeTripsPt("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsPt(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar("0", Integer.toString(zoneGeometries.size()-4), 8*60); // home, work, anzahl
+//		generateHomeWorkHomeTripsCar(Integer.toString(zoneGeometries.size()-4), "0", 8*60); // home, work, anzahl
 		
 //		for (String zone1 : zoneGeometries.keySet()){
 //			for (String zone2 : zoneGeometries.keySet()){
