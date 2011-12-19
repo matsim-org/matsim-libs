@@ -42,13 +42,25 @@ public class StringMatrix {
 		matrix.add(row);
 	}
 	
-	public void setString(int row,int column, String value){
+	public void replaceString(int row,int column, String value){
 		try{
 			matrix.get(row).remove(column);
 			matrix.get(row).add(column, value);
 		} catch (Exception e) {
 			DebugLib.stopSystemAndReportInconsistency("(tried to add value outside of boundries - row:" + row + ",col:" + column + ",val:" + value);
 		}
+	}
+	
+	public void putString(int row,int column, String value){
+		while (row>=getNumberOfRows()){
+			matrix.add(new ArrayList<String>());
+		}
+		
+		while (column>=getNumberOfColumnsInRow(row)){
+			matrix.get(row).add("");
+		}
+		
+		replaceString(row,column,value);
 	}
 	
 	public void writeMatrix(String fileName){

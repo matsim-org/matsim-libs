@@ -70,7 +70,7 @@ public class AssignParkingLinkIds {
 				}
 			}
 
-			chargingLog.setString(i, 0, getClosestLinkFromParking(parkings.get(selectedParking.getParkingId())).toString());
+			chargingLog.replaceString(i, 0, getClosestLinkFromParking(parkings.get(selectedParking.getParkingId())).toString());
 
 			if (minDifference > 5000) {
 				//DebugLib.stopSystemAndReportInconsistency();
@@ -104,7 +104,7 @@ public class AssignParkingLinkIds {
 			}
 
 			Id closestLinkFromParking = getClosestLinkFromParking(parkings.get(selectedParking.getParkingId()));
-			parkingTimes.setString(i, 3, closestLinkFromParking.toString());
+			parkingTimes.replaceString(i, 3, closestLinkFromParking.toString());
 
 			statisticsOnDistanceBetweenParkingAndActivity.add(GeneralLib.getDistance(network.getLinks().get(closestLinkFromParking).getCoord(), network.getLinks().get(activityLinkId).getCoord()));
 			

@@ -1,0 +1,71 @@
+package playground.wrashid.artemis.checks;
+
+import java.util.LinkedList;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.network.NetworkImpl;
+
+import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.obj.IntegerValueHashMap;
+import playground.wrashid.lib.obj.StringMatrix;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
+
+public class NumberOfParkingsPerLinkAndHub {
+
+	public static void main(String[] args) {
+		StringMatrix stringMatrix = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/inputs/linkHubMappings/linkHub.mappingTable.txt", "\t");
+		NetworkImpl network = GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
+		String parkingBasePath =	"H:/data/experiments/TRBAug2011/parkings/flat/";
+		
+		LinkedList<Parking> privateParkingCityZH=getParkingCollection(parkingBasePath + "privateParkings_v1_kti.xml");
+		LinkedList<Parking> streetParkings=getParkingCollection(parkingBasePath + "streetParkings.xml");
+		LinkedList<Parking> garageParkings=getParkingCollection(parkingBasePath + "garageParkings.xml");
+		LinkedList<Parking> publicParkingsOutsideZH=getParkingCollection(parkingBasePath + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml");
+		
+		stringMatrix.putString(0, 2, "privatParkings");
+		stringMatrix.putString(0, 3, "streetParkings");
+		stringMatrix.putString(0, 4, "garageParkings");
+		stringMatrix.putString(0, 5, "publicParkingsOutsideZHCity");
+		
+		IntegerValueHashMap<Id> numberOfPrivateParkingsAttachedToLinks = getNumberOfParkingsPerLink(network, privateParkingCityZH);
+		IntegerValueHashMap<Id> numberOfStreetParkingsAttachedToLinks = getNumberOfParkingsPerLink(network, streetParkings);
+		IntegerValueHashMap<Id> numberOfGarageParkingsAttachedToLinks = getNumberOfParkingsPerLink(network, garageParkings);
+		IntegerValueHashMap<Id> numberOfPublicParkingsOutsideCityAttachedToLinks = getNumberOfParkingsPerLink(network, publicParkingsOutsideZH);
+		
+		
+		for (int i=1;i<stringMatrix.getNumberOfRows();i++){
+			Id linkId=new IdImpl(stringMatrix.getString(i, 1));
+			
+			stringMatrix.putString(i, 2, Integer.toString(numberOfPrivateParkingsAttachedToLinks.get(linkId)));
+			stringMatrix.putString(i, 3, Integer.toString(numberOfStreetParkingsAttachedToLinks.get(linkId)));
+			stringMatrix.putString(i, 4, Integer.toString(numberOfGarageParkingsAttachedToLinks.get(linkId)));
+			stringMatrix.putString(i, 5, Integer.toString(numberOfPublicParkingsOutsideCityAttachedToLinks.get(linkId)));
+			
+		}
+		
+		stringMatrix.writeMatrix("H:/data/experiments/ARTEMIS/nov2011/analysis/numberOfParkingsPerLinkAndHub.txt");
+		
+		
+		
+	}
+
+	private static IntegerValueHashMap<Id> getNumberOfParkingsPerLink(NetworkImpl network,
+			LinkedList<Parking> privateParkingCityZH) {
+		IntegerValueHashMap<Id> numberOfParkingsAttachedToLinks=new IntegerValueHashMap<Id>();
+		
+		for (Parking parking:privateParkingCityZH){
+			Id closestLinkId = network.getNearestLink(parking.getCoord()).getId();
+			numberOfParkingsAttachedToLinks.incrementBy(closestLinkId, (int) Math.round(parking.getCapacity()));
+		}
+		return numberOfParkingsAttachedToLinks;
+	}
+	
+	private static LinkedList<Parking> getParkingCollection(String path){
+		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
+		ParkingHerbieControler.readParkings(1.0, path, parkingCollection);
+		return parkingCollection;
+	}
+	
+}
