@@ -55,6 +55,7 @@ import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTi
 import playground.thibautd.householdsfromcensus.CliquesWriter;
 import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
 import playground.thibautd.utils.MoreIOUtils;
+import playground.thibautd.utils.TransitActRemoverCorrectTravelTime;
 
 /**
  * Executable class which runs the whole mating procedure.
@@ -190,6 +191,7 @@ public class RunReducedSPModel {
 				model);
 
 		modeChooser.addPlanAcceptor( new NoFreightPlanAcceptor() );
+		modeChooser.addPreChoiceAlgo( new TransitActRemoverCorrectTravelTime() );
 		modeChooser.process();
 		Map<Id, List<Id>> cliques = modeChooser.getCliques();
 
