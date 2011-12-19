@@ -61,7 +61,8 @@ public class HammingChromosomeDistanceComparator  extends ChromosomeDistanceComp
 	}
 
 	private double getDiscreteDistance(final Gene gene1, final Gene gene2) {
-		return ((gene1.getAllele()).equals(gene2.getAllele()) ? 0 : 1);
+		return ((((BooleanGene) gene1).booleanValue() ==
+					((BooleanGene) gene2).booleanValue()) ? 0 : 1);
 	}
 }
 

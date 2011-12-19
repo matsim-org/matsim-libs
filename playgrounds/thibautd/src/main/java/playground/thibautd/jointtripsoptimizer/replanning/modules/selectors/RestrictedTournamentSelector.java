@@ -31,6 +31,7 @@ import org.jgap.NaturalSelectorExt;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
 
 /**
@@ -74,14 +75,26 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 		//		configGroup.getRtsWindowSize(),
 		//		//jgapConfig.getPopulationSize());
 		//		configGroup.getPopulationSize());
-		int paramWindowSize = (int) Math.ceil(
-				configGroup.getWindowSizeIntercept() +
-				configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
-		paramWindowSize = Math.min(
-				paramWindowSize,
-				jgapConfig.getPopulationSize());
+		if (configGroup.isProportionnalWindowSize()) {
+			int paramWindowSize = (int) Math.ceil(
+					configGroup.getWindowSizeIntercept() +
+					configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
+			paramWindowSize = Math.min(
+					paramWindowSize,
+					jgapConfig.getPopulationSize());
 
-		this.windowSize = Math.max(1, paramWindowSize);
+			this.windowSize = Math.max(1, paramWindowSize);
+		}
+		else {
+			int nToggleGenes =
+				((JointPlanOptimizerJGAPConfiguration) jgapConfig).getNumJointEpisodes();
+			int paramWindowSize = (int) Math.pow(2, nToggleGenes);
+
+			this.windowSize = Math.min(
+					paramWindowSize,
+					jgapConfig.getPopulationSize());
+		}
+
 
 		this.jgapConfig = jgapConfig;
 		this.random = new Random( jgapConfig.getRandomGenerator().nextLong() + 194534 );
