@@ -1,68 +1,35 @@
-/*******************************************************************************
- * Copyright (C) 2011 Stefan Schroeder.
- * eMail: stefan.schroeder@kit.edu
- * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
-import org.matsim.contrib.freight.vrp.api.Customer;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
-
-
-
-/**
- * Radial ruin chooses a random customer and ruins current solution in its neighborhood. Thus, it supports local search for a better solution.
- * However, this version does not consider time dependent tranport costs. It calculates nearest neighour by using the first time slice (0.0).
- * 
- * @author stefan schroeder
- *
- */
-
-public class RadialRuin implements RuinStrategy {
-
-	static class ReferencedCustomer {
-		private Customer customer;
+public class RadialRuin implements RuinStrategy{
+	
+	static class ReferencedJob {
+		private Job job;
 		private double distance;
 		
-		public ReferencedCustomer(Customer customer, double distance) {
+		public ReferencedJob(Job job, double distance) {
 			super();
-			this.customer = customer;
+			this.job = job;
 			this.distance = distance;
 		}
 
-		public Customer getCustomer() {
-			return customer;
+		public Job getJob(){
+			return job;
 		}
 
 		public double getDistance() {
@@ -72,27 +39,28 @@ public class RadialRuin implements RuinStrategy {
 	
 	private Logger logger = Logger.getLogger(RadialRuin.class);
 	
-	private SingleDepotVRP vrp;
+	private VehicleRoutingProblem vrp;
 	
 	private double fractionOfAllNodes2beRuined;
 	
-	private Map<String,TreeSet<ReferencedCustomer>> distanceNodeTree = new HashMap<String,TreeSet<ReferencedCustomer>>();
+	private Map<String,TreeSet<ReferencedJob>> distanceNodeTree = new HashMap<String,TreeSet<ReferencedJob>>();
 	
-	private List<Shipment> shipmentsWithoutService = new ArrayList<Shipment>();
-	
-	private List<Customer> customerWithoutDepot = new ArrayList<Customer>();
+	private List<Job> unassignedJobs = new ArrayList<Job>();
 	
 	private Random random = RandomNumberGeneration.getRandom();
+
+	private JobDistance jobDistance;
 	
 	public void setRandom(Random random) {
 		this.random = random;
 	}
 
-	public RadialRuin(SingleDepotVRP vrp) {
+	public RadialRuin(VehicleRoutingProblem vrp, JobDistance jobDistance) {
 		super();
 		this.vrp = vrp;
+		this.jobDistance = jobDistance;
 		logger.info("intialise radial ruin");
-		makeNodeDataStructure();
+		calculateDistancesFromJob2Job();
 		logger.info("done");
 	}
 
@@ -100,12 +68,12 @@ public class RadialRuin implements RuinStrategy {
 		this.fractionOfAllNodes2beRuined = fractionOfAllNodes;
 	}
 
-	private void makeNodeDataStructure() {
-		createCustomerWithoutDepot();
-		for(Customer origin : customerWithoutDepot){
-			TreeSet<ReferencedCustomer> treeSet = new TreeSet<ReferencedCustomer>(new Comparator<ReferencedCustomer>() {
+	
+	private void calculateDistancesFromJob2Job() {
+		for(Job i : vrp.getJobs().values()){
+			TreeSet<ReferencedJob> treeSet = new TreeSet<ReferencedJob>(new Comparator<ReferencedJob>() {
 				@Override
-				public int compare(ReferencedCustomer o1, ReferencedCustomer o2) {
+				public int compare(ReferencedJob o1, ReferencedJob o2) {
 					if(o1.getDistance() <= o2.getDistance()){
 						return 1;
 					}
@@ -114,117 +82,60 @@ public class RadialRuin implements RuinStrategy {
 					}
 				}
 			});
-			distanceNodeTree.put(origin.getId(), treeSet);
-			for(Customer destination : customerWithoutDepot){
-				double distance = vrp.getCosts().getGeneralizedCost(origin.getLocation(), destination.getLocation(), 0.0);
-				ReferencedCustomer refNode = new ReferencedCustomer(destination, distance);
+			distanceNodeTree.put(i.getId(), treeSet);
+			for(Job j : vrp.getJobs().values()){
+				double distance = jobDistance.calculateDistance(i,j);
+				logger.debug("distMatrix: " + i.getId() + " " + j.getId() + " " + distance);
+				ReferencedJob refNode = new ReferencedJob(j, distance);
 				treeSet.add(refNode);
 			}
 		}
 	}
 
-	private void createCustomerWithoutDepot() {
-		for(Customer c : vrp.getCustomers().values()){
-			if(!isDepot(c)){
-				customerWithoutDepot.add(c);
-			}
-		}
-	}
-
-	private boolean isDepot(Customer c) {
-		if(vrp.getDepot().getId().equals(c.getId())){
-			return true;
-		}
-		return false;
-	}
 
 	@Override
-	public void run(Solution initialSolution) {
+	public void run(RRSolution initialSolution) {
 		clear();
-		int nOfNodes2BeRemoved = selectNumberOfNearestNeighbors();
-		if(nOfNodes2BeRemoved == 0){
+		int nOfJobs2BeRemoved = getNuOfJobs2BeRemoved();
+		if(nOfJobs2BeRemoved == 0){
 			return;
 		}
-		Customer randomCustomer = pickRandomCustomer();
-		logger.debug("randCust: " + randomCustomer);
-		TreeSet<ReferencedCustomer> tree = distanceNodeTree.get(randomCustomer.getId());
-		Iterator<ReferencedCustomer> descendingIterator = tree.descendingIterator();
+		Job randomJob = pickRandomJob();
+		logger.debug("randomJob: " + randomJob.getId());
+		TreeSet<ReferencedJob> tree = distanceNodeTree.get(randomJob.getId());
+		Iterator<ReferencedJob> descendingIterator = tree.descendingIterator();
 		int counter = 0;
-		List<TourAgent> agent2BeRemoved = new ArrayList<TourAgent>();
-		Set<String> removedCustomers = new HashSet<String>();
-		while(descendingIterator.hasNext() && counter<nOfNodes2BeRemoved){
-			ReferencedCustomer refNode = descendingIterator.next();
-			Customer customer = refNode.getCustomer();
-			logger.debug("remCust: " + customer);
-			if(removedCustomers.contains(customer.getId())){
-				continue;
-			}
+		while(descendingIterator.hasNext() && counter<nOfJobs2BeRemoved){
+			ReferencedJob refJob = descendingIterator.next();
+			Job job = refJob.getJob();
+			logger.debug("removedJob: " + job.getId());
 			for(TourAgent agent : initialSolution.getTourAgents()){
-				if(agent.hasCustomer(customer)){
-					Shipment shipment = null;
-					agent.removeCustomer(customer);
-					removedCustomers.add(customer.getId());
-					if(customer.hasRelation()){
-						Customer relatedCustomer = customer.getRelation().getCustomer();
-						agent.removeCustomer(relatedCustomer);
-						removedCustomers.add(relatedCustomer.getId());
-						shipment = makeShipment(customer, relatedCustomer);
-					}
-					else{
-						shipment = makeShipment(customer);
-					}
-					shipmentsWithoutService.add(shipment);
-					if(agent.getTourSize() < 3){
-						agent2BeRemoved.add(agent);
-					}
+				if(agent.hasJob(job)){
+					agent.removeJob(job);
+					unassignedJobs.add(job);
 				}
 			}
 			counter++;
 		}
-		for(TourAgent vA : agent2BeRemoved){
-			initialSolution.getTourAgents().remove(vA);
-		}
-	}
-	
-	private Shipment makeShipment(Customer customer, Customer relatedCustomer) {
-		Shipment shipment = null;
-		if(customer.getDemand() < 0){
-			shipment = VrpUtils.createShipment(relatedCustomer, customer);
-		}
-		else{
-			shipment = VrpUtils.createShipment(customer, relatedCustomer);
-		}
-		return shipment;
 	}
 
-	private Shipment makeShipment(Customer customer) {
-		Shipment shipment = null;
-		if(customer.getDemand() < 0){
-			shipment = VrpUtils.createShipment(vrp.getDepot(), customer);
-		}
-		else{
-			shipment = VrpUtils.createShipment(customer, vrp.getDepot());
-		}
-		return shipment;
-	}
-
-	private Customer pickRandomCustomer() {
-		int totNuOfNodes = customerWithoutDepot.size();
-		int randomIndex = random.nextInt(totNuOfNodes);
-		Customer customer = customerWithoutDepot.get(randomIndex);
-		return customer;
+	private Job pickRandomJob() {
+		int totNuOfJobs = vrp.getJobs().values().size();
+		int randomIndex = random.nextInt(totNuOfJobs);
+		Job job = new ArrayList<Job>(vrp.getJobs().values()).get(randomIndex);
+		return job;
 	}
 
 	private void clear() {
-		shipmentsWithoutService.clear();
+		unassignedJobs.clear();
 	}
 
-	private int selectNumberOfNearestNeighbors(){
-		return (int)Math.round(customerWithoutDepot.size()*fractionOfAllNodes2beRuined);
+	private int getNuOfJobs2BeRemoved(){
+		return (int)Math.round(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
 	}
-
+	
 	@Override
-	public List<Shipment> getShipmentsWithoutService() {
-		return shipmentsWithoutService;
+	public List<Job> getUnassignedJobs() {
+		return unassignedJobs;
 	}
 }

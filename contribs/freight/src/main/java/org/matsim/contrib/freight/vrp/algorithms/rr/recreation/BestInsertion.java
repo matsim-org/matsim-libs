@@ -17,25 +17,17 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.recreation;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RecreationStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
-import org.matsim.contrib.freight.vrp.api.Offer;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.Offer;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactory;
-import org.matsim.contrib.freight.vrp.basics.Tour;
-import org.matsim.contrib.freight.vrp.basics.Vehicle;
-import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 
 
@@ -51,11 +43,7 @@ public class BestInsertion implements RecreationStrategy{
 
 	private Logger logger = Logger.getLogger(BestInsertion.class);
 	
-	private SingleDepotVRP vrp;
-	
 	private TourAgentFactory tourAgentFactory;
-	
-	private Collection<RecreationListener> recreationListeners = new ArrayList<RecreationListener>();
 	
 	private Random random = RandomNumberGeneration.getRandom();
 	
@@ -63,88 +51,34 @@ public class BestInsertion implements RecreationStrategy{
 		this.random = random;
 	}
 
-	public Collection<RecreationListener> getRecreationListener() {
-		return recreationListeners;
-	}
-
-	public BestInsertion(SingleDepotVRP vrp) {
-		super();
-		this.vrp = vrp;
-	}
-
-	public void setTourAgentFactory(TourAgentFactory tourAgentFactory) {
-		this.tourAgentFactory = tourAgentFactory;
-	}
-
 	@Override
-	public void run(Solution tentativeSolution, List<Shipment> shipmentsWithoutService) {
-		Collections.shuffle(shipmentsWithoutService,random);
-		for(Shipment shipmentWithoutService : shipmentsWithoutService){
-			assertShipmentIsInCorrectOrder(shipmentWithoutService);
+	public void run(RRSolution tentativeSolution, List<Job> unassignedJobs) {
+		Collections.shuffle(unassignedJobs,random);
+		for(Job unassignedJob : unassignedJobs){
 			Offer bestOffer = null;
+			boolean firstAgent = true;
+			double bestKnownPrice = Double.MAX_VALUE;
 			for(TourAgent agent : tentativeSolution.getTourAgents()){
-				double bestKnownPrice;
-				if(bestOffer == null){
-					bestKnownPrice = Double.MAX_VALUE;
-				}
-				else{
-					bestKnownPrice = bestOffer.getPrice();
-				}
-				Offer offer = agent.requestService(shipmentWithoutService,bestKnownPrice);
+				Offer offer = agent.requestService(unassignedJob,bestKnownPrice);
 				if(offer == null){
 					continue;
 				}
-				if(bestOffer == null){
+				if(firstAgent){
 					bestOffer = offer;
+					firstAgent = false;
 				}
 				else if(offer.getPrice() < bestOffer.getPrice()){
 					bestOffer = offer;
+					bestKnownPrice = offer.getPrice();
 				}
 			}
 			if(bestOffer != null){
-				logger.debug("offer granted " + bestOffer.getServiceProvider() + " " + bestOffer + " " + shipmentWithoutService);
-				bestOffer.getServiceProvider().offerGranted(shipmentWithoutService);
-				informListeners(shipmentWithoutService,bestOffer.getPrice());
+				logger.debug("offer granted " + bestOffer.getServiceProvider() + " " + bestOffer + " " + unassignedJob);
+				bestOffer.getServiceProvider().offerGranted(unassignedJob);
 			}
 			else{
-				TourAgent newTourAgent = createTourAgent(shipmentWithoutService);
-				if(newTourAgent.tourIsValid()){
-					tentativeSolution.getTourAgents().add(newTourAgent);
-				}
-				else{
-					throw new IllegalStateException("could not create a valid round-tour" + newTourAgent);
-				}
-				
+				throw new IllegalStateException("given the vehicles, could not create a valid solution");
 			}
 		}
 	}
-
-	
-
-	private void assertShipmentIsInCorrectOrder(Shipment shipmentWithoutService) {
-		if(shipmentWithoutService.getFrom().getDemand() < 0){
-			throw new IllegalStateException("this must be a pickup and can thus not be smaller than 0. " + shipmentWithoutService.getFrom().getId() + "; " + shipmentWithoutService.getTo().getId());
-		}
-		
-	}
-
-	private void informListeners(Shipment shipment, double cost) {
-		for(RecreationListener l : recreationListeners){
-			l.inform(new RecreationEvent(shipment,cost));
-		}
-		
-	}
-
-	private TourAgent createTourAgent(Shipment shipmentWithoutService) {
-		Tour tour = VrpUtils.createRoundTour(vrp, shipmentWithoutService.getFrom(), shipmentWithoutService.getTo());
-		Vehicle vehicle = VrpUtils.createVehicle(vrp.getVehicleType());
-		TourAgent agent = tourAgentFactory.createTourAgent(tour, vehicle);
-		return agent;
-	}
-
-	@Override
-	public void addListener(RecreationListener l) {
-		recreationListeners.add(l);	
-	}
-
 }

@@ -6,7 +6,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
 import org.matsim.contrib.freight.vrp.VRPSolverFactory;
-import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 
 public class CarrierContractLandscapeChangedResponder implements CarrierPlanStrategyModule{
 

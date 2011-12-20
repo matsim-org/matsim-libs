@@ -22,8 +22,8 @@ package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.controler.RunMobSimWithCarrier;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 

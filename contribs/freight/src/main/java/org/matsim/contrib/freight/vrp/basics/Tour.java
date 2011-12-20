@@ -45,12 +45,7 @@ public class Tour {
 	public String toString() {
 		String tour = null;
 		for(TourActivity c : tourActivities){
-			if(tour == null){
-				tour = "[" + c.getCustomer() + "]";
-			}
-			else{
-				tour += "[" + c.getCustomer() + "]";
-			}
+			
 		}
 		if(tour != null){
 			tour += "[time=" + costs.time + "][distance=" + costs.distance + "][generalizedCosts=" + costs.generalizedCosts + "]"; 

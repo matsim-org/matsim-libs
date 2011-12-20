@@ -13,8 +13,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Contract;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.vrp.api.Costs;
-import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 
 public class VRPCarrierPlanBuilder {
 	

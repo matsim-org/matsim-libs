@@ -1,10 +1,10 @@
 package org.matsim.contrib.freight.replanning;
 
-import org.matsim.contrib.freight.carrier.Actor;
-import org.matsim.core.gbl.MatsimRandom;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.contrib.freight.carrier.Actor;
+import org.matsim.core.gbl.MatsimRandom;
 
 public class PlanStrategyManager<T extends Actor> {
 	

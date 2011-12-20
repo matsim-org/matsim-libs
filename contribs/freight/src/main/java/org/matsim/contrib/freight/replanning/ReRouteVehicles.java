@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
 import org.matsim.contrib.freight.vrp.VRPSolverFactory;
-import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 
 public class ReRouteVehicles implements CarrierPlanStrategyModule{
 

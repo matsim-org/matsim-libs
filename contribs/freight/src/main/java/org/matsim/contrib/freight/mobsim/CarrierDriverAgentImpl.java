@@ -1,7 +1,6 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;

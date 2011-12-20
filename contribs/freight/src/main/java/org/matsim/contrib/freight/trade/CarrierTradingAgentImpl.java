@@ -3,7 +3,6 @@ package org.matsim.contrib.freight.trade;
 import java.util.logging.Logger;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierContract;
 import org.matsim.contrib.freight.carrier.CarrierOffer;

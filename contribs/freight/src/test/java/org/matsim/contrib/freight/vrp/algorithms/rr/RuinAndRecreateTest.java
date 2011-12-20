@@ -17,20 +17,21 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
-import junit.framework.TestCase;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityConstraint;
-import org.matsim.contrib.freight.vrp.api.*;
+import junit.framework.TestCase;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotVRPBuilder;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.TimeAndCapacityAndTWConstraints;
 import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 /**
  * test case: example is take from: http://web.mit.edu/urban_or_book/www/book/chapter6/6.4.12.html
@@ -40,7 +41,7 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
 
 public class RuinAndRecreateTest extends TestCase{
 	
-	SingleDepotVRP vrp;
+	VehicleRoutingProblem vrp;
 	
 	RuinAndRecreate algo;
 	
@@ -50,12 +51,10 @@ public class RuinAndRecreateTest extends TestCase{
 	
 	Costs costs;
 	
-	Constraints constraints;
-	
-	SingleDepotVRPBuilder vrpBuilder;
+	VrpBuilder vrpBuilder;
 	
 	public void setUp(){
-		
+		Logger.getRootLogger().setLevel(Level.INFO);
 		/*
 		 * example is take from: 
 		 * 
@@ -71,14 +70,15 @@ public class RuinAndRecreateTest extends TestCase{
 		List<Integer> row9 = Arrays.asList(48,72,89,99,65,62,31,11,0,83);
 		List<Integer> row10 = Arrays.asList(71,91,114,108,65,46,43,46,36,0);
 		distanceMatrix = Arrays.asList(row1,row2,row3,row4,row5,row6,row7,row8,row9,row10);
+		
 		demand = Arrays.asList(0,4,6,5,4,7,3,5,4,4);
 		
 		costs = new Costs() {
 			
 			@Override
-			public Double getTransportTime(Node from, Node to, double time) {
-				int fromInt = Integer.parseInt(from.getId());
-				int toInt = Integer.parseInt(to.getId());
+			public Double getTransportTime(String fromId, String toId, double time) {
+				int fromInt = Integer.parseInt(fromId);
+				int toInt = Integer.parseInt(toId);
 				if(fromInt >= toInt){
 					return distanceMatrix.get(fromInt).get(toInt).doubleValue();
 				}
@@ -88,104 +88,71 @@ public class RuinAndRecreateTest extends TestCase{
 			}
 			
 			@Override
-			public Double getDistance(Node from, Node to, double time) {
-				return getTransportTime(from,to, 0.0);
+			public Double getDistance(String fromId, String toId, double time) {
+				return getTransportTime(fromId,toId, 0.0);
 			}
 			
 			@Override
-			public Double getGeneralizedCost(Node from, Node to, double time) {
-				return getTransportTime(from,to, 0.0);
+			public Double getGeneralizedCost(String fromId, String toId, double time) {
+				return getTransportTime(fromId,toId, 0.0);
 			}
 		};
-		vrpBuilder = new SingleDepotVRPBuilder();
-		Customer depot=null;
-		for(Integer i=0;i<demand.size();i++){
-			Customer customer = vrpBuilder.createAndAddCustomer(i.toString(), vrpBuilder.getNodeFactory().createNode(i.toString()), demand.get(i), 0.0, Double.MAX_VALUE, 0.0);
-			if(i==0){
-				depot = customer;
-			}
+		vrpBuilder = new VrpBuilder(costs, new TimeAndCapacityAndTWConstraints(250));
+//		vrpBuilder.setDepot("0", 0.0, 0.0);
+		for(Integer i=1;i<demand.size();i++){
+			vrpBuilder.addJob(VrpUtils.createShipment(i.toString(), "0", i.toString(), demand.get(i), 
+					VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
 		}
-		constraints = new CapacityConstraint();
 		
-		vrpBuilder.setDepot(depot);
 		RandomNumberGeneration.reset();
 	}
 	
 	public void testSizeOfSolution(){
-		vrpBuilder.setVehicleType(23);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 23));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
-		Collection<Tour> solution = algo.getSolution();
-		assertEquals(solution.size(),2);
+		int active = getActiveVehicles(algo.getSolution());
+		assertEquals(2,active);
  	}
 	
 	public void testSolutionValue(){
-		vrpBuilder.setVehicleType(23);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 23));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
+		
 		Collection<Tour> solution = algo.getSolution();
 		int solVal = 0;
 		for(Tour t : solution){
 			solVal += t.costs.distance;
 		}
-		assertEquals(solVal,397);
- 	}
-	
-	public void testCustomerSequence(){
-		vrpBuilder.setVehicleType(23);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
-		algo.run();
-		Collection<Tour> solution = algo.getSolution();
-		List<Tour> solList = new ArrayList<Tour>(solution);
-		assertEquals(solList.get(0).getActivities().get(0).getCustomer().getId(),"0");
-		assertEquals(solList.get(0).getActivities().get(1).getCustomer().getId(),"2");
-		assertEquals(solList.get(0).getActivities().get(2).getCustomer().getId(),"1");
-		assertEquals(solList.get(0).getActivities().get(3).getCustomer().getId(),"3");
-		assertEquals(solList.get(0).getActivities().get(4).getCustomer().getId(),"4");
-		assertEquals(solList.get(0).getActivities().get(5).getCustomer().getId(),"0");
-		
-		assertEquals(solList.get(1).getActivities().get(0).getCustomer().getId(),"0");
-		assertEquals(solList.get(1).getActivities().get(1).getCustomer().getId(),"7");
-		assertEquals(solList.get(1).getActivities().get(2).getCustomer().getId(),"8");
-		assertEquals(solList.get(1).getActivities().get(3).getCustomer().getId(),"9");
-		assertEquals(solList.get(1).getActivities().get(4).getCustomer().getId(),"5");
-		assertEquals(solList.get(1).getActivities().get(5).getCustomer().getId(),"6");
-		assertEquals(solList.get(1).getActivities().get(6).getCustomer().getId(),"0");
-
+		assertEquals(397,solVal);
  	}
 	
 	public void testSolutionSizeWithCapacity16(){
-		vrpBuilder.setVehicleType(16);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("2","0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("3","0", 16));
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
-		Collection<Tour> solution = algo.getSolution();
-		assertEquals(solution.size(),3);
+		int active = getActiveVehicles(algo.getSolution());
+		assertEquals(3,active);
 	}
 	
 	public void testSolutionValueWithCapacity16(){
-		vrpBuilder.setVehicleType(16);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("1","0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16));
+		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16));
+		VehicleRoutingProblem vrp = vrpBuilder.build();
+		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
+		
 		Collection<Tour> solution = algo.getSolution();
 		int solVal = 0;
 		for(Tour t : solution){
@@ -193,34 +160,15 @@ public class RuinAndRecreateTest extends TestCase{
 		}
 		assertEquals(solVal,445);
 	}
-	
-	public void testCustomerSequenceCap16(){
-		vrpBuilder.setVehicleType(16);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		SingleDepotVRP vrp = vrpBuilder.buildVRP();
-		
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp), vrp.getVehicleType().capacity);
-		algo.run();
-		Collection<Tour> solution = algo.getSolution();
-		List<Tour> solList = new ArrayList<Tour>(solution);
-		assertEquals(solList.get(0).getActivities().get(0).getCustomer().getId(),"0");
-		assertEquals(solList.get(0).getActivities().get(1).getCustomer().getId(),"1");
-		assertEquals(solList.get(0).getActivities().get(2).getCustomer().getId(),"3");
-		assertEquals(solList.get(0).getActivities().get(3).getCustomer().getId(),"2");
-		assertEquals(solList.get(0).getActivities().get(4).getCustomer().getId(),"0");
-		
-		assertEquals(solList.get(1).getActivities().get(0).getCustomer().getId(),"0");
-		assertEquals(solList.get(1).getActivities().get(1).getCustomer().getId(),"7");
-		assertEquals(solList.get(1).getActivities().get(2).getCustomer().getId(),"8");
-		assertEquals(solList.get(1).getActivities().get(3).getCustomer().getId(),"9");
-		assertEquals(solList.get(1).getActivities().get(4).getCustomer().getId(),"6");
-		assertEquals(solList.get(1).getActivities().get(5).getCustomer().getId(),"0");
-		
-		assertEquals(solList.get(2).getActivities().get(0).getCustomer().getId(),"0");
-		assertEquals(solList.get(2).getActivities().get(1).getCustomer().getId(),"5");
-		assertEquals(solList.get(2).getActivities().get(2).getCustomer().getId(),"4");
-		assertEquals(solList.get(2).getActivities().get(3).getCustomer().getId(),"0");
- 	}
+
+	private int getActiveVehicles(Collection<Tour> solution) {
+		int active = 0;
+		for(Tour t : solution){
+			if(t.getActivities().size()>2){
+				active++;
+			}
+		}
+		return active;
+	}
 
 }

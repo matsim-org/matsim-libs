@@ -1,7 +1,6 @@
 package org.matsim.contrib.freight.trade;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.carrier.Shipment;
 
 public class Service {

@@ -20,8 +20,8 @@
  */
 package org.matsim.contrib.freight.vrp.basics;
 
-import org.matsim.contrib.freight.vrp.api.Costs;
-import org.matsim.contrib.freight.vrp.api.Node;
+import org.apache.log4j.Logger;
+
 
 
 /**
@@ -30,24 +30,41 @@ import org.matsim.contrib.freight.vrp.api.Node;
  */
 public class CrowFlyCosts implements Costs{
 	
+	private static Logger logger = Logger.getLogger(CrowFlyCosts.class);
+	
 	public int speed = 1;
 	
 	public double detourFactor = 1.0;
 	
-	@Override
-	public Double getGeneralizedCost(Node from, Node to, double time) {
-		return getDistance(from, to, 0.0);
+	private Locations locations;
+	
+	public CrowFlyCosts(Locations locations) {
+		super();
+		this.locations = locations;
 	}
 
 	@Override
-	public Double getDistance(Node from, Node to, double time) {
-		return EuclideanDistanceCalculator.calculateDistance(from.getCoord(), to.getCoord())*detourFactor;
+	public Double getGeneralizedCost(String fromId, String toId, double time) {
+		return getDistance(fromId, toId, 0.0);
+	}
+
+	@Override
+	public Double getDistance(String fromId, String toId, double time) {
+		Double dist;
+		try{
+			dist = EuclideanDistanceCalculator.calculateDistance(locations.getCoord(fromId), locations.getCoord(toId))*detourFactor;
+		}
+		catch(NullPointerException e){
+			logger.debug(fromId + " " + toId + " no dist found");
+			throw new NullPointerException();
+		}
+		return dist; 
 	}
 
 
 	@Override
-	public synchronized Double getTransportTime(Node from, Node to, double time) {
-		return getDistance(from, to, 0.0)/speed;
+	public Double getTransportTime(String fromId, String toId, double time) {
+		return getDistance(fromId, toId, 0.0)/speed;
 	}
 
 }

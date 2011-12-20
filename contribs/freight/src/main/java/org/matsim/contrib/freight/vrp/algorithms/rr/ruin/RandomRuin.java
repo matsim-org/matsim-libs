@@ -18,22 +18,16 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.ruin;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Shipment;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
-import org.matsim.contrib.freight.vrp.api.Customer;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.VrpUtils;
-
-
-
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 /**
  * In the random-ruin strategy, current solution is ruined randomly. I.e. customer are removed randomly from current solution.
@@ -44,15 +38,13 @@ import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 public class RandomRuin implements RuinStrategy {
 	
-	private Logger logger = Logger.getLogger(RadialRuin.class);
+	private Logger logger = Logger.getLogger(RandomRuin.class);
 
-	private SingleDepotVRP vrp;
+	private VehicleRoutingProblem vrp;
 
 	private double fractionOfAllNodes2beRuined;
 	
-	private List<Shipment> shipmentsWithoutService = new ArrayList<Shipment>();
-	
-	private List<Customer> customersWithoutDepot = new ArrayList<Customer>();
+	private List<Job> unassignedJobs = new ArrayList<Job>();
 	
 	private Random random = RandomNumberGeneration.getRandom();
 	
@@ -60,117 +52,51 @@ public class RandomRuin implements RuinStrategy {
 		this.random = random;
 	}
 
-	public RandomRuin(SingleDepotVRP vrp) {
+	public RandomRuin(VehicleRoutingProblem vrp) {
 		super();
 		this.vrp = vrp;
 		logger.info("initialise random ruin");
-		makeCustomersWithoutDepot();
 		logger.info("done");
 	}
 
-	private void makeCustomersWithoutDepot() {
-		for(Customer c : vrp.getCustomers().values()){
-			if(!isDepot(c)){
-				customersWithoutDepot.add(c);
-			}
-		}
-		
-	}
-
-	private boolean isDepot(Customer c) {
-		if(vrp.getDepot().getId().equals(c.getId())){
-			return true;
-		}
-		return false;
-	}
-
 	@Override
-	public void run(Solution initialSolution) {
+	public void run(RRSolution initialSolution) {
 		clear();
-		int nOfCustomers2BeRemoved = selectNumberOfNearestNeighbors();
-		List<Customer> customerList = copyList(customersWithoutDepot);
-		List<TourAgent> agent2BeRemoved = new ArrayList<TourAgent>();
-		for(int i=0;i<nOfCustomers2BeRemoved;i++){
-			Customer customer = pickRandomCustomer(customerList);
-			logger.debug("randCust: " + customer);
+		int nOfJobs2BeRemoved = selectNuOfJobs2BeRemoved();
+		LinkedList<Job> availableJobs = new LinkedList<Job>(vrp.getJobs().values());
+		for(int i=0;i<nOfJobs2BeRemoved;i++){
+			Job job = pickRandomJob(availableJobs);
+			logger.debug("randomJob: " + job);
 			for(TourAgent agent : initialSolution.getTourAgents()){
-				if(agent.hasCustomer(customer)){
-					Shipment shipment = null;
-					agent.removeCustomer(customer);
-					logger.debug("remCust: " + customer);
-					customerList.remove(customer);
-					if(customer.hasRelation()){
-						Customer relatedCustomer = customer.getRelation().getCustomer();
-						agent.removeCustomer(relatedCustomer);
-						customerList.remove(relatedCustomer);
-						logger.debug("remCust: " + relatedCustomer);
-						shipment = makeShipment(customer, relatedCustomer);
-					}
-					else{
-						shipment = makeShipment(customer);
-					}
-					shipmentsWithoutService.add(shipment);
-					if(agent.getTourSize() < 3){
-						agent2BeRemoved.add(agent);
-					}
-					break;
+				if(agent.hasJob(job)){
+					agent.removeJob(job);
+					unassignedJobs.add(job);
+					availableJobs.remove(job);
 				}
 			}
 		}
-		for(TourAgent vA : agent2BeRemoved){
-			initialSolution.getTourAgents().remove(vA);
-		}
 	}
 
-	private List<Customer> copyList(Collection<Customer> collection) {
-		List<Customer> customerList = new ArrayList<Customer>(collection);
-		return customerList;
+	private Job pickRandomJob(LinkedList<Job> availableJobs) {
+		int randomIndex = random.nextInt(availableJobs.size());
+		return availableJobs.get(randomIndex);
 	}
 
 	public void setFractionOfAllNodes2beRuined(double fractionOfAllNodes2beRuined) {
 		this.fractionOfAllNodes2beRuined = fractionOfAllNodes2beRuined;
 	}
 	
-	private int selectNumberOfNearestNeighbors(){
-		return (int)Math.round(customersWithoutDepot.size()*fractionOfAllNodes2beRuined);
-	}
-	
-	private Customer pickRandomCustomer(List<Customer> customerList) {
-		int totNuOfNodes = customerList.size();
-		int randomIndex = random.nextInt(totNuOfNodes);
-		Customer customer = customerList.get(randomIndex);
-		return customer;
+	private int selectNuOfJobs2BeRemoved(){
+		return (int)Math.round(vrp.getJobs().values().size()*fractionOfAllNodes2beRuined);
 	}
 	
 	private void clear() {
-		shipmentsWithoutService.clear();
-	}
-	
-	private Shipment makeShipment(Customer customer, Customer relatedCustomer) {
-		Shipment shipment = null;
-		if(customer.getDemand() < 0){
-			shipment = VrpUtils.createShipment(relatedCustomer, customer);
-		}
-		else{
-			shipment = VrpUtils.createShipment(customer, relatedCustomer);
-		}
-		return shipment;
-	}
-
-	private Shipment makeShipment(Customer customer) {
-		Shipment shipment = null;
-		if(customer.getDemand() < 0){
-			shipment = VrpUtils.createShipment(vrp.getDepot(), customer);
-		}
-		else{
-			shipment = VrpUtils.createShipment(customer, vrp.getDepot());
-		}
-		return shipment;
+		unassignedJobs.clear();
 	}
 
 	@Override
-	public List<Shipment> getShipmentsWithoutService() {
-		return shipmentsWithoutService;
+	public List<Job> getUnassignedJobs() {
+		return unassignedJobs;
 	}
 
 }

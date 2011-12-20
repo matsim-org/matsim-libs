@@ -17,12 +17,13 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
+import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.StandardRuinAndRecreateFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityConstraint;
-import org.matsim.contrib.freight.vrp.api.Costs;
+import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,8 +40,8 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
-			solver.setConstraints(new CapacityConstraint());
-			solver.setIniSolutionFactory(new SingleDepotInitialSolutionFactoryImpl());
+			solver.setConstraints(new PickAndDeliveryCapacityAndTWConstraint());
+			solver.setIniSolutionFactory(new InitialSolution());
 			solver.setnOfWarmupIterations(20);
 			solver.setnOfIterations(50);
 			return solver;
@@ -61,10 +62,22 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 		scenario = ScenarioUtils.createScenario(config);
 		shipments = new ArrayList<CarrierShipment>();
 		vehicles = new ArrayList<CarrierVehicle>();
-		costs = new CrowFlyCosts();
+		createTestNetwork();
+		costs = new CrowFlyCosts(new org.matsim.contrib.freight.vrp.basics.Locations(){
+
+			@Override
+			public Coordinate getCoord(String id) {
+				Coord coord = scenario.getNetwork().getLinks().get(makeId(id)).getCoord();
+				return makeCoordinate(coord);
+			}
+
+			private Coordinate makeCoordinate(Coord coord) {
+				return new Coordinate(coord.getX(),coord.getY());
+			}
+			
+		});
 		costs.speed = 18;
 		costs.detourFactor = 1.2;
-		createTestNetwork();
 		RandomNumberGeneration.reset();
 	}
 	

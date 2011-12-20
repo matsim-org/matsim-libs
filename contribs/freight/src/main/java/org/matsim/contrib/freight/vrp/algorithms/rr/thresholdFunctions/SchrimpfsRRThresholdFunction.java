@@ -17,7 +17,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions;
 
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.ThresholdFunction;
 
 /**
  * See 

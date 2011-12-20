@@ -1,73 +1,73 @@
 package org.matsim.contrib.freight.vrp;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.vrp.api.Constraints;
-import org.matsim.contrib.freight.vrp.api.Costs;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotVRPImpl;
-import org.matsim.contrib.freight.vrp.basics.VehicleType;
+import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.vrp.basics.Constraints;
+import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.Shipment;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VRPImpl;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 public class MatSimSingleDepotVRPBuilder {
 	
 	private Constraints constraints;
 	
-	private MatSim2VRPTransformation matsim2vrp;
+	private MatSim2VRP matsim2vrpRecorder;
 	
 	private Costs costs;
 	
-	private Id depot;
+	private String depotLocationId;
 	
-	private Id depotLocation;
+	private Collection<Vehicle> vehicles;
 	
-	private VehicleType vehicleType;
-	
-	public MatSimSingleDepotVRPBuilder(Id depotId, Id depotLocationId, VehicleType vehicleType, MatSim2VRPTransformation matsim2vrp) {
-		super();
-		this.matsim2vrp = matsim2vrp;
-		this.depot = depotId;
-		this.depotLocation = depotLocationId;
-		this.vehicleType = vehicleType;
-	}
-	
-	/**
-	 * Use this method to register a transport relation from a customer to the depot, i.e. pickup smth from customer and deliver it to the depot.
-	 * @param carrierShipment
-	 */
-	public void addPickupForDepotShipment(CarrierShipment carrierShipment){
-		if(!carrierShipment.getTo().equals(depotLocation)){
-			throw new IllegalStateException("a pickupForDepot-shipment must have the depotLocation as destination (i.e. shipment.getTo() must return depotLocation)");
-		}
-		matsim2vrp.addPickupForDepotShipment(carrierShipment);
-	}
-	
-	/**
-	 * Use this method to register a transport relation from the depot to a customer, i.e. pickup smth in the depot to deliver it to a customer. 
-	 * @param carrierShipment
-	 */
-	public void addDeliveryFromDepotShipment(CarrierShipment carrierShipment){
-		if(!carrierShipment.getFrom().equals(depotLocation)){
-			throw new IllegalStateException("a deliveryFromDepotShipment-shipment must have the depotLocation as origint (i.e. shipment.getFrom() must return depotLocation)");
-		}
-		matsim2vrp.addDeliveryFromDepotShipment(carrierShipment);
-	}
-	
-	/**
-	 * Use this method to register a transport relation occurring during the route, i.e. the pickup activity occurs after the vehicle has started from depot and 
-	 * the delivery activity occurs before the vehicle heads back to the depot. In principle, even relation from the depot to a customer (and the other way around) can
-	 * be formulated as enRoutePickupAndDelivery problem. This however is by far more complex than simple depot customer relations.  
-	 * @param carrierShipment
-	 */
-	public void addEnRoutePickupAndDeliveryShipment(CarrierShipment carrierShipment){
-		matsim2vrp.addEnRoutePickupAndDeliveryShipment(carrierShipment);
-	}
-	
+	private Integer shipmentIdCounter = 1;
 
-	public MatSim2VRPTransformation getVrpTransformation() {
-		return matsim2vrp;
+	public MatSimSingleDepotVRPBuilder(Id depotLocationId, Collection<CarrierVehicle> vehicles, MatSim2VRP matsim2vrpRecorder, 
+			Network network) {
+		super();
+		this.matsim2vrpRecorder = matsim2vrpRecorder;
+		this.depotLocationId = depotLocationId.toString();
+		makeVehicles(vehicles);
 	}
 	
+	private void makeVehicles(Collection<CarrierVehicle> vehicles) {
+		for(CarrierVehicle v : vehicles){
+			VrpUtils.createVehicle(v.getVehicleId().toString(), v.getLocation().toString(), v.getCapacity());
+			vehicles.add(v);
+		}
+	}
+
+	public void addShipment(CarrierShipment carrierShipment, double pickupServiceTime, double deliveryServiceTime){
+		Shipment vrpShipment = buildVrpShipment(carrierShipment,pickupServiceTime,deliveryServiceTime);
+		matsim2vrpRecorder.addShipmentEntry(carrierShipment, vrpShipment);
+	}
+		
+	private Shipment buildVrpShipment(CarrierShipment carrierShipment, double pickupServiceTime, double deliveryServiceTime) {
+		String id = makeId();
+		Shipment s = VrpUtils.createShipment(id, carrierShipment.getFrom().toString(),carrierShipment.getTo().toString(),
+				carrierShipment.getSize(), makeTW(carrierShipment.getPickupTimeWindow()),makeTW(carrierShipment.getDeliveryTimeWindow()));
+		s.setPickupServiceTime(pickupServiceTime);
+		s.setDeliveryServiceTime(deliveryServiceTime);
+		return s;
+	}
+
+	private String makeId() {
+		String id = shipmentIdCounter.toString();
+		shipmentIdCounter++;
+		return id;
+	}
+
+	private org.matsim.contrib.freight.vrp.basics.TimeWindow makeTW(TimeWindow timeWindow) {
+		return VrpUtils.createTimeWindow(timeWindow.getStart(), timeWindow.getEnd());
+	}
+
 	/**
 	 * 
 	 * @param constraints
@@ -88,26 +88,21 @@ public class MatSimSingleDepotVRPBuilder {
 	 * 
 	 * @return
 	 */
-	public SingleDepotVRP buildVRP(){
+	public VehicleRoutingProblem buildVRP(){
 		verify();
-		matsim2vrp.addAndCreateCustomer(depot, depotLocation, 0, 0.0, Double.MAX_VALUE, 0.0);
-		SingleDepotVRPImpl vrp = new SingleDepotVRPImpl(depot.toString(), vehicleType, matsim2vrp.getCustomers(), costs, constraints);
+		VRPImpl vrp = new VRPImpl(matsim2vrpRecorder.getVrpShipments(), vehicles, 
+				costs, constraints);
 		return vrp;
 	}
-	
+
 	private void verify() {
-		if(depot == null){
-			throw new IllegalStateException("no depot set");
-		}
 		if(constraints == null){
 			throw new IllegalStateException("no constraints set");
 		}
 		if(costs == null){
 			throw new IllegalStateException("no costs set");
 		}
-		if(vehicleType == null){
-			throw new IllegalStateException("no vehicleType set");
-		}
 	}
+
 
 }

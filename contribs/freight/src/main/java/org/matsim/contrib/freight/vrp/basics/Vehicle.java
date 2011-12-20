@@ -25,35 +25,30 @@ package org.matsim.contrib.freight.vrp.basics;
  */
 
 public class Vehicle{
+	
 	private int capacity;
 	
-	private String id;
+	private String locationId;
 	
-	public String getId() {
-		return id;
-	}
+	private String id;
 
-	public void setId(String id) {
+	public Vehicle(String id, String locationId, int capacity) {
+		super();
+		this.capacity = capacity;
+		this.locationId = locationId;
 		this.id = id;
 	}
-
-	private String locationId;
 
 	public String getLocationId() {
 		return locationId;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 	public void setLocationId(String locationId) {
 		this.locationId = locationId;
-	}
-
-	public Vehicle(int capacity) {
-		super();
-		this.capacity = capacity;
-	}
-
-	public Vehicle(VehicleType type) {
-		this.capacity = type.capacity;
 	}
 
 	public int getCapacity() {

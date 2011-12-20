@@ -22,15 +22,12 @@ import java.util.Collection;
 
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RecreationStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinAndRecreateListener;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.RuinStrategy;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.ThresholdFunction;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
-import org.matsim.contrib.freight.vrp.api.VRP;
+import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.RecreationStrategy;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RuinStrategy;
+import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.ThresholdFunction;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
@@ -53,7 +50,7 @@ public class RuinAndRecreate {
 
 	private RecreationStrategy recreationStrategy;
 	
-	private VRP vrp;
+	private VehicleRoutingProblem vrp;
 	
 	private int nOfMutations = 100;
 	
@@ -61,7 +58,7 @@ public class RuinAndRecreate {
 	
 	private int currentMutation = 0;
 	
-	private Solution currentSolution;
+	private RRSolution currentSolution;
 	
 	private ThresholdFunction thresholdFunction;
 	
@@ -75,7 +72,7 @@ public class RuinAndRecreate {
 	
 	private int lastPrint = 1;
 	
-	public RuinAndRecreate(SingleDepotVRP vrp, Solution iniSolution, int nOfMutations) {
+	public RuinAndRecreate(VehicleRoutingProblem vrp, RRSolution iniSolution, int nOfMutations) {
 		this.vrp = vrp;
 		this.currentSolution = iniSolution;
 		this.nOfMutations = nOfMutations;
@@ -110,12 +107,12 @@ public class RuinAndRecreate {
 		logger.info("#warmupIterations="+warmUpIterations+ "; #iterations="+nOfMutations);
 		verify();
 		init();
-		logger.info("#customer: " + vrp.getCustomers().values().size());
+		logger.info("#jobs: " + vrp.getJobs().values().size());
 		randomWalk(warmUpIterations);
 		logger.info("run mutations");
 		resetIterations();
 		while(currentMutation < nOfMutations){
-			Solution tentativeSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+			RRSolution tentativeSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
 			ruinAndRecreate(tentativeSolution);
 			double tentativeResult = tentativeSolution.getResult();
 			double currentResult = currentSolution.getResult();
@@ -143,11 +140,11 @@ public class RuinAndRecreate {
 		thresholdFunction.setInitialThreshold(initialThreshold);
 	}
 
-	private void ruinAndRecreate(Solution solution) {
+	private void ruinAndRecreate(RRSolution solution) {
 		RuinStrategy ruinStrategy = ruinStrategyManager.getRandomStrategy();
 		logger.debug("stratClass=" + ruinStrategy.getClass());
 		ruinStrategy.run(solution);
-		recreationStrategy.run(solution,ruinStrategy.getShipmentsWithoutService());
+		recreationStrategy.run(solution,ruinStrategy.getUnassignedJobs());
 	}
 
 	private void randomWalk(int nOfIterations) {
@@ -155,7 +152,7 @@ public class RuinAndRecreate {
 			return;
 		}
 		logger.info("random walk for threshold determination");
-		Solution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
+		RRSolution initialSolution = VrpUtils.copySolution(currentSolution, vrp, tourAgentFactory);
 		resetIterations();
 		double[] results = new double[nOfIterations];
 		for(int i=0;i<nOfIterations;i++){

@@ -8,13 +8,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.GeneralActivity;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.MatsimXmlWriter;
 
 
 public class CarrierPlanWriter extends MatsimXmlWriter{

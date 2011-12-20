@@ -17,8 +17,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.basics;
 
-import org.matsim.contrib.freight.vrp.api.Costs;
-import org.matsim.contrib.freight.vrp.api.Node;
 
 /**
  * 
@@ -30,24 +28,32 @@ public class ManhattanCosts implements Costs {
 
 	public double speed = 1;
 	
-	@Override
-	public Double getGeneralizedCost(Node from, Node to, double time) {
-		return getDistance(from, to, 0.0);
+	private Locations locations;
+
+	public ManhattanCosts(Locations locations) {
+		super();
+		this.locations = locations;
 	}
 
 	@Override
-	public Double getDistance(Node from, Node to, double time) {
-		return calculateDistance(from, to);
+	public Double getGeneralizedCost(String fromId, String toId, double time) {
+		return getDistance(fromId, toId, 0.0);
 	}
 
 	@Override
-	public Double getTransportTime(Node from, Node to, double time) {
-		double transportTime = calculateDistance(from, to)/speed;
+	public Double getDistance(String fromId, String toId, double time) {
+		return calculateDistance(fromId, toId);
+	}
+
+	@Override
+	public Double getTransportTime(String fromId, String toId, double time) {
+		double transportTime = calculateDistance(fromId, toId)/speed;
 		return transportTime;
 	}
 	
-	private double calculateDistance(Node from, Node to){
-		double distance = Math.abs(from.getCoord().getX() - to.getCoord().getX()) + Math.abs(from.getCoord().getY() - to.getCoord().getY());
+	private double calculateDistance(String fromId, String toId){
+		double distance = Math.abs(locations.getCoord(fromId).getX() - locations.getCoord(toId).getX()) + 
+			Math.abs(locations.getCoord(fromId).getY() - locations.getCoord(toId).getY());
 		return distance;
 	}
 

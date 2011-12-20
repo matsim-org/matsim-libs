@@ -42,8 +42,7 @@ import org.matsim.contrib.freight.replanning.CarrierPlanStrategy;
 import org.matsim.contrib.freight.replanning.PlanStrategyManager;
 import org.matsim.contrib.freight.replanning.ReRouteVehicles;
 import org.matsim.contrib.freight.vrp.RRPDTWSolverFactory;
-import org.matsim.contrib.freight.vrp.api.Costs;
-import org.matsim.contrib.freight.vrp.api.Node;
+import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -115,9 +114,9 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 		Costs costs = new Costs() {
 
 			@Override
-			public Double getGeneralizedCost(Node from, Node to, double time) {
-				Id fromLinkId = new IdImpl(from.getId());
-				Id toLinkId = new IdImpl(to.getId());
+			public Double getGeneralizedCost(String fromId, String toId, double time) {
+				Id fromLinkId = new IdImpl(fromId);
+				Id toLinkId = new IdImpl(toId);
 				Network network = event.getControler().getNetwork();
 				Link fromLink = network.getLinks().get(fromLinkId);
 				Link toLink = network.getLinks().get(toLinkId);
@@ -126,9 +125,9 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 			}
 
 			@Override
-			public Double getDistance(Node from, Node to, double time) {
-				Id fromLinkId = new IdImpl(from.getId());
-				Id toLinkId = new IdImpl(to.getId());
+			public Double getDistance(String fromId, String toId, double time) {
+				Id fromLinkId = new IdImpl(fromId);
+				Id toLinkId = new IdImpl(toId);
 				Network network = event.getControler().getNetwork();
 				Link fromLink = network.getLinks().get(fromLinkId);
 				Link toLink = network.getLinks().get(toLinkId);
@@ -137,9 +136,9 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 			}
 
 			@Override
-			public Double getTransportTime(Node from, Node to, double time) {
-				Id fromLinkId = new IdImpl(from.getId());
-				Id toLinkId = new IdImpl(to.getId());
+			public Double getTransportTime(String fromId, String toId, double time) {
+				Id fromLinkId = new IdImpl(fromId);
+				Id toLinkId = new IdImpl(toId);
 				Network network = event.getControler().getNetwork();
 				Link fromLink = network.getLinks().get(fromLinkId);
 				Link toLink = network.getLinks().get(toLinkId);

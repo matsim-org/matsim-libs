@@ -29,7 +29,6 @@
 package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.mobsim.*;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**

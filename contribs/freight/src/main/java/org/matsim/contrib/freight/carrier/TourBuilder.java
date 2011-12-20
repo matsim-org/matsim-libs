@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.GeneralActivity;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;

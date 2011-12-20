@@ -18,14 +18,11 @@
 package org.matsim.contrib.freight.vrp.basics;
 
 
-import java.util.Collection;
-
-import org.matsim.contrib.freight.vrp.api.Customer;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
 
 
 public interface SingleDepotInitialSolutionFactory {
 	
-	public Collection<Tour> createInitialSolution(SingleDepotVRP vrp);
+	public RRSolution createInitialSolution(VehicleRoutingProblem vrp);
 
 }

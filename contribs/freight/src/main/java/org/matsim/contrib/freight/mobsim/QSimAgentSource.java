@@ -28,16 +28,16 @@
 
 package org.matsim.contrib.freight.mobsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,7 +66,7 @@ public class QSimAgentSource implements AgentSource {
         for (Plan plan : plans) {
             MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(plan.getPerson());
             agents.add(agent);
-            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
+            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getCurrentLinkId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
         }
         return agents;
     }

@@ -5,12 +5,10 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.trade.CostMemory;
-import org.matsim.core.utils.geometry.CoordUtils;
-
 import org.matsim.contrib.freight.carrier.CarrierContract;
 import org.matsim.contrib.freight.carrier.CarrierCostCalculator;
 import org.matsim.contrib.freight.carrier.Shipment;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class MarginalCostOfContractCalculator implements CarrierCostCalculator {
 	

@@ -17,30 +17,50 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.TestCase;
+
 import org.junit.Ignore;
-import org.matsim.contrib.freight.vrp.algorithms.rr.api.TourAgent;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.RRTourAgentFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.basics.Solution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.CapacityPickupsDeliveriesSequenceConstraint;
-import org.matsim.contrib.freight.vrp.api.*;
-import org.matsim.contrib.freight.vrp.basics.*;
-
-
-import java.util.*;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
+import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.basics.Constraints;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
+import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
+import org.matsim.contrib.freight.vrp.basics.Shipment;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.Tour;
+import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
 @Ignore
 public class VRPTestCase extends TestCase{
+	
+	static class MyLocations implements Locations{
+
+		private Map<String,Coordinate> locations = new HashMap<String, Coordinate>();
+
+		@Override
+		public Coordinate getCoord(String id) {
+			return locations.get(id);
+		}
+		
+		public void add(String id, Coordinate coord){
+			locations .put(id,coord);
+		}
+		
+	}
 	
 	public Tour tour;
 	
 	public Costs costs;
 	
-	public Nodes nodes;
-	
-	public List<Customer> customers;
-	
-	public Map<String,Customer> customerMap;
+	public MyLocations locations;
 	
 	public Constraints constraints;
 	
@@ -66,111 +86,60 @@ public class VRPTestCase extends TestCase{
 	 *   
 	 */
 	
-	protected void initCustomersInPlainCoordinateSystem(){
-		costs = new ManhattanCosts();
-		nodes = new Nodes();
-		customers = new ArrayList<Customer>();
-		customerMap = new HashMap<String, Customer>();
-		createNodesAndCustomer();
-		constraints = new CapacityPickupsDeliveriesSequenceConstraint(20);
-		init = true;
-		
+	protected void initJobsInPlainCoordinateSystem(){
+		locations = new MyLocations();
+		createLocations();
+		costs = new ManhattanCosts(locations);
+		constraints = new PickAndDeliveryCapacityAndTWConstraint();
 	}
 	
-	protected SingleDepotVRP getVRP(int capacity){
-		if(!init){
-			initCustomersInPlainCoordinateSystem();
-			init = true;
-		}
-		Customer depot1 = customerMap.get(makeId(0,0));
-		depot1.setDemand(0);
-		SingleDepotVRPBuilder vrpBuilder = new SingleDepotVRPBuilder();
-		vrpBuilder.addCustomer(depot1);
-		vrpBuilder.setDepot(depot1);
-		vrpBuilder.addCustomer(customerMap.get(makeId(0,10)));
-		vrpBuilder.addCustomer(customerMap.get(makeId(10,10)));
-		Customer c1 = customerMap.get(makeId(1,4));
-		vrpBuilder.addCustomer(c1);
-		Customer c2 = customerMap.get(makeId(1,5));
-		vrpBuilder.addCustomer(c2);
-		setRelation(c1,c2);
-		vrpBuilder.setCosts(costs);
-		vrpBuilder.setConstraints(constraints);
-		vrpBuilder.setVehicleType(new VehicleType(capacity));
-		return vrpBuilder.buildVRP();
-	}
-	
-	protected Solution getInitialSolution(SingleDepotVRP vrp){
-		Collection<Tour> tours = new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp);
-		Collection<TourAgent> agents = new ArrayList<TourAgent>();
-		for(Tour t : tours){
-			VehicleType type = vrp.getVehicleType();
-			TourAgent a = new RRTourAgentFactory(vrp).createTourAgent(t, VrpUtils.createVehicle(type));
-			agents.add(a);
-		}
-		return new Solution(agents);
-	}
-	
-	protected Customer getDepot(){
-		return customerMap.get(makeId(0,0));
-	}
-	
-	protected void setRelation(Customer c1, Customer c2){
-		c1.setRelation(new Relation(c2));
-		c2.setRelation(new Relation(c1));
-	}
-	
-	protected TourAgent getTourAgent(VRP vrp, Tour tour1, VehicleType type1) {
-		return new RRTourAgentFactory(vrp).createTourAgent(tour1, VrpUtils.createVehicle(type1));
-	}
-	
-	protected Tour makeTour(Collection<Customer> tourSequence){
-		Tour tour = new Tour();
-		TourActivityFactory activityFactory = new TourActivityFactory();
-		for(Customer c : tourSequence){
-			tour.getActivities().add(activityFactory.createTourActivity(c));
-		}
-		return tour;
-	}
-
-	private void createNodesAndCustomer() {
+	private void createLocations() {
 		for(int i=0;i<11;i++){
 			for(int j=0;j<11;j++){
-				String nodeId = makeId(i,j);
-				Node node = makeNode(nodeId);
-				node.setCoord(makeCoord(i,j));
-				nodes.getNodes().put(nodeId, node);
-				Customer customer = makeCustomer(node);
-				if(i == 0 && j == 0){
-					customer.setDemand(0);
-				}
-				else if((i+j) % 2 == 0){
-					customer.setDemand(1);
-				}
-				else{
-					customer.setDemand(-1);
-				}
-				customers.add(customer);
-				customerMap.put(customer.getId(), customer);
+				String id = makeId(i,j);
+				Coordinate coord = makeCoord(i,j);
+				locations.add(id, coord);
 			}
 		}
 	}
 
-	private Customer makeCustomer(Node node) {
-		Customer customer = new CustomerImpl(node.getId(),node);
-		return customer;
+	protected VehicleRoutingProblem getVRP(int nOfVehicles, int capacity){
+		String depot = makeId(0,0);
+		VrpBuilder vrpBuilder = new VrpBuilder(costs, constraints);
+//		vrpBuilder.setDepot(depot, 0.0, Double.MAX_VALUE);
+		vrpBuilder.addJob(VrpUtils.createShipment("1", makeId(0,0), makeId(0,10), 1, 
+				VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
+		vrpBuilder.addJob(VrpUtils.createShipment("2", makeId(0,0), makeId(10,10), 1, 
+				VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
+		vrpBuilder.addJob(VrpUtils.createShipment("3", makeId(1,4), makeId(1,5), 1, 
+				VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE), VrpUtils.createTimeWindow(0.0, Double.MAX_VALUE)));
+		for(int i=0; i<nOfVehicles;i++){
+			vrpBuilder.addVehicle(VrpUtils.createVehicle(""+i, depot, capacity));
+		}
+		return vrpBuilder.build();
 	}
-
+	
+	protected RRSolution getInitialSolution(VehicleRoutingProblem vrp){
+		return new InitialSolution().createInitialSolution(vrp);
+	}
+	
+	protected TourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
+		return new RRTourAgentFactory(vrp).createTourAgent(tour1, vehicle);
+	}
+	
 	private Coordinate makeCoord(int i, int j) {
 		return new Coordinate(i,j);
 	}
 
-	private Node makeNode(String nodeId) {
-		return new NodeImpl(nodeId);
+	protected String makeId(int i, int j) {
+		return "" + i + "," + j;
+	}
+	
+	protected Shipment createShipment(String id, String from, String to){
+		Shipment s1 = VrpUtils.createShipment(id, from, to, 1, VrpUtils.createTimeWindow(0, Double.MAX_VALUE), 
+				VrpUtils.createTimeWindow(0, Double.MAX_VALUE));
+		return s1;
 	}
 
-	protected String makeId(int i, int j) {
-		return i + "," + j;
-	}
 
 }

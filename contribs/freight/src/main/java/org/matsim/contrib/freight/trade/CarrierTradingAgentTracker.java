@@ -1,13 +1,22 @@
 package org.matsim.contrib.freight.trade;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierContract;
 import org.matsim.contrib.freight.carrier.CarrierOffer;
 import org.matsim.contrib.freight.carrier.NoOffer;
-import org.matsim.contrib.freight.events.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import org.matsim.contrib.freight.events.CarrierOfferAcceptEvent;
+import org.matsim.contrib.freight.events.CarrierOfferAcceptEventHandler;
+import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
+import org.matsim.contrib.freight.events.CarrierOfferRejectEventHandler;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
+import org.matsim.contrib.freight.events.QueryCarrierOffersEventHandler;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractAcceptEventHandler;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEvent;
+import org.matsim.contrib.freight.events.TSPCarrierContractCanceledEventHandler;
 
 public class CarrierTradingAgentTracker implements QueryCarrierOffersEventHandler, CarrierOfferAcceptEventHandler, CarrierOfferRejectEventHandler,
 TSPCarrierContractAcceptEventHandler, TSPCarrierContractCanceledEventHandler {
