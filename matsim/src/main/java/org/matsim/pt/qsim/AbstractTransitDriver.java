@@ -62,6 +62,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
+	private MobsimEngine trEngine ;
 	
 	/* package */ MobsimAgent.State state = MobsimAgent.State.ACTIVITY ; 
 	// yy not so great: implicit instantiation at activity.  kai, nov'11
@@ -79,10 +80,12 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriver(MobsimEngine trEngine, TransitStopAgentTracker agentTracker2) {
+	public AbstractTransitDriver(MobsimEngine trEngine2, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.sim = trEngine.getMobsim() ;
+		this.sim = trEngine2.getMobsim() ;
 		this.agentTracker = agentTracker2;
+		this.trEngine = trEngine2 ; 
+		// (has to be of this type in order to work.  might as well fix type in constructor? kai, dec'11)
 	}
 
 	protected void init() {
@@ -275,6 +278,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndAssumeControl(time);
+			((TransitQSimEngine)this.trEngine).internalInterface.arrangeNextAgentState(agent) ;
+			// (cannot set trEngine to TransitQSimEngine because there are tests where this will not work. kai, dec'11)
 		}
 		return handled;
 	}

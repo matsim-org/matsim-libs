@@ -109,13 +109,10 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	private final double stucktimeCache;
 	private final DepartureHandler dpHandler ;
 	
-	private InternalInterface internalInterface = null ;
+	/*package*/ InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
-	}
-	/* package */ void arrangeNextAgentAction( MobsimAgent agent ) {
-		this.internalInterface.arrangeNextAgentState(agent) ;
 	}
 
 	public QNetsimEngine(final QSim sim, final Random random) {

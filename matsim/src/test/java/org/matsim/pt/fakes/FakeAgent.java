@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -179,8 +180,7 @@ public class FakeAgent implements MobsimDriverAgent, PassengerAgent {
 
 	@Override
 	public State getState() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		return MobsimAgent.State.ABORT ;
 	}
 
 //	@Override

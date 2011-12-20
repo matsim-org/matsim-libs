@@ -76,8 +76,8 @@ public class TransitDriverTest extends MatsimTestCase {
 			this.internalInterface = internalInterface ;
 		}
 
-		FakeEngine( Netsim netsim ) {
-			this.netsim = netsim ;
+		FakeEngine( Netsim netsimTmp ) {
+			this.netsim = netsimTmp ;
 		}
 
 		@Override
@@ -312,10 +312,11 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker();
-    ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
-	TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine) ;
 
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));

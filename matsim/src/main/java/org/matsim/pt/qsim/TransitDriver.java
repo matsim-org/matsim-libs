@@ -99,7 +99,9 @@ public class TransitDriver extends AbstractTransitDriver {
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 
-		this.getSimulation().getAgentCounter().decLiving();
+//		this.getSimulation().getAgentCounter().decLiving();
+		this.state = MobsimAgent.State.ABORT ;
+		this.sim.reInsertAgentIntoMobsim(this) ;
 	}
 
 	@Override

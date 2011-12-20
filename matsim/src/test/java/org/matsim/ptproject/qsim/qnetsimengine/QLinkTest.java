@@ -198,6 +198,7 @@ public class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		driver.endActivityAndAssumeControl(0);
+		f.queueNetwork.simEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(f.qlink1.bufferIsEmpty());
 		assertEquals(0, f.qlink1.vehOnLinkCount());
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
@@ -351,7 +352,7 @@ public class QLinkTest extends MatsimTestCase {
 		/*package*/ final ScenarioImpl scenario;
 		/*package*/ final Link link1;
 		/*package*/ final Link link2;
-		/*package*/ final NetsimNetwork queueNetwork;
+		/*package*/ final QNetwork queueNetwork;
 		/*package*/ final QLinkImpl qlink1;
 		/*package*/ final QLinkImpl qlink2;
 		/*package*/ final Vehicle basicVehicle;
@@ -368,7 +369,7 @@ public class QLinkTest extends MatsimTestCase {
 			this.link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1.0, 1.0, 3600.0, 1.0);
 			this.link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0);
 			sim = QSim.createQSimAndAddAgentSource(scenario, (EventsUtils.createEventsManager()));
-			this.queueNetwork = sim.getNetsimNetwork();
+			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 			this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("1"));
 			this.qlink2 = (QLinkImpl) this.queueNetwork.getNetsimLink(new IdImpl("2"));
 

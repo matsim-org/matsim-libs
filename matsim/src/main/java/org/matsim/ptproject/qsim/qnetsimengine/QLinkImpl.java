@@ -381,7 +381,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
 						trDriver.endLegAndAssumeControl(now);
 						this.addParkedVehicle(veh);
-						this.network.simEngine.arrangeNextAgentAction(trDriver) ;
+						this.network.simEngine.internalInterface.arrangeNextAgentState(trDriver) ;
 						this.makeVehicleAvailableToNextDriver(veh, now);
 						// remove _after_ processing the arrival to keep link active
 						this.vehQueue.poll();

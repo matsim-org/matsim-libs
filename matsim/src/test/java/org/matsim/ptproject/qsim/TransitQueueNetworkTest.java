@@ -499,6 +499,7 @@ public class TransitQueueNetworkTest extends TestCase {
         // time 120: normalVeh2 departs, cannot be blocked from waitingQueue, so moved to buffer
         f.qsim.getSimTimer().setTime(120);
         f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+        f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(120);
 
         // time 121: normalVeh2 moves to qlink2 (exit-time 221)
@@ -550,6 +551,7 @@ public class TransitQueueNetworkTest extends TestCase {
         // time 120: normalVeh2 departs, moved to buffer
         f.qsim.getSimTimer().setTime(124);
         f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver());
         f.simEngine.doSimStep(124);
 
         // time 125: normalVeh2 moves to qlink2 (exit-time 225)
@@ -651,6 +653,7 @@ public class TransitQueueNetworkTest extends TestCase {
         // time 124: normalVeh2 departs, moved to buffer
         f.qsim.getSimTimer().setTime(124);
         f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(124);
 
         // time 125: normalVeh2 moves to qlink2 (exit-time 225)
@@ -764,6 +767,7 @@ public class TransitQueueNetworkTest extends TestCase {
         // time 124: normalVeh2 departs, moved to qlink1.buffer
         f.qsim.getSimTimer().setTime(124);
         f.normalVehicle2.getDriver().endActivityAndAssumeControl(124);
+        f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver()) ;
         f.simEngine.doSimStep(124);
         assertEquals(2, f.qlink2.getAllVehicles().size());
 
@@ -876,6 +880,7 @@ public class TransitQueueNetworkTest extends TestCase {
         // time 120: normalVeh2 departs, moved to qlink1.buffer
         f.qsim.getSimTimer().setTime(120);
         f.normalVehicle2.getDriver().endActivityAndAssumeControl(120);
+        f.qsim.internalInterface.arrangeNextAgentState(f.normalVehicle2.getDriver());
         f.simEngine.doSimStep(120);
         assertEquals(2, f.qlink2.getAllVehicles().size());
 

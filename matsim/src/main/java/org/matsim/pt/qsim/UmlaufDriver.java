@@ -138,7 +138,9 @@ public class UmlaufDriver extends AbstractTransitDriver {
 
 
 		} else {
-			this.getSimulation().getAgentCounter().decLiving();
+			this.state = MobsimAgent.State.ABORT ;
+//			this.getSimulation().getAgentCounter().decLiving();
+			this.sim.reInsertAgentIntoMobsim(this) ;
 		}
 	}
 

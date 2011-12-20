@@ -30,6 +30,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,6 +46,9 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.pt.qsim.TransitQSimEngine;
+import org.matsim.pt.qsim.TransitStopAgentTracker;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
@@ -209,7 +213,12 @@ public class OTFVis {
 		server.setSimulation(queueSimulationFeature);
 
 		if (config.scenario().isUseTransit()) {
-            FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(scenario.getNetwork(), ((ScenarioImpl) scenario).getTransitSchedule(), qSim.getTransitEngine().getAgentTracker());
+			
+            Network network = scenario.getNetwork();
+			TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
+			TransitQSimEngine transitEngine = qSim.getTransitEngine();
+			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
+			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker);
 			server.addAdditionalElement(facilityWriter);
 		}
 

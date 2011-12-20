@@ -313,6 +313,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine) ;
 
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
@@ -374,6 +375,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(sc, ((EventsManager) EventsUtils.createEventsManager()));
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine) ;
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -391,8 +393,10 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 		driver.endActivityAndAssumeControl(0);
+		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Leg);
 		driver.endLegAndAssumeControl(1);
+		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentPlanElement() instanceof Activity);
 	}
 

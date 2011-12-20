@@ -443,6 +443,7 @@ public final class QSim implements VisMobsim, Netsim {
 			this.arrangeAgentDeparture(agent) ; 
 			break ;
 		case ABORT:
+			this.agents.remove(agent) ;
 			this.getAgentCounter().decLiving();
 			this.getAgentCounter().incLost();
 			break ;
@@ -662,6 +663,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private void printSimLog(final double time) {
 		if (time >= this.infoTime) {
+//		if(true){
 			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
 			long diffreal = (endtime.getTime() - this.realWorldStarttime
@@ -750,8 +752,16 @@ public final class QSim implements VisMobsim, Netsim {
 
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {
         if (mobsimEngine instanceof TransitQSimEngine) {
+        	if ( this.transitEngine != null ) {
+        		log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
+        				"there can only be one TransitQSimEngine") ;
+        	}
             this.transitEngine = (TransitQSimEngine) mobsimEngine;
         } if (mobsimEngine instanceof MultiModalSimEngine) {
+        	if ( this.multiModalEngine != null ) {
+        		log.warn("pre-existing multiModalEngine != null; will be overwritten; with the current design, " +
+        				"there can only be one MultiModalSimEngine") ;
+        	}
         	this.multiModalEngine = (MultiModalSimEngine) mobsimEngine;
         }
         

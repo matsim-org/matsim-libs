@@ -161,8 +161,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 		
 		if ( this.state.equals( MobsimAgent.State.ABORT ) ) {
 			log.warn("found agent state of ABORT.  Not re-inserting the agent in the mobsim ...") ;
+//			log.warn("found agent state of ABORT.  Sending agent.ABORT to mobsim ...") ;
 			this.simulation.getAgentCounter().decLiving();
 			this.simulation.getAgentCounter().incLost();
+//			this.simulation.reInsertAgentIntoMobsim(this);
 			return ;
 		}
 
