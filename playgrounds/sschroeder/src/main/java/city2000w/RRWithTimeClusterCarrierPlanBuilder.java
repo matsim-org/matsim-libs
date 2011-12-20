@@ -1,18 +1,36 @@
 package city2000w;
 
-import freight.TourScheduler;
-import freight.utils.*;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.vrp.VRPSolver;
-import org.matsim.contrib.freight.vrp.VRPSolverFactory;
-import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierShipment;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Shipment;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.TourBuilder;
+import org.matsim.contrib.freight.vrp.VRPSolver;
+import org.matsim.contrib.freight.vrp.VRPSolverFactory;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
+import org.matsim.contrib.freight.vrp.basics.Costs;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+import org.matsim.core.basic.v01.IdImpl;
+
+import freight.TourScheduler;
+import freight.utils.GreedyShipmentAggregator;
+import freight.utils.ShipmentClustererImpl;
+import freight.utils.TimePeriod;
+import freight.utils.TimePeriods;
+import freight.utils.TimeSchema;
 
 public class RRWithTimeClusterCarrierPlanBuilder {
 	
@@ -69,6 +87,22 @@ public class RRWithTimeClusterCarrierPlanBuilder {
 		if(contracts.isEmpty()){
 			return getEmptyPlan(carrierCapabilities);
 		}
+		CrowFlyCosts crowFlyDistance = new CrowFlyCosts(new Locations(){
+
+			@Override
+			public Coordinate getCoord(String id) {
+				return makeCoordinate(network.getLinks().get(makeId(id)).getCoord());
+			}
+			
+			private Coordinate makeCoordinate(Coord coord) {
+				return new Coordinate(coord.getX(),coord.getY());
+			}
+
+			public Id makeId(String id){
+				return new IdImpl(id);
+			}
+			
+		});
 		ShipmentClustererImpl shipmentClusterer = new ShipmentClustererImpl(timePeriods);
 		Map<TimePeriod, Collection<Shipment>> clusteredShipments = shipmentClusterer.clusterShipments(getShipments(contracts));
 		
@@ -80,7 +114,6 @@ public class RRWithTimeClusterCarrierPlanBuilder {
 				continue;
 			}
 			Map<CarrierShipment,Collection<CarrierShipment>> aggregatedShipments = greedyShipmentAggregator.aggregateShipments(shipments);
-			CrowFlyCosts crowFlyDistance = new CrowFlyCosts();
 			crowFlyDistance.speed = 18;
 			crowFlyDistance.detourFactor = 1.2;
 			VRPSolver vrpSolver = solverFactory.createSolver(aggregatedShipments.keySet(), carrierCapabilities.getCarrierVehicles(), network, crowFlyDistance);

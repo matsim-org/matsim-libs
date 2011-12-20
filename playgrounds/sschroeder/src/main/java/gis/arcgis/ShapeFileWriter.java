@@ -33,10 +33,12 @@ public class ShapeFileWriter {
 		this.features = simpleFeatureCollection;
 	}
 
-	public void writeFeatures(String filename) throws IOException{
+	public void writeFeatures(String filename) {
 		 /*
          * Get an output file name and create the new shapefile
          */
+		try{
+		
         verify(features);
 		
 		File newFile = new File(filename);
@@ -79,6 +81,11 @@ public class ShapeFileWriter {
             System.out.println(typeName + " does not support read/write access");
             System.exit(1);
         }
+		}
+		catch(IOException e){
+			System.out.println(e.toString());
+            System.exit(1);
+		}
 	}
 
 	private static void verify(FeatureCollection<SimpleFeatureType, SimpleFeature> features) {

@@ -1,11 +1,21 @@
 package city2000w;
 
-import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 import gis.arcgis.NutsRegionShapeReader;
-import kid.*;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import kid.KiDDataReader;
+import kid.KiDPlanAgentCreator;
+import kid.KiDStatWriter;
+import kid.KiDUtils;
+import kid.ScheduledVehicles;
 import kid.filter.And;
 import kid.filter.AtLeastOneActivitiesInSelectedRegionsFilter;
 import kid.filter.LogicVehicleFilter;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -19,10 +29,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 
 
 public class KarlsruheKiDPopulationGenerator {
@@ -46,7 +53,7 @@ public class KarlsruheKiDPopulationGenerator {
 		List<SimpleFeature> regions = new ArrayList<SimpleFeature>();
 		NutsRegionShapeReader regionReader = new NutsRegionShapeReader(regions, new KarlsruheNetworkCreator.KarlsruheRegierungsBezirksFilter(), null);
 		regionReader.read(directory + "regions_europe_wgsUtm32N.shp");
-		kidReader.setScheduledVehicleFilter(new AtLeastOneActivitiesInSelectedRegionsFilter(regions));
+//		kidReader.setScheduledVehicleFilter(new AtLeastOneActivitiesInSelectedRegionsFilter(regions));
 		kidReader.run();
 		
 		new KiDStatWriter(scheduledVehicles).write("output/karlsruheStats.txt");

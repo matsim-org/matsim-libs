@@ -3,7 +3,7 @@ package freight.offermaker;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.vrp.api.Locations;
+import org.matsim.contrib.freight.vrp.basics.Locations;
 
 import playground.mzilske.freight.OfferMaker;
 

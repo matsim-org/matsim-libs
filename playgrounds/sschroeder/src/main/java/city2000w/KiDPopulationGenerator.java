@@ -49,7 +49,7 @@ public class KiDPopulationGenerator {
 		List<SimpleFeature> regions = new ArrayList<SimpleFeature>();
 		NutsRegionShapeReader regionReader = new NutsRegionShapeReader(regions, new KarlsruheNetworkCreator.KarlsruheRegierungsBezirksFilter(), null);
 		regionReader.read(directory + "regions_europe_wgsUtm32N.shp");
-		kidReader.setScheduledVehicleFilter(new AllActivitiesInSelectedRegionsFilter(regions));
+//		kidReader.setScheduledVehicleFilter(new AllActivitiesInSelectedRegionsFilter(regions));
 		kidReader.run();
 		
 		Config config = ConfigUtils.createConfig();

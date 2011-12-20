@@ -1,22 +1,29 @@
 package vrp.vrpInstances;
 
-import freight.vrp.ChartListener;
-import freight.vrp.RuinAndRecreateReport;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateWithTimeWindowsFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.constraints.TWAndCapacityConstraint;
-import org.matsim.contrib.freight.vrp.api.Customer;
-import org.matsim.contrib.freight.vrp.api.SingleDepotVRP;
-import org.matsim.contrib.freight.vrp.basics.Coordinate;
-import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotInitialSolutionFactoryImpl;
-import org.matsim.contrib.freight.vrp.basics.SingleDepotVRPBuilder;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateWithTimeWindowsFactory;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
+import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Job;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.basics.Shipment;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * test instances for the capacitated vrp with pickup and deliveries and time windows. 
@@ -29,51 +36,121 @@ import java.io.IOException;
 
 public class LiLim {
 	
-private SingleDepotVRPBuilder vrpBuilder;
+	static class MyLocations implements Locations{
+
+		private Map<String,Coordinate> locations = new HashMap<String, Coordinate>();
+
+		public void addLocation(String id, Coordinate coord){
+			locations.put(id, coord);
+		}
+
+		@Override
+		public Coordinate getCoord(String id) {
+			return locations.get(id);
+		}	
+	}
+	
+	static class CustomerData{
+		public double start;
+		public double end;
+		public double serviceTime;
+		public CustomerData(double start, double end, double serviceTime) {
+			super();
+			this.start = start;
+			this.end = end;
+			this.serviceTime = serviceTime;
+		}
+	}
+	
+	static class Relation{
+		public String from;
+		public String to;
+		public int demand;
+		public Relation(String from, String to, int demand) {
+			super();
+			this.from = from;
+			this.to = to;
+			this.demand = demand;
+		}
+		
+	}
+	
+	private static Logger logger = Logger.getLogger(Christophides.class);
+	
+	private VrpBuilder vrpBuilder;
+	
+//	private Locations locations;
 	
 	private String fileNameOfInstance;
 	
-	private String instanceName;
+	private int vehicleCapacity;
 	
+	private String depotId;
+	
+	private Map<String,CustomerData> data;
+	
+	private Collection<Relation> relations;
+	
+	private String instanceName;
 	public LiLim(String fileNameOfInstance, String instanceName) {
 		this.fileNameOfInstance = fileNameOfInstance;
 		this.instanceName = instanceName;
+		data = new HashMap<String, LiLim.CustomerData>();
+		relations = new ArrayList<LiLim.Relation>();
 	}
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		LiLim liLim = new LiLim("/Users/stefan/Documents/workspace/VehicleRouting/instances/cvrppdtw_lilim/pdp100/lc103.txt", "lc103");
+		LiLim liLim = new LiLim("/Users/stefan/Documents/workspace/VehicleRouting/instances/cvrppdtw_lilim/pdp100/lc205.txt", "lc205");
 		liLim.run();
 	}
 	
 	public void run(){
-		vrpBuilder = new SingleDepotVRPBuilder();
-		readProblem(fileNameOfInstance);
-		SingleDepotVRP vrp = createVRP();
-		RuinAndRecreate algo = createAlgo(vrp);
+		MyLocations myLocations = new MyLocations();
+		Collection<Job> jobs = new ArrayList<Job>();
+		readLocationsAndJobs(myLocations);
+		buildJobs(jobs);
+		VrpBuilder vrpBuilder = new VrpBuilder(new CrowFlyCosts(myLocations), new PickAndDeliveryCapacityAndTWConstraint());
+		for(Job j : jobs){
+			vrpBuilder.addJob(j);
+		}
+		for(int i=0;i<20;i++){
+			vrpBuilder.addVehicle(VrpUtils.createVehicle("" + (i+1), depotId, vehicleCapacity));
+		}
+		RuinAndRecreate algo = createAlgo(vrpBuilder.build());
 		algo.run();
 	}
 	
-	private RuinAndRecreate createAlgo(SingleDepotVRP vrp) {
+	private void buildJobs(Collection<Job> jobs) {
+		Integer counter = 0;
+		for(Relation rel : relations){
+			counter++;
+			String from = rel.from;
+			String to = rel.to;
+			Shipment s = VrpUtils.createShipment(counter.toString(), from, to, rel.demand, 
+					VrpUtils.createTimeWindow(data.get(from).start, data.get(from).end), 
+					VrpUtils.createTimeWindow(data.get(to).start, data.get(to).end));
+			s.setPickupServiceTime(data.get(from).serviceTime);
+			s.setDeliveryServiceTime(data.get(to).serviceTime);
+			jobs.add(s);
+		}
+		
+	}
+
+	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
 		RuinAndRecreateWithTimeWindowsFactory factory = new RuinAndRecreateWithTimeWindowsFactory();
-		factory.setIterations(10000);
-		factory.setWarmUp(100);
+		factory.setIterations(100);
+		factory.setWarmUp(10);
 		ChartListener chartListener = new ChartListener();
 		chartListener.setFilename("vrp/liLim/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
 		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);
-		return factory.createAlgorithm(vrp, new SingleDepotInitialSolutionFactoryImpl().createInitialSolution(vrp),vrp.getVehicleType().capacity);
+		return factory.createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 	}
 
-	private SingleDepotVRP createVRP() {
-		vrpBuilder.setConstraints(new TWAndCapacityConstraint());
-		vrpBuilder.setCosts(new CrowFlyCosts());
-		return vrpBuilder.buildVRP();
-	}
-
-	private void readProblem(String filename) {
-		BufferedReader reader = IOUtils.getBufferedReader(filename);
+	private void readLocationsAndJobs(MyLocations locs) {
+		BufferedReader reader = IOUtils.getBufferedReader(fileNameOfInstance);
 		String line = null;
 		boolean firstLine = true;
 		try {
@@ -83,27 +160,24 @@ private SingleDepotVRPBuilder vrpBuilder;
 				String[] tokens = line.split("\t");
 				if(firstLine){
 					int vehicleCapacity = getInt(tokens[1]);
-					vrpBuilder.setVehicleType(vehicleCapacity);
+					this.vehicleCapacity = vehicleCapacity;
 					firstLine = false;
 					continue;
 				}
 				else{
 					String customerId = tokens[0];
 					Coordinate coord = makeCoord(tokens[1], tokens[2]);
+					if(customerId.equals("0")){
+						depotId = customerId;
+					}
 					int demand = getInt(tokens[3]);
 					double startTimeWindow = getDouble(tokens[4]);
 					double endTimeWindow = getDouble(tokens[5]);
 					double serviceTime = getDouble(tokens[6]);
-					Customer customer = vrpBuilder.createAndAddCustomer(customerId, vrpBuilder.getNodeFactory().createNode(customerId, coord), 
-							demand, startTimeWindow, endTimeWindow, serviceTime); 
-					if(customerId.equals("0")){
-						vrpBuilder.setDepot(customer);
-					}
-					if(!tokens[7].equals("0")){
-						vrpBuilder.addRelation(customerId,tokens[7]);
-					}
-					else if(!tokens[8].equals("0")){
-						vrpBuilder.addRelation(customerId,tokens[8]);
+					locs.addLocation(customerId, coord);
+					data.put(customerId, new CustomerData(startTimeWindow,endTimeWindow,serviceTime));
+					if(demand > 0){
+						relations.add(new Relation(customerId,tokens[8],demand));
 					}
 				}
 			}

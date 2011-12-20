@@ -3,12 +3,19 @@
  */
 package city2000w;
 
-import city2000w.replanning.*;
-import freight.*;
-import freight.utils.TimePeriod;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierContract;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierPlanReader;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
 import org.matsim.contrib.freight.replanning.CarrierContractLandscapeChangedResponder;
@@ -17,22 +24,53 @@ import org.matsim.contrib.freight.replanning.PlanStrategyManager;
 import org.matsim.contrib.freight.replanning.ReRouteVehicles;
 import org.matsim.contrib.freight.vrp.RRPDTWSolverFactory;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.mzilske.city2000w.City2000WMobsimFactory;
-import playground.mzilske.freight.*;
-import playground.mzilske.freight.api.TSPAgentFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import playground.mzilske.city2000w.City2000WMobsimFactory;
+import playground.mzilske.freight.TSPAgentTracker;
+import playground.mzilske.freight.TSPContract;
+import playground.mzilske.freight.TSPPlan;
+import playground.mzilske.freight.TransportChainAgentFactoryImpl;
+import playground.mzilske.freight.TransportServiceProvider;
+import playground.mzilske.freight.TransportServiceProviders;
+import playground.mzilske.freight.api.TSPAgentFactory;
+import city2000w.replanning.CarrierSelector;
+import city2000w.replanning.FrequencyAndTSPSelector;
+import city2000w.replanning.ShipperPlanStrategy;
+import city2000w.replanning.TSPContractLandscapeChangedResponder;
+import city2000w.replanning.TSPPlanStrategy;
+import freight.ShipperAgentTracker;
+import freight.ShipperImpl;
+import freight.ShipperPlanReader;
+import freight.ShipperPlanWriter;
+import freight.Shippers;
+import freight.TSPPlanReader;
+import freight.TSPPlanWriter;
+import freight.TlcCostFunction;
+import freight.utils.TimePeriod;
 
 
 /**
@@ -58,6 +96,8 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 	private ScenarioImpl scenario;
 
 	private boolean liveModus = false;
+
+	private CrowFlyCosts costs;
 	
 	private static final String NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
 	
@@ -117,7 +157,24 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(liveModus );
-		event.getControler().setMobsimFactory(mobsimFactory);		
+		event.getControler().setMobsimFactory(mobsimFactory);	
+		
+		costs = new CrowFlyCosts(new Locations(){
+
+			@Override
+			public Coordinate getCoord(String id) {
+				return makeCoordinate(scenario.getNetwork().getLinks().get(makeId(id)).getCoord());
+			}
+			
+			private Coordinate makeCoordinate(Coord coord) {
+				return new Coordinate(coord.getX(),coord.getY());
+			}
+
+			public Id makeId(String id){
+				return new IdImpl(id);
+			}
+			
+		});
 	}
 
 	private void createInitialTSPPlans() {
@@ -191,7 +248,7 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 
 	private void createInitialCarrierPlans() {
 
-		CrowFlyCosts costs = new CrowFlyCosts();
+		
 		for(Carrier carrier : carriers.getCarriers().values()){
 			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), costs);
 			planBuilder.setVrpSolverFactory(new RRPDTWSolverFactory());
@@ -260,7 +317,6 @@ public class RunKarlsruheScenarioExtended implements StartupListener, BeforeMobs
 	}
 
 	private void replanCarrier() {
-		CrowFlyCosts costs = new CrowFlyCosts();
 		CarrierPlanStrategy planStrat = new CarrierPlanStrategy();
 		CarrierContractLandscapeChangedResponder contractChangedResponder = new CarrierContractLandscapeChangedResponder(scenario.getNetwork(), costs, new RRPDTWSolverFactory());
 		planStrat.addModule(contractChangedResponder);

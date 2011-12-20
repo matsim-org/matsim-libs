@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="carrier_heavy" linkId="i(4,0)">
+			<vehicles>
+				<vehicle id="vehicle_heavy" linkId="i(4,0)" cap="60"/>
+			</vehicles>
+		</carrier>
+		<carrier id="carrier_medium" linkId="i(4,8)">
+			<vehicles>
+				<vehicle id="vehicle_medium" linkId="i(4,8)" cap="20"/>
+			</vehicles>
+		</carrier>
+		<carrier id="carrier_small_north" linkId="i(4,0)">
+			<vehicles>
+				<vehicle id="vehicle_small_north" linkId="i(4,8)" cap="10"/>
+			</vehicles>
+		</carrier>
+		<carrier id="carrier_small_south" linkId="i(4,8)">
+			<vehicles>
+				<vehicle id="vehicle_small_south" linkId="i(4,8)" cap="10"/>
+			</vehicles>
+		</carrier>
+	</carriers>

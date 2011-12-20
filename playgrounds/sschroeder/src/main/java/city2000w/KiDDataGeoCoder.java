@@ -44,7 +44,7 @@ public class KiDDataGeoCoder {
 		List<SimpleFeature> regions = new ArrayList<SimpleFeature>();
 		NutsRegionShapeReader regionReader = new NutsRegionShapeReader(regions, new StuttgartRegionFilter(),null);
 		regionReader.read(directory + "regions_europe_wgsUtm32N.shp");
-		kidReader.setScheduledVehicleFilter(new GeoRegionFilter(regions));
+//		kidReader.setScheduledVehicleFilter(new GeoRegionFilter(regions));
 		kidReader.run();
 		
 		KiDShapeFileWriter shapeFileWriter = new KiDShapeFileWriter(vehicles);

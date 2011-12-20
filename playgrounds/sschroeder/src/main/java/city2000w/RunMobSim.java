@@ -48,7 +48,6 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 		controler.setCreateGraphs(false);
 		controler.addControlerListener(this);
 		controler.setOverwriteFiles(true);
-		
 		controler.run();
 	}
 
@@ -65,7 +64,7 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 	public void notifyStartup(StartupEvent event) {
 		planAgentCreator = new KiDPlanAgentCreator(scenario.getPopulation());
 		WIVERMobsimFactory mobsimFactory = new WIVERMobsimFactory(0, planAgentCreator);
-		mobsimFactory.setUseOTFVis(false);
+		mobsimFactory.setUseOTFVis(true);
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 	
@@ -75,9 +74,7 @@ public class RunMobSim implements StartupListener, BeforeMobsimListener{
 	}
 
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		event.getControler().getEvents().removeHandler(event.getControler().getPlansScoring().getPlanScorer());
-		
-		
+		event.getControler().getEvents().removeHandler(event.getControler().getPlansScoring().getPlanScorer());	
 	}
 
 }

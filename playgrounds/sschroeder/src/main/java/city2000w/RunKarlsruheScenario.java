@@ -5,6 +5,7 @@ package city2000w;
 
 import freight.TSPPlanReader;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.events.CarrierOfferRejectEvent;
 import org.matsim.contrib.freight.events.QueryCarrierOffersEvent;
@@ -16,7 +17,10 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.CarrierDriverAgentFactoryImpl;
 import org.matsim.contrib.freight.trade.Service;
 import org.matsim.contrib.freight.vrp.VRPCarrierPlanBuilder;
+import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
+import org.matsim.contrib.freight.vrp.basics.Locations;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.*;
@@ -52,6 +56,8 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 	private ScenarioImpl scenario;
 
 	private boolean liveModus = false;
+
+	private CrowFlyCosts costs;
 	
 	private static final String NETWORK_FILENAME = "../playgrounds/sschroeder/networks/karlsruheNetwork.xml";
 	
@@ -99,7 +105,24 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		
 		City2000WMobsimFactory mobsimFactory = new City2000WMobsimFactory(0, carrierAgentTracker);
 		mobsimFactory.setUseOTFVis(liveModus );
-		event.getControler().setMobsimFactory(mobsimFactory);		
+		event.getControler().setMobsimFactory(mobsimFactory);	
+		
+		costs = new CrowFlyCosts(new Locations(){
+
+			@Override
+			public Coordinate getCoord(String id) {
+				return makeCoordinate(scenario.getNetwork().getLinks().get(makeId(id)).getCoord());
+			}
+			
+			private Coordinate makeCoordinate(Coord coord) {
+				return new Coordinate(coord.getX(),coord.getY());
+			}
+
+			public Id makeId(String id){
+				return new IdImpl(id);
+			}
+			
+		});
 	}
 
 	@Override
@@ -150,7 +173,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 
 	private void createCarrierPlans() {
 		for(Carrier carrier : carriers.getCarriers().values()){
-			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
+			VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), costs);
 			CarrierPlan plan = planBuilder.buildPlan();
 			carrier.getPlans().add(plan);
 			carrier.setSelectedPlan(plan);
@@ -186,7 +209,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 		for(Carrier carrier : carriers.getCarriers().values()){
 			if(!carrier.getNewContracts().isEmpty()){
 				logger.info("hohohohoh. obviously, i have to plan a new contract");
-				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), costs);
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);
@@ -194,7 +217,7 @@ public class RunKarlsruheScenario implements StartupListener, BeforeMobsimListen
 			}
 			if(!carrier.getExpiredContracts().isEmpty()){
 				logger.info("outsch. a contract was canceled and i must adapt my plan");
-				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), new CrowFlyCosts());
+				VRPCarrierPlanBuilder planBuilder = new VRPCarrierPlanBuilder(carrier.getCarrierCapabilities(), carrier.getContracts(), scenario.getNetwork(), costs);
 				CarrierPlan plan = planBuilder.buildPlan();
 				carrier.getPlans().add(plan);
 				carrier.setSelectedPlan(plan);
