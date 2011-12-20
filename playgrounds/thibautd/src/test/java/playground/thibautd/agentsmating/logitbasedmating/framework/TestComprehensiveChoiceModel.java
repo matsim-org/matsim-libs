@@ -149,12 +149,12 @@ public class TestComprehensiveChoiceModel {
 		plan6.createAndAddLeg( "car" );
 		plan6.createAndAddActivity( "w" , id9 );
 		plan6.createAndAddLeg( "bike" );
-		plan6.createAndAddActivity( "s" , id10 );
-		plan6.createAndAddLeg( "car" );
-		plan6.createAndAddActivity( "w" , id11 );
-		plan6.createAndAddLeg( "pt" );
-		plan6.createAndAddActivity( "s" , id9 );
-		plan6.createAndAddLeg( "car" );
+		//plan6.createAndAddActivity( "s" , id10 );
+		//plan6.createAndAddLeg( "car" );
+		//plan6.createAndAddActivity( "w" , id11 );
+		//plan6.createAndAddLeg( "pt" );
+		//plan6.createAndAddActivity( "s" , id9 );
+		//plan6.createAndAddLeg( "car" );
 		plan6.createAndAddActivity( "w" , id6 );
 		plan6.createAndAddLeg( "bike" );
 		plan6.createAndAddActivity( "s" , id7 );
@@ -165,7 +165,7 @@ public class TestComprehensiveChoiceModel {
 		plan6.createAndAddLeg( "car" );
 		plan6.createAndAddActivity( "h" , id1 );
 
-		plans = Arrays.asList( plan1 , plan2 , plan3 /*, plan5 , plan6*/ );
+		plans = Arrays.asList( plan1 , plan2 , plan3 , plan5 , plan6 );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
