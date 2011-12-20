@@ -154,6 +154,22 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		public Netsim getMobsim() {
 			return QueueSimulation.this ;
 		}
+		
+		@Override
+		public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
+			throw new UnsupportedOperationException() ;
+		}
+
 	};
 	
 	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
@@ -423,6 +439,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 				MobsimAgent person = entry.getSecond();
 				person.notifyTeleportToLink(person.getDestinationLinkId());
 				person.endLegAndAssumeControl(now) ;
+				this.internalInterface.arrangeNextAgentState(person) ;
 			} else break;
 		}
 	}
@@ -481,6 +498,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				agent.endActivityAndAssumeControl(time);
+				this.internalInterface.arrangeNextAgentState(agent) ;
 			} else {
 				return;
 			}

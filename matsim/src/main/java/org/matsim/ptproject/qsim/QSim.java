@@ -102,7 +102,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private final EventsManager events;
 
-	public final QNetsimEngine netEngine;
+	private final QNetsimEngine netEngine;
 	private NetworkChangeEventsEngine changeEventsEngine = null;
 	private MultiModalSimEngine multiModalEngine = null;
 
@@ -143,7 +143,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override
-		public void arrangeNextAgentState(MobsimAgent agent) {
+		public final void arrangeNextAgentState(MobsimAgent agent) {
 			if ( NEW ) {
 				QSim.this.arrangeNextAgentAction(agent) ;
 			} else {
@@ -151,9 +151,37 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		@Override
-		public Netsim getMobsim() {
+		public final Netsim getMobsim() {
 			return QSim.this ;
 		}
+		
+		@Override
+		public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
+			if ( NEW ) { 
+				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
+			} else {
+			}
+		}
+		
+		@Override
+		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+			if ( NEW ) {
+				return null ;
+			} else {
+				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+			}
+		}
+		
+		@Deprecated // use through InternalInterface
+		@Override
+		public final void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
+			// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
+			// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
+
+			QSim.this.internalRescheduleActivityEnd(agent, oldTime, newTime);
+		}
+
+
 	};
 	
 	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
@@ -476,6 +504,11 @@ public final class QSim implements VisMobsim, Netsim {
 		// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
 		// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
 
+		internalRescheduleActivityEnd(agent, oldTime, newTime);
+	}
+
+
+	private void internalRescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime) {
 		// remove agent from queue
 		this.activityEndsList.remove(agent);
 
@@ -513,9 +546,13 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
+	@Deprecated // use InternalInterface
 	@Override
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		netEngine.registerAdditionalAgentOnLink(planAgent);
+		if ( NEW ) { 
+		} else {
+			netEngine.registerAdditionalAgentOnLink(planAgent);
+		}
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
@@ -526,9 +563,14 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
+	@Deprecated // use InternalInterface
 	@Override
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-		return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+		if ( NEW ) {
+			return null ;
+		} else {
+			return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+		}
 	}
 
 	private void handleActivityEnds(final double time) {
@@ -740,7 +782,8 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.netEngine;
 	}
 
-	// For a test
+	// For a test 
+	// the corresponding test could be moved into this package. kai
 	public final MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
 	}

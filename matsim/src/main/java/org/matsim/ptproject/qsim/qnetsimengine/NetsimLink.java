@@ -33,6 +33,7 @@ public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 	public Link getLink();
 
 	public void recalcTimeVariantAttributes(double time);
+	// yyyy my intuition says that this should be moved to the InternalInterface.  kai, dec'11
 
 
 	@Override

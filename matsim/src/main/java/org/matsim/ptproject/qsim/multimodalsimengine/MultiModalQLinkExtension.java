@@ -149,6 +149,7 @@ public class MultiModalQLinkExtension {
 			MobsimDriverAgent driver = (MobsimDriverAgent) tuple.getSecond();
 			if ((qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
 				driver.endLegAndAssumeControl(now);
+				this.simEngine.internalInterface.arrangeNextAgentState(driver);
 			}
 			/*
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.

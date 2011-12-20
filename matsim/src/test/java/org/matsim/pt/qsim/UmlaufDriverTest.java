@@ -108,6 +108,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = QSim.createQSimAndAddAgentSource(scenario, ((EventsManager) EventsUtils.createEventsManager()));
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
+		tqsim.addMobsimEngine(trEngine) ;
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -121,6 +122,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle, 3.0);
 		driver.setVehicle(queueVehicle);
 		driver.endActivityAndAssumeControl(0);
+		trEngine.internalInterface.arrangeNextAgentState(driver) ;
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
 		List<Id> expectedLinkIds = route.getLinkIds();

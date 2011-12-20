@@ -69,6 +69,8 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndAssumeControl(now);
+			this.simEngine.internalInterface.arrangeNextAgentState(personAgent) ;
+			/* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */  
 		} else {
 			extension.addDepartingAgent(personAgent, now);
 		}				

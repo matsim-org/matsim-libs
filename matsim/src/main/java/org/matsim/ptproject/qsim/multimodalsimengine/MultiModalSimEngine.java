@@ -43,7 +43,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ Queue<MultiModalQLinkExtension> linksToActivate;
 	/*package*/ Queue<MultiModalQNodeExtension> nodesToActivate;
 
-	private InternalInterface internalInterface = null;
+	/*package*/ InternalInterface internalInterface = null;
 	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {

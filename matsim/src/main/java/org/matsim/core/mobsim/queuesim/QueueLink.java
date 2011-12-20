@@ -344,6 +344,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			if ((this.getLink().getId().equals(driver.getDestinationLinkId()))
 					&& (driver.chooseNextLinkId() == null)) {
 				driver.endLegAndAssumeControl(now) ;
+				this.queueNetwork.getMobsim().internalInterface.arrangeNextAgentState(driver) ;
 				this.processVehicleArrival(now, veh);
 				// remove _after_ processing the arrival to keep link active
 				this.vehQueue.poll();
