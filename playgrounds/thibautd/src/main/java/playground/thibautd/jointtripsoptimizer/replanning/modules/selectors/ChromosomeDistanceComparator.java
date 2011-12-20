@@ -20,9 +20,7 @@
 package playground.thibautd.jointtripsoptimizer.replanning.modules.selectors;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jgap.IChromosome;
 
@@ -58,14 +56,6 @@ public abstract class ChromosomeDistanceComparator implements Comparator<IChromo
 			final IChromosome chr2) {
 		double d1, d2;
 
-		//try {
-		//	d1 = this.distanceMap.get(chr1);
-		//	d2 = this.distanceMap.get(chr2);
-		//} catch (NullPointerException e) {
-		//	throw new IllegalArgumentException("can only compare chromosomes in"
-		//			+" the comparison data");
-		//}
-
 		if (chr1.equals(chr2)) {
 			return 0;
 		}
@@ -73,7 +63,7 @@ public abstract class ChromosomeDistanceComparator implements Comparator<IChromo
 		d1 = getDistance(newBorn, chr1);
 		d2 = getDistance(newBorn, chr2);
 
-		return (d1 > d2 ? 1 : -1);
+		return d1 == d2 ? 0 : (d1 > d2 ? 1 : -1);
 	}
 
 	/**
