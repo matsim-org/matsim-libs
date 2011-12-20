@@ -6,6 +6,7 @@ import java.util.Random;
 
 import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
+import playground.wrashid.lib.MathLib;
 import playground.wrashid.lib.obj.SortableMapObject;
 
 public class SmartCharger {
@@ -33,7 +34,7 @@ public class SmartCharger {
 				totalChargingTimeNeeded-=tmpChargingTime.getDuration();
 				result.add(tmpChargingTime);
 				
-				if (totalChargingTimeNeeded>0){
+				if (!MathLib.equals(totalChargingTimeNeeded,0.0,0.1)){
 					DebugLib.stopSystemAndReportInconsistency();
 				}
 			}
