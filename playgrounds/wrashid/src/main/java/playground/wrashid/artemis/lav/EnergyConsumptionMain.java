@@ -55,9 +55,14 @@ public class EnergyConsumptionMain {
 
 		events.addHandler(energyConsumptionPlugin);
 
-		DumbCharger dumbCharger = new DumbCharger(agentSocMapping, agentVehicleMapping,
+		Charger charger = new Charger(agentSocMapping, agentVehicleMapping,
 				energyConsumptionModel,config.getIntParameter("chargingScenarioNumber"));
-		events.addHandler(dumbCharger);
+		String chargingMode = config.getParameterValue("chargingMode");
+		charger.setChargingMode(chargingMode);
+		
+		
+		
+		events.addHandler(charger);
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 
@@ -67,12 +72,12 @@ public class EnergyConsumptionMain {
 		// reader.readFile(eventsFile);
 
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
-		dumbCharger.performLastChargingOfDay();
+		charger.performLastChargingOfDay();
 
 		String outputFileEnergyConsumptionLogPerLink = config.getParameterValue("outputFileEnergyConsumptionLogPerLink");
 		energyConsumptionPlugin.writeOutputLog(outputFileEnergyConsumptionLogPerLink);
 		String outputFileChargingLog = config.getParameterValue("outputFileChargingLog");
-		dumbCharger.writeChargingLog(outputFileChargingLog);
+		charger.writeChargingLog(outputFileChargingLog);
 
 		reportIfEVRanOutOfElectricity(agentSocMapping);
 

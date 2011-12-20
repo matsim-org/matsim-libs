@@ -20,6 +20,8 @@ import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.MathLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
 import playground.wrashid.artemis.output.*;
+import playground.wrashid.artemis.smartCharging.ChargingTime;
+import playground.wrashid.artemis.smartCharging.SmartCharger;
 
 /**
  * Start charging immediatly, if arrive at a location. -> The charging starts at
@@ -41,7 +43,7 @@ import playground.wrashid.artemis.output.*;
  * @author wrashid
  * 
  */
-public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class Charger implements ActivityStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
 
 	private HashMap<Id, String> firstActTypeDuringParking;
 	private HashMap<Id, Id> carParkedAtLink;
@@ -56,8 +58,9 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 	private ChargingLog chargingLog;
 
 	private ChargingPowerInterface chargingPowerInterface;
+	private String chargingMode;
 
-	public DumbCharger(HashMap<Id, VehicleSOC> agentSocMapping, HashMap<Id, VehicleTypeLAV> agentVehicleMapping,
+	public Charger(HashMap<Id, VehicleSOC> agentSocMapping, HashMap<Id, VehicleTypeLAV> agentVehicleMapping,
 			EnergyConsumptionModelLAV_v1 energyConsumptionModel, int chargingScenarioNumber) {
 		this.agentSocMapping = agentSocMapping;
 		this.agentVehicleMapping = agentVehicleMapping;
@@ -117,15 +120,38 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 					chargingDuration = timeNeededToChargeInSeconds;
 				}
 
-				double batteryChargedInJoule = chargingDuration * chargingPowerInterface.getChargingPowerInWatt(actType);
-				double startSOCInJoule = vehicleSOC.getSocInJoule();
-				vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);
-				double endSOCInJoule = vehicleSOC.getSocInJoule();
-
-				chargingLog
-						.addChargingLog(linkId.toString(), personId.toString(), startIntervalTime,
-								GeneralLib.projectTimeWithin24Hours(startIntervalTime + chargingDuration), startSOCInJoule,
+				
+				
+				if (chargingMode==null || chargingMode.equalsIgnoreCase("dumbCharging") || chargingDuration == parkingDuration){
+					double batteryChargedInJoule = chargingDuration * chargingPowerInterface.getChargingPowerInWatt(actType);
+					double startSOCInJoule = vehicleSOC.getSocInJoule();
+					vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);
+					double endSOCInJoule = vehicleSOC.getSocInJoule();
+					chargingLog
+					.addChargingLog(linkId.toString(), personId.toString(), startIntervalTime,
+							GeneralLib.projectTimeWithin24Hours(startIntervalTime + chargingDuration), startSOCInJoule,
+							endSOCInJoule);
+				} else if (chargingMode.equalsIgnoreCase("randomDistributionOfCharingSlotsDuringParking")){
+					LinkedList<ChargingTime> chargingTimes = ChargingTime.get15MinChargingBins(startIntervalTime, departureTime);
+					LinkedList<ChargingTime> randomChargingTimes = SmartCharger.getRandomChargingTimes(chargingTimes, chargingDuration);
+					LinkedList<ChargingTime> sortedChargingTimes = ChargingTime.sortChargingTimes(randomChargingTimes);
+					
+					for (ChargingTime chargingTime:sortedChargingTimes){
+						double batteryChargedInJoule = chargingTime.getDuration()  * chargingPowerInterface.getChargingPowerInWatt(actType);
+						double startSOCInJoule = vehicleSOC.getSocInJoule();
+						vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);
+						double endSOCInJoule = vehicleSOC.getSocInJoule();
+						chargingLog
+						.addChargingLog(linkId.toString(), personId.toString(), chargingTime.getStartChargingTime(),
+								GeneralLib.projectTimeWithin24Hours(chargingTime.getEndChargingTime()), startSOCInJoule,
 								endSOCInJoule);
+					}
+					
+				} else {
+					DebugLib.stopSystemAndReportInconsistency("unknown chargingMode:" + chargingMode);
+				}
+				
+				double endSOCInJoule = vehicleSOC.getSocInJoule();
 
 				if (!MathLib.equals(endSOCInJoule, batteryCapacityInJoule, 0.001) && endSOCInJoule > batteryCapacityInJoule) {
 					DebugLib.stopSystemAndReportInconsistency("overcharging:" + vehicleSOC.getSocInJoule() + "/"
@@ -193,6 +219,10 @@ public class DumbCharger implements ActivityStartEventHandler, AgentArrivalEvent
 
 	private boolean isCarParked(Id agentId) {
 		return lastArrivalTime.keySet().contains(agentId);
+	}
+
+	public void setChargingMode(String chargingMode) {
+		this.chargingMode = chargingMode;
 	}
 
 }

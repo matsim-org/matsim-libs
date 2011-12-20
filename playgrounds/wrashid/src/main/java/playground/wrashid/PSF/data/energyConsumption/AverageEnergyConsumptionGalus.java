@@ -8,7 +8,7 @@ public class AverageEnergyConsumptionGalus implements AverageEnergyConsumptionBi
 	private EnergyConsumptionSamples ecs=new EnergyConsumptionSamples();
 	
 	public AverageEnergyConsumptionGalus() {
-		// energy consumption for different speeds for driving one meter
+		// energy consumption for different speeds for driving one meter in joule
 		ecs.add(new AverageSpeedEnergyConsumption(5.555555556,3.173684E+02));
 		ecs.add(new AverageSpeedEnergyConsumption(8.333333333,4.231656E+02));
 		ecs.add(new AverageSpeedEnergyConsumption(11.11111111,5.549931E+02));
