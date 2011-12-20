@@ -211,6 +211,11 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.passengerEventsCreator = new PassengerEventsCreator(this.events);
+
+		this.sim.addMobsimEngine(this.passengerEventsCreator) ;
+		// need to do this since this does not only create events, but also behaves like a Mobsim Engine by ending (passenger)
+		// legs.  kai, dec'11
+		
 		this.getEvents().addHandler(passengerEventsCreator);
 		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);
 		

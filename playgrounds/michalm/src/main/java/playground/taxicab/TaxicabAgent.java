@@ -188,14 +188,18 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 					this.getId() ) ) ;
 			
 			this.currentPassenger.notifyTeleportToLink(this.currentLinkId) ;
-			this.currentPassenger.endLegAndAssumeControl(now) ;
-			this.currentPassenger = null ;
+//			this.currentPassenger.endLegAndAssumeControl(now) ;
 			
-			this.destinationLinkId = NO_LINK ;
+			throw new RuntimeException("I don't think this is used anywhere.  Pls complain if this is wrong. kai, dec'11");
 			
-//			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
-			this.state = MobsimAgent.State.LEG ;
-			this.netsim.reInsertAgentIntoMobsim(this) ;
+//			
+//			this.currentPassenger = null ;
+//			
+//			this.destinationLinkId = NO_LINK ;
+//			
+////			this.netsim.arrangeAgentDeparture(this) ; // empty taxicab
+//			this.state = MobsimAgent.State.LEG ;
+//			this.netsim.reInsertAgentIntoMobsim(this) ;
 		
 		} else {
 			throw new RuntimeException("undefined state") ;

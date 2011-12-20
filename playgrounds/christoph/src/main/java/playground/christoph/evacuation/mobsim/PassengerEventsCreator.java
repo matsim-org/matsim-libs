@@ -48,28 +48,36 @@ import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
+import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * Duplicates the events of given driver agents to the passengers
  * in the same vehicle.
- * 
+ * <p/>
  * To duplicate the events, some calls to quite internal methods of
  * the QSim are necessary - therefore the code might be a bit crappy...
- * 
+ * <p/>
  * It would be nice to be able to directly add agents as passengers
  * to a QVehicle. Probably a future ToDo...
- * 
+ * <p/>
  * So far, only ride_passenger is supported. However, other modes like
  * walk_passenger could be added (the slowest person of a group walks,
  * all other persons follow with the same speed).
+ * <p/>
+ * Comments:<ul>
+ * <li> In the public transit simulation, we have deliberately NOT replicated the "driver" events since they can be 
+ * reconstructed.  See, e.g., PtPlanToPlanStepBasedOnEvents in playground.mmoyo.  Maybe take this to the committee?  kai, dec'11
+ * </ul>
  * 
  * @author cdobler
  */
 public class PassengerEventsCreator implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, 
-	SimulationInitializedListener, SimulationAfterSimStepListener, DepartureHandler {
+	SimulationInitializedListener, SimulationAfterSimStepListener, DepartureHandler, MobsimEngine {
 
 	public final static String passengerTransportMode = "ride_passenger";
 	
@@ -78,6 +86,8 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 	private final Map<Id, List<Id>> driverPassengerMap;
 	private final Map<Id, Leg> currentDriverLegs;
 	private final List<Id> departedDrivers;
+
+	private InternalInterface internalInterface;
 	
 	public PassengerEventsCreator(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
@@ -135,7 +145,8 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 				 * the currently performed leg of the agent is ended.
 				 */
 				MobsimAgent passenger = agents.get(passengerId);
-				passenger.endLegAndAssumeControl(event.getTime());				
+				passenger.endLegAndAssumeControl(event.getTime());	
+				this.internalInterface.arrangeNextAgentState(passenger) ;
 			}
 		}
 	}
@@ -221,6 +232,31 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 			}
 		}
 		departedDrivers.clear();
+	}
+
+	@Override
+	public void afterSim() {
+		// nothing to do
+	}
+
+	@Override
+	public Netsim getMobsim() {
+		return this.internalInterface.getMobsim() ;
+	}
+
+	@Override
+	public void onPrepareSim() {
+		// nothing to do
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface2) {
+		this.internalInterface = internalInterface2 ;
+	}
+
+	@Override
+	public void doSimStep(double time) {
+		// nothing to do
 	}
 	
 }

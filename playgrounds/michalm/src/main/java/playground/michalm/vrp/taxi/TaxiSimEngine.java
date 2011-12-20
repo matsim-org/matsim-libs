@@ -31,7 +31,12 @@ public class TaxiSimEngine
     private List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
     private List<OptimizerListener> optimizerListeners = new ArrayList<OptimizerListener>();
 
-    private InternalInterface internalInterface = null;
+    /**
+     * yyyyyy This should not be public.  An easy fix would be to put vrp.taxi.taxicab and vrp.taxi into the same package
+     * and reduce visibility to package level.  Alternatively, the internal interface can be passed to the taxicabs somehow
+     * (during initialization?).  kai, dec'11
+     */
+    public InternalInterface internalInterface = null;
 
 
     @Override
