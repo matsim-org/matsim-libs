@@ -139,7 +139,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
     
-    static boolean NEW = false ;
+    static boolean NEW = true ;
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override

@@ -134,7 +134,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private MobsimTimer simTimer ;
 	
-    static boolean NEW = false ;
+    static boolean NEW = true ;
 
 	/**
 	 * The InternalInterface technically is not needed for the QueueSimulation since everything is in the same 
