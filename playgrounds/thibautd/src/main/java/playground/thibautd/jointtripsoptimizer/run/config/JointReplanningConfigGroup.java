@@ -509,6 +509,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, TOGGLE_OPT_FITNESS_WEIGHT);
 		this.addParameterToMap(map, N_MAX_SIMPLEX_ITERS);
 		this.addParameterToMap(map, PROPORTIONNAL_WINDOW_SIZE);
+		this.addParameterToMap(map, MULTIPLICATIVE_POP_SIZE);
 		return map;
 	}
 
