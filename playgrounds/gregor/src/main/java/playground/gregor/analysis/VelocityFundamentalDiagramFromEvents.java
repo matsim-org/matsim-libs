@@ -166,7 +166,7 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
 		//		Envelope e = new Envelope(4,7,2.75,3.25);
-		Envelope e = new Envelope(5.5,6.5,2.5,3.5);
+		Envelope e = new Envelope(5.5,6.5,2.65,3.35);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += .125 ) {
