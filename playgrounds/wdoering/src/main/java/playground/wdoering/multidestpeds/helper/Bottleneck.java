@@ -54,7 +54,7 @@ public class Bottleneck
 		{
 			//get path
 			//				String scDir = args[0];
-			//			String scDir = "C:/temp";
+//			String scDir = "C:/temp/bottleneck";
 			String scDir = "/Users/laemmel/devel/bottleneck/";
 
 			//set input directory
@@ -92,7 +92,8 @@ public class Bottleneck
 			c.strategy().addParam("ModuleProbability_2", "0.9");
 			//
 			Sim2DConfigGroup s2d = new Sim2DConfigGroup();
-			s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+//			s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+			s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 			c.addModule("sim2d", s2d);
 			new ConfigWriter(c).write(inputDir + "/config.xml");
 		}
@@ -175,7 +176,9 @@ public class Bottleneck
 			//				double x = currentLink.getFromNode().getCoord().getX() + dx;
 			//				double y = currentLink.getFromNode().getCoord().getY() + dy;
 
-			double x = (-waitingAreaWidth/2) + ( ((i % personsPerRow) + 0.01 / personsPerRow) * waitingAreaWidth);
+			double step = ((float)((i % personsPerRow) + 0.01f) / (float)personsPerRow);
+//			System.out.println(step);
+			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth);
 			double y = ((Math.floor((i + 0.01 / personsPerRow))/persons)*waitingAreaWidth);
 
 			Point p = geofac.createPoint(new Coordinate(x,y));
@@ -337,8 +340,9 @@ public class Bottleneck
 		//adding them to the debugger
 		GisDebugger.addGeometry(leftSideLines);
 		GisDebugger.addGeometry(rightSideLines);
-		GisDebugger.dump(dir + "/bottleneck" + (int)width + "_" + (int)length +  ".shp");
-
+//		GisDebugger.dump(dir + "/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+		GisDebugger.dump(dir + "/floorplan.shp");
+		
 	}
 
 
