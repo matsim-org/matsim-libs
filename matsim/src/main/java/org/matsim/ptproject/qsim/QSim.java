@@ -95,6 +95,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * <li> <i>A caveat is that drivers that move around other agents (such as TransitDriver, TaxicabDriver) need to become
  * "engines".</i>  Possibly, something that executes a leg is not really the same as an "engine", but this is what we have
  * for the time being.
+ * <li> Engines that offer new modes also need to be registered as "DepartureHandler"s.
  *  * </ul>
  * Future plans include: pull the agent counter write methods back into QSim (no big deal, I hope); pull the actstart/end, 
  * agent departure/arrival back into QSim+engines; somewhat separate the teleportation engine and the activities engine from the
