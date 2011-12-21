@@ -20,19 +20,16 @@
 package playground.thibautd.agentsmating.logitbasedmating.basic;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -42,7 +39,7 @@ import playground.thibautd.agentsmating.greedysavings.FacilitiesFactory;
 import playground.thibautd.agentsmating.logitbasedmating.framework.CliquesConstructor;
 import playground.thibautd.agentsmating.logitbasedmating.framework.Mating;
 import playground.thibautd.agentsmating.logitbasedmating.framework.TripRequest;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.JointActingTypes;
 
 /**
  * Default implementation of a clique constructor. It can only handle

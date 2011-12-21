@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationWriter;
@@ -31,9 +30,9 @@ import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
  * Corrects plans with an inconsistent mode chain.

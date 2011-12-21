@@ -25,22 +25,19 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointLeg;
-import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointLeg;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
 
 /**
  * Aims at correcting inconsistencies in the mode chain of plans generated with

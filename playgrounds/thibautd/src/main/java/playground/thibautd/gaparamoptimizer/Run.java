@@ -21,7 +21,7 @@ package playground.thibautd.gaparamoptimizer;
 
 import org.matsim.core.controler.Controler;
 
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
  * @author thibautd

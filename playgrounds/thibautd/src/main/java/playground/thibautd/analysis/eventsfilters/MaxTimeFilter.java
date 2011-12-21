@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.eventsfilters;
 
-import org.matsim.core.api.experimental.events.Event;
 
 /**
  * @author thibautd

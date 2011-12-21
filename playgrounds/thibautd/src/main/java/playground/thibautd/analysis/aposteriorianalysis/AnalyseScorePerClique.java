@@ -21,17 +21,15 @@ package playground.thibautd.analysis.aposteriorianalysis;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * runs an analysis of the score per clique size

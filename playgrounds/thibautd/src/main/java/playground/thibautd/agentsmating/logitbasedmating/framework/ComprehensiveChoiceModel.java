@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 

@@ -28,8 +28,6 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips;
-
 /**
  * @author thibautd
  */

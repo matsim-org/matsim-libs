@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.basic;
 
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 

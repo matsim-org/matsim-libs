@@ -22,24 +22,21 @@ package playground.thibautd.gaparamoptimizer;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.event.EventManager;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.NaturalSelector;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
  * A simple jgap config to optimize the parameters of the JPO

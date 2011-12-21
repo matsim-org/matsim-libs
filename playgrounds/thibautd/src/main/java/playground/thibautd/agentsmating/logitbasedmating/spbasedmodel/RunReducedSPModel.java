@@ -19,19 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
+import herbie.running.config.HerbieConfigGroup;
+
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
@@ -39,21 +41,16 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.controler.HerbieControler;
-
 import playground.thibautd.agentsmating.logitbasedmating.basic.PlatformBasedModeChooserFactory;
-import playground.thibautd.agentsmating.logitbasedmating.framework.ChoiceModel;
 import playground.thibautd.agentsmating.logitbasedmating.framework.PlatformBasedModeChooser;
 import playground.thibautd.agentsmating.logitbasedmating.utils.SimpleLegTravelTimeEstimatorFactory;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
+import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.TransitActRemoverCorrectTravelTime;
 

@@ -25,12 +25,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -40,13 +39,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
 import playground.thibautd.utils.charts.WrapperChartUtil;
 
 /**

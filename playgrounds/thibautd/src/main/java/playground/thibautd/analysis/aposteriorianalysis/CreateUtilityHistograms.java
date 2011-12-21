@@ -22,7 +22,6 @@ package playground.thibautd.analysis.aposteriorianalysis;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,28 +29,24 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.xy.XYDataset;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 import playground.thibautd.utils.charts.WrapperChartUtil;
 import playground.thibautd.utils.charts.XYLineHistogramDataset;
 

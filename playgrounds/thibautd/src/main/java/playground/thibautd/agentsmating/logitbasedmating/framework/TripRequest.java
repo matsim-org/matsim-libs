@@ -21,7 +21,6 @@ package playground.thibautd.agentsmating.logitbasedmating.framework;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 
 /**

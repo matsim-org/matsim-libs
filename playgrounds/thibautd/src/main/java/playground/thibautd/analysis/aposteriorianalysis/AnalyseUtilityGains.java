@@ -25,19 +25,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.charts.ChartUtil;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 import playground.thibautd.utils.charts.BoxAndWhiskersChart;
 import playground.thibautd.utils.charts.XYChartUtils;
 

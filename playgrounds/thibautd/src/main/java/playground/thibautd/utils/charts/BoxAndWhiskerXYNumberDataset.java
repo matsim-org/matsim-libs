@@ -26,7 +26,6 @@ import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.BoxAndWhiskerXYDataset;
 import org.jfree.data.xy.AbstractXYDataset;
-
 import org.matsim.core.utils.collections.Tuple;
 
 /**

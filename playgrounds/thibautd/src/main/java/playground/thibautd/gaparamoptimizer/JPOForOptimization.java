@@ -21,28 +21,25 @@ package playground.thibautd.gaparamoptimizer;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
-import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.Configuration;
 import org.jgap.Genotype;
 import org.jgap.Population;
-
+import org.jgap.audit.IEvolutionMonitor;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerPopulationFactory;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerPopulationFactory;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
  * Runs the joint plan optimizer and returns the best obtained score

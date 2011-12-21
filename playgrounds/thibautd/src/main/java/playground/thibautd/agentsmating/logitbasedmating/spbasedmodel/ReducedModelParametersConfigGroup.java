@@ -21,8 +21,6 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Module;
 
 /**

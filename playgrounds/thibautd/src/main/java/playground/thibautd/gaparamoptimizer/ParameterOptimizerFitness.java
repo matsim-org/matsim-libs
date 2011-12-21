@@ -21,31 +21,28 @@ package playground.thibautd.gaparamoptimizer;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 import org.jgap.impl.IntegerGene;
-import org.jgap.InvalidConfigurationException;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
  * Fitness function for the meta-GA.

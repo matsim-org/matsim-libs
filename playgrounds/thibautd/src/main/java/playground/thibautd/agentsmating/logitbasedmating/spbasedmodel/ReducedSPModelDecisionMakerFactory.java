@@ -21,12 +21,9 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 

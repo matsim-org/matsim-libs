@@ -25,11 +25,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.run.JointControler;
-import playground.thibautd.jointtripsoptimizer.scoring.JointEventsToScore;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.scoring.JointEventsToScore;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
  * Aims at getting the scores of executed plans for a given iteration for which

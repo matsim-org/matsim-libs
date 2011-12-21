@@ -20,8 +20,8 @@
 package playground.thibautd.analysis.possiblesharedrides;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * Corrects a data file for which distances were got from route

@@ -21,20 +21,16 @@ package playground.thibautd.analysis.populationstats;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.LogarithmicAxis;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.RangeType;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
-
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 

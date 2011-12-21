@@ -26,22 +26,19 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithJointTripsWriterHandler;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.run.JointControler;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.PopulationOfCliques;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.population.PopulationWithJointTripsWriterHandler;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
  * Very simple utility, which creates a population without the cliques of more than 10 individuals.

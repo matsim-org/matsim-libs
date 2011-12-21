@@ -30,7 +30,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -41,12 +40,12 @@ import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.locationchoice.facilityload.ScoringPenalty;
 
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.JointActingTypes;
 
 /**
  * Activity scoring function based on the KTI activity scoring.

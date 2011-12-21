@@ -21,12 +21,10 @@ package playground.thibautd.agentsmating.logitbasedmating.spbasedmodel.populatio
 
 import java.io.BufferedReader;
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;

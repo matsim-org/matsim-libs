@@ -26,24 +26,18 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.charts.XYLineChart;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
-import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
-import playground.thibautd.utils.charts.BoxAndWhiskerXYNumberDataset;
-import playground.thibautd.utils.charts.WrapperChartUtil;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.PopulationOfCliques;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
 /**
  * output plots comparing the avg number of joint trips per agent

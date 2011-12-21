@@ -25,8 +25,8 @@ import java.util.List;
 import org.jgap.Configuration;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
-import org.jgap.impl.GABreeder;
 import org.jgap.Population;
+import org.jgap.impl.GABreeder;
 
 /**
  * @author thibautd

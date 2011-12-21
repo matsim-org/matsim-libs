@@ -20,36 +20,31 @@
 package playground.thibautd.gaparamoptimizer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.jgap.Configuration;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.Population;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.population.PopulationOfCliques;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtrips.run.JointControler;
 
 /**
  * Core of the meta-GA.

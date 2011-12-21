@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -29,9 +32,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
 
 /**
  * Based on {@link herbie.running.scoring.HerbieScoringFunctionFactory}.

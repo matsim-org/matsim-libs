@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -33,13 +32,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.thibautd.jointtripsoptimizer.population.Clique;
-import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
-import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
-import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.jointtrips.config.CliquesConfigGroup;
+import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.ScenarioWithCliques;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
+import playground.thibautd.jointtrips.replanning.selectors.PlanWithLongestTypeSelector;
+import playground.thibautd.jointtrips.run.JointControler;
 import playground.thibautd.utils.RemoveJointTrips;
 
 /**

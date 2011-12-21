@@ -22,7 +22,6 @@ package playground.thibautd.agentsmating.ptv2matsim;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,14 +30,13 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -49,7 +47,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.thibautd.agentsmating.greedysavings.FacilitiesFactory;
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.jointtripsoptimizer.population.JointActingTypes;
+import playground.thibautd.jointtrips.population.JointActingTypes;
 
 /**
  * Takes PTV carpool data and a Matsim population, and create a population

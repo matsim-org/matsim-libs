@@ -23,8 +23,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.charts.ChartUtil;
 
-import playground.thibautd.jointtripsoptimizer.population.PopulationWithCliques;
-import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
+import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.utils.JointControlerUtils;
 import playground.thibautd.utils.MoreIOUtils;
 
 /**
