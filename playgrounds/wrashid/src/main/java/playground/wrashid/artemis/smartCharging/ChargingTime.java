@@ -40,6 +40,13 @@ public class ChargingTime {
 
 	public static LinkedList<ChargingTime> get15MinChargingBins(double startParkingTime, double endParkingTime) {
 		LinkedList<ChargingTime> chargingTimes = new LinkedList<ChargingTime>();
+		
+		startParkingTime=GeneralLib.projectTimeWithin24Hours(startParkingTime);
+		
+		if (endParkingTime<startParkingTime){
+			endParkingTime+=3600*24;
+		}
+		
 		int indexStartParking = getBinIndex(startParkingTime);
 		int indexEndParking = getBinIndex(endParkingTime);
 

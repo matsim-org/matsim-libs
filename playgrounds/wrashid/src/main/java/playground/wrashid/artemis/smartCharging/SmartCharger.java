@@ -23,9 +23,15 @@ public class SmartCharger {
 			priorityQueue.add(new SortableMapObject<ChargingTime>(chargingTime, rand.nextDouble()));
 		}
 		
-		while (totalChargingTimeNeeded>0){
-			ChargingTime chargingTime = priorityQueue.poll().getKey();
-			
+		
+		
+		while (!MathLib.equals(totalChargingTimeNeeded,0.0,0.1)){
+			ChargingTime chargingTime=null;
+			try{
+				chargingTime = priorityQueue.poll().getKey();
+			} catch (Exception e) {
+				DebugLib.emptyFunctionForSettingBreakPoint();
+			}
 			if (chargingTime.getDuration()<totalChargingTimeNeeded){
 				totalChargingTimeNeeded-=chargingTime.getDuration();
 				result.add(chargingTime);

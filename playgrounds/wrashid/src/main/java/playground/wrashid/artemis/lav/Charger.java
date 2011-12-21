@@ -205,7 +205,7 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 				// end of simulation).
 				firstCarDepartureTimeOfDay.put(personId, event.getTime());
 			} else {
-				handleCharging(lastArrivalTime.get(personId), personId, firstActTypeDuringParking.get(personId), carParkedAtLink.get(personId));
+				handleCharging(event.getTime(), personId, firstActTypeDuringParking.get(personId), carParkedAtLink.get(personId));
 				
 				lastArrivalTime.remove(personId);
 				firstActTypeDuringParking.remove(personId);
