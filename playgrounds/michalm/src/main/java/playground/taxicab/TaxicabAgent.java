@@ -71,7 +71,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 //		netsim.arrangeActivityStart(this) ;
 		this.state = MobsimAgent.State.ACTIVITY ;
-		netsim.reInsertAgentIntoMobsim(this) ;
+//		netsim.reInsertAgentIntoMobsim(this) ;
 		// yyyyyy 000000
 		
 		
@@ -166,19 +166,20 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		if ( this.expectedPassengerId!=null && this.currentPassenger==null ) {
 			// (= no passenger on board, but having a request)
 			
-			MobsimAgent passenger = ((QSim) this.netsim).unregisterAdditionalAgentOnLink(this.expectedPassengerId, this.currentLinkId) ;
-			this.expectedPassengerId = null ;
-			this.currentPassenger = passenger ;
-			if ( passenger != null ) {
-				this.destinationLinkId = passenger.getDestinationLinkId() ;
-			}
-
-			events.processEvent( evFac.createPersonEntersVehicleEvent(now, passenger.getId(), this.vehicle.getId(), this.getId() ) ) ;
-
-//			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
-			this.state = MobsimAgent.State.LEG ;
-			this.netsim.reInsertAgentIntoMobsim(this);
-			// yyyyyy 000000
+			throw new RuntimeException("I don't think this is used anywhere.  Pls complain if this is wrong. kai, dec'11");
+//			MobsimAgent passenger = ((QSim) this.netsim).unregisterAdditionalAgentOnLink(this.expectedPassengerId, this.currentLinkId) ;
+//			this.expectedPassengerId = null ;
+//			this.currentPassenger = passenger ;
+//			if ( passenger != null ) {
+//				this.destinationLinkId = passenger.getDestinationLinkId() ;
+//			}
+//
+//			events.processEvent( evFac.createPersonEntersVehicleEvent(now, passenger.getId(), this.vehicle.getId(), this.getId() ) ) ;
+//
+////			this.netsim.arrangeAgentDeparture(this) ; // full taxicab
+//			this.state = MobsimAgent.State.LEG ;
+////			this.netsim.reInsertAgentIntoMobsim(this);
+//			// yyyyyy 000000
 
 
 		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
@@ -219,7 +220,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 
 //		this.netsim.arrangeAgentDeparture(this) ;
 		this.state = MobsimAgent.State.LEG ;
-		this.netsim.reInsertAgentIntoMobsim(this);
+//		this.netsim.reInsertAgentIntoMobsim(this);
 		// yyyyyy 000000
 
 		

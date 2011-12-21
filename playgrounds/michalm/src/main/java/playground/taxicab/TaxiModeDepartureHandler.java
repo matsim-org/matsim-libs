@@ -46,11 +46,13 @@ public class TaxiModeDepartureHandler implements DepartureHandler {
 			mobsim.getEventsManager().processEvent( 
 					new PassengerTaxiRequestEvent( now, agent.getId(), linkId )) ;
 			
-			this.mobsim.registerAdditionalAgentOnLink(agent) ; 
-
+			throw new RuntimeException("I don't think this is being used. Kai") ;
 			
-			Logger.getLogger(this.getClass()).warn("done with taxi mode departure" ) ;
-			return true ;
+//			this.mobsim.registerAdditionalAgentOnLink(agent) ; 
+//
+//			
+//			Logger.getLogger(this.getClass()).warn("done with taxi mode departure" ) ;
+//			return true ;
 		} else {
 			return false ;
 		}

@@ -108,7 +108,7 @@ public class DynAgent
         }
         else {
             state = MobsimAgent.State.ACTIVITY;
-            simulation.reInsertAgentIntoMobsim(this);
+//            simulation.reInsertAgentIntoMobsim(this);
 			// yyyyyy 000000
 
         }
@@ -121,7 +121,7 @@ public class DynAgent
         nextLinkId = leg.getNextLinkId();
 
         state = MobsimAgent.State.LEG;
-        simulation.reInsertAgentIntoMobsim(this);
+//        simulation.reInsertAgentIntoMobsim(this);
 		// yyyyyy 000000
 
     }

@@ -185,8 +185,8 @@ public class TaxiAgentLogic
             throw new IllegalStateException("Passanger and taxi on different links!");
         }
 
-        if (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),
-                currentLinkId) == null) {
+//        if (taxiSimEngine.getMobsim().unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId) == null) {
+        if (taxiSimEngine.internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(),currentLinkId) == null) {
             throw new RuntimeException("Passenger id=" + passenger.getId()
                     + "is not waiting for taxi");
         }
