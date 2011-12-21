@@ -35,7 +35,7 @@ import org.matsim.core.population.PopulationWriter;
 
 import playground.thibautd.jointtripsoptimizer.population.Clique;
 import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.JointPlanOptimizerModule;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
 import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
 import playground.thibautd.jointtripsoptimizer.run.config.CliquesConfigGroup;
 import playground.thibautd.jointtripsoptimizer.run.config.JointReplanningConfigGroup;

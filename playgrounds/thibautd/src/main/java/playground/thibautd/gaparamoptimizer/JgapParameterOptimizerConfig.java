@@ -39,7 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtripsoptimizer.population.JointPlan;
-import playground.thibautd.jointtripsoptimizer.replanning.modules.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
  * A simple jgap config to optimize the parameters of the JPO
