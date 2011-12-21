@@ -259,7 +259,8 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			if (planAgent instanceof PersonDriverAgentImpl) { 
 				Id agentId = planAgent.getId();
 				Id linkId = planAgent.getCurrentLinkId();
-				this.getSimulation().unregisterAdditionalAgentOnLink(agentId, linkId);
+//				this.getSimulation().unregisterAdditionalAgentOnLink(agentId, linkId);
+				((TransitQSimEngine)this.trEngine).internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();

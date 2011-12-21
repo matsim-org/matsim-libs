@@ -33,16 +33,16 @@ public interface Netsim extends Mobsim {
 
 	NetsimNetwork getNetsimNetwork();
 	
-	/**Registering and unregistering agents on links for visualization (and maybe other purposes).  
-	 * 
-	 * Design decision: In theory, the links could also ask the central
-	 * "activities" or "agentTracker" data structures, but in practice this is too slow.  kai, aug'10
-	 * 
-	 * This needs the "getCurrentLinkId()" of the MobsimAgent filled with meaningful information.
-	 * 	 */
-	void registerAdditionalAgentOnLink( final MobsimAgent agent ) ;
+//	/**Registering and unregistering agents on links for visualization (and maybe other purposes).  
+//	 * 
+//	 * Design decision: In theory, the links could also ask the central
+//	 * "activities" or "agentTracker" data structures, but in practice this is too slow.  kai, aug'10
+//	 * 
+//	 * This needs the "getCurrentLinkId()" of the MobsimAgent filled with meaningful information.
+//	 * 	 */
+//	void registerAdditionalAgentOnLink( final MobsimAgent agent ) ;
 
-	MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId);
+//	MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId);
 
 	void addParkedVehicle(MobsimVehicle veh, Id startLinkId);
 

@@ -166,7 +166,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 //			this.simulation.getAgentCounter().incLost();
 
 			log.warn("found agent state of ABORT.  Sending agent.ABORT to mobsim ...") ;
-			this.simulation.reInsertAgentIntoMobsim(this);
+//			this.simulation.reInsertAgentIntoMobsim(this);
 
 			return ;
 		}
@@ -189,7 +189,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 //				this.simulation.arrangeActivityStart(this);
 				this.state = MobsimAgent.State.ACTIVITY ;
-				this.simulation.reInsertAgentIntoMobsim(this);
+//				this.simulation.reInsertAgentIntoMobsim(this);
 				// yyyyyy 000000
 				
 				return ;
@@ -198,7 +198,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 //				this.simulation.getAgentCounter().decLiving();
 				this.state = MobsimAgent.State.ACTIVITY ;
 				this.activityEndTime = Double.POSITIVE_INFINITY ;
-				this.simulation.reInsertAgentIntoMobsim(this);
+//				this.simulation.reInsertAgentIntoMobsim(this);
 				return ;
 			}
 
@@ -208,7 +208,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 //			    this.simulation.arrangeAgentDeparture(this);
 			this.state = MobsimAgent.State.LEG ;
-			this.simulation.reInsertAgentIntoMobsim(this) ;
+//			this.simulation.reInsertAgentIntoMobsim(this) ;
 
 			    
 			    return ;

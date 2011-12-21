@@ -165,20 +165,21 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			throw new UnsupportedOperationException() ;
 		}
 
-		@Override
-		public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
-			throw new UnsupportedOperationException() ;
-		}
+//		@Override
+//		public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
+//			throw new UnsupportedOperationException() ;
+//		}
 
 	};
 	
-	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
-	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
-		if ( NEW ) {
-		} else {
-			this.arrangeNextAgentAction( agent) ;
-		}
-	}
+//	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
+//	@Override
+//	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
+//		if ( NEW ) {
+//		} else {
+//			this.arrangeNextAgentAction( agent) ;
+//		}
+//	}
 
 
 	/**
@@ -669,10 +670,10 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	}
 
 
-	@Override
-	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
-		throw new UnsupportedOperationException() ;
-	}
+//	@Override
+//	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
+//		throw new UnsupportedOperationException() ;
+//	}
 
 
 	@Override
@@ -687,10 +688,10 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	}
 
 
-	@Override
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-		throw new UnsupportedOperationException() ;
-	}
+//	@Override
+//	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+//		throw new UnsupportedOperationException() ;
+//	}
 
 
 	@Override

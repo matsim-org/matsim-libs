@@ -79,10 +79,27 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
- * Implementation of a queue-based transport simulation. Lanes and SignalSystems
- * are not initialized unless the setter are invoked.
+ * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
+ * approach consists of the following elements (and presumably more, developed by mzilske):<ul>
+ * <li> QSim itself should have all basic functionality to execute a typical agent plan, i.e. activities and legs.  In this basic
+ * version, all legs are teleported.
+ * <li> In addition, there are "engines" that plug into QSim.  Those are time-step driven, as is QSim.  Many engines move
+ * particles around, i.e. they execute the different modes.  Others are responsible for, e.g., time-variant networks or signals. 
+ * <li> A special engine is the netsim engine, which is the original "queue"
+ * engine.  It is invoked by default, and it carries the "NetsimNetwork" for which there is a getter.
+ * <li> Engines that move particles around need to be able to "end legs".  
+ * This used to be such that control went to the agents, which
+ * reinserted themselves into QSim.  This has now been changed: The agents compute their next state, but the engines are
+ * responsible for reinsertion into QSim.  For this, they obtain an "internal interface" during engine addition.  Naming 
+ * conventions will be adapted to this in the future.
+ * <li> <i>A caveat is that drivers that move around other agents (such as TransitDriver, TaxicabDriver) need to become
+ * "engines".</i>  Possibly, something that executes a leg is not really the same as an "engine", but this is what we have
+ * for the time being.
+ *  * </ul>
+ * Future plans include: pull the agent counter write methods back into QSim (no big deal, I hope); pull the actstart/end, 
+ * agent departure/arrival back into QSim+engines; somewhat separate the teleportation engine and the activities engine from the
+ * framework part of QSim. 
  * <p/>
- * 
  * @author dstrippgen
  * @author mrieser
  * @author dgrether
@@ -92,12 +109,14 @@ public final class QSim implements VisMobsim, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
-	/* time since last snapshot */
+	/** time since last snapshot */
 	private double snapshotTime = 0.0;
+
 	private int snapshotPeriod = 0;
 
-	/* time since last "info" */
+	/** time since last "info" */
 	private double infoTime = 0;
+
 	private static final int INFO_PERIOD = 3600;
 
 	private final EventsManager events;
@@ -139,15 +158,15 @@ public final class QSim implements VisMobsim, Netsim {
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
     
-    static boolean NEW = true ;
+//    static boolean NEW = true ;
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public final void arrangeNextAgentState(MobsimAgent agent) {
-			if ( NEW ) {
+//			if ( NEW ) {
 				QSim.this.arrangeNextAgentAction(agent) ;
-			} else {
-			}
+//			} else {
+//			}
 		}
 
 		@Override
@@ -157,40 +176,31 @@ public final class QSim implements VisMobsim, Netsim {
 		
 		@Override
 		public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-			if ( NEW ) { 
+//			if ( NEW ) { 
 				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
-			} else {
-			}
+//			} else {
+//			}
 		}
 		
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-			if ( NEW ) {
-				return null ;
-			} else {
+//			if ( NEW ) {
 				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-			}
+//			} else {
+//				return null ;
+//			}
 		}
 		
-		@Deprecated // use through InternalInterface
-		@Override
-		public final void rescheduleActivityEnd(final MobsimAgent agent, final double oldTime, final double newTime ) {
-			// yyyy quite possibly, this should be "notifyChangedPlan".  kai, oct'10
-			// yy the "newTime" is strictly speaking not necessary.  kai, oct'10
-
-			QSim.this.internalRescheduleActivityEnd(agent, oldTime, newTime);
-		}
-
 
 	};
 	
-	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
-	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
-		if ( NEW ) {
-		} else {
-			this.arrangeNextAgentAction( agent) ;
-		}
-	}
+//	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
+//	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
+//		if ( NEW ) {
+//		} else {
+//			this.arrangeNextAgentAction( agent) ;
+//		}
+//	}
 
 
     // everything above this line is private and should remain private. pls
@@ -546,14 +556,14 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	@Deprecated // use InternalInterface
-	@Override
-	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		if ( NEW ) { 
-		} else {
-			netEngine.registerAdditionalAgentOnLink(planAgent);
-		}
-	}
+//	@Deprecated // use InternalInterface
+//	@Override
+//	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
+//		if ( NEW ) { 
+//		} else {
+//			netEngine.registerAdditionalAgentOnLink(planAgent);
+//		}
+//	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		if (!(agent instanceof TransitDriver)) {
@@ -563,15 +573,15 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	@Deprecated // use InternalInterface
-	@Override
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-		if ( NEW ) {
-			return null ;
-		} else {
-			return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-		}
-	}
+//	@Deprecated // use InternalInterface
+//	@Override
+//	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+//		if ( NEW ) {
+//			return null ;
+//		} else {
+//			return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+//		}
+//	}
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {

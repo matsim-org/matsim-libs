@@ -95,7 +95,7 @@ public interface Mobsim extends ObservableSimulation {
 	 * InternalInterface .  kai, nov'11
 	 */
 	void insertAgentIntoMobsim( MobsimAgent agent ) ;
-	void reInsertAgentIntoMobsim( MobsimAgent agent ) ;
+//	void reInsertAgentIntoMobsim( MobsimAgent agent ) ;
 	
 //	void arrangeAgentDeparture(MobsimAgent planAgent);
 

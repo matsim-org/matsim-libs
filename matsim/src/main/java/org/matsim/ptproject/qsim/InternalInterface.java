@@ -9,5 +9,5 @@ public interface InternalInterface {
 	public void arrangeNextAgentState(MobsimAgent agent) ;
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId);
-	void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime);
+//	void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime);
 }
