@@ -34,7 +34,7 @@ package playground.wdoering.multidestpeds.helper;
 	import com.vividsolutions.jts.geom.Coordinate;
 	import com.vividsolutions.jts.geom.GeometryFactory;
 	import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+	import com.vividsolutions.jts.geom.Point;
 
 	public class Bottleneck
 	{
@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
 
 		public static void main(String [] args)
 		{
-			if (args.length != 1)
+			if (args.length != 0)
 			{
 				System.err.println("No output path given! ( Bottleneck.java /path/to/output/ )");
 				System.exit(0);
@@ -52,7 +52,8 @@ import com.vividsolutions.jts.geom.Point;
 			else
 			{
 				//get path
-				String scDir = args[0];
+//				String scDir = args[0];
+				String scDir = "C:/temp";
 				
 				//set input directory
 				String inputDir = scDir + "/input/";
@@ -73,22 +74,21 @@ import com.vividsolutions.jts.geom.Point;
 				//create nodes and links (network)
 				List<Link> links = createNetwork(scenario, inputDir, distance, length, width, waitingAreaWidth);
 	
-				//TODO: create population for bottleneck
 				//create population
 				createPop(scenario, inputDir, links, length, width, waitingAreaWidth);
 //	
-//				c.controler().setLastIteration(10);
-//				c.controler().setOutputDirectory(scDir + "output/");
+				c.controler().setLastIteration(0);
+				c.controler().setOutputDirectory(scDir + "output/");
+	
+				c.strategy().setMaxAgentPlanMemorySize(3);
+	
+				c.strategy().addParam("maxAgentPlanMemorySize", "3");
+				c.strategy().addParam("Module_1", "ReRoute");
+				c.strategy().addParam("ModuleProbability_1", "0.1");
+				c.strategy().addParam("Module_2", "ChangeExpBeta");
+				c.strategy().addParam("ModuleProbability_2", "0.9");
 //	
-//				c.strategy().setMaxAgentPlanMemorySize(3);
-//	
-//				c.strategy().addParam("maxAgentPlanMemorySize", "3");
-//				c.strategy().addParam("Module_1", "ReRoute");
-//				c.strategy().addParam("ModuleProbability_1", "0.1");
-//				c.strategy().addParam("Module_2", "ChangeExpBeta");
-//				c.strategy().addParam("ModuleProbability_2", "0.9");
-//	
-//				new ConfigWriter(c).write(inputDir + "/config.xml");
+				new ConfigWriter(c).write(inputDir + "/config.xml");
 			}
 
 
@@ -169,8 +169,8 @@ import com.vividsolutions.jts.geom.Point;
 //				double x = currentLink.getFromNode().getCoord().getX() + dx;
 //				double y = currentLink.getFromNode().getCoord().getY() + dy;
 
-				double x = (-waitingAreaWidth/2) + ((i % personsPerRow) / personsPerRow);
-				double y = (-waitingAreaWidth/2) + Math.floor((i / waitingAreaWidth));
+				double x = (-waitingAreaWidth/2) + ( ((i % personsPerRow) + 0.01 / personsPerRow) * waitingAreaWidth);
+				double y = ((Math.floor((i + 0.01 / personsPerRow))/persons)*waitingAreaWidth);
 				
 				Point p = geofac.createPoint(new Coordinate(x,y));
 				GisDebugger.addGeometry(p, ""+i);
@@ -180,7 +180,7 @@ import com.vividsolutions.jts.geom.Point;
 //				currPos += dist;
 			}
 			
-			GisDebugger.dump("/Users/laemmel/devel/counter/input/persons.shp");
+			GisDebugger.dump("C:/temp/persons.shp");
 
 
 		}
