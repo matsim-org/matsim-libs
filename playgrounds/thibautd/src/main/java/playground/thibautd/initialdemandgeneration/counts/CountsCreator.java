@@ -19,21 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.counts;
 
-import java.io.File;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
-import org.matsim.counts.MatsimCountsReader;
-
-import playground.thibautd.initialdemandgeneration.counts.TimeFilter.DayFilter;
-import playground.thibautd.initialdemandgeneration.counts.TimeFilter.Day;
 
 /**
  * @author thibautd

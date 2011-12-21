@@ -20,7 +20,6 @@
 package playground.thibautd.initialdemandgeneration.counts;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;

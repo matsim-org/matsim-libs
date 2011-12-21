@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Module;
 import org.matsim.core.population.PersonImpl;

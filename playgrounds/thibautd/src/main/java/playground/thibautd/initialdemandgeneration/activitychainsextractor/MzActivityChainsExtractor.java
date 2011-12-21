@@ -22,8 +22,6 @@ package playground.thibautd.initialdemandgeneration.activitychainsextractor;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
