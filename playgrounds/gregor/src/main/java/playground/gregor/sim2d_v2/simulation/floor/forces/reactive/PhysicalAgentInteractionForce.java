@@ -1,22 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * AgentInteractionModule.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation.floor.forces.reactive;
 
 import java.util.Collection;
@@ -29,15 +10,7 @@ import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
-
-/**
- * Agent interaction forces according to: D. Helbing, I. Farkas, T. Vicsek,
- * Nature 407, 487-490 (2000)
- * 
- * @author laemmel
- * 
- */
-public class CircularAgentInteractionModule implements DynamicForceModule {
+public class PhysicalAgentInteractionForce implements DynamicForceModule {
 
 	protected final PhysicalFloor floor;
 	protected final Scenario sc;
@@ -47,19 +20,15 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 	private QuadTree<Agent2D> coordsQuad;
 
 	//Helbing constant
-	private static final double Bi=0.08;
-	private static final double Ai=2000;
-	private static final double k = 1.2 * 100000;
-	private static final double kappa = 2.4 * 100000;
+	private static final double Bi=0.125;
+	private static final double Ai=5;
 
-	//Laemmel constant
-	private static final double neighborhoodSensingRange = 5;
 
 	/**
 	 * @param floor
 	 * @param sceanrio
 	 */
-	public CircularAgentInteractionModule(PhysicalFloor floor, Scenario scenario) {
+	public PhysicalAgentInteractionForce(PhysicalFloor floor, Scenario scenario) {
 		this.floor = floor;
 		this.sc = scenario;
 	}
@@ -84,7 +53,7 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, neighborhoodSensingRange);
+		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 5*Agent2D.AGENT_DIAMETER);
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -92,23 +61,15 @@ public class CircularAgentInteractionModule implements DynamicForceModule {
 			}
 
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist > neighborhoodSensingRange) {
+			if (dist > Agent2D.AGENT_DIAMETER) {
 				continue;
 			}
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;
 			double dy = (agent.getPosition().y - other.getPosition().y) / dist;
 
-			double bounderyDist = Agent2D.AGENT_DIAMETER - dist;
-			double g = bounderyDist > 0 ? bounderyDist : 0;
 
-			double tanDvx = (other.getVx() - agent.getVx()) * dx;
-			double tanDvy = (other.getVy() - agent.getVy()) * dy;
-
-			double tanX = tanDvx * -dy;
-			double tanY = tanDvy * dx;
-
-			double xc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dx+ kappa * g * tanX;
-			double yc = (Ai * Math.exp((bounderyDist) / Bi) + k*g)* dy + kappa * g * tanY;
+			double xc = (Ai * Math.exp( Bi/dist))* dx;
+			double yc = (Ai * Math.exp(Bi/dist))* dy;
 			//			double xc = ( k*g)* dx;
 			//			double yc = (k*g)* dy ;
 

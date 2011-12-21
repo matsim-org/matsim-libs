@@ -47,7 +47,7 @@ public class ScenarioGeneratorV {
 
 		double length = 6;
 		double r = 3;
-		double width = 1.;
+		double width = .7;
 
 
 		Config c = ConfigUtils.createConfig();
@@ -101,7 +101,7 @@ public class ScenarioGeneratorV {
 			List<Link> links, int persons, double time) {
 
 		//DEBUG
-		GeometryFactory geofac = new GeometryFactory();
+		//		GeometryFactory geofac = new GeometryFactory();
 
 		double length = 0;
 		for (int i = 0; i < links.size()/10; i++) {
@@ -126,13 +126,13 @@ public class ScenarioGeneratorV {
 			double x = clink.getFromNode().getCoord().getX() + dx;
 			double y = clink.getFromNode().getCoord().getY() + dy;
 
-			Point p = geofac.createPoint(new Coordinate(x,y));
-			GisDebugger.addGeometry(p, ""+i);
+			//			Point p = geofac.createPoint(new Coordinate(x,y));
+			//			GisDebugger.addGeometry(p, ""+i);
 			Person pers = createPerson(pb,new CoordImpl(x,y),clink,links,time,sc);
 			pop.addPerson(pers);
 			currPos += dist;
 		}
-		GisDebugger.dump("/Users/laemmel/devel/counter/input/persons.shp");
+		//		GisDebugger.dump("/Users/laemmel/devel/counter/input/persons.shp");
 
 
 	}
@@ -146,21 +146,38 @@ public class ScenarioGeneratorV {
 		//		createPersons(sc,pb,pop,links,23,0);
 
 		//
-		createPersons(sc,pb,pop,links,83,0*60);
-		createPersons(sc,pb,pop,links,72,120*60);
-		createPersons(sc,pb,pop,links,59,180*60);
-		createPersons(sc,pb,pop,links,49,240*60);
-		createPersons(sc,pb,pop,links,37,300*60);
-		createPersons(sc,pb,pop,links,23,360*60);
-		createPersons(sc,pb,pop,links,18,400*60);
-		createPersons(sc,pb,pop,links,14,405*60);
-		createPersons(sc,pb,pop,links,12,410*60);
-		createPersons(sc,pb,pop,links,10,415*60);
-		createPersons(sc,pb,pop,links,18,420*60);
-		createPersons(sc,pb,pop,links,2,425*60);
-		createPersons(sc,pb,pop,links,1,430*60);
-		createPersons(sc,pb,pop,links,1,435*60);
-		createPersons(sc,pb,pop,links,107,440*60);
+
+		createPersons(sc,pb,pop,links,70,0*60);
+		createPersons(sc,pb,pop,links,62,60*60);
+		createPersons(sc,pb,pop,links,56,120*60);
+		createPersons(sc,pb,pop,links,45,180*60);
+		createPersons(sc,pb,pop,links,39,240*60);
+		createPersons(sc,pb,pop,links,34,300*60);
+		createPersons(sc,pb,pop,links,28,360*60);
+		createPersons(sc,pb,pop,links,25,420*60);
+		createPersons(sc,pb,pop,links,22,480*60);
+		createPersons(sc,pb,pop,links,20,540*60);
+		createPersons(sc,pb,pop,links,17,600*60);
+		createPersons(sc,pb,pop,links,14,660*60);
+		//		createPersons(sc,pb,pop,links,1,430*60);
+		//		createPersons(sc,pb,pop,links,1,435*60);
+		//		createPersons(sc,pb,pop,links,107,440*60);
+
+		//		createPersons(sc,pb,pop,links,83,0*60);
+		//		createPersons(sc,pb,pop,links,72,120*60);
+		//		createPersons(sc,pb,pop,links,59,180*60);
+		//		createPersons(sc,pb,pop,links,49,240*60);
+		//		createPersons(sc,pb,pop,links,37,300*60);
+		//		createPersons(sc,pb,pop,links,23,360*60);
+		//		createPersons(sc,pb,pop,links,18,400*60);
+		//		createPersons(sc,pb,pop,links,14,405*60);
+		//		createPersons(sc,pb,pop,links,12,410*60);
+		//		createPersons(sc,pb,pop,links,10,415*60);
+		//		createPersons(sc,pb,pop,links,8,420*60);
+		//		createPersons(sc,pb,pop,links,2,425*60);
+		//		createPersons(sc,pb,pop,links,1,430*60);
+		//		createPersons(sc,pb,pop,links,1,435*60);
+		//		createPersons(sc,pb,pop,links,107,440*60);
 		String outputPopulationFile = inputDir + "/plans.xml";
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), 1).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
@@ -310,7 +327,6 @@ public class ScenarioGeneratorV {
 		double xm = r;
 		double ym = 0;
 		List<Coordinate> o1 = getOval(r0, xm, ym, length,0.1);
-
 		Coordinate[] c1 = new Coordinate[o1.size()+1];
 		for (int i = 0; i < o1.size(); i++) {
 			c1[i] = o1.get(i);

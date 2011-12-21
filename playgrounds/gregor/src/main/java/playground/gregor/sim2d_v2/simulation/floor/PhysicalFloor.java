@@ -60,6 +60,8 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForce
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
+import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
+import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalEnvironmentForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -154,6 +156,10 @@ public class PhysicalFloor implements Floor {
 		if (this.sim2DConfig.isEnablePathForceModule()){
 			this.forceModules.add(new PathForceModule(this, this.scenario));
 		}
+
+		//		//testing only
+		//		this.forceModules.add(new PhysicalEnvironmentForce(this, this.scenario));
+		//		this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
 
 		for (ForceModule m : this.forceModules) {
 			m.init();

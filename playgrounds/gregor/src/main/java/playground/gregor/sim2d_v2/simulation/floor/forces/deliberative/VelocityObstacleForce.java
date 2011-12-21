@@ -66,6 +66,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 	//Laemmel constant
+	@Deprecated
 	private static final double neighborhoodSensingRange = 5;
 
 	public VelocityObstacleForce(PhysicalFloor floor, Scenario sc) {
@@ -150,6 +151,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		//		GeometryFactory geofac = new GeometryFactory();
 
 		Coordinate pos = agent.getPosition();
+
+		//TODO think about this
 		double dist = Math.max(4, this.timeHorizont*agent.getDesiredVelocity());
 		Collection<CCWPolygon> coords = new HashSet<CCWPolygon>();
 		q.get(pos.x-dist , pos.y-dist, pos.x+dist, pos.y+dist, coords);
@@ -160,11 +163,11 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			double collTime = Double.POSITIVE_INFINITY;
 			if (Algorithms.contains(agent.getPosition(),envObst)) {
 				//TODO no magic numbers here!!
-				double move = 2*agent.getGeometry().d;
+				double move = agent.getGeometry().d;
 				Coordinate cobst = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().get(agent.getPosition().x, agent.getPosition().y);
 
-				double x = move*(cobst.x - agent.getPosition().x)/dist;
-				double y = move*(cobst.y - agent.getPosition().y)/dist;
+				double x = move*(cobst.x - agent.getPosition().x);
+				double y = move*(cobst.y - agent.getPosition().y);
 				Coordinate agPos = new Coordinate(agent.getPosition().x-x,agent.getPosition().y-y);
 				idx = Algorithms.getTangentIndices(agPos,envObst);
 
@@ -174,8 +177,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 				//				LineString lrCso = geofac.createLineString(envObst);
 				//				GisDebugger.addGeometry(lrCso,"A(+)-B");
 				collTime = 0;
-				agent.getForce().setVx(.5*agent.getVx());
-				agent.getForce().setVy(.5*agent.getVy());
+				//				agent.getForce().setVx(.9*agent.getVx());
+				//				agent.getForce().setVy(.9*agent.getVy());
 
 			} else {
 				idx = Algorithms.getTangentIndices(agent.getPosition(),envObst);
@@ -257,7 +260,6 @@ public class VelocityObstacleForce implements DynamicForceModule{
 				//				LineString lrCso = geofac.createLineString(cso);
 				//				GisDebugger.addGeometry(lrCso,"A(+)-B");
 
-				//TODO no magic numbers here!!
 				double move = other.getGeometry().d + agent.getGeometry().d;
 				double x = move*(other.getPosition().x - agent.getPosition().x)/dist;
 				double y = move*(other.getPosition().y - agent.getPosition().y)/dist;
