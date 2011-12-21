@@ -20,17 +20,25 @@
 package playground.thibautd.utils.charts;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.RectangularShape;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.DatasetRenderingOrder;
+import org.jfree.chart.renderer.category.BarPainter;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StatisticalBarRenderer;
+import org.jfree.chart.renderer.category.StatisticalLineAndShapeRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
+import org.jfree.ui.RectangleEdge;
 import org.matsim.core.utils.charts.ChartUtil;
 
 /**

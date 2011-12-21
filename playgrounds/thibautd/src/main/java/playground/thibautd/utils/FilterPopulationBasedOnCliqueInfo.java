@@ -25,17 +25,18 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 
-import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.PopulationOfCliques;
-import playground.thibautd.jointtrips.population.ScenarioWithCliques;
-import playground.thibautd.jointtrips.run.JointControler;
-import playground.thibautd.jointtrips.utils.JointControlerUtils;
+import playground.thibautd.jointtripsoptimizer.population.Clique;
+import playground.thibautd.jointtripsoptimizer.population.PopulationOfCliques;
+import playground.thibautd.jointtripsoptimizer.population.ScenarioWithCliques;
+import playground.thibautd.jointtripsoptimizer.run.JointControler;
+import playground.thibautd.jointtripsoptimizer.utils.JointControlerUtils;
 
 /**
  * creates a sample of a population containing only the agents listed in

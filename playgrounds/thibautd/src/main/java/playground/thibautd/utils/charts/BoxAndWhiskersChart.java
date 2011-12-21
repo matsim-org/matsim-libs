@@ -20,19 +20,21 @@
 package playground.thibautd.utils.charts;
 
 import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.DatasetRenderingOrder;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBoxAndWhiskerRenderer;
 import org.jfree.chart.renderer.xy.XYErrorRenderer;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
+import org.jfree.data.xy.IntervalXYDataset;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.collections.Tuple;
 

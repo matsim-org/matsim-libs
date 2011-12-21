@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.JFreeChart;
 
 /**
  * provides static functions to perform usual XYPlot manipulation.

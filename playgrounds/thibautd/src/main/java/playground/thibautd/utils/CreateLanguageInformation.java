@@ -21,11 +21,13 @@ package playground.thibautd.utils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,11 +36,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.MyPerson;
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.census2000.data.Households;
 import playground.balmermi.world.Layer;
+import playground.balmermi.world.World;
 import playground.balmermi.world.Zone;
 
 /**
