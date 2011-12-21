@@ -66,7 +66,7 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 
 		if (this.e.contains(event.getCoordinate())){
 			double v = Math.sqrt(event.getVX()*event.getVX()+event.getVY()*event.getVY());
-			v *= event.getVX() < 0 ? -1 : 1;
+			//			v *= event.getVX() < 0 ? -1 : 1;
 			this.velo.add(v);
 		}
 	}
@@ -155,8 +155,8 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 	}
 
 	public static void main(String [] args) {
-		String eventsFile = "/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz";
-		String config = "/Users/laemmel/devel/counter/config.xml";
+		String eventsFile = "/Users/laemmel/devel/bottleneck/output/ITERS/it.0/0.events.xml.gz";
+		String config = "/Users/laemmel/devel/bottleneck/input/config.xml";
 
 		Config c = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(c);
@@ -166,7 +166,8 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
 		//		Envelope e = new Envelope(4,7,2.75,3.25);
-		Envelope e = new Envelope(5.5,6.5,2.65,3.35);
+		// minX maxX minY maxY
+		Envelope e = new Envelope(-0.5,0.5,-3,-2);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += .125 ) {
