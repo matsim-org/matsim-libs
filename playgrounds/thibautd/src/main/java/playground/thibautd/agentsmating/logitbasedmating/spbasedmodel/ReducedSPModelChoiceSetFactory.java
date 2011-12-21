@@ -145,6 +145,7 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		int nTransfers = 0;
 
 		// car
+		// ---------------------------------------------------------------------
 		leg.setMode( TransportMode.car );
 		carTravelTime = ttEstimator.getLegTravelTimeEstimation(
 				personId,
@@ -169,6 +170,10 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 		nonCpAlternatives.add( currentAlternative );
 
 		// pt
+		// ---------------------------------------------------------------------
+		walkingTime = 0d;
+		waitingTime = 0d;
+		distance = 0;
 		if (transitRouter != null) {
 			List<Leg> ptLegs = transitRouter.calcRoute(
 					origin.getCoord(),
@@ -176,12 +181,33 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 					departureTime,
 					population.getPersons().get( personId ) );
 
-			ptTravelTime = 0;
-			for (Leg ptLeg : ptLegs) {
-				ptTravelTime += ptLeg.getRoute().getTravelTime();
-			}
+			if (ptLegs != null && ptLegs.size() > 0) {
+				ptTravelTime = 0;
 
-			nTransfers = ptLegs.size() - 1;
+				double lastArrivalTime = Double.NaN;
+				for (Leg ptLeg : ptLegs) {
+					if (!Double.isNaN( lastArrivalTime )) {
+						waitingTime += ptLeg.getDepartureTime() - lastArrivalTime;
+					}
+					lastArrivalTime = ptLeg.getDepartureTime() + ptLeg.getTravelTime();
+
+					if ( ptLeg.getMode().equals( TransportMode.walk ) ||
+							ptLeg.getMode().equals( TransportMode.transit_walk ) ) {
+						walkingTime += ptLeg.getTravelTime();
+					}
+					else {
+						ptTravelTime += ptLeg.getTravelTime();
+					}
+				}
+
+				nTransfers = Math.max( ptLegs.size() - 3 , 0 );
+			}
+			else {
+				// it is not clear whether this can happen or not (a quick glance
+				// at the code makes think that yes, but it is not documented)
+				log.warn( "no valid pt route obtained: setting pt travel time to infinity" );
+				ptTravelTime = Double.POSITIVE_INFINITY;
+			}
 		}
 		else {
 			leg.setMode( TransportMode.pt );
@@ -192,26 +218,33 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 					destination,
 					leg,
 					true);
+		}
 
+		if (!Double.isInfinite( ptTravelTime )) {
+			// the PT router does not allow to obtain easily the network distance:
+			// use a bee-fly estimate
 			distance = CoordUtils.calcDistance(
 					origin.getCoord(),
 					destination.getCoord() );
+
+			ptTravelCost = distance * getPtTravelCostPerM( decisionMaker );
+
+			currentAlternative = createPtAlternative(
+					ptTravelTime,
+					ptTravelCost,
+					walkingTime,
+					waitingTime,
+					nTransfers);
+
+			allAlternatives.add( currentAlternative );
+			nonCpAlternatives.add( currentAlternative );
+
+			nonCpAlternatives = Collections.unmodifiableList( nonCpAlternatives );
 		}
-		ptTravelCost = distance * getPtTravelCostPerM( decisionMaker );
-		walkingTime = 0d;
-		waitingTime = 0d;
-		currentAlternative = createPtAlternative(
-				ptTravelTime,
-				ptTravelCost,
-				walkingTime,
-				waitingTime,
-				nTransfers);
 
-		allAlternatives.add( currentAlternative );
-		nonCpAlternatives.add( currentAlternative );
-
-		nonCpAlternatives = Collections.unmodifiableList( nonCpAlternatives );
 		// cpd
+		// ---------------------------------------------------------------------
+		walkingTime = 0d;
 		currentAlternative = createCpdAlternative(
 				carTravelTime + configGroup.getSurplusDriver(),
 				carTravelCost / 2d,
@@ -227,6 +260,8 @@ public class ReducedSPModelChoiceSetFactory implements ChoiceSetFactory {
 			nonCpAlternatives) );
 
 		// cpp
+		// ---------------------------------------------------------------------
+		walkingTime = 0d;
 		currentAlternative = createCppAlternative(
 				carTravelTime,
 				carTravelCost / 2d,
