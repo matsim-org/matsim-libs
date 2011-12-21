@@ -65,17 +65,17 @@ import com.vividsolutions.jts.geom.Point;
 	
 				//create config
 				Config c = ConfigUtils.createConfig();
-				Scenario sc = ScenarioUtils.createScenario(c);
+				Scenario scenario = ScenarioUtils.createScenario(c);
 	
 				//create (and save) environment
 				createAndSaveEnvironment(inputDir,length, distance, width, waitingAreaWidth);
 				
 				//create nodes and links (network)
-				List<Link> links = createNetwork(sc, inputDir, distance, length, width, waitingAreaWidth);
+				List<Link> links = createNetwork(scenario, inputDir, distance, length, width, waitingAreaWidth);
 	
 				//TODO: create population for bottleneck
 				//create population
-//				createPop(sc,inputDir, links);
+				createPop(scenario, inputDir, links, length, width, waitingAreaWidth);
 //	
 //				c.controler().setLastIteration(10);
 //				c.controler().setOutputDirectory(scDir + "output/");
@@ -93,117 +93,134 @@ import com.vividsolutions.jts.geom.Point;
 
 
 		}
-		private static Person createPerson(PopulationFactory pb, CoordImpl coordImpl, Link clink, List<Link> links, double time, Scenario sc)
+		private static Person createPerson(PopulationFactory populationFactory, CoordImpl coordImpl, Link clink, List<Link> links, double time, Scenario sc)
 		{
-			Person pers = pb.createPerson(sc.createId("g"+Integer.toString(persId ++)));
-			Plan plan = pb.createPlan();
-			ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", clink.getId());
+			//create person
+			Person pers = populationFactory.createPerson(sc.createId("g"+Integer.toString(persId ++)));
+			
+			//set plan
+			Plan plan = populationFactory.createPlan();
+			
+			//set activity
+			ActivityImpl act = (ActivityImpl) populationFactory.createActivityFromLinkId("h", clink.getId());
 			act.setCoord(coordImpl);
 			act.setEndTime(time);
+			
+			//add activity
 			plan.addActivity(act);
-			Leg leg = pb.createLeg("walk2d");
+			
+			//set leg
+			Leg leg = populationFactory.createLeg("walk2d");
+			
+			//add leg
 			plan.addLeg(leg);
+			
+			//get last link
 			Link l1 = links.get(links.size()-1);
-			Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
+			
+			//set final activity
+			Activity act2 = populationFactory.createActivityFromLinkId("h", l1.getId());
 			act2.setEndTime(0);
 			plan.addActivity(act2);
 			plan.setScore(0.);
+			
+			//add to plan
 			pers.addPlan(plan);
 			
 			return pers;
 		}
 
 
-		private static void createPersons(Scenario sc,PopulationFactory pb, Population pop, List<Link> links, int persons, double time)
+		private static void createPersons(Scenario sc,PopulationFactory pb, Population pop, List<Link> links, int persons, double time, double length, double width, double waitingAreaWidth)
 		{
 
 			//DEBUG
-//			GeometryFactory geofac = new GeometryFactory();
-//
+			GeometryFactory geofac = new GeometryFactory();
+
 //			double length = 0;
 //			for (int i = 0; i < links.size()/10; i++) {
 //				Link link = links.get(i);
 //				length += link.getLength();
 //			}
-//
-//			double dist = length / persons;
-//			Iterator<Link> it = links.iterator();
-//			Link clink = it.next();
-//			double linkLength = clink.getLength();
+
+			double dist = length / persons;
+			
+			//get links
+			Iterator<Link> it = links.iterator();
+			Link currentLink = it.next();
+			double linkLength = currentLink.getLength();
+			
 //			double currPos = 0;
-//			for (int i = 0; i < persons; i++) {
-//				while (currPos > linkLength) {
-//					clink = it.next();
-//					linkLength += clink.getLength();
+			
+			int personsPerRow = (int)Math.sqrt(persons);
+			
+			for (int i = 0; i < persons; i++)
+			{
+//				while (currPos > linkLength)
+//				{
+//					currentLink = it.next();
+//					linkLength += currentLink.getLength();
 //				}
-//				double posOnLink = currPos - linkLength + clink.getLength();
-//				double dx = posOnLink*(clink.getToNode().getCoord().getX() - clink.getFromNode().getCoord().getX())/clink.getLength();
-//				double dy = posOnLink*(clink.getToNode().getCoord().getY() - clink.getFromNode().getCoord().getY())/clink.getLength();
-//
-//				double x = clink.getFromNode().getCoord().getX() + dx;
-//				double y = clink.getFromNode().getCoord().getY() + dy;
-//
-//				Point p = geofac.createPoint(new Coordinate(x,y));
-//				GisDebugger.addGeometry(p, ""+i);
-//				Person pers = createPerson(pb,new CoordImpl(x,y),clink,links,time,sc);
-//				pop.addPerson(pers);
+//				
+//				double posOnLink = currPos - linkLength + currentLink.getLength();
+//				double dx = posOnLink*(currentLink.getToNode().getCoord().getX() - currentLink.getFromNode().getCoord().getX())/currentLink.getLength();
+//				double dy = posOnLink*(currentLink.getToNode().getCoord().getY() - currentLink.getFromNode().getCoord().getY())/currentLink.getLength();
+
+//				double x = currentLink.getFromNode().getCoord().getX() + dx;
+//				double y = currentLink.getFromNode().getCoord().getY() + dy;
+
+				double x = (-waitingAreaWidth/2) + ((i % personsPerRow) / personsPerRow);
+				double y = (-waitingAreaWidth/2) + Math.floor((i / waitingAreaWidth));
+				
+				Point p = geofac.createPoint(new Coordinate(x,y));
+				GisDebugger.addGeometry(p, ""+i);
+				Person pers = createPerson(pb,new CoordImpl(x,y),currentLink,links,time,sc);
+				
+				pop.addPerson(pers);
 //				currPos += dist;
-//			}
-//			
-//			GisDebugger.dump("/Users/laemmel/devel/counter/input/persons.shp");
+			}
+			
+			GisDebugger.dump("/Users/laemmel/devel/counter/input/persons.shp");
 
 
 		}
 
 
 
-		private static void createPop(Scenario scenario, String inputDir, List<Link> links)
+		private static void createPop(Scenario scenario, String inputDir, List<Link> links, double length, double width, double waitingAreaWidth)
 		{
-//			Population pop = scenario.getPopulation();
-//			PopulationFactory pb = pop.getFactory();
-//
-//			//		createPersons(sc,pb,pop,links,23,0);
-//
-//			//
-//			createPersons(scenario,pb,pop,links,83,0*60);
-//			createPersons(scenario,pb,pop,links,72,120*60);
-//			createPersons(scenario,pb,pop,links,59,180*60);
-//			createPersons(scenario,pb,pop,links,49,240*60);
-//			createPersons(scenario,pb,pop,links,37,300*60);
-//			createPersons(scenario,pb,pop,links,23,360*60);
-//			createPersons(scenario,pb,pop,links,18,400*60);
-//			createPersons(scenario,pb,pop,links,14,405*60);
-//			createPersons(scenario,pb,pop,links,12,410*60);
-//			createPersons(scenario,pb,pop,links,10,415*60);
-//			createPersons(scenario,pb,pop,links,18,420*60);
-//			createPersons(scenario,pb,pop,links,2,425*60);
-//			createPersons(scenario,pb,pop,links,1,430*60);
-//			createPersons(scenario,pb,pop,links,1,435*60);
-//			createPersons(scenario,pb,pop,links,107,440*60);
-//			String outputPopulationFile = inputDir + "/plans.xml";
-//			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), 1).write(outputPopulationFile);
-//			scenario.getConfig().plans().setInputFile(outputPopulationFile);
-//
-//
-//			ActivityParams pre = new ActivityParams("h");
-//			pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
-//			// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
-//			pre.setMinimalDuration(49);
-//			pre.setClosingTime(49);
-//			pre.setEarliestEndTime(49);
-//			pre.setLatestStartTime(49);
-//			pre.setOpeningTime(49);
-//
-//
-//			//		ActivityParams post = new ActivityParams("post-evac");
-//			//		post.setTypicalDuration(49); // dito
-//			//		post.setMinimalDuration(49);
-//			//		post.setClosingTime(49);
-//			//		post.setEarliestEndTime(49);
-//			//		post.setLatestStartTime(49);
-//			//		post.setOpeningTime(49);
-//			scenario.getConfig().planCalcScore().addActivityParams(pre);
-			//		sc.getConfig().planCalcScore().addActivityParams(post);
+			Population population = scenario.getPopulation();
+			PopulationFactory populationFactory = population.getFactory();
+
+			//			createPersons(scenario,pb,pop,links,83,0*60);
+			
+			createPersons(scenario, populationFactory, population, links, 23, 0, length, width, waitingAreaWidth);
+					
+			//create plans file
+			String outputPopulationFile = inputDir + "/plans.xml";
+			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), 1).write(outputPopulationFile);
+			scenario.getConfig().plans().setInputFile(outputPopulationFile);
+
+
+			ActivityParams pre = new ActivityParams("h");
+			pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+			// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+			pre.setMinimalDuration(49);
+			pre.setClosingTime(49);
+			pre.setEarliestEndTime(49);
+			pre.setLatestStartTime(49);
+			pre.setOpeningTime(49);
+
+
+			//		ActivityParams post = new ActivityParams("post-evac");
+			//		post.setTypicalDuration(49); // dito
+			//		post.setMinimalDuration(49);
+			//		post.setClosingTime(49);
+			//		post.setEarliestEndTime(49);
+			//		post.setLatestStartTime(49);
+			//		post.setOpeningTime(49);
+			scenario.getConfig().planCalcScore().addActivityParams(pre);
+//			scenario.getConfig().planCalcScore().addActivityParams(post);
 		}
 
 
