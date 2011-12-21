@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningStrategy.java
+ * FinalScorer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.pipeddecoder;
 
-import org.matsim.core.controler.Controler;
+import org.jgap.IChromosome;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
+import playground.thibautd.jointtripsoptimizer.population.JointPlan;
 
 /**
- * a {@link JointPlanStrategy} using a {@link JointPlanOptimizerModule}.
- * The plan to modify is selected using a {@link PlanWithLongestTypeSelector}
+ * Interface meant at building "on the fly" scorer in a modular way.
+ * This class takes a partially decoded plan and a chromosome, and computes
+ * the fitness based on the yet undecoded dimensions (eg durations).
  *
  * @author thibautd
  */
-public class ReplanningStrategy extends JointPlanStrategy {
-
-	public ReplanningStrategy(final Controler controler) {
-		this.planSelector = new PlanWithLongestTypeSelector();
-
-		this.addStrategyModule(new JointPlanOptimizerModule(controler));
-	}
+public interface FinalScorer {
+	/**
+	 * @param chromosome the representation of the plan to score
+	 * @param inputPlan a plan in wich all dimensions unhandled by this class
+	 * are corretly set.
+	 * @return the score of the plan coded by chromosome
+	 */
+	public double score(IChromosome chromosome, JointPlan inputPlan);
 }
 

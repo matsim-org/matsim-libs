@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningStrategy.java
+ * JointPlanOptimizerPipedDecoder.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.pipeddecoder;
 
-import org.matsim.core.controler.Controler;
+import java.util.ArrayList;
+import java.util.List;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
+import org.jgap.IChromosome;
+
+import playground.thibautd.jointtripsoptimizer.population.JointPlan;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
 
 /**
- * a {@link JointPlanStrategy} using a {@link JointPlanOptimizerModule}.
- * The plan to modify is selected using a {@link PlanWithLongestTypeSelector}
- *
+ * Modular decoder, decoding each "dimension" one after the other.
  * @author thibautd
  */
-public class ReplanningStrategy extends JointPlanStrategy {
+public class JointPlanOptimizerPipedDecoder implements JointPlanOptimizerDecoder {
+	private final List<JointPlanOptimizerDimensionDecoder> decoders =
+		new ArrayList<JointPlanOptimizerDimensionDecoder>();
+	private final JointPlan plan;
 
-	public ReplanningStrategy(final Controler controler) {
-		this.planSelector = new PlanWithLongestTypeSelector();
+	public JointPlanOptimizerPipedDecoder(final JointPlan plan) {
+		this.plan = plan;
+	}
 
-		this.addStrategyModule(new JointPlanOptimizerModule(controler));
+	/**
+	 * Add a decoder.
+	 * The order is important.
+	 */
+	public void addDecoder(final JointPlanOptimizerDimensionDecoder decoder) {
+		this.decoders.add(decoder);
+	}
+
+	/**
+	 * execute the decoders in the order they were added.
+	 */
+	@Override
+	public JointPlan decode(final IChromosome chromosome) {
+		JointPlan outputPlan = this.plan;
+
+		for (JointPlanOptimizerDimensionDecoder decoder : this.decoders) {
+			outputPlan = decoder.decode(chromosome, outputPlan);
+		}
+
+		return outputPlan;
 	}
 }
 

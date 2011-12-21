@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningStrategy.java
+ * AbstractJointPlanOptimizerFitnessFunction.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.fitness;
 
-import org.matsim.core.controler.Controler;
+import org.jgap.FitnessFunction;
+import org.jgap.IChromosome;
 
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
 
 /**
- * a {@link JointPlanStrategy} using a {@link JointPlanOptimizerModule}.
- * The plan to modify is selected using a {@link PlanWithLongestTypeSelector}
+ * Extend this class to provide a fitness function for the joint replanning algorithm.
+ *
  *
  * @author thibautd
  */
-public class ReplanningStrategy extends JointPlanStrategy {
+abstract public class AbstractJointPlanOptimizerFitnessFunction extends FitnessFunction {
+	/**
+	 * @return a decoder which creates plans consistent with the scores
+	 */
+	abstract public JointPlanOptimizerDecoder getDecoder(); 
+	private double lastComputedFitnessValue = Double.NEGATIVE_INFINITY;
 
-	public ReplanningStrategy(final Controler controler) {
-		this.planSelector = new PlanWithLongestTypeSelector();
-
-		this.addStrategyModule(new JointPlanOptimizerModule(controler));
+	/**
+	 * Reimplements the jgap default by allowing a negative fitness.
+	 */
+	@Override
+	public double getFitnessValue(final IChromosome a_subject) {
+		double fitnessValue = evaluate(a_subject);
+		this.lastComputedFitnessValue = fitnessValue;
+		return fitnessValue;
 	}
+
+	@Override
+	public double getLastComputedFitnessValue() {
+		return this.lastComputedFitnessValue;
+	}
+
 }
 

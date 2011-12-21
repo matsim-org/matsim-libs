@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplanningStrategy.java
+ * HammingChromosomeDistanceComparator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,25 +17,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.selectors;
 
-import org.matsim.core.controler.Controler;
-
-import playground.thibautd.jointtripsoptimizer.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
-import playground.thibautd.jointtripsoptimizer.replanning.selectors.PlanWithLongestTypeSelector;
+import org.jgap.Gene;
+import org.jgap.IChromosome;
+import org.jgap.impl.BooleanGene;
 
 /**
- * a {@link JointPlanStrategy} using a {@link JointPlanOptimizerModule}.
- * The plan to modify is selected using a {@link PlanWithLongestTypeSelector}
+ * {@link ChromosomeDistanceComparator} using only the hamming distance on toggle
+ * genes.
  *
  * @author thibautd
  */
-public class ReplanningStrategy extends JointPlanStrategy {
+public class HammingChromosomeDistanceComparator  extends ChromosomeDistanceComparator {
 
-	public ReplanningStrategy(final Controler controler) {
-		this.planSelector = new PlanWithLongestTypeSelector();
+	/**
+	 * @return the number of BooleanGene which values are different in the two 
+	 * chromosomes
+	 */
+	@Override
+	protected double getDistance(final IChromosome chr1, final IChromosome chr2) {
+		double distance = 0d;
+		int size = chr1.size();
 
-		this.addStrategyModule(new JointPlanOptimizerModule(controler));
+		if ((chr1.getClass() != chr2.getClass()) || (chr2.size() != size)) {
+			throw new IllegalArgumentException("incompatible chromosomes");
+		}
+
+		Gene[] genes1 = chr1.getGenes();
+		Gene[] genes2 = chr2.getGenes();
+
+		for (int i=0; i < size; i++) {
+			if (isDiscrete(genes1[i])) {
+				distance += getDiscreteDistance(genes1[i], genes2[i]);
+			}
+		}
+
+		return distance;
+	}
+
+	private boolean isDiscrete(final Gene gene) {
+		return (gene instanceof BooleanGene);
+	}
+
+	private double getDiscreteDistance(final Gene gene1, final Gene gene2) {
+		return ((((BooleanGene) gene1).booleanValue() ==
+					((BooleanGene) gene2).booleanValue()) ? 0 : 1);
 	}
 }
 
