@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtripsoptimizer.replanning.reroute;
+package playground.thibautd.jointtripsoptimizer.replanning.modules.reroute;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;

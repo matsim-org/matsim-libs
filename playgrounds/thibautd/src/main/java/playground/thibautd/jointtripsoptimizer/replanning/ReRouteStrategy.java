@@ -22,7 +22,7 @@ package playground.thibautd.jointtripsoptimizer.replanning;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 
-import playground.thibautd.jointtripsoptimizer.replanning.reroute.JointReRouteModule;
+import playground.thibautd.jointtripsoptimizer.replanning.modules.reroute.JointReRouteModule;
 
 /**
  * {@link JointPlanStrategy} using an {@link BestPlanSelector} to select a plan
