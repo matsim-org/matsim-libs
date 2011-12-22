@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.geotools.feature.AttributeType;
 import org.geotools.feature.AttributeTypeFactory;
-import org.geotools.feature.DefaultAttributeTypeFactory;
 import org.geotools.feature.DefaultFeatureTypeFactory;
 import org.geotools.feature.Feature;
 import org.geotools.feature.FeatureType;
@@ -54,17 +53,13 @@ import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * show the quotient (speed/freespeed) in QGIS map
- *
+ * 
  * @author yu
- *
+ * 
  */
 public class SpeedLevel2QGIS extends MATSimNet2QGIS {
-	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
-		super(netFilename, coordRefSys);
-	}
-
 	public static class SpeedLevel2PolygonGraph extends Network2PolygonGraph {
-		private Set<Id> linkIds;
+		private final Set<Id> linkIds;
 
 		public SpeedLevel2PolygonGraph(Network network,
 				CoordinateReferenceSystem crs, Set<Id> linkIds) {
@@ -72,19 +67,19 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 			this.linkIds = linkIds;
 			geofac = new GeometryFactory();
 			features = new ArrayList<Feature>();
-			AttributeType geom = DefaultAttributeTypeFactory.newAttributeType(
+			AttributeType geom = AttributeTypeFactory.newAttributeType(
 					"MultiPolygon", MultiPolygon.class, true, null, null, crs);
 			AttributeType id = AttributeTypeFactory.newAttributeType("ID",
 					String.class);
 			defaultFeatureTypeFactory = new DefaultFeatureTypeFactory();
 			defaultFeatureTypeFactory.setName("link");
 			defaultFeatureTypeFactory
-					.addTypes(new AttributeType[] { geom, id });
+			.addTypes(new AttributeType[] { geom, id });
 		}
 
 		@Override
 		public Collection<Feature> getFeatures() throws SchemaException,
-				NumberFormatException, IllegalAttributeException {
+		NumberFormatException, IllegalAttributeException {
 			for (int i = 0; i < attrTypes.size(); i++) {
 				defaultFeatureTypeFactory.addType(attrTypes.get(i));
 			}
@@ -123,7 +118,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 					m = new HashMap<Id, Double>();
 					speeds.add(i, m);
 				}
-				double speed = clas.getAvgSpeed(linkId, (i * 3600))/* km/h */
+				double speed = clas.getAvgSpeed(linkId, i * 3600)/* km/h */
 						/ 3.6 / network.getLinks().get(linkId).getFreespeed();
 				m.put(linkId, speed);
 			}
@@ -131,15 +126,44 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		return speeds;
 	}
 
-	public void setLinkIds(Set<Id> linkIds) {
-		setN2g(new SpeedLevel2PolygonGraph(getNetwork(), crs, linkIds));
-	}
-
+	/**
+	 * @param args
+	 *            [0] - network filename
+	 * @param args
+	 *            [1] - coordinate reference system
+	 * @param args
+	 *            [2] - flow capacity factor
+	 * @param args
+	 *            [3] - start time
+	 * @param args
+	 *            [4] - end time
+	 * @param args
+	 *            [5] - events filename
+	 */
 	public static void main(String[] args) {
-		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(
-				"D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
-				gk4);
-		MATSimNet2QGIS.setFlowCapFactor(0.1);
+		String networkFilename, coordinateReferenceSystem, eventsFilename;
+		double flowCapacityFactor;
+		int startTime, endTime;
+
+		if (args.length <= 3) {
+			networkFilename = "../../matsim/examples/equil/network.xml";
+			coordinateReferenceSystem = gk4;
+			flowCapacityFactor = 0.1;
+			startTime = 7;
+			endTime = 20;
+			eventsFilename = "../../matsim/output/example1/ITERS/it.0/0.events.xml.gz";
+		} else {
+			networkFilename = args[0];
+			coordinateReferenceSystem = args[1];
+			flowCapacityFactor = Double.parseDouble(args[2]);
+			startTime = Integer.parseInt(args[3]);
+			endTime = Integer.parseInt(args[4]);
+			eventsFilename = args[5];
+		}
+
+		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(networkFilename,
+				coordinateReferenceSystem);
+		MATSimNet2QGIS.setFlowCapFactor(flowCapacityFactor);
 		/*
 		 * //////////////////////////////////////////////////////////////////////
 		 * /Traffic speed level and MATSim-network to Shp-file
@@ -151,8 +175,8 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net, 3600);
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600 - 1, net);
 
-		mn2q.readEvents("test/input/bln2pct/travPt-12.1500.events.xml.gz"
-		// "../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz"
+		mn2q.readEvents(eventsFilename
+				// "../../runs-svn/run1535/ITERS/it.1900/1535.1900.events.xml.gz"
 				, new EventHandler[] { clas, va });
 
 		/*
@@ -161,7 +185,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		 * tollReader .parse(
 		 * "../schweiz-ivtch-SVN/baseCase/roadpricing/KantonZurich/KantonZurich.xml"
 		 * );
-		 *
+		 * 
 		 * Collection<Id> links = rps.getLinkIdSet();
 		 */
 
@@ -170,22 +194,29 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 		// Set<Id> linkIds = rps.getLinkIdSet();
 
-		for (int i = 6; i < 20; i++) {
-			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class,
-					sls.get(i));
+		for (int i = startTime - 1; i < endTime; i++) {
+			// mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class,
+			// sls.get(i));
 
-			// SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(
-			// "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz",
-			// gk4);
+			SpeedLevel2QGIS sl2q = new SpeedLevel2QGIS(networkFilename,
+					coordinateReferenceSystem);
 			//
-			// sl2q.setLinkIds(links);
-			// sl2q.addParameter("sl", Double.class, sls.get(i));
-			// sl2q.writeShapeFile("../../runs-svn/run1535/ITERS/it.1900/1535.1900."
-			// + (i + 1) + "speedLevel.shp");
+			sl2q.setLinkIds(links);
+			sl2q.addParameter("sl", Double.class, sls.get(i));
+			sl2q.writeShapeFile(eventsFilename.split("xml.gz")[0] + (i + 1)
+					+ ".speedLevel.shp");
 		}
-		mn2q.writeShapeFile("test/output/bln2pct/travPt-12.1500.speedLevel.shp");
+		// mn2q.writeShapeFile("test/output/bln2pct/travPt-12.1500.speedLevel.shp");
 
 		System.out.println("----->done!");
+	}
+
+	public SpeedLevel2QGIS(String netFilename, String coordRefSys) {
+		super(netFilename, coordRefSys);
+	}
+
+	public void setLinkIds(Set<Id> linkIds) {
+		setN2g(new SpeedLevel2PolygonGraph(getNetwork(), crs, linkIds));
 	}
 
 }
