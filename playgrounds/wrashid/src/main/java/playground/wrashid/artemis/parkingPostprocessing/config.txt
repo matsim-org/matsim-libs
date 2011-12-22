@@ -1,3 +1,4 @@
+x	This config is for class AssignParkingLinkIds
 baseFolder	H:/data/experiments/TRBAug2011/runs/ktiRun45/output/
 parkingLogInfoFileName	#baseFolder#ITERS/it.50/50.parkingLogInfo.txt
 networkFilePath	#baseFolder#output_network.xml.gz

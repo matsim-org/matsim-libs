@@ -13,6 +13,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
 import playground.wrashid.lib.DebugLib;
@@ -106,6 +107,12 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 					.getVehicleEnergyConsumptionModel(vehicle, dummySpeed);
 			double batteryCapacityInJoule = vehicleEnergyConsumptionModel.getBatteryCapacityInJoule();
 
+			// don't charge, if arrival time and departure time the same, as this might be interpreted wrongly
+			// as a 24 hour stay.
+			if (MathLib.equals(startIntervalTime, departureTime, 0.1)){
+				return;
+			}
+			
 			if (vehicleSOC == null) {
 				DebugLib.stopSystemAndReportInconsistency();
 			}
@@ -123,6 +130,7 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 				
 				
 				if (chargingMode==null || chargingMode.equalsIgnoreCase("dumbCharging") || chargingDuration == parkingDuration){
+					DebugLib.traceAgent(personId);
 					double batteryChargedInJoule = chargingDuration * chargingPowerInterface.getChargingPowerInWatt(actType);
 					double startSOCInJoule = vehicleSOC.getSocInJoule();
 					vehicleSOC.chargeVehicle(vehicleEnergyConsumptionModel, batteryChargedInJoule);
@@ -132,6 +140,8 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 							GeneralLib.projectTimeWithin24Hours(startIntervalTime + chargingDuration), startSOCInJoule,
 							endSOCInJoule);
 				} else if (chargingMode.equalsIgnoreCase("randomDistributionOfCharingSlotsDuringParking")){
+					// NOTE: not used for experiments (deadend: => see smartCharging.SmartCharger).
+					
 					LinkedList<ChargingTime> chargingTimes = ChargingTime.get15MinChargingBins(startIntervalTime, departureTime);
 					LinkedList<ChargingTime> randomChargingTimes = SmartCharger.getRandomChargingTimes(chargingTimes, chargingDuration);
 					LinkedList<ChargingTime> sortedChargingTimes = ChargingTime.sortChargingTimes(randomChargingTimes);

@@ -32,7 +32,7 @@ public class PrintEventsOfSingleAgent {
 		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun22/output/ITERS/it.50/50.events.xml.gz";
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
-		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("4580643"));
+		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("1470986"));
 		
 		events.addHandler(singleAgentEventsPrinter);
 		

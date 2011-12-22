@@ -10,4 +10,4 @@ outputFileEnergyConsumptionLogPerLink	c:/tmp/energyConsumptionLogPerLink.txt
 outputFileChargingLog	c:/tmp/chargingLog.txt
 outputFileForParkingTimesAndLegEnergyConsumption	c:/tmp/parkingTimesAndLegEnergyConsumption.txt
 outputFileAgentVehicleMapping	c:/tmp/agentVehicleMapping.txt
-chargingMode	randomDistributionOfCharingSlotsDuringParking
+chargingMode	dumbCharging
