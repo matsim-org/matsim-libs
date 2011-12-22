@@ -55,23 +55,27 @@ public class EinsteigerPerStopEventHandler implements PersonEntersVehicleEventHa
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		System.out.println("Person "+event.getPersonId()+" enters Vehicle "+event.getVehicleId()+" at Facility "+vehicleId2stopId.get(event.getVehicleId())+".");
-		Id vehicleId = event.getVehicleId();
-		Id stopId = vehicleId2stopId.get(vehicleId);
-		Integer einsteigerBisher = 0;
-		if (stopId2einsteiger.containsKey(stopId)){
-			einsteigerBisher = stopId2einsteiger.get(stopId);
+		if (event.getPersonId().toString().contains("bus")){
+			
 		}
-		else {}
-		Integer einsteigerNew = einsteigerBisher + 1;
-		stopId2einsteiger.put(stopId, einsteigerNew);
-//		System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS) +" Uhr: Link "+event.getLinkId()+ " wurde von "+event.getPersonId()+" verlassen.");
-	
+		else {
+			System.out.println("Person "+event.getPersonId()+" enters Vehicle "+event.getVehicleId()+" at Facility "+vehicleId2stopId.get(event.getVehicleId())+".");
+			Id vehicleId = event.getVehicleId();
+			Id stopId = vehicleId2stopId.get(vehicleId);
+			Integer einsteigerBisher = 0;
+			if (stopId2einsteiger.containsKey(stopId)){
+				einsteigerBisher = stopId2einsteiger.get(stopId);
+			}
+			else {}
+			Integer einsteigerNew = einsteigerBisher + 1;
+			stopId2einsteiger.put(stopId, einsteigerNew);
+	//		System.out.println(Time.writeTime(event.getTime(), Time.TIMEFORMAT_HHMMSS) +" Uhr: Link "+event.getLinkId()+ " wurde von "+event.getPersonId()+" verlassen.");
+		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		System.out.println("Vehicle "+event.getVehicleId()+" arrives at "+event.getFacilityId()+".");
+//		System.out.println("Vehicle "+event.getVehicleId()+" arrives at "+event.getFacilityId()+".");
 
 		vehicleId2stopId.put(event.getVehicleId(), event.getFacilityId());
 	}
