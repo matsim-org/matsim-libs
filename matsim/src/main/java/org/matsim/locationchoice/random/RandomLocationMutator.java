@@ -20,12 +20,13 @@
 
 package org.matsim.locationchoice.random;
 
-import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -63,16 +64,17 @@ public class RandomLocationMutator extends LocationMutator {
 
 
 	private void handlePlanForPreDefinedFlexibleTypes(final Plan plan) {
-		final List<?> actslegs = plan.getPlanElements();
-		for (int j = 0; j < actslegs.size(); j=j+2) {
-			final ActivityImpl act = (ActivityImpl)actslegs.get(j);
-
-			// if home is accidentally not defined as primary
-			if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) {
-				int length = this.facilitiesOfType.get(act.getType()).length;
-				// only one facility: do not need to do location choice
-				if (length > 1) {
-					this.setNewLocationForAct(act, length);
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				final Activity act = (Activity) pe;
+	
+				// if home is accidentally not defined as primary
+				if (super.defineFlexibleActivities.getFlexibleTypes().contains(act.getType())) {
+					int length = this.facilitiesOfType.get(act.getType()).length;
+					// only one facility: do not need to do location choice
+					if (length > 1) {
+						this.setNewLocationForAct((ActivityImpl) act, length);
+					}
 				}
 			}
 		}

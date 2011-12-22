@@ -25,20 +25,21 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -51,7 +52,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 	private Person person;
-	private List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
+	private final List<PlanImpl> copyPlans = new ArrayList<PlanImpl>();
 
 	public NewPtWalkPlan(final Network network, final Population population, final String filename) {
 		super(network, population, filename);
@@ -64,26 +65,27 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 			for (Plan pl : person.getPlans()) {
 				run(pl);
 			}
-			for (PlanImpl copyPlan : copyPlans) {
+			for (PlanImpl copyPlan : this.copyPlans) {
 				person.addPlan(copyPlan);
 			}
-			copyPlans.clear();
+			this.copyPlans.clear();
 		}
 		this.pw.writePerson(person);
 	}
 
-	public void run(Plan plan) {
-		PlanImpl ptPlan = new PlanImpl(person);
-		PlanImpl walkPlan = new PlanImpl(person);
+	@Override
+	public void run(final Plan plan) {
+		PlanImpl ptPlan = new PlanImpl(this.person);
+		PlanImpl walkPlan = new PlanImpl(this.person);
 		List<PlanElement> actsLegs = plan.getPlanElements();
 		for (int i = 0; i < actsLegs.size(); i++) {
 			Object o = actsLegs.get(i);
-			if (i % 2 == 0) {
-				ptPlan.addActivity((ActivityImpl) o);
-				walkPlan.addActivity((ActivityImpl) o);
-			} else {
-				LegImpl leg = (LegImpl) o;
-				LegImpl ptLeg = new org.matsim.core.population.LegImpl(leg);
+			if (o instanceof Activity) {
+				ptPlan.addActivity((Activity) o);
+				walkPlan.addActivity((Activity) o);
+			} else if (o instanceof Leg){
+				Leg leg = (Leg) o;
+				LegImpl ptLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
 				ptLeg.setMode(TransportMode.pt);
 				ptLeg.setRoute(null);
 				// -----------------------------------------------
@@ -92,7 +94,7 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 				// -----------------------------------------------
 				ptPlan.addLeg(ptLeg);
 
-				LegImpl walkLeg = new org.matsim.core.population.LegImpl(leg);
+				LegImpl walkLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
 				walkLeg.setMode(TransportMode.walk);
 				walkLeg.setRoute(null);
 				walkPlan.addLeg(walkLeg);
@@ -102,8 +104,8 @@ public class NewPtWalkPlan extends NewPopulation implements PlanAlgorithm {
 				}
 			}
 		}
-		copyPlans.add(ptPlan);
-		copyPlans.add(walkPlan);
+		this.copyPlans.add(ptPlan);
+		this.copyPlans.add(walkPlan);
 	}
 
 	public static void main(final String[] args) {

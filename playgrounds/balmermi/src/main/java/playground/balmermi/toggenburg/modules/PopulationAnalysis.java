@@ -6,6 +6,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -16,7 +18,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
 public class PopulationAnalysis {
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
@@ -31,13 +33,13 @@ public class PopulationAnalysis {
 		log.info("init " + this.getClass().getName() + " module...");
 		log.info("done.");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
-	private final void populationStats(Population population, Set<IdImpl> toggenLinks) {
-		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverf�gbarkeit, Berufst�tig, �V Abo Verf�gbarkeit
+
+	private final void populationStats(final Population population, final Set<IdImpl> toggenLinks) {
+		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverfuegbarkeit, Berufstaetig, OeV Abo Verfuegbarkeit
 		// index  : 0..99  100    101  102  103          104           105          106       107       108    109     110     111
 		// meaning: 0..99  >=100  m    f    licenseTrue  licenseFalse  availAlways  availSom  availNev  eTrue  eFalse  ptTrue  ptFalse
 		int[] stats = new int[112];
@@ -46,17 +48,16 @@ public class PopulationAnalysis {
 		for (Person pp : population.getPersons().values()) {
 			PersonImpl p = (PersonImpl) pp;
 			boolean analyse = true;
-			List<PlanElement> e = p.getSelectedPlan().getPlanElements();
-			for (int i=0; i<e.size(); i++) {
-				if (i%2==0) {
-					ActivityImpl a = (ActivityImpl)e.get(i);
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity a = (Activity) pe;
 					if (toggenLinks.contains(a.getLinkId())) {
 						analyse = true;
 						break;
 					}
 				}
-				else {
-					LegImpl l = (LegImpl)e.get(i);
+				else if (pe instanceof Leg){
+					Leg l = (Leg) pe;
 					if (l.getRoute() instanceof NetworkRoute) {
 						NetworkRoute ll = (NetworkRoute)l.getRoute();
 						for (Id lid : ll.getLinkIds()) {
@@ -88,8 +89,8 @@ public class PopulationAnalysis {
 		}
 		System.out.println(count+" out of "+population.getPersons().size()+" analyzed.");
 	}
-	
-	private final void tripStats(Population population) {
+
+	private final void tripStats(final Population population) {
 		// \    h  w  e  s  l
 		// car
 		// pt
@@ -116,13 +117,13 @@ public class PopulationAnalysis {
 				else if (a.getType().startsWith("e")) { col = 2; }
 				else if (a.getType().startsWith("s")) { col = 3; }
 				else if (a.getType().startsWith("l")) { col = 4; }
-				
+
 				if (l.getMode() == TransportMode.car) { row = 0; }
 				else if (l.getMode() == TransportMode.pt) { row = 1; }
 				else if (l.getMode() == TransportMode.bike) { row = 2; }
 				else if (l.getMode() == TransportMode.walk) { row = 3; }
 				else if (l.getMode() == TransportMode.ride) { row = 4; }
-				
+
 				dist[row][col] += l.getRoute().getDistance();
 				count[row][col]++;
 			}
@@ -133,12 +134,12 @@ public class PopulationAnalysis {
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
-	
-	public void run(Population population, Set<IdImpl> toggenLinks) {
+
+	public void run(final Population population, final Set<IdImpl> toggenLinks) {
 		log.info("running " + this.getClass().getName() + " module...");
 		this.populationStats(population,toggenLinks);
 		this.tripStats(population);

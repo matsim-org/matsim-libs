@@ -20,9 +20,10 @@
 
 package playground.yu.bottleneck;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -37,16 +38,16 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 	private final int mutationRange;
 
 	//---------------------------------CONSTRUCTOR----------------------------
-	public PlanMutateTimeAllocationBottleneck(int mutationRange) {
+	public PlanMutateTimeAllocationBottleneck(final int mutationRange) {
 		this.mutationRange = mutationRange;
 	}
 
-	public void run(Plan plan) {
+	@Override
+	public void run(final Plan plan) {
 		mutatePlan(plan);
 	}
 
-	@SuppressWarnings("deprecation")
-	private void mutatePlan(Plan plan) {
+	private void mutatePlan(final Plan plan) {
 
 		int max = plan.getPlanElements().size();
 
@@ -54,9 +55,9 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 
 		// apply mutation to all activities except the last home activity
 		for (int i = 0; i < max; i++) {
-
-			if (i % 2 == 0) {
-				ActivityImpl act = (ActivityImpl) (plan.getPlanElements().get(i));
+			PlanElement pe = plan.getPlanElements().get(i);
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				// invalidate previous activity times because durations will change
 				act.setStartTime(Time.UNDEFINED_TIME);
 
@@ -71,7 +72,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 					// move now pointer
 					now += act.getEndTime();
 
-					// handle middle activities	
+					// handle middle activities
 				} else if ((i > 0) && (i < (max - 1))) {
 
 					// assume that there will be no delay between arrival time and activity start time
@@ -114,7 +115,7 @@ public class PlanMutateTimeAllocationBottleneck implements PlanAlgorithm {
 		double t = time;
 		if (t != Time.UNDEFINED_TIME) {
 			t = t
-					+ (int) ((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * mutationRange);
+					+ (int) ((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 			if (t < 0)
 				t = 0;
 			if (t > 24 * 3600)

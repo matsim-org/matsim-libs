@@ -22,6 +22,8 @@ package playground.balmermi.census2000.modules;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -57,7 +59,7 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void run(Person person) {
+	public void run(final Person person) {
 		List<? extends PlanElement> acts_legs = person.getSelectedPlan().getPlanElements();
 
 		double bias = MatsimRandom.getRandom().nextInt(3600)-1800.0; // [-1800,1800[
@@ -67,10 +69,12 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 		while (first_end_time+bias < 0.0) {
 			bias = MatsimRandom.getRandom().nextInt(3600)-1800.0;
 		}
-		
-		for (int i=0; i<acts_legs.size(); i++) {
-			if (i % 2 == 0) {
-				ActivityImpl act = (ActivityImpl)acts_legs.get(i);
+
+		int i = -1;
+		for (PlanElement pe : acts_legs) {
+			i++;
+			if (pe instanceof Activity) {
+				Activity act = (Activity) acts_legs.get(i);
 				if (i == 0) { // first act
 					act.setStartTime(0.0);
 					act.setMaximumDuration(act.getMaximumDuration()+bias);
@@ -86,14 +90,17 @@ public class PersonVaryTimes extends AbstractPersonAlgorithm implements PlanAlgo
 					act.setEndTime(act.getEndTime()+bias);
 				}
 			}
-			else {
-				LegImpl leg = (LegImpl)acts_legs.get(i);
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) acts_legs.get(i);
 				leg.setDepartureTime(leg.getDepartureTime()+bias);
-				leg.setArrivalTime(leg.getArrivalTime()+bias);
+				if (leg instanceof LegImpl) {
+					((LegImpl)leg).setArrivalTime(((LegImpl)leg).getArrivalTime()+bias);
+				}
 			}
-		} 
+		}
 	}
 
-	public void run(Plan plan) {
+	@Override
+	public void run(final Plan plan) {
 	}
 }

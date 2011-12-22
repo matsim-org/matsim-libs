@@ -27,14 +27,15 @@ import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -57,10 +58,10 @@ public class ItsumoSim extends ExternalMobsim {
 		// ONLY reason why this needs to be overridden is because of the different events file name !!
 		// Since it new exists, writeItsumoConfig is different from writeConfig.
 
-		String iterationPlansFile = controlerIO.getIterationFilename(this.iteration, this.plansFileName);
+		String iterationPlansFile = this.controlerIO.getIterationFilename(this.iteration, this.plansFileName);
 //		String iterationEventsFile = Controler.getIterationFilename(this.eventsFileName);
 		String iterationEventsFile = "./drivers.txt" ;
-		String iterationConfigFile = controlerIO.getIterationFilename(this.iteration, this.configFileName);
+		String iterationConfigFile = this.controlerIO.getIterationFilename(this.iteration, this.configFileName);
 
 		try {
 			writeConfig( iterationPlansFile, iterationEventsFile, "output/config.xml" ) ;
@@ -76,7 +77,7 @@ public class ItsumoSim extends ExternalMobsim {
 		}
 	}
 
-	protected void writeItsumoConfig(String outFileName ) throws FileNotFoundException, IOException {
+	protected void writeItsumoConfig(final String outFileName ) throws FileNotFoundException, IOException {
 		System.out.println("writing config AND plans into config file for itsumo mobsim at " + (new Date()));
 
 		BufferedWriter out = null ;
@@ -119,19 +120,22 @@ public class ItsumoSim extends ExternalMobsim {
 				out.write("   <routes>"); out.newLine();
 
 				// act/leg
-				for (int jj = 0; jj < plan.getPlanElements().size(); jj++) {
-					if (jj % 2 == 0) {
-						ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(jj);
+				int actCnt = 0;
+				for (PlanElement pe : plan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						actCnt++;
+						Activity act = (Activity) pe;
 
 						out.write("    <route>"); out.newLine();
 						out.write("     <laneset>" + act.getLinkId() + "</laneset>"); out.newLine();
 						out.write("    </route>"); out.newLine();
 
-						if ( jj==2 ) {
-							break ;  // we write only the first leg for itsumo!
+						if (actCnt == 2) {
+							break;  // we write only the first leg for itsumo!
 						}
-					} else {
-						LegImpl leg = (LegImpl)plan.getPlanElements().get(jj);
+					}
+					if (pe instanceof Leg) {
+						Leg leg = (Leg) pe;
 						// route
 						if (leg.getRoute() == null) {
 							System.err.println ( " WARNING: Empty route.  Not sure if itsumo can deal with this.  Continuing anyway ... " ) ;
@@ -176,11 +180,11 @@ public class ItsumoSim extends ExternalMobsim {
 	}
 
 	@Override
-	public void setControlerIO(ControlerIO controlerIO) {
+	public void setControlerIO(final ControlerIO controlerIO) {
 		this.controlerio = controlerIO;
 	}
 
-	public void setIteration(int iteration) {
+	public void setIteration(final int iteration) {
 		this.iteration = iteration;
 	}
 

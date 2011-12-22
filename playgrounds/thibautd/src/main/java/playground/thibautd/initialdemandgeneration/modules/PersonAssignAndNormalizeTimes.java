@@ -22,10 +22,11 @@ package playground.thibautd.initialdemandgeneration.modules;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -58,7 +59,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	private final static Logger log = Logger.getLogger(PersonAssignAndNormalizeTimes.class);
 
 	private static final double HOME_MIN = 4*3600;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
@@ -71,7 +72,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 	//////////////////////////////////////////////////////////////////////
 	// private methods
 	//////////////////////////////////////////////////////////////////////
-	
+
 	/**
 	 * sets leg travel times to 0, and affects the travel time to the next activity
 	 */
@@ -80,11 +81,12 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		double tod = ((ActivityImpl) p.getPlanElements().get(0)).getEndTime();
 
 		for (int i=1; i<p.getPlanElements().size(); i++) {
+			PlanElement pe = p.getPlanElements().get(i);
 			if (i == p.getPlanElements().size()-1) {
 				// last act
-				ActivityImpl a = (ActivityImpl) p.getPlanElements().get(i);
+				Activity a = (Activity) pe;
 				if (prev_ttime == Time.UNDEFINED_TIME) {
-					Gbl.errorMsg("got undefined travel time!");
+					throw new RuntimeException("got undefined travel time!");
 				}
 				double dur = prev_ttime;
 
@@ -94,12 +96,12 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
-			else if (i % 2 == 0) {
+			else if (pe instanceof Activity) {
 				// in between acts
-				ActivityImpl a = (ActivityImpl) p.getPlanElements().get(i);
+				Activity a = (Activity) p.getPlanElements().get(i);
 				double dur = a.getMaximumDuration();
 				if (prev_ttime == Time.UNDEFINED_TIME) {
-					Gbl.errorMsg("got undefined travel time!");
+					throw new RuntimeException("got undefined travel time!");
 				}
 				dur += prev_ttime;
 				if (dur < 5*60.0) {
@@ -114,22 +116,24 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 				tod = a.getEndTime();
 				prev_ttime = Time.UNDEFINED_TIME;
 			}
-			else {
-				LegImpl l = (LegImpl) p.getPlanElements().get(i);
+			else if (pe instanceof Leg) {
+				Leg l = (Leg) p.getPlanElements().get(i);
 				prev_ttime = l.getTravelTime();
 
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
-				l.setArrivalTime(tod);
+				if (l instanceof LegImpl) {
+					((LegImpl) l).setArrivalTime(tod);
+				}
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * normalises activity times so that the plan ends at 24:00, and the
-	 * "night" home activity (ie the combination af the first and last home
+	 * normalizes activity times so that the plan ends at 24:00, and the
+	 * "night" home activity (i.e. the combination of the first and last home
 	 * activity) has a minimal duration.
 	 */
 	private final void normalizeTimes(final Plan p) {
@@ -146,8 +150,11 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		// time between the first and last activity (CAN include home activities)
 		double othr_dur = 0.0;
 
-		for (int i=2; i<p.getPlanElements().size()-2; i=i+2) {
-			othr_dur += ((ActivityImpl)p.getPlanElements().get(i)).getMaximumDuration();
+		for (int i=1; i<p.getPlanElements().size()-1; i=i++) {
+			PlanElement pe = p.getPlanElements().get(i);
+			if (pe instanceof Activity) {
+				othr_dur += ((Activity)p.getPlanElements().get(i)).getMaximumDuration();
+			}
 		}
 		if (othr_dur <= (Time.MIDNIGHT - HOME_MIN)) {
 			ActivityImpl a = (ActivityImpl) p.getPlanElements().get(p.getPlanElements().size()-1);
@@ -155,21 +162,22 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 			a.setEndTime(Time.UNDEFINED_TIME);
 			return;
 		}
-		
+
 		// home activity not long enough
 		// normalize the other activity durations
 		log.info("pid="+p.getPerson().getId()+": normalizing times (othr_dur="+Time.writeTime(othr_dur)+").");
 		double tod = home_dur;
 		for (int i=1; i<p.getPlanElements().size(); i++) {
+			PlanElement pe = p.getPlanElements().get(i);
 			if (i == p.getPlanElements().size()-1) {
-				ActivityImpl a = (ActivityImpl)p.getPlanElements().get(i);
+				Activity a = (Activity) pe;
 
 				a.setStartTime(tod);
 				a.setMaximumDuration(Time.UNDEFINED_TIME);
 				a.setEndTime(Time.UNDEFINED_TIME);
 			}
-			else if (i % 2 == 0) {
-				ActivityImpl a = (ActivityImpl) p.getPlanElements().get(i);
+			else if (pe instanceof Activity) {
+				Activity a = (Activity) pe;
 
 				a.setStartTime(tod);
 				a.setMaximumDuration(
@@ -179,16 +187,18 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 
 				tod = a.getEndTime();
 			}
-			else {
-				LegImpl l = (LegImpl) p.getPlanElements().get(i);
+			else if (pe instanceof Leg) {
+				Leg l = (Leg) pe;
 
 				l.setDepartureTime(tod);
 				l.setTravelTime(0.0);
-				l.setArrivalTime(tod);
+				if (l instanceof LegImpl) {
+					((LegImpl) l).setArrivalTime(tod);
+				}
 			}
 		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	/**
@@ -217,13 +227,13 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		}
 		double home_dur = Time.MIDNIGHT - othr_dur;
 		if (home_dur <= 0.0) {
-			Gbl.errorMsg("pid="+p.getPerson().getId()+": negative home duration!");
+			throw new RuntimeException("pid="+p.getPerson().getId()+": negative home duration!");
 		}
 		d.accumulateActivityDuration(
 				((ActivityImpl) p.getPlanElements().get(0)).getType(),
 				home_dur);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	/**
@@ -239,10 +249,11 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		while (first_end_time + bias < 0.0) {
 			bias = MatsimRandom.getRandom().nextInt(3600)-1800.0;
 		}
-		
+
 		for (int i=0; i<acts_legs.size(); i++) {
-			if (i % 2 == 0) {
-				ActivityImpl act = (ActivityImpl) acts_legs.get(i);
+			PlanElement pe = acts_legs.get(i);
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
 				if (i == 0) {
 					// first act
 					act.setStartTime(0.0);
@@ -261,14 +272,16 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 					act.setEndTime(act.getEndTime() + bias);
 				}
 			}
-			else {
-				LegImpl leg = (LegImpl) acts_legs.get(i);
+			else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				leg.setDepartureTime(leg.getDepartureTime() + bias);
-				leg.setArrivalTime(leg.getArrivalTime() + bias);
+				if (leg instanceof LegImpl) {
+					((LegImpl) leg).setArrivalTime(((LegImpl) leg).getArrivalTime() + bias);
+				}
 			}
-		} 
+		}
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// run methods
 	//////////////////////////////////////////////////////////////////////
@@ -278,6 +291,7 @@ public class PersonAssignAndNormalizeTimes extends AbstractPersonAlgorithm imple
 		this.run(person.getSelectedPlan());
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		this.moveTravTimeToNextAct( plan );
 		this.normalizeTimes( plan );

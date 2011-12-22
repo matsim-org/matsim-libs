@@ -28,9 +28,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
 
@@ -59,7 +59,7 @@ public class ModFileMaker {
 		log.info("This constructor is allowed only when calling writeForSeasonTicket(outputFile)");
 	}
 
-	public void writeForSeasonTicket (String outputFile){
+	public void writeForSeasonTicket (final String outputFile){
 		log.info("Writing mod file...");
 
 		PrintStream stream;
@@ -166,27 +166,27 @@ public class ModFileMaker {
 	}
 
 
-	public void writeWithRandomSelectionAccumulated (String outputFile,
-			String beta,
-			String gamma,
-			String similarity,
-			String incomeConstant,
-			String incomeDivided,
-			String incomeDividedLN,
-			String incomeBoxCox,
-			String age,
-			String gender,
-			String income,
-			String license,
-			String carAvail,
-			String seasonTicket,
-			String travelDistance,
-			String travelCost,
-			String travelConstant,
-			String beta_travel,
-			String bikeIn,
-			String munType,
-			String innerHome){
+	public void writeWithRandomSelectionAccumulated (final String outputFile,
+			final String beta,
+			final String gamma,
+			final String similarity,
+			final String incomeConstant,
+			final String incomeDivided,
+			final String incomeDividedLN,
+			final String incomeBoxCox,
+			final String age,
+			final String gender,
+			final String income,
+			final String license,
+			final String carAvail,
+			final String seasonTicket,
+			final String travelDistance,
+			final String travelCost,
+			final String travelConstant,
+			final String beta_travel,
+			final String bikeIn,
+			final String munType,
+			final String innerHome){
 
 		log.info("Writing mod file...");
 
@@ -634,8 +634,9 @@ public class ModFileMaker {
 			else stream.print("HomeUmax * one / ( ( one + HomeGamma * exp( HomeBeta * ( HomeAlpha * one - x"+(i+1)+"_"+1+" ) ) ) ^ ( one / HomeGamma * one ) )");
 
 			for (int j=1;j<actslegs.size()-1;j++){
-				if (j%2==0){
-					ActivityImpl act = (ActivityImpl)actslegs.get(j);
+				PlanElement pe = actslegs.get(j);
+				if (pe instanceof Activity){
+					Activity act = (Activity) actslegs.get(j);
 					stream.print(" + ");
 					if (gender.equals("yes")) stream.print("( one + beta_female_act * Female ");
 				/*	if (gender.equals("yes")) {

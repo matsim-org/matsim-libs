@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -36,16 +37,15 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
@@ -89,10 +89,9 @@ public class Wait2Link_2Acts1LinkTest {
 				Plan p = person.getSelectedPlan();
 				if (p != null) {
 					List<PlanElement> actsLegs = p.getPlanElements();
-					int max = actsLegs.size();
-					for (int i = 0; i < max; i++)
-						if (i % 2 == 0) {
-							ActivityImpl a = (ActivityImpl) actsLegs.get(i);
+					for (PlanElement pe : actsLegs) {
+						if (pe instanceof Activity) {
+							Activity a = (Activity) pe;
 							nextTmpLinkId = a.getLinkId().toString();
 							if (tmpLinkId != null && nextTmpLinkId != null)
 								if (tmpLinkId.equals(nextTmpLinkId)) {
@@ -104,6 +103,7 @@ public class Wait2Link_2Acts1LinkTest {
 								}
 							tmpLinkId = nextTmpLinkId;
 						}
+					}
 					if (this.actsAtSameLink)
 						this.personCount++;
 				}
@@ -154,6 +154,7 @@ public class Wait2Link_2Acts1LinkTest {
 			this.overlapCount = 0;
 		}
 
+		@Override
 		public void handleEvent(final AgentWait2LinkEvent event) {
 			for (AgentLinkPair alp : this.agentLinksPairs)
 				if (alp.agentId.equals(event.getPersonId().toString())
@@ -167,6 +168,7 @@ public class Wait2Link_2Acts1LinkTest {
 				}
 		}
 
+		@Override
 		public void reset(final int iteration) {
 			this.agentLinksPairs.clear();
 		}
@@ -212,7 +214,7 @@ public class Wait2Link_2Acts1LinkTest {
 		System.out.println("there is " + sal.getPersonCount() + " persons, "
 				+ sal.getActLocCount() + " 2Acts1Link-s!");
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		Wait2Link w2l = new Wait2Link(sal.getAgentLinks(), outputFilename);
 		events.addHandler(w2l);

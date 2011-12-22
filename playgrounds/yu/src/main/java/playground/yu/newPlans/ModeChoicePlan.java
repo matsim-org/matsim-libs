@@ -25,8 +25,10 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -55,7 +57,7 @@ public class ModeChoicePlan extends NewPopulation {
 
 		// Plan.Type t = sp.getType();
 		PlanImpl cp = new org.matsim.core.population.PlanImpl(person);
-		List actsLegs = sp.getPlanElements();
+		List<PlanElement> actsLegs = sp.getPlanElements();
 
 		if (
 		// t.equals(Plan.Type.CAR)
@@ -82,9 +84,9 @@ public class ModeChoicePlan extends NewPopulation {
 			// cp.setType(Plan.Type.CAR);
 			for (int i = 0; i < actsLegs.size(); i++) {
 				Object o = actsLegs.get(i);
-				if (i % 2 == 0) {
-					cp.addActivity((ActivityImpl) o);
-				} else {
+				if (o instanceof Activity) {
+					cp.addActivity((Activity) o);
+				} else if (o instanceof LegImpl) {
 					LegImpl cl = new org.matsim.core.population.LegImpl((LegImpl) o);
 					cl.setMode(
 					// "car"

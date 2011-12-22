@@ -28,7 +28,10 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -46,7 +49,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -430,10 +432,11 @@ public class BetaTravelTest extends MatsimTestCase {
 			int now = 0;
 
 			// apply mutation to all activities except the last home activity
-			for (int i = 0; i < max; i++ ) {
-
-				if (i % 2 == 0) {
-					ActivityImpl act = (ActivityImpl)(plan.getPlanElements().get(i));
+			int i = -1;
+			for (PlanElement pe : plan.getPlanElements()) {
+				i++;
+				if (pe instanceof Activity) {
+					Activity act = (Activity) pe;
 					// invalidate previous activity times because durations will change
 					act.setStartTime(Time.UNDEFINED_TIME);
 
@@ -457,9 +460,10 @@ public class BetaTravelTest extends MatsimTestCase {
 						act.setEndTime(Time.UNDEFINED_TIME);
 					}
 
-				} else {
+				}
+				if (pe instanceof Leg) {
 
-					LegImpl leg = (LegImpl)(plan.getPlanElements().get(i));
+					Leg leg = (Leg) pe;
 
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);
@@ -468,7 +472,9 @@ public class BetaTravelTest extends MatsimTestCase {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly
-					leg.setArrivalTime(now);
+					if (pe instanceof LegImpl) {
+						((LegImpl) leg).setArrivalTime(now);
+					}
 
 				}
 			}

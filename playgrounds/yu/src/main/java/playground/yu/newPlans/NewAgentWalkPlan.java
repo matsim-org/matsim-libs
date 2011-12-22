@@ -26,12 +26,12 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -70,13 +70,13 @@ public class NewAgentWalkPlan extends NewPopulation {
 					PlanImpl walkPlan = new org.matsim.core.population.PlanImpl(
 							person);
 					walkPlan.setType(PlanImpl.DeprecatedConstants.WALK);
-					List actsLegs = pl.getPlanElements();
+					List<PlanElement> actsLegs = pl.getPlanElements();
 					for (int i = 0; i < actsLegs.size(); i++) {
 						Object o = actsLegs.get(i);
-						if (i % 2 == 0) {
-							walkPlan.addActivity((ActivityImpl) o);
-						} else {
-							LegImpl leg = (LegImpl) o;
+						if (o instanceof Activity) {
+							walkPlan.addActivity((Activity) o);
+						} else if (o instanceof Leg) {
+							Leg leg = (Leg) o;
 							// -----------------------------------------------
 							// WITHOUT routeSetting!
 							// -----------------------------------------------
@@ -84,7 +84,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 									TransportMode.walk);
 							walkLeg.setDepartureTime(leg.getDepartureTime());
 							walkLeg.setTravelTime(leg.getTravelTime());
-							walkLeg.setArrivalTime(leg.getArrivalTime());
+							walkLeg.setArrivalTime(((LegImpl) leg).getArrivalTime());
 							walkLeg.setRoute(null);
 							walkPlan.addLeg(walkLeg);
 							// if (!leg.getMode().equals(Mode.car)) {
@@ -103,7 +103,7 @@ public class NewAgentWalkPlan extends NewPopulation {
 		this.pw.writePerson(person);
 	}
 
-	private boolean hasLongLegs(Plan plan) {
+	private boolean hasLongLegs(final Plan plan) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;

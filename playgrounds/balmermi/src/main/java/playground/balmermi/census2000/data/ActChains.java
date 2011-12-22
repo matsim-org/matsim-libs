@@ -25,8 +25,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.matsim.core.gbl.Gbl;
-
 public class ActChains {
 
 	//////////////////////////////////////////////////////////////////////
@@ -43,12 +41,12 @@ public class ActChains {
 	// chain_type[i] = ArrayList<ArrayList<Integer>>
 	private final ArrayList<ArrayList<Integer>>[] chain_types = new ArrayList[16];
 	private final String inputfile;
-	
+
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public ActChains(String inputfile) {
+	public ActChains(final String inputfile) {
 		this.inputfile = inputfile;
 		for (int i=0; i<this.chain_types.length; i++) {
 			this.chain_types[i] = new ArrayList<ArrayList<Integer>>();
@@ -59,10 +57,10 @@ public class ActChains {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ArrayList<ArrayList<Integer>> getChains(int bitcode) {
+	public final ArrayList<ArrayList<Integer>> getChains(final int bitcode) {
 		return this.chain_types[bitcode];
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	//////////////////////////////////////////////////////////////////////
@@ -70,9 +68,8 @@ public class ActChains {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void parse() {
-		int line_cnt = 0;
 		try {
-			FileReader file_reader = new FileReader(inputfile);
+			FileReader file_reader = new FileReader(this.inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
 
 			String curr_line;
@@ -81,7 +78,7 @@ public class ActChains {
 
 				// ActType1  end_time1 ActType2  dur2  ...  durN-1  ActTypeN
 				// 0         1         2         3     ...
-				
+
 				ArrayList<Integer> chain = new ArrayList<Integer>();
 				int w = 0;
 				int e = 0;
@@ -95,7 +92,7 @@ public class ActChains {
 						else if (entry.equals(E)) { chain.add(new Integer(4)); e = 4; }
 						else if (entry.equals(S)) { chain.add(new Integer(2)); s = 2; }
 						else if (entry.equals(L)) { chain.add(new Integer(1)); l = 1; }
-						else { Gbl.errorMsg("Line " + curr_line + ": act_type=" + entry + " not known!"); }
+						else { throw new RuntimeException("Line " + curr_line + ": act_type=" + entry + " not known!"); }
 					} else { // time
 						Integer time = Integer.parseInt(entry);
 						chain.add(time);
@@ -106,11 +103,10 @@ public class ActChains {
 					ArrayList<ArrayList<Integer>> list = this.chain_types[index];
 					list.add(chain);
 				}
-				line_cnt++;
-			}	
+			}
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

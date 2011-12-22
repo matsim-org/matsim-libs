@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -21,45 +20,45 @@ import playground.wrashid.lib.GeneralLib;
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, AgentDepartureEventHandler {
 
-	private Controler controler;
-	private LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
-	private Id selectedPersonId;
+	private final Controler controler;
+	private final LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
+	private final Id selectedPersonId;
 	//private int indexOfActivity = 0;
 	//private Double startTimeFirstAct = null;
-	private ActDurationEstimationContainer actDurationEstimationContainer=new ActDurationEstimationContainer();
+	private final ActDurationEstimationContainer actDurationEstimationContainer=new ActDurationEstimationContainer();
 
-	public ActivityDurationEstimator(Controler controler, Id selectedPersonId) {
+	public ActivityDurationEstimator(final Controler controler, final Id selectedPersonId) {
 		this.controler = controler;
 		this.selectedPersonId = selectedPersonId;
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public void reset(final int iteration) {
 		// TODO Auto-generated method stub
 
 	}
 
 	public LinkedList<Double> getActivityDurationEstimations() {
-		return activityDurationEstimations;
+		return this.activityDurationEstimations;
 	}
 
 	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if (event.getPersonId().equals(selectedPersonId)) {
+	public void handleEvent(final ActivityStartEvent event) {
+		if (event.getPersonId().equals(this.selectedPersonId)) {
 
-			GeneralLib.controler=controler;
-			
-			actDurationEstimationContainer.registerNewActivity();
-			if (actDurationEstimationContainer.isCurrentParkingTimeOver()){
-				double estimatedActduration = getEstimatedActDuration(event, controler, actDurationEstimationContainer);
-				activityDurationEstimations.add(estimatedActduration);
+			GeneralLib.controler=this.controler;
+
+			this.actDurationEstimationContainer.registerNewActivity();
+			if (this.actDurationEstimationContainer.isCurrentParkingTimeOver()){
+				double estimatedActduration = getEstimatedActDuration(event, this.controler, this.actDurationEstimationContainer);
+				this.activityDurationEstimations.add(estimatedActduration);
 			}
 		}
 	}
 
-	public static double getEstimatedActDuration(ActivityStartEvent event, Controler controler,
-			ActDurationEstimationContainer actDurationEstimationContainer) {
-		
+	public static double getEstimatedActDuration(final ActivityStartEvent event, final Controler controler,
+			final ActDurationEstimationContainer actDurationEstimationContainer) {
+
 		Plan selectedPlan = controler.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 
 		List<PlanElement> planElement = selectedPlan.getPlanElements();
@@ -67,14 +66,14 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 		int indexOfActivity=actDurationEstimationContainer.indexOfCurrentActivity;
 		double endTimeOfFirstAct=actDurationEstimationContainer.endTimeOfFirstAct;
 		if (isLastAct(indexOfActivity, planElement)) {
-			
+
 			return GeneralLib.getIntervalDuration(event.getTime(), endTimeOfFirstAct);
 		}
 
 		int indexOfFirstCarLegAfterCurrentAct = getIndexOfFirstCarLegAfterCurrentAct(indexOfActivity, planElement);
 
 		actDurationEstimationContainer.skipAllPlanElementsTillIndex=indexOfFirstCarLegAfterCurrentAct;
-		
+
 		double estimatedActduration = 0;
 
 		for (int i = indexOfActivity; i < indexOfFirstCarLegAfterCurrentAct; i++) {
@@ -116,11 +115,12 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 		return estimatedActduration;
 	}
 
-	private static int getIndexOfFirstCarLegAfterCurrentAct(int indexOfActivity, List<PlanElement> planElement) {
+	private static int getIndexOfFirstCarLegAfterCurrentAct(final int indexOfActivity, final List<PlanElement> planElements) {
 		int indexOfFirstCarLegAfterCurrentAct = 0;
-		for (int i = indexOfActivity; i < planElement.size(); i++) {
-			if (i % 2 == 1) {
-				Leg leg = (Leg) planElement.get(i);
+		for (int i = indexOfActivity; i < planElements.size(); i++) {
+			PlanElement pe = planElements.get(i);
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
 				if (leg.getMode().equalsIgnoreCase("car")) {
 					indexOfFirstCarLegAfterCurrentAct = i;
 					break;
@@ -130,15 +130,15 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 		return indexOfFirstCarLegAfterCurrentAct;
 	}
 
-	private static boolean isLastAct(int indexOfActivity, List<PlanElement> pe) {
+	private static boolean isLastAct(final int indexOfActivity, final List<PlanElement> pe) {
 		return indexOfActivity + 1 == pe.size();
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getPersonId().equals(selectedPersonId)) {
-			if (actDurationEstimationContainer.endTimeOfFirstAct == null) {
-				actDurationEstimationContainer.endTimeOfFirstAct = event.getTime();
+	public void handleEvent(final AgentDepartureEvent event) {
+		if (event.getPersonId().equals(this.selectedPersonId)) {
+			if (this.actDurationEstimationContainer.endTimeOfFirstAct == null) {
+				this.actDurationEstimationContainer.endTimeOfFirstAct = event.getTime();
 			}
 		}
 	}

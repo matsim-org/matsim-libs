@@ -25,10 +25,12 @@ import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -58,15 +60,15 @@ public class NewAgentPtPlan extends NewPopulation {
 //				Plan walkPlan = new org.matsim.population.PlanImpl(person);
 //				walkPlan.setType(Type.WALK);
 
-				List actsLegs = pl.getPlanElements();
+				List<PlanElement> actsLegs = pl.getPlanElements();
 				for (int i = 0; i < actsLegs.size(); i++) {
-					Object o = actsLegs.get(i);
-					if (i % 2 == 0) {
-						ptPlan.addActivity((ActivityImpl) o);
+					PlanElement o = actsLegs.get(i);
+					if (o instanceof Activity) {
+						ptPlan.addActivity((Activity) o);
 //						walkPlan.addAct((Act) o);
-					} else {
-						LegImpl leg = (LegImpl) o;
-						LegImpl ptLeg = new org.matsim.core.population.LegImpl(leg);
+					} else if (o instanceof Leg) {
+						Leg leg = (Leg) o;
+						LegImpl ptLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
 						ptLeg.setMode(TransportMode.pt);
 						ptLeg.setRoute(null);
 						// -----------------------------------------------
@@ -75,7 +77,7 @@ public class NewAgentPtPlan extends NewPopulation {
 						// automaticly!!
 						// -----------------------------------------------
 						ptPlan.addLeg(ptLeg);
-						LegImpl walkLeg = new org.matsim.core.population.LegImpl(leg);
+						LegImpl walkLeg = new org.matsim.core.population.LegImpl((LegImpl) leg);
 						walkLeg.setMode(TransportMode.walk);
 						walkLeg.setRoute(null);
 //						walkPlan.addLeg(walkLeg);
