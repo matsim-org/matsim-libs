@@ -125,7 +125,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		((QSim) e.getQueueSimulation()).gets
+		
 	}
 	
 }

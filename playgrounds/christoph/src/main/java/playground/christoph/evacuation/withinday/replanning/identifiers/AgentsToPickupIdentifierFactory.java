@@ -20,20 +20,23 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
 public class AgentsToPickupIdentifierFactory implements DuringLegIdentifierFactory {
 
+	private final Scenario scenario;
 	private final InsecureLegPerformingIdentifier insecureLegPerformingIdentifier;
 	
-	public AgentsToPickupIdentifierFactory(InsecureLegPerformingIdentifier insecureLegPerformingIdentifier) {
+	public AgentsToPickupIdentifierFactory(Scenario scenario, InsecureLegPerformingIdentifier insecureLegPerformingIdentifier) {
+		this.scenario = scenario;
 		this.insecureLegPerformingIdentifier = insecureLegPerformingIdentifier;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(insecureLegPerformingIdentifier);
+		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, insecureLegPerformingIdentifier);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}
