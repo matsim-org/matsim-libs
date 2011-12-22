@@ -20,7 +20,6 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.ptproject.qsim.comparators.PersonAgentComparator;
@@ -54,17 +52,9 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		Set<PlanBasedWithinDayAgent> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Collection<PlanBasedWithinDayAgent> handledAgents = this.getHandledAgents();
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		if (handledAgents == null) return agentsToReplan;	
-
-		for (PlanBasedWithinDayAgent personAgent : activityPerformingAgents) {
-			/*
-			 * Remove the Agent from the list, if the replanning flag is not set.
-			 */
-			if (!handledAgents.contains(personAgent)) continue;
-			
+		for (PlanBasedWithinDayAgent personAgent : activityPerformingAgents) {		
 			/*
 			 *  Get the current PlanElement and check if it is an Activity
 			 */

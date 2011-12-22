@@ -40,6 +40,10 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -67,6 +71,8 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  * So far, only ride_passenger is supported. However, other modes like
  * walk_passenger could be added (the slowest person of a group walks,
  * all other persons follow with the same speed).
+ *
+ * Unfortunately, the code is not compatible with parallel events handling. 
  * <p/>
  * Comments:<ul>
  * <li> In the public transit simulation, we have deliberately NOT replicated the "driver" events since they can be 
@@ -77,7 +83,9 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  */
 public class PassengerEventsCreator implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 	LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, 
-	SimulationInitializedListener, SimulationAfterSimStepListener, DepartureHandler, MobsimEngine {
+	SimulationInitializedListener, SimulationAfterSimStepListener, DepartureHandler,
+	PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, MobsimEngine {
+
 
 	public final static String passengerTransportMode = "ride_passenger";
 	
@@ -105,7 +113,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		if (agent.getMode().equals(passengerTransportMode)) {
-			if ( agent instanceof MobsimDriverAgent ) {
+			if (agent instanceof MobsimDriverAgent) {
 				handlePassengerDeparture(now, (MobsimDriverAgent)agent, linkId);
 				return true;
 			} else {
@@ -146,11 +154,10 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 				 */
 				MobsimAgent passenger = agents.get(passengerId);
 				passenger.endLegAndAssumeControl(event.getTime());	
-				this.internalInterface.arrangeNextAgentState(passenger) ;
+				this.internalInterface.arrangeNextAgentState(passenger);
 			}
 		}
 	}
-
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -191,7 +198,31 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 			}
 		}
 	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		List<Id> passengers = driverPassengerMap.get(event.getPersonId());
+		
+		if (passengers != null) {
+			for (Id passengerId : passengers) {
+				Event e = eventsManager.getFactory().createPersonEntersVehicleEvent(event.getTime(), passengerId, event.getPersonId(), null);
+				eventsManager.processEvent(e);
+			}
+		}
+	}
 
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		List<Id> passengers = driverPassengerMap.get(event.getPersonId());
+		
+		if (passengers != null) {
+			for (Id passengerId : passengers) {
+				Event e = eventsManager.getFactory().createPersonLeavesVehicleEvent(event.getTime(), passengerId, event.getPersonId(), null);
+				eventsManager.processEvent(e);
+			}
+		}	
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		this.agents.clear();

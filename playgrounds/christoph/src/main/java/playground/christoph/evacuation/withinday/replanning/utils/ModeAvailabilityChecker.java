@@ -47,9 +47,11 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-/*
+/**
  * Checks whether a car is available for an agent or not.
  * The position of each agent's car is logged.
+ * 
+ * @author cdobler
  */
 public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentDepartureEventHandler, 
 	ActivityStartEventHandler, SimulationInitializedListener {
@@ -102,14 +104,12 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 		return carCoords.get(personId);
 	}
 	
-	/*
+	/**
 	 * By default we try to use a car. We can do this, if the previous or the next 
 	 * Leg are performed with a car or the agents car is within a reachable distance.
 	 * The order is as following:
 	 * car is preferred to ride is preferred to pt is preferred to bike if preferred to walk 
-	 */
-
-	/**
+	 * 
 	 * @param currentActivityIndex index of an activity
 	 * @param plan an agents plan plan
 	 */

@@ -35,6 +35,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
@@ -49,6 +50,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
@@ -67,10 +69,16 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
+import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
+import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
+import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
+import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+import playground.christoph.evacuation.vehicles.HouseholdVehiclesTracker;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -88,6 +96,34 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
 	protected double maxCarAvailableDistance = 250.0;
+	
+	protected String[] householdVehicleFiles = new String[]{
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AI.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AR.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BE.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BL.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BS.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_FR.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GE.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GL.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GR.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_JU.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_LU.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NE.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NW.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_OW.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SG.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SH.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SO.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SZ.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TG.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TI.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_UR.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VD.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VS.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
+												"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -119,8 +155,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //	protected WithinDayDuringLegReplanner duringSecureLegReplanner;
 //	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
 //	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
-
+	
+	protected LegModeChecker legModeChecker;
+	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
+	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	protected HouseholdsUtils householdsUtils;
+	protected HouseholdVehiclesTracker householdVehiclesTracker;
+	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	protected PassengerEventsCreator passengerEventsCreator;
@@ -133,8 +174,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	protected boolean analyzeEvacuation = false;
 	protected EvacuationTimePicture evacuationTimePicture;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
-	
-	protected QSim sim;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
@@ -181,6 +220,15 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		// Add secure Facilities to secure Links.
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
 		
+		/*
+		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
+		 */
+		legModeChecker = new LegModeChecker(this.createRoutingAlgorithm());
+		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
+		legModeChecker.setToCarProbability(0.5);
+		legModeChecker.run(this.scenarioData.getPopulation());
+		legModeChecker.printStatistics();
+				
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
@@ -211,13 +259,41 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
 		this.passengerEventsCreator = new PassengerEventsCreator(this.events);
-
-		this.sim.addMobsimEngine(this.passengerEventsCreator) ;
-		// need to do this since this does not only create events, but also behaves like a Mobsim Engine by ending (passenger)
-		// legs.  kai, dec'11
 		
 		this.getEvents().addHandler(passengerEventsCreator);
 		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);
+		
+		/*
+		 * Read household-vehicles-assignment files.
+		 */
+		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
+		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
+		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
+		
+		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
+		this.getEvents().addHandler(householdVehiclesTracker);
+		
+		/*
+		 * Create vehicles for households and add them to the scenario.
+		 */
+		// hack to create vehicles container in scenario
+		this.config.scenario().setUseVehicles(true);
+		this.scenarioData.getVehicles();
+		this.config.scenario().setUseVehicles(false);
+		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
+		createVehiclesForHouseholds.run();
+		
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.createRoutingAlgorithm());
+		for (Household household : scenarioData.getHouseholds().getHouseholds().values()) {
+			this.assignVehiclesToPlans.run(household);
+		}
+		
+		/*
+		 * Use a MobsimFactory which creates vehicles according to available vehicles per
+		 * household.
+		 */
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory();
+		this.setMobsimFactory(mobsimFactory);
 		
 		/*
 		 * Create the set of analyzed modes.
@@ -252,6 +328,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
+		
+		/*
+		 * Need to do this since this does not only create events, but also behaves 
+		 * like a Mobsim Engine by ending (passenger) legs.  kai, dec'11 
+		 */
+		((QSim)e.getQueueSimulation()).addMobsimEngine(this.passengerEventsCreator);
+		
 		this.initReplanners((QSim)e.getQueueSimulation());
 		
 		/*
@@ -281,6 +364,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		householdsUtils.printStatistics();
 		householdsUtils.printClosingStatistics();
+		
+		householdVehiclesTracker.printClosingStatistics();
 	}
 
 	protected void initIdentifiers() {
@@ -396,15 +481,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 
 		super.setUp();
 	}
-
-//	/*
-//	 * Always use a MultiModalMobsimFactory - it will return
-//	 * a (Parallel)QSim using a MultiModalQNetwork.
-//	 */
-//	@Override
-//	public MobsimFactory getMobsimFactory() {
-//		return new MultiModalMobsimFactory(super.getMobsimFactory(), this.getTravelTimeCollector());
-//	}
 
 	/*
 	 * ===================================================================

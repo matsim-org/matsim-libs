@@ -32,11 +32,12 @@ import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
-/*
+/**
  * Persons who use this replanner perform an activity at a "save" place
  * when the evacuation order is given. They extend their current activity
  * until the end of the day.
  * 
+ * @author cdobler
  */
 public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityReplanner {
 
@@ -72,10 +73,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;
-		
-		// If we don't have a current Activity.
-		if (currentActivity == null) return false;
-		
+				
 		/*
 		 * If it is already the last Activity that lasts until the end
 		 * of the simulation the end time is Time.UNDEFINED_TIME. In that

@@ -1,0 +1,164 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AssignVehiclesToPlans.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.christoph.evacuation.vehicles;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.households.Household;
+import org.matsim.population.algorithms.AbstractPersonAlgorithm;
+import org.matsim.population.algorithms.PlanAlgorithm;
+
+public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements PlanAlgorithm {
+
+	private final Scenario scenario;
+	private final PlanAlgorithm routingAlgorithm;
+	private final Counter counter;
+	
+	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
+		this.scenario = scenario;
+		this.routingAlgorithm = planAlgorithm;
+		
+		this.counter = new Counter("Assigned vehicles: ");
+	}
+	
+	public void run(Household household) {
+		
+		// get a household's persons and check whether they require a car
+    	List<Person> persons = new ArrayList<Person>();
+    	List<Person> vehicleRequiringPersons = new ArrayList<Person>();
+    	for (Id personId : household.getMemberIds()) {
+    		Person p = scenario.getPopulation().getPersons().get(personId);
+    		persons.add(p);
+    		
+    		boolean requiresVehicle = requiresVehicle(p);
+    		if (requiresVehicle) vehicleRequiringPersons.add(p);
+    	}
+    	
+    	List<Id> vehicleIds = household.getVehicleIds();
+    	
+    	/*
+    	 * If the household requires more vehicles than available.
+    	 * TODO: implement a better methodology to adapt person's plans,
+    	 * e.g. count car legs or take their length into account.
+    	 */
+    	while (vehicleRequiringPersons.size() > vehicleIds.size()) {
+    		Person p = vehicleRequiringPersons.remove(0);
+    		run(p);
+    	}
+    	
+    	/*
+    	 * Assign vehicles to person's legs.
+    	 */
+    	for (int i = 0; i < vehicleRequiringPersons.size(); i++) {
+    		assignVehicleToPerson(vehicleRequiringPersons.get(i), vehicleIds.get(i));
+    		counter.incCounter();
+    	}
+	}
+	
+	@Override
+	public void run(Plan plan) {
+		for (int i = 1; i < plan.getPlanElements().size() - 2; i = i + 2) {
+			Leg leg = (Leg) plan.getPlanElements().get(i);
+
+			if (leg.getMode().equals(TransportMode.car)) {
+				Id startLinkId = leg.getRoute().getStartLinkId();
+				Id endLinkId = leg.getRoute().getEndLinkId();
+				Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
+				Link endLink = scenario.getNetwork().getLinks().get(endLinkId);
+				double distance = CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord());
+				
+				if (distance < 2000.0) leg.setMode(TransportMode.walk);
+				else if (distance < 5000.0) leg.setMode(TransportMode.bike);
+				else leg.setMode(TransportMode.pt);
+				
+				/*
+				 * Create a new route for the given leg.
+				 */
+				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+				PlanImpl newPlan = new PlanImpl(plan.getPerson());
+				newPlan.addActivity(previousActivity);
+				newPlan.addLeg(leg);
+				newPlan.addActivity(nextActivity);
+				routingAlgorithm.run(newPlan);						
+			}
+		}
+	}
+
+	/**
+	 * Replace person's car legs with non-car legs.
+	 * Legs with a crow fly distance:
+	 * <ul>
+	 * 	<li>below 2000m become walk legs.</li>
+	 * 	<li>between 2000 and 5000m become bike legs.</li>
+	 * 	<li>above 5000m become pt legs.</li>
+	 * </ul>
+	 */
+	@Override
+	public void run(Person person) {
+		this.run(person.getSelectedPlan());
+	}
+	
+	
+	private boolean requiresVehicle(Person p) {
+		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+			if (planElement instanceof Leg) {
+				if (((Leg) planElement).getMode().equals(TransportMode.car)) return true;
+			}
+		}
+		return false;
+	}
+		
+	private void assignVehicleToPerson(Person p, Id vehicleId) {
+		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+			if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (leg.getMode().equals(TransportMode.car)) {
+					assignVehicleToLeg(leg, vehicleId);
+				}
+			}
+		}
+	}
+	
+	private void assignVehicleToLeg(Leg leg, Id vehicleId) {
+		Route route = leg.getRoute();
+		
+		if (route instanceof NetworkRoute) {
+			((NetworkRoute) route).setVehicleId(vehicleId);
+		}
+	}
+
+}

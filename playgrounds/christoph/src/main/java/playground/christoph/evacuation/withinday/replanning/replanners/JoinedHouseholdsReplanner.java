@@ -41,10 +41,12 @@ import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
-/*
+/**
  * Replanner for agents that are currently together with the other
  * members of their household. They evacuate together to a predefined
  * facility in the secure area.
+ * 
+ * @author cdobler
  */
 public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner {
 
@@ -114,7 +116,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 */
 		Leg legToMeeting;
 		if (transportMode.equals(PassengerEventsCreator.passengerTransportMode)) {
-			legToMeeting = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);			
+			legToMeeting = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);
 		} else {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);
 		}

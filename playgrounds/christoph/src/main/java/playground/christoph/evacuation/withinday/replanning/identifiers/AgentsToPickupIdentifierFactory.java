@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EvacuationDuringLegReplanningModule.java
+ * InsecureLegPerformingIdentifierFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,25 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.mobsim;
+package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import org.matsim.withinday.mobsim.DuringLegReplanningModule;
-import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
-import playground.christoph.evacuation.config.EvacuationConfig;
+public class AgentsToPickupIdentifierFactory implements DuringLegIdentifierFactory {
 
-public class EvacuationDuringLegReplanningModule extends DuringLegReplanningModule {
+	private final InsecureLegPerformingIdentifier insecureLegPerformingIdentifier;
 	
-	private double evacuationTime = EvacuationConfig.evacuationTime;
-	
-	public EvacuationDuringLegReplanningModule(ParallelDuringLegReplanner parallelDuringLegReplanner) {
-		super(parallelDuringLegReplanner);
+	public AgentsToPickupIdentifierFactory(InsecureLegPerformingIdentifier insecureLegPerformingIdentifier) {
+		this.insecureLegPerformingIdentifier = insecureLegPerformingIdentifier;
 	}
-
+	
 	@Override
-	public void doReplanning(double time) {
-		if (time != evacuationTime) return;
-//		if (time < evacuationTime) return;
-		else super.doReplanning(time);
+	public DuringLegIdentifier createIdentifier() {
+		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(insecureLegPerformingIdentifier);
+		identifier.setIdentifierFactory(this);
+		return identifier;
 	}
+
 }
