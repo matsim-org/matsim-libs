@@ -31,13 +31,14 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
  * {@link PlanAlgorithm} aimed at optimizing joint plans with a genetic algorithm.
  * @author thibautd
  */
-public class JointPlanOptimizer implements PlanAlgorithm {
+public class JointPlanOptimizer extends JointPlanAlgorithm {
 	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
 	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
@@ -63,21 +64,11 @@ public class JointPlanOptimizer implements PlanAlgorithm {
 		this.outputPath = iterationOutputPath;
 	}
 
-	@Override
-	public void run(final Plan plan) {
-		if (plan instanceof JointPlan) {
-			//log.debug("joint plan optimization algorithm lanched succesfully");
-			this.run((JointPlan) plan);
-		} else {
-			throw new IllegalArgumentException("JointPlanOptimizer launched with"+
-					"a non-joint plan");
-		}
-	}
-
 	/**
 	 * the actual optimisation algorithm, operating on a joint plan.
 	 */
-	private final void run(final JointPlan plan) {
+	@Override
+	public void run(final JointPlan plan) {
 		if (!isOptimizablePlan(plan)) {
 			return;
 		}

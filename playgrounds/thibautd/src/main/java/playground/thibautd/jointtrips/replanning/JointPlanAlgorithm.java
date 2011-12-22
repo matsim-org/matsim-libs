@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointReRouteAlgo.java
+ * JointPlanAlgorithm.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.modules.reroute;
+package playground.thibautd.jointtrips.replanning;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
 
 /**
- * Similar to the {@link org.matsim.core.replanning.modules.ReRoute} algorithm, on all plans of a joint plan.
- *
- * Execution of the ReRoute on a JointPlan fails, as a strict act/leg
- * alternance is expected (which is not the case between the individual 
- * plans of a JointPlan.
+ * Simple abstract class to extend to provide PlanAlgorithms for
+ * cliques.
  *
  * @author thibautd
  */
-public class JointReRouteAlgo extends JointPlanAlgorithm {
+public abstract class JointPlanAlgorithm implements PlanAlgorithm {
 
-	private final PlansCalcRoute routingAlgo;
-
-	public JointReRouteAlgo(final Controler controler) {
-		this.routingAlgo = (PlansCalcRoute) controler.createRoutingAlgorithm();
-	}	
-
-	public void run(final JointPlan plan) {
-		for (Plan indivPlan: plan.getIndividualPlans().values()) {
-			this.routingAlgo.run(indivPlan);
+	/**
+	 * Checks if the plan is a joint plan, and passes it to run( JointPlan ).
+	 *
+	 * @throws IllegalArgumentException if the argument is not a {@link JointPlan}
+	 */
+	@Override
+	public final void run(final Plan plan) {
+		if (plan instanceof JointPlan) {
+			run((JointPlan) plan);
+		} else {
+			throw new IllegalArgumentException(getClass().getSimpleName()+"launched with"+
+					"a non-joint plan");
 		}
 	}
+
+	/**
+	 * executes the algorithm.
+	 *
+	 * @param plan
+	 */
+	public abstract void run(final JointPlan plan);
+
 }
 
