@@ -54,6 +54,7 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 	@Override
 	public List<MobsimAgent> insertAgentsIntoMobsim() {
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+        Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
         
         for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
         	
@@ -69,12 +70,13 @@ public class EvacuationPopulationAgentSource implements AgentSource {
         	Person p = scenario.getPopulation().getPersons().get(household.getMemberIds().get(0));
         	
         	// get id of the household's home facility
-        	Id homeLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();
-        	
-        	Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
+        	Id homeLinkId = ((Activity) p.getSelectedPlan().getPlanElements().get(0)).getLinkId();       	
         	
         	// add vehicles to QSim
-        	for (Vehicle veh : vehicles.getVehicles().values()) qsim.createAndParkVehicleOnLink(veh, homeLinkId);
+        	for (Id vehicleId : household.getVehicleIds()) {
+        		Vehicle veh = vehicles.getVehicles().get(vehicleId);
+        		qsim.createAndParkVehicleOnLink(veh, homeLinkId);
+        	}
         }
         return agents;
 	}

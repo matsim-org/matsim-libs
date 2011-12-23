@@ -38,6 +38,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
+/**
+ * Checks how many vehicles are used by one household at a time and creates a warn
+ * message if the number of available vehicles is exceeded.
+ * 
+ * @author cdobler
+ */
 public class HouseholdVehiclesTracker implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private static final Logger log = Logger.getLogger(HouseholdVehiclesTracker.class);

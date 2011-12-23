@@ -50,7 +50,7 @@ public class CreateVehiclesForHouseholds {
 	
 	private void createVehiclesForHousehold(Household household) {
 		Vehicles vehicles = ((ScenarioImpl)this.scenario).getVehicles();
-		
+
 		HouseholdVehiclesInfo info = householdVehicles.get(household.getId());
 		
 		int numVehicles = info.getNumVehicles();
@@ -80,6 +80,5 @@ public class CreateVehiclesForHouseholds {
 			vehicleIds.add(veh.getId());
 			vehicles.getVehicles().put(veh.getId(), veh);
 		}
-
 	}
 }
