@@ -36,12 +36,11 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 	
 	@Override
 	public void reset(int iteration) {
-
+		this.earnings = 0;
 	}
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		
 		this.earnings = this.earnings + (-1 * event.getAmount());
 	}
 

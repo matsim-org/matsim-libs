@@ -39,17 +39,17 @@ public class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_version6/network.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_version6/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_version6/population.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_version7";
-	static int numberOfExternalIterations = 3;
-	static int lastInternalIteration = 0 ; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/population.xml"; // for first iteration only
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_final_relaxation";
+	static int numberOfExternalIterations = 0;
+	static int lastInternalIteration = 100; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not increased for all iterations
 	private int numberOfBuses = 1; // at least one bus!
-	private double fare = -1.3; // negative!
-	private int capacity = 19; // standing room + seats (realistic values between 19 and 101!)
+	private double fare = -2.5; // negative!
+	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
 	private String directoryExtIt;
@@ -64,8 +64,6 @@ public class ExternalControler {
 	private Map<Integer, Integer> iteration2numberOfWalkLegs = new HashMap<Integer, Integer>();
 	private Map<Integer, Double> iteration2fare = new HashMap<Integer, Double>();
 	private Map<Integer, Double> iteration2capacity = new HashMap<Integer, Double>();
-
-
 
 	public static void main(final String[] args) throws IOException {
 		ExternalControler simulation = new ExternalControler();
@@ -89,7 +87,7 @@ public class ExternalControler {
 
 			Operator operator = new Operator(this.getExtItNr(), this.getNumberOfBuses(), this.getCapacity());
 			operator.calculateScore(this.getDirectoryExtIt(), lastInternalIteration, networkFile);
-			operator.analyzeScores();
+//			operator.analyzeScores();
 			
 			Users users = new Users();
 			users.analyzeScores(this.getDirectoryExtIt(), networkFile);
@@ -109,8 +107,8 @@ public class ExternalControler {
 			// settings for next external iteration
 //			this.setNumberOfBuses(operator.strategy(this.iteration2numberOfBuses, this.iteration2operatorScore));
 //			this.setNumberOfBuses(operator.increaseNumberOfBuses(1)); // absolute value
-//			this.setFare(operator.increaseFare(this.getFare(), -0.2)); // absolute value
-			this.setCapacity(operator.increaseCapacity(5)); // absolute value
+//			this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
+			this.setCapacity(operator.increaseCapacity(2)); // absolute value
 			
 
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");

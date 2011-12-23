@@ -16,7 +16,7 @@ public class TextFileWriter {
 		   
 	    try {
 	    BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-	    String zeile1 = "ITERATION ; NumberOfBuses ; fare ; capacity ; OperatorCosts ; OperatorEarnings; OperatorProfit ; UserScore (avg. executed) ; CarLegs ; PtLegs ; WalkLegs";
+	    String zeile1 = "ITERATION ; NumberOfBuses ; fare ; capacity ; OperatorCosts (AUD) ; OperatorEarnings (AUD); OperatorProfit (AUD) ; UserScore (avg. executed) ; CarLegs ; PtLegs ; WalkLegs";
 	    bw.write(zeile1);
 	    bw.newLine();
 	

@@ -121,6 +121,8 @@ public class MyLegScoringFunction implements LegScoring, BasicScoring {
 			if (this.params.marginalUtilityOfDistancePt_m != 0.0) {
 				dist = leg.getRoute().getDistance();
 			}
+			
+			plan.getPerson().getId();
 			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + this.params.marginalUtilityOfDistancePt_m * dist;
 			tmpScore += this.params.constantPt;
 //			tmpScore += 1000 ;

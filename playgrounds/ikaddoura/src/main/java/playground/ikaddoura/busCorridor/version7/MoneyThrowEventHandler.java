@@ -55,9 +55,11 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		this.fare = calculateFare(event, population);
-		AgentMoneyEvent moneyEvent = new AgentMoneyEventImpl(event.getTime(), event.getPersonId(), fare);
-		this.events.processEvent(moneyEvent); //schickt das MoneyEvent an den EventManager
+		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
+			this.fare = calculateFare(event, population);
+			AgentMoneyEvent moneyEvent = new AgentMoneyEventImpl(event.getTime(), event.getPersonId(), fare);
+			this.events.processEvent(moneyEvent); //schickt das MoneyEvent an den EventManager
+		}
 	}
 
 	private double calculateFare(PersonEntersVehicleEvent event, Population population) {

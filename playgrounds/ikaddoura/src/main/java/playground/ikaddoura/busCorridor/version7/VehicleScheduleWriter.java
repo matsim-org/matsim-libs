@@ -40,8 +40,8 @@ public class VehicleScheduleWriter {
 	private String directoryExtIt;
 	private int capacity;
 	private double length;
-	private double egressSeconds;
-	private double accessSeconds;
+	private double egressSeconds = 1.0;
+	private double accessSeconds = 1.0;
 	private int busSeats;
 	private int standingRoom;
 	
@@ -81,7 +81,8 @@ public class VehicleScheduleWriter {
 	public void writeTransit() throws IOException {
 		
 		ScheduleVehiclesGenerator generator = new ScheduleVehiclesGenerator();
-		generator.setStopTime(20); // for schedule schedule!
+		generator.setStopTime(20); // for schedule!
+		generator.setScheduleSpeed(8.33334); // for schedule!
 		generator.setNetworkFile(networkFile);
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");
@@ -91,15 +92,15 @@ public class VehicleScheduleWriter {
 		generator.setRouteId2(new IdImpl("Ost-West"));
 		
 		generator.setVehTypeId(new IdImpl("Bus"));
-		generator.setAccessSeconds(1.0); // seconds per person for entering a vehicle 
-		generator.setEgressSeconds(1.0); // seconds per person for leaving a vehicle
+		generator.setAccessSeconds(accessSeconds); // seconds per person for entering a vehicle 
+		generator.setEgressSeconds(egressSeconds); // seconds per person for leaving a vehicle
 		generator.setSeats(busSeats);
 		generator.setStandingRoom(standingRoom);
 		generator.setLength(length);
 		
 		generator.setNumberOfBusses(this.numberOfBuses);
-		generator.setStartTime(7*3600); // first cycle Time
-		generator.setEndTime(18*3600); // latest begin of cycle Time, bus will finish cycle after that time
+		generator.setStartTime(6*3600); // first cycle Time
+		generator.setEndTime(22*3600); // latest begin of cycle Time, bus will finish cycle after that time
 		
 		generator.createVehicles();
 		generator.createSchedule();

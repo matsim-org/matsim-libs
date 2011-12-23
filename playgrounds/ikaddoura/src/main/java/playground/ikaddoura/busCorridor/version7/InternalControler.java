@@ -49,11 +49,21 @@ public class InternalControler {
 	private String networkFile;
 	private double fare;
 	
-	private final double TRAVEL_PT_UTILS_PER_HOUR = -3;
-	private final double TRAVEL_CAR_UTILS_PER_HOUR = -6;
-	private final double TRAVEL_WALK_UTILS_PER_HOUR = -2;
-	private final double MONEY_UTILS_PER_EURO = 1;
+//	private final double TRAVEL_PT_AUD_PER_HOUR = 18.19;
+//	private final double TRAVEL_CAR_AUD_PER_HOUR = 18.68;
+////	private final double TRAVEL_WALK_UTILS_PER_HOUR = 19.91;
+//	private final double MONEY_UTILS_PER_EURO = 1;
+////	private final double TRAVEL_PT_WAITING_AUD_PER_HOUR = -30.53;
+//	private final double CONSTANT_CAR_AUD = 0;
+//	private final double CONSTANT_PT_AUD = -12.20;
+	
+	private final double TRAVEL_PT = -3.2982;
+	private final double TRAVEL_CAR = -1.8534;
+	private final double TRAVEL_WALK = -3.6102;
+	private final double MONEY_UTILS = 0.1813; // has to be positive!
 	private final double CONSTANT_CAR = 0;
+	private final double CONSTANT_PT = 2.2118;
+
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare) {
 		this.configFile = configFile;
@@ -103,11 +113,12 @@ public class InternalControler {
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
-		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT_UTILS_PER_HOUR);
-		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MONEY_UTILS_PER_EURO);
-		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR_UTILS_PER_HOUR);
-		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK_UTILS_PER_HOUR);
+		planCalcScoreConfigGroup.setTravelingPt_utils_hr(TRAVEL_PT);
+		planCalcScoreConfigGroup.setMarginalUtilityOfMoney(MONEY_UTILS);
+		planCalcScoreConfigGroup.setTraveling_utils_hr(TRAVEL_CAR);
+		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
+		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
 		
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup);
 		controler.setScoringFunctionFactory(scoringfactory);

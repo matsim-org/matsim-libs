@@ -48,6 +48,9 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 	@Override
 	public void reset(int iteration) {
 		this.vehicleSeconds = 0;
+		this.numberOfPtLegs = 0;
+		this.numberOfCarLegs = 0;
+		this.numberOfWalkLegs = 0;
 	}
 
 	@Override

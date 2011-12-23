@@ -92,7 +92,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("Operator score per iteration", "Iteration", "Euro");
+		LineChart chart = new LineChart("Operator score per iteration", "Iteration", "AUD");
 	    
 		double[] yWerte1 = new double[iteration2score.size()];
 		int counter2 = 0;

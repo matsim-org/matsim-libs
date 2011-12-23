@@ -83,6 +83,7 @@ public class ScheduleVehiclesGenerator {
 	private double length;
 	private double egressSeconds;
 	private double accessSeconds;
+	private double scheduleSpeed;
 	
 	List<Id> vehicleIDs = new ArrayList<Id>();
 	
@@ -217,7 +218,8 @@ public class ScheduleVehiclesGenerator {
 				}
 					
 				else {
-					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // v = s/t --> t = s/v
+					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.getScheduleSpeed(); // v = s/t --> t = s/v
+//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
 				}
 				arrivalTime = departureTime + travelTimeBus;
 				departureTime = arrivalTime + stopTime;	
@@ -408,6 +410,14 @@ public class ScheduleVehiclesGenerator {
 
 	public void setAccessSeconds(double accessSeconds) {
 		this.accessSeconds = accessSeconds;
+	}
+
+	public void setScheduleSpeed(double scheduleSpeed) {
+		this.scheduleSpeed = scheduleSpeed;
+	}
+
+	public double getScheduleSpeed() {
+		return scheduleSpeed;
 	}
 	
 	

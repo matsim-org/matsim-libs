@@ -44,7 +44,7 @@ public class Operator {
 	
 	private final static Logger log = Logger.getLogger(Operator.class);
 	
-	private final double COSTS_PER_VEH_HOUR = 19; // in Euro
+	private final double COSTS_PER_VEH_HOUR = 33; // in AUD
 	private final double OVERHEAD_PERCENTAGE = 1.21; // on top of direct operating costs
 
 	private int extItNr;
@@ -67,14 +67,14 @@ public class Operator {
 	}
 	
 	private double getCostsPerVehicleKm() {
-		double costsPerVehicleKm = 0.0036 * this.getCapacity() + 0.3018; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
-		log.info("CostsPerVehicleKm: "+costsPerVehicleKm);
+		double costsPerVehicleKm = 0.006 * this.getCapacity() + 0.513; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
+		log.info("CostsPerVehicleKm (AUD): "+costsPerVehicleKm);
 		return costsPerVehicleKm;
 	}
 
 	private double getCostsPerVehicleDay() {
-		double costsPerVehicleDay = 0.9449 * this.getCapacity() + 13.307; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
-		log.info("costsPerVehicleDay: "+costsPerVehicleDay);
+		double costsPerVehicleDay = 1.6064 * this.getCapacity() + 22.622; // siehe lineare Regressionsanalyse in "BusCostsEstimations.xls"
+		log.info("costsPerVehicleDay (AUD): "+costsPerVehicleDay);
 		return costsPerVehicleDay;
 	}
 
@@ -107,7 +107,7 @@ public class Operator {
 		double vehicleKm = linksHandler.getVehicleKm(); // vehicle-km aus den Events!
 		double vehicleHours = departureArrivalEventHandler.getVehicleHours(); // vehicle-hours aus den Events, nicht aus dem Fahrplan!
 		
-		this.costs = ((numberOfBuses * costsPerVehicleDay) + (vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
+		this.costs = (numberOfBuses * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
 		this.profit = this.getEarnings() - this.getCosts();
 
 		log.info("OperatorScore calculated: "+this.getProfit());
