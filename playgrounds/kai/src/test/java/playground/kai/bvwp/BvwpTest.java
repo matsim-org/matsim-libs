@@ -73,8 +73,14 @@ public class BvwpTest extends MatsimTestCase {
 			}
 			return planfall ; 
 		}
+		OutputFromPrognosis() {
+			for ( Mode mode : Mode.values() ) {
+				OutputFromPrognosisByMode vals = new OutputFromPrognosisByMode() ;
+				entries.put( mode, vals ) ;
+			}
+		}
 		OutputFromPrognosisByMode getByMode( Mode mode ) {
-			return entries.get(mode) ;
+				return entries.get(mode) ;
 		}
 		void setValuesForMode( Mode mode, OutputFromPrognosisByMode values ) {
 			entries.put( mode, values ) ;
