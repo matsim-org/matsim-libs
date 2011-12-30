@@ -49,21 +49,19 @@ public class InternalControler {
 	private String networkFile;
 	private double fare;
 	
-//	private final double TRAVEL_PT_AUD_PER_HOUR = 18.19;
-//	private final double TRAVEL_CAR_AUD_PER_HOUR = 18.68;
-////	private final double TRAVEL_WALK_UTILS_PER_HOUR = 19.91;
-//	private final double MONEY_UTILS_PER_EURO = 1;
-////	private final double TRAVEL_PT_WAITING_AUD_PER_HOUR = -30.53;
-//	private final double CONSTANT_CAR_AUD = 0;
-//	private final double CONSTANT_PT_AUD = -12.20;
-	
-	private final double TRAVEL_PT = -3.2982;
-	private final double TRAVEL_CAR = -1.8534;
-	private final double TRAVEL_WALK = -3.6102;
-	private final double MONEY_UTILS = 0.1813; // has to be positive!
-	private final double CONSTANT_CAR = 0;
-	private final double CONSTANT_PT = 2.2118;
+//	private final double TRAVEL_PT = -3.2982;
+//	private final double TRAVEL_CAR = -1.8534;
+//	private final double TRAVEL_WALK = -3.6102;
+//	private final double MONEY_UTILS = 0.1813; // has to be positive, because costs are negative!
+//	private final double CONSTANT_CAR = 0;
+//	private final double CONSTANT_PT = 2.2118;
 
+	private final double TRAVEL_PT = -18.19;
+	private final double TRAVEL_CAR = -18.68;
+	private final double TRAVEL_WALK = -19.91;
+	private final double MONEY_UTILS = 1; // has to be positive, because costs are negative!
+	private final double CONSTANT_CAR = 0;
+	private final double CONSTANT_PT = 12.20;
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare) {
 		this.configFile = configFile;

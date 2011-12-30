@@ -46,6 +46,7 @@ public class Users {
 	private final static Logger log = Logger.getLogger(Users.class);
 
 	private double avgExecScore;
+	private double scoreSum;
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs;
@@ -73,6 +74,7 @@ public class Users {
 		}
 		
 		this.setAvgExecScore(scoreSum/scores.size());
+		this.setScoreSum(scoreSum);
 		
 		log.info("Users Scores analyzed.");
 	}
@@ -114,5 +116,13 @@ public class Users {
 		
 		log.info("Leg Modes analyzed.");
 
+	}
+
+	public void setScoreSum(double scoreSum) {
+		this.scoreSum = scoreSum;
+	}
+
+	public double getScoreSum() {
+		return scoreSum;
 	}
 }

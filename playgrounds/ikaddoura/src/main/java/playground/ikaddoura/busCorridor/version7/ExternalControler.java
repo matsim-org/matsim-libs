@@ -42,9 +42,9 @@ public class ExternalControler {
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/population.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_final_relaxation";
-	static int numberOfExternalIterations = 0;
-	static int lastInternalIteration = 100; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_busNumber";
+	static int numberOfExternalIterations = 2;
+	static int lastInternalIteration = 1; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not increased for all iterations
 	private int numberOfBuses = 1; // at least one bus!
@@ -59,6 +59,8 @@ public class ExternalControler {
 	private Map<Integer, Double> iteration2operatorEarnings = new HashMap<Integer, Double>();
 	private Map<Integer, Double> iteration2numberOfBuses = new HashMap<Integer, Double>();
 	private Map<Integer, Double> iteration2userScore = new HashMap<Integer,Double>();
+	private Map<Integer, Double> iteration2userScoreSum = new HashMap<Integer,Double>();
+	private Map<Integer, Double> iteration2totalScore = new HashMap<Integer,Double>();
 	private Map<Integer, Integer> iteration2numberOfCarLegs = new HashMap<Integer, Integer>();
 	private Map<Integer, Integer> iteration2numberOfPtLegs = new HashMap<Integer, Integer>();
 	private Map<Integer, Integer> iteration2numberOfWalkLegs = new HashMap<Integer, Integer>();
@@ -97,7 +99,9 @@ public class ExternalControler {
 			this.iteration2operatorCosts.put(this.getExtItNr(), operator.getCosts());
 			this.iteration2operatorEarnings.put(this.getExtItNr(), operator.getEarnings());
 			this.iteration2numberOfBuses.put(this.getExtItNr(), (double) this.getNumberOfBuses());
+			this.iteration2userScoreSum.put(this.getExtItNr(), users.getScoreSum());
 			this.iteration2userScore.put(this.getExtItNr(), users.getAvgExecScore());
+			this.iteration2totalScore.put(this.getExtItNr(), (users.getScoreSum()+operator.getProfit()));
 			this.iteration2numberOfCarLegs.put(this.getExtItNr(), users.getNumberOfCarLegs());
 			this.iteration2numberOfPtLegs.put(this.getExtItNr(), users.getNumberOfPtLegs());
 			this.iteration2numberOfWalkLegs.put(this.getExtItNr(), users.getNumberOfWalkLegs());
@@ -106,16 +110,16 @@ public class ExternalControler {
 			
 			// settings for next external iteration
 //			this.setNumberOfBuses(operator.strategy(this.iteration2numberOfBuses, this.iteration2operatorScore));
-//			this.setNumberOfBuses(operator.increaseNumberOfBuses(1)); // absolute value
+			this.setNumberOfBuses(operator.increaseNumberOfBuses(1)); // absolute value
 //			this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
-			this.setCapacity(operator.increaseCapacity(2)); // absolute value
+//			this.setCapacity(operator.increaseCapacity(2)); // absolute value
 			
 
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
 		}
 
 		TextFileWriter stats = new TextFileWriter();
-		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorEarnings, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
+		stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorEarnings, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 
 		ChartFileWriter chartWriter = new ChartFileWriter();
 		
@@ -125,6 +129,8 @@ public class ExternalControler {
 
 		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
 		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
+		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
+		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
 		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
 
 	}
