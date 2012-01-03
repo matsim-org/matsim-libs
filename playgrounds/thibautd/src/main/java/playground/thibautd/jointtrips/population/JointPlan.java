@@ -20,6 +20,7 @@
 package playground.thibautd.jointtrips.population;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
 import playground.thibautd.jointtrips.scoring.HomogeneousScoreAggregatorFactory;
 import playground.thibautd.jointtrips.scoring.ScoresAggregator;
 import playground.thibautd.jointtrips.scoring.ScoresAggregatorFactory;
@@ -49,7 +51,6 @@ import playground.thibautd.jointtrips.scoring.ScoresAggregatorFactory;
 public class JointPlan implements Plan {
 	private static final Logger log =
 		Logger.getLogger(JointPlan.class);
-
 
 	// durations for syncing:
 	private final static double pickUpDuration = 0d;
@@ -72,6 +73,7 @@ public class JointPlan implements Plan {
 	// for replanning modules to be able to replicate aggregator
 	private final ScoresAggregatorFactory aggregatorFactory;
 	private final String individualPlanType;
+	private JointTripPossibilities jointTripPossibilities = null;
 
 	//private Id currentIndividual = null;
 	//private Iterator<Id> individualsIterator;
@@ -278,6 +280,7 @@ public class JointPlan implements Plan {
 				plan.setAtIndividualLevel,
 				false, // just copy the plan: do not try to synchronize
 				plan.getScoresAggregatorFactory());
+		this.setJointTripPossibilities( plan.getJointTripPossibilities() );
 	}
 
 	private void constructLegsMap() {
@@ -312,8 +315,7 @@ public class JointPlan implements Plan {
 	 */
 	/**
 	 * @return the list of plan elements, for all individuals. While the plan 
-	 * elements are internal references, the list is not: modifying it (by adding
-	 * or removing elements) will not modify the joint plan.
+	 * elements are internal references, the list is not, and is immutable.
 	 */
 	@Override
 	public List<PlanElement> getPlanElements() {
@@ -321,7 +323,7 @@ public class JointPlan implements Plan {
 		for (Plan plan : this.individualPlans.values()) {
 			output.addAll(plan.getPlanElements());
 		}
-		return output;
+		return Collections.unmodifiableList(output);
 	}
 
 
@@ -330,7 +332,7 @@ public class JointPlan implements Plan {
 	 * @throws UnsupportedOperationException always
 	 */
 	@Override
-	public void addLeg(Leg leg) {
+	public void addLeg(final Leg leg) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -339,7 +341,7 @@ public class JointPlan implements Plan {
 	 * @throws UnsupportedOperationException always
 	 */
 	@Override
-	public void addActivity(Activity act) {
+	public void addActivity(final Activity act) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -349,7 +351,7 @@ public class JointPlan implements Plan {
 	}
 
 	@Override
-	public void setScore(Double score) {
+	public void setScore(final Double score) {
 		throw new UnsupportedOperationException("JointPlan.setScore(Double) is"+
 				" unsupported. The scores must be set on the individual plans.");
 	}
@@ -375,7 +377,7 @@ public class JointPlan implements Plan {
 	 * @throws UnsupportedOperationException always
 	 */
 	@Override
-	public void setPerson(Person person) {
+	public void setPerson(final Person person) {
 		throw new UnsupportedOperationException("JointPlan instances can only be"
 				+" associated to a clique at construction");
 	}
@@ -395,21 +397,28 @@ public class JointPlan implements Plan {
 		return this.clique;
 	}
 
+	/**
+	 * returns the list of plan elements for each agent. List are immutable.
+	 * @return a map linking agents Id the the list of their plan elements,
+	 * in correct temporal sequence.
+	 */
 	public Map<Id, List<PlanElement>> getIndividualPlanElements() {
 		Map<Id, List<PlanElement>> output = new TreeMap<Id, List<PlanElement>>();
 
 		for (Map.Entry<Id, Plan> entry : this.individualPlans.entrySet()) {
-			output.put(entry.getKey(), entry.getValue().getPlanElements());
+			output.put(
+					entry.getKey(),
+					Collections.unmodifiableList( entry.getValue().getPlanElements() ));
 		}
 
 		return output;
 	}
 
-	public Plan getIndividualPlan(Person person) {
+	public Plan getIndividualPlan(final Person person) {
 		return this.getIndividualPlan(person.getId());
 	}
 
-	public Plan getIndividualPlan(Id id) {
+	public Plan getIndividualPlan(final Id id) {
 		return this.individualPlans.get(id);
 	}
 
@@ -429,7 +438,7 @@ public class JointPlan implements Plan {
 	 * individual plans are set identical to the "old" ones.
 	 *
 	 */
-	public void resetFromPlan(JointPlan plan) {
+	public void resetFromPlan(final JointPlan plan) {
 		if (plan.getClique() != this.clique) {
 			throw new UnsupportedOperationException("resetting a joint plan from"+
 					" a plan of a different clique is unsupported.");
@@ -492,11 +501,10 @@ public class JointPlan implements Plan {
 	/**
 	 * Returns the a leg given its Id.
 	 * used to resolve links between joint legs.
-	 * for used in JointLeg only.
 	 *
 	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
 	 */
-	JointLeg getLegById(IdLeg legId) {
+	public JointLeg getLegById(final IdLeg legId) {
 		JointLeg leg = this.legsMap.get(legId);
 
 		if (leg == null) {
@@ -532,6 +540,22 @@ public class JointPlan implements Plan {
 
 	public ScoresAggregatorFactory getScoresAggregatorFactory() {
 		return this.aggregatorFactory;
+	}
+
+	public JointTripPossibilities getJointTripPossibilities() {
+		return jointTripPossibilities;
+	}
+
+	/**
+	 * Sets the joint trip possibilities information
+	 * @param possibilities the information to set (can be null)
+	 * @return the previously set possibilities information (can be null)
+	 */
+	public JointTripPossibilities setJointTripPossibilities(
+			final JointTripPossibilities possibilities) {
+		JointTripPossibilities old = this.jointTripPossibilities;
+		this.jointTripPossibilities = possibilities;
+		return old;
 	}
 
 	/*

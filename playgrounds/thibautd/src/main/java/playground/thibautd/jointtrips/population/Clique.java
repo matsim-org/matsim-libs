@@ -32,6 +32,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesUtils;
+
 /**
  * Defines a "clique" agregating several agents.
  *
@@ -51,7 +54,9 @@ public class Clique implements Person {
 	static final String PLAN_TYPE_PREFIX = "linkedPlan";
 	static final String PLAN_TYPE_REGEXP = PLAN_TYPE_PREFIX + PLAN_TYPE_SEP + ".*";
 
+	// "log only once" variables
 	private static boolean warnKeepOnlySelected = true;
+	private static boolean warnNoJointTripPossibilities = true;
 
 	private int planCount = 0;
 
@@ -317,8 +322,7 @@ public class Clique implements Person {
 	 * <BR><BR>
 	 * CAUTION: importing from the plan dump will produce valid plans, but not a strict
 	 * copy of the imported plans: the leg ids, that are used to resolve linked legs,
-	 * are not dumped. This does not currently pose problems, but could if the
-	 * cliques where to maintain several "father" plans.
+	 * are not dumped. This poses problems when using the JointTripPosssibilities
 	 */
 	public void buildJointPlanFromIndividualPlans() {
 		if (this.plans.isEmpty()) {
@@ -392,6 +396,24 @@ public class Clique implements Person {
 			throw new UnsupportedOperationException(
 					"Clique.buildJointPlanFromIndividualPlans() cannot be ran "+
 					"when the clique already contains joint plans.");
+		}
+
+		constructAndSetJointTripPossibilities();
+	}
+
+	private void constructAndSetJointTripPossibilities() {
+		if ( plans.size() == 1 ) {
+			JointPlan plan = plans.get( 0 );
+			JointTripPossibilities possibilities =
+				JointTripPossibilitiesUtils.extractJointTripPossibilities( plan );
+
+			plan.setJointTripPossibilities( possibilities );
+		}
+		else if ( warnNoJointTripPossibilities ) {
+			warnNoJointTripPossibilities = false;
+			log.warn( "can create joint trip possibilities only if one and only one joint plan" );
+			log.warn( "this was not the case for clique "+getId() );
+			log.warn( "this message is given only once." );
 		}
 	}
 
