@@ -526,7 +526,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	
 	@Override
 	public final String getMode() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		/* directly access the current plan element instead of using this.getCurrentPlanElement()
+		 * as that one creates a lot of unnecessary Unmodifiable-wrappers
+		 */
+		PlanElement currentPlanElement = this.person.getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
@@ -565,6 +568,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	public Plan getSelectedPlan() {
 		return PopulationUtils.unmodifiablePlan(this.person.getSelectedPlan());
 	}
+	@Override
 	public MobsimAgent.State getState() {
 		return state;
 	}
