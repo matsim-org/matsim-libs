@@ -42,6 +42,10 @@ public class StringMatrix {
 		matrix.add(row);
 	}
 	
+	public void deleteRow(int row){
+		matrix.remove(row);
+	}
+	
 	public void replaceString(int row,int column, String value){
 		try{
 			matrix.get(row).remove(column);

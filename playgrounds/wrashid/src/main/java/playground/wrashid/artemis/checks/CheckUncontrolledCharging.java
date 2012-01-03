@@ -13,8 +13,11 @@ import playground.wrashid.lib.obj.StringMatrix;
 public class CheckUncontrolledCharging {
 
 	public static void main(String[] args) {
-//		StringMatrix parkingTimes = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/N-szenario11/output/parkingTimesAndLegEnergyConsumption_n.txt", "\t");
-		StringMatrix parkingTimes = GeneralLib.readStringMatrix("c:/tmp/parkingTimesAndLegEnergyConsumption.txt", "\t");
+		StringMatrix parkingTimes = GeneralLib.readStringMatrix(
+				"H:/data/experiments/ARTEMIS/nov2011/N-szenario11/run1/output/parkingTimesAndLegEnergyConsumption.txt", "\t");
+		// StringMatrix parkingTimes =
+		// GeneralLib.readStringMatrix("c:/tmp/parkingTimesAndLegEnergyConsumption.txt",
+		// "\t");
 
 		HashMap<String, Integer> indexOfParkingTimesOfAgent = new HashMap<String, Integer>();
 
@@ -25,36 +28,49 @@ public class CheckUncontrolledCharging {
 			}
 		}
 
-//		StringMatrix chargingLog = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/N-szenario11/output/chargingLog_n.txt", "\t");
-		StringMatrix chargingLog = GeneralLib.readStringMatrix("c:/tmp/chargingLog.txt", "\t");
+		StringMatrix chargingLog = GeneralLib.readStringMatrix(
+				"H:/data/experiments/ARTEMIS/nov2011/N-szenario11/run1/output/chargingLog.txt", "\t");
+		// StringMatrix chargingLog =
+		// GeneralLib.readStringMatrix("c:/tmp/chargingLog.txt", "\t");
 
+		System.out.print("inconsitent Agents: ");
+		
 		for (int i = 1; i < chargingLog.getNumberOfRows(); i++) {
 			String chargingLogAgentId = chargingLog.getString(i, 1);
 			int j = indexOfParkingTimesOfAgent.get(chargingLogAgentId);
 
-			double startChargingTime=chargingLog.getDouble(i, 2);
-			double endChargingTime=chargingLog.getDouble(i, 3);
-			double parkingArrivalTime=parkingTimes.getDouble(j, 1);
-			double parkingDeparturetime=parkingTimes.getDouble(j, 2);
-			
-			while (!GeneralLib.isIn24HourInterval(parkingArrivalTime,parkingDeparturetime,startChargingTime+0.1) || !GeneralLib.isIn24HourInterval(parkingArrivalTime,parkingDeparturetime,endChargingTime-0.1)) {
+			double startChargingTime = chargingLog.getDouble(i, 2);
+			double endChargingTime = chargingLog.getDouble(i, 3);
+			double parkingArrivalTime = parkingTimes.getDouble(j, 1);
+			double parkingDeparturetime = parkingTimes.getDouble(j, 2);
+
+			do {
 				DebugLib.traceAgent(new IdImpl(chargingLogAgentId));
+
 				
-				j++;
-				parkingArrivalTime=parkingTimes.getDouble(j, 1);
-				parkingDeparturetime=parkingTimes.getDouble(j, 2);
-				//DebugLib.stopSystemAndReportInconsistency("charging not possible, when vehicle not parked");
-				
+
 				String parkingLogAgentId = parkingTimes.getString(j, 0);
 				if (!chargingLogAgentId.equalsIgnoreCase(parkingLogAgentId)) {
-					//DebugLib.stopSystemAndReportInconsistency("match not found for agent:" + chargingLogAgentId);
-					System.out.println("inconsistency found for agent: " + chargingLogAgentId);
+					// DebugLib.stopSystemAndReportInconsistency("match not found for agent:"
+					// + chargingLogAgentId);
+					//System.out.println("no charging log found for agent: " + chargingLogAgentId);
+					System.out.print(chargingLogAgentId + ", ");
 					break;
 				}
-			
-			}
 
-			
+				if (GeneralLib.isIn24HourInterval(parkingArrivalTime, parkingDeparturetime, startChargingTime + 0.1)) {
+					if (GeneralLib.getIntervalDuration(parkingArrivalTime, startChargingTime + 1) > 10) {
+						//System.out.println("overlapping charging log (e.g. from prev. day): " + chargingLogAgentId);
+						System.out.print(chargingLogAgentId + ", ");
+					}
+					break;
+				}
+				
+				j++;
+				parkingArrivalTime = parkingTimes.getDouble(j, 1);
+				parkingDeparturetime = parkingTimes.getDouble(j, 2);
+
+			} while (true);
 
 		}
 	}
