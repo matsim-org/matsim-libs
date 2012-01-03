@@ -28,6 +28,7 @@ public interface AgentEvent extends PersonEvent {
 	public Id getLinkId();
 
 	// yyyyyy why "legmode" for "agent event"?  kai, aug'10
+	// From our point of view this method should be pushed down to AgentDeparture and AgentArrivalEvent, there it is really useful, dr & dg 01-2012
 	public String getLegMode();
 
 }
