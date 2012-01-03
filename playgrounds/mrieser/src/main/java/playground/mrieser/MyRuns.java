@@ -43,6 +43,7 @@ import net.opengis.kml._2.PolyStyleType;
 import net.opengis.kml._2.StyleType;
 import net.opengis.kml._2.TimeSpanType;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -72,6 +73,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ActLocationFalsifier;
@@ -87,6 +89,8 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.kml.KMZWriter;
 
 public class MyRuns {
+
+	private final static Logger log = Logger.getLogger(MyRuns.class);
 
 	//////////////////////////////////////////////////////////////////////
 	// filterSelectedPlans
@@ -848,24 +852,53 @@ public class MyRuns {
 //		  String s = formatter.format(date);
 //		  System.out.println("hh:mm:ss a formate : " + s);
 
-		int argb = 0xff000000;
-		int alpha = (argb >> 24) & 0x000000ff;
 
-		int alpha2 = 0xff000000;
-
-		alpha2 = (alpha2 >> 24) & 0x000000ff;
-		System.out.println(alpha);
-		System.out.println(Integer.toHexString(alpha));
-
-		alpha = alpha * alpha2 / 255;
-		System.out.println(alpha);
-		System.out.println(Integer.toHexString(alpha));
-		alpha = alpha << 24;
-		System.out.println(Integer.toHexString(alpha));
+//		float value = 3.5f;
+//		String formatted = Formatter.
+//		System.out.printf("%10.4f", value);
 
 
 
 //		System.out.println("stop at " + (new Date()));
 //		System.exit(0); // currently only used for calcRouteMT();
+
+//
+//		String line = "    4090    5056    4088    1802    4153    1800    5350    5349    3804    1847    1848    3963    3966    1849    3404    1854    3397    3367    3365    1853    1852    1864    1863    1862    1330    1343    3535    1331    1332    1333    1334    1335    3544    1312    3511    3512    3459    1351    4512    4506    4507    1440    2574    2581    1407    3914    1408    3527    1409    2545";
+//		String parts[] = line.split("\\s+");
+//		System.out.println(parts.length);
+//		for (String part : parts) {
+//			System.out.println("\"" + part + "\"");
+//		}
+//
+//
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.CH1903_LV03, TransformationFactory.WGS84);
+		Coord c = ct.transform(new CoordImpl(681733, 249168));
+		System.out.println(c.getX());
+		System.out.println(c.getY());
+
+
+
+
+//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//
+//		new MatsimNetworkReader(scenario).readFile("/Volumes/Data/vis/ch25pct/network.xml.gz");
+//
+//		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
+//		plans.setIsStreaming(true);
+//		final PopulationWriter plansWriter = new PopulationWriter(plans, scenario.getNetwork());
+////		plansWriter.setWriterHandler(new PopulationWriterHandlerImplV5());
+//		plansWriter.startStreaming("plansOUT2.xml.gz");
+//		plans.addAlgorithm(plansWriter);
+//		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+//
+//		log.info("  reading and writing plans...");
+////		plansReader.readFile("/Volumes/Data/vis/ch25pct/60.plans.xml.gz");
+//		plansReader.readFile("plansOUT.xml.gz");
+//		plans.printPlansCount();
+//		plansWriter.closeStreaming();
+
+		log.info("done.");
+
 	}
 }

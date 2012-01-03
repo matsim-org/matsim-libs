@@ -114,7 +114,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		NetworkImpl network = controler.getNetwork();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		initSpatialGirds(network);
 
 		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");

@@ -24,9 +24,9 @@ package playground.mfeil.creators;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,9 +39,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class NetworkCapacityReducer {
 
 	private static final Logger log = Logger.getLogger(NetworkCapacityReducer.class);
-	private NetworkImpl network;
+	private Network network;
 
-	public NetworkCapacityReducer(NetworkImpl network){
+	public NetworkCapacityReducer(Network network){
 		this.network = network;
 	}
 

@@ -25,13 +25,13 @@ import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -93,7 +93,7 @@ public class CMCFScenarioGenerator {
 
 	private Config config;
 
-	private NetworkImpl network;
+	private Network network;
 
 	public CMCFScenarioGenerator() throws Exception {
 		init();

@@ -27,10 +27,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -48,7 +48,7 @@ public class ReNumberNetwork {
 
 	private static final Logger log = Logger.getLogger(WithinDayControler.class);
 	
-	private static NetworkImpl network;
+	private static Network network;
 	private static String networkFile = "mysimulations/kt-zurich-cut/network.xml";
 	private static String outputNetworkFile = "mysimulations/kt-zurich-cut/mapped_network.xml.gz";
 	

@@ -2,7 +2,8 @@ package playground.andreas.utils.pop;
 
 import java.util.Iterator;
 
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -11,7 +12,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ArgumentParser;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * Assigns each activity in each plan of each person in the population a link
@@ -83,7 +83,7 @@ public class SimpleXY2Links {
 		scenario.getConfig().plans().setInputFile(this.plansfileIN);
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(scenario);
 		sl.loadNetwork();
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		final PopulationImpl plans = (PopulationImpl) sl.getScenario().getPopulation();
 		plans.setIsStreaming(true);

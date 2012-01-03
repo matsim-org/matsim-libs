@@ -24,13 +24,13 @@
 package playground.yu.analysis.forBln;
 
 import org.matsim.analysis.CalcAverageTripLength;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -99,9 +99,8 @@ public class AnalysisTest4BlnWithXMLEvents implements Analysis4Bln {
 		withToll = Boolean.parseBoolean(args[args.length - 2]);
 		String tollFilename = withToll ? args[args.length - 3] : null;
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = sc.getNetwork();
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 
 		// toll

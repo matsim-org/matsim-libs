@@ -29,6 +29,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -107,7 +108,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 	public void notifyStartup(StartupEvent event) {
 				
 		// connect facilities to network
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), getNetwork());
+		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 		
 		super.createAndInitReplanningManager(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();

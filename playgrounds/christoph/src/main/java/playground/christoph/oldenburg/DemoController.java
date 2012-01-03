@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -61,7 +62,6 @@ import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 public class DemoController extends WithinDayController implements SimulationInitializedListener, StartupListener, 
 	SimulationBeforeSimStepListener, IterationEndsListener {
@@ -163,7 +163,7 @@ public class DemoController extends WithinDayController implements SimulationIni
 		// Das könnte man so sehen.  Besprichst Du es mal mit den Autoren (Dominik & Gregor)?
 		// Aber: Ist die Rechnung denn richtig?  Müsste man nicht schauen, wie weit das Fahrzeug auf der Kante
 		// bereits ist?  Ansonsten ersetzt man einfach einen Fehler durch einen anderen, oder?  kai, nov'11
-		for (NetworkChangeEvent networkChangeEvent : this.getNetwork().getNetworkChangeEvents()) {
+		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) this.getNetwork()).getNetworkChangeEvents()) {
 			if(networkChangeEvent.getStartTime() == e.getSimulationTime()) {
 				for (Link link : networkChangeEvent.getLinks()) {
 

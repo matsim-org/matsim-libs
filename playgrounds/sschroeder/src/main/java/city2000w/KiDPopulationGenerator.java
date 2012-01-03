@@ -1,31 +1,34 @@
 package city2000w;
 
-import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 import gis.arcgis.NutsRegionShapeReader;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import kid.KiDDataReader;
 import kid.KiDPlanAgentCreator;
 import kid.KiDUtils;
 import kid.ScheduledVehicles;
-import kid.filter.AllActivitiesInSelectedRegionsFilter;
 import kid.filter.And;
 import kid.filter.LogicVehicleFilter;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import city2000w.KiDDataGeoCoder.MobileVehicleFilter;
 
 
 public class KiDPopulationGenerator {
@@ -62,7 +65,7 @@ public class KiDPopulationGenerator {
 		
 		KiDPlanAgentCreator planAgentCreator = new KiDPlanAgentCreator(scheduledVehicles);
 		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM32N());
-		planAgentCreator.setNetwork(scen.getNetwork());
+		planAgentCreator.setNetwork((NetworkImpl) scen.getNetwork());
 		PlansCalcRoute router = new PlansCalcRoute(null, scen.getNetwork(), 
 				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
 		planAgentCreator.setRouter(router);

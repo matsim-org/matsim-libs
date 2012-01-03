@@ -41,7 +41,7 @@ public class LinkToLinkTravelTimeCalculatorTest extends MatsimTestCase {
 	public void testLongTravelTimeInEmptySlot() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
     scenario.getConfig().travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));

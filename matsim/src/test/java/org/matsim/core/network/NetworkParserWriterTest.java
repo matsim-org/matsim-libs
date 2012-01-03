@@ -59,7 +59,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void runModules(final NetworkImpl network) {
+	private final void runModules(final Network network) {
 		log.info("  running network modules... ");
 		new NetworkCleaner().run(network);
 		new NetworkMergeDoubleLinks().run(network);
@@ -89,7 +89,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 
-		this.runModules((NetworkImpl) network);
+		this.runModules(network);
 
 		TriangleScenario.writeNetwork(network, getOutputDirectory() + "output_network.xml");
 
@@ -110,7 +110,7 @@ public class NetworkParserWriterTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 
 		log.info("  reading network xml file as a layer of the world... ");
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 

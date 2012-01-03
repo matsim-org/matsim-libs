@@ -52,13 +52,14 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		catch(Exception e){ System.exit(-1); }
 	}
 
+	@Override
 	void runMATSim(){
 		
 		log.info("Starting MATSim from UrbanSim");
 		int benchmarkID = this.benchmark.addMeasure("MATSim4UrbanSimInteroplation Run");
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		modifyNetwork(network);
 		cleanNetwork(network);
 		

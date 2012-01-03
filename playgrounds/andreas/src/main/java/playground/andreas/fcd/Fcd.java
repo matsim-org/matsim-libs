@@ -96,7 +96,7 @@ public class Fcd {
 		Fcd fcd = new Fcd(fcdNetInFile, fcdEventsInFile, minDistanceBetweenTwoActs);
 		fcd.writeNetworkFromEvents(outDir + "fcd_netFromEvents.xml.gz");
 		fcd.writeSimplePlansFromEvents(outDir + "fcd_simplePlans.xml.gz");
-		fcd.writeComplexPlansFromEvents(outDir + "fcd_complexPlans.xml.gz", sc.getNetwork());
+		fcd.writeComplexPlansFromEvents(outDir + "fcd_complexPlans.xml.gz", (NetworkImpl) sc.getNetwork());
 		fcd.writeLinksUsed(outDir + "fcd_linksInUseByFcd.txt");
 		
 		return fcd.linksUsed;
@@ -119,7 +119,7 @@ public class Fcd {
 		Fcd fcd = new Fcd(netInFile, fcdEventsInFile, 0.0);
 		fcd.writeNetworkFromEvents(netOutFile);
 		fcd.writeSimplePlansFromEvents(plansOutFile);
-		fcd.writeComplexPlansFromEvents(plansOutFile + ".complex.xml", sc.getNetwork());
+		fcd.writeComplexPlansFromEvents(plansOutFile + ".complex.xml", (NetworkImpl) sc.getNetwork());
 		fcd.writeLinksUsed(linksUsed);
 	}
 

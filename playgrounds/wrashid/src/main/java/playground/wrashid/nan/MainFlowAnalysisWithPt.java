@@ -1,12 +1,9 @@
-package playground.wrashid.nan;
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * MainDensityAnalysis.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,21 +16,17 @@ package playground.wrashid.nan;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-import java.util.HashMap;
+
+package playground.wrashid.nan;
+
 import java.util.Map;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainFlowAnalysisWithPt {
 
@@ -53,7 +46,7 @@ public class MainFlowAnalysisWithPt {
 		double radiusInMeters=50000;
 		
 		
-		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		
 		
 		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
@@ -63,7 +56,7 @@ public class MainFlowAnalysisWithPt {
 		flowAnalyzer.reset(0);
 		//inflowAnalyzer.reset(0);
 				
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
+		EventsManager events = EventsUtils.createEventsManager();  //create new object of events-manager class
 		//EventsManagerImpl eventsInflow=new EventsManagerImpl();
 		
 		events.addHandler(flowAnalyzer); // add handler

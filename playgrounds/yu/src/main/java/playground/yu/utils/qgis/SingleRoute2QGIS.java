@@ -35,16 +35,16 @@ import org.geotools.feature.FeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.yu.analysis.DiverseRoutesSummary;
@@ -66,13 +66,13 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	private final static Logger log = Logger.getLogger(SingleRoute2QGIS.class);
 	protected Map<String, List<LegRoute>> dailyRoutes;
-	protected NetworkImpl network;
+	protected Network network;
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
 	public SingleRoute2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkImpl network, final Map<String, List<LegRoute>> map) {
+			final Network network, final Map<String, List<LegRoute>> map) {
 		super(population, network, crs, outputDir);
 		this.network = network;
 		dailyRoutes = map;
@@ -186,8 +186,8 @@ public class SingleRoute2QGIS extends SelectedPlans2ESRIShapeChanged implements
 			// outputDir = "../matsimTests/dailyJourney_Route2QGIS/Berlin";
 			// sample = 0.1;
 		}
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

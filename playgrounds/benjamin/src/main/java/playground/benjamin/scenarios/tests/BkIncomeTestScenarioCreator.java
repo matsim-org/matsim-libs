@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -157,7 +157,7 @@ public class BkIncomeTestScenarioCreator {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String outfile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/plans.xml";
 		String networkFile = BkPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/network.xml";
-		NetworkImpl uselessNetwork = scenario.getNetwork();
+		Network uselessNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		BkIncomeTestScenarioCreator pc = new BkIncomeTestScenarioCreator(scenario);

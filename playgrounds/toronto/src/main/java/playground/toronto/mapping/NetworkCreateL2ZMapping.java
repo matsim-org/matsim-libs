@@ -28,8 +28,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 public class NetworkCreateL2ZMapping {
@@ -53,7 +53,7 @@ public class NetworkCreateL2ZMapping {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,Node> nodes) {
+	private QuadTree<Node> buildCentroidNodeQuadTree(final Map<Id,? extends Node> nodes) {
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;
 		double maxx = Double.NEGATIVE_INFINITY;
@@ -94,7 +94,7 @@ public class NetworkCreateL2ZMapping {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(NetworkImpl network) {
+	public void run(Network network) {
 		QuadTree<Node> qt = buildCentroidNodeQuadTree(network.getNodes());
 		log.info("# centroid nodes: "+qt.size());
 		try {

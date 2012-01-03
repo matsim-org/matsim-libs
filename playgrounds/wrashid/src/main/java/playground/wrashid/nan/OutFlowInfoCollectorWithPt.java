@@ -31,21 +31,20 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.LinkImpl;
 
 public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		AgentArrivalEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
-	private Map<Id, Link> filteredEquilNetLinks; // define
+	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
 	
 	// personId, linkId
 	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
 	
 	private boolean isOldEventFile;
 
-	public OutFlowInfoCollectorWithPt(Map<Id, Link> filteredEquilNetLinks,
+	public OutFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile,int binSizeInSeconds) { // to create the class FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
@@ -53,11 +52,13 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 		this.binSizeInSeconds = binSizeInSeconds;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		linkOutFlow = new HashMap<Id, int[]>(); // reset the variables (private
 												// ones)
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) { // call from
 													// NetworkReadExample
 		linkLeave(event.getLinkId(), event.getTime());

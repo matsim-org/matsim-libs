@@ -468,7 +468,7 @@ public class TransitRouterImplTest {
 			this.coord7 = this.scenario.createCoord(x, 0);
 
 			// network
-			NetworkImpl network = this.scenario.getNetwork();
+			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			NodeImpl node1 = network.getFactory().createNode(this.scenario.createId("1"), this.coord1);
 			NodeImpl node2 = network.getFactory().createNode(this.scenario.createId("2"), this.coord2);
 			NodeImpl node3 = network.getFactory().createNode(this.scenario.createId("3"), this.coord3);

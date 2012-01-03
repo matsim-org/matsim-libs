@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -42,17 +42,17 @@ public class CreateStopsForAllCarLinks {
 	
 	private final static Logger log = Logger.getLogger(CreateStopsForAllCarLinks.class);
 	
-	private final NetworkImpl net;
+	private final Network net;
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
 	
-	public static TransitSchedule createStopsForAllCarLinks(NetworkImpl network, PConfigGroup pConfigGroup){
+	public static TransitSchedule createStopsForAllCarLinks(Network network, PConfigGroup pConfigGroup){
 		CreateStopsForAllCarLinks cS = new CreateStopsForAllCarLinks(network, pConfigGroup);
 		cS.run();
 		return cS.getTransitSchedule();
 	}
 
-	public CreateStopsForAllCarLinks(NetworkImpl net, PConfigGroup pConfigGroup) {
+	public CreateStopsForAllCarLinks(Network net, PConfigGroup pConfigGroup) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 	}

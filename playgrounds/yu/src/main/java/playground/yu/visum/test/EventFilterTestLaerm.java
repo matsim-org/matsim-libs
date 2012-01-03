@@ -22,13 +22,13 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -48,7 +48,7 @@ public class EventFilterTestLaerm {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		// network
 		System.out.println("  creating network object... ");
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  reading network file... ");
@@ -62,7 +62,7 @@ public class EventFilterTestLaerm {
 		System.out.println("  done.");
 		// events
 		System.out.println("  creating events object... ");
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		System.out.println("  done.");
 
 		System.out.println("  adding events algorithms...");

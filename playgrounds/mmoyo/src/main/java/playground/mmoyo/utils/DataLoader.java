@@ -21,17 +21,17 @@ package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -44,7 +44,7 @@ public class DataLoader {
 
 	//this is to be used when one need to work with a scenario outside a controler. v.gr. at util classes
 	public ScenarioImpl loadScenarioWithTrSchedule(final String configFile) {
-		ScenarioImpl scenario = (ScenarioImpl) this.loadScenario(configFile);
+		ScenarioImpl scenario = this.loadScenario(configFile);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		
@@ -66,7 +66,7 @@ public class DataLoader {
 		return schedule;
 	}
 
-	public TransitSchedule readTransitSchedule(final NetworkImpl network, final String transitScheduleFile) {
+	public TransitSchedule readTransitSchedule(final Network network, final String transitScheduleFile) {
 		TransitScheduleFactoryImpl transitScheduleFactoryImpl = new TransitScheduleFactoryImpl();
 		TransitSchedule transitSchedule = transitScheduleFactoryImpl.createTransitSchedule();
 		Scenario scn = this.createScenario();
@@ -78,11 +78,11 @@ public class DataLoader {
 		return transitSchedule;
 	}
 
-	public NetworkImpl readNetwork (final String networkFile){
+	public Network readNetwork (final String networkFile){
 		Scenario scenario = this.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scenario);
 		matsimNetReader.readFile(networkFile);
-		NetworkImpl network = ((ScenarioImpl)scenario).getNetwork(); 
+		Network network = ((ScenarioImpl)scenario).getNetwork(); 
 		scenario = null;
 		matsimNetReader = null;
 		return network;

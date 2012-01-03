@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -71,7 +72,7 @@ import org.matsim.core.utils.misc.Time;
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(100, 0));
@@ -109,7 +110,7 @@ import org.matsim.core.utils.misc.Time;
 		 *
 		 * each link is 100m long and can be traveled along with 18km/h = 5m/s = 20s for 100m
 		 */
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node0 = network.createAndAddNode(new IdImpl( "0"), new CoordImpl(  0,   10));
 		Node node1 = network.createAndAddNode(new IdImpl( "1"), new CoordImpl(  0,  100));
@@ -144,7 +145,7 @@ import org.matsim.core.utils.misc.Time;
 	 **/
 	protected static void createPopulation1(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		Link link0 = network.getLinks().get(new IdImpl(0));
 		Link link1 = network.getLinks().get(new IdImpl(1));
@@ -173,7 +174,7 @@ import org.matsim.core.utils.misc.Time;
 	 **/
 	protected static void createPopulation2(final ScenarioImpl scenario) {
 		Population population = scenario.getPopulation();
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(new IdImpl("1")), network.getLinks().get(new IdImpl("7")), network.getLinks().get(new IdImpl("13"))), population);
 	}
@@ -214,7 +215,7 @@ import org.matsim.core.utils.misc.Time;
 		Fixture.createNetwork1(scenario);
 		Fixture.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
 		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);

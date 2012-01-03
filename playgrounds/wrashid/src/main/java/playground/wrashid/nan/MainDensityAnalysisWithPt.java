@@ -1,20 +1,34 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.nan;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainDensityAnalysisWithPt {
 
@@ -35,14 +49,14 @@ public class MainDensityAnalysisWithPt {
 		
 		
 		
-		Map<Id, Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
+		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		InFlowInfoCollectorWithPt inflowHandler=new InFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
 		OutFlowInfoCollectorWithPt outflowHandler=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds);// "links" makes run faster
 		
 		inflowHandler.reset(0);
 		outflowHandler.reset(0);
 				
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
+		EventsManager events = EventsUtils.createEventsManager();  //create new object of events-manager class
 		
 		events.addHandler(inflowHandler); // add handler
 		events.addHandler(outflowHandler);
@@ -88,7 +102,7 @@ public class MainDensityAnalysisWithPt {
 		return result;
 	}
 	
-	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, Link> links){
+	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links){
 			//send actual link info.)
 		HashMap<Id, double[]> density=new HashMap<Id, double[]>();
 		
@@ -122,7 +136,7 @@ public class MainDensityAnalysisWithPt {
 		return density;
 	}
 	
-	public static void printDensity(HashMap<Id, double[]> density, Map<Id, Link> links) { // print
+	public static void printDensity(HashMap<Id, double[]> density, Map<Id, ? extends Link> links) { // print
 		for (Id linkId : density.keySet()) {
 			double[] bins = density.get(linkId);
 

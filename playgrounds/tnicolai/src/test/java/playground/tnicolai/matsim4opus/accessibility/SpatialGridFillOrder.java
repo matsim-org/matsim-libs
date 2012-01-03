@@ -142,7 +142,7 @@ public class SpatialGridFillOrder {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		// add nodes
 		Node node1 = network.createAndAddNode(new IdImpl(1), scenario.createCoord(0, 100));

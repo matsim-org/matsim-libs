@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.artemis.checks;
 
 import java.util.LinkedList;
@@ -16,7 +35,7 @@ public class NumberOfParkingsPerLinkAndHub {
 
 	public static void main(String[] args) {
 		StringMatrix stringMatrix = GeneralLib.readStringMatrix("H:/data/experiments/ARTEMIS/nov2011/inputs/linkHubMappings/linkHub.mappingTable.txt", "\t");
-		NetworkImpl network = GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
+		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
 		String parkingBasePath =	"H:/data/experiments/TRBAug2011/parkings/flat/";
 		
 		LinkedList<Parking> privateParkingCityZH=getParkingCollection(parkingBasePath + "privateParkings_v1_kti.xml");

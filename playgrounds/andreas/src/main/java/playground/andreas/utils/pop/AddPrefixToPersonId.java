@@ -7,7 +7,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -43,7 +42,7 @@ public class AddPrefixToPersonId extends NewPopulation {
 		String inPlansFile = "./plan_korridor.xml.gz";
 		String outPlansFile = "./plan_korridor_50x.xml.gz";
 
-		NetworkImpl net = sc.getNetwork();
+		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();

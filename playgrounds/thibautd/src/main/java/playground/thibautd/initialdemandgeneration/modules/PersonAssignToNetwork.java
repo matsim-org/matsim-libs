@@ -21,6 +21,7 @@
 package playground.thibautd.initialdemandgeneration.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -28,7 +29,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
@@ -61,7 +61,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	 * initialises the module without routing capability
 	 */
 	public PersonAssignToNetwork(
-			final NetworkImpl network,
+			final Network network,
 			final ActivityFacilities facilities) {
 		this( network , facilities , null , null );
 	}
@@ -70,7 +70,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	 * initialises the module with routing capability
 	 */
 	public PersonAssignToNetwork(
-			final NetworkImpl network,
+			final Network network,
 			final ActivityFacilities facilities,
 			final Config config,
 			final ModeRouteFactory routeFactory) {

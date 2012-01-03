@@ -25,14 +25,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.jjoubert.CommercialModel.Listeners.MyCommercialActivityDensityWriter;
 
@@ -47,13 +47,13 @@ public class ReadingEventsFile {
 		try {
 			bw = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			try{
-				ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				NetworkImpl nl = scenario.getNetwork();
+				Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+				Network nl = scenario.getNetwork();
 				MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 				nr.readFile(networkFilename);
 				
 				String input = root + "/Output/Run06/it.100-7699/100.events.txt.gz";
-				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+				EventsManager events = EventsUtils.createEventsManager();
 				MyCommercialActivityDensityWriter handler = new MyCommercialActivityDensityWriter(bw, nl);	
 				events.addHandler(handler);
 

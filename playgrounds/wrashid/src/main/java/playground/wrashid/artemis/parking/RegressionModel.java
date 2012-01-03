@@ -1,21 +1,16 @@
 package playground.wrashid.artemis.parking;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.artemis.hubs.LinkHubMapping;
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.DoubleValueHashMap;
-import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.lib.obj.StringMatrix;
 
 public class RegressionModel {
 
@@ -91,7 +86,7 @@ public class RegressionModel {
 
 	private static NetworkImpl getNetwork() {
 		String inputNetworkPath="C:/eTmp/run10/output_network.xml.gz";
-		NetworkImpl network= GeneralLib.readNetwork(inputNetworkPath);
+		NetworkImpl network= (NetworkImpl) GeneralLib.readNetwork(inputNetworkPath);
 		return network;
 	}
 

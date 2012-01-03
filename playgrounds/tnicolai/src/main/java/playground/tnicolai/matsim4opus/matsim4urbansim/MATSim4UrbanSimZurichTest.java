@@ -1,8 +1,8 @@
 package playground.tnicolai.matsim4opus.matsim4urbansim;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
@@ -34,7 +34,7 @@ public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 	 * test parameter in the MATSim config file (from UrbanSim)
 	 */
 	@Override
-	void modifyNetwork(NetworkImpl network){
+	void modifyNetwork(Network network){
 		log.info("");
 		log.info("Checking for network modifications ...");
 		// check given test parameter for desired modifications

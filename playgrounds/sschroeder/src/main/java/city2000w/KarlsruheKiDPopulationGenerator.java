@@ -13,7 +13,6 @@ import kid.KiDStatWriter;
 import kid.KiDUtils;
 import kid.ScheduledVehicles;
 import kid.filter.And;
-import kid.filter.AtLeastOneActivitiesInSelectedRegionsFilter;
 import kid.filter.LogicVehicleFilter;
 
 import org.apache.log4j.Level;
@@ -21,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -68,7 +68,7 @@ public class KarlsruheKiDPopulationGenerator {
 		
 		KiDPlanAgentCreator planAgentCreator = new KiDPlanAgentCreator(scheduledVehicles);
 		planAgentCreator.setTransformation(KiDUtils.createTransformation_WGS84ToWGS84UTM33N());
-		planAgentCreator.setNetwork(scen.getNetwork());
+		planAgentCreator.setNetwork((NetworkImpl) scen.getNetwork());
 		PlansCalcRoute router = new PlansCalcRoute(null, scen.getNetwork(), 
 				new FreespeedTravelTimeCost(-1.0,0.0,0.0), new FreespeedTravelTimeCost(-1.0,0.0,0.0), ((PopulationFactoryImpl) scen.getPopulation().getFactory()).getModeRouteFactory());
 		planAgentCreator.setRouter(router);

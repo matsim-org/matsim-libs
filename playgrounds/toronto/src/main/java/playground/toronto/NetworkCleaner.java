@@ -22,9 +22,9 @@ package playground.toronto;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,7 +64,7 @@ public class NetworkCleaner {
 	 */
 	public void run(final String inputNetworkFile, final String outputNetworkFile) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 
 		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);

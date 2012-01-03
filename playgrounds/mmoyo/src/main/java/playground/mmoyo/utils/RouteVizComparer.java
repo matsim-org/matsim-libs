@@ -22,12 +22,12 @@ package playground.mmoyo.utils;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.run.OTFVis;
 
 public class RouteVizComparer {
@@ -45,7 +45,7 @@ public class RouteVizComparer {
 		PlanFragmenter fragmenter =  new PlanFragmenter();
 		DataLoader loader = new DataLoader();
 
-		NetworkImpl net = loader.readNetwork(netFile);
+		Network net = loader.readNetwork(netFile);
 
 		final String strFrag = "/Frag_";
 		for (int i=0; i< arraPopPaths.length;i++){

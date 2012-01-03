@@ -43,6 +43,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 //		this.controler = controler;
 
 	}
+	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 		if (event.getIteration() < event.getControler().getConfig().controler().getLastIteration()) {
 			return;
@@ -52,7 +53,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 
 	protected void computeChoiceSet(Controler controler) {
 
-		NetworkImpl network = controler.getNetwork();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 
 		LinkImpl link0 = network.getNearestLink(new CoordImpl(681753.6875, 251900.64844999998));
 		ActivityImpl fromAct = new ActivityImpl("home", link0.getId());

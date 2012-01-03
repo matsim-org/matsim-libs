@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.run.OTFVis;
@@ -64,7 +65,7 @@ public class FindAgentRejectNearStop {
 		PopulationImpl outputPopulation = new PopulationImpl(tempScenario);
 		
 		//create set of nodes coordinates around the station
-		Collection <Node> nearNodes = scn.getNetwork().getNearestNodes(stopCoord, this.distance);
+		Collection <Node> nearNodes = ((NetworkImpl) scn.getNetwork()).getNearestNodes(stopCoord, this.distance);
 		Set <Coord> nearNodesCoord = new HashSet<Coord>();
 		for (Node node : nearNodes){
 			nearNodesCoord.add(node.getCoord());
@@ -152,7 +153,7 @@ public class FindAgentRejectNearStop {
 		double distance = 1000.0;
 		final String type =  "pt";   //options:  "pt" , "car"  "pt+car"
 		
-		ScenarioImpl scenario = (ScenarioImpl) new DataLoader().loadScenario(configFile);
+		ScenarioImpl scenario = new DataLoader().loadScenario(configFile);
 		FindAgentRejectNearStop agentsNearStop = new FindAgentRejectNearStop(scenario, distance, type);
 		agentsNearStop.writePlan(badStopsArray[1]);                
 		//agentsNearStop.playAvoidingPopulation(badStopsArray[1]);    

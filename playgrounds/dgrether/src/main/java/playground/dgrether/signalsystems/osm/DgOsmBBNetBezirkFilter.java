@@ -33,13 +33,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.dgrether.visualization.KmlNetworkVisualizer;
 
@@ -91,7 +91,7 @@ public class DgOsmBBNetBezirkFilter {
 	
 	public Network filterNetwork(Network net){
 		GeometryFactory factory = new GeometryFactory();
-		NetworkImpl n = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
+		NetworkImpl n = (NetworkImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getNetwork();
 		n.setCapacityPeriod(net.getCapacityPeriod());
 		n.setEffectiveLaneWidth(net.getEffectiveLaneWidth());
 		for (Link orgLink : net.getLinks().values()){
@@ -125,7 +125,7 @@ public class DgOsmBBNetBezirkFilter {
 	
 	public static void main(String[] args){
 		DgOsmBBNetBezirkFilter filter = new DgOsmBBNetBezirkFilter(DgOsmBBPaths.BASE_OUT_DIR + "berliner_bezirke/berliner_bezirke.shp");
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader reader = new MatsimNetworkReader(sc);
 		reader.readFile(DgOsmBBPaths.NETWORK_GENERATED);
 //		filter.addBezirkFilter("Reinickendorf");

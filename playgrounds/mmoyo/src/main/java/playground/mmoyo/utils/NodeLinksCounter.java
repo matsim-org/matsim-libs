@@ -20,18 +20,18 @@
 
 package playground.mmoyo.utils;
 
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 public class NodeLinksCounter {
 
-	private void run(NetworkImpl net){
+	private void run(Network net){
 		System.out.println("links: " + net.getLinks().size());
 		System.out.println("nodes: " + net.getNodes().size());
 	}
 	
 	public static void main(String[] args) {
 		String netFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz";
-		NetworkImpl net = new DataLoader().readNetwork(netFile);
+		Network net = new DataLoader().readNetwork(netFile);
 		new NodeLinksCounter().run(net);
 	}
 

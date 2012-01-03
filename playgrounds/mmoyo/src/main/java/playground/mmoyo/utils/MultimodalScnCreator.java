@@ -1,29 +1,43 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.ActivityImpl;
-//import playground.mrieser.pt.utils.MergeNetworks;
 
 import playground.mmoyo.algorithms.PopulationCleaner;
 
 public class MultimodalScnCreator {
-	NetworkImpl mivNet;
-	NetworkImpl ptNet;
+	Network mivNet;
+	Network ptNet;
 	Population pop;
 	final static String MIV = "miv_";
 	
-	public MultimodalScnCreator (final NetworkImpl mivNet, final NetworkImpl ptNet, final Population pop){
+	public MultimodalScnCreator (final Network mivNet, final Network ptNet, final Population pop){
 		this.mivNet = mivNet;
 		this.ptNet = ptNet;
 		this.pop= pop;
@@ -104,8 +118,8 @@ public class MultimodalScnCreator {
 		}
 
 		DataLoader dLoader = new DataLoader();
-		NetworkImpl mivNet = dLoader.readNetwork(mivNetPath);
-		NetworkImpl ptNet = dLoader.readNetwork(ptNetPath);
+		Network mivNet = dLoader.readNetwork(mivNetPath);
+		Network ptNet = dLoader.readNetwork(ptNetPath);
 		//Population pop = dLoader.readPopulation(popfilePath);
 		
 		new MultimodalScnCreator(mivNet, ptNet, null).createMultimodalNet("../../input/newDemand/");

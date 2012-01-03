@@ -11,12 +11,12 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.LeastCostPathTree;
 import org.matsim.utils.LeastCostPathTree.NodeData;
@@ -120,7 +120,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		 *          (2) 
 		 *        /     \
 		 *(10m/s)/       \(10m/s)
-		 *(500m)/	      \(500m)
+		 *(500m)/	        \(500m)
 		 *     /           \
 		 *    /             \
 		 *	 /               \
@@ -128,7 +128,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		 *(50m,0.1m/s)(50m,0.1m/s) 			
 		 */
 		
-		NetworkImpl network = this.scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = network.createAndAddNode(new IdImpl(1), this.scenario.createCoord(0, 0));

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -41,7 +42,6 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufInterpolator;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -142,12 +142,12 @@ public class DataPrepare {
 
 	protected void mergeNetworks() {
 		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl transitNetwork = transitScenario.getNetwork();
+		Network transitNetwork = transitScenario.getNetwork();
 		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl streetNetwork = streetScenario.getNetwork();
+		Network streetNetwork = streetScenario.getNetwork();
 		new MatsimNetworkReader(transitScenario).parse(IntermediateTransitNetworkFile);
 		new MatsimNetworkReader(streetScenario).parse(InNetworkFile);
-		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", this.scenario.getNetwork());
+		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write(OutMultimodalNetworkFile);
 	}
 

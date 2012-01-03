@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -24,9 +24,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class AdjList {
 	private TransitSchedule transitSchedule;
 	private Map <Id, List<TransitRoute>> AdjMap = new TreeMap <Id, List<TransitRoute>>();   //idStopFacility, <Routes>
-	private NetworkImpl plainNet;
+	private Network plainNet;
 
-	public AdjList(final TransitSchedule transitSchedule, final NetworkImpl plainNet ) {
+	public AdjList(final TransitSchedule transitSchedule, final Network plainNet ) {
 		this.plainNet = plainNet;
 		this.transitSchedule= transitSchedule;
 		createAdjList();

@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -40,7 +41,7 @@ public class ReplanTimeSchedule {
 	
 	private TreeMap<Id, SchedulePlans> population = new TreeMap<Id, SchedulePlans>();
 	
-	public void replan(PConfigGroup pConfig, NetworkImpl net){
+	public void replan(PConfigGroup pConfig, Network net){
 		
 		String eventsFile = pConfig.getCurrentOutputBase() + "ITERS/it.0/0.events.xml.gz";
 		
@@ -62,7 +63,7 @@ public class ReplanTimeSchedule {
 			if(plan.getBestPlan() != null){
 				inSchedule.addTransitLine(plan.getBestPlan());
 			} else {
-				inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine(net, inSchedule, plan.getAgentId()));
+				inSchedule.addTransitLine(CreateInitialTimeSchedule.createSingleTransitLine((NetworkImpl) net, inSchedule, plan.getAgentId()));
 			}				
 		}	
 		new TransitScheduleWriterV1(inSchedule).write(pConfig.getNextOutputBase() + "transitSchedule.xml");

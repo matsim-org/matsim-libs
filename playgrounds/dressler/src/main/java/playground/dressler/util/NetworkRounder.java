@@ -22,12 +22,12 @@
 package playground.dressler.util;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author Manuel Schneider
@@ -108,7 +108,7 @@ public class NetworkRounder {
 	public static NetworkImpl roundNetwork(String filename, int newcap, double flowCapacityFactor, double lengthFactor, boolean forEAF){
 		//read network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(filename);
 		System.out.println("Network stats: Nodes = " + network.getNodes().size() + ", Edges = " + network.getLinks().size());

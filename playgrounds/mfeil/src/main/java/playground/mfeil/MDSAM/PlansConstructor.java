@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,7 +49,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -60,8 +60,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.timegeography.ManageSubchains;
+import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.locationchoice.timegeography.SubChain;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.deprecated.DeprecatedStaticMethod;
@@ -85,7 +85,7 @@ public class PlansConstructor implements PlanStrategyModule{
 	protected String inputFile, outputFile, outputFileBiogeme, attributesInputFile, outputFileMod, outputFileSimsOverview, outputFileSimsDetailLog;
 	protected Population population;
 	protected ArrayList<List<PlanElement>> actChains;
-	protected NetworkImpl network;
+	protected Network network;
 	protected PlansCalcRoute router;
 	protected RecursiveLocationMutator locator;
 	protected MDSAM mdsam;
@@ -112,7 +112,6 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.population = new PopulationImpl(this.controler.getScenario());
 		this.sims = null;
 		this.network = controler.getNetwork();
-		this.init(network);
 		this.router = new PlansCalcRoute (controler.getConfig().plansCalcRoute(), controler.getNetwork(), controler.createTravelCostCalculator(), controler.getTravelTimeCalculator(), controler.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
 		this.locator = new RecursiveLocationMutator(controler.getNetwork(), controler, new Random(4711));
 		this.linker = new XY2Links (this.controler.getNetwork());
@@ -156,10 +155,6 @@ public class PlansConstructor implements PlanStrategyModule{
 		this.costPtNothing		= 0.28;	// CHF/km
 		this.costPtHalbtax		= 0.15;	// CHF/km
 		this.costPtGA			= 0.08;	// CHF/km
-	}
-
-	private void init(final NetworkImpl network) {
-		this.network.connect();
 	}
 
 	@Override

@@ -23,8 +23,8 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 
 public class GridBasedAccessibilityControlerListener implements ShutdownListener{
 	
@@ -87,7 +87,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		NetworkImpl network = controler.getNetwork();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
 		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation");
 		
@@ -106,7 +106,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 		
 		try{
 			log.info("Computing and writing accessibility measures ..." );
-			Iterator<Node> startNodeIterator = network.getNodes().values().iterator();
+			Iterator<? extends Node> startNodeIterator = network.getNodes().values().iterator();
 			int numberOfStartNodes = network.getNodes().values().size();
 			log.info("Calculating " + numberOfStartNodes + " starting points ...");
 			

@@ -26,13 +26,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.TravelCost;
@@ -60,7 +61,7 @@ public class CreateKnowledgeForDatabase {
 	private final static Logger log = Logger.getLogger(CreateKnowledgeForDatabase.class);
 
 	private final ScenarioImpl scenario;
-	private NetworkImpl network;
+	private Network network;
 	private Population population;
 	private ActivityFacilitiesImpl facilities;
 	private ArrayList<SelectNodes> nodeSelectors;
@@ -277,7 +278,7 @@ public class CreateKnowledgeForDatabase {
 	private void loadNetwork()
 	{
 		network = scenario.getNetwork();
-		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
+		((NetworkFactoryImpl) network.getFactory()).setLinkFactory(new MyLinkFactoryImpl());
 
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("Loading Network ... done");

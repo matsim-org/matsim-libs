@@ -21,12 +21,11 @@ package playground.andreas.bvgScoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
@@ -47,7 +46,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 	protected final Plan plan;
 
-	private NetworkImpl network;
+	private Network network;
 
 	protected double score;
 	private double lastTime;
@@ -62,7 +61,7 @@ public class BvgLegScoringFunction implements LegScoring, BasicScoring {
 	protected final BvgScoringFunctionParameters bvgParameters;
 	protected final Double utilityOfLineSwitch;
 
-	public BvgLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, Double utilityOfLineSwitch, NetworkImpl network) {
+	public BvgLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters charyparNagelParameters, final BvgScoringFunctionParameters bvgParameters, Double utilityOfLineSwitch, Network network) {
 		this.charyparNagelParameters = charyparNagelParameters;
 		this.bvgParameters = bvgParameters;
 		this.utilityOfLineSwitch = utilityOfLineSwitch;

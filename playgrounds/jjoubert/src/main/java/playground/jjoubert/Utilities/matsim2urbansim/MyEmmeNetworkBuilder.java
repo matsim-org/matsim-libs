@@ -27,9 +27,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -146,7 +146,7 @@ public class MyEmmeNetworkBuilder {
 	 */
 	public void buildNodes(){
 		log.info("Building nodes.");
-		NetworkFactoryImpl f = scenario.getNetwork().getFactory();
+		NetworkFactory f = scenario.getNetwork().getFactory();
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(nodeFile);
 			try{
@@ -174,7 +174,7 @@ public class MyEmmeNetworkBuilder {
 	 */
 	public void buildLinks(){
 		log.info("Building links.");
-		NetworkFactoryImpl f = scenario.getNetwork().getFactory();
+		NetworkFactory f = scenario.getNetwork().getFactory();
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(linkFile);
 			try{
@@ -194,12 +194,11 @@ public class MyEmmeNetworkBuilder {
 					Link l = f.createLink(
 							new IdImpl(id), 
 							scenario.getNetwork().getNodes().get(new IdImpl(from)), 
-							scenario.getNetwork().getNodes().get(new IdImpl(to)), 
-							scenario.getNetwork(), 
-							len*1000, 					// Nelson Mandela data is in km
-							(speed*1000.0/3600.0), 		// Nelson Mandela data in in km/h
-							cap, 
-							lanes);
+							scenario.getNetwork().getNodes().get(new IdImpl(to)));
+					l.setLength(len*1000); 					// Nelson Mandela data is in km
+					l.setFreespeed(speed*1000.0/3600.0); 		// Nelson Mandela data in in km/h
+					l.setCapacity(cap); 
+					l.setNumberOfLanes(lanes);
 					scenario.getNetwork().addLink(l);
 				}
 			} finally{

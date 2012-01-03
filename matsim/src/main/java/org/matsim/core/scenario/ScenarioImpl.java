@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -62,7 +63,7 @@ public class ScenarioImpl implements Scenario {
 
 	//mandatory attributes
 	private final Config config;
-	private NetworkImpl network;
+	private Network network;
 	private Population population;
 	private ActivityFacilitiesImpl facilities;
 
@@ -137,7 +138,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public NetworkImpl getNetwork() {
+	public Network getNetwork() {
 		return this.network;
 	}
 
@@ -188,13 +189,13 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Deprecated
-	public void setNetwork(NetworkImpl network2) {
-		this.network = network2;
+	public void setNetwork(Network network) {
+		this.network = network;
 	}
 
 	@Deprecated
-	public void setPopulation(Population population2) {
-		this.population = population2;
+	public void setPopulation(Population population) {
+		this.population = population;
 	}
 
 	@Deprecated

@@ -32,6 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -121,7 +122,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.startElement("", "", NETWORK, atts);
 		atts.clear();
 		hd.startElement("", "", NAME, atts);
-		String name = sc.getNetwork().getName();
+		String name = ((NetworkImpl) sc.getNetwork()).getName();
 		if (name == null) {
 			name = "noname";
 		}
@@ -221,7 +222,7 @@ public class DgKoehlerStrehler2010ModelWriter {
 		hd.endElement("", "", COMMODITIES);
 	}
 
-	private void writeStreets(DgNetwork network, NetworkImpl matsimNet, TransformerHandler hd)
+	private void writeStreets(DgNetwork network, Network matsimNet, TransformerHandler hd)
 			throws SAXException {
 		AttributesImpl atts = new AttributesImpl();
 		hd.startElement("", "", STREETS, atts);

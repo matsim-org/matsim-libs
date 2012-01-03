@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.PSF.data.hubCoordinates.hubLinkMapper;
 
 import java.util.HashMap;
@@ -7,8 +26,8 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
@@ -16,7 +35,6 @@ import playground.wrashid.lib.obj.GenericResult;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
-import playground.wrashid.lib.tools.kml.Color;
 
 public class GenerateTableHubLinkMapping {
 
@@ -35,8 +53,7 @@ public class GenerateTableHubLinkMapping {
 		Coord bottomLeft = (Coord) genericResult[0];
 		Coord topRight = (Coord) genericResult[1];
 
-		NetworkImpl network = GeneralLib
-				.readNetwork("C:/Users/Admin/Desktop/psl-temp/network.xml.gz");
+		Network network = GeneralLib.readNetwork("C:/Users/Admin/Desktop/psl-temp/network.xml.gz");//tss, working as Admin... ;-)
 
 		System.out.println("network loaded...");
 		

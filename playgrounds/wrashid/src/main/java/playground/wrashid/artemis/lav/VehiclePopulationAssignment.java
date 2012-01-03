@@ -3,17 +3,15 @@ package playground.wrashid.artemis.lav;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.lib.DebugLib;
@@ -44,7 +42,7 @@ public class VehiclePopulationAssignment {
 
 	public static HashMap<Id, VehicleTypeLAV> getAgentVehicleMapping(final String eventsFileName, ScenarioImpl scenario, String fleetCompositionFileName) {
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping;
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TotalLengthOfAllCarLegsInDay totalLengthOfAllCarLegsInDay = new TotalLengthOfAllCarLegsInDay(scenario.getNetwork());
 		eventsManager.addHandler(totalLengthOfAllCarLegsInDay);
 
@@ -260,9 +258,9 @@ public class VehiclePopulationAssignment {
 
 	private static class TotalLengthOfAllCarLegsInDay implements LinkLeaveEventHandler{
 		public DoubleValueHashMap<Id> totalTripLengths=new DoubleValueHashMap<Id>();
-		private final NetworkImpl network;
+		private final Network network;
 		
-		public TotalLengthOfAllCarLegsInDay(NetworkImpl network){
+		public TotalLengthOfAllCarLegsInDay(Network network){
 			this.network = network;
 		}
 		

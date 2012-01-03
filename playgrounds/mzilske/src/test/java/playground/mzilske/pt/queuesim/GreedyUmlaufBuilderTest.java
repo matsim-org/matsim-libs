@@ -9,13 +9,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
@@ -159,7 +159,7 @@ public class GreedyUmlaufBuilderTest {
 		 *                    1
 		 *
 		 */
-		NetworkImpl network = this.scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(this.ids[1], this.scenario.createCoord(-2000, 0));
 		Node node2 = network.createAndAddNode(this.ids[2], this.scenario.createCoord(-2000, 1000));

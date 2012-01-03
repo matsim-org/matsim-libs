@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.lib;
 
 import java.io.BufferedReader;
@@ -43,7 +62,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -80,7 +98,7 @@ public class GeneralLib {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
@@ -109,7 +127,7 @@ public class GeneralLib {
 	/*
 	 * Reads the network from the network file.
 	 */
-	public static NetworkImpl readNetwork(String networkFile) {
+	public static Network readNetwork(String networkFile) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
@@ -602,7 +620,7 @@ public class GeneralLib {
 	 * @param outputPlansFileName
 	 * @param network
 	 */
-	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, NetworkImpl network) {
+	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, Network network) {
 		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(null), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
@@ -655,7 +673,7 @@ public class GeneralLib {
 
 	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException,
 			ParserConfigurationException, IOException {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
 		CoordinateTransformation ct = new WGS84toCH1903LV03();

@@ -256,14 +256,14 @@ public class DanielMain {
 		
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		HashMap<Node, Integer> demands = null;
 		Node sink = null;
 
 		//read network
 		if (networkfile != null) {
 			scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			network = scenario.getNetwork();
+			network = (NetworkImpl) scenario.getNetwork();
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 			networkReader.readFile(networkfile);
 			sink = network.getNodes().get(new IdImpl(sinkid));

@@ -28,16 +28,16 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
@@ -49,7 +49,7 @@ public class PathSetGenerator {
 
 	private final static Logger log = Logger.getLogger(PathSetGenerator.class);
 
-	private final NetworkImpl network;
+	private final Network network;
 	private final FreespeedTravelTimeCost frespeedCost;
 	private final LeastCostPathCalculator router;
 
@@ -73,7 +73,7 @@ public class PathSetGenerator {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PathSetGenerator(final NetworkImpl network) {
+	public PathSetGenerator(final Network network) {
 		if (network == null) { throw new RuntimeException("Network must exist."); }
 		this.network = network;
 		this.frespeedCost = new FreespeedTravelTimeCost(new PlanCalcScoreConfigGroup());

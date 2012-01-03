@@ -89,9 +89,58 @@ public class PersonPrepareForSimTest {
 			pop.addPerson(person);
 		}
 
-		new PersonPrepareForSim(new DummyRouter(), (ScenarioImpl) sc).run(person);
-		new PersonPrepareForSim(new DummyRouter(), ((ScenarioImpl) sc).getNetwork()).run(person);
+		new PersonPrepareForSim(new DummyRouter(), (((ScenarioImpl) sc).getNetwork())).run(person);
 
+		Assert.assertEquals(l1.getId(), a1.getLinkId());
+		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+	}
+
+	@Test
+	public void testRun_MultimodalScenario() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
+		Network net = sc.getNetwork();
+		Link l1;
+		{
+			NetworkFactory nf = net.getFactory();
+			Set<String> modes = new HashSet<String>();
+			Node n1 = nf.createNode(sc.createId("1"), sc.createCoord(0, 0));
+			Node n2 = nf.createNode(sc.createId("2"), sc.createCoord(1000, 0));
+			Node n3 = nf.createNode(sc.createId("3"), sc.createCoord(2000, 0));
+			net.addNode(n1);
+			net.addNode(n2);
+			net.addNode(n3);
+			l1 = nf.createLink(sc.createId("1"), n1, n2);
+			modes.add(TransportMode.car);
+			l1.setAllowedModes(modes);
+			Link l2 = nf.createLink(sc.createId("2"), n2, n3);
+			modes.clear();
+			modes.add(TransportMode.pt);
+			l2.setAllowedModes(modes);
+			net.addLink(l1);
+			net.addLink(l2);
+		}
+		
+		Population pop = sc.getPopulation();
+		Person person;
+		Activity a1;
+		Activity a2;
+		{
+			PopulationFactory pf = pop.getFactory();
+			person = pf.createPerson(sc.createId("1"));
+			Plan p = pf.createPlan();
+			a1 = pf.createActivityFromCoord("h", sc.createCoord(10, -10));
+			Leg l = pf.createLeg(TransportMode.walk);
+			a2 = pf.createActivityFromCoord("w", sc.createCoord(1900, -10));
+			p.addActivity(a1);
+			p.addLeg(l);
+			p.addActivity(a2);
+			person.addPlan(p);
+			pop.addPerson(person);
+		}
+		
+		new PersonPrepareForSim(new DummyRouter(), (ScenarioImpl) sc).run(person);
+		
 		Assert.assertEquals(l1.getId(), a1.getLinkId());
 		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}

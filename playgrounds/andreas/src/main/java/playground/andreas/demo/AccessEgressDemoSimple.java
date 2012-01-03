@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -100,8 +101,8 @@ public class AccessEgressDemoSimple {
 	}
 
 	private void createNetwork() {
-		NetworkImpl network = this.scenario.getNetwork();
-		network.setCapacityPeriod(3600.0);
+		Network network = this.scenario.getNetwork();
+		((NetworkImpl) network).setCapacityPeriod(3600.0);
 		
 		network.addNode(network.getFactory().createNode(new IdImpl("01"), this.scenario.createCoord(-500, 0)));
 		network.addNode(network.getFactory().createNode(new IdImpl("10"), this.scenario.createCoord(0, 0)));

@@ -21,6 +21,7 @@ package playground.mfeil;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -38,7 +39,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 	
-	protected final NetworkImpl 						network;
+	protected final Network network;
 	protected final Controler							controler;
 	protected final RecursiveLocationMutator 			locator;
 	protected final PlanScorer 							scorer;
@@ -71,8 +72,8 @@ public class AgentsAssignmentInitialiser extends AbstractMultithreadedModule {
 		this.distanceCoefficients = distanceCoefficients;
 	}
 	
-	private void init(final NetworkImpl network) {
-		this.network.connect();
+	private void init(final Network network) {
+		((NetworkImpl) this.network).connect();
 	}
 
 	

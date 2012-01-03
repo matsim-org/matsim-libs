@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -45,9 +45,8 @@ public class CountsConverter {
 	public static void main(String[] args) {
 		// ------------READ MATSIM NETWORK-----------------
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario)
-				.readFile("../berlin data/old_wip/wip_net.xml");
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile("../berlin data/old_wip/wip_net.xml");
 		// ------------READ .ATT COUNTSFILE----------------
 		SimpleReader sr = new SimpleReader(
 				"../berlin data/old_wip/link_counts_PKW_hrs0-24.att");

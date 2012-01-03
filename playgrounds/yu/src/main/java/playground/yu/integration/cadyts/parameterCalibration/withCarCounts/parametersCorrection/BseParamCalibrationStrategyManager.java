@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -49,7 +49,7 @@ public abstract class BseParamCalibrationStrategyManager extends
 	protected int iter;
 	protected final int firstIter;
 	// protected RemoveWorstPlanSelector worstPlanSelector;
-	protected NetworkImpl net;
+	protected Network net;
 	protected double[] statistics;
 	protected TravelTime tt;
 

@@ -22,12 +22,10 @@ package playground.wrashid.lib.tools.network;
 
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -64,7 +62,7 @@ public class VisualizeSetOfLinksInNetwork {
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		
 		
-		NetworkImpl network= GeneralLib.readNetwork(inputNetworkPath);
+		Network network= GeneralLib.readNetwork(inputNetworkPath);
 		
 		for (Link link:network.getLinks().values()){
 			if (selectedLinks.contains(link.getId())){

@@ -50,10 +50,12 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
@@ -90,6 +92,7 @@ import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -121,7 +124,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
@@ -200,7 +202,7 @@ public class Controler {
 	private final String dtdFileName;
 
 	protected EventsManagerImpl events = null;
-	protected NetworkImpl network = null;
+	protected Network network = null;
 	protected Population population = null;
 	private Counts counts = null;
 
@@ -542,9 +544,9 @@ public class Controler {
 					new FacilitiesWriter((ActivityFacilitiesImpl) facilities)
 						.write(this.controlerIO.getOutputFilename("output_facilities.xml.gz"));
 				}
-				if (this.network.getFactory().isTimeVariant()) {
+				if (((NetworkFactoryImpl) this.network.getFactory()).isTimeVariant()) {
 					new NetworkChangeEventsWriter().write(this.controlerIO.getOutputFilename("output_change_events.xml.gz"),
-							this.network.getNetworkChangeEvents());
+							((NetworkImpl) this.network).getNetworkChangeEvents());
 				}
 				if (this.config.scenario().isUseHouseholds()) {
 					new HouseholdsWriterV10(this.scenarioData.getHouseholds())
@@ -1296,7 +1298,7 @@ public class Controler {
 		return this.scenarioData.getActivityFacilities();
 	}
 
-	public final NetworkImpl getNetwork() {
+	public final Network getNetwork() {
 		return this.network;
 	}
 

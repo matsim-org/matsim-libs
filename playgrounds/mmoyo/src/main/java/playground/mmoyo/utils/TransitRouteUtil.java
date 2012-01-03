@@ -7,11 +7,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 
 public class TransitRouteUtil {
 	private final Network net;
@@ -91,7 +90,7 @@ public class TransitRouteUtil {
 		String strTrRoute = "B-100.101.001.H";
 			
 		DataLoader dloader = new DataLoader();
-		NetworkImpl net = dloader.readNetwork(netFilePath);
+		Network net = dloader.readNetwork(netFilePath);
 		TransitSchedule trSchedule = dloader.readTransitSchedule(net, scheduleFilePath);
 		TransitRoute route = dloader.getTransitRoute(strTrRoute, trSchedule);
 		dloader = null;

@@ -35,6 +35,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -64,7 +65,7 @@ public class TestCellKnowledge {
 	//private final String networkFile = "D:/Master_Thesis_HLI/Workspace/myMATSIM/mysimulations/kt-zurich/networks/ivtch-zh-cut/network.xml";
 
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		new TestCellKnowledge();
 	}
@@ -83,21 +84,21 @@ public class TestCellKnowledge {
 		log.info("Population size: " + this.scenario.getPopulation().getPersons().size());
 
 		//Person person = population.getPersons().values().iterator().next();
-		person = this.scenario.getPopulation().getPersons().get(new IdImpl(100000));
-		log.info("Person: " + person);
-		log.info("ID: " + person.getId());
+		this.person = this.scenario.getPopulation().getPersons().get(new IdImpl(100000));
+		log.info("Person: " + this.person);
+		log.info("ID: " + this.person.getId());
 
 		initNodeSelector();
 		createKnownNodes();
-		log.info("Found known Nodes: " + nodesMap.size());
+		log.info("Found known Nodes: " + this.nodesMap.size());
 
-		cellNetworkMapping = new CellNetworkMapping(this.scenario.getNetwork());
-		cellNetworkMapping.createMapping();
+		this.cellNetworkMapping = new CellNetworkMapping((NetworkImpl) this.scenario.getNetwork());
+		this.cellNetworkMapping.createMapping();
 
 		CreateCellKnowledge();
 
-		log.info("included Nodes in CellKnowledge: " + cellKnowledge.getKnownNodes().size());
-		cellKnowledge.findFullCells();
+		log.info("included Nodes in CellKnowledge: " + this.cellKnowledge.getKnownNodes().size());
+		this.cellKnowledge.findFullCells();
 
 /*
 		long memUsage;
@@ -111,15 +112,15 @@ public class TestCellKnowledge {
 
 	private void CreateCellKnowledge()
 	{
-		createCellKnowledge = new CellKnowledgeCreator(cellNetworkMapping);
-		cellKnowledge = createCellKnowledge.createCellKnowledge(nodesMap);
+		this.createCellKnowledge = new CellKnowledgeCreator(this.cellNetworkMapping);
+		this.cellKnowledge = this.createCellKnowledge.createCellKnowledge(this.nodesMap);
 	}
 
 	private void createKnownNodes()
 	{
-		Plan plan = person.getSelectedPlan();
+		Plan plan = this.person.getSelectedPlan();
 
-		nodesMap = new TreeMap<Id, Node>();
+		this.nodesMap = new TreeMap<Id, Node>();
 
 		// get all acts of the selected plan
 		ArrayList<Activity> acts = new ArrayList<Activity>();
@@ -134,29 +135,29 @@ public class TestCellKnowledge {
 			Node startNode = this.scenario.getNetwork().getLinks().get(acts.get(j-1).getLinkId()).getToNode();
 			Node endNode = this.scenario.getNetwork().getLinks().get(acts.get(j).getLinkId()).getFromNode();
 
-			selectNodesDijkstra.setStartNode(startNode);
-			selectNodesDijkstra.setEndNode(endNode);
+			this.selectNodesDijkstra.setStartNode(startNode);
+			this.selectNodesDijkstra.setEndNode(endNode);
 
-			selectNodesDijkstra.addNodesToMap(nodesMap);
+			this.selectNodesDijkstra.addNodesToMap(this.nodesMap);
 		}
 	}
 
 	private void initNodeSelector()
 	{
-		selectNodesDijkstra = new SelectNodesDijkstra(this.scenario.getNetwork());
-		selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
-		selectNodesDijkstra.setCostFactor(20.0);
+		this.selectNodesDijkstra = new SelectNodesDijkstra(this.scenario.getNetwork());
+		this.selectNodesDijkstra.setCostCalculator(new OnlyTimeDependentTravelCostCalculator(null));
+		this.selectNodesDijkstra.setCostFactor(20.0);
 	}
 
 	private void loadNetwork()
 	{
-		new MatsimNetworkReader(this.scenario).readFile(networkFile);
+		new MatsimNetworkReader(this.scenario).readFile(this.networkFile);
 		log.info("Loading Network ... done");
 	}
 
 	private void loadPopulation()
 	{
-		new MatsimPopulationReader(this.scenario).readFile(populationFile);
+		new MatsimPopulationReader(this.scenario).readFile(this.populationFile);
 		log.info("Loading Population ... done");
 	}
 

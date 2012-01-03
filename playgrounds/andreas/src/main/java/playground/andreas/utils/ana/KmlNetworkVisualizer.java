@@ -9,11 +9,11 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -42,7 +42,7 @@ public class KmlNetworkVisualizer {
 		KmlNetworkVisualizer.convertNetwork2Kml("F:/convert/counts_network_merged.xml_cl.xml", "F:/convert/net.kml", new GK4toWGS84());
 	}
 	
-	public static void convertNetwork2Kml(NetworkImpl network, String kmlfile, CoordinateTransformation coordTransform){
+	public static void convertNetwork2Kml(Network network, String kmlfile, CoordinateTransformation coordTransform){
 		KmlNetworkVisualizer kmlNetVis = new KmlNetworkVisualizer();
 		kmlNetVis.write(network, kmlfile, coordTransform);
 	}
@@ -54,7 +54,7 @@ public class KmlNetworkVisualizer {
 		KmlNetworkVisualizer.convertNetwork2Kml(scenario.getNetwork(), kmlfile, coordTransform);		
 	}
 	
-	private void write(final NetworkImpl network, final String filename, CoordinateTransformation transform) {
+	private void write(final Network network, final String filename, CoordinateTransformation transform) {
 		
 		log.info("Converting network to kmz...");
 		

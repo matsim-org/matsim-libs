@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -126,9 +125,8 @@ public class NewPtPlans extends NewPopulation implements PlanAlgorithm {
 		final String plansFilename = "../../matsim/examples/equil/plans100.xml";
 		final String outputFilename = "test/input/plans100withPt.xml";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

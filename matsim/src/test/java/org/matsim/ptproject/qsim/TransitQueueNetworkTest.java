@@ -61,14 +61,15 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.*;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
@@ -991,7 +992,7 @@ public class TransitQueueNetworkTest extends TestCase {
             Id id4 = scenario.createId("4");
 
             // setup: network
-            NetworkImpl network = scenario.getNetwork();
+            NetworkImpl network = (NetworkImpl) scenario.getNetwork();
             Node node1 = network.createAndAddNode(id1, scenario.createCoord(   0, 0));
             Node node2 = network.createAndAddNode(id2, scenario.createCoord(1000, 0));
             Node node3 = network.createAndAddNode(id3, scenario.createCoord(2000, 0));
@@ -1100,7 +1101,7 @@ public class TransitQueueNetworkTest extends TestCase {
             if (stop2 != null) {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,
                      * that *could* overtake a transit vehicle at its second stop. */
-                this.normalVehicle2 = (QVehicle) new QVehicle(new VehicleImpl(id3, vehicleType));
+                this.normalVehicle2 = new QVehicle(new VehicleImpl(id3, vehicleType));
                 this.qlink1.addParkedVehicle(this.normalVehicle2);
 
                 Person person2 = pb.createPerson(id3);

@@ -26,15 +26,15 @@ import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
@@ -55,7 +55,7 @@ public class VolumefromEventsOfIters {
 
 		System.out.println(">>>>>reading the network...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		System.out.println(">>>>>reading the counts...");
@@ -68,7 +68,7 @@ public class VolumefromEventsOfIters {
 		List<VolumesAnalyzer> vols = new ArrayList<VolumesAnalyzer>();
 		for (int i = 500; i < 505; i++) {
 			System.out.println(">>>>>reading the events...");
-			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+			EventsManager events = EventsUtils.createEventsManager();
 			VolumesAnalyzer volumes = new VolumesAnalyzer(900, 24 * 3600 - 1,
 					network);
 			events.addHandler(volumes);

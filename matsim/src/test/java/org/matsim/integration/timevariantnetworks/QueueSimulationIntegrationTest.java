@@ -170,9 +170,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 	 */
 	private NetworkImpl createNetwork(ScenarioImpl scenario) {
 		// create a network
-		NetworkFactoryImpl nf = scenario.getNetwork().getFactory();
+		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new TimeVariantLinkFactory());
-		final NetworkImpl network = scenario.getNetwork();
+		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0

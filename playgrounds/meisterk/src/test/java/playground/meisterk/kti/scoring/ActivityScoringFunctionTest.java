@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -53,7 +54,6 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
-import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -124,7 +124,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		facilityShop.createActivityOption("shop");
 
 		// generate network
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(    0.0, 0.0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(  500.0, 0.0));
@@ -148,7 +148,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 	public void testNoTrips() {
 		
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		NetworkImpl network = this.scenario.getNetwork();
+		Network network = this.scenario.getNetwork();
 		ActivityFacility facilityHome = this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
 		
 		// generate desires
@@ -187,7 +187,7 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		
 		PopulationFactoryImpl routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory());
 		PersonImpl person = (PersonImpl) this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID);
-		NetworkImpl network = this.scenario.getNetwork();
+		Network network = this.scenario.getNetwork();
 		ActivityFacilityImpl facilityHome = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_HOME_ID);
 		ActivityFacilityImpl facilityWork = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_WORK_ID);
 		ActivityFacilityImpl facilityLeisure = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(FACILITY_LEISURE_ID);
@@ -399,9 +399,9 @@ public class ActivityScoringFunctionTest extends MatsimTestCase {
 		Plan plan = this.scenario.getPopulation().getPersons().get(TEST_PERSON_ID).getSelectedPlan(); 
 		ScoringFunctionAccumulator testee = (ScoringFunctionAccumulator) factory.createNewScoringFunction(plan);
 
-		assertEquals(1, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().size());
-		assertEquals(ActivityScoringFunction.class, ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0).getClass());
-		ActivityScoringFunction asf = (ActivityScoringFunction) ((ScoringFunctionAccumulator) testee).getActivityScoringFunctions().get(0);
+		assertEquals(1, testee.getActivityScoringFunctions().size());
+		assertEquals(ActivityScoringFunction.class, testee.getActivityScoringFunctions().get(0).getClass());
+		ActivityScoringFunction asf = (ActivityScoringFunction) testee.getActivityScoringFunctions().get(0);
 
 		testee.endActivity(Time.parseTime("08:00:00"), (ActivityImpl) plan.getPlanElements().get(0));
 

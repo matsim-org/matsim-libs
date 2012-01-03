@@ -7,12 +7,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -45,7 +46,7 @@ public class Controller {
 		plansReader.readFile(PLANFILE);
 
 		//Create Kroutecalculator with global variables to fill the connection map and near stations
-		KroutesCalculator kRoutesCalculator= new KroutesCalculator(transitSchedule, scenario.getNetwork(), connectionMap, nearStopMap);
+		KroutesCalculator kRoutesCalculator= new KroutesCalculator(transitSchedule, (NetworkImpl) scenario.getNetwork(), connectionMap, nearStopMap);
 
 		//precalculate routes and near stations of the population
 		PlanRouteCalculator precalPopulation = new PlanRouteCalculator(transitSchedule, scenario.getNetwork(), connectionMap, scenario.getPopulation(), kRoutesCalculator);

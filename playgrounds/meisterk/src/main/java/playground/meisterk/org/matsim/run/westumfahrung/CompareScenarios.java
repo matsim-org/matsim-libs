@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -40,15 +41,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonIdRecorder;
 import org.matsim.population.algorithms.PlanAverageScore;
@@ -340,7 +340,7 @@ public class CompareScenarios {
 			personIdRecorders.put(analysis, new TreeMap<String, PersonIdRecorder>());
 		}
 		TreeMap<String, Population> scenarioPlans = new TreeMap<String, Population>();
-		TreeMap<String, NetworkImpl> scenarioNetworks = new TreeMap<String, NetworkImpl>();
+		TreeMap<String, Network> scenarioNetworks = new TreeMap<String, Network>();
 
 		PersonIdRecorder personIdRecorder = null;
 		PersonFilter filterAlgorithm = null;
@@ -348,7 +348,7 @@ public class CompareScenarios {
 		for (String scenarioName : this.scenarioNames) {
 
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			NetworkImpl network = scenario.getNetwork();
+			Network network = scenario.getNetwork();
 			new MatsimNetworkReader(scenario).readFile(this.networkInputFilenames.get(scenarioName));
 			scenarioNetworks.put(scenarioName, network);
 
@@ -483,7 +483,7 @@ public class CompareScenarios {
 				CalcAverageTripLength calcAverageTripLength = new CalcAverageTripLength(scenarioNetworks.get(scenarioName));
 				calcAverageTripLength.run(plansSubPop);
 
-				EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+				EventsManager events = EventsUtils.createEventsManager();
 
 				CalcLegTimes calcLegTimes = new CalcLegTimes();
 				events.addHandler(calcLegTimes);

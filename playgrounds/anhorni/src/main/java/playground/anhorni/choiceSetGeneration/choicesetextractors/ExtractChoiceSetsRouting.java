@@ -27,17 +27,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.utils.deprecated.DeprecatedStaticMethod;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
 import playground.anhorni.choiceSetGeneration.helper.SpanningTree;
@@ -60,6 +59,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 		this.mode = mode;
 	}
 
+	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
 
 		if (event.getIteration() < event.getControler().getLastIteration()) {
@@ -92,7 +92,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	 */
 
 	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
-		NetworkImpl network = controler.getNetwork();
+		Network network = controler.getNetwork();
 
 		Id linkId = facility.getLinkId();
 

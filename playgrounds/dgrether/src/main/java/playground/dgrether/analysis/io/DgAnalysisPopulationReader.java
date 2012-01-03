@@ -27,11 +27,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
@@ -49,7 +49,7 @@ public class DgAnalysisPopulationReader {
 
 	private static final Logger log = Logger.getLogger(DgAnalysisPopulationReader.class);
 
-	private Map<String, NetworkImpl> loadedNetworks = new HashMap<String, NetworkImpl>();
+	private Map<String, Network> loadedNetworks = new HashMap<String, Network>();
 
 	
 	private List<DgAnalysisReaderFilter> filterList = null;
@@ -60,7 +60,7 @@ public class DgAnalysisPopulationReader {
 	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population;
-		NetworkImpl net;
+		Network net;
 		if (this.loadedNetworks.containsKey(networkPath)){
 			net = loadedNetworks.get(networkPath);
 			sc.setNetwork(net);

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingChoice.trb2011.analysis;
 
 import java.util.LinkedList;
@@ -5,14 +24,13 @@ import java.util.PriorityQueue;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.GeneralLib;
 import playground.wrashid.lib.obj.SortableMapObject;
-import playground.wrashid.parkingChoice.trb2011.analysis.LinkVolumeAnalyzer.PeakHourAgents;
 
 public class AnalyzeVolumesAfterApplyingPolicy {
 
@@ -21,7 +39,7 @@ public class AnalyzeVolumesAfterApplyingPolicy {
 		final String networkFileName = outputFolderBaseCase + "output_network.xml.gz";
 		final String eventsFileName = outputFolderBaseCase + "ITERS/it.50/50.events.xml.gz";
 		
-		NetworkImpl network = GeneralLib.readNetwork(networkFileName);
+		Network network = GeneralLib.readNetwork(networkFileName);
 		
 		VolumesAnalyzer volumeAnalyzerBaseScenario = loadVolumeOfBaseScenario(network, eventsFileName);
 		
@@ -88,8 +106,8 @@ public class AnalyzeVolumesAfterApplyingPolicy {
 		return peakHourLinkIds;
 	}
 
-	private static VolumesAnalyzer loadVolumeOfBaseScenario(final NetworkImpl network, final String eventsFileName) {
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+	private static VolumesAnalyzer loadVolumeOfBaseScenario(final Network network, final String eventsFileName) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		VolumesAnalyzer volumeAnalyzer = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
 		eventsManager.addHandler(volumeAnalyzer);

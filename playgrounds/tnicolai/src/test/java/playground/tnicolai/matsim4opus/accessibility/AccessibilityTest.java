@@ -169,7 +169,7 @@ public class AccessibilityTest extends MatsimTestCase{
 		double capacity = 500.;
 		double numLanes = 1.;
 		
-		NetworkImpl network = this.scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = network.createAndAddNode(new IdImpl(1), this.scenario.createCoord(0, 0));

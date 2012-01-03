@@ -22,6 +22,7 @@ package playground.mrieser.pt.demo;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -29,15 +30,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -72,8 +72,8 @@ public class PseudoNetworkDemo {
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
 
-		NetworkImpl network = scenario.getNetwork();
-		network.setCapacityPeriod(3600.0);
+		Network network = scenario.getNetwork();
+//		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
 			new MatsimNetworkReader(scenario).parse(networkFile);
 		}

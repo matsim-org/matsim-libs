@@ -48,21 +48,21 @@ public class QLaneTest extends MatsimTestCase {
   private final Id id2 = new IdImpl("2");	
   private final Id id3 = new IdImpl("3");	
 	
-  private Network initNetwork(NetworkImpl network) {
-		network.setCapacityPeriod(3600.0);
+  private Network initNetwork(Network network) {
+		((NetworkImpl) network).setCapacityPeriod(3600.0);
 		Node node1 = network.getFactory().createNode(id1, new CoordImpl(0, 0));
 		Node node2 = network.getFactory().createNode(id2, new CoordImpl(1, 0));
 		Node node3 = network.getFactory().createNode(id3, new CoordImpl(2, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
-		Link l1 = network.getFactory().createLink(id1, id1, id2);
+		Link l1 = network.getFactory().createLink(id1, node1, node2);
 		l1.setLength(1005.0);
 		l1.setFreespeed(15.0);
 		l1.setCapacity(1800.0);
 		l1.setNumberOfLanes(2.0);
 		network.addLink(l1);
-		Link l2 = network.getFactory().createLink(id2, id2, id3);
+		Link l2 = network.getFactory().createLink(id2, node2, node3);
 		network.addLink(l2);
 		return network;
   }

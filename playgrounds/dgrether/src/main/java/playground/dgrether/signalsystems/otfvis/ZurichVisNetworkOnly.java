@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.LaneDefinitions;
@@ -55,14 +56,14 @@ public class ZurichVisNetworkOnly {
 		//this is run
 //		OTFVis.playNetwork(netArray);
 		//this is hack
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
-		LaneDefinitions laneDefs = scenario.getLaneDefinitions();
+		LaneDefinitions laneDefs = ((ScenarioImpl) scenario).getLaneDefinitions();
 		
 		MatsimLaneDefinitionsReader lanesReader = new MatsimLaneDefinitionsReader(laneDefs);
 		lanesReader.readFile(lanesFile);

@@ -22,10 +22,10 @@ package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -51,7 +51,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
@@ -111,7 +111,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
@@ -143,7 +143,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled
@@ -172,7 +172,7 @@ public class PlansCalcAreaTollRouteTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 
 		// a basic toll where only the morning hours are tolled

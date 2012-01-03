@@ -95,7 +95,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
 //		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculator()); // tnicolai: check with kai
 		
-		NetworkImpl network = controler.getNetwork() ;
+		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
 		
 		// od-trip matrix (zonal based)

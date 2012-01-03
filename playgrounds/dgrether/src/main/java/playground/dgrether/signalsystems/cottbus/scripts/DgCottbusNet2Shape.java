@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.scripts;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 
 
@@ -34,13 +34,10 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
  */
 public class DgCottbusNet2Shape {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl net = scenario.getNetwork();
+		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 //		NetworkCleaner nc = new NetworkCleaner();

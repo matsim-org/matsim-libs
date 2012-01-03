@@ -36,7 +36,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -98,8 +97,8 @@ public class BlockingStopDemo {
 	}
 
 	private void createNetwork() {
-		NetworkImpl network = this.scenario.getNetwork();
-		network.setCapacityPeriod(3600.0);
+		Network network = this.scenario.getNetwork();
+//		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks * 2 + 2];
 		for (int i = 0; i <= nOfLinks; i++) {
 			nodes[i] = network.getFactory().createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));

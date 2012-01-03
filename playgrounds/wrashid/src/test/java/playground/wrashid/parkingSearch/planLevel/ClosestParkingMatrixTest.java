@@ -21,7 +21,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetClosestLinks() {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
+		NetworkImpl net = (NetworkImpl) BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 
@@ -41,7 +41,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetClosestParkings() {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
+		NetworkImpl net = (NetworkImpl) BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 
@@ -81,7 +81,7 @@ public class ClosestParkingMatrixTest extends MatsimTestCase {
 	public void testGetOrderedListAccordingToDistanceFromCoord() {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl net = BaseNonControlerScenario.loadNetwork(sc);
+		NetworkImpl net = (NetworkImpl) BaseNonControlerScenario.loadNetwork(sc);
 
 		ClosestParkingMatrix cpm = new ClosestParkingMatrix(sc.getActivityFacilities(), net);
 

@@ -22,7 +22,6 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.population.algorithms.XY2Links;
 
-import playground.mmoyo.algorithms.AgentInPtRouteZoneFind;
 import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.utils.DataLoader;
 
@@ -99,10 +98,10 @@ public class PreparePopFromFile implements PersonAlgorithm{
 		matsimNetReader.readFile(newNetPath);  
 		
 		//load ptNet
-		NetworkImpl ptNet = dataLoader.readNetwork(ptNetFilePath);
+		Network ptNet = dataLoader.readNetwork(ptNetFilePath);
 		
 		//load oldNet
-		NetworkImpl mivNet = dataLoader.readNetwork(mivNetpath);
+		Network mivNet = dataLoader.readNetwork(mivNetpath);
 		
 		//create nodeLst
 		List<Node> nodeList = new ArrayList<Node>();
@@ -128,7 +127,7 @@ public class PreparePopFromFile implements PersonAlgorithm{
 		Population newPop = dataLoader.createScenario().getPopulation();
 		
 		//create personAlgorihtms
-		AgentInPtRouteZoneFind agentInPtRouteZoneFind = new AgentInPtRouteZoneFind (nodeList, ptNet);
+		AgentInPtRouteZoneFind agentInPtRouteZoneFind = new AgentInPtRouteZoneFind (nodeList, (NetworkImpl) ptNet);
 		XY2Links xy2Links = new XY2Links (mivNet);
 		
 		//run preparation

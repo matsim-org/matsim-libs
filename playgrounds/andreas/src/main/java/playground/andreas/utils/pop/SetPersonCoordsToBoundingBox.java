@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -105,7 +104,7 @@ public class SetPersonCoordsToBoundingBox extends NewPopulation {
 		Coord minXY = new CoordImpl(4590999.0, 5805999.0);
 		Coord maxXY = new CoordImpl(4606021.0, 5822001.0);
 
-		NetworkImpl net = sc.getNetwork();
+		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(networkFile);
 
 		Population inPop = sc.getPopulation();

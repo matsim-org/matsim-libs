@@ -36,9 +36,11 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -48,7 +50,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
@@ -106,7 +107,7 @@ public class VisualizeTransitPlans {
 						visAct.setStartTime(act.getStartTime());
 						visAct.setMaximumDuration((act).getMaximumDuration());
 						visAct.setEndTime(act.getEndTime());
-						visAct.setLinkId(this.visScenario.getNetwork().getNearestLink(act.getCoord()).getId());
+						visAct.setLinkId(((NetworkImpl) this.visScenario.getNetwork()).getNearestLink(act.getCoord()).getId());
 						visPlan.addActivity(visAct);
 					} else if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;

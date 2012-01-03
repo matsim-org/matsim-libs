@@ -181,7 +181,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		String networkFile = getClassInputDirectory() + "link10_network.xml";
 		String eventsFile = getClassInputDirectory() + "link10_events.txt";
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
@@ -253,7 +253,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	public void testLongTravelTimeInEmptySlot() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));

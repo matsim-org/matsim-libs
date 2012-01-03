@@ -21,13 +21,13 @@
 package playground.balmermi.census2000v2.modules;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
@@ -51,7 +51,7 @@ public class PersonAssignToNetwork extends AbstractPersonAlgorithm implements Pl
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAssignToNetwork(final NetworkImpl network, final ActivityFacilities facilities, final Config config, final ModeRouteFactory routeFactory) {
+	public PersonAssignToNetwork(final Network network, final ActivityFacilities facilities, final Config config, final ModeRouteFactory routeFactory) {
 		log.info("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
 		FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(config.planCalcScore());

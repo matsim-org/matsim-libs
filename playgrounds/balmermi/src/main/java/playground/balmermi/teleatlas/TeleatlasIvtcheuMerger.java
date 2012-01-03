@@ -175,11 +175,11 @@ public class TeleatlasIvtcheuMerger {
 		String outNetFile = args[4].trim();
 
 		ScenarioImpl taScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl networkTeleatlas = taScenario.getNetwork();
+		NetworkImpl networkTeleatlas = (NetworkImpl) taScenario.getNetwork();
 		new MatsimNetworkReader(taScenario).readFile(teleatlasfile);
 
 		ScenarioImpl ivtcheuScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl networkIvtcheu = ivtcheuScenario.getNetwork();
+		NetworkImpl networkIvtcheu = (NetworkImpl) ivtcheuScenario.getNetwork();
 		new MatsimNetworkReader(ivtcheuScenario).readFile(ivtcheufile);
 
 		deleteLinks(networkIvtcheu,il2deletefile);

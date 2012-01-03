@@ -32,6 +32,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -43,8 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.visum.VisumNetwork;
-import org.matsim.visum.VisumNetworkReader;
 import org.matsim.visum.VisumNetwork.EdgeType;
+import org.matsim.visum.VisumNetworkReader;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -87,7 +88,7 @@ public class NetworkVisum2Matsim {
 	}
 
 	private void convertNetwork() {
-		final NetworkImpl network = scenario.getNetwork();
+		final NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		final Set<Feature> featuresInShape;
@@ -247,7 +248,7 @@ public class NetworkVisum2Matsim {
 
 	private void writeNetwork() throws IOException,
 	FileNotFoundException {
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
 	}

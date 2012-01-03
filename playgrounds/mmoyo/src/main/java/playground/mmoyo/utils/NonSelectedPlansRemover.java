@@ -23,11 +23,11 @@ package playground.mmoyo.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.population.algorithms.PersonAlgorithm;
  
 /**
@@ -68,7 +68,7 @@ public class NonSelectedPlansRemover implements PersonAlgorithm {
 		
 		Population population = dLoader.readPopulation(popFilePath);
 		new NonSelectedPlansRemover().run(population);
-		NetworkImpl net = dLoader.readNetwork(netFilePath);
+		Network net = dLoader.readNetwork(netFilePath);
 		
 		System.out.println("writing output plan file..." + outputFilePath);
 		new PopulationWriter(population, net).write(outputFilePath);

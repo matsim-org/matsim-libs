@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -56,9 +55,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testDijkstra() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "Dijkstra";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new DijkstraFactory();
 			}
@@ -67,9 +68,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testFastDijkstra() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "FastDijkstra";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new FastDijkstraFactory();
 			}
@@ -78,9 +81,11 @@ public class RoutingTest extends MatsimTestCase {
 	
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "DijkstraPruneDeadends";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				preProcessData.run(network);
@@ -91,9 +96,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testFastDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "FastDijkstraPruneDeadends";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
 				preProcessData.run(network);
@@ -104,9 +111,11 @@ public class RoutingTest extends MatsimTestCase {
 	
 	public void testAStarEuclidean() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "AStarEuclidean";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new AStarEuclideanFactory(network, costCalc);
 			}
@@ -115,9 +124,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testFastAStarEuclidean() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "FastAStarEuclidean";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new FastAStarEuclideanFactory(network, costCalc);
 			}
@@ -126,9 +137,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testAStarLandmarks() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "AStarLandmarks";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new AStarLandmarksFactory(network, costCalc);
 			}
@@ -137,9 +150,11 @@ public class RoutingTest extends MatsimTestCase {
 
 	public void testFastAStarLandmarks() {
 		doTest(new RouterProvider() {
+			@Override
 			public String getName() {
 				return "FastAStarLandmarks";
 			}
+			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelMinCost costCalc, final TravelTime timeCalc) {
 				return new FastAStarLandmarksFactory(network, costCalc);
 			}
@@ -151,7 +166,7 @@ public class RoutingTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		String inPlansName = "test/input/" + this.getClass().getCanonicalName().replace('.', '/') + "/plans.xml.gz";
@@ -169,7 +184,7 @@ public class RoutingTest extends MatsimTestCase {
 		assertEquals("different plans files.", referenceChecksum, routerChecksum);
 	}
 
-	private void calcRoute(final RouterProvider provider, final NetworkImpl  network, final Population population, final Config config) {
+	private void calcRoute(final RouterProvider provider, final Network network, final Population population, final Config config) {
 		log.info("### calcRoute with router " + provider.getName());
 
 		FreespeedTravelTimeCost calculator = new FreespeedTravelTimeCost(config.planCalcScore());

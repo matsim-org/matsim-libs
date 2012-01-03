@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -46,7 +47,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.dressler.Interval.EdgeIntervals;
 import playground.dressler.Interval.Interval;
@@ -956,7 +956,7 @@ public class MultiSourceEAF {
 		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		HashMap<Node, Integer> demands = null;
 		HashMap<Id, Interval> whenAvailable = null;
 		Node sink = null;
@@ -964,7 +964,7 @@ public class MultiSourceEAF {
 		//read network
 		if (networkfile != null) {
 			scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			network = scenario.getNetwork();
+			network = (NetworkImpl) scenario.getNetwork();
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 			networkReader.readFile(networkfile);
 			sink = network.getNodes().get(new IdImpl(sinkid));

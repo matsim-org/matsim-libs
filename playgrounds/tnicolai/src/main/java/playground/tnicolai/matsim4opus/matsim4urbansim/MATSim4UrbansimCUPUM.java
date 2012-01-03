@@ -28,11 +28,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
@@ -61,6 +61,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 			testParam = args[1];
 	}
 	
+	@Override
 	void runMATSim(){
 		log.info("Starting MATSim from Urbansim");
 
@@ -73,7 +74,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		cleanNetwork(network);
 		
 		if(!testParam.equalsIgnoreCase("Ferry"))	// than its the Highway scenario
@@ -101,7 +102,7 @@ class MATSim4UrbansimCUPUM extends MATSim4UrbanSim{
 	 * modifies the links in the travel network without changing the file
 	 * @param network
 	 */
-	void modifyLinks(NetworkImpl network, String testParam){
+	void modifyLinks(Network network, String testParam){
 		
 		double capacity = -1; // -1 means, no capacity changes on the network/links
 		try{

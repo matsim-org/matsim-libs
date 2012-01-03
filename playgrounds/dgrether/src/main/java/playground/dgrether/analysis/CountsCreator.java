@@ -24,14 +24,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.counts.Counts;
@@ -44,7 +44,7 @@ public class CountsCreator {
 
 	private static final Logger log = Logger.getLogger(CountsCreator.class);
 
-	private NetworkImpl network;
+	private Network network;
 
 	/*
 	 * main NODES: 9233, 1563, 1558, 1562, 1564, 1000597, 1565, 1525, 1519, 1518,

@@ -32,7 +32,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.TravelTimeEstimatorWrapper;
 import playground.thibautd.jointtrips.run.JointControler;
 import playground.thibautd.jointtrips.utils.JointControlerUtils;
 
@@ -72,7 +71,7 @@ public class TestWrapper {
 		controler.run();
 		travelTime2 = (TravelTimeCalculator) controler.getTravelTimeCalculator();
 
-		Map<Id, Link> linkMap = controler.getNetwork().getLinks();
+		Map<Id, ? extends Link> linkMap = controler.getNetwork().getLinks();
 		links = new Link[]{
 			linkMap.get( new IdImpl(1) ),
 			linkMap.get( new IdImpl(2) ),

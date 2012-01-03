@@ -33,6 +33,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -60,7 +61,6 @@ import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -964,7 +964,7 @@ public class QueueSimulationTest extends TestCase {
 		Config config = scenario.getConfig();
 
 		// build simple network with 1 link
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
 		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		network.addNode(node1);
@@ -1025,7 +1025,7 @@ public class QueueSimulationTest extends TestCase {
 		double simEndTime = 8.0*3600;
 
 		// build simple network with 2 links
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
 		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
 		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
@@ -1157,7 +1157,7 @@ public class QueueSimulationTest extends TestCase {
 	private static final class Fixture {
 		final ScenarioImpl scenario;
 		final Config config;
-		final NetworkImpl network;
+		final Network network;
 		final Node node1;
 		final Node node2;
 		final Node node3;

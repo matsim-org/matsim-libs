@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -109,7 +110,7 @@ public abstract class Utils
 
     QuadTree<ActivityFacility> facilityQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
     for (ActivityFacility f : controler.getFacilities().getFacilities().values()) {
-      ((ActivityFacilityImpl) f).setLinkId(controler.getNetwork().getNearestLink(f.getCoord()).getId());
+      ((ActivityFacilityImpl) f).setLinkId(((NetworkImpl) controler.getNetwork()).getNearestLink(f.getCoord()).getId());
       Coord c = f.getCoord();
       facilityQuadTree.put(c.getX(), c.getY(), f);
     }
@@ -199,7 +200,7 @@ public abstract class Utils
             if (act.getType().equals("home")) {
               if (!(hasHome)) {
                 c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (IdImpl)(controler.getNetwork().getNearestLink(act.getCoord())).getId();
+                activityLink = (IdImpl)(((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
                 //activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);

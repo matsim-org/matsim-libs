@@ -7,13 +7,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 
@@ -28,13 +28,13 @@ public class ZurichUtilities {
 	private static String CLOSE_SCHWAMENDINGERTUNNEL = "schwamendingertunnel";
 	
 	/** links to remove */
-	private static ArrayList<IdImpl> linksToRemove = null;
+	private static ArrayList<Id> linksToRemove = null;
 
 	/**
 	 * This modifies the MATSim network according to the given test parameter in
 	 * the MATSim config file (from UrbanSim)
 	 */
-	public static void modifyNetwork(final NetworkImpl network, final String[] scenarioArray) {
+	public static void modifyNetwork(final Network network, final String[] scenarioArray) {
 
 		for (int i = 0; i < scenarioArray.length; i++) {
 
@@ -54,11 +54,11 @@ public class ZurichUtilities {
 	 * 
 	 * @param network
 	 */
-	private static void removeUetliBergTunnel(final NetworkImpl network) {
+	private static void removeUetliBergTunnel(final Network network) {
 
 		log.info("Closing Uetlibertunnel from network ...");
 		
-		linksToRemove = new ArrayList<IdImpl>();
+		linksToRemove = new ArrayList<Id>();
 		
 		linksToRemove.add(new IdImpl(108150));
 		linksToRemove.add(new IdImpl(121962));
@@ -73,11 +73,11 @@ public class ZurichUtilities {
 	 * 
 	 * @param network
 	 */
-	private static void removeBirmensdorferstrasse(final NetworkImpl network) {
+	private static void removeBirmensdorferstrasse(final Network network) {
 
 		log.info("Closing Birmensdorferstrasse from network ...");
 		
-		linksToRemove = new ArrayList<IdImpl>();
+		linksToRemove = new ArrayList<Id>();
 		
 		linksToRemove.add(new IdImpl(125464));
 		linksToRemove.add(new IdImpl(125460));
@@ -87,10 +87,10 @@ public class ZurichUtilities {
 		log.info("Done closing Birmensdorferstrasse!");
 	}
 
-	private static void removeSchwamendingerTunnel(final NetworkImpl network) {
+	private static void removeSchwamendingerTunnel(final Network network) {
 		log.info("Closing Schwamendingertunnel from network ...");
 
-		linksToRemove = new ArrayList<IdImpl>();
+		linksToRemove = new ArrayList<Id>();
 		
 		linksToRemove.add(new IdImpl(109024));
 		//add(new IdImpl(65583));
@@ -113,7 +113,7 @@ public class ZurichUtilities {
 	 * @param network
 	 * @param linkList
 	 */
-	private static void applyScenario(final NetworkImpl network){
+	private static void applyScenario(final Network network){
 		// check whether all links exist in network
 		existsInNetwork(network);
 		// close links
@@ -126,7 +126,7 @@ public class ZurichUtilities {
 	 * @param linkList
 	 * @return true if all links exist in the network
 	 */
-	private static void existsInNetwork(final NetworkImpl network){
+	private static void existsInNetwork(final Network network){
 		
 		log.info("Looking whether all links for road closure exist in network ...");
 		
@@ -135,11 +135,11 @@ public class ZurichUtilities {
 			return;
 		}
 		
-		Map<Id, Link> networkLinks = network.getLinks();
-		Iterator<IdImpl> linkIterator = linksToRemove.iterator();
+		Map<Id, ? extends Link> networkLinks = network.getLinks();
+		Iterator<Id> linkIterator = linksToRemove.iterator();
 		
 		while(linkIterator.hasNext()){
-			IdImpl id = linkIterator.next();
+			Id id = linkIterator.next();
 			if(networkLinks.containsKey(id))
 				log.info("Link found in network: " + id.toString());
 			else
@@ -154,15 +154,15 @@ public class ZurichUtilities {
 	 * @param network
 	 * @param linkList
 	 */
-	private static void removeLinks(final NetworkImpl network){
+	private static void removeLinks(final Network network){
 		
 		if(linksToRemove == null)
 			return;
 		
-		Iterator<IdImpl> linkIterator = linksToRemove.iterator();
+		Iterator<Id> linkIterator = linksToRemove.iterator();
 		
 		while(linkIterator.hasNext()){
-			IdImpl id = linkIterator.next();
+			Id id = linkIterator.next();
 			
 			network.removeLink( id );
 			log.info("Removed link " + id.toString() + " from network ...");
@@ -190,11 +190,11 @@ public class ZurichUtilities {
 						if(leg.getRoute() != null){
 							
 							NetworkRoute nr = (NetworkRoute)leg.getRoute();
-							Iterator<IdImpl> linkIterator = linksToRemove.iterator();
+							Iterator<Id> linkIterator = linksToRemove.iterator();
 							boolean setRouteToNull = false;
 							
 							while(linkIterator.hasNext()){
-								IdImpl linkId = linkIterator.next();
+								Id linkId = linkIterator.next();
 								
 								for(Id id : nr.getLinkIds()){
 									if(id.compareTo(linkId) == 0){

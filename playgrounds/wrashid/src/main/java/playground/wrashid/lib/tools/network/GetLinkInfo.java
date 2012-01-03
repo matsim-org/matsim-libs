@@ -20,8 +20,8 @@
 
 package playground.wrashid.lib.tools.network;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.GeneralLib;
 
@@ -31,7 +31,7 @@ public class GetLinkInfo {
 		String networkFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/output_network.xml.gz";
 		String linkIdString="17560001607380FT-1";
 		
-		NetworkImpl network = GeneralLib.readNetwork(networkFilePath);
+		Network network = GeneralLib.readNetwork(networkFilePath);
 		
 		System.out.println(network.getLinks().get(new IdImpl(linkIdString)).toString());
 		System.out.println(network.getLinks().get(new IdImpl(linkIdString)).getCoord().toString());

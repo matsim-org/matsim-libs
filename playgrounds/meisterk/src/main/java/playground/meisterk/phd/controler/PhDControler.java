@@ -26,11 +26,11 @@ import java.text.NumberFormat;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
@@ -99,10 +99,11 @@ public class PhDControler extends Controler {
 			super();
 		}
 
+		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 
 			Controler c = event.getControler();
-			NetworkImpl network = c.getNetwork();
+			Network network = c.getNetwork();
 			TravelTime travelTime = c.getTravelTimeCalculator();
 			double binSize = c.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 

@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -198,7 +199,7 @@ public class PaperController extends WithinDayController implements StartupListe
 		
 		// Module to analyze expected travel time on a single link
 		Collection<Link> changedLinks = new HashSet<Link>();
-		for (NetworkChangeEvent networkChangeEvent : super.getNetwork().getNetworkChangeEvents()) {
+		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) super.getNetwork()).getNetworkChangeEvents()) {
 			changedLinks.addAll(networkChangeEvent.getLinks());
 		}
 		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, super.getTravelTimeCollector(), super.getTravelTimeCalculator());

@@ -22,11 +22,11 @@ package org.matsim.utils.gis.matsim2esri.plans;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -48,8 +48,8 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		String outShp = getOutputDirectory() + "acts.shp";
 //		String outDbf = getOutputDirectory() + "acts.dbf";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
@@ -85,8 +85,8 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 		String outShp = getOutputDirectory() + "legs.shp";
 //		String outDbf = getOutputDirectory() + "legs.dbf";
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(super.loadConfig(null));
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

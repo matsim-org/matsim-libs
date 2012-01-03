@@ -20,9 +20,9 @@
 package playground.andreas.bvgScoringFunction;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -44,9 +44,9 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 	private final CharyparNagelScoringParameters charyparNagelConfigParameters;
 	private final BvgScoringFunctionParameters bvgParameters;
 	private final Double utilityOfLineSwitch;
-	private final NetworkImpl network;
+	private final Network network;
 
-	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroup bvgConfig, NetworkImpl network){
+	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroup bvgConfig, Network network) {
 		this.charyparNagelConfigParameters = new CharyparNagelScoringParameters(charyparNagelConfig);
 		this.bvgParameters = new BvgScoringFunctionParameters(bvgConfig);
 		this.utilityOfLineSwitch = charyparNagelConfig.getUtilityOfLineSwitch();

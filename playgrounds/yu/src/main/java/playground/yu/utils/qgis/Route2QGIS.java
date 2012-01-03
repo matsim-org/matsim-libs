@@ -36,15 +36,15 @@ import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.config.ConfigUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -59,13 +59,13 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		X2QGIS {
 	private final static Logger log = Logger.getLogger(Route2QGIS.class);
 	protected Map<List<Id>, Integer> routeCounters;
-	protected NetworkImpl network;
+	protected Network network;
 	private FeatureType featureTypeRoute;
 	private boolean writeRoutes = true;
 
 	public Route2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkImpl network,
+			final Network network,
 			final Map<List<Id>, Integer> routeCounters) {
 		super(population, network, crs, outputDir);
 		this.network = network;
@@ -181,8 +181,8 @@ public class Route2QGIS extends SelectedPlans2ESRIShapeChanged implements
 		final String populationFilename = args[1];
 		final String outputDir = args[2];
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();

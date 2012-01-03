@@ -21,6 +21,7 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -106,7 +107,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("  done.");
 
 		log.info("  reading network xml file... ");
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(this.config.network().getInputFile());
 		log.info("  done.");
 
@@ -114,7 +115,7 @@ public class TriangleTest extends MatsimTestCase {
 		log.info("1. VALIDATE AND COMPLETE THE WORLD");
 		log.info("\n");
 
-		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
 
 		log.info("\n");
 		log.info("2. SUMMARY INFORMATION OF THE NETWORK");

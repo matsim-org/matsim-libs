@@ -23,10 +23,10 @@ package playground.christoph.analysis.wardrop;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
@@ -39,7 +39,7 @@ public class WardropTest {
 	//protected static ScenarioData scenarioData;
 	protected static ScenarioImpl scenario;
 	protected static Population population;
-	protected static NetworkImpl network;
+	protected static Network network;
 	protected static Config config;
 //	protected static NetworkFactory networkFactory = new NetworkFactory();
 

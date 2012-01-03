@@ -23,13 +23,13 @@ package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gene
 import java.util.Collections;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
@@ -55,7 +55,7 @@ public class PCStrMn extends BseParamCalibrationStrategyManager implements
 
 	private BasicStatistics betaTravelingPtStats = null;
 
-	public PCStrMn(NetworkImpl net, int firstIteration, Config config
+	public PCStrMn(Network net, int firstIteration, Config config
 	// ,int paramDimension
 	) {
 		super(firstIteration);

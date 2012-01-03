@@ -156,7 +156,7 @@ public class MyRuns {
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		NodeImpl node = null;
 
@@ -360,7 +360,7 @@ public class MyRuns {
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 

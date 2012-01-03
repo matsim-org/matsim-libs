@@ -20,14 +20,14 @@
 package playground.wrashid.PSF.DataForPSL;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 
 import playground.wrashid.lib.GeneralLib;
 
 public class PrintLinkCoordinates {
 
 	public static void main(String[] args) throws Exception {
-		NetworkImpl network = GeneralLib.readNetwork("C:/data/workspace/playgrounds/mzilske/inputs/schweiz/zurich-switzerland.xml.gz");
+		Network network = GeneralLib.readNetwork("C:/data/workspace/playgrounds/mzilske/inputs/schweiz/zurich-switzerland.xml.gz");
 
 		System.out.println("linkId\tx\ty");
 		for (Link link : network.getLinks().values()){

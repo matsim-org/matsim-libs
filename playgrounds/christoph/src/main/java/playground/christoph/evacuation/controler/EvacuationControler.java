@@ -21,12 +21,11 @@
 package playground.christoph.evacuation.controler;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
@@ -39,6 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -63,8 +63,6 @@ import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
@@ -81,10 +79,12 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHo
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
+import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
 		StartupListener, AfterMobsimListener {
@@ -206,7 +206,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			this.getFixedOrderSimulationListener().addSimulationListener((SimStepParallelEventsManagerImpl) this.getEvents());
 		}
 		
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), getNetwork());
+		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getFacilities(), (NetworkImpl) getNetwork());
 
 		// Add Rescue Links to Network
 		new AddExitLinksToNetwork(this.scenarioData).createExitLinks();

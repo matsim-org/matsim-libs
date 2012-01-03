@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
@@ -140,7 +139,7 @@ public class RouterPerformanceTest {
 	private static void doTest(final RouterProvider provider, final Config config, final int limit) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
 		String inPlansName = config.plans().getInputFile();

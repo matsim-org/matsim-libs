@@ -1,11 +1,11 @@
 package playground.michalm.ttcalc_error;
 
-import java.util.*;
+import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.controler.*;
-import org.matsim.core.router.util.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.TravelTime;
 
 
 public class SimLauncher
@@ -21,7 +21,7 @@ public class SimLauncher
 
         TravelTime travelTime = controler.getTravelTimeCalculator();
 
-        Map<Id, Link> links = controler.getNetwork().getLinks();
+        Map<Id, ? extends Link> links = controler.getNetwork().getLinks();
         Id idB = controler.getScenario().createId("B");
         Link linkB = links.get(idB);
 

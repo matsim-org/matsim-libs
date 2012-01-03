@@ -22,12 +22,12 @@ package playground.andreas.utils.ana.plans2kml;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -43,7 +43,7 @@ public class PersonPlan2Kml extends NewPopulation{
 
 	boolean warningPrinted = false;
 	String outputDir;
-	NetworkImpl network;
+	Network network;
 	TreeSet<String> agentIds;
 
 	/**
@@ -54,7 +54,7 @@ public class PersonPlan2Kml extends NewPopulation{
 	 * @param outputDir Directory for kml output
 	 * @param agentIds Ids of agents to be converted. Be careful: If <code>null</code> every agent will be converted.
 	 */
-	public PersonPlan2Kml(NetworkImpl network, Population population, String outputDir, TreeSet<String> agentIds) {
+	public PersonPlan2Kml(Network network, Population population, String outputDir, TreeSet<String> agentIds) {
 		super(network, population, "nofile.xml");
 		this.outputDir = outputDir;
 		this.network = network;
@@ -89,7 +89,7 @@ public class PersonPlan2Kml extends NewPopulation{
 
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		NetworkImpl network = s.getNetwork();
+		Network network = s.getNetwork();
 		new MatsimNetworkReader(s).readFile(networkFilename);
 
 		Population population = s.getPopulation();

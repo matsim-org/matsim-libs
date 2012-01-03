@@ -21,6 +21,7 @@
 package org.matsim.pt.counts;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerIO;
@@ -32,7 +33,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -121,7 +121,7 @@ BeforeMobsimListener, AfterMobsimListener  {
 				controler.stopwatch.beginOperation("compare with pt counts");
 
 				double countsScaleFactor = Double.parseDouble(this.config.getParam(MODULE_NAME, "countsScaleFactor"));
-				NetworkImpl network = controler.getNetwork();
+				Network network = controler.getNetwork();
 				PtCountsComparisonAlgorithm ccaBoard = new PtBoardCountComparisonAlgorithm(this.occupancyAnalyzer, this.boardCounts, network, countsScaleFactor);
 				PtCountsComparisonAlgorithm ccaAlight = new PtAlightCountComparisonAlgorithm(this.occupancyAnalyzer, this.alightCounts, network, countsScaleFactor);
 				PtCountsComparisonAlgorithm ccaOccupancy = new PtOccupancyCountComparisonAlgorithm(this.occupancyAnalyzer, this.occupancyCounts, network, countsScaleFactor);

@@ -96,7 +96,7 @@ public class TestSubNetwork {
 	}
 
 	private void loadNetwork() {
-		NetworkImpl network = this.scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
 
 		new MatsimNetworkReader(this.scenario).readFile(networkFile);

@@ -31,14 +31,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.jjoubert.CommercialModel.Listeners.MyPrivateVehicleSpeedAnalyser;
 import playground.jjoubert.CommercialTraffic.SAZone;
@@ -89,7 +89,7 @@ public class PrivateVehicleSpeedEvaluator {
 
 		String networkFile = root + "Commercial/Input/network" + province + ".xml";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl nl = scenario.getNetwork();
+		Network nl = scenario.getNetwork();
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(networkFile);
 
@@ -106,7 +106,7 @@ public class PrivateVehicleSpeedEvaluator {
 		 *  I'm not sure if this will give the right output now.
 		 */
 		
-		Map<Id, Link> map = nl.getLinks();
+		Map<Id, ? extends Link> map = nl.getLinks();
 		for (Id key : map.keySet()) {
 			Link link = map.get(key);
 
@@ -172,7 +172,7 @@ public class PrivateVehicleSpeedEvaluator {
 				if(inputFolder == null){
 					log.warn("Could not find the events file for Run" + run + "!");
 				} else{
-					EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+					EventsManager events = EventsUtils.createEventsManager();
 					MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 					events.addHandler(handler);
 
@@ -207,7 +207,7 @@ public class PrivateVehicleSpeedEvaluator {
 			log.info("==============================  Processing private-only events file  ==============================");
 
 			String fileName = root + "Commercial/Input/PrivateOnlyEvents.txt.gz";
-			EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+			EventsManager events = EventsUtils.createEventsManager();
 			MyPrivateVehicleSpeedAnalyser handler = new MyPrivateVehicleSpeedAnalyser(zoneTree, nl, lowerId, upperId, numberOfHourBins);
 			events.addHandler(handler);
 

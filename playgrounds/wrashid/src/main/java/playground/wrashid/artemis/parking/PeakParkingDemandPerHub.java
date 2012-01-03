@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.artemis.parking;
 
 import java.util.HashMap;
@@ -5,10 +24,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
@@ -20,7 +39,7 @@ public class PeakParkingDemandPerHub {
 
 	public static void main(String[] args) {
 		String networkPath="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
-		NetworkImpl network= GeneralLib.readNetwork(networkPath);
+		Network network= GeneralLib.readNetwork(networkPath);
 		
 		String linkHubMappingTable = "H:/data/experiments/ARTEMIS/zh/dumb charging/input/run1/linkHub_orig.mappingTable.txt";
 		LinkHubMapping linkHubMapping = new LinkHubMapping(linkHubMappingTable);
@@ -28,7 +47,7 @@ public class PeakParkingDemandPerHub {
 		HashMap<Id, ParkingOccupancyBins> hubIdParkingOccupancies=new HashMap<Id, ParkingOccupancyBins>();
 
 		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		

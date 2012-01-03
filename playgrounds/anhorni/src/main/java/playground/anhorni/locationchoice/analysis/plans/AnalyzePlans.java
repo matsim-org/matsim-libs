@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -38,7 +39,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -58,7 +58,7 @@ public class AnalyzePlans {
 	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private final Population plans = scenario.getPopulation();
 	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
-	private final NetworkImpl network = scenario.getNetwork();
+	private final Network network = scenario.getNetwork();
 
 	String plansfilePath;
 
@@ -498,7 +498,7 @@ public class AnalyzePlans {
 		return facilities;
 	}
 
-	public NetworkImpl getNetwork() {
+	public Network getNetwork() {
 		return network;
 	}
 

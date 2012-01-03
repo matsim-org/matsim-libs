@@ -267,7 +267,7 @@ public class QueueLinkTest extends MatsimTestCase {
 	 */
 	public void testBuffer() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));
@@ -352,7 +352,7 @@ public class QueueLinkTest extends MatsimTestCase {
 		veh1.setDriver(new DefaultAgentFactory( qsim ).createMobsimAgentFromPersonAndInsert( p ));
 		QueueVehicle veh25 = new QueueVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
 		veh25.setDriver(new DefaultAgentFactory( null ).createMobsimAgentFromPersonAndInsert( p ));
-		QueueVehicle veh5 = new QueueVehicle(new VehicleImpl(new IdImpl(3), vehType), (double) 5);
+		QueueVehicle veh5 = new QueueVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
 		veh5.setDriver(new DefaultAgentFactory( null ).createMobsimAgentFromPersonAndInsert( p ));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getStorageCapacity(), EPSILON);
@@ -401,7 +401,7 @@ public class QueueLinkTest extends MatsimTestCase {
 
 		/*package*/ Fixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			NetworkImpl network = this.scenario.getNetwork();
+			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
 			Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1, 0));

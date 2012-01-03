@@ -27,7 +27,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -43,7 +42,7 @@ public class PopulationSplitter {
 	private final static Logger log = Logger.getLogger(PopulationSplitter.class);
 
 	private ScenarioImpl scenario;
-	private NetworkImpl network;
+	private Network network;
 	private ActivityFacilitiesImpl facilities;
 	private Population population;
 

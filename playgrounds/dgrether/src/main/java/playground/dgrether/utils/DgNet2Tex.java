@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -53,7 +52,7 @@ public class DgNet2Tex {
 
 
 
-	public void convert(NetworkImpl net, String texnet) {
+	public void convert(Network net, String texnet) {
 		log.info("starting conversion...");
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(texnet);
@@ -88,7 +87,7 @@ public class DgNet2Tex {
 		log.info("latex output written!");
 	}
 
-	private void writeNetwork(NetworkImpl net, BufferedWriter writer) throws IOException {
+	private void writeNetwork(Network net, BufferedWriter writer) throws IOException {
 		List<Set<Link>> samePropertyLinksList = this.classifyNetwork(net);
 		for (Set<Link> linkSet : samePropertyLinksList){
 			Iterator<Link> it = linkSet.iterator();
@@ -156,7 +155,7 @@ public class DgNet2Tex {
 
 	public void convert(String net, String texnet) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 		reader.readFile(net);
 		this.convert(network, texnet);

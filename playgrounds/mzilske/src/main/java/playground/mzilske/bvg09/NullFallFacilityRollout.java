@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -294,7 +293,7 @@ public class NullFallFacilityRollout {
 
 	private void writeNetworkAndScheduleAndVehicles() throws IOException,
 			FileNotFoundException {
-		NetworkImpl network = outScenario.getNetwork();
+		Network network = outScenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
 		log.info("writing TransitSchedule to file.");

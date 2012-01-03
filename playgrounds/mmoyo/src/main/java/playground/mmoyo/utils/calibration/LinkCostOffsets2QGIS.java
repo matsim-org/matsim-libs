@@ -27,9 +27,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.counts.Counts;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -41,19 +41,18 @@ import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.TransitRouteUtil;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utils.qgis.LinkCostOffsets2QGISWithArrowhead;
 import playground.yu.utils.qgis.X2QGIS;
-
 import utilities.misc.DynamicData;
 
  /**produces gis polygons from cost offset values*/
 public class LinkCostOffsets2QGIS {
 	final String netFilePath;
-	final NetworkImpl net;
+	final Network net;
 	final DynamicData<TransitStopFacility> stopOffsets;
 	final Counts counts;
 	final TransitSchedule schedule;
 	final String outDir;
 	
-	public LinkCostOffsets2QGIS(final String netFilePath, final NetworkImpl net, final DynamicData<TransitStopFacility> stopOffsets,   final Counts counts, final TransitSchedule schedule,  final String outDir){
+	public LinkCostOffsets2QGIS(final String netFilePath, final Network net, final DynamicData<TransitStopFacility> stopOffsets,   final Counts counts, final TransitSchedule schedule,  final String outDir){
 		this.netFilePath = netFilePath;
 		this.net = net;
 		this.stopOffsets = stopOffsets;
@@ -144,7 +143,7 @@ public class LinkCostOffsets2QGIS {
 		
 		//load data
 		DataLoader dLoader = new DataLoader();
-		NetworkImpl net =dLoader.readNetwork(netFilePath);
+		Network net =dLoader.readNetwork(netFilePath);
 		Counts counts = dLoader.readCounts(countsFilePath);
 		TransitSchedule schedule = dLoader.readTransitSchedule(net, transitScheduleFilePath);
 		PtBseLinkCostOffsetsXMLFileIO reader = new PtBseLinkCostOffsetsXMLFileIO (schedule);

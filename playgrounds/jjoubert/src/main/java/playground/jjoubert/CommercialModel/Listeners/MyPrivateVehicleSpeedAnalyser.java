@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
@@ -41,12 +41,12 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	private Map<Id, SAZone> map;
 	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
 	private Map<Id, Double> eventMap;
-	private NetworkImpl networkLayer;
+	private Network networkLayer;
 	private Integer lowerAgentId;
 	private Integer upperAgentId;
 	private boolean weighLinksByUse = false;
 	
-	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, NetworkImpl nl, int lowerAgentId, int upperAgentId, int hours){
+	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, Network nl, int lowerAgentId, int upperAgentId, int hours){
 		this.map = map;
 		this.networkLayer = nl;
 		this.lowerAgentId = lowerAgentId;
@@ -66,6 +66,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
 		Id linkId = event.getLinkId();
@@ -79,6 +80,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 		
 	}
 
+	@Override
 	public void reset(int iteration) {
 		
 	}
@@ -101,6 +103,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	 * 			 is not an issue since then event's speed will probably be the free speed anyway.)</i>  
 	 * </ul> 
 	 */
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if(this.weighLinksByUse){
 			addSpeedToZone(event);			
@@ -110,6 +113,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	}
 	
 	
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		eventMap.remove(event.getPersonId());		
 	}

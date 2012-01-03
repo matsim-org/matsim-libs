@@ -27,11 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -98,7 +98,7 @@ public class PlansExchanger {
 		// read old popFilenames
 		for (int i = 0; i < oldPopFilenames.length; i++) {
 			ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			NetworkImpl net = sc.getNetwork();
+			Network net = sc.getNetwork();
 			new MatsimNetworkReader(sc).readFile(netFilename);
 
 			Population pop = sc.getPopulation();
@@ -123,7 +123,7 @@ public class PlansExchanger {
 		}
 
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl net = sc.getNetwork();
+		Network net = sc.getNetwork();
 		new MatsimNetworkReader(sc).readFile(netFilename);
 		for (int i = 0; i < newPopFilenames.length; i++) {
 			new PopulationWriter(newPops.get(i), net).write(newPopFilenames[i]);

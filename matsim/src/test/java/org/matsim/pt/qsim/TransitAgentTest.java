@@ -59,7 +59,7 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
@@ -102,7 +102,7 @@ public class TransitAgentTest extends TestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
 		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));

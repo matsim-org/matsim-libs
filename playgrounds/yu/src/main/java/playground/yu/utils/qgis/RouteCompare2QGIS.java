@@ -36,10 +36,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,7 +60,7 @@ public class RouteCompare2QGIS extends Route2QGIS {
 
 	public RouteCompare2QGIS(Population population,
 			final CoordinateReferenceSystem crs, final String outputDir,
-			final NetworkImpl network,
+			final Network network,
 			final Map<List<Id>, Integer> routeCountersA,
 			final Map<List<Id>, Integer> routeCountersB) {
 		super(population, crs, outputDir, network, routeCountersA);
@@ -165,8 +166,8 @@ public class RouteCompare2QGIS extends Route2QGIS {
 		final String populationFilenameB = args[2];
 		final String outputDir = args[3];
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		// ------------------------RouteSummaryA--------------------------------
 		ScenarioImpl scenarioA = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());

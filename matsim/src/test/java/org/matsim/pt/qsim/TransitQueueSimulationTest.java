@@ -87,7 +87,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
@@ -367,7 +366,7 @@ public class TransitQueueSimulationTest {
         population.addPerson(person);
 
         // run simulation
-        EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
         QSim simulation = QSim.createQSimAndAddAgentSource(scenario, events);
         simulation.run();
     }
@@ -483,7 +482,7 @@ public class TransitQueueSimulationTest {
 
 
         // run simulation
-        EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
         TestHandleStopSimulation simulation = TestHandleStopSimulation.createTestHandleStopSimulation(scenario, events, line, tRoute, departure);
         simulation.run();
 
@@ -650,7 +649,7 @@ public class TransitQueueSimulationTest {
         config.addQSimConfigGroup(new QSimConfigGroup());
 
         // build simple network with 2 links
-        NetworkImpl network = scenario.getNetwork();
+        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
         NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
         NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
         NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
@@ -695,7 +694,7 @@ public class TransitQueueSimulationTest {
         new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 
         // prepare test
-        EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
         FirstLastEventCollector collector = new FirstLastEventCollector();
         events.addHandler(collector);
 
@@ -741,18 +740,18 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
         // build simple network with 2 links
-        NetworkImpl network = scenario.getNetwork();
+        NetworkImpl network = (NetworkImpl) scenario.getNetwork();
         NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
         NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
         NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
         network.getNodes().put(node1.getId(), node1);
         network.getNodes().put(node2.getId(), node2);
         network.getNodes().put(node3.getId(), node3);
-        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1.getId(), node2.getId());
+        Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
         link1.setFreespeed(10.0);
         link1.setCapacity(2000.0);
         link1.setLength(1000.0);
-        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2.getId(), node3.getId());
+        Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
         link2.setFreespeed(10.0);
         link2.setCapacity(2000.0);
         link2.setLength(1000.0);
@@ -821,7 +820,7 @@ public class TransitQueueSimulationTest {
         population.addPerson(person);
 
         // run sim
-        EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
         QSim.createQSimAndAddAgentSource(scenario, events).run();

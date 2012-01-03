@@ -22,13 +22,13 @@ package playground.yu.visum.test;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -77,9 +77,8 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 
 		// network
 		System.out.println("  reading network file... ");
-		NetworkImpl network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network()
-				.getInputFile());
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		System.out.println("  done.");
 
 		// plans
@@ -98,7 +97,7 @@ public class EventFilterTestAveTraSpeCal_personSpecific {
 
 		// events
 		System.out.println("  creating events object... ");
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		System.out.println("  done.");
 
 		System.out.println("  reading plans xml file... ");

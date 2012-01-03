@@ -31,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -75,7 +76,7 @@ public class PlansAnalyzer {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
 		
-		FacilityValidator.generate(scenario.getActivityFacilities(), scenario.getNetwork(), graph);
+		FacilityValidator.generate(scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork(), graph);
 		
 		PseudoSim sim = new PseudoSim();
 		

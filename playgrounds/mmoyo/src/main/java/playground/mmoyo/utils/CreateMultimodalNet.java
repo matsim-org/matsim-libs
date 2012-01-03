@@ -32,7 +32,7 @@ public class CreateMultimodalNet {
 	public void run(ScenarioImpl scenario, final String outputFile) {
 		NetworkImpl ptNetwork = NetworkImpl.createNetwork();
 		new CreatePseudoNetwork(scenario.getTransitSchedule(), ptNetwork, "tr_").createNetwork();
-		MergeNetworks.merge(scenario.getNetwork(), "", ptNetwork, "", scenario.getNetwork());
+		MergeNetworks.merge(scenario.getNetwork(), "", ptNetwork, "", (NetworkImpl) scenario.getNetwork());
 		new NetworkWriter(scenario.getNetwork()).write(outputFile);
 		System.out.println("done writting:" + outputFile);
 		// NetVis.displayNetwork(outputFile);

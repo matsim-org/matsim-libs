@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.otfvis;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.MatsimLaneDefinitionsReader;
 import org.matsim.ptproject.qsim.QSim;
@@ -37,9 +37,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class FourWaysVisNetworkOnly {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		String netFile = FourWaysVis.TESTINPUTDIR+ "network.xml.gz";
@@ -53,10 +50,10 @@ public class FourWaysVisNetworkOnly {
 		//this is hack
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 //		PopulationImpl population = scenario.getPopulation();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		scenario.getConfig().scenario().setUseLanes(true);
 		LaneDefinitions laneDefs = scenario.getLaneDefinitions();

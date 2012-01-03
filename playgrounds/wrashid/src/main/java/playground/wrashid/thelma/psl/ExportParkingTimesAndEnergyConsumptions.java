@@ -1,13 +1,32 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.thelma.psl;
 
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
@@ -33,7 +52,7 @@ public class ExportParkingTimesAndEnergyConsumptions {
 	public static void main(String[] args) {
 		String eventsFile="H:/data/experiments/ARTEMIS/output/run10/ITERS/it.50/50.events.txt.gz";
 		String networkFile="H:/data/experiments/ARTEMIS/output/run10/output_network.xml.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		
 		
@@ -79,7 +98,7 @@ public class ExportParkingTimesAndEnergyConsumptions {
 		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);
 		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		vehicles.put(Vehicle.getPlaceholderForUnmappedPersonIds(), new PlugInHybridElectricVehicle(new IdImpl(1)));
-		NetworkImpl network=GeneralLib.readNetwork(networkFile);
+		Network network=GeneralLib.readNetwork(networkFile);
 		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,vehicles,network);
 		return energyConsumptionPlugin;
 	}

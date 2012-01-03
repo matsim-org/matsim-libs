@@ -28,19 +28,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.christoph.energyflows.facilities.AnalyzeRemovedFacilities;
+import playground.christoph.energyflows.facilities.BuildingsZHCreator;
 import playground.christoph.energyflows.facilities.EnterpriseFacilitiesCreator;
 import playground.christoph.energyflows.facilities.FacilitiesToRemoveFromZH;
 import playground.christoph.energyflows.facilities.RemoveFacilitiesFromZH;
-import playground.christoph.energyflows.facilities.BuildingsZHCreator;
 import playground.christoph.energyflows.population.GetPersonsToAdapt;
 import playground.christoph.energyflows.population.RelocateActivities;
 
@@ -95,7 +96,7 @@ public class Create2kwScenario {
 		Gbl.printMemoryUsage();
 		
 		log.info("connecting facilities to network...");
-		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), scenario.getNetwork());
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(scenario.getActivityFacilities(), (NetworkImpl) scenario.getNetwork());
 		log.info("...done.");
 			
 		log.info("read facilities to remove...");
@@ -126,7 +127,7 @@ public class Create2kwScenario {
 
 		log.info("connecting Zurich facilities to network...");
 		config.getModule("f2l").getParams().remove("inputF2LFile"); // there is no f2l file for the new Zurich facilities
-		new WorldConnectLocations(config).connectFacilitiesWithLinks(zurichFacilities, scenario.getNetwork());
+		new WorldConnectLocations(config).connectFacilitiesWithLinks(zurichFacilities, (NetworkImpl) scenario.getNetwork());
 		log.info("...done.");
 
 		/*
@@ -155,13 +156,13 @@ public class Create2kwScenario {
 		log.info("...done.");	
 		
 		log.info("relocate activities from removed facilites...");
-		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities, scenario.getActivityFacilities(), ((ScenarioImpl)scenario).getKnowledges());
+		RelocateActivities relocateActivities = new RelocateActivities(zurichFacilities, scenario.getActivityFacilities(), scenario.getKnowledges());
 		relocateActivities.relocateActivities(scenario.getPopulation(), persons, facilitiesToRemove);
 		relocateActivities.checkCapacityUsage();
 		log.info("...done.");
 		
 		log.info("write population...");
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), ((ScenarioImpl)scenario).getKnowledges()).write(populationOutFile);
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork(), scenario.getKnowledges()).write(populationOutFile);
 		log.info("...done.");
 	}
 }

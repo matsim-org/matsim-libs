@@ -58,7 +58,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		config.setParam("changeLegMode", "modes", "car,walk");
 
 		// setup network
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);

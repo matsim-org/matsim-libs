@@ -24,10 +24,9 @@ import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
-//import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -144,7 +143,7 @@ class CadytsErrorPlot {
 		
 		//load data
 		DataLoader dataloader = new DataLoader();
-		NetworkImpl net = dataloader.readNetwork(netfilepath);
+		Network net = dataloader.readNetwork(netfilepath);
 		TransitSchedule schedule = dataloader.readTransitSchedule(net, trScheduleFilePath);
 		Counts realCounts = dataloader.readCounts(realOccupFilePath);
 		

@@ -13,6 +13,7 @@ import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -69,7 +70,7 @@ public class DataPrepare {
 	}
 
 	private void convertNetwork() {
-		final NetworkImpl network = scenario.getNetwork();
+		final Network network = scenario.getNetwork();
 		StreamingVisumNetworkReader streamingVisumNetworkReader = new StreamingVisumNetworkReader();
 
 		final Set<Feature> featuresInShape;
@@ -81,7 +82,7 @@ public class DataPrepare {
 			public void handleRow(Map<String, String> row) {
 				Id id = new IdImpl(row.get("NR"));
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
-				network.createAndAddNode(id, coord);
+				((NetworkImpl) network).createAndAddNode(id, coord);
 			}
 
 		};
@@ -126,14 +127,14 @@ public class DataPrepare {
 						else{
 							freespeed = getFreespeedTravelTime(edgeTypeId);
 						}
-						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
+						((NetworkImpl) network).createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
 						usedIds.add(edgeTypeIdString);
 					}
 					// kick out all edges in periphery that are irrelevant only there
 					else {
 						if(isEdgeTypeRelevantForPeriphery(edgeTypeId)){
 							freespeed = getFreespeedTravelTime(edgeTypeId);
-							network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
+							((NetworkImpl) network).createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, 1, null, edgeTypeIdString);
 							usedIds.add(edgeTypeIdString);
 						}
 					}
@@ -144,7 +145,7 @@ public class DataPrepare {
 		};
 		streamingVisumNetworkReader.addRowHandler("STRECKE", edgeRowHandler);
 		streamingVisumNetworkReader.read(InVisumNetFile);
-		network.setCapacityPeriod(16*3600);
+		((NetworkImpl) network).setCapacityPeriod(16*3600);
 	}
 
 	private boolean isEdgeTypeRelevant(Id edgeTypeId) {
@@ -202,7 +203,7 @@ public class DataPrepare {
 
 	private void writeNetwork() throws IOException,
 	FileNotFoundException {
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		log.info("writing network to file.");
 		new NetworkWriter(network).write(OutNetworkFile);
 	}

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
@@ -46,10 +47,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelCost;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-
 
 public class RetailerRelocation implements IterationStartsListener {	
 
@@ -62,6 +60,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	private TreeMap<Id, Integer> load = new TreeMap<Id, Integer>();
 	
 	
+	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {	
 		if (event.getIteration() % 2 == 0 && event.getIteration() > 0) {
 			log.info("start relocation of retailers ...");
@@ -107,7 +106,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private void evaluateCompetitorsPower(IterationStartsEvent event) {
-		NetworkImpl network = event.getControler().getNetwork();
+		Network network = event.getControler().getNetwork();
 		for (LinkCandidate candidate : this.linkCandidates.values()) {
 			Link link = network.getLinks().get(candidate.getLinkId());
 			double power = this.getCompetitorsPowerInArea(link.getCoord());
@@ -159,7 +158,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private void relocateSomeRetailers(IterationStartsEvent event, double share) {
-		NetworkImpl network = event.getControler().getNetwork();
+		Network network = event.getControler().getNetwork();
 		
 		TreeMap<Id,ActivityFacility> shoppingfacs = 
 			event.getControler().getScenario().getActivityFacilities().getFacilitiesForActivityType("s");
@@ -177,7 +176,7 @@ public class RetailerRelocation implements IterationStartsListener {
 	private void generateProbabilities(IterationStartsEvent event) {		
 		this.moveProbabilities = new TreeMap<Double, LinkCandidate>();
 		
-		NetworkImpl network = event.getControler().getNetwork();
+		Network network = event.getControler().getNetwork();
 		double totalPower = 0.0;
 		for (LinkCandidate candidate : this.linkCandidates.values()) {
 			Link link = network.getLinks().get(candidate.getLinkId());
@@ -217,12 +216,12 @@ public class RetailerRelocation implements IterationStartsListener {
 	}
 	
 	private void adaptAgents(IterationStartsEvent event) {
-		NetworkImpl network = event.getControler().getNetwork();
+		NetworkImpl network = (NetworkImpl) event.getControler().getNetwork();
 		ActivityFacilities facilities = event.getControler().getFacilities();
 		
 		LeastCostPathCalculator calculator = event.getControler().getLeastCostPathCalculatorFactory().createPathCalculator(network, 
-				(TravelCost)event.getControler().createTravelCostCalculator(),
-				(TravelTime)event.getControler().getTravelTimeCalculator());
+				event.getControler().createTravelCostCalculator(),
+				event.getControler().getTravelTimeCalculator());
 		
 		NetworkLegRouter router = new NetworkLegRouter(network, calculator, new ModeRouteFactory());
 		

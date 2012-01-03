@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -109,7 +110,7 @@ public class MATSim4UrbanSim {
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
@@ -172,7 +173,7 @@ public class MATSim4UrbanSim {
 	 * @param network
 	 * @return
 	 */
-	Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, NetworkImpl network){
+	Population readUrbansimPersons(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, Network network){
 		// read urbansim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
@@ -228,7 +229,7 @@ public class MATSim4UrbanSim {
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
 		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
-																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., scenario.getNetwork()), 
+																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork()), 
 																					benchmark));
 		
 		// tnicolai todo?: count number of cars per h on a link
@@ -268,7 +269,7 @@ public class MATSim4UrbanSim {
 	 * cleaning matsim network
 	 * @param network
 	 */
-	void cleanNetwork(NetworkImpl network){
+	void cleanNetwork(Network network){
 		log.info("") ;
 		log.info("Cleaning network ...");
 		( new NetworkCleaner() ).run(network);
@@ -282,7 +283,7 @@ public class MATSim4UrbanSim {
 	 * 
 	 * @param network
 	 */
-	void modifyNetwork(NetworkImpl network){
+	void modifyNetwork(Network network){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by another class
 	}

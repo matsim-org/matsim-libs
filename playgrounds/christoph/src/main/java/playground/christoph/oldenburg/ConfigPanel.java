@@ -50,6 +50,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 
 public class ConfigPanel extends JPanel {
@@ -675,7 +677,7 @@ public class ConfigPanel extends JPanel {
 			
 			int i = 0;
 			List<NetworkChangeEvent> adaptedChangeEvents = new ArrayList<NetworkChangeEvent>();
-			for (NetworkChangeEvent networkChangeEvent : controller.getNetwork().getNetworkChangeEvents()) {
+			for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) controller.getNetwork()).getNetworkChangeEvents()) {
 				
 				int selected = selection.get(i);
 				
@@ -689,7 +691,7 @@ public class ConfigPanel extends JPanel {
 				 */
 				double time = DemoConfig.evacuationTime + (selected - 1) * 1800;
 				
-				NetworkChangeEvent newEvent = controller.getNetwork().getFactory().createNetworkChangeEvent(time);
+				NetworkChangeEvent newEvent = ((NetworkFactoryImpl) controller.getNetwork().getFactory()).createNetworkChangeEvent(time);
 				
 				// clone event parameter
 				for (Link link : networkChangeEvent.getLinks()) newEvent.addLink(link);
@@ -703,7 +705,7 @@ public class ConfigPanel extends JPanel {
 			}
 			
 			// replace network change events
-			controller.getNetwork().setNetworkChangeEvents(adaptedChangeEvents);			
+			((NetworkImpl) controller.getNetwork()).setNetworkChangeEvents(adaptedChangeEvents);			
 		}
 		
         /*

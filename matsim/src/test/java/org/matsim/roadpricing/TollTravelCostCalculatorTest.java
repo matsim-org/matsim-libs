@@ -20,6 +20,7 @@
 
 package org.matsim.roadpricing;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -27,7 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -40,7 +41,6 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.roadpricing.RoadPricingScheme.Cost;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -56,7 +56,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("distance");
@@ -111,7 +111,7 @@ public class TollTravelCostCalculatorTest extends MatsimTestCase {
 		Config config = loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Fixture.createNetwork2(scenario);
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingScheme toll = new RoadPricingScheme();
 		toll.setType("cordon");

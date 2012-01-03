@@ -44,7 +44,6 @@ import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
 
 import playground.johannes.coopsim.LoggerUtils;
 import playground.johannes.coopsim.SimEngine;
@@ -218,7 +217,7 @@ public class Simulator {
 		LoggerUtils.setVerbose(false);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
-		network = scenario.getNetwork();
+		network = (NetworkImpl) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);
 		
 		logger.info("Loading facilities data...");
@@ -396,7 +395,7 @@ public class Simulator {
 		Map<SocialVertex, Double> map = new HashMap<SocialVertex, Double>(graph.getVertices().size());
 
 		for(SocialVertex v : graph.getVertices()) {
-			double sample =(double) sampler.nextSample();
+			double sample =sampler.nextSample();
 			map.put(v, sample);
 		}
 		

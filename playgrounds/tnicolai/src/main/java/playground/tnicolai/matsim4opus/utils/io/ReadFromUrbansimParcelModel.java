@@ -18,6 +18,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -204,7 +205,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @param samplingRate
 	 */
-	public Population readPersons(Population oldPop, final ActivityFacilitiesImpl parcels, final NetworkImpl network, final double samplingRate) {
+	public Population readPersons(Population oldPop, final ActivityFacilitiesImpl parcels, final Network network, final double samplingRate) {
 		
 		Population mergePop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
 		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
@@ -414,7 +415,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param newPerson
 	 */
 	private void mergePopulation(final Population oldPop,
-			final Population newPop, final NetworkImpl network,
+			final Population newPop, final Network network,
 			Population backupPop, PopulationCounter cnt, Id personId, PersonImpl newPerson) {
 		
 		while ( true ) { // loop from which we can "break":
@@ -790,7 +791,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @return
 	 */
-	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final NetworkImpl network ) {
+	private boolean actHasChanged ( final Activity oldAct, final Activity newAct, final Network network ) {
 		
 		if( !( (oldAct.getCoord().getX() == newAct.getCoord().getX()) && 
 			    oldAct.getCoord().getY() == newAct.getCoord().getY() ) ){		

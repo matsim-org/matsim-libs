@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -52,13 +52,13 @@ public class PlanRouteCalculator {
 	private DynamicConnection  dynamicConnection;
 	private Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();;
 	private TransitSchedule transitSchedule;
-	private NetworkImpl net;
+	private Network net;
 	private Population population;
 	private KroutesCalculator kRoutesCalculator;
 	PlainTimeTable plainTimeTable;
 	private PlanValidator planValidator = new PlanValidator();
 
-	public PlanRouteCalculator(final TransitSchedule transitSchedule, final NetworkImpl net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
+	public PlanRouteCalculator(final TransitSchedule transitSchedule, final Network net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
 		this.net = net;
 		this.connectionMap = connectionMap;

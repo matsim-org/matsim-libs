@@ -62,7 +62,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();
-		NetworkImpl net = scenario.getNetwork();
+		Network net = this.network;
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
@@ -75,11 +75,11 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	}
 	
 	@Deprecated
-	public PersonPrepareForSim(final PlanAlgorithm router, final NetworkImpl network) {
+	public PersonPrepareForSim(final PlanAlgorithm router, final Network network) {
 		super();
 		this.router = router;
 		this.network = network;
-		NetworkImpl net = network;
+		Network net = network;
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);

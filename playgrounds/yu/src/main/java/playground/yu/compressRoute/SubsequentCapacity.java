@@ -31,8 +31,8 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 /**
@@ -53,7 +53,7 @@ public class SubsequentCapacity extends MatsimXmlWriter {
 
 	Map<String, Link> outLinksMap = new TreeMap<String, Link>();
 
-	public SubsequentCapacity(final NetworkImpl network) {
+	public SubsequentCapacity(final Network network) {
 		links = network.getLinks();
 	}
 

@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingChoice.trb2011.analysis;
 
 import java.util.Collection;
@@ -9,6 +28,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -21,7 +41,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -50,9 +69,9 @@ public class LinkVolumeAnalyzer {
 		final String plansFileName = outputFolder + "output_plans.xml.gz";
 		final String facilitiesFileName = outputFolder + "output_facilities.xml.gz";
 
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		NetworkImpl network = GeneralLib.readNetwork(networkFileName);
+		Network network = GeneralLib.readNetwork(networkFileName);
 
 		VolumesAnalyzer volumeAnalyzer = new VolumesAnalyzer(3600, 24 * 3600 - 1, network);
 		PeakHourAgents peakHourAgents = new PeakHourAgents(network);
@@ -225,9 +244,9 @@ public class LinkVolumeAnalyzer {
 		public HashMap<Id, Id> lastFacilityVisited = new HashMap<Id, Id>();
 
 		public HashMap<Id, Boolean> stopFollowingAgent = new HashMap<Id, Boolean>();
-		private final NetworkImpl network;
+		private final Network network;
 
-		public PeakHourAgents(NetworkImpl network) {
+		public PeakHourAgents(Network network) {
 			this.network = network;
 		}
 

@@ -1,6 +1,24 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.artemis.parkingPostprocessing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -9,9 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.wrashid.lib.DebugLib;
 import playground.wrashid.lib.GeneralLib;
-import playground.wrashid.lib.MathLib;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 import playground.wrashid.lib.obj.StringMatrix;
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
@@ -37,7 +53,7 @@ public class AssignParkingLinkIds {
 		parkingInfo = ParkingInfo.readParkingInfo(parkingLogInfoFileName);
 
 		String networkFilePath = config.getParameterValue("networkFilePath");
-		network = GeneralLib.readNetwork(networkFilePath);
+		network = (NetworkImpl) GeneralLib.readNetwork(networkFilePath);
 
 		parkings = readParkings();
 

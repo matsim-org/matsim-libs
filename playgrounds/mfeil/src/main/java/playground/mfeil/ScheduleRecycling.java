@@ -32,12 +32,12 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -69,7 +69,7 @@ public class ScheduleRecycling implements PlanStrategyModule{
 	private OptimizedAgents 						agents;
 	private LinkedList<String>						nonassignedAgents;
 	private final DepartureDelayAverageCalculator 	tDepDelayCalc;
-	private final NetworkImpl 						network;
+	private final Network network;
 	public static PrintStream 						assignment;
 	private final Knowledges 						knowledges;
 	private final ActivityTypeFinder 				finder;
@@ -101,7 +101,6 @@ public class ScheduleRecycling implements PlanStrategyModule{
 		this.locator 				= new RecursiveLocationMutator(controler.getNetwork(), controler, new Random(4711));
 		this.scorer 				= new PlanScorer (controler.getScoringFunctionFactory());
 		this.network 				= controler.getNetwork();
-		this.init(network);
 		this.tDepDelayCalc 			= new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
 		this.nonassignedAgents 		= new LinkedList<String>();
@@ -141,10 +140,6 @@ public class ScheduleRecycling implements PlanStrategyModule{
 		}
 		ScheduleRecycling.assignment = new PrintStream (fileOverview);
 		ScheduleRecycling.assignment.println("Agent\tScore\tPlan\n");
-	}
-
-	private void init(final NetworkImpl network) {
-		this.network.connect();
 	}
 
 	@Override

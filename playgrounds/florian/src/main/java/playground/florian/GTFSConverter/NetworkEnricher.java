@@ -10,8 +10,10 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -19,7 +21,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -27,14 +28,14 @@ public class NetworkEnricher {
 	
 	private Map<Id,NetworkRoute> outputRoutes = new HashMap<Id,NetworkRoute>();
 	
-	private NetworkImpl inputNet;
+	private Network inputNet;
 
-	private ScenarioImpl sc;
+	private Scenario sc;
 	
-	NetworkEnricher(NetworkImpl inputNet) {
+	NetworkEnricher(Network inputNet) {
 		this.inputNet = inputNet;
 		Config config = ConfigUtils.createConfig();
-		sc = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		sc = (ScenarioUtils.createScenario(config));
 	}
 
 	Map<Id, NetworkRoute> replaceLinks(Map<Id, List<Coord>> shapedLinks, Map<Id,NetworkRoute> netRoutes) {
@@ -43,7 +44,7 @@ public class NetworkEnricher {
 		Map<Coord,Node> existingNodes = new HashMap<Coord,Node>();
 		// Copy Nodes from original Network to new Network
 		for(Id id: inputNet.getNodes().keySet()){
-			sc.getNetwork().createAndAddNode(id, inputNet.getNodes().get(id).getCoord());
+			((NetworkImpl) sc.getNetwork()).createAndAddNode(id, inputNet.getNodes().get(id).getCoord());
 			existingNodes.put(sc.getNetwork().getNodes().get(id).getCoord(), sc.getNetwork().getNodes().get(id));
 		}
 		// Replace Links
@@ -59,7 +60,7 @@ public class NetworkEnricher {
 					if(existingNodes.containsKey(x)){
 						n2 = existingNodes.get(x);
 					}else{
-						n2 = sc.getNetwork().createAndAddNode(new IdImpl("s" + linkId.toString() + "." + shapeCounter), x);
+						n2 = ((NetworkImpl) sc.getNetwork()).createAndAddNode(new IdImpl("s" + linkId.toString() + "." + shapeCounter), x);
 						existingNodes.put(x, n2);
 					}
 					if(fromNodes.containsKey(n1.getId())){
@@ -78,7 +79,7 @@ public class NetworkEnricher {
 					if(addLink){
 						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());						
 						double freespeed = 50/3.6;
-						Link newLink = sc.getNetwork().createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);											
+						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);											
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
 						modes.add(TransportMode.pt);
@@ -95,7 +96,7 @@ public class NetworkEnricher {
 						if(!(fromNodes.get(n1.getId()).contains(n2.getId()))){
 							double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
 							double freespeed = 50/3.6;
-							Link newLink = sc.getNetwork().createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
+							Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
 							// Change the linktype to pt
 							Set<String> modes = new HashSet<String>();
 							modes.add(TransportMode.pt);
@@ -108,7 +109,7 @@ public class NetworkEnricher {
 						fromNodes.put(n1.getId(), new ArrayList<Id>());
 						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
 						double freespeed = 50/3.6;
-						Link newLink = sc.getNetwork().createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
+						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(new IdImpl(linkId + "." + shapeCounter), n1, n2, length, freespeed, 1500, 1);						
 						// Change the linktype to pt
 						Set<String> modes = new HashSet<String>();
 						modes.add(TransportMode.pt);
@@ -120,7 +121,7 @@ public class NetworkEnricher {
 				replacedLinks.put(linkId, newLinks);
 			}else{
 				if(!sc.getNetwork().getLinks().containsKey(link.getId())){
-					Link newLink = sc.getNetwork().createAndAddLink(link.getId(), sc.getNetwork().getNodes().get(link.getFromNode().getId()), sc.getNetwork().getNodes().get(link.getToNode().getId()), link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());						
+					Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(link.getId(), sc.getNetwork().getNodes().get(link.getFromNode().getId()), sc.getNetwork().getNodes().get(link.getToNode().getId()), link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());						
 					// Change the linktype to pt
 					Set<String> modes = new HashSet<String>();
 					modes.add(TransportMode.pt);
@@ -169,7 +170,7 @@ public class NetworkEnricher {
 	}
 
 	
-	private Link getLinkBetweenNodes(NetworkImpl net2, Id fromId, Id toId) {
+	private Link getLinkBetweenNodes(Network net2, Id fromId, Id toId) {
 		Link result = null;
 		for(Link l: net2.getNodes().get(fromId).getOutLinks().values()){
 			if(l.getToNode().getId().equals(toId)){
@@ -182,7 +183,7 @@ public class NetworkEnricher {
 		return result;
 	}
 
-	public NetworkImpl getEnrichedNetwork() {
+	public Network getEnrichedNetwork() {
 		return sc.getNetwork();
 	}
 

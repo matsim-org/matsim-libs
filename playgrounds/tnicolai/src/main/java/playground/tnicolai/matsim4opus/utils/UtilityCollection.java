@@ -31,6 +31,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -144,16 +145,16 @@ public class UtilityCollection {
 	 * @param network
 	 * @return NetworkExtend
 	 */
-	public static NetworkBoundary getNetworkBoundary(NetworkImpl network){
+	public static NetworkBoundary getNetworkBoundary(Network network){
 		
 		double start = System.currentTimeMillis();
 		
 		double xmin = Double.MAX_VALUE;
 		double ymin = Double.MAX_VALUE;
-		double xmax = Double.MIN_VALUE;
-		double ymax = Double.MIN_VALUE;
+		double xmax = Double.MIN_VALUE; // This will not work with negative coordinates.   mrieser/jan12
+		double ymax = Double.MIN_VALUE; // please reuse existing functionality instead of making your own, i.e. use NetworkUtils.getBoundaryBox()
 		
-		Iterator<Node> nodeItereator = network.getNodes().values().iterator();
+		Iterator<? extends Node> nodeItereator = network.getNodes().values().iterator();
 
 		while(nodeItereator.hasNext()){
 			

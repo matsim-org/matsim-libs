@@ -59,13 +59,14 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListener!");
 	}
 	
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		NetworkImpl network = controler.getNetwork();
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
 		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 		

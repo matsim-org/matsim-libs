@@ -97,7 +97,7 @@ public class DgCalculateSignalGroups {
 		this.net = net;
 	}
 	
-	public DgCalculateSignalGroups(SignalSystemsData signalSystems2, NetworkImpl network,
+	public DgCalculateSignalGroups(SignalSystemsData signalSystems2, Network network,
 			LaneDefinitions laneDefinitions) {
 		this(signalSystems2, network);
 		this.lanes = laneDefinitions;

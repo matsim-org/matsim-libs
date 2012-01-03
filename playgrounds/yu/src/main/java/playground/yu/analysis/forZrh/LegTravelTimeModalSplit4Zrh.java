@@ -3,6 +3,7 @@
  */
 package playground.yu.analysis.forZrh;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -12,7 +13,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -172,7 +172,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		// Gbl.createConfig(null);
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();
@@ -191,7 +191,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 		// e.printStackTrace();
 		// }
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		LegTravelTimeModalSplit lttms = new LegTravelTimeModalSplit(population
 		// ,tollReader.getScheme()

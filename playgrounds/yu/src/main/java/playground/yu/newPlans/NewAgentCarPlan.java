@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -73,6 +72,7 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 		pw.writePerson(person);
 	}
 
+	@Override
 	public void run(final Plan plan) {
 		if (!PlanModeJudger.useCar(plan)) {
 			((PersonImpl) person).removePlan(plan);
@@ -85,7 +85,7 @@ public class NewAgentCarPlan extends NewPopulation implements PlanAlgorithm {
 		final String outputPlansFilename = "../schweiz-ivtch-SVN/baseCase/plans/plans_all_with_car_zrh30km_transitincl_10pct.xml.gz";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

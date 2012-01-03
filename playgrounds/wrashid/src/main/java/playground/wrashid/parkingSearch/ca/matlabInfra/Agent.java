@@ -3,7 +3,6 @@ package playground.wrashid.parkingSearch.ca.matlabInfra;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.NetworkImpl;
 
 public class Agent {
 
@@ -32,7 +31,7 @@ public class Agent {
 		this.routeAway = routeAway;		
 	}
 	
-	public String getXMLString(NetworkImpl network){
+	public String getXMLString(org.matsim.api.core.v01.network.Network network){
 		Random rand=new Random();
 		
 		StringBuffer stringBuffer = new StringBuffer();

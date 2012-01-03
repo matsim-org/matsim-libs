@@ -24,10 +24,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
@@ -54,10 +54,10 @@ public class SimpleCircleScheduleProvider implements PRouteProvider {
 	private final static Logger log = Logger.getLogger(SimpleCircleScheduleProvider.class);
 	public final static String NAME = "SimpleCircleScheduleProvider";
 	
-	private NetworkImpl net;
+	private Network net;
 	private TransitSchedule scheduleWithStopsOnly;
 	
-	public SimpleCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, NetworkImpl network, int iteration) {
+	public SimpleCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, int iteration) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 	}

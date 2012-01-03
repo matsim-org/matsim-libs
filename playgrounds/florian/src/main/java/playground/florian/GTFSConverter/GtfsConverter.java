@@ -17,6 +17,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -24,7 +25,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -609,7 +609,7 @@ public class GtfsConverter {
 		// To prevent the creation of similiar links in different directions there need to be a Map which contains all existing connections
 		Map<Id,List<Id>> fromNodes = new HashMap<Id,List<Id>>();
 		// Create a new Network
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		// Add all stops as nodes
 		Map<Id, TransitStopFacility> stops = ts.getFacilities();
 		for(Id id: stops.keySet()){
@@ -620,7 +620,7 @@ public class GtfsConverter {
 			stop.setLinkId(new IdImpl("dL1_"+ stop.getId().toString()));
 		}
 		// Get the Links from the trips in stopTimesSource
-		Map<Id, Node> nodes = network.getNodes();
+		Map<Id, ? extends Node> nodes = network.getNodes();
 		int tripIdIndex = stopTimesSource.getContentIndex("trip_id");
 		int stopIdIndex = stopTimesSource.getContentIndex("stop_id");
 		int arrivalTimeIndex = stopTimesSource.getContentIndex("arrival_time");
@@ -691,13 +691,23 @@ public class GtfsConverter {
 					n.setCoord(new CoordImpl(nodes.get(toNodeId).getCoord().getX()+1,nodes.get(toNodeId).getCoord().getY()+1));
 					network.addNode(n);
 					double length = CoordUtils.calcDistance(n.getCoord(), nodes.get(toNodeId).getCoord());
-					Link link = network.createAndAddLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId), length, 1000, capacity, numLanes);
+					Link link = network.getFactory().createLink(new IdImpl("dL1_" + toNodeId), n, nodes.get(toNodeId));
+					link.setLength(length);
+					link.setFreespeed(1000);
+					link.setCapacity(capacity);
+					link.setNumberOfLanes(numLanes);
+					network.addLink(link);
 					// Change the linktype to pt
 					Set<String> modes = new HashSet<String>();
 					modes.add(TransportMode.pt);
 					link.setAllowedModes(modes);
 					// Backwards
-					Link link2 = network.createAndAddLink(new IdImpl("dL2_" + toNodeId), nodes.get(toNodeId),n , length, 1000, capacity, numLanes);
+					Link link2 = network.getFactory().createLink(new IdImpl("dL2_" + toNodeId), n, nodes.get(toNodeId));
+					link2.setLength(length);
+					link2.setFreespeed(1000);
+					link2.setCapacity(capacity);
+					link2.setNumberOfLanes(numLanes);
+					network.addLink(link2);
 					link2.setAllowedModes(modes);
 				}
 				Link link = null;
@@ -711,7 +721,12 @@ public class GtfsConverter {
 							System.out.println("The Difference between ArrivalTime at one Stop " + ts.getFacilities().get(toNodeId).getName() + "(" + toNodeId + ") and DepartureTime at the previous Stop " + ts.getFacilities().get(fromNodeId).getName() + "(" + fromNodeId + ") is 0. That leads to high freespeeds.");
 						}
 					}
-					link = network.createAndAddLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId), length, freespeed, capacity, numLanes);						
+					link = network.getFactory().createLink(new IdImpl(i++), nodes.get(fromNodeId), nodes.get(toNodeId));
+					link.setLength(length);
+					link.setFreespeed(freespeed);
+					link.setCapacity(capacity);
+					link.setNumberOfLanes(numLanes);
+					network.addLink(link);
 					// Change the linktype to pt
 					Set<String> modes = new HashSet<String>();
 					modes.add(TransportMode.pt);

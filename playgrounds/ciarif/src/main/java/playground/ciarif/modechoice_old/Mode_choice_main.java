@@ -22,13 +22,13 @@ package playground.ciarif.modechoice_old;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -61,7 +61,7 @@ public class Mode_choice_main {
 		System.out.println("  done.");
 
 		System.out.println("  creating network layer... ");
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		System.out.println("  done.");
 
 		System.out.println("  reading network xml file... ");

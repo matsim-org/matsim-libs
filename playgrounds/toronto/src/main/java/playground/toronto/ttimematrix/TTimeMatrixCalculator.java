@@ -31,12 +31,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.utils.LeastCostPathTree;
 
@@ -51,7 +51,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	private final Map<Id,Set<Id>> z2nMapping;
 	private final Set<Integer> hours;
 	private final LeastCostPathTree st;
-	private final NetworkImpl network;
+	private final Network network;
 
 	private int hour = 0;
 	private Map<Id,Map<Id,Tuple<Double,Integer>>> ttimeMatrix = new HashMap<Id, Map<Id,Tuple<Double,Integer>>>();
@@ -63,7 +63,7 @@ public class TTimeMatrixCalculator implements AgentDepartureEventHandler, AgentA
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final LeastCostPathTree st, final NetworkImpl network) {
+	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final LeastCostPathTree st, final Network network) {
 		log.info("init...");
 		this.l2zMapping = l2zMapping;
 		this.st = st;

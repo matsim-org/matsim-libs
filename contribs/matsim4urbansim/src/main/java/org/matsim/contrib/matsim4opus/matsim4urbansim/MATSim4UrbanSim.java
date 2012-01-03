@@ -108,7 +108,7 @@ public class MATSim4UrbanSim {
 
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
-		NetworkImpl network = scenario.getNetwork();
+		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		modifyNetwork(network);
 		cleanNetwork(network);
 		
@@ -226,7 +226,7 @@ public class MATSim4UrbanSim {
 		// The following lines register what should be done _after_ the iterations were run:
 		controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, parcels) ); 	// creates zone2zone impedance matrix
 		controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				// creates zone based table of log sums (workplce accessibility)
-																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., scenario.getNetwork()), 
+																					readFromUrbansim.getAggregatedWorkplaces(parcels, 1., (NetworkImpl) scenario.getNetwork()), 
 																					benchmark));
 		
 		// tnicolai todo?: count number of cars per h on a link

@@ -35,6 +35,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -42,7 +43,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -74,7 +74,7 @@ public class ASPGeneral {
 	private PrintStream stream;
 
 
-	public ASPGeneral (final int iter, final int lastIter, final String directory, final NetworkImpl network) {
+	public ASPGeneral (final int iter, final int lastIter, final String directory, final Network network) {
 		// Scenario files
 		final String facilitiesFilename = "/home/baug/mfeil/data/Zurich10/facilities.xml";
 	//	final String facilitiesFilename = "../matsim/test/scenarios/chessboard/facilities.xml";
@@ -281,7 +281,7 @@ public class ASPGeneral {
 		this.stream.println();
 	}
 	
-	private void runMATSimTrips (Population pop, NetworkImpl network){
+	private void runMATSimTrips (Population pop, Network network){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
 //	private void runMATSimTrips (Population pop){
@@ -291,7 +291,7 @@ public class ASPGeneral {
 	}
 
 	
-	private void runMZTrips (Population pop, NetworkImpl network){
+	private void runMZTrips (Population pop, Network network){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
 //	private void runMZTrips (Population pop){
@@ -301,7 +301,7 @@ public class ASPGeneral {
 		this.stream.println();
 	}
 	
-	private void runMATSimDistances (Population pop, NetworkImpl network){
+	private void runMATSimDistances (Population pop, Network network){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
 
@@ -311,7 +311,7 @@ public class ASPGeneral {
 		ts.runDisaggregateStats("MATSim", pop, this.stream, null);
 	}
 	
-	private void runMZDistances (Population pop, NetworkImpl network){
+	private void runMZDistances (Population pop, Network network){
 		TravelStatsMZMATSim ts = new TravelStatsMZMATSim(network);
 
 

@@ -39,19 +39,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculator;
 import org.matsim.core.router.util.TravelCost;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.knowledge.nodeselection.DijkstraForSelectNodes;
@@ -68,8 +68,8 @@ public class CreateDijkstraKnowledge4MultiFactors {
 
 	private final static Logger log = Logger.getLogger(CreateDijkstraKnowledge4MultiFactors.class);
 
-	private NetworkImpl network;
-	private ActivityFacilitiesImpl facilities;
+	private Network network;
+	private ActivityFacilities facilities;
 	private Population population;
 	private Config config;
 	private final ScenarioImpl scenario;
@@ -147,7 +147,7 @@ public class CreateDijkstraKnowledge4MultiFactors {
 		 * Use MyLinkImpl. They can carry some additional Information like their
 		 * TravelTime or TravelCost.
 		 */
-		network.getFactory().setLinkFactory(new MyLinkFactoryImpl());
+		((NetworkFactoryImpl) network.getFactory()).setLinkFactory(new MyLinkFactoryImpl());
 
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 

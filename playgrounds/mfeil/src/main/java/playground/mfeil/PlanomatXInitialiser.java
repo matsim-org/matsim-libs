@@ -19,10 +19,9 @@
  * *********************************************************************** */
 package playground.mfeil;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -38,7 +37,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 	
 	
-	private final NetworkImpl 							network;
+	private final Network network;
 	private final Controler								controler;
 	private final RecursiveLocationMutator 			locator;
 	private /*final*/ DepartureDelayAverageCalculator 	tDepDelayCalc;
@@ -49,9 +48,8 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;
-		this.init(network);	
 	//	this.locator = new LocationMutatorwChoiceSet(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges());
-		this.locator = new LMwCSCustomized(controler.getNetwork(), controler, ((ScenarioImpl)controler.getScenario()).getKnowledges());
+		this.locator = new LMwCSCustomized(controler.getNetwork(), controler, controler.getScenario().getKnowledges());
 		
 		this.tDepDelayCalc = new DepartureDelayAverageCalculator(this.network,controler.getConfig().travelTimeCalculator().getTraveltimeBinSize());
 		this.controler.getEvents().addHandler(tDepDelayCalc);
@@ -63,15 +61,9 @@ public class PlanomatXInitialiser extends AbstractMultithreadedModule{
 		super(controler.getConfig().global());
 		this.network = controler.getNetwork();
 		this.controler = controler;
-		this.init(network);
 		this.locator = locator;
 		this.finder = finder;
 	}
-	
-	private void init(final NetworkImpl network) {
-		this.network.connect();
-	}
-
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {

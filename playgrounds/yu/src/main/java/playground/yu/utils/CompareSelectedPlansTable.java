@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -60,7 +60,7 @@ public class CompareSelectedPlansTable {
 			+ "plantype0;plantype1;planTypeChange;"
 			+ "departuretime0;departuretime1;dt1-dt0;"
 			+ "numberoftrips0;numberoftrips1;n1-n0";
-	private NetworkImpl network;
+	private Network network;
 
 	/**
 	 * @param args

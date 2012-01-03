@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -68,7 +69,6 @@ import org.matsim.core.events.PersonLeavesVehicleEventImpl;
 import org.matsim.core.events.TravelEventImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -1097,11 +1097,11 @@ public class QSimTest {
 		config.addQSimConfigGroup(new QSimConfigGroup());
 
 		// build simple network with 1 link
-		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		network.getNodes().put(node1.getId(), node1);
-		network.getNodes().put(node2.getId(), node2);
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		network.addNode(node1);
+		network.addNode(node2);
 		Link link = network.getFactory().createLink(scenario.createId("1"), node1, node2);
 		link.setFreespeed(10.0);
 		link.setCapacity(2000.0);
@@ -1159,10 +1159,10 @@ public class QSimTest {
 		double simEndTime = 8.0*3600;
 
 		// build simple network with 2 links
-		NetworkImpl network = scenario.getNetwork();
-		NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
-		NodeImpl node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
-		NodeImpl node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
+		Network network = scenario.getNetwork();
+		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
+		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(1000.0, 0.0));
+		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(2000.0, 0.0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);

@@ -105,7 +105,7 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcpt = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 
-		NetworkImpl network = controler.getNetwork() ;
+		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;
 		
 		// od-trip matrix (zonal based)

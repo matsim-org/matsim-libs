@@ -56,7 +56,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -66,7 +65,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ControlerTest {
@@ -612,6 +610,7 @@ public class ControlerTest {
 
 	private class ControlerRunnable implements Runnable {
 		/*package*/ Controler controler = null;
+		@Override
 		public void run() {
 			final Config config = ControlerTest.this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 			config.controler().setLastIteration(1);
@@ -869,7 +868,7 @@ public class ControlerTest {
 	 */
 	private static class Fixture {
 		final ScenarioImpl scenario;
-		final NetworkImpl network;
+		final Network network;
 		Node node1 = null;
 		Node node2 = null;
 		Node node3 = null;
@@ -893,7 +892,7 @@ public class ControlerTest {
 			 * the average travel time on that link should be 150sec for the two cars
 			 * (one having 100secs, the other having 200secs to cross the link).
 			 */
-			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
+//			this.network.setCapacityPeriod(Time.parseTime("01:00:00"));
 			this.node1 = this.network.getFactory().createNode(new IdImpl(1), new CoordImpl(-100.0, 0.0));
 			this.node2 = this.network.getFactory().createNode(new IdImpl(2), new CoordImpl(0.0, 0.0));
 			this.node3 = this.network.getFactory().createNode(new IdImpl(3), new CoordImpl(1000.0, 0.0));

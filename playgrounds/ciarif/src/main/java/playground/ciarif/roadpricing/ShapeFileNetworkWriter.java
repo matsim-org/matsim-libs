@@ -1,4 +1,3 @@
-package playground.ciarif.roadpricing;
 	/* *********************************************************************** *
 	 * project: org.matsim.*
 	 *                                                                         *
@@ -18,12 +17,13 @@ package playground.ciarif.roadpricing;
 	 *                                                                         *
 	 * *********************************************************************** */
 
+package playground.ciarif.roadpricing;
 
-		import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 
 	/**
@@ -44,14 +44,14 @@ import org.matsim.core.config.ConfigUtils;
 		
 		public void writeNetwork(String network, String outfile) {
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			NetworkImpl net = scenario.getNetwork();
+			Network net = scenario.getNetwork();
 			MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
 			reader.readFile(network);
 			writeNetwork(net, outfile);
 		}
 		
 		
-		public void writeNetwork(NetworkImpl network, String outfile) {
+		public void writeNetwork(Network network, String outfile) {
 			//uncomment the following lines to let the tool work
 //			MATSimNet2QGIS mn2q = new MATSimNet2QGIS();
 //			MATSimNet2QGIS.setFlowCapFactor(0.1);

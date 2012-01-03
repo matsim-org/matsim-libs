@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -75,7 +75,7 @@ public class NodeId2StopName {
 		String scheduleFile = "../shared-svn/studies/countries/de/berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
 	
 		DataLoader dataLoader = new DataLoader();
-		NetworkImpl net = dataLoader.readNetwork(netFile);
+		Network net = dataLoader.readNetwork(netFile);
 		TransitSchedule schedule = dataLoader.readTransitSchedule(net, scheduleFile);
 		
 		final Counts counts = new Counts();

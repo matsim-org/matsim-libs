@@ -21,19 +21,17 @@
 package playground.wrashid.PSF2.pluggable;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelLAV;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionPlugin;
-import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.PlugInHybridElectricVehicle;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.GeneralLib;
@@ -43,11 +41,11 @@ public class EnergyConsumptionTest extends MatsimTestCase {
 
 	private EnergyConsumptionPlugin runWithModel(EnergyConsumptionModel energyConsumptionModel){
 		String eventsFile="test/input/playground/wrashid/PSF2/pluggable/0.events.txt.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		
 		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
 		vehicles.put(new IdImpl(1), new PlugInHybridElectricVehicle(new IdImpl(1)));
-		NetworkImpl network=GeneralLib.readNetwork("test/scenarios/equil/network.xml");
+		Network network=GeneralLib.readNetwork("test/scenarios/equil/network.xml");
 		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,vehicles,network);
 		
 		events.addHandler(energyConsumptionPlugin);

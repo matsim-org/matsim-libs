@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.network.NetworkImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 
@@ -35,7 +36,7 @@ public class RetailerStrategyImpl
     int intCount = 0;
     for (ActivityFacilityImpl af : this.retailerFacilities.values())
     {
-      locations.put(Integer.valueOf(intCount), this.controler.getNetwork().getNearestLink(af.getCoord()).getId().toString());
+      locations.put(Integer.valueOf(intCount), ((NetworkImpl) this.controler.getNetwork()).getNearestLink(af.getCoord()).getId().toString());
       ++intCount;
       log.info("The facility with Id: " + af.getId() + " has been added, this is located on the link: " + af.getLinkId());
     }

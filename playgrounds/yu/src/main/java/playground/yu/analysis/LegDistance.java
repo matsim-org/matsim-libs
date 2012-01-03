@@ -44,7 +44,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -125,6 +124,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		this.ppl = ppl;
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Link l = this.network.getLinks().get(event.getLinkId());
 		String agentId = event.getPersonId().toString();
@@ -148,10 +148,12 @@ public class LegDistance implements LinkEnterEventHandler,
 		}
 	}
 
+	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		handleEventIntern(event);
 	}
 
+	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		handleEventIntern(event);
 	}
@@ -195,6 +197,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		this.distances.clear();
 	}
@@ -239,7 +242,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		Gbl.startMeasurement();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		NetworkImpl network = scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		// Plans population = new Plans();
@@ -247,7 +250,7 @@ public class LegDistance implements LinkEnterEventHandler,
 		// new MatsimPopulationReader(population).readFile(plansFilename);
 		// world.setPopulation(population);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		LegDistance legDist = new LegDistance(300, network);
 		events.addHandler(legDist);

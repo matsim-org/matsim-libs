@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.nan;
 
 import java.util.HashMap;
@@ -6,22 +25,22 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 public class NetworkReadExample {
 
 	public static void main(String[] args) {
 		//getFilteredEquilNetLinks();
 	}
-	public static Map<Id,Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
+	public static Map<Id,? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
 		ScenarioImpl scenanrioImpl = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
 
 		new MatsimNetworkReader(scenanrioImpl).readFile(networkFile);//matsim function, need scenario object for reading
 		// read the network file
-		NetworkImpl network=scenanrioImpl.getNetwork();
+		Network network=scenanrioImpl.getNetwork();
 
 
 		if (center==null){
@@ -31,7 +50,7 @@ public class NetworkReadExample {
 		}
 
 	}
-	public static Map<Id, Link> getLinksWithinRadius(Map<Id, Link> links, double radius, Coord center){
+	public static Map<Id, ? extends Link> getLinksWithinRadius(Map<Id, ? extends Link> links, double radius, Coord center){
 		HashMap<Id,Link> filteredLinks=new HashMap<Id, Link>();
 
 		for (Id linkId:links.keySet()){

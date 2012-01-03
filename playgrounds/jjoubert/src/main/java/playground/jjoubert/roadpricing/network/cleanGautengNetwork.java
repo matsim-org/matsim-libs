@@ -27,9 +27,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -227,7 +227,7 @@ public class cleanGautengNetwork {
 		this.log.info("Removing identified links.");
 		readNetwork(fileToRead);
 		
-		NetworkImpl nw = sc.getNetwork();
+		Network nw = sc.getNetwork();
 		nw.removeLink(new IdImpl("182490"));
 		nw.removeLink(new IdImpl("182491"));
 		nw.removeLink(new IdImpl("209887"));
