@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
  *
  */
 public class DisChargingProfile{
+	
 
 	private static final Logger log = Logger
 		.getLogger(DisChargingProfile.class);

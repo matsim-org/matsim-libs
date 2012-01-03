@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Id;
  *
  */
 public class ChargingProfile{
-
+	
 	private static final Logger log = Logger
 		.getLogger(ChargingProfile.class);
 	private Id id;

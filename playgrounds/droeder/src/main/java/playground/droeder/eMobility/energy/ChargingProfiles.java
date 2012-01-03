@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.DaFileReader;
+import playground.droeder.eMobility.io.EmobEnergyProfileReader;
 
 /**
  * @author droeder
@@ -47,18 +48,22 @@ public class ChargingProfiles {
 	}
 	
 	public Double getNewState(Id id, Double  duration, Double currentState){
-		return this.profiles.get(id).getNewState(duration, currentState);
+		if(this.profiles.containsKey(id)){
+			return this.profiles.get(id).getNewState(duration, currentState);
+		}else{
+			return currentState;
+		}
 	}
 	
-	// TODO probably own reader
-	public void readAndAddDataFromFile(String inputFile){
-		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
-		
-		for(String[] s: values){
-			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
-		}
-		
-	}
+//	// TODO probably own reader
+//	public void readAndAddDataFromFile(String inputFile){
+//		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
+//		
+//		for(String[] s: values){
+//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
+//		}
+//		
+//	}
 	
 	@Override
 	public String toString(){
@@ -74,8 +79,7 @@ public class ChargingProfiles {
 	
 	public static void main(String[] args){
 		String inputFile =  "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
-		ChargingProfiles profiles = new ChargingProfiles();
-		profiles.readAndAddDataFromFile(inputFile);
+		ChargingProfiles profiles = EmobEnergyProfileReader.readChargingProfiles(inputFile);
 		
 //		System.out.println(profiles.toString());
 		System.out.println(profiles.getNewState(new IdImpl("SLOW"), 60., 20.));

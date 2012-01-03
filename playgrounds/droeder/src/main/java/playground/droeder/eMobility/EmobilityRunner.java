@@ -25,24 +25,28 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
+import playground.droeder.eMobility.handler.EmobPersonHandler;
+import playground.droeder.eMobility.handler.EmobVehicleDrivingHandler;
+import playground.droeder.eMobility.io.EmobEnergyProfileReader;
+import playground.droeder.eMobility.subjects.EmobilityPerson;
 
 /**
  * @author droeder
@@ -51,51 +55,52 @@ import playground.droeder.eMobility.energy.DisChargingProfiles;
 public class EmobilityRunner {
 	
 	private Scenario scenario;
-	private EventsManager manager;
-	private Map<Id, ElectroVehicle> vehicles;
+//	private EventsManager manager;
+	private Map<Id, EmobilityPerson> persons;
 	private ChargingProfiles charging;
 	private DisChargingProfiles discharging;
-	private ElectroVehicleHandler eHandler;
 	private List<EventHandler> handler;
+	
+	private Integer cnt = 0;
 	/**
 	 * 
 	 */
 	public EmobilityRunner(String configFile) {
 		Config c = ConfigUtils.loadConfig(configFile);
 		this.scenario = ScenarioUtils.loadScenario(c);
-		this.manager = EventsUtils.createEventsManager();
+//		this.manager = EventsUtils.createEventsManager();
 		this.handler = new ArrayList<EventHandler>();
+		this.persons = new HashMap<Id, EmobilityPerson>();
 	}
 	
-	public void createAndAddElectroVehicle(String eMobPlans){
-		//TODO
-		this.vehicles = new HashMap<Id, ElectroVehicle>();
-		
-		ElectroVehicle veh = new ElectroVehicle(new IdImpl("emob1"), 26.0, 26.0);
-		veh.setChargingType(new IdImpl("FAST"));
-		veh.setDischargingType(new IdImpl("HIGH"));
-		this.vehicles.put(new IdImpl("emob1"), veh);
-
+	public void createAndAddPerson(String eMobPlan){
+		EmobilityPerson p = new EmobilityPerson(new IdImpl("emob" + String.valueOf(this.cnt)), new CoordImpl(4588309,5820079), scenario.getNetwork().getNodes().get(new IdImpl("26736131")), 26.0, scenario.getNetwork());
+		p.readDataFromFile(eMobPlan);
+		this.scenario.getPopulation().addPerson(p.createMatsimPerson(this.scenario.getPopulation().getFactory()));
+		this.persons.put(p.getId(), p);
+		this.cnt++;
 		
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		new MatsimNetworkReader(sc).readFile(this.scenario.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
+//		new MatsimNetworkRe	ader(sc).readFile(this.scenario.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
 //		new MatsimPopulationReader(sc).readFile(eMobPlans);
 //		for(Person p: sc.getPopulation().getPersons().values()){
 	}
 	
 	public void loadDisChargingProfiles(String file){
-		this.discharging = new DisChargingProfiles();
-		this.discharging.readAndAddDataFromFile(file);
+		this.discharging = EmobEnergyProfileReader.readDisChargingProfiles(file);
 	}
 	
 	public void loadChargingProfiles(String file){
-		this.charging = new ChargingProfiles();
-		this.charging.readAndAddDataFromFile(file);
+		this.charging = EmobEnergyProfileReader.readChargingProfiles(file);
 	}
 	
 	public void run(){
-		this.eHandler = new ElectroVehicleHandler(this.vehicles, this.charging, this.discharging, this.scenario.getNetwork());
-		this.handler.add(eHandler);
+//		this.eHandler = new EmobiltyHandler(this.vehicles, this.charging, this.discharging, this.scenario.getNetwork());
+//		this.handler.add(this.eHandler);
+		EmobVehicleDrivingHandler h1 =  new EmobVehicleDrivingHandler(discharging, this.scenario.getNetwork());
+		EmobPersonHandler h2 = new EmobPersonHandler(persons, h1, charging);
+		this.handler.add(h1);
+		this.handler.add(h2);
 		
 		Controler c = new Controler(this.scenario);
 		c.addControlerListener(new MyListener(this.handler));
@@ -104,12 +109,6 @@ public class EmobilityRunner {
 		c.setOverwriteFiles(true);
 		
 		c.run();
-//		this.manager.addHandler(eHandler);
-//		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(this.scenario, this.manager);
-//		
-//		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, this.manager, otfVisQSim);
-//		OTFClientLive.run(this.scenario.getConfig(), server);
-//		otfVisQSim.run();
 	}
 	
 	//internal class
@@ -141,10 +140,12 @@ public class EmobilityRunner {
 		System.out.println("test");
 		BufferedWriter writer = IOUtils.getBufferedWriter(outdir + "distance.csv");
 		try {
-			writer.write("distance;charge;\n");
-			for(Tuple<Double, Double> v: this.vehicles.get(new IdImpl("emob1")).getDist2Charge()){
-				writer.write(v.getFirst() +";" + v.getSecond() + ";");
-				writer.newLine();
+			writer.write("id;distance;charge;\n");
+			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
+				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getDist2Charge()){
+					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
+					writer.newLine();
+				}
 			}
 			writer.flush();
 			writer.close();
@@ -154,10 +155,12 @@ public class EmobilityRunner {
 		
 		writer = IOUtils.getBufferedWriter(outdir + "time.csv");
 		try {
-			writer.write("time;charge;\n");
-			for(Tuple<Double, Double> v: this.vehicles.get(new IdImpl("emob1")).getTime2Charge()){
-				writer.write(v.getFirst() +";" + v.getSecond() + ";");
-				writer.newLine();
+			writer.write("id;time;charge;\n");
+			for(Entry<Id, EmobilityPerson> e: this.persons.entrySet()){
+				for(Tuple<Double, Double> ee: e.getValue().getVehicle().getTime2Charge()){
+					writer.write(e.getKey() + ";" + ee.getFirst() +";" + ee.getSecond() + ";");
+					writer.newLine();
+				}
 			}
 			writer.flush();
 			writer.close();
@@ -167,7 +170,7 @@ public class EmobilityRunner {
 	}
 
 	private static final String CONFIG = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/config.xml";
-	private static final String EMOBPLANS = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/testpopulation_new.xml";
+	private static final String EMOBPLANS = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/testplan.txt";
 	private static final String CHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
 	private static final String DISCHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
 	private static final String OUTDIR = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/";
@@ -175,7 +178,7 @@ public class EmobilityRunner {
 	public static void main(String[] args) {
 		EmobilityRunner runner = new EmobilityRunner(CONFIG);
 		
-		runner.createAndAddElectroVehicle(EMOBPLANS);
+		runner.createAndAddPerson(EMOBPLANS);
 		runner.loadChargingProfiles(CHARGINGPROFILE);
 		runner.loadDisChargingProfiles(DISCHARGINGPROFILE);
 		

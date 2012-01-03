@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.DaFileReader;
+import playground.droeder.eMobility.io.EmobEnergyProfileReader;
 
 /**
  * @author droeder
@@ -47,17 +48,21 @@ public class DisChargingProfiles {
 	}
 	
 	public Double getJoulePerKm(Id id, Double  speed, Double slope){
-		return this.profiles.get(id).getNewState(speed, slope);
-	}
-	
-	//TODO probably own reader
-	public void readAndAddDataFromFile(String inputFile){
-		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
-		
-		for(String[] s: values){
-			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
+		if(this.profiles.containsKey(id)){
+			return this.profiles.get(id).getNewState(speed, slope);
+		}else{
+			return 0.0;
 		}
 	}
+	
+//	//TODO probably own reader
+//	public void readAndAddDataFromFile(String inputFile){
+//		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
+//		
+//		for(String[] s: values){
+//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
+//		}
+//	}
 	
 	@Override
 	public String toString(){
@@ -73,8 +78,7 @@ public class DisChargingProfiles {
 	
 	public static void main(String[] args){
 		String inputFile =  "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
-		DisChargingProfiles profiles = new DisChargingProfiles();
-		profiles.readAndAddDataFromFile(inputFile);
+		DisChargingProfiles profiles = EmobEnergyProfileReader.readDisChargingProfiles(inputFile);
 		
 		System.out.println(profiles.toString());
 		System.out.println(profiles.getJoulePerKm(new IdImpl("LOW"), 21.773336, 22.));

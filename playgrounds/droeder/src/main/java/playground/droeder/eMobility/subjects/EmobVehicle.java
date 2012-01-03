@@ -17,16 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility;
+package playground.droeder.eMobility.subjects;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -35,31 +32,28 @@ import org.matsim.core.utils.collections.Tuple;
  * @author droeder
  *
  */
-public class ElectroVehicle {
-	private static final Logger log = Logger.getLogger(ElectroVehicle.class);
+public class EmobVehicle {
 	
 	private Id id;
 	private Id dischargingType;
 	private Id chargingType;
-	private Double maxCharge;
 	private Double currentCharge;
 	private Double traveledDistance;
 	private List<Tuple<Double, Double>> time2charge;
 	private List<Tuple<Double, Double>> distance2charge;
+	@SuppressWarnings("unused")
+	private Coord position;
 
-
-
-
-
-	public ElectroVehicle(Id id, Double maxCharge, Double currentCharge){
+	public EmobVehicle(Id id, Double currentCharge, Coord position){
 		this.id = id;
-		this.maxCharge = maxCharge;
 		this.currentCharge = currentCharge;
 		this.chargingType = new IdImpl("default");
 		this.dischargingType = new IdImpl("default");
 		this.time2charge = new ArrayList<Tuple<Double, Double>>();
 		this.distance2charge = new ArrayList<Tuple<Double,Double>>();
 		this.traveledDistance = 0.;
+		this.position = position;
+		this.saveCharge(0.0, currentCharge, 0.0);
 	}
 	
 	public Id getId(){
@@ -91,21 +85,21 @@ public class ElectroVehicle {
 		this.distance2charge.add(new Tuple<Double, Double>(this.traveledDistance, this.currentCharge));
 	}
 
-	public Id getDisChargingType(){
-		return this.dischargingType;
-	}
-	
-	public void setDischargingType(Id type){
-		this.dischargingType = type;
-	}
-	
-	public Id getChargingType(){
-		return this.chargingType;
-	}
-	
-	public void setChargingType(Id type){
-		this.chargingType = type;
-	}
+//	public Id getDisChargingType(){
+//		return this.dischargingType;
+//	}
+//	
+//	public void setDischargingType(Id type){
+//		this.dischargingType = type;
+//	}
+//	
+//	public Id getChargingType(){
+//		return this.chargingType;
+//	}
+//	
+//	public void setChargingType(Id type){
+//		this.chargingType = type;
+//	}
 	
 	public List<Tuple<Double, Double>> getTime2Charge(){
 		return this.time2charge;
