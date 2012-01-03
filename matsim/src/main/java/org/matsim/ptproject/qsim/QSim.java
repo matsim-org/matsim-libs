@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -155,7 +156,7 @@ public final class QSim implements VisMobsim, Netsim {
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private AgentCounterI agentCounter;
-	private Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
     
