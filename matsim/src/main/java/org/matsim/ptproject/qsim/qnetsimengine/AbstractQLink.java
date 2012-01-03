@@ -146,7 +146,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 			//			Leg currentLeg = agent.getCurrentLeg();
 			String mode = agent.getMode() ;
 			//			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
-			if (mode != null && mode.equals(TransportMode.car)) {
+			if (TransportMode.car.equals(mode)) {
 				// We are not in an activity, but in a car leg, and we are an "additional agent".
 				// This currently means that we are waiting for our car to become available.
 				// So our current route must be a NetworkRoute.
@@ -213,6 +213,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		return ret;
 	}
 	
+	@Override
 	public final Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = this.getAllNonParkedVehicles();
 		vehicles.addAll(this.parkedVehicles.values());
