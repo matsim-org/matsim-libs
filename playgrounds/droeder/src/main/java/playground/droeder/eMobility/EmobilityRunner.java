@@ -41,6 +41,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.droeder.DRPaths;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.handler.EmobPersonHandler;
@@ -74,6 +75,7 @@ public class EmobilityRunner {
 	}
 	
 	public void createAndAddPerson(String eMobPlan){
+		//TODO 
 		EmobilityPerson p = new EmobilityPerson(new IdImpl("emob" + String.valueOf(this.cnt)), new CoordImpl(4588309,5820079), scenario.getNetwork().getNodes().get(new IdImpl("26736131")), 26.0, scenario.getNetwork());
 		p.readDataFromFile(eMobPlan);
 		this.scenario.getPopulation().addPerson(p.createMatsimPerson(this.scenario.getPopulation().getFactory()));
@@ -169,12 +171,16 @@ public class EmobilityRunner {
 		}
 	}
 
-	private static final String CONFIG = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/config.xml";
-	private static final String EMOBPLANS = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/testplan.txt";
+	private final static String VWDIR = "D:/VSP/svn/shared/volkswagen/";
+	private final static String SCENARIO = VWDIR + "80testdaten/1/";
+	
+	private static final String CONFIG = SCENARIO + "config.xml";
+	private static final String EMOBPLANS = SCENARIO + "testplan.txt";
+	private static final String OUTDIR = SCENARIO + "output/";
+	
 	private static final String CHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/ChargingLookupTable_2011-11-30.txt";
 	private static final String DISCHARGINGPROFILE = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/DrivingLookupTable_2011-11-25.txt";
-	private static final String OUTDIR = "C:/Users/Daniel/Desktop/Dokumente_MATSim_AP1und2/";
-	
+
 	public static void main(String[] args) {
 		EmobilityRunner runner = new EmobilityRunner(CONFIG);
 		
