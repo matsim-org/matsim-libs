@@ -50,9 +50,13 @@ public class MyFileFilter implements FilenameFilter {
 	public boolean accept(File directory, String filename) {
 		int filepathLength = filename.length();
 		int pos = filename.indexOf(".");
-		String extention = filename.substring(pos, filepathLength);
-		if(extention.equalsIgnoreCase(this.extension)){
-			return true;
+		if(pos > -1){
+			String extention = filename.substring(pos, filepathLength);
+			if(extention.equalsIgnoreCase(this.extension)){
+				return true;
+			} else{
+				return false;
+			}			
 		} else{
 			return false;
 		}
