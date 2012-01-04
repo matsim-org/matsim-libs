@@ -1,6 +1,7 @@
 package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle;
 
 import java.util.Map.Entry;
+import java.util.List;
 import java.util.TreeMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -387,5 +388,25 @@ public abstract class Algorithms {
 		intersectionCoordinate.y = y;
 
 		return true;
+	}
+
+	public static boolean testForCollision(VelocityObstacle info, Coordinate c) {
+		Coordinate[] vo = info.getVo();
+
+		boolean leftOfLeft = Algorithms.isLeftOfLine(c, vo[0], vo[1]) > 0;
+		boolean rightOfRight = Algorithms.isLeftOfLine(c, vo[0], vo[2]) < 0;
+		if (leftOfLeft && rightOfRight) {
+			return true;
+		}
+		return false;
+	}
+
+	public static boolean testForCollision(List<VelocityObstacle> infos, Coordinate c) {
+		for (VelocityObstacle info : infos) {
+			if (testForCollision(info,c)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
