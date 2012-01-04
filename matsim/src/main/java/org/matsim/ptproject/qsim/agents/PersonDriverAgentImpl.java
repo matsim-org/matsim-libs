@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim.agents;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -463,7 +462,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return Collections.unmodifiableList( this.getSelectedPlan().getPlanElements() ) ;
+		return this.person.getSelectedPlan().getPlanElements();
 	}
 
 	public final Netsim getMobsim(){
@@ -526,9 +525,6 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	
 	@Override
 	public final String getMode() {
-		/* directly access the current plan element instead of using this.getCurrentPlanElement()
-		 * as that one creates a lot of unnecessary Unmodifiable-wrappers
-		 */
 		PlanElement currentPlanElement = this.person.getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
