@@ -72,7 +72,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
 			for (MobsimAgent passenger : peopleInVehicle) {
-				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
+				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 				}
@@ -92,7 +92,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
 		for (MobsimAgent pa : agentsInActivities) {
-			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(pa.getId(), link, c) ;
+			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), c) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
 			c++ ;
@@ -115,7 +115,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
-					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, cnt2); // for the time being, same position as facilities
+					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 					if ( passenger.getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 					} else if (last) {
@@ -152,7 +152,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
 			MobsimAgent passenger = it.previous();
-			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane, cnt);
+			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane+2*cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			//			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
 			//			passengerPosition.setColorValueBetweenZeroAndOne(tmp);

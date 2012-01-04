@@ -81,7 +81,7 @@ public class FacilityDrawer {
 						out.putDouble(point.getY());
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
-						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(facility.getId(), link) ;
+						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.createAgentSnapshotInfo(facility.getId(), link, 0.9*link.getLength(), 0) ;
 						Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(ps.getEasting(), ps.getNorthing()));
 						out.putDouble(point.getX()) ;
 						out.putDouble(point.getY()) ;

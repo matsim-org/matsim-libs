@@ -786,7 +786,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	class VisDataImpl implements VisData {
 		//TODO should be the same value as in OTFLaneWriter
-		private static final double nodeOffsetMeter = 50.0;
+		private static final double nodeOffsetMeter = 0.0;
 		
 		private double visLaneLength;
 		private double visLinkLength;
@@ -803,12 +803,11 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			//the offset of this lane
 			double offset= this.visLinkLength -  this.linkScale * QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();
 			agentSnapshotInfoBuilder.addVehiclePositions(QLane.this, positions, QLane.this.buffer, QLane.this.vehQueue, null,
-					this.visLaneLength, offset,
-					QLane.this.visualizerLane*3);
+					this.visLaneLength, offset, 	QLane.this.visualizerLane*3);
 
 			return positions;
 		}
-	}
+	};
 
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;

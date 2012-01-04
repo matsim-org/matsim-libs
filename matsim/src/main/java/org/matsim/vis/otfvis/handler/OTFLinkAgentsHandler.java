@@ -165,7 +165,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		float colorValue = in.getFloat();
 		int state = in.getInt();
 
-		AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
+		AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
 		agInfo.setColorValueBetweenZeroAndOne(colorValue);
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);

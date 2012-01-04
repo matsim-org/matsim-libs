@@ -20,16 +20,11 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import java.awt.geom.Point2D;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.vecmathutils.VectorUtils;
 
 /**
  * @author nagel
@@ -37,7 +32,6 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  */
 public class AgentSnapshotInfoFactory {
 
-//	private Scenario sc = null ;
 	private static final double TWO_PI = 2.0 * Math.PI;
 	private static final double PI_HALF = Math.PI / 2.0;
 	/**
@@ -60,78 +54,51 @@ public class AgentSnapshotInfoFactory {
 	//
 	// The design is now in a way that this could, in principle, be fixed.  kai, aug'10
 
-	/**
-	 * default factory that is here so that the static methods can use the non-static "calculatePosition".  kai, aug'10
-	 */
-	private static final AgentSnapshotInfoFactory defaultFactory = new AgentSnapshotInfoFactory( null ) ;
-
-	public AgentSnapshotInfoFactory( Scenario sc ) {
-//		this.sc = sc ;
+	public AgentSnapshotInfoFactory() {
 	}
 
 	// static creators based on x/y
 
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
+	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
 		info.setEasting( easting ) ;
 		info.setNorthing( northing ) ;
 		info.setAzimuth( azimuth ) ;
-		return info ;
-	}
-
-	@Deprecated // in my view, use creational method with shorter argument list (set colorValue, agentState separately).  kai, aug'10
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth,
-			double colorValue, AgentState agentState)
-	{
-		PositionInfo info = new PositionInfo() ;
-		info.setId( agentId ) ;
-		info.setEasting( easting ) ;
-		info.setNorthing( northing ) ;
-		info.setAzimuth( azimuth ) ;
-		info.setColorValueBetweenZeroAndOne(colorValue) ;
-		info.setAgentState( agentState ) ;
 		return info ;
 	}
 
 	// static creators based on link
-
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link) {
-		return staticCreateAgentSnapshotInfo( agentId, link, 0 ) ;
-	}
-
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, int cnt) {
-		return staticCreateAgentSnapshotInfo( agentId, link, 0.9*link.getLength(), cnt ) ;
-	}
-
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
-		return staticCreateAgentSnapshotInfo( agentId, link, distanceOnLink, lane, 0 ) ;
-//		return new PositionInfo(agentId, link, distanceOnLink, lane);
+	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
+		if (link instanceof LinkImpl){ //as for LinkImpl instances the euklidean distance is already computed we can safe computing time but have a cast instead
+			PositionInfo info = new PositionInfo() ;
+			info.setId(agentId) ;
+			calculateAndSetPosition(info, link.getFromNode().getCoord(), link.getToNode().getCoord(),
+					distanceOnLink, link.getLength(), ((LinkImpl)link).getEuklideanDistance(), lane);
+			return info;
+		}
+		return createAgentSnapshotInfo(agentId, link.getFromNode().getCoord(), link.getToNode().getCoord(), distanceOnLink, lane, link.getLength());
 	}
 	
-  //used by qsim
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane, int cnt) {
-		AgentSnapshotInfo position = staticCreateAgentSnapshotInfo( 1.0, agentId, link, distanceOnLink, lane+2*cnt);
-		position.setColorValueBetweenZeroAndOne(0.0);
-		return position;
-	}
-
-	@Deprecated // in my view, use creational method with shorter argument list (set colorValue, agentState separately).  kai, aug'10
-	public static AgentSnapshotInfo staticCreateAgentSnapshotInfo(double linkScale, Id agentId, Link link, 
-			double distanceOnLink, int lane)
-	{
+	/**
+	 * Static creator based on Coord
+	 * @param lengthOfVector lengths are usually different (usually longer) than the Euklidean distances between the startCoord and endCoord
+	 */
+	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
+			int lane, double lengthOfVector) {
 		PositionInfo info = new PositionInfo() ;
-		info.setId( agentId ) ;
-		defaultFactory.calculatePosition( info, link, linkScale, distanceOnLink, lane ) ;
-		return info ;
-//		return new PositionInfo(linkScale, agentId, link, distanceOnLink, lane, speed, agentState);
+		info.setId(agentId) ;
+		double euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
+		calculateAndSetPosition(info, startCoord, endCoord,
+				distanceOnLink, lengthOfVector, euklideanDistance, lane) ;
+		return info;
 	}
+	
+	
 
-	protected final void calculatePosition(PositionInfo info, Link link, double linkScale, double distanceOnLink, int lane){
-		Point2D.Double linkStart = new Point2D.Double(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-		Point2D.Double linkEnd = new Point2D.Double(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-		double dx = -linkStart.getX() + linkEnd.getX();
-		double dy = -linkStart.getY() + linkEnd.getY();
+	private static final void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double distanceOnVector, double lengthOfVector, double euklideanDistance, int lane){
+		double dx = -startCoord.getX() + endCoord.getX();
+		double dy = -startCoord.getY() + endCoord.getY();
 		double theta = 0.0;
 		if (dx > 0) {
 			theta = Math.atan(dy/dx);
@@ -151,24 +118,14 @@ public class AgentSnapshotInfoFactory {
 		// Since the simulation, on the other hand, reports odometer distances, this needs to be corrected.  kai, apr'10
 		// The same correction can be used for the orthogonal offsets.  kai, aug'10
 		double correction = 0. ;
-		if ( link.getLength() != 0 ){
-			if (link instanceof LinkImpl) {
-				correction = ((LinkImpl)link).getEuklideanDistance() / link.getLength();
-			} else  {
-				correction = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()) / link.getLength();
-			}
+		if ( lengthOfVector != 0 ){
+			correction = euklideanDistance / lengthOfVector;
 		}
 
-		// "link scale" is not from me.  Presumably, it "pulls back" the drawing of the vehicles from the nodes on
-		// both ends.  kai, apr'10
-		if (linkScale != 1.0) {
-			Tuple<Point2D.Double, Point2D.Double> scaledLinkTuple = VectorUtils.scaleVector(linkStart, linkEnd, linkScale);
-			linkStart = scaledLinkTuple.getFirst();
-		}
 
-		info.setEasting( linkStart.getX() + Math.cos(theta) * (distanceOnLink * linkScale) * correction
+		info.setEasting( startCoord.getX() + Math.cos(theta) * distanceOnVector * correction
 		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction ) ;
-		info.setNorthing( linkStart.getY() + Math.sin(theta) * (distanceOnLink * linkScale) * correction
+		info.setNorthing( startCoord.getY() + Math.sin(theta) * distanceOnVector  * correction
 		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction );
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}

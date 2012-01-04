@@ -22,6 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -36,6 +37,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  */
 public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder {
 
+	private static final Logger log = Logger.getLogger(QueueAgentSnapshotInfoBuilder.class);
+	
 	public QueueAgentSnapshotInfoBuilder(Scenario scenario) {
 		super(scenario);
 	}
@@ -113,7 +116,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 	 */
 	private void positionOtherDrivingVehiclesAsQueue(final Collection<AgentSnapshotInfo> positions, double queueEnd,
 			double vehSpacing, Collection<QVehicle> vehQueue, double offset, Integer laneNumber,
-			double linkLength, VisLane qBufferItem)
+			double length, VisLane qBufferItem)
 	{
 		double now = qBufferItem.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		Link  link = qBufferItem.getQLink().getLink() ;
@@ -123,7 +126,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 		double freeSpeedTravelTime = link.getLength() / link.getFreespeed(now);
 		for (QVehicle veh : vehQueue) {
 			double travelTime = now - veh.getLinkEnterTime();
-			double distanceOnLink = (freeSpeedTravelTime == 0.0 ? 0.0	: ((travelTime / freeSpeedTravelTime) * linkLength));
+			double distanceOnLink = (freeSpeedTravelTime == 0.0 ? 0.0	: ((travelTime / freeSpeedTravelTime) * length));
 			if (distanceOnLink > queueEnd) { // vehicle is already in queue
 				distanceOnLink = queueEnd;
 				queueEnd -= vehSpacing;
