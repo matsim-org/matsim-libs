@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -150,7 +151,13 @@ public class CarPoolingOpeningTimesActivityScoringFunction extends ActivityScori
 			SortedSet<OpeningTime> openTimes = DEFAULT_OPENING_TIME;
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
-			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
+			ActivityFacility facility = facilities.getFacilities().get(act.getFacilityId());
+			ActivityOption actOpt = null;
+			
+			// this allows not to set facilities for pick-up and drop-offs
+			if (facility != null) {
+				actOpt = facility.getActivityOptions().get(act.getType());
+			}
 
 			if ( isPuDo( act.getType() ) ) {
 				openTimes = null;
