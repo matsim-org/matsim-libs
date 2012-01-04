@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.AbstractRoute;
 
+import playground.thibautd.utils.UniqueIdFactory;
+
 /**
  * Defines a {@link Leg} type, which can be linked to other individual legs
  * to identify shared rides.
@@ -52,8 +54,8 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * Each joint leg created from a constructor without a joint leg as an argument
 	 * is attributed a unique Id.
 	 */
-	private static long currentLegId = 0;
-	private final IdLeg legId;
+	private static final UniqueIdFactory idFactory = new UniqueIdFactory( "leg" );
+	private final Id legId;
 
 	/**
 	 * to indicate when it is safe to copy the route of the driver leg from
@@ -61,7 +63,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 */
 	private boolean routeToCopy = false;
 	
-	private final List<IdLeg> linkedLegsIds = new ArrayList<IdLeg>();
+	private final List<Id> linkedLegsIds = new ArrayList<Id>();
 	private JointPlan jointPlan = null;
 
 	private Person person;
@@ -80,7 +82,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	public JointLeg(final String transportMode, final Person person) {
 		super(transportMode);
 		this.person = person;
-		this.legId = createId();
+		this.legId = idFactory.createNextId();
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 			this.legId = ((JointLeg) leg).getId();
 			constructFromJointLeg((JointLeg) leg);
 		} else {
-			this.legId = createId();
+			this.legId = idFactory.createNextId();
 			this.person = pers;
 		}
 	}
@@ -128,16 +130,6 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		//this.isDriver = leg.getIsDriver();
 		//this.associatedIndividualLeg = leg.getAssociatedIndividualLeg();
 		this.person = leg.getPerson();
-	}
-
-	/**
-	 * creates an unexisting id.
-	 *
-	 * the method is static and synchronized, so that simultaneous
-	 * creation of Ids in different threads is safe.
-	 */
-	private static synchronized IdLeg createId() {
-		return new IdLeg( currentLegId++ );
 	}
 
 	/*
@@ -256,7 +248,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		Map<Id, JointLeg> output = new HashMap<Id, JointLeg>();
 		JointLeg currentLeg;
 
-		for (IdLeg currentIdLeg : this.linkedLegsIds) {
+		for (Id currentIdLeg : this.linkedLegsIds) {
 			currentLeg = this.jointPlan.getLegById(currentIdLeg);
 			output.put(currentLeg.getPerson().getId(), currentLeg);
 		}
@@ -273,7 +265,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 		try {
 			this.linkedLegsIds.clear();
 			for (Id linkedId : linkedElements) {
-				this.linkedLegsIds.add((IdLeg) linkedId);
+				this.linkedLegsIds.add(linkedId);
 			}
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException("ids linked to a joint leg must "+
@@ -287,12 +279,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 */
 	@Override
 	public void addLinkedElementById(final Id linkedId) {
-		try {
-			this.linkedLegsIds.add((IdLeg) linkedId);
-		} catch (ClassCastException e) {
-			throw new IllegalArgumentException("ids linked to a joint leg must "+
-					"be of type IdLeg!");
-		}
+		this.linkedLegsIds.add(linkedId);
 	}
 
 	/**
@@ -300,7 +287,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	 * @see JointActing#getLinkedElementsIds() JointActing.getLinkedElementsIds()
 	 */
 	@Override
-	public List<IdLeg> getLinkedElementsIds() {
+	public List<Id> getLinkedElementsIds() {
 		return this.linkedLegsIds;
 	}
 
@@ -323,7 +310,7 @@ public class JointLeg extends LegImpl implements Leg, JointActing, Identifiable 
 	}
 
 	@Override
-	public IdLeg getId() {
+	public Id getId() {
 		return this.legId;
 	}
 

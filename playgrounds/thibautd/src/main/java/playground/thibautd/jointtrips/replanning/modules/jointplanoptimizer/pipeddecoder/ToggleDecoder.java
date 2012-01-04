@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.thibautd.jointtrips.population.IdLeg;
 import playground.thibautd.jointtrips.population.JointActing;
 import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointActivity;
@@ -72,8 +71,8 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 		new HashMap<PlanElement, Tuple<PlanElement, PlanElement>>();
 	private final Map<PlanElement, Integer> associatedGene =
 		new HashMap<PlanElement, Integer>();
-	private final List<IdLeg> unaffectedLegs =
-		new ArrayList<IdLeg>();
+	private final List<Id> unaffectedLegs =
+		new ArrayList<Id>();
 
 	//private static Integer NO_GENE = null; 
 
@@ -529,13 +528,13 @@ public class ToggleDecoder implements JointPlanOptimizerDimensionDecoder {
 	}
 
 	private void correctLegLinks(final Map<Id, PlanImpl> individualPlans) {
-		List<IdLeg> toRemove = new ArrayList<IdLeg>();
+		List<Id> toRemove = new ArrayList<Id>();
 
 		for (PlanImpl individualPlan : individualPlans.values()) {
 			for (PlanElement pe : individualPlan.getPlanElements()) {
 				if (((JointActing) pe).getJoint()) {
 					toRemove.clear();
-					for (IdLeg linkedElement :
+					for (Id linkedElement :
 							// only legs should be joint
 							((JointLeg) pe).getLinkedElementsIds()) {
 						if (this.unaffectedLegs.contains(linkedElement)) {

@@ -61,8 +61,8 @@ public class JointPlan implements Plan {
 	/**
 	 * for robust resolution of links between activities.
 	 */
-	private final Map<IdLeg, JointLeg> legsMap = new HashMap<IdLeg, JointLeg>();
-	private final Map<IdActivity, JointActivity> actMap = new HashMap<IdActivity, JointActivity>();
+	private final Map<Id, JointLeg> legsMap = new HashMap<Id, JointLeg>();
+	private final Map<Id, JointActivity> actMap = new HashMap<Id, JointActivity>();
 	/**
 	 * true if the individual plans are maintained at the individual level.
 	 */
@@ -523,7 +523,7 @@ public class JointPlan implements Plan {
 	 *
 	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
 	 */
-	public JointLeg getLegById(final IdLeg legId) {
+	public JointLeg getLegById(final Id legId) {
 		JointLeg leg = this.legsMap.get(legId);
 
 		if (leg == null) {
@@ -540,7 +540,7 @@ public class JointPlan implements Plan {
 	 *
 	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
 	 */
-	public JointActivity getActById(final IdActivity actId) {
+	public JointActivity getActById(final Id actId) {
 		JointActivity act = actMap.get(actId);
 
 		if (act == null) {

@@ -26,14 +26,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.thibautd.jointtrips.population.IdActivity;
 import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointActivity;
 import playground.thibautd.jointtrips.population.JointLeg;
@@ -335,8 +334,8 @@ class PuDoFactory {
 	public PuDoFactory(
 			final JointTripPossibility possibility,
 			final JointPlan plan) {
-		Activity origin = plan.getActById( (IdActivity) possibility.getPassenger().getOriginActivityId() );
-		Activity destination  = plan.getActById( (IdActivity) possibility.getPassenger().getDestinationActivityId() );
+		Activity origin = plan.getActById( (Id) possibility.getPassenger().getOriginActivityId() );
+		Activity destination  = plan.getActById( (Id) possibility.getPassenger().getDestinationActivityId() );
 
 		puLink = origin.getLinkId();
 		doLink = destination.getLinkId();

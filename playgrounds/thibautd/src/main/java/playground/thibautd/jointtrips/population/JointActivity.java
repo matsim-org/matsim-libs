@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 
+import playground.thibautd.utils.UniqueIdFactory;
+
 /**
  * @author thibautd
  */
@@ -36,14 +38,14 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	// must extend ActivityImpl, as there exist parts of the code (mobsim...) where
 	// Activities are casted to ActivityImpl.
 
-	private static long currentActId = 0;
+	private static final UniqueIdFactory idFactory = new UniqueIdFactory( "activity" );
 	// joint activity currently unsupported
 	private final boolean isJoint = false;
 	//private List<Person> participants = null;
 	//private Map<Id, JointActivity> linkedActivities = new HashMap<Id, JointActivity>();
 	private Person person;
 	private final String initialType;
-	private final IdActivity id;
+	private final Id id;
 
 	/*
 	 * =========================================================================
@@ -68,14 +70,14 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		super(type, coord, linkId);
 		this.person = person;
 		this.initialType = type;
-		this.id = createId();
+		this.id = idFactory.createNextId();
 	}
 
 	public JointActivity(final ActivityImpl act, final Person person) {
 		super(act);
 		this.person = person;
 		this.initialType = act.getType();
-		this.id = createId();
+		this.id = idFactory.createNextId();
 	}
 
 	public JointActivity(final JointActivity act) {
@@ -94,22 +96,12 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 		} else {
 			this.person = pers;
 			this.initialType = act.getType();
-			this.id = createId();
+			this.id = idFactory.createNextId();
 		} 
 	}
 
 	private void constructFromJointActivity(final JointActivity act) {
 		this.person = act.getPerson();
-	}
-
-	/**
-	 * creates an unexisting id.
-	 *
-	 * the method is static and synchronized, so that simultaneous
-	 * creation of Ids in different threads is safe.
-	 */
-	private static synchronized IdActivity createId() {
-		return new IdActivity( currentActId++ );
 	}
 
 	/*
@@ -183,7 +175,7 @@ public class JointActivity extends ActivityImpl implements Activity, JointActing
 	}
 
 	@Override
-	public IdActivity getId() {
+	public Id getId() {
 		return id;
 	}
 

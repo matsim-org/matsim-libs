@@ -47,7 +47,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.jointtrips.population.Clique;
-import playground.thibautd.jointtrips.population.IdLeg;
 import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.PopulationOfCliques;
@@ -101,11 +100,11 @@ public class JointEventsToScore implements
 	private final Map<Id, Integer> indicesInEvents =
 		new TreeMap<Id, Integer>();
 
-	private final Map<IdLeg, Double> examinedLegsForDeparture =
-		new TreeMap<IdLeg, Double>();
+	private final Map<Id, Double> examinedLegsForDeparture =
+		new TreeMap<Id, Double>();
 
-	private final Map<IdLeg, Double> examinedLegsForArrival =
-		new TreeMap<IdLeg, Double>();
+	private final Map<Id, Double> examinedLegsForArrival =
+		new TreeMap<Id, Double>();
 
 	/**
 	 * Initializes EventsToScore with a learningRate of 1.0.
@@ -342,7 +341,7 @@ public class JointEventsToScore implements
 		}
 
 		if (!examinedLegsForDeparture.containsKey(leg.getId())) {
-			this.examinedLegsForDeparture.put((IdLeg) leg.getId(), time);
+			this.examinedLegsForDeparture.put(leg.getId(), time);
 		}
 
 		if (this.examinedLegsForDeparture.keySet().containsAll(leg.getLinkedElementsIds())) {
@@ -357,7 +356,7 @@ public class JointEventsToScore implements
 		double maxTime = Double.NEGATIVE_INFINITY;
 		double currentTime;
 
-		for (IdLeg id : leg.getLinkedElementsIds()) {
+		for (Id id : leg.getLinkedElementsIds()) {
 			currentTime = this.examinedLegsForDeparture.get(id);
 			maxTime = Math.max(currentTime, maxTime);
 		}
@@ -381,7 +380,7 @@ public class JointEventsToScore implements
 		}
 
 		if (!examinedLegsForArrival.containsKey(leg.getId())) {
-			this.examinedLegsForArrival.put((IdLeg) leg.getId(), time);
+			this.examinedLegsForArrival.put( leg.getId(), time);
 		}
 
 		if (this.examinedLegsForArrival.keySet().containsAll(leg.getLinkedElementsIds())) {
@@ -400,7 +399,7 @@ public class JointEventsToScore implements
 		double maxTime = Double.NEGATIVE_INFINITY;
 		double currentTime;
 
-		for (IdLeg id : leg.getLinkedElementsIds()) {
+		for (Id id : leg.getLinkedElementsIds()) {
 			currentTime = this.examinedLegsForArrival.get(id);
 			maxTime = Math.max(currentTime, maxTime);
 		}

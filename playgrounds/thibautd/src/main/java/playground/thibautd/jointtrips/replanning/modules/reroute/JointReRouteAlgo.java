@@ -22,7 +22,6 @@ package playground.thibautd.jointtrips.replanning.modules.reroute;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;

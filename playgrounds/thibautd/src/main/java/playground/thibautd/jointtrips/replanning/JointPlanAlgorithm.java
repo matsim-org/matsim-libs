@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
 
 /**
  * Simple abstract class to extend to provide PlanAlgorithms for

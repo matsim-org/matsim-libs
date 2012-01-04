@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.population.jointtrippossibilities;
 
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Default immutable implementation of a JointTripPossibility object.

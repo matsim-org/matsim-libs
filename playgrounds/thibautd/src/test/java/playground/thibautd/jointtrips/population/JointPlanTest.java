@@ -215,16 +215,16 @@ public class JointPlanTest {
 
 			activities.put(
 					"passenger origin",
-					testPlan.getActById( (IdActivity) possibility.getPassenger().getOriginActivityId() ) );
+					testPlan.getActById( (Id) possibility.getPassenger().getOriginActivityId() ) );
 			activities.put(
 					"passenger destination",
-					testPlan.getActById( (IdActivity) possibility.getPassenger().getDestinationActivityId() ) );
+					testPlan.getActById( (Id) possibility.getPassenger().getDestinationActivityId() ) );
 			activities.put(
 					"driver origin",
-					testPlan.getActById( (IdActivity) possibility.getDriver().getOriginActivityId() ) );
+					testPlan.getActById( (Id) possibility.getDriver().getOriginActivityId() ) );
 			activities.put(
 					"passenger destination",
-					testPlan.getActById( (IdActivity) possibility.getPassenger().getDestinationActivityId() ) );
+					testPlan.getActById( (Id) possibility.getPassenger().getDestinationActivityId() ) );
 
 			for (Map.Entry<String, Activity> activity : activities.entrySet()) {
 				Assert.assertFalse(

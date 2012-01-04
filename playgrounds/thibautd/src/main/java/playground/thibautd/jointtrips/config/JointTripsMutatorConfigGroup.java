@@ -22,7 +22,6 @@ package playground.thibautd.jointtrips.config;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Module;
 
 /**
