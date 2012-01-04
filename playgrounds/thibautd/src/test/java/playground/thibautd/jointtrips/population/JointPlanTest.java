@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +37,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
+
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilities;
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibility;
 
 /**
  * Testcase for the JointPlan class
@@ -187,6 +192,49 @@ public class JointPlanTest {
 		// TODO: modify copy and chack no modification in copied
 	}
 
+	@Test
+	public void testJointTripPossibilitiesInitialisation() {
+		// this is THE method which initialises the structure.
+		clique.buildJointPlanFromIndividualPlans();
+		JointPlan testPlan = (JointPlan) clique.getSelectedPlan();
+
+		JointTripPossibilities possibilities = testPlan.getJointTripPossibilities();
+		int expectedCount = countPassengerTrips( testPlan );
+
+		Assert.assertNotNull(
+				"joint trip possibilities were not initialised by the clique!",
+				possibilities);
+
+		Assert.assertEquals(
+				"unexpected number of joint trip possibilities",
+				expectedCount,
+				possibilities.getJointTripPossibilities().size());
+
+		for (JointTripPossibility possibility : possibilities.getJointTripPossibilities()) {
+			Map<String , Activity> activities = new HashMap<String , Activity>();
+
+			activities.put(
+					"passenger origin",
+					testPlan.getActById( (IdActivity) possibility.getPassenger().getOriginActivityId() ) );
+			activities.put(
+					"passenger destination",
+					testPlan.getActById( (IdActivity) possibility.getPassenger().getDestinationActivityId() ) );
+			activities.put(
+					"driver origin",
+					testPlan.getActById( (IdActivity) possibility.getDriver().getOriginActivityId() ) );
+			activities.put(
+					"passenger destination",
+					testPlan.getActById( (IdActivity) possibility.getPassenger().getDestinationActivityId() ) );
+
+			for (Map.Entry<String, Activity> activity : activities.entrySet()) {
+				Assert.assertFalse(
+						"got a pick-up/drop-off activity in joint trip possibility, for "+activity.getKey(),
+						isPuDo( activity.getValue() ));
+			}
+		}
+
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
@@ -267,10 +315,28 @@ public class JointPlanTest {
 		return out;
 	}
 
-	private void assertTimesEquals(final Activity act,final double time) {
+	private static void assertTimesEquals(final Activity act,final double time) {
 		String msg = "plan durations where change without synchronisation";
 		Assert.assertEquals(
 				msg, time, act.getEndTime(), MatsimTestUtils.EPSILON);
+	}
+
+	private static int countPassengerTrips(final JointPlan plan) {
+		int count = 0;
+
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Leg &&
+					((Leg) pe).getMode().equals( JointActingTypes.PASSENGER )) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	private static boolean isPuDo(final Activity act) {
+		return act.getType().equals( JointActingTypes.PICK_UP ) ||
+			act.getType().equals( JointActingTypes.DROP_OFF );
 	}
 }
 
