@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointLegTest.java
+ * JointActivityTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -24,50 +24,26 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
 /**
  * @author thibautd
  */
-public class JointLegTest {
-	/**
-	 * Tests the behaviour of equals with the different constructors.
-	 */
-	@Test
-	public void testEquals() {
-		JointLeg leg = new JointLeg("mode", new PersonImpl(new IdImpl(1)));
-		JointLeg copy = new JointLeg(leg);
-
-		Assert.assertTrue(
-				"leg generated with copy constructor not equal to the copied one",
-				leg.equals(copy));
-
-		LegImpl legImpl = new LegImpl("mode2");
-		copy = new JointLeg(legImpl, leg);
-
-		Assert.assertTrue(
-				"leg generated with 'almost copy' constructor not equal to the copied one",
-				leg.equals(copy));
-
-		JointLeg leg2 = new JointLeg("mode", new PersonImpl(new IdImpl(1)));
-
-		Assert.assertFalse(
-				"two different legs found equal",
-				leg.equals(leg2));
-	}
+public class JointActivityTest {
 
 	@Test
 	public void testIds() {
 		Set<Id> createdIds = new HashSet<Id>();
 
 		for (int i=0; i <= 100; i++) {
-			JointLeg leg = new JointLeg(
-					"mode" ,
-					new PersonImpl( new IdImpl( "n" ) ) );
-			Assert.assertTrue( createdIds.add( leg.getId() ) );
+			JointActivity act = new JointActivity(
+					"type" ,
+					new IdImpl( "link" ),
+					new PersonImpl( new IdImpl( "person" ) ) );
+			Assert.assertTrue( createdIds.add( act.getId() ) );
 		}
 	}
 }
