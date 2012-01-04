@@ -68,6 +68,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	private Id currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
+	
+	private final Plan selectedPlan;
 
 	private transient Id cachedDestinationLinkId;
 
@@ -89,8 +91,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 		this.person = p;
 		this.simulation = simulation;
+		this.selectedPlan = PopulationUtils.unmodifiablePlan(p.getSelectedPlan());
 
-		List<? extends PlanElement> planElements = p.getSelectedPlan().getPlanElements();
+		List<? extends PlanElement> planElements = this.selectedPlan.getPlanElements();
 		if (planElements.size() > 0) {
 			this.currentPlanElementIndex = 0;
 			Activity firstAct = (Activity) planElements.get(0);
@@ -462,7 +465,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
 	private final List<PlanElement> getPlanElements() {
-		return this.person.getSelectedPlan().getPlanElements();
+		return this.getSelectedPlan().getPlanElements();
 	}
 
 	public final Netsim getMobsim(){
@@ -525,7 +528,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	
 	@Override
 	public final String getMode() {
-		PlanElement currentPlanElement = this.person.getSelectedPlan().getPlanElements().get(currentPlanElementIndex);
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
@@ -562,8 +565,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	@Override
 	public Plan getSelectedPlan() {
-		return PopulationUtils.unmodifiablePlan(this.person.getSelectedPlan());
+		return this.selectedPlan;
 	}
+	
 	@Override
 	public MobsimAgent.State getState() {
 		return state;

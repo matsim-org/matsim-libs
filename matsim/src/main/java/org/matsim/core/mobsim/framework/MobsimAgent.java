@@ -138,6 +138,8 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	/**
 	 * Convenience method for Leg.getMode(), in an attempt to get rid of getCurrentLeg().  If the agent is not on a leg, 
 	 * the behavior of this method is undefined (so don't rely on it).
+	 * 
+	 * Should be renamed to getLegMode(), in my opinion, as the mode of an agent can be anything else. mrieser/jan'12
 	 */
 	public String getMode() ;
 	

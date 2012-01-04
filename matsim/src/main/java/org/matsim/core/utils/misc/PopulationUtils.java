@@ -54,10 +54,12 @@ public class PopulationUtils {
 	}
 
 	public static class UnmodifiablePlan implements Plan {
-		Plan delegate = null ;
+		private final Plan delegate;
+		private final List<PlanElement> unmodifiablePlanElements;
 		
 		public UnmodifiablePlan( Plan plan ) {
-			delegate = plan ;
+			this.delegate = plan;
+			this.unmodifiablePlanElements = Collections.unmodifiableList(delegate.getPlanElements());
 		}
 
 		@Override
@@ -82,7 +84,7 @@ public class PopulationUtils {
 
 		@Override
 		public List<PlanElement> getPlanElements() {
-			return Collections.unmodifiableList( delegate.getPlanElements() );
+			return this.unmodifiablePlanElements;
 		}
 
 		@Override
