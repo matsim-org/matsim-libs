@@ -62,48 +62,56 @@ public class RemoveJointTrips {
 	public static void removeJointTrips(final Population population) {
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				List<PlanElement> inPlanElements = plan.getPlanElements();
-				List<PlanElement> constructedPlanElements = new ArrayList<PlanElement>();
-
-				// step through plan, and retain only plan elements not in a shared ride.
-				// the first access leg is retained.
-				boolean inJointTrip = false;
-				for (PlanElement element : inPlanElements) {
-					if (inJointTrip) {
-						if (element instanceof Activity) {
-							String type = ((Activity) element).getType();
-
-							if ( !type.matches( JointActingTypes.PICK_UP_REGEXP ) &&
-									!type.equals( JointActingTypes.PICK_UP ) &&
-									!type.equals( JointActingTypes.DROP_OFF ) ) {
-								constructedPlanElements.add( element );
-								inJointTrip = false;
-							}
-						}
-					}
-					else {
-						if (element instanceof Activity) {
-							String type = ((Activity) element).getType();
-
-							if ( type.matches( JointActingTypes.PICK_UP_REGEXP ) ||
-									type.equals( JointActingTypes.PICK_UP ) ) {
-								inJointTrip = true;
-							}
-							else {
-								constructedPlanElements.add( element );
-							}
-						}
-						else {
-							constructedPlanElements.add( element );
-						}
-					}
-				}
-
-				// update plan
-				inPlanElements.clear();
-				inPlanElements.addAll( constructedPlanElements );
+				removeJointTrips( plan );
 			}
 		}
+	}
+
+	/**
+	 * XXX: if the plans pertain to a joint plan, no modification
+	 * of the tracking structure is done (leg links, etc)
+	 */
+	public static void removeJointTrips(final Plan individualPlan) {
+		List<PlanElement> inPlanElements = individualPlan.getPlanElements();
+		List<PlanElement> constructedPlanElements = new ArrayList<PlanElement>();
+
+		// step through plan, and retain only plan elements not in a shared ride.
+		// the first access leg is retained.
+		boolean inJointTrip = false;
+		for (PlanElement element : inPlanElements) {
+			if (inJointTrip) {
+				if (element instanceof Activity) {
+					String type = ((Activity) element).getType();
+
+					if ( !type.matches( JointActingTypes.PICK_UP_REGEXP ) &&
+							!type.equals( JointActingTypes.PICK_UP ) &&
+							!type.equals( JointActingTypes.DROP_OFF ) ) {
+						constructedPlanElements.add( element );
+						inJointTrip = false;
+					}
+				}
+			}
+			else {
+				if (element instanceof Activity) {
+					String type = ((Activity) element).getType();
+
+					if ( type.matches( JointActingTypes.PICK_UP_REGEXP ) ||
+							type.equals( JointActingTypes.PICK_UP ) ) {
+						inJointTrip = true;
+					}
+					else {
+						constructedPlanElements.add( element );
+					}
+				}
+				else {
+					constructedPlanElements.add( element );
+				}
+			}
+		}
+
+		// update plan
+		inPlanElements.clear();
+		inPlanElements.addAll( constructedPlanElements );
 	}
 }
 
