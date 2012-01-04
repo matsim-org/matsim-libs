@@ -34,7 +34,7 @@ import playground.thibautd.jointtrips.replanning.selectors.PlanWithLongestTypeSe
 public class ReplanningStrategy extends JointPlanStrategy {
 
 	public ReplanningStrategy(final Controler controler) {
-		this.planSelector = new PlanWithLongestTypeSelector();
+		super( new PlanWithLongestTypeSelector() );
 
 		this.addStrategyModule(new JointPlanOptimizerModule(controler));
 	}

@@ -34,7 +34,7 @@ import playground.thibautd.jointtrips.replanning.modules.reroute.JointReRouteMod
 public class ExpBetaReRouteStrategy extends JointPlanStrategy {
 
 	public ExpBetaReRouteStrategy(final Controler controler) {
-		this.planSelector = new ExpBetaPlanSelector(controler.getConfig().planCalcScore());
+		super( new ExpBetaPlanSelector(controler.getConfig().planCalcScore()) );
 
 		this.addStrategyModule(new JointReRouteModule(controler));
 	}

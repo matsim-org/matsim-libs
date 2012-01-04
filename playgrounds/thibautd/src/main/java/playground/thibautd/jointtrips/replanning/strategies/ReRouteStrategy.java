@@ -36,7 +36,7 @@ public class ReRouteStrategy extends JointPlanStrategy {
 	public ReRouteStrategy(final Controler controler) {
 		// TODO: use a JointPlan specific selector?
 		// + pass it from the config file
-		this.planSelector = new BestPlanSelector();
+		super( new BestPlanSelector() );
 
 		this.addStrategyModule(new JointReRouteModule(controler));
 	}

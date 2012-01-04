@@ -47,10 +47,15 @@ public abstract class JointPlanStrategy implements PlanStrategy  {
 	private static final Logger log =
 		Logger.getLogger(JointPlanStrategy.class);
 
-	protected PlanSelector planSelector;
+	private final PlanSelector planSelector;
 	private ArrayList<PlanStrategyModule> strategyModules = new ArrayList<PlanStrategyModule>();
 	private final ArrayList<Plan> plans = new ArrayList<Plan>();
 	private int counter = 0;
+
+	protected JointPlanStrategy(
+			final PlanSelector selector) {
+		this.planSelector = selector;
+	}
 
 	/*
 	 * =========================================================================

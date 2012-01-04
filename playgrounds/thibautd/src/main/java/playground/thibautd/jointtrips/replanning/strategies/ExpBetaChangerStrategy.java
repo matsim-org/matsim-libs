@@ -30,7 +30,7 @@ import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
  */
 public class ExpBetaChangerStrategy  extends JointPlanStrategy {
 	public ExpBetaChangerStrategy(final Controler controler) {
-		this.planSelector = new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta());
+		super( new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta()) );
 	}
 }
 

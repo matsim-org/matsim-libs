@@ -30,7 +30,7 @@ import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
  */
 public class BestScoreStrategy extends JointPlanStrategy {
 	public BestScoreStrategy(final Controler controler) {
-		this.planSelector = new BestPlanSelector();
+		super( new BestPlanSelector() );
 	}
 }
 
