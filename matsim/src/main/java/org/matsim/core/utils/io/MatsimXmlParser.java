@@ -39,7 +39,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -274,16 +273,6 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	public final void startElement(final String uri, final String localName, final String qName, Attributes atts) throws SAXException {
 		String tag = (uri.length() == 0) ? qName : localName;
 		this.buffers.push(new StringBuffer());
-		if (atts != null) {
-			AttributesImpl newAtts = new AttributesImpl(atts);
-			String value = null;
-			for (int i = 0; i < atts.getLength(); i++){
-				value = atts.getValue(i);
-				value = value.replace("&gt;", ">").replace("&lt;", ">").replace("&quot;", "\"").replace("&amp;", "&");
-				newAtts.setValue(i, value);
-			}
-			atts = newAtts;
-		}
 		this.startTag(tag, atts, this.context);
 		this.context.push(tag);
 	}
