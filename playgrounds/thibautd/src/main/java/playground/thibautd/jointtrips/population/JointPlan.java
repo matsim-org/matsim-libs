@@ -62,6 +62,7 @@ public class JointPlan implements Plan {
 	 * for robust resolution of links between activities.
 	 */
 	private final Map<IdLeg, JointLeg> legsMap = new HashMap<IdLeg, JointLeg>();
+	private final Map<IdActivity, JointActivity> actMap = new HashMap<IdActivity, JointActivity>();
 	/**
 	 * true if the individual plans are maintained at the individual level.
 	 */
@@ -305,6 +306,24 @@ public class JointPlan implements Plan {
 							" with mode "+old.getMode());
 				}
 			}
+			else if (pe instanceof JointActivity) {
+				JointActivity act = (JointActivity) pe;
+				JointActivity old = actMap.put(act.getId(), act);
+
+				if (old != null) {
+					throw new IllegalArgumentException("duplicate id found during"
+							+" JointPlan construction for clique "+clique.getId()+
+							": act "+act.getId()+
+							" for person "+act.getPerson().getId()+
+							" with type "+act.getType()+
+							" conflicts with act "+old.getId()+
+							" for person "+old.getPerson().getId()+
+							" with type "+old.getType());
+				}
+			}
+			else {
+				throw new RuntimeException( "unexpected plan element type "+pe.getClass().getName() );
+			}
 		}
 	}
 
@@ -499,7 +518,7 @@ public class JointPlan implements Plan {
 	}
 
 	/**
-	 * Returns the a leg given its Id.
+	 * Returns a leg given its Id.
 	 * used to resolve links between joint legs.
 	 *
 	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
@@ -508,10 +527,29 @@ public class JointPlan implements Plan {
 		JointLeg leg = this.legsMap.get(legId);
 
 		if (leg == null) {
-			throw new LinkedElementsResolutionException("legs links could not be resolved");
+			throw new LinkedElementsResolutionException(
+					"legs links could not be resolved, when searching for leg with id "+legId+
+					" in plan with registered legs "+legsMap.keySet());
 		}
 
 		return leg;
+	}
+
+	/**
+	 * Returns an act given its Id.
+	 *
+	 * @throws LinkedElementsResolutionException if the corresponding leg is not found
+	 */
+	public JointActivity getActById(final IdActivity actId) {
+		JointActivity act = actMap.get(actId);
+
+		if (act == null) {
+			throw new LinkedElementsResolutionException(
+					"acts links could not be resolved, when searching for act with id "+actId+
+					" in plan with registered activities "+actMap.keySet());
+		}
+
+		return act;
 	}
 
 	/**
