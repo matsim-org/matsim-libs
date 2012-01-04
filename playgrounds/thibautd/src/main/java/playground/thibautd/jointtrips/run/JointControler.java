@@ -152,7 +152,7 @@ public class JointControler extends Controler {
 	public PlanAlgorithm createRoutingAlgorithm(
 			final PersonalizableTravelCost travelCosts,
 			final PersonalizableTravelTime travelTimes) {
-		log.debug("routing algorithm created");
+		// log.debug("routing algorithm created");
 		PlansCalcRoute router = (PlansCalcRoute) 
 			super.createRoutingAlgorithm(travelCosts, travelTimes);
 
