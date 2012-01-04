@@ -30,6 +30,7 @@ import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory
 
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
+import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.population.CliquesXmlReader;
 import playground.thibautd.jointtrips.population.PopulationWithJointTripsReader;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
@@ -106,6 +107,7 @@ public class JointControlerUtils {
 	public static Config createConfig(final String configFile) {
 		JointReplanningConfigGroup jointConfigGroup = new JointReplanningConfigGroup();
 		CliquesConfigGroup cliquesConfigGroup = new CliquesConfigGroup();
+		JointTripsMutatorConfigGroup mutatorConfigGroup = new JointTripsMutatorConfigGroup();
 
 		Config config = ConfigUtils.createConfig();
 
@@ -114,6 +116,7 @@ public class JointControlerUtils {
 		config.addCoreModules();
 		config.addModule(JointReplanningConfigGroup.GROUP_NAME, jointConfigGroup);
 		config.addModule(CliquesConfigGroup.GROUP_NAME, cliquesConfigGroup);
+		config.addModule(JointTripsMutatorConfigGroup.GROUP_NAME, mutatorConfigGroup);
 
 		//read the config file
 		ConfigUtils.loadConfig(config, configFile);
