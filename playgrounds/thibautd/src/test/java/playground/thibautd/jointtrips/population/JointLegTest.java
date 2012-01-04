@@ -67,7 +67,9 @@ public class JointLegTest {
 			JointLeg leg = new JointLeg(
 					"mode" ,
 					new PersonImpl( new IdImpl( "n" ) ) );
-			Assert.assertTrue( createdIds.add( leg.getId() ) );
+			Assert.assertTrue(
+					"two legs have id "+leg.getId(),
+					createdIds.add( leg.getId() ) );
 		}
 	}
 }

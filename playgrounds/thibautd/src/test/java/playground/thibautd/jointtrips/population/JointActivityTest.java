@@ -43,7 +43,9 @@ public class JointActivityTest {
 					"type" ,
 					new IdImpl( "link" ),
 					new PersonImpl( new IdImpl( "person" ) ) );
-			Assert.assertTrue( createdIds.add( act.getId() ) );
+			Assert.assertTrue(
+					"two activities have id "+act.getId(),
+					createdIds.add( act.getId() ) );
 		}
 	}
 }
