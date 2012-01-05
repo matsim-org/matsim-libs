@@ -70,7 +70,7 @@ public class FourWaysVis {
 		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
-		scenario.getConfig().otfVis().setAgentSize(50.0f);
+		scenario.getConfig().otfVis().setAgentSize(130.0f);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
