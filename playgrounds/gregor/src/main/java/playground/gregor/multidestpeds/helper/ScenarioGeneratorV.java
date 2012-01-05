@@ -29,12 +29,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 public class ScenarioGeneratorV {
 
@@ -42,7 +42,7 @@ public class ScenarioGeneratorV {
 	private static int persId = 0;
 
 	public static void main(String [] args) {
-		String scDir = "/Users/laemmel/devel/counter/";
+		String scDir = "/Users/laemmel/devel/oval/";
 		String inputDir = scDir + "/input/";
 
 		double length = 6;
@@ -61,8 +61,9 @@ public class ScenarioGeneratorV {
 		createPop(sc,inputDir, links);
 
 
-		c.controler().setLastIteration(10);
+		c.controler().setLastIteration(0);
 		c.controler().setOutputDirectory(scDir + "output/");
+		c.controler().setMobsim("hybridQ2D");
 
 		c.strategy().setMaxAgentPlanMemorySize(3);
 
@@ -71,7 +72,22 @@ public class ScenarioGeneratorV {
 		c.strategy().addParam("ModuleProbability_1", "0.1");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
+		//
+		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
+		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
+		s2d.setEnableCircularAgentInterActionModule("false");
+		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+		s2d.setEnableDrivingForceModule("false");
+		s2d.setEnableEnvironmentForceModule("false");
+		s2d.setEnablePathForceModule("false");
+		s2d.setEnableVelocityObstacleModule("true");
+		s2d.setEnablePhysicalEnvironmentForceModule("false");
+
+
+		c.addModule("sim2d", s2d);
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
 
@@ -104,7 +120,8 @@ public class ScenarioGeneratorV {
 		//		GeometryFactory geofac = new GeometryFactory();
 
 		double length = 0;
-		for (int i = 0; i < links.size()/10; i++) {
+		//		for (int i = 0; i < links.size()/10; i++) {
+		for (int i = 0; i < links.size(); i++) {
 			Link link = links.get(i);
 			length += link.getLength();
 		}
@@ -220,15 +237,15 @@ public class ScenarioGeneratorV {
 		double xm = r;
 		double ym = 0;
 		List<Coordinate> oval = getOval(r,xm,ym,length,0.1);
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
-		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
+		//		oval.addAll(getOval(r,xm,ym,length,0.1));
 		for (Coordinate coord : oval) {
 			Id nid = new IdImpl(nodeId++);
 			CoordImpl c = new CoordImpl(coord.x,coord.y);

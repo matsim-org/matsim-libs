@@ -22,6 +22,7 @@ package playground.gregor.sim2d_v2.simulation.floor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class Agent2D  {
+public class Agent2D implements MobsimAgent {
 
 	private Coordinate currentPosition;
 	private final Force force = new Force();
@@ -70,6 +71,8 @@ public class Agent2D  {
 
 
 	private double sensingRange = 5;
+	public final double wi;
+
 
 	/**
 	 * @param p
@@ -84,6 +87,8 @@ public class Agent2D  {
 		this.currentDesiredVelocity = this.desiredVelocity;
 		this.mentalLinkSwitcher = mlsw;
 		initGeometry();
+
+		this.wi = MatsimRandom.getRandom().nextDouble()*0.9+0.1;
 
 	}
 
@@ -206,14 +211,17 @@ public class Agent2D  {
 		return this.getCurrentLinkId();
 	}
 
+	@Override
 	public Id getId() {
 		return this.pda.getId();
 	}
 
+	@Override
 	public Id getCurrentLinkId() {
 		return this.pda.getCurrentLinkId();
 	}
 
+	@Override
 	public void endLegAndAssumeControl(double time) {
 		this.pda.endLegAndAssumeControl(time);
 	}
@@ -249,5 +257,41 @@ public class Agent2D  {
 	@Override
 	public String toString() {
 		return this.currentPosition.toString();
+	}
+
+	@Override
+	public Id getDestinationLinkId() {
+		return this.pda.getDestinationLinkId();
+	}
+
+	@Override
+	public State getState() {
+		return this.pda.getState();
+	}
+
+	@Override
+	public double getActivityEndTime() {
+		//TODO return my rounded ActivityEndTime
+		return this.pda.getActivityEndTime();
+	}
+
+	@Override
+	public void endActivityAndAssumeControl(double now) {
+		this.pda.endActivityAndAssumeControl(now);
+	}
+
+	@Override
+	public Double getExpectedTravelTime() {
+		return this.pda.getExpectedTravelTime();
+	}
+
+	@Override
+	public String getMode() {
+		return this.pda.getMode();
+	}
+
+	@Override
+	public void notifyTeleportToLink(Id linkId) {
+		this.pda.notifyTeleportToLink(linkId);
 	}
 }

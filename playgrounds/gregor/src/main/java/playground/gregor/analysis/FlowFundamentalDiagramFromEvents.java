@@ -49,8 +49,8 @@ public class FlowFundamentalDiagramFromEvents implements XYVxVyEventsHandler, Do
 	public FlowFundamentalDiagramFromEvents(Envelope e) {
 		this.e = e;
 		this.timeRes = new Sim2DConfigGroup().getTimeStepSize();
-		this.fl0 = new Coordinate(e.getMinX(),(e.getMinY()+e.getMaxY())/2);
-		this.fl1 = new Coordinate(e.getMaxX(),(e.getMinY()+e.getMaxY())/2);
+		this.fl0 = new Coordinate((e.getMinX()+e.getMaxX())/2,e.getMinY());
+		this.fl1 = new Coordinate((e.getMinX()+e.getMaxX())/2,e.getMaxY());
 	}
 
 
@@ -152,8 +152,8 @@ public class FlowFundamentalDiagramFromEvents implements XYVxVyEventsHandler, Do
 	}
 
 	public static void main(String [] args) {
-		String eventsFile = "/Users/laemmel/devel/bottleneck/output/ITERS/it.0/0.events.xml.gz";
-		String config = "/Users/laemmel/devel/bottleneck/input/config.xml";
+		String eventsFile = "/Users/laemmel/devel/oval/output/ITERS/it.0/0.events.xml.gz";
+		String config = "/Users/laemmel/devel/oval/input/config.xml";
 
 		Config c = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(c);
@@ -162,7 +162,7 @@ public class FlowFundamentalDiagramFromEvents implements XYVxVyEventsHandler, Do
 		EventsManager em = EventsUtils.createEventsManager();
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
-		Envelope e = new Envelope(-0.5,0.5,-3,-2);
+		Envelope e = new Envelope(5.5,6.5,2.65,3.35);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();
 		for (double x = e.getMinX(); x <= e.getMaxX(); x += .125 ) {

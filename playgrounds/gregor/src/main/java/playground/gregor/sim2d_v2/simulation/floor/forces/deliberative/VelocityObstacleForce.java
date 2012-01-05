@@ -58,13 +58,13 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		this.floor = floor;
 		this.driver = new PathAndDrivingAcceleration(floor,sc);
 		this.sc = sc;
-		double maxX = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxEasting();
-		double minX = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinEasting();
-		double maxY = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxNorthing();
-		double minY = this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
+		double maxX = 1000*this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxEasting();
+		double minX = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinEasting();
+		double maxY = 1000*this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMaxNorthing();
+		double minY = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
-		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
+		this.velocityChooser = new RandomAlternativeVelocityChooser();
 	}
 
 
@@ -270,6 +270,9 @@ public class VelocityObstacleForce implements DynamicForceModule{
 				int [] idx = Algorithms.getTangentIndices(agent.getPosition(),cso);
 				tan = new Coordinate[]{new Coordinate(agent.getPosition()),new Coordinate(cso[idx[0]]),new Coordinate(cso[idx[1]])};
 			}
+
+
+
 			double mvX = .5*(agent.getVx() - other.getVx());
 			double mvY = .5*(agent.getVy() - other.getVy());
 

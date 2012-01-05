@@ -53,6 +53,7 @@ public class Sim2DConfigGroup extends Module {
 	public static final String ENABLE_DRIVING_FORCE_MODULE = "enableDrivingForceModule";
 	public static final String ENABLE_ENVIRONMENT_FORCE_MODULE = "enableEnvironmentForceModule";
 	public static final String ENABLE_PATH_FORCE_MODULE = "enablePathForthModule";
+	public static final String ENABLE_PHYSICAL_ENVIRONMENT_FORCE_MODULE = "enablePhysicalEnvironmentForceModule";
 
 	public static final String ENABLE_MENTAL_LINK_SWITCH = "enableMentalLinkSwitch";
 
@@ -89,6 +90,7 @@ public class Sim2DConfigGroup extends Module {
 
 	private boolean enableEnvironmentForceModule = true;
 
+	private boolean enablePhysicalEnvironmentForceModuel = false;
 
 	private boolean enablePathForceModule = true;
 
@@ -181,6 +183,8 @@ public class Sim2DConfigGroup extends Module {
 			setMaxSensingRange(value);
 		} else if (ENABLE_MENTAL_LINK_SWITCH.equals(key)){
 			setEnableMentalLinkSwitch(value);
+		} else if (ENABLE_PHYSICAL_ENVIRONMENT_FORCE_MODULE.equals(key)){
+			setEnablePhysicalEnvironmentForceModule(value);
 		}
 		else {
 			throw new IllegalArgumentException(key);
@@ -235,7 +239,7 @@ public class Sim2DConfigGroup extends Module {
 		return this.enableVelocityObstacleModule;
 	}
 
-	private void setEnableVelocityObstacleModule(String value) {
+	public void setEnableVelocityObstacleModule(String value) {
 		this.enableVelocityObstacleModule = Boolean.parseBoolean(value);
 
 	}
@@ -264,6 +268,14 @@ public class Sim2DConfigGroup extends Module {
 	public void setEnableCircularAgentInterActionModule(String value) {
 		this.enableCircularAgentInteractionModule = Boolean.parseBoolean(value);
 
+	}
+
+	public boolean isEnablePhysicalEnvironmentForceModule() {
+		return this.enablePhysicalEnvironmentForceModuel;
+	}
+
+	public void setEnablePhysicalEnvironmentForceModule(String value) {
+		this.enablePhysicalEnvironmentForceModuel = Boolean.parseBoolean(value);
 	}
 
 	@Override
@@ -298,6 +310,8 @@ public class Sim2DConfigGroup extends Module {
 			return Double.toString(getMaxSensingRange());
 		}else if (ENABLE_MENTAL_LINK_SWITCH.equals(key)){
 			return Boolean.toString(isEnableMentalLinkSwitch());
+		}else if (ENABLE_PHYSICAL_ENVIRONMENT_FORCE_MODULE.equals(key)){
+			return Boolean.toString(isEnablePhysicalEnvironmentForceModule());
 		}
 		throw new IllegalArgumentException(key);
 	}
@@ -326,6 +340,7 @@ public class Sim2DConfigGroup extends Module {
 		map.put(ENABLE_VELOCITY_OBSTACLE_MODULE, getValue(ENABLE_VELOCITY_OBSTACLE_MODULE));
 		map.put(MAX_SENSING_RANGE, getValue(MAX_SENSING_RANGE));
 		map.put(ENABLE_MENTAL_LINK_SWITCH, getValue(ENABLE_MENTAL_LINK_SWITCH));
+		map.put(ENABLE_PHYSICAL_ENVIRONMENT_FORCE_MODULE, getValue(ENABLE_PHYSICAL_ENVIRONMENT_FORCE_MODULE));
 		return map;
 	}
 
