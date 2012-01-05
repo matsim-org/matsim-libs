@@ -45,7 +45,7 @@ public class VisLinkImpl implements VisLink {
 
 		for (MobsimVehicle veh : this.link.buffer.buffer) {
 			dist -= vehSize;
-			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(1.0);
 			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
 			positions.add(pi);
@@ -53,7 +53,7 @@ public class VisLinkImpl implements VisLink {
 		vehSize = dist / this.link.vehQueue.size();
 		for (MobsimVehicle veh : this.link.vehQueue) {
 			dist -= vehSize;
-			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.staticCreateAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(0.5);
 			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
 			positions.add(pi);
