@@ -21,6 +21,7 @@ package playground.thibautd.jointtrips.replanning.strategies;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
 import playground.thibautd.jointtrips.replanning.modules.reroute.JointReRouteModule;
@@ -36,7 +37,8 @@ public class ReRouteStrategy extends JointPlanStrategy {
 	public ReRouteStrategy(final Controler controler) {
 		// TODO: use a JointPlan specific selector?
 		// + pass it from the config file
-		super( new BestPlanSelector() );
+		// super( new BestPlanSelector() );
+		super( new RandomPlanSelector() );
 
 		this.addStrategyModule(new JointReRouteModule(controler));
 	}
