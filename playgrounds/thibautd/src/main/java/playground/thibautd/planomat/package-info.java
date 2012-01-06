@@ -1,19 +1,8 @@
 /**
- * This package provides <em>Planomat</em>.
- * 
- * <h2>Package Maintainer(s):</h2>
- * <ul>
- *   <li>Konrad Meister</li>
- * </ul>
- * 
- * <h2>Parameters:<a name="planomat_parameters"></a></h2>
- * <ul>
- * 	<li><strong><font color="blue">...</font></strong> <br>
- * 		Type and range: ... <br>
- * 		Default: ... <br>
- * 		Description: ...
- * 	</li>
- * </ul>
- * 
+ * This package provides version 2 of <em>Planomat</em>.
+ *
+ * This version is meant to be easier to extend than the previous one.
+ *
+ * @author thibautd, based on Konrad Meister previous version
  */
 package playground.thibautd.planomat;

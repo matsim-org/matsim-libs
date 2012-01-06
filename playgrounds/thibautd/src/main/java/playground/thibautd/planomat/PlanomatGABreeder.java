@@ -28,6 +28,14 @@ import org.jgap.Population;
 import org.jgap.event.GeneticEvent;
 import org.jgap.impl.GABreeder;
 
+import playground.thibautd.planomat.api.PlanomatFitnessFunction;
+
+/**
+ * Reimplements the Jgap class, so that it allows negative fitness
+ * values.
+ *
+ * @author thibautd
+ */
 public class PlanomatGABreeder extends GABreeder {
 
 	/**
@@ -90,7 +98,7 @@ public class PlanomatGABreeder extends GABreeder {
 	    int currentPopSize = pop.size();
 	    for (int i = originalPopSize; i < currentPopSize; i++) {
 	      IChromosome chrom = pop.getChromosome(i);
-	      chrom.setFitnessValueDirectly(PlanomatFitnessFunctionWrapper.NO_FITNESS_VALUE);
+	      chrom.setFitnessValueDirectly(PlanomatFitnessFunction.NO_FITNESS_VALUE);
 	      // Mark chromosome as new-born.
 	      // ----------------------------
 	      chrom.resetAge();
