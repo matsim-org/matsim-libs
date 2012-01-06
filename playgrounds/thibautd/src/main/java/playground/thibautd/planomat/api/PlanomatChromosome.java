@@ -26,6 +26,7 @@ import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
 import org.jgap.IGeneConstraintChecker;
+import org.jgap.IInitializer;
 import org.jgap.InvalidConfigurationException;
 
 /**
@@ -33,11 +34,12 @@ import org.jgap.InvalidConfigurationException;
  * fitness values.
  * To provide a sample chromosome, initialise an instance of this class
  * with the desired sequence of chromosomes.
+ * It is suitable to be initialised with genotype.randomInitialGenotype
  *
  * @author thibautd
  */
 // TODO: test!
-public class PlanomatChromosome implements IChromosome {
+public class PlanomatChromosome implements IChromosome , IInitializer {
 	private static final long serialVersionUID = 1L;
 
 	private final Chromosome delegate;
@@ -111,6 +113,19 @@ public class PlanomatChromosome implements IChromosome {
 	public static IChromosome randomInitialChromosome(final Configuration conf)
 		throws InvalidConfigurationException {
 		return new PlanomatChromosome( (Chromosome) Chromosome.randomInitialChromosome(conf) );
+	}
+
+	public boolean isHandlerFor(
+			final Object a_obj,
+			final Class a_class) {
+		return getClass().equals( a_class );
+	}
+
+	public Object perform(
+			final Object a_obj,
+			final Class a_class,
+			final Object a_params) throws Exception {
+		return new PlanomatChromosome( (Chromosome) delegate.perform(a_obj, a_class, a_params) );
 	}
 
 	/**

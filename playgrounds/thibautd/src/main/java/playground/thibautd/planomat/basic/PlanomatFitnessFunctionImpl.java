@@ -113,6 +113,7 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 	private final Map<Activity, Double> enforcedDurations = new HashMap<Activity, Double>();
 	private double timeToFill;
 	private final List<List<Leg>> subtours = new ArrayList<List<Leg>>();
+	private int nModeGene;
 
 	/**
 	 * Initialises a fitness function.
@@ -189,8 +190,11 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 		// count genes and add them, and store a map gene->planElement
 		// start with mode genes
 		int maxIntGene = possibleModes.length - 1;
-		for (int i=0; i < subtourAnalyser.getNumSubtours(); i++) {
-			genes.add( new IntegerGene( jgapConfig, 0, maxIntGene ) );
+		nModeGene = 0;
+		if (maxIntGene > 0) {
+			for (; nModeGene < subtourAnalyser.getNumSubtours(); nModeGene++) {
+				genes.add( new IntegerGene( jgapConfig, 0, maxIntGene ) );
+			}
 		}
 
 		// then, durations
@@ -227,15 +231,17 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 		int count = 0;
 
 		// mode
-		for (List<Leg> subtour : subtours) {
-			int modeIndex = ((IntegerGene) genes[ count ]).intValue();
-			String mode = possibleModes[ modeIndex ];
+		if (nModeGene > 0) {
+			for (List<Leg> subtour : subtours) {
+				int modeIndex = ((IntegerGene) genes[ count ]).intValue();
+				String mode = possibleModes[ modeIndex ];
 
-			for (Leg leg : subtour) {
-				leg.setMode( mode );
+				for (Leg leg : subtour) {
+					leg.setMode( mode );
+				}
+
+				count++;
 			}
-
-			count++;
 		}
 
 		// duration
