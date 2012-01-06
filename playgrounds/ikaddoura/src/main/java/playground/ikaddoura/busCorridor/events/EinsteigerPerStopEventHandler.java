@@ -59,7 +59,7 @@ public class EinsteigerPerStopEventHandler implements PersonEntersVehicleEventHa
 			
 		}
 		else {
-			System.out.println("Person "+event.getPersonId()+" enters Vehicle "+event.getVehicleId()+" at Facility "+vehicleId2stopId.get(event.getVehicleId())+".");
+//			System.out.println("Person "+event.getPersonId()+" enters Vehicle "+event.getVehicleId()+" at Facility "+vehicleId2stopId.get(event.getVehicleId())+".");
 			Id vehicleId = event.getVehicleId();
 			Id stopId = vehicleId2stopId.get(vehicleId);
 			Integer einsteigerBisher = 0;

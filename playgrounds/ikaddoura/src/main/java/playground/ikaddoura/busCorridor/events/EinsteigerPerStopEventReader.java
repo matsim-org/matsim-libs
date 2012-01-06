@@ -36,7 +36,7 @@ public class EinsteigerPerStopEventReader {
 
 	public static void main(String[] args) {
 		
-		String eventFile = "../../shared-svn/studies/ihab/busCorridor/output_otfVis/extITERS/extIt.0/internalIterations/ITERS/it.0/0.events.xml.gz";
+		String eventFile = "../../shared-svn/studies/ihab/busCorridor/output_test/extITERS/extIt.0/internalIterations/ITERS/it.0/0.events.xml.gz";
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 
 		EinsteigerPerStopEventHandler handler = new EinsteigerPerStopEventHandler();
@@ -47,9 +47,13 @@ public class EinsteigerPerStopEventReader {
 		
 		System.out.println("Events file "+eventFile+" read!");
 		
+		int sum = 0;
 		for (Id id : handler.getStopId2einsteiger().keySet()){
 			System.out.println("StopId: "+id+" - Einsteiger: "+handler.getStopId2einsteiger().get(id));
+			sum = sum + handler.getStopId2einsteiger().get(id);
 		}
+		System.out.println("Einsteiger insgesamt: "+sum);
+		System.out.println("durchsch. Einsteiger pro Stop: "+sum/handler.getStopId2einsteiger().size());
 	}
 
 }
