@@ -71,7 +71,6 @@ public class Agent2D implements MobsimAgent {
 
 
 	private double sensingRange = 5;
-	public final double wi;
 
 
 	/**
@@ -87,9 +86,6 @@ public class Agent2D implements MobsimAgent {
 		this.currentDesiredVelocity = this.desiredVelocity;
 		this.mentalLinkSwitcher = mlsw;
 		initGeometry();
-
-		this.wi = MatsimRandom.getRandom().nextDouble()*0.9+0.1;
-
 	}
 
 	private void initGeometry() {

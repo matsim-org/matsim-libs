@@ -17,6 +17,7 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 	private static final double MAX_V_COEFF = 1.25;
 	private final XORShiftRandom random;
 
+	private static final double W_I = 0.5; //TODO shouldn't this be a parameter of the agents?
 
 	public RandomAlternativeVelocityChooser() {
 		this.random = new XORShiftRandom(MatsimRandom.getRandom().nextLong());
@@ -43,7 +44,7 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 				}
 			} else {
 				double colTime = timeToCollision(vOs, c0, candC);
-				double testPen = candC.distance(c1) + agent.wi/colTime;
+				double testPen = candC.distance(c1) + W_I/colTime;
 
 				//FIXME use simStepTime instead of 0.04
 				if (colTime > 0.12 && testPen < penalty) {
