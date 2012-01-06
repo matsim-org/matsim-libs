@@ -21,7 +21,9 @@
 package playground.christoph.evacuation.vehicles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -46,12 +48,14 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private final Scenario scenario;
 	private final PlanAlgorithm routingAlgorithm;
 	private final Counter counter;
+	private final Map<Id, Id> mapping;	// <AgentId, VehicleId>
 	
 	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
 		this.scenario = scenario;
 		this.routingAlgorithm = planAlgorithm;
 		
 		this.counter = new Counter("Assigned vehicles: ");
+		this.mapping = new HashMap<Id, Id>();
 	}
 	
 	public void run(Household household) {
@@ -62,6 +66,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     	for (Id personId : household.getMemberIds()) {
     		Person p = scenario.getPopulation().getPersons().get(personId);
     		persons.add(p);
+    		mapping.put(p.getId(), null);
     		
     		boolean requiresVehicle = requiresVehicle(p);
     		if (requiresVehicle) vehicleRequiringPersons.add(p);
@@ -77,20 +82,63 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     	while (vehicleRequiringPersons.size() > vehicleIds.size()) {
     		Person p = vehicleRequiringPersons.remove(0);
     		run(p);
+    		checkVehicleId(p.getSelectedPlan());
     	}
     	
     	/*
     	 * Assign vehicles to person's legs.
     	 */
     	for (int i = 0; i < vehicleRequiringPersons.size(); i++) {
+    		Person p = vehicleRequiringPersons.get(i);
+    		Id vehicleId = vehicleIds.get(i);
     		assignVehicleToPerson(vehicleRequiringPersons.get(i), vehicleIds.get(i));
+    		mapping.put(p.getId(), vehicleId);
     		counter.incCounter();
     	}
 	}
 	
+	/*
+	 * So far, vehicle Ids are deleted when a person's route is updated. Therefore
+	 * we have to set the vehicles again.
+	 */
+	public void reassignVehicles() {
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			Id vehicleId = mapping.get(p.getId());
+			if (vehicleId != null) {
+				assignVehicleToPerson(p, vehicleId);				
+			}
+		}
+	}
+	
+	private void checkVehicleId(Plan plan) {
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				Leg leg = (Leg) planElement;
+				if (leg.getMode().equals(TransportMode.car)) {
+					NetworkRoute route = (NetworkRoute) leg.getRoute();
+					if (route.getVehicleId() == null) {
+						System.out.println("Vehicle Id is null!");
+					} else if(!route.getVehicleId().toString().contains("_veh")) {
+						System.out.println("Unexpected vehicle Id!");
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Replace all car legs in a plan by legs with alternative transport modes.
+	 * Trips with a crow-fly distance of
+	 * <ui>
+	 * <li>0.0 .. 2000.0 become walk legs</li>
+	 * <li>2000.0 .. 5000.0 become bike legs</li>
+	 * <li>5000.0 ... become pt legs</li> 
+	 * </ui> 
+	 * @param plan to be adapted
+	 */
 	@Override
 	public void run(Plan plan) {
-		for (int i = 1; i < plan.getPlanElements().size() - 2; i = i + 2) {
+		for (int i = 1; i < plan.getPlanElements().size() - 1; i = i + 2) {
 			Leg leg = (Leg) plan.getPlanElements().get(i);
 
 			if (leg.getMode().equals(TransportMode.car)) {

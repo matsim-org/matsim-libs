@@ -23,21 +23,29 @@ package playground.christoph.evacuation.controler;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 
+import playground.christoph.controler.KTIEnergyFlowsController;
 import playground.christoph.energyflows.controller.EnergyFlowsController;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
+import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
+import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
+import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
@@ -53,8 +61,10 @@ import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader
  * 
  * @author cdobler
  */
-public class PrepareScenarioControler extends EnergyFlowsController implements StartupListener, SimulationInitializedListener {
-	
+//public class PrepareScenarioControler extends EnergyFlowsController implements StartupListener, ReplanningListener {
+public class PrepareScenarioControler extends KTIEnergyFlowsController implements StartupListener, ReplanningListener {
+
+
 	protected String[] householdVehicleFiles = new String[]{
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AI.txt",
@@ -83,6 +93,10 @@ public class PrepareScenarioControler extends EnergyFlowsController implements S
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
 
+	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
+	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+	
+	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected LegModeChecker legModeChecker;
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
@@ -90,8 +104,7 @@ public class PrepareScenarioControler extends EnergyFlowsController implements S
 	
 	public PrepareScenarioControler(String[] args) {
 		super(args);
-		
-		this.getQueueSimulationListener().add(this);
+
 		this.addCoreControlerListener(this);
 	}
 	
@@ -102,6 +115,22 @@ public class PrepareScenarioControler extends EnergyFlowsController implements S
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+//		/*
+//		 * Adding z-coordinates to the network
+//		 */
+//		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
+//		zCoordinateAdder.addZCoordinatesToNetwork();
+//		zCoordinateAdder.checkSteepness();
+
+//		/*
+//		 * Use advanced walk- and bike travel time calculators
+//		 */
+//		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+//		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
+		
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
@@ -142,35 +171,16 @@ public class PrepareScenarioControler extends EnergyFlowsController implements S
 		this.setMobsimFactory(mobsimFactory);
 	}
 	
+	/*
+	 * So far, vehicle Ids are deleted when a person's route is updated during
+	 * the replanning. Therefore we have to set the vehicles again after the
+	 * replanning.
+	 */
 	@Override
-	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		/*
-		 * We replace the selected plan of each agent with the executed plan which
-		 * is adapted by the within day replanning modules.
-		 * So far, this is necessary because some modules, like e.g. EventsToScore,
-		 * use person.getSelectedPlan(). However, when using within-day replanning
-		 * the selected plan might be different than the executed plan which
-		 * in turn will result in code that crashes...
-		 */
-		for (MobsimAgent agent : ((QSim)e.getQueueSimulation()).getAgents()) {
-			if (agent instanceof ExperimentalBasicWithindayAgent) {
-				Plan executedPlan = ((ExperimentalBasicWithindayAgent) agent).getSelectedPlan();
-				PersonImpl person = (PersonImpl)((ExperimentalBasicWithindayAgent) agent).getPerson();
-				person.removePlan(person.getSelectedPlan());
-				person.addPlan(executedPlan);
-				person.setSelectedPlan(executedPlan);
-			}
-		}
-		
-		/*
-		 * Assign vehicles to agent's plans.
-		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.createRoutingAlgorithm());
-		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
-			this.assignVehiclesToPlans.run(household);
-		}
+	public void notifyReplanning(ReplanningEvent event) {
+		this.assignVehiclesToPlans.reassignVehicles();
 	}
-	
+
 	/*
 	 * ===================================================================
 	 * main

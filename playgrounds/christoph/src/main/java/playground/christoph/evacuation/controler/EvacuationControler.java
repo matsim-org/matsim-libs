@@ -447,12 +447,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //		this.getReplanningManager().addDuringLegReplanner(this.currentInsecureLegReplanner);
 	}
 
-	@Override
-	protected void setUp() {
-
-		super.setUp();
-	}
-
 	/*
 	 * ===================================================================
 	 * main

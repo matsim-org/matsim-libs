@@ -118,6 +118,9 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		return link.getLength() / (personSpeed * slopeFactor);
 	}
 
+	/*
+	 * Returns the slope of a link in %.
+	 */
 	private double calcSlope(Link link) {
 		double slope = 0.0;
 		double length = link.getLength();
@@ -136,7 +139,8 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 			}		
 		} else incLinkLengthWarnCount("Link length is <= 0.0. Link's slope cannot be calculated. Assuming slope of 0%.");
 		
-		return slope;
+		// convert slope to % and return it
+		return 100 * slope;
 	}
 	
 	private void incLinkLengthWarnCount(String text) {
