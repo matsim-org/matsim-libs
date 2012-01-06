@@ -106,7 +106,13 @@ public class TimePeriod {
 		return orderId;
 	}
 	
+	public void changeFromTime(double time) {
+		this.setFromTime(this.getFromTime() + time);
+	}
 	
+	public void changeToTime(double time) {
+		this.setToTime(this.getToTime() + time);
+	}
 	
 }
 
