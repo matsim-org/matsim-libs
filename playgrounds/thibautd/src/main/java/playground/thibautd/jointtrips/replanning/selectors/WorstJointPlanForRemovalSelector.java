@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.selectors;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,70 +33,46 @@ import playground.thibautd.jointtrips.population.JointPlan;
 
 /**
  * Returns the plan with the lowest score.
- * Always keeps the more "general" plan, that is, the "father" plan
+ * If it is initalised as "type aware", keeps the more "general" plan, that is, the "father" plan
  * from which we can obtain the others by desaffecting joint trips.
+ * This is useful only if not using JointTripPossibilities.
  *
  * Plans which are duplicated are removed in priority.
  *
  * @author thibautd
  */
 public class WorstJointPlanForRemovalSelector implements PlanSelector {
+	private final boolean isTypeAware;
+
+	public WorstJointPlanForRemovalSelector(
+			final boolean isTypeAware) {
+		this.isTypeAware = isTypeAware;
+	}
+
+	/**
+	 * initialises a non-type aware instance.
+	 */
+	public WorstJointPlanForRemovalSelector() {
+		this( false );
+	}
 
 	@Override
-	public Plan selectPlan(Person person) {
-
+	public Plan selectPlan(final Person person) {
 		if (person instanceof Clique) {
-			return selectPlan((Clique) person);
+			return isTypeAware ? selectPlanTypeAware((Clique) person) : selectPlan((Clique) person);
 		} else {
 			throw new IllegalArgumentException("WorstJointPlanForRemoval used "+
 					"for a non clique agent");
 		}
 	}
 
-	//public Plan selectPlan(Clique clique) {
-	//	Double worstScore = Double.POSITIVE_INFINITY;
-	//	Double currentScore;
-	//	int currentLongestType = 0;
-	//	int currentTypeSize;
-	//	int countFathers = 0;
-	//	Plan fatherPlan=null;
-	//	Plan worstPlan=null;
-	//	List<? extends Plan> individualPlans = clique.getPlans();
+	private static Plan selectPlan(final Clique clique) {
+		List<? extends Plan> plans = clique.getPlans();
 
-	//	// count "father" plans.
-	//	// assumes that there is only one initial plan, so that the more
-	//	// general plan is the one with the longest type.
-	//	for (Plan plan: individualPlans) {
-	//		currentTypeSize = ((JointPlan) plan).getType().length();
-	//		if (currentTypeSize > currentLongestType) {
-	//			currentLongestType = currentTypeSize;
-	//			fatherPlan = plan;
-	//			countFathers = 1;
-	//		}
-	//		else if (currentTypeSize == currentLongestType) {
-	//			countFathers++;
-	//		}
-	//	}
+		return Collections.min( plans , new ScoreComparator() );
+	}
 
-	//	for (Plan plan : individualPlans) {
-	//		// consider the plan only if it is not the only "father" plan
-	//		if ((plan != fatherPlan)||(countFathers > 1)) {
-	//			currentScore = plan.getScore();			
-	//			if (currentScore==null) {
-	//				//if there is an unscored plan, consider it as worst
-	//				return plan;
-	//			}
-	//			else if (currentScore < worstScore) {
-	//				worstScore = currentScore;
-	//				worstPlan = plan;
-	//			}
-	//		}
-	//	}
-
-	//	return worstPlan;
-	//}
-
-	public Plan selectPlan(Clique clique) {
+	private static Plan selectPlanTypeAware(final Clique clique) {
 		Double worstScore = Double.POSITIVE_INFINITY;
 		Double currentScore;
 		String currentType;
@@ -175,3 +154,10 @@ public class WorstJointPlanForRemovalSelector implements PlanSelector {
 	}
 }
 
+class ScoreComparator implements Comparator<Plan> {
+
+	@Override
+	public int compare(final Plan plan1, final Plan plan2) {
+		return Double.compare( plan1.getScore() , plan2.getScore() );
+	}
+}
