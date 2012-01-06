@@ -40,10 +40,10 @@ public class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_test/network.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/population.xml"; // for first iteration only
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn";
 	static int numberOfExternalIterations = 1;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
