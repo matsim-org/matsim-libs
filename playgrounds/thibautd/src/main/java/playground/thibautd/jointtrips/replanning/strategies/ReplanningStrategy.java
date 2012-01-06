@@ -20,6 +20,7 @@
 package playground.thibautd.jointtrips.replanning.strategies;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
@@ -34,7 +35,9 @@ import playground.thibautd.jointtrips.replanning.selectors.PlanWithLongestTypeSe
 public class ReplanningStrategy extends JointPlanStrategy {
 
 	public ReplanningStrategy(final Controler controler) {
-		super( new PlanWithLongestTypeSelector() );
+		// selector: should be gotten from some config group.
+		//super( new PlanWithLongestTypeSelector() );
+		super( new ExpBetaPlanSelector( controler.getConfig().planCalcScore() ) );
 
 		this.addStrategyModule(new JointPlanOptimizerModule(controler));
 	}
