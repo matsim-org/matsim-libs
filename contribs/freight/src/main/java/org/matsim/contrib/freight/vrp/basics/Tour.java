@@ -43,13 +43,11 @@ public class Tour {
 	
 	@Override
 	public String toString() {
-		String tour = null;
+		String tour = "";
 		for(TourActivity c : tourActivities){
-			
+			tour += "[" + c.getType() + "@" + c.getLocationId() + "@" + c.getEarliestArrTime() + "-" + c.getLatestArrTime() + "]";
 		}
-		if(tour != null){
-			tour += "[time=" + costs.time + "][distance=" + costs.distance + "][generalizedCosts=" + costs.generalizedCosts + "]"; 
-		}
+		tour += "[time=" + costs.time + "][distance=" + costs.distance + "][generalizedCosts=" + costs.generalizedCosts + "]"; 
 		return tour;
 	}
 

@@ -46,36 +46,30 @@ import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
  *
  */
 
-class BestTourBuilder {
+public class PickupAndDeliveryTourFactory implements TourFactory {
 	
-	private static Logger logger = Logger.getLogger(BestTourBuilder.class);
+	private static Logger logger = Logger.getLogger(PickupAndDeliveryTourFactory.class);
 	
 	private Costs costs;
 	
-	private Vehicle vehicle;
-
 	private Constraints constraints;
 
-	private TourActivityStatusUpdater tourActivityUpdater;
+	private TourStatusProcessor tourActivityUpdater;
 
-	private Tour tour;
-	
-	public BestTourBuilder(Tour tour, Costs costs, Vehicle vehicle, Constraints constraints, TourActivityStatusUpdater tourActivityUpdater) {
+	public PickupAndDeliveryTourFactory(Costs costs, Constraints constraints, TourStatusProcessor tourActivityUpdater) {
 		super();
 		this.costs = costs;
-		this.vehicle = vehicle;
 		this.constraints = constraints;
 		this.tourActivityUpdater = tourActivityUpdater;
-		this.tour = tour;
 	}
 	
-	public Tour buildTour(Job job, double bestKnownPrice){
+	public Tour createTour(Vehicle vehicle, Tour oldTour, Job job, double bestKnownPrice){
 		Tour newTour = null;
-		newTour = buildTourWithNewShipment(tour,(Shipment)job,bestKnownPrice);
+		newTour = buildTourWithNewShipment(vehicle,oldTour,(Shipment)job, bestKnownPrice);
 		return newTour;
 	}
 	
-	private Tour buildTourWithNewShipment(Tour tour, Shipment shipment, double bestKnownPrice) {
+	private Tour buildTourWithNewShipment(Vehicle vehicle, Tour tour, Shipment shipment, double bestKnownPrice) {
 			Pickup pickup = createPickup(shipment);
 			Delivery delivery = createDelivery(shipment);
 			Double bestMarginalCost = bestKnownPrice;
@@ -132,7 +126,7 @@ class BestTourBuilder {
 			tourBuilder.scheduleActivity(tour.getActivities().get(i));
 		}
 		Tour newTour = tourBuilder.build();
-		tourActivityUpdater.update(newTour);
+		tourActivityUpdater.process(newTour);
 		return newTour;
 	}
 
@@ -155,19 +149,5 @@ class BestTourBuilder {
 	private TourActivity getActivity(Tour tour, int i) {
 		return tour.getActivities().get(i);
 	}
-
-//	private double getMarginalInsertionCosts(String act_i,String act_j, String pickupLoc, String deliveryLoc) {
-//	double tt_acti_2_pickup = getTravelTime(act_i.getLocation(),pickupLoc.getLocation(),act_i.getEarliestArrTime() + act_i.getServiceTime()); 
-//	double earliestArrTimeAtPickup = act_i.getEarliestArrTime() + act_i.getServiceTime() + tt_acti_2_pickup;
-//	double tt_pickup2delivery = getTravelTime(pickupLoc.getLocation(),deliveryLoc.getLocation(),earliestArrTimeAtPickup + shipment.getPickupServiceTime()); 
-//	double earliestArrTimeAtDelivery = earliestArrTimeAtPickup + shipment.getPickupServiceTime() + tt_pickup2delivery;
-//	
-//	double marginalCost = getGeneralizedCosts(act_i.getLocation(), pickupLoc.getLocation(), act_i.getEarliestArrTime() + act_i.getServiceTime()) +
-//		getGeneralizedCosts(pickupLoc.getLocation(), deliveryLoc.getLocation(), earliestArrTimeAtPickup + shipment.getPickupServiceTime()) +
-//		getGeneralizedCosts(deliveryLoc.getLocation(), act_j.getLocation(), earliestArrTimeAtDelivery + shipment.getDeliveryServiceTime()) -
-//		getGeneralizedCosts(act_i.getLocation(), act_j.getLocation(), act_i.getEarliestArrTime() + act_i.getServiceTime());	
-//	return marginalCost;
-//}
-
 
 }

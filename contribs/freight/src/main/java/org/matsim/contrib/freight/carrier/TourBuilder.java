@@ -22,6 +22,12 @@ public class TourBuilder {
 
 	private Id endLinkId;
 	
+	private double earliestDeparture;
+	
+	private double latestDeparture;
+	
+	private boolean departureSet = false;
+	
 	public void scheduleStart(Id startLinkId) {
 		this.startLinkId = startLinkId;
 	}
@@ -47,7 +53,12 @@ public class TourBuilder {
 	}
 
 	public Tour build() {
-		return new Tour(startLinkId, tourElements, endLinkId);
+		Tour tour = new Tour(startLinkId, tourElements, endLinkId);
+		if(departureSet){
+			tour.setEarliestDeparture(earliestDeparture);
+			tour.setLatestDeparture(latestDeparture);
+		}
+		return tour;
 	}
 
 	private Pickup createPickup(CarrierShipment shipment) {
@@ -75,6 +86,12 @@ public class TourBuilder {
 	private TourElement createGeneralActivity(String type, Id locationLink,Double earliestStart, Double latestStart, Double duration) {
 		GeneralActivity act = new GeneralActivity(type, locationLink, earliestStart, latestStart, duration);
 		return act;
+	}
+
+	public void setTourStartTimeWindow(double earliestDeparture, double latestDeparture) {
+		this.earliestDeparture = earliestDeparture;
+		this.latestDeparture = latestDeparture;
+		departureSet = true;
 	}
 
 }

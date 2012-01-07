@@ -23,18 +23,22 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgent;
-import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostAndTWProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourStatusProcessor;
 import org.matsim.contrib.freight.vrp.basics.Constraints;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Locations;
 import org.matsim.contrib.freight.vrp.basics.ManhattanCosts;
+import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
+import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.VrpBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
@@ -66,6 +70,10 @@ public class VRPTestCase extends TestCase{
 	
 	public boolean init = false;
 	
+	public TourStatusProcessor tourStatusProcessor;
+	
+	public TourFactory tourFactory;
+	
 	
 	/*
 	 * 	|
@@ -91,7 +99,10 @@ public class VRPTestCase extends TestCase{
 		createLocations();
 		costs = new ManhattanCosts(locations);
 		constraints = new PickAndDeliveryCapacityAndTWConstraint();
+		tourStatusProcessor = new TourCostAndTWProcessor(costs);
+		tourFactory = new PickupAndDeliveryTourFactory(costs, constraints, tourStatusProcessor);
 	}
+
 	
 	private void createLocations() {
 		for(int i=0;i<11;i++){
@@ -124,7 +135,8 @@ public class VRPTestCase extends TestCase{
 	}
 	
 	protected TourAgent getTourAgent(VehicleRoutingProblem vrp, Tour tour1, Vehicle vehicle) {
-		return new RRTourAgentFactory(vrp).createTourAgent(tour1, vehicle);
+		
+		return new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(tour1, vehicle);
 	}
 	
 	private Coordinate makeCoord(int i, int j) {

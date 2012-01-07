@@ -33,19 +33,19 @@ import org.matsim.contrib.freight.vrp.basics.TourActivity;
  *
  */
 
-class TourActivityStatusUpdaterImpl implements TourActivityStatusUpdater{
+public class TourCostProcessor implements TourStatusProcessor{
 	
-	private static Logger logger = Logger.getLogger(TourActivityStatusUpdaterImpl.class);
+	private static Logger logger = Logger.getLogger(TourCostProcessor.class);
 	
 	private Costs costs;
 	
-	TourActivityStatusUpdaterImpl(Costs costs) {
+	public TourCostProcessor(Costs costs) {
 		super();
 		this.costs = costs;
 	}
 	
 	@Override
-	public void update(Tour tour){
+	public void process(Tour tour){
 		reset(tour);
 		for(int i=1;i<tour.getActivities().size();i++){
 			TourActivity fromAct = tour.getActivities().get(i-1);

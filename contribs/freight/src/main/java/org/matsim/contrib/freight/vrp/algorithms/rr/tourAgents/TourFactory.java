@@ -17,7 +17,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
+import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -28,27 +28,6 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
  *
  */
 
-public class RRTourAgentWithTimeWindowFactory implements TourAgentFactory{
-
-	private VehicleRoutingProblem vrp;
-	
-	public RRTourAgentWithTimeWindowFactory(VehicleRoutingProblem vrp) {
-		super();
-		this.vrp = vrp;
-	}
-
-	@Override
-	public TourAgent createTourAgent(Tour tour, Vehicle vehicle) {
-		TourActivityStatusUpdater updater = new TourActivityStatusUpdaterWithTWImpl(vrp.getCosts());
-//		BestTourBuilder tourBuilder = new BestTourBuilder();
-//		tourBuilder.setConstraints(vrp.getConstraints());
-//		tourBuilder.setCosts(vrp.getCosts());
-//		tourBuilder.setTourActivityStatusUpdater(updater);
-//		tourBuilder.setVehicle(vehicle);
-		RRTourAgent tourAgent = new RRTourAgent(vrp.getCosts(), tour, vehicle, updater, vrp.getConstraints());
-//		tourAgent.setConstraint(vrp.getConstraints());
-//		tourAgent.setTourBuilder(tourBuilder);
-		return tourAgent;
-	}
-
+public interface TourFactory {
+	Tour createTour(Vehicle vehicle, Tour tour, Job job, double bestKnownPrice);
 }

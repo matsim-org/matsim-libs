@@ -17,18 +17,18 @@ public class VrpTourBuilder {
 		tour = new Tour();
 	}
 	
-	public void scheduleStart(String locationId, double earliestArr, double latestArr){
+	public void scheduleStart(String locationId, double earliestDeparture, double latestDeparture){
 		if(tourStarted){
 			throw new IllegalStateException("tour has already started");
 		}
 		Start start = new Start(locationId);
-		start.setEarliestArrTime(earliestArr);
-		start.setLatestArrTime(latestArr);
+		start.setEarliestArrTime(earliestDeparture);
+		start.setLatestArrTime(latestDeparture);
 		tourStarted = true;
 		tour.getActivities().add(start);
 	}
 	
-	public void scheduleEnd(String locationId, double earliestArr, double latestArr){
+	public void scheduleEnd(String locationId, double earliestArrival, double latestArrival){
 		if(!tourStarted){
 			throw new IllegalStateException("tour must start before end");
 		}
@@ -36,8 +36,8 @@ public class VrpTourBuilder {
 			throw new IllegalStateException("there are still open shipments");
 		}
 		End end = new End(locationId);
-		end.setEarliestArrTime(earliestArr);
-		end.setLatestArrTime(latestArr);
+		end.setEarliestArrTime(earliestArrival);
+		end.setLatestArrTime(latestArrival);
 		tour.getActivities().add(end);
 		tourEnded = true;
 	}

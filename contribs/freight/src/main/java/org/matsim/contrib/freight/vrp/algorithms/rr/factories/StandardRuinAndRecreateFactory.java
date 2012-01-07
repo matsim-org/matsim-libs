@@ -15,18 +15,26 @@
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package org.matsim.contrib.freight.vrp.algorithms.rr;
+package org.matsim.contrib.freight.vrp.algorithms.rr.factories;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RRSolution;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateListener;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinStrategyManager;
 import org.matsim.contrib.freight.vrp.algorithms.rr.recreation.BestInsertion;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.AvgDistanceBetweenJobs;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RadialRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ruin.RandomRuin;
 import org.matsim.contrib.freight.vrp.algorithms.rr.thresholdFunctions.SchrimpfsRRThresholdFunction;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.PickupAndDeliveryTourFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.RRTourAgentFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourCostProcessor;
+import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 
@@ -63,7 +71,9 @@ public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 	 */
 	@Override
 	public RuinAndRecreate createAlgorithm(VehicleRoutingProblem vrp, RRSolution initialSolution){
-		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(vrp);
+		TourCostProcessor tourCostProcessor = new TourCostProcessor(vrp.getCosts());
+		TourFactory tourFactory = new PickupAndDeliveryTourFactory(vrp.getCosts(),vrp.getConstraints(), tourCostProcessor);
+		RRTourAgentFactory tourAgentFactory = new RRTourAgentFactory(tourCostProcessor,tourFactory);
 		RuinAndRecreate ruinAndRecreateAlgo = new RuinAndRecreate(vrp, initialSolution, iterations);
 		ruinAndRecreateAlgo.setWarmUpIterations(warmUp);
 		ruinAndRecreateAlgo.setTourAgentFactory(tourAgentFactory);

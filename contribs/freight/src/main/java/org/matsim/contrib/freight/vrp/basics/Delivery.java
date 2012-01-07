@@ -16,6 +16,11 @@ public class Delivery implements TourActivity, JobActivity{
 		practical_latestArrivalTime = shipment.getDeliveryTW().getEnd();
 	}
 	
+	@Override
+	public String getType() {
+		return "Delivery";
+	}
+
 	public int getCapacityDemand(){
 		return -1*shipment.getSize();
 	}

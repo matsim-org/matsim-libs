@@ -17,7 +17,6 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
-import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
@@ -31,24 +30,19 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 
 public class RRTourAgentFactory implements TourAgentFactory{
 
-	private VehicleRoutingProblem vrp;
+	private TourStatusProcessor tourStatusProcessor;
 	
-	public RRTourAgentFactory(VehicleRoutingProblem vrp) {
+	private TourFactory tourBuilder;
+	
+	public RRTourAgentFactory(TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
 		super();
-		this.vrp = vrp;
+		this.tourStatusProcessor = tourStatusProcessor;
+		this.tourBuilder = tourBuilder;
 	}
 
 	@Override
 	public TourAgent createTourAgent(Tour tour, Vehicle vehicle) {
-		TourActivityStatusUpdater updater = new TourActivityStatusUpdaterImpl(vrp.getCosts());
-//		BestTourBuilder tourBuilder = new BestTourBuilder();
-//		tourBuilder.setConstraints(vrp.getConstraints());
-//		tourBuilder.setCosts(vrp.getCosts());
-//		tourBuilder.setTourActivityStatusUpdater(updater);
-//		tourBuilder.setVehicle(vehicle);
-		RRTourAgent tourAgent = new RRTourAgent(vrp.getCosts(), tour, vehicle, updater, vrp.getConstraints());
-//		tourAgent.setConstraint(vrp.getConstraints());
-//		tourAgent.setTourBuilder(tourBuilder);
+		RRTourAgent tourAgent = new RRTourAgent(vehicle, tour, tourStatusProcessor, tourBuilder);
 		return tourAgent;
 	}
 }

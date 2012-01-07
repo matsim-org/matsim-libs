@@ -17,4 +17,6 @@ public interface TourActivity {
 	
 	public double getServiceTime();
 
+	public abstract String getType();
+
 }

@@ -43,12 +43,12 @@ public class CarrierPlanStrategy implements PlanStrategy<Carrier>{
 		}
 		for(Shipment cF : contractedCarrierShipments){
 			if(!shipmentsInPlan.contains(cF)){
-				throw new IllegalStateException("tspShipment in contracts not in plan");
+				throw new IllegalStateException("shipment in contracts not in plan");
 			}
 		}
 		for(Shipment cF : shipmentsInPlan){
 			if(!contractedCarrierShipments.contains(cF)){
-				throw new IllegalStateException("tspShipment in plan not in contracts");
+				throw new IllegalStateException("shipment in plan not in contracts");
 			}
 		}
 		

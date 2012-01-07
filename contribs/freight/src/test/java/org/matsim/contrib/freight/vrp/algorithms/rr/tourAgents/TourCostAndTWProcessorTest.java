@@ -22,24 +22,28 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.VRPTestCase;
 import org.matsim.contrib.freight.vrp.basics.Shipment;
 import org.matsim.contrib.freight.vrp.basics.Tour;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
+import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
-public class TourActivityStatusUpdaterImplTest extends VRPTestCase{
+public class TourCostAndTWProcessorTest extends VRPTestCase{
 	
 	Tour tour;
 	
 	Tour anotherTour;
 	
-	TourActivityStatusUpdaterImpl statusUpdater;
+	TourStatusProcessor statusUpdater;
 	
 	@Override
 	public void setUp(){
 		initJobsInPlainCoordinateSystem();
-		VrpTourBuilder tourBuilder = new VrpTourBuilder();
-		Shipment s1 = createShipment("1", makeId(0,0), makeId(0,10));
-		Shipment s2 = createShipment("2", makeId(0,0), makeId(10,0));
-		Shipment s3 = createShipment("3", makeId(0,9), makeId(10,0));
 		
-		tourBuilder.scheduleStart(makeId(0,0), 0.0, Double.MAX_VALUE);
+		VrpTourBuilder tourBuilder = new VrpTourBuilder();
+		Shipment s1 = createShipment("1", makeId(0,10), makeId(0,0));
+		s1.setPickupTW(VrpUtils.createTimeWindow(8,12));
+		
+		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
+		s2.setPickupTW(VrpUtils.createTimeWindow(30,30));
+		
+		tourBuilder.scheduleStart(makeId(0,0), 0.0, 0.0);
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.schedulePickup(s2);
 		tourBuilder.scheduleDelivery(s1);
@@ -47,49 +51,52 @@ public class TourActivityStatusUpdaterImplTest extends VRPTestCase{
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		tour = tourBuilder.build();
 		
-		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
-		anotherTourBuilder.scheduleStart(makeId(0,0), 0.0, Double.MAX_VALUE);
-		anotherTourBuilder.schedulePickup(s3);
-		anotherTourBuilder.scheduleDelivery(s3);
-		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		anotherTour = anotherTourBuilder.build();
-		
-		statusUpdater = new TourActivityStatusUpdaterImpl(costs);
-	}
-	
-	@Override
-	public void tearDown(){
-		
+		statusUpdater = new TourCostAndTWProcessor(costs);
 	}
 	
 	public void testCalculatedDistance(){
-		statusUpdater.update(tour);
+		statusUpdater.process(tour);
 		assertEquals(40.0, tour.costs.distance);
 	}
-	
-	public void testCalculatedCosts(){
-		statusUpdater.update(tour);
-		assertEquals(40.0, tour.costs.generalizedCosts);
-	}
-	
-	public void testCalculatedTime(){
-		statusUpdater.update(tour);
-		assertEquals(40.0, tour.costs.time);
-	}
-	
-	public void testCalculatedDistanceForAnotherTour(){
-		statusUpdater.update(anotherTour);
-		assertEquals(38.0, anotherTour.costs.distance);
-	}
-	
-	public void testCalculatedCostsForAnotherTour(){
-		statusUpdater.update(anotherTour);
-		assertEquals(38.0, anotherTour.costs.generalizedCosts);
-	}
-	
-	public void testCalculatedTimeForAnotherTour(){
-		statusUpdater.update(anotherTour);
-		assertEquals(38.0, anotherTour.costs.time);
-	}
 
+	public void testEarliestArrStart(){
+		statusUpdater.process(tour);
+		assertEquals(0.0,tour.getActivities().get(0).getEarliestArrTime());
+	}
+	
+	public void testLatestArrStart(){
+		statusUpdater.process(tour);
+		assertEquals(0.0,tour.getActivities().get(0).getLatestArrTime());
+	}
+	
+	public void testEarliestArrAtFirstPickup(){
+		statusUpdater.process(tour);
+		assertEquals(10.0,tour.getActivities().get(1).getEarliestArrTime());
+	}
+	
+	public void testLatestArrAtFirstPickup(){
+		statusUpdater.process(tour);
+		assertEquals(10.0,tour.getActivities().get(1).getLatestArrTime());
+	}
+	
+	public void testEarliestArrAtSecondPickup(){
+		statusUpdater.process(tour);
+		assertEquals(30.0,tour.getActivities().get(2).getEarliestArrTime());
+	}
+	
+	public void testLatestArrAtSecondPickup(){
+		statusUpdater.process(tour);
+		assertEquals(30.0,tour.getActivities().get(2).getLatestArrTime());
+	}
+	
+	public void testEarliestArrAtEnd(){
+		statusUpdater.process(tour);
+		assertEquals(40.0,tour.getActivities().get(5).getEarliestArrTime());
+	}
+	
+	public void testLatestArrAtEnd(){
+		statusUpdater.process(tour);
+		assertEquals(Double.MAX_VALUE,tour.getActivities().get(5).getLatestArrTime());
+	}
+	
 }

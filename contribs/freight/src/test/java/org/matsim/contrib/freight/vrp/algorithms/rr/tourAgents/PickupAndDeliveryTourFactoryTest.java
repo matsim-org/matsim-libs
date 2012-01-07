@@ -25,9 +25,9 @@ import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VrpTourBuilder;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
-public class BestTourBuilderTest extends VRPTestCase{
+public class PickupAndDeliveryTourFactoryTest extends VRPTestCase{
 	
-	BestTourBuilder tourBuilder;
+	PickupAndDeliveryTourFactory tourBuilder;
 	
 	Tour tour;
 	
@@ -35,12 +35,12 @@ public class BestTourBuilderTest extends VRPTestCase{
 	
 	Shipment shipment;
 	
-	TourActivityStatusUpdater tourActivityStatusUpdater;
+	TourStatusProcessor tourActivityStatusUpdater;
 	
 	@Override
 	public void setUp(){
 		initJobsInPlainCoordinateSystem();
-		tourActivityStatusUpdater = new TourActivityStatusUpdaterImpl(costs);
+		tourActivityStatusUpdater = new TourCostProcessor(costs);
 		
 		Shipment s1 = VrpUtils.createShipment("1", makeId(0,0), makeId(0,10), 1, VrpUtils.createTimeWindow(0, Double.MAX_VALUE), 
 				VrpUtils.createTimeWindow(8, 10));
@@ -63,12 +63,12 @@ public class BestTourBuilderTest extends VRPTestCase{
 	}
 	
 	public void testAddShipment(){
-		Tour newTour = new BestTourBuilder(tour, costs, vehicle, constraints, tourActivityStatusUpdater).buildTour(shipment, Double.MAX_VALUE);
+		Tour newTour = new PickupAndDeliveryTourFactory(costs, constraints, tourActivityStatusUpdater).createTour(vehicle, tour, shipment, Double.MAX_VALUE);
 		assertEquals(8,newTour.getActivities().size());
 	}
 	
 	public void testAddShipmentAndResultingCosts(){
-		Tour newTour = new BestTourBuilder(tour, costs, vehicle, constraints, tourActivityStatusUpdater).buildTour(shipment, Double.MAX_VALUE);
+		Tour newTour = new PickupAndDeliveryTourFactory(costs, constraints, tourActivityStatusUpdater).createTour(vehicle, tour, shipment, Double.MAX_VALUE);
 		assertEquals(50.0,newTour.costs.generalizedCosts);
 		assertEquals(50.0,newTour.costs.distance);
 		assertEquals(50.0,newTour.costs.time);
@@ -87,7 +87,7 @@ public class BestTourBuilderTest extends VRPTestCase{
 		tourBuilder.scheduleDelivery(s2);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		Tour tour = tourBuilder.build();
-		Tour newTour =  new BestTourBuilder(tour, costs, vehicle, constraints, tourActivityStatusUpdater).buildTour(s4, Double.MAX_VALUE);
+		Tour newTour =  new PickupAndDeliveryTourFactory(costs, constraints, tourActivityStatusUpdater).createTour(vehicle, tour, s4, Double.MAX_VALUE);
 		assertEquals(40.0,newTour.costs.generalizedCosts);
 		assertEquals( makeId(10,10),newTour.getActivities().get(3).getLocationId());
 		assertEquals(makeId(0,0), newTour.getActivities().get(6).getLocationId());
@@ -108,7 +108,7 @@ public class BestTourBuilderTest extends VRPTestCase{
 		tourBuilder.scheduleDelivery(s3);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
 		Tour tour = tourBuilder.build();
-		Tour newTour =  new BestTourBuilder(tour, costs, vehicle, constraints, tourActivityStatusUpdater).buildTour(s4, Double.MAX_VALUE);
+		Tour newTour =  new PickupAndDeliveryTourFactory(costs, constraints, tourActivityStatusUpdater).createTour(vehicle, tour, s4, Double.MAX_VALUE);
 		assertEquals(40.0,newTour.costs.generalizedCosts);
 		assertEquals(makeId(10,10),newTour.getActivities().get(5).getLocationId());
 		assertEquals(makeId(0,0), newTour.getActivities().get(8).getLocationId());

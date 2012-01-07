@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -95,6 +96,21 @@ public class RuinAndRecreateTest extends TestCase{
 			@Override
 			public Double getGeneralizedCost(String fromId, String toId, double time) {
 				return getTransportTime(fromId,toId, 0.0);
+			}
+
+			@Override
+			public Double getBackwardGeneralizedCost(String fromId,String toId, double arrivalTime) {
+				return getGeneralizedCost(fromId, toId, arrivalTime);
+			}
+
+			@Override
+			public Double getBackwardTransportTime(String fromId, String toId,double arrivalTime) {
+				return getTransportTime(fromId, toId, arrivalTime);
+			}
+
+			@Override
+			public Double getBackwardDistance(String fromId, String toId,double arrivalTime) {
+				return getDistance(fromId, toId, arrivalTime);
 			}
 		};
 		vrpBuilder = new VrpBuilder(costs, new TimeAndCapacityAndTWConstraints(250));

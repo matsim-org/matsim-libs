@@ -1,8 +1,8 @@
 package org.matsim.contrib.freight.vrp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -15,7 +15,14 @@ import org.matsim.contrib.freight.vrp.basics.VRPImpl;
 import org.matsim.contrib.freight.vrp.basics.Vehicle;
 import org.matsim.contrib.freight.vrp.basics.VrpUtils;
 
-public class MatSimSingleDepotVRPBuilder {
+/**
+ * This helps building the vehicle routing problem. Basically, it translates carrier-shipments to vrp-shipments (to what is 
+ * required by the routing algo) and memories this translation in MatSim2VRP for re-transformation.
+ * @author stefan
+ *
+ */
+
+public class MatSimVRPBuilder {
 	
 	private Constraints constraints;
 	
@@ -23,38 +30,40 @@ public class MatSimSingleDepotVRPBuilder {
 	
 	private Costs costs;
 	
-	private String depotLocationId;
-	
 	private Collection<Vehicle> vehicles;
 	
 	private Integer shipmentIdCounter = 1;
 
-	public MatSimSingleDepotVRPBuilder(Id depotLocationId, Collection<CarrierVehicle> vehicles, MatSim2VRP matsim2vrpRecorder, 
-			Network network) {
+	public MatSimVRPBuilder(Collection<CarrierVehicle> vehicles, MatSim2VRP matsim2vrpRecorder, Network network) {
 		super();
 		this.matsim2vrpRecorder = matsim2vrpRecorder;
-		this.depotLocationId = depotLocationId.toString();
-		makeVehicles(vehicles);
+		makeRoutingVehicles(vehicles);
 	}
 	
-	private void makeVehicles(Collection<CarrierVehicle> vehicles) {
+	private void makeRoutingVehicles(Collection<CarrierVehicle> vehicles) {
+		this.vehicles = new ArrayList<Vehicle>(); 
 		for(CarrierVehicle v : vehicles){
-			VrpUtils.createVehicle(v.getVehicleId().toString(), v.getLocation().toString(), v.getCapacity());
-			vehicles.add(v);
+			Vehicle vrpVehicle = VrpUtils.createVehicle(v.getVehicleId().toString(), v.getLocation().toString(), v.getCapacity());
+			this.vehicles.add(vrpVehicle);
 		}
 	}
 
-	public void addShipment(CarrierShipment carrierShipment, double pickupServiceTime, double deliveryServiceTime){
-		Shipment vrpShipment = buildVrpShipment(carrierShipment,pickupServiceTime,deliveryServiceTime);
+	/**
+	 * By adding a carrierShipment, a vrp-shipment is created (as input for the router). This translation is memorized
+	 * for re-translation.
+	 * @param carrierShipment
+	 */
+	public void addShipment(CarrierShipment carrierShipment){
+		Shipment vrpShipment = createVrpShipment(carrierShipment);
 		matsim2vrpRecorder.addShipmentEntry(carrierShipment, vrpShipment);
 	}
 		
-	private Shipment buildVrpShipment(CarrierShipment carrierShipment, double pickupServiceTime, double deliveryServiceTime) {
+	private Shipment createVrpShipment(CarrierShipment carrierShipment) {
 		String id = makeId();
 		Shipment s = VrpUtils.createShipment(id, carrierShipment.getFrom().toString(),carrierShipment.getTo().toString(),
 				carrierShipment.getSize(), makeTW(carrierShipment.getPickupTimeWindow()),makeTW(carrierShipment.getDeliveryTimeWindow()));
-		s.setPickupServiceTime(pickupServiceTime);
-		s.setDeliveryServiceTime(deliveryServiceTime);
+		s.setPickupServiceTime(carrierShipment.getPickupServiceTime());
+		s.setDeliveryServiceTime(carrierShipment.getDeliveryServiceTime());
 		return s;
 	}
 
@@ -90,8 +99,7 @@ public class MatSimSingleDepotVRPBuilder {
 	 */
 	public VehicleRoutingProblem buildVRP(){
 		verify();
-		VRPImpl vrp = new VRPImpl(matsim2vrpRecorder.getVrpShipments(), vehicles, 
-				costs, constraints);
+		VRPImpl vrp = new VRPImpl(matsim2vrpRecorder.getVrpShipments(), vehicles, costs, constraints);
 		return vrp;
 	}
 

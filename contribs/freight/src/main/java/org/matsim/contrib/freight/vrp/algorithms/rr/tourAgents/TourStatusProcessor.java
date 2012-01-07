@@ -17,9 +17,7 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
-import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.Tour;
-
 
 /**
  * 
@@ -27,6 +25,8 @@ import org.matsim.contrib.freight.vrp.basics.Tour;
  *
  */
 
-public interface TourBuilder {
-	Tour addJobAndGetTour(Tour tour, Job job, double bestKnownPrice);
+public interface TourStatusProcessor {
+	
+	public void process(Tour tour);
+	
 }

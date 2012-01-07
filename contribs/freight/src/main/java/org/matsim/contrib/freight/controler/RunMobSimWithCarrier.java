@@ -103,7 +103,7 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		CarrierPlanStrategy planStrat2 = new CarrierPlanStrategy();
+		CarrierPlanStrategy planStrat = new CarrierPlanStrategy();
 //		CrowFlyCosts crowFlyDistance = new CrowFlyCosts();
 //		crowFlyDistance.speed = 18;
 //		crowFlyDistance.detourFactor = 1.2;
@@ -145,13 +145,28 @@ public class RunMobSimWithCarrier implements StartupListener, BeforeMobsimListen
 				Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), time);
 				return path.travelTime;
 			}
+
+			@Override
+			public Double getBackwardGeneralizedCost(String fromId, String toId, double arrivalTime) {
+				return getGeneralizedCost(fromId, toId, arrivalTime);
+			}
+
+			@Override
+			public Double getBackwardTransportTime(String fromId, String toId, double arrivalTime) { 
+				return getTransportTime(fromId, toId, arrivalTime);
+			}
+
+			@Override
+			public Double getBackwardDistance(String fromId, String toId, double arrivalTime) {
+				return getDistance(fromId, toId, arrivalTime);
+			}
 			
 		};
 		
-		planStrat2.addModule(new ReRouteVehicles(event.getControler().getNetwork(), costs, new RRPDTWSolverFactory()));
+		planStrat.addModule(new ReRouteVehicles(event.getControler().getNetwork(), costs, new RRPDTWSolverFactory()));
 		
 		PlanStrategyManager<Carrier> stratManager = new PlanStrategyManager<Carrier>();
-		stratManager.addStrategy(planStrat2, 1.0);
+		stratManager.addStrategy(planStrat, 1.0);
 		
 		for(Carrier carrier : carriers.getCarriers().values()){
 			stratManager.nextStrategy().run(carrier);

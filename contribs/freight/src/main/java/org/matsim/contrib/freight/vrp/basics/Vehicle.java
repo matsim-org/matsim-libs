@@ -31,6 +31,26 @@ public class Vehicle{
 	private String locationId;
 	
 	private String id;
+	
+	private double earliestDeparture = 0.0;
+	
+	private double latestArrival = Double.MAX_VALUE;
+
+	public double getEarliestDeparture() {
+		return earliestDeparture;
+	}
+
+	public void setEarliestDeparture(double earliestDeparture) {
+		this.earliestDeparture = earliestDeparture;
+	}
+
+	public double getLatestArrival() {
+		return latestArrival;
+	}
+
+	public void setLatestArrival(double latestArrival) {
+		this.latestArrival = latestArrival;
+	}
 
 	public Vehicle(String id, String locationId, int capacity) {
 		super();

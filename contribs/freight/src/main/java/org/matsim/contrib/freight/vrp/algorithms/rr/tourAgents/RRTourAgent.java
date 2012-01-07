@@ -18,11 +18,11 @@
 package org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.basics.Constraints;
-import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.Job;
 import org.matsim.contrib.freight.vrp.basics.JobActivity;
 import org.matsim.contrib.freight.vrp.basics.Tour;
@@ -45,47 +45,40 @@ class RRTourAgent implements TourAgent {
 	
 	private Vehicle vehicle;
 
-	private Constraints constraints;
-	
 	private Offer openOffer = null;
 	
 	private Tour tourOfLastOffer = null;
 	
-	private TourActivityStatusUpdater activityStatusUpdater;
+	private TourStatusProcessor activityStatusUpdater;
 
-	private Costs costs;
+	private boolean tourStatusOutOfSync = true;
 	
-//	private TourBuilder tourBuilder;
+	private Map<String, Job> jobs = new HashMap<String, Job>();
 	
-	RRTourAgent(Costs costs, Tour tour, Vehicle vehicle, TourActivityStatusUpdater updater, Constraints constraints) {
+	private TourFactory tourFactory;
+	
+	RRTourAgent(Vehicle vehicle, Tour tour, TourStatusProcessor tourStatusProcessor, TourFactory tourBuilder) {
 		super();
 		this.tour = tour;
+		this.tourFactory=tourBuilder;
+		this.activityStatusUpdater=tourStatusProcessor;
 		this.vehicle = vehicle;
-		this.activityStatusUpdater = updater;
-		updater.update(tour);
-		this.costs = costs;
-		this.constraints = constraints;
+		iniJobs();
+		syncTour();
 	}
 
-//	public void setTourBuilder(TourBuilder tourBuilder) {
-//		this.tourBuilder = tourBuilder;
-//	}
+	public void setTourBuilder(TourFactory tourBuilder) {
+		this.tourFactory = tourBuilder;
+	}
 
+	private void iniJobs() {
+		for(TourActivity c : tour.getActivities()){
+			if(c instanceof JobActivity){
+				jobs.put(((JobActivity) c).getJob().getId(), ((JobActivity) c).getJob());
+			}
+		}
+	}
 
-	/* (non-Javadoc)
-	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#getConstraint()
-	 */
-//	Constraints getConstraint() {
-//		return constraint;
-//	}
-//
-//	/* (non-Javadoc)
-//	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#setConstraint(api.basic.Constraints)
-//	 */
-//	@Override
-//	public void setConstraint(Constraints constraint) {
-//		this.constraint = constraint;
-//	}
 
 	/* (non-Javadoc)
 	 * @see core.algorithms.ruinAndRecreate.VehicleAgent#offerRejected(core.algorithms.ruinAndRecreate.RuinAndRecreate.Offer)
@@ -101,8 +94,16 @@ class RRTourAgent implements TourAgent {
 	 */
 	@Override
 	public double getTourCost(){
+		syncTour();
 		return tour.getCosts().generalizedCosts;
 	}
+	
+	@Override
+	public Tour getTour() {
+		syncTour();
+		return tour;
+	}
+
 	
 	@Override
 	public String toString() {
@@ -110,13 +111,9 @@ class RRTourAgent implements TourAgent {
 	}
 
 	@Override
-	public Tour getTour() {
-		return tour;
-	}
-
-	@Override
 	public Offer requestService(Job job, double bestKnownPrice) {
-		Tour newTour = new BestTourBuilder(tour, costs, vehicle, constraints, activityStatusUpdater).buildTour(job, bestKnownPrice);
+		syncTour();
+		Tour newTour = tourFactory.createTour(vehicle, tour, job, bestKnownPrice);
 		if(newTour != null){
 			double marginalCosts = newTour.costs.generalizedCosts - tour.costs.generalizedCosts;
 			Offer offer = new Offer(this, marginalCosts);
@@ -129,8 +126,17 @@ class RRTourAgent implements TourAgent {
 		}
 	}
 
+	private void syncTour() {
+		if(tourStatusOutOfSync){
+			tourStatusOutOfSync = false;
+			activityStatusUpdater.process(tour);
+		}
+	}
+
+
 	@Override
 	public void offerGranted(Job job) {
+		jobs.put(job.getId(), job);
 		if(tourOfLastOffer != null){
 			tour = tourOfLastOffer;
 			logger.debug("granted offer: " + openOffer);
@@ -145,27 +151,25 @@ class RRTourAgent implements TourAgent {
 
 	@Override
 	public boolean hasJob(Job job) {
-		for(TourActivity c : tour.getActivities()){
-			if(c instanceof JobActivity){
-				if(job.getId().equals(((JobActivity) c).getJob().getId())){
-					return true;
-				}
-			}
+		if(jobs.containsKey(job.getId())){
+			return true;
 		}
 		return false;
 	}
 
 	@Override
 	public void removeJob(Job job) {
-		List<TourActivity> acts = new ArrayList<TourActivity>(tour.getActivities());
-		for(TourActivity c : acts){
-			if(c instanceof JobActivity){
-				if(job.getId().equals(((JobActivity) c).getJob().getId())){
-					tour.getActivities().remove(c);
-					activityStatusUpdater.update(tour);
+		if(jobs.containsKey(job.getId())){
+			List<TourActivity> acts = new ArrayList<TourActivity>(tour.getActivities());
+			for(TourActivity c : acts){
+				if(c instanceof JobActivity){
+					if(job.getId().equals(((JobActivity) c).getJob().getId())){
+						tour.getActivities().remove(c);
+					}
 				}
 			}
+			tourStatusOutOfSync = true;
+			jobs.remove(job.getId());
 		}
 	}
-
 }

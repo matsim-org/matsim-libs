@@ -51,7 +51,7 @@ public class VRPCarrierPlanBuilder {
 	private Collection<ScheduledTour> makeScheduledTours(Collection<Tour> tours) {
 		Collection<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
 		for(Tour t : tours){
-			sTours.add(new ScheduledTour(t, getVehicle(t,caps), 0.0));
+			sTours.add(new ScheduledTour(t, getVehicle(t,caps), t.getEarliestDeparture()));
 		}
 		return sTours;
 	}

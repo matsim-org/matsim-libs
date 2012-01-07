@@ -14,6 +14,26 @@ public class CarrierShipment implements Shipment {
 	private TimeWindow pickupTimeWindow;
 	
 	private TimeWindow deliveryTimeWindow;
+	
+	private double pickupServiceTime;
+	
+	private double deliveryServiceTime;
+
+	public double getPickupServiceTime() {
+		return pickupServiceTime;
+	}
+
+	public void setPickupServiceTime(double pickupServiceTime) {
+		this.pickupServiceTime = pickupServiceTime;
+	}
+
+	public double getDeliveryServiceTime() {
+		return deliveryServiceTime;
+	}
+
+	public void setDeliveryServiceTime(double deliveryServiceTime) {
+		this.deliveryServiceTime = deliveryServiceTime;
+	}
 
 	public CarrierShipment(Id from, Id to, int size, TimeWindow pickupTimeWindow, TimeWindow deliveryTimeWindow) {
 		super();

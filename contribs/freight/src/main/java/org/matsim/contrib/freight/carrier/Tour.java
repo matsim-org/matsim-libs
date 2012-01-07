@@ -30,6 +30,7 @@ public class Tour {
 	
 	public static class Pickup extends ShipmentBasedActivity {
 
+		
 		private CarrierShipment shipment;
 
 		public Pickup(CarrierShipment shipment) {
@@ -53,13 +54,14 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getSize()*60;
+			return shipment.getPickupServiceTime();
 		}
 
 		@Override
 		public CarrierShipment getShipment() {
 			return shipment;
 		}
+
 	};
 	
 	public static class Delivery extends ShipmentBasedActivity {
@@ -87,7 +89,7 @@ public class Tour {
 
 		@Override
 		public double getDuration() {
-			return shipment.getSize()*60;
+			return shipment.getDeliveryServiceTime();
 		}
 
 		@Override
@@ -146,14 +148,21 @@ public class Tour {
 	}
 
 	private List<TourElement> tourElements;
+	
 	private Id startLinkId;
+	
 	private Id endLinkId;
-
+	
+	private double earliestDeparture;
+	
+	private double latestDeparture;
 
 	Tour(Id startLinkId, List<TourElement> tourElements, Id endLinkId) {
 		this.startLinkId = startLinkId;
 		this.tourElements = Collections.unmodifiableList(tourElements);
 		this.endLinkId = endLinkId;
+		this.earliestDeparture = 0.0;
+		this.latestDeparture = 0.0;
 	}
 
 	public List<TourElement> getTourElements() {
@@ -177,6 +186,22 @@ public class Tour {
 
 	public Id getEndLinkId() {
 		return endLinkId;
+	}
+
+	public double getEarliestDeparture() {
+		return earliestDeparture;
+	}
+
+	public void setEarliestDeparture(double earliestDeparture) {
+		this.earliestDeparture = earliestDeparture;
+	}
+
+	public double getLatestDeparture() {
+		return latestDeparture;
+	}
+
+	public void setLatestDeparture(double latestDeparture) {
+		this.latestDeparture = latestDeparture;
 	}
 
 }

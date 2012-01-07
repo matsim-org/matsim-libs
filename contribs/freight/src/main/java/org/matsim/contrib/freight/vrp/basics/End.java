@@ -15,6 +15,11 @@ public class End implements TourActivity{
 	}
 
 	@Override
+	public String getType() {
+		return "End";
+	}
+
+	@Override
 	public void setEarliestArrTime(double early) {
 		practical_earliestArrivalTime = early;	
 	}

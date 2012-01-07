@@ -18,7 +18,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.StandardRuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
@@ -30,13 +30,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class RRSingleDepotVRPSolverTest extends TestCase{
+public class RRVRPSolverTest extends TestCase{
 	
 	class MyVRPSolverFactory implements VRPSolverFactory{
 
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
-			ShipmentBasedSingleDepotVRPSolver solver = new ShipmentBasedSingleDepotVRPSolver(shipments, carrierVehicles, network);
+			ShipmentBasedVRPSolver solver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, network);
 			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
@@ -121,8 +121,14 @@ public class RRSingleDepotVRPSolverTest extends TestCase{
 	public void testSolveWithNoVehicles(){
 		vehicles.clear();
 		shipments.add(makeShipment("depotLocation","customerLocation",20));
-		Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
-		assertTrue(tours.isEmpty());
+		try{
+			Collection<Tour> tours = new MyVRPSolverFactory().createSolver(shipments, vehicles, scenario.getNetwork(), costs).solve();
+			assertTrue(false);
+		}
+		catch(IllegalStateException e){
+			assertTrue(true);
+		}
+		
 	}
 	
 	

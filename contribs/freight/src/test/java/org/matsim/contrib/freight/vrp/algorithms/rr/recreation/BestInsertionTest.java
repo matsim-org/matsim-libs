@@ -59,7 +59,7 @@ public class BestInsertionTest extends VRPTestCase{
 		tourBuilder.schedulePickup(s1);
 		tourBuilder.scheduleDelivery(s1);
 		tourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent1 = new RRTourAgentFactory(vrp).createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent1 = new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(tourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		VrpTourBuilder anotherTourBuilder = new VrpTourBuilder();
 		Shipment s2 = createShipment("2", makeId(10,0), makeId(0,0));
@@ -67,7 +67,7 @@ public class BestInsertionTest extends VRPTestCase{
 		anotherTourBuilder.schedulePickup(s2);
 		anotherTourBuilder.scheduleDelivery(s2);
 		anotherTourBuilder.scheduleEnd(makeId(0,0), 0.0, Double.MAX_VALUE);
-		tourAgent2 = new RRTourAgentFactory(vrp).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
+		tourAgent2 = new RRTourAgentFactory(tourStatusProcessor, tourFactory).createTourAgent(anotherTourBuilder.build(), vrp.getVehicles().iterator().next());
 		
 		Collection<TourAgent> agents = new ArrayList<TourAgent>();
 		agents.add(tourAgent1);

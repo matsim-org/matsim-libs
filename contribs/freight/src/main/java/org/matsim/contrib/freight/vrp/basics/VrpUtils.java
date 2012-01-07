@@ -34,8 +34,8 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourAgentFactory;
 
 public class VrpUtils {
 
-	public static Vehicle createVehicle(String id, String locationId, int newVehicleCapacity) {
-		return new Vehicle(id, locationId, newVehicleCapacity);
+	public static Vehicle createVehicle(String id, String locationId, int vehicleCapacity) {
+		return new Vehicle(id, locationId, vehicleCapacity);
 	}
 	
 	public static RRSolution copySolution(RRSolution solution, VehicleRoutingProblem vrp, TourAgentFactory tourAgentFactory){
@@ -68,11 +68,15 @@ public class VrpUtils {
 		return new Coordinate(x,y);
 	}
 
-	public static Shipment createShipment(String id, String fromId, String toId, int size,TimeWindow pickupTW,TimeWindow deliverTW) {
-		Shipment s = new Shipment(id, fromId, toId, size);
+	public static Shipment createShipment(String id, String fromId, String toId, int size, TimeWindow pickupTW,TimeWindow deliverTW) {
+		Shipment s = createShipment(id, fromId, toId, size);
 		s.setPickupTW(pickupTW);
 		s.setDeliveryTW(deliverTW);
 		return s;
+	}
+	
+	public static Shipment createShipment(String id, String fromId, String toId, int size){
+		return new Shipment(id, fromId, toId, size);
 	}
 	
 }

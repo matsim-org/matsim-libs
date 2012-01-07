@@ -16,6 +16,11 @@ public class Pickup implements TourActivity, JobActivity{
 		practical_latestArrivalTime = shipment.getPickupTW().getEnd();
 	}
 	
+	@Override
+	public String getType() {
+		return "Pickup";
+	}
+
 	public int getCapacityDemand(){
 		return shipment.getSize();
 	}
