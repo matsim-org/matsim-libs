@@ -12,8 +12,10 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateWithTimeWindowsFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourWithTimeWindowsAlgoFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.RuinAndRecreateWithTimeWindowsFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -77,7 +79,7 @@ public class Solomon {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Solomon solomon = new Solomon("/Users/stefan/Documents/workspace/VehicleRouting/instances/cvrptw_solomon/nOfCust100/R111.txt", "100_R111");
+		Solomon solomon = new Solomon("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/cvrptw_solomon/nOfCust100/C101.txt", "100_C101");
 		solomon.run();
 	}
 
@@ -98,11 +100,11 @@ public class Solomon {
 	
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
-		RuinAndRecreateWithTimeWindowsFactory factory = new RuinAndRecreateWithTimeWindowsFactory();
-		factory.setIterations(1000);
-		factory.setWarmUp(100);
+		RuinAndRecreateFactory factory = new DistributionTourWithTimeWindowsAlgoFactory();
+		factory.setIterations(200);
+		factory.setWarmUp(50);
 		ChartListener chartListener = new ChartListener();
-		chartListener.setFilename("vrp/solomon/"+instanceName+".png");
+		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
 		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);

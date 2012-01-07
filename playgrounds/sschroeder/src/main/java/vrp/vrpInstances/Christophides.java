@@ -12,8 +12,9 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
+import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.StandardRuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -72,7 +73,7 @@ public class Christophides {
 	
 	public static void main(String[] args) {
 		Logger.getRootLogger().setLevel(Level.INFO);
-		Christophides christophides = new Christophides("/Users/stefan/Documents/workspace/VehicleRouting/instances/vrp_christofides_mingozzi_toth/vrpnc1.txt", "vrpnc1");
+		Christophides christophides = new Christophides("/Users/stefan/Documents/Schroeder/Dissertation/vrpInstances/vrp_christofides_mingozzi_toth/vrpnc1.txt", "vrpnc1");
 		christophides.run();
 		
 	}
@@ -97,13 +98,13 @@ public class Christophides {
 	}
 	
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
-		StandardRuinAndRecreateFactory factory = new StandardRuinAndRecreateFactory();
-		factory.setIterations(1000);
+		RuinAndRecreateFactory factory = new DistributionTourAlgoFactory();
+		factory.setIterations(500);
 		factory.setWarmUp(100);
 		ChartListener chartListener = new ChartListener();
-		chartListener.setFilename("vrp/christophides/"+instanceName+".png");
+		chartListener.setFilename("output/"+instanceName+".png");
 		RuinAndRecreateReport report = new RuinAndRecreateReport();
-//		factory.addRuinAndRecreateListener(chartListener);
+		factory.addRuinAndRecreateListener(chartListener);
 		factory.addRuinAndRecreateListener(report);
 		return factory.createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 	}
