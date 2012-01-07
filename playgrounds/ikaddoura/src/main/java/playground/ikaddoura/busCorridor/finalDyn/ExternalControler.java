@@ -44,7 +44,7 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int numberOfExternalIterations = 6;
+	static int numberOfExternalIterations = 4;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
@@ -129,9 +129,10 @@ public class ExternalControler {
 			
 			// settings for next external iteration	
 			if (this.getExtItNr() < numberOfExternalIterations){
-//				this.setDay(increaseNumberOfBuses(1));
-				this.setDay(extend(2, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
-				this.setDay(extend(4, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
+//				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
+				this.setDay(increaseBuses(2, 1)); // timePeriod, number of buses
+//				this.setDay(extend(2, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
+//				this.setDay(extend(4, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
 	//			this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
 	//			this.setCapacity(operator.increaseCapacity(2)); // absolute value
 			}
@@ -153,6 +154,17 @@ public class ExternalControler {
 		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
 		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
 		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
+	}
+
+	/**
+	 * @param i
+	 * @param j
+	 * @return
+	 */
+	private Map<Integer, TimePeriod> increaseBuses(int period, int increase) {
+		Map<Integer, TimePeriod> dayMod = this.getDay();	
+		dayMod.get(period).increaseNumberOfBuses(increase);
+		return dayMod;
 	}
 
 	/**
@@ -208,7 +220,7 @@ public class ExternalControler {
 	 * @param i
 	 * @return
 	 */
-	private Map<Integer, TimePeriod> increaseNumberOfBuses(int i) {
+	private Map<Integer, TimePeriod> increaseNumberOfBusesAllTimePeriods(int i) {
 		Map<Integer, TimePeriod> dayNextExtIt = new HashMap<Integer, TimePeriod>();
 		for (TimePeriod t : this.getDay().values()){
 			TimePeriod t2 = t;
