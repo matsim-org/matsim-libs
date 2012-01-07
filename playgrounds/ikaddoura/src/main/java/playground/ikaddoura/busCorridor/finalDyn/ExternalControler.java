@@ -130,8 +130,10 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < numberOfExternalIterations){
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
-				this.setDay(increaseBuses(2, 1)); // timePeriod, number of buses
-//				this.setDay(extend(2, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
+				this.setDay(increaseBuses(2, 2)); // timePeriod, number of buses
+				this.setDay(increaseBuses(4, 2)); // timePeriod, number of buses
+
+				this.setDay(extend(2, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
 //				this.setDay(extend(4, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
 	//			this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
 	//			this.setCapacity(operator.increaseCapacity(2)); // absolute value
@@ -178,33 +180,31 @@ public class ExternalControler {
 		
 		boolean test = true;
 		
-		if (this.getDay().containsKey(period-1)){
+		if (dayNextExtItOutput.containsKey(period-1)){
 			System.out.println("A");
-			if(this.getDay().get(period-1).getFromTime() + time/2 >= this.getDay().get(period-1).getToTime()){
+			if(dayNextExtItOutput.get(period-1).getFromTime() + time/2 >= dayNextExtItOutput.get(period-1).getToTime()){
 				test = false;
 			}	
 		}
-		if (this.getDay().containsKey(period+1)){
+		if (dayNextExtItOutput.containsKey(period+1)){
 			System.out.println("B");
-			if(this.getDay().get(period+1).getFromTime() + time/2 >= this.getDay().get(period+1).getToTime()){
+			if(dayNextExtItOutput.get(period+1).getFromTime() + time/2 >= dayNextExtItOutput.get(period+1).getToTime()){
 				test = false;
 			}	
 		}
-		if(this.getDay().get(period).getFromTime() + time/2 >= this.getDay().get(period).getToTime()){
+		if(dayNextExtItOutput.get(period).getFromTime() + time/2 >= dayNextExtItOutput.get(period).getToTime()){
 			test = false;
 		}
 		
 		if (test == true){	
-			Map<Integer, TimePeriod> dayNextExtIt = this.getDay();
-			dayNextExtIt.get(period).changeFromTime(-time/2);
-			dayNextExtIt.get(period).changeToTime(time/2);
-			if (dayNextExtIt.containsKey(period-1)){
-				dayNextExtIt.get(period-1).changeToTime(-time/2);
+			dayNextExtItOutput.get(period).changeFromTime(-time/2);
+			dayNextExtItOutput.get(period).changeToTime(time/2);
+			if (dayNextExtItOutput.containsKey(period-1)){
+				dayNextExtItOutput.get(period-1).changeToTime(-time/2);
 			}
-			if (dayNextExtIt.containsKey(period+1)){
-				dayNextExtIt.get(period+1).changeFromTime(time/2);
+			if (dayNextExtItOutput.containsKey(period+1)){
+				dayNextExtItOutput.get(period+1).changeFromTime(time/2);
 			}
-			dayNextExtItOutput = dayNextExtIt;
 		}
 		
 		else {
