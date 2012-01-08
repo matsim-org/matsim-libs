@@ -24,7 +24,7 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 public class DistributionTourAlgoFactory implements RuinAndRecreateFactory {
 
 
-	private static Logger logger = Logger.getLogger(RuinAndRecreateWithTimeWindowsFactory.class);
+	private static Logger logger = Logger.getLogger(PickupAndDeliveryTourWithTimeWindowsAlgoFactory.class);
 	
 	private Collection<RuinAndRecreateListener> ruinAndRecreationListeners = new ArrayList<RuinAndRecreateListener>();
 

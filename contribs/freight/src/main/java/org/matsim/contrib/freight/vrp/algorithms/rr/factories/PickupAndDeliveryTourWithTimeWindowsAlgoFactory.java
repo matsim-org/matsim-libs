@@ -21,9 +21,9 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.tourAgents.TourFactory;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
 
 
-public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFactory{
+public class PickupAndDeliveryTourWithTimeWindowsAlgoFactory implements RuinAndRecreateFactory{
 
-	private static Logger logger = Logger.getLogger(RuinAndRecreateWithTimeWindowsFactory.class);
+	private static Logger logger = Logger.getLogger(PickupAndDeliveryTourWithTimeWindowsAlgoFactory.class);
 	
 	private Collection<RuinAndRecreateListener> ruinAndRecreationListeners = new ArrayList<RuinAndRecreateListener>();
 
@@ -31,12 +31,12 @@ public class RuinAndRecreateWithTimeWindowsFactory implements RuinAndRecreateFac
 	
 	private int iterations = 50;
 	
-	public RuinAndRecreateWithTimeWindowsFactory(int warmup, int iterations) {
+	public PickupAndDeliveryTourWithTimeWindowsAlgoFactory(int warmup, int iterations) {
 		this.warmUp = warmup;
 		this.iterations = iterations;
 	}
 
-	public RuinAndRecreateWithTimeWindowsFactory() {
+	public PickupAndDeliveryTourWithTimeWindowsAlgoFactory() {
 		super();
 	}
 

@@ -46,9 +46,9 @@ import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
  */
 
 
-public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
+public class PickupAndDeliveryTourAlgoFactory implements RuinAndRecreateFactory {
 	
-	private static Logger logger = Logger.getLogger(StandardRuinAndRecreateFactory.class);
+	private static Logger logger = Logger.getLogger(PickupAndDeliveryTourAlgoFactory.class);
 	
 	private Collection<RuinAndRecreateListener> ruinAndRecreationListeners = new ArrayList<RuinAndRecreateListener>();
 
@@ -56,13 +56,13 @@ public class StandardRuinAndRecreateFactory implements RuinAndRecreateFactory {
 	
 	private int iterations = 100;
 	
-	public StandardRuinAndRecreateFactory(int warmUp, int iterations) {
+	public PickupAndDeliveryTourAlgoFactory(int warmUp, int iterations) {
 		super();
 		this.warmUp = warmUp;
 		this.iterations = iterations;
 	}
 
-	public StandardRuinAndRecreateFactory() {
+	public PickupAndDeliveryTourAlgoFactory() {
 		super();
 	}
 
