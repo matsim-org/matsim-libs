@@ -18,7 +18,7 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.PickAndDeliveryCapacityAndTWConstraint;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.Costs;
@@ -37,7 +37,7 @@ public class RRVRPSolverTest extends TestCase{
 		@Override
 		public VRPSolver createSolver(Collection<CarrierShipment> shipments,Collection<CarrierVehicle> carrierVehicles, Network network, Costs costs) {
 			ShipmentBasedVRPSolver solver = new ShipmentBasedVRPSolver(shipments, carrierVehicles, network);
-			StandardRuinAndRecreateFactory ruinAndRecreateFactory = new StandardRuinAndRecreateFactory();
+			PickupAndDeliveryTourAlgoFactory ruinAndRecreateFactory = new PickupAndDeliveryTourAlgoFactory();
 			solver.setRuinAndRecreateFactory(ruinAndRecreateFactory);
 			solver.setCosts(costs);
 			solver.setConstraints(new PickAndDeliveryCapacityAndTWConstraint());

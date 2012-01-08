@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.StandardRuinAndRecreateFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Costs;
 import org.matsim.contrib.freight.vrp.basics.RandomNumberGeneration;
 import org.matsim.contrib.freight.vrp.basics.VehicleRoutingProblem;
@@ -128,7 +128,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		int active = getActiveVehicles(algo.getSolution());
 		assertEquals(2,active);
@@ -139,7 +139,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 23));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 23));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
 		Collection<Tour> solution = algo.getSolution();
@@ -155,7 +155,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2","0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3","0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		int active = getActiveVehicles(algo.getSolution());
 		assertEquals(3,active);
@@ -166,7 +166,7 @@ public class RuinAndRecreateTest extends TestCase{
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("2", "0", 16));
 		vrpBuilder.addVehicle(VrpUtils.createVehicle("3", "0", 16));
 		VehicleRoutingProblem vrp = vrpBuilder.build();
-		algo = new StandardRuinAndRecreateFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
+		algo = new PickupAndDeliveryTourAlgoFactory().createAlgorithm(vrp, new InitialSolution().createInitialSolution(vrp));
 		algo.run();
 		
 		Collection<Tour> solution = algo.getSolution();
