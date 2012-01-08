@@ -20,7 +20,6 @@
 
 package org.matsim.core.scoring.charyparNagel;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -35,7 +34,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  * <blockquote>
  *  <p>Charypar, D. und K. Nagel (2005) <br>
  *  Generating complete all-day activity plans with genetic algorithms,<br>
- *  Transportation, 32 (4) 369–397.</p>
+ *  Transportation, 32 (4) 369-397.</p>
  * </blockquote>
  * 
  * @author rashid_waraich

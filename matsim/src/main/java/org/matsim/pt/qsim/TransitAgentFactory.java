@@ -20,10 +20,7 @@
 
 package org.matsim.pt.qsim;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -34,7 +31,7 @@ public class TransitAgentFactory implements AgentFactory {
 
 
 	public TransitAgentFactory(final Netsim simulation) {
-		this.simulation = simulation ;
+		this.simulation = simulation;
 	}
 
 	@Override

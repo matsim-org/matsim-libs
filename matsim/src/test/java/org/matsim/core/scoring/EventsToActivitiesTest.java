@@ -23,55 +23,49 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
-
-
  public class EventsToActivitiesTest extends MatsimTestCase {
-
-    private Activity returnedActivity;
 
     public void testCreatesActivty() {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventsToActivities testee = new EventsToActivities();
-        testee.setActivityHandler(new ActivityHandler() {
-            @Override
-            public void handleActivity(Id agentId, Activity activity) {
-                returnedActivity = activity;
-            }
-        });
+        MockActivityHandler ah = new MockActivityHandler();
+        testee.setActivityHandler(ah);
         testee.reset(0);
         testee.handleEvent(eventsManager.getFactory().createActivityStartEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
         testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(30.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
-        assertNotNull(returnedActivity);
-        assertEquals(10.0, returnedActivity.getStartTime());
-        assertEquals(30.0, returnedActivity.getEndTime());
+        assertNotNull(ah.handledActivity);
+        assertEquals(10.0, ah.handledActivity.getStartTime());
+        assertEquals(30.0, ah.handledActivity.getEndTime());
     }
 
     public void testCreateNightActivity() {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventsToActivities testee = new EventsToActivities();
-        testee.setActivityHandler(new ActivityHandler() {
-            @Override
-            public void handleActivity(Id agentId, Activity activity) {
-                returnedActivity = activity;
-            }
-        });
+        MockActivityHandler ah = new MockActivityHandler();
+        testee.setActivityHandler(ah);
         testee.reset(0);
         testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
-        assertNotNull(returnedActivity);
-        assertEquals(Time.UNDEFINED_TIME, returnedActivity.getStartTime());
-        assertEquals(10.0, returnedActivity.getEndTime());
-        returnedActivity = null;
+        assertNotNull(ah.handledActivity);
+        assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getStartTime());
+        assertEquals(10.0, ah.handledActivity.getEndTime());
+        ah.handledActivity = null;
         testee.handleEvent(eventsManager.getFactory().createActivityStartEvent(90.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
         testee.finish();
-        assertNotNull(returnedActivity);
-        assertEquals(Time.UNDEFINED_TIME, returnedActivity.getEndTime());
-        assertEquals(90.0, returnedActivity.getStartTime());
-
+        assertNotNull(ah.handledActivity);
+        assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getEndTime());
+        assertEquals(90.0, ah.handledActivity.getStartTime());
+    }
+    
+    private static class MockActivityHandler implements ActivityHandler {
+    	public Activity handledActivity = null;
+    	@Override
+    	public void handleActivity(Id agentId, Activity activity) {
+    		this.handledActivity = activity;
+    	}
     }
 
 }

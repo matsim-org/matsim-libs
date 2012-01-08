@@ -20,16 +20,15 @@
 
  package org.matsim.core.scoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.population.ActivityImpl;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
 

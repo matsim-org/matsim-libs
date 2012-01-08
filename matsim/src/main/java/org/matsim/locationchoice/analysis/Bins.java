@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.locationchoice.analysis;
 
 import java.io.BufferedWriter;
@@ -123,7 +142,7 @@ public class Bins {
 		if (values.size() == 0) return 0.0;
 
 	    Collections.sort(values);
-	    if (values.size() % 2 == 1) {
+	    if (values.size() % 2 != 0) {
 	    	return values.get((values.size()+1)/2-1);
 	    }
 	    else {
@@ -145,7 +164,7 @@ public class Bins {
 	}
 	
 	public double weightedMean(List<Double> values, List<Double> weights) {
-		return weightedMean((Double[])values.toArray(new Double[values.size()]), (Double[])weights.toArray(new Double[weights.size()]));
+		return weightedMean(values.toArray(new Double[values.size()]), weights.toArray(new Double[weights.size()]));
 	}
 	
 	public double weightedMean(Double[] values, Double[] weights) {
@@ -166,7 +185,7 @@ public class Bins {
 	}
 	
 	public double getMax(List<Double> values) {
-		return getMax((Double[])values.toArray(new Double[values.size()]));
+		return getMax(values.toArray(new Double[values.size()]));
 	}
 	
 	public double getMax(Double[] values) {

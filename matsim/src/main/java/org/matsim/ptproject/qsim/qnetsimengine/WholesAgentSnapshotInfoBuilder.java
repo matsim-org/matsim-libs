@@ -40,7 +40,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  * @deprecated seems to be really experimental code that was never completely finished, dg sep. 2011
  */
 @Deprecated
-public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder  {
+public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilder {
 
 	/*package*/ static class TupleDoubleComparator implements Comparator<Tuple<Double, QItem>>, Serializable, MatsimComparator {
 

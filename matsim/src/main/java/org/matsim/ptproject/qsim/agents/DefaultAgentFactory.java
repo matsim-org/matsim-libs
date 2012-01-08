@@ -30,7 +30,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  */
 public final class DefaultAgentFactory implements AgentFactory {
 
-	protected final Netsim simulation;
+	private final Netsim simulation;
 
 	public DefaultAgentFactory(final Netsim simulation) {
 		this.simulation = simulation;

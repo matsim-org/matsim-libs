@@ -23,7 +23,6 @@ package org.matsim.vis.otfvis.opengl.gl;
 import java.awt.Color;
 import java.io.Serializable;
 
-import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;

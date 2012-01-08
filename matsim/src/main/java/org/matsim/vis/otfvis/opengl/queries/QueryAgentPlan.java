@@ -191,14 +191,12 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private transient List<InfoText> activityTexts;
 		protected transient InfoText agentText = null;
 		private ByteBuffer cols;
-		int activityNr = -1;
-		double activityFinished = 0;
 
 		private boolean calcOffset = true;
 
 		@Override
 		public void draw(OTFOGLDrawer drawer) {
-			drawWithGLDrawer((OTFOGLDrawer) drawer);
+			drawWithGLDrawer(drawer);
 		}
 
 		protected void drawWithGLDrawer(OTFOGLDrawer drawer) {

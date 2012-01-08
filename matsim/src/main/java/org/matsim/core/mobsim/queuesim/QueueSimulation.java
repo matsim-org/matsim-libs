@@ -55,7 +55,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.InternalInterface;
-import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
@@ -419,7 +418,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 	@Override
 	public EventsManager getEventsManager() {
-		return this.events ;
+		return this.events;
 	}
 
 	private static final void setEvents(final EventsManager events) {
@@ -454,6 +453,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 	}
 	
+	@Override
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		this.arrangeNextAgentAction(agent) ;
 	}

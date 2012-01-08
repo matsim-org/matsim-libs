@@ -34,20 +34,18 @@ import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 
 /**
  * @author dgrether
- *
  */
 public class NetworkChangeEventsEngine implements MobsimEngine {
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	private QSim qsim;
 
-	private InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
+		// internalInterface is not used in this class
 	}
 
-	public NetworkChangeEventsEngine(QSim sim){
+	public NetworkChangeEventsEngine(QSim sim) {
 		this.qsim = sim;
 	}
 	
@@ -70,6 +68,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		}
 	}
 
+	@Override
 	public void doSimStep(double time) {
 		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
 			handleNetworkChangeEvents(time);

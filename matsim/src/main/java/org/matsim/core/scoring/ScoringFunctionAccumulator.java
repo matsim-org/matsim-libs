@@ -30,7 +30,6 @@ import org.matsim.core.scoring.interfaces.AgentStuckScoring;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
 import org.matsim.core.scoring.interfaces.MoneyScoring;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * The accumulator adds up the different parts of the score.

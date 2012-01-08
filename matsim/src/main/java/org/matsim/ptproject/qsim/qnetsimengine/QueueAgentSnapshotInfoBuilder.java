@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -35,10 +34,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  * @author dgrether
  *
  */
-public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder {
+public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	private static final Logger log = Logger.getLogger(QueueAgentSnapshotInfoBuilder.class);
-	
 	public QueueAgentSnapshotInfoBuilder(Scenario scenario) {
 		super(scenario);
 	}

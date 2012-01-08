@@ -42,7 +42,7 @@ public class TravelTimeFactoryWrapper implements PersonalizableTravelTimeFactory
 		return travelTime;
 	}
 
-	private class Wrapper implements PersonalizableTravelTime {
+	private static class Wrapper implements PersonalizableTravelTime {
 
 		private final TravelTime travelTime;
 		
@@ -52,7 +52,7 @@ public class TravelTimeFactoryWrapper implements PersonalizableTravelTimeFactory
 		
 		@Override
 		public double getLinkTravelTime(Link link, double time) {
-			return travelTime.getLinkTravelTime(link, time);
+			return this.travelTime.getLinkTravelTime(link, time);
 		}
 
 		@Override

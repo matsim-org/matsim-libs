@@ -21,8 +21,6 @@ package org.matsim.core.config;
 
 import java.io.File;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**

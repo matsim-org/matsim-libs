@@ -22,7 +22,6 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -34,9 +33,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
  * @author dgrether
  */
-final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder {
-
-	private static final Logger log = Logger.getLogger(EquiDistAgentSnapshotInfoBuilder.class);
+final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
 	EquiDistAgentSnapshotInfoBuilder( Scenario sc ){
 		super(sc);
@@ -53,6 +50,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
 	 * @param laneNumber
 	 */
+	@Override
 	public void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
 			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
 			double offset, Integer laneNumber){
