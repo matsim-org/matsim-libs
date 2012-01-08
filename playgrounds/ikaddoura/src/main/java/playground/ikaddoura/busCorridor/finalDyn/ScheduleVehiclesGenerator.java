@@ -83,7 +83,8 @@ public class ScheduleVehiclesGenerator {
 	private double egressSeconds;
 	private double accessSeconds;
 	private double scheduleSpeed;
-	
+	private double pausenzeit;
+
 	private Map<Integer, Double> vehNr2lastPeriodDepTimeHin = new HashMap<Integer, Double>();
 	private int periodNr = 0;
 
@@ -266,7 +267,6 @@ public class ScheduleVehiclesGenerator {
 			//-----------
 			int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
 			double routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset() + this.stopTime;
-			double pausenzeit = 0;
 			double umlaufzeit = (routeTravelTime + pausenzeit) * 2;
 			log.info("Umlaufzeit: "+Time.writeTime(umlaufzeit, Time.TIMEFORMAT_HHMMSS));
 			double takt = umlaufzeit / numberOfBusesZeitraum; //sec
@@ -473,5 +473,21 @@ public class ScheduleVehiclesGenerator {
 	public Map<Integer, Double> getVehNr2lastPeriodDepTimeHin() {
 		return vehNr2lastPeriodDepTimeHin;
 	}
+
+	/**
+	 * @return the pausenzeit
+	 */
+	public double getPausenzeit() {
+		return pausenzeit;
+	}
+
+	/**
+	 * @param pausenzeit the pausenzeit to set
+	 */
+	public void setPausenzeit(double pausenzeit) {
+		this.pausenzeit = pausenzeit;
+	}
+	
+	
 	
 }

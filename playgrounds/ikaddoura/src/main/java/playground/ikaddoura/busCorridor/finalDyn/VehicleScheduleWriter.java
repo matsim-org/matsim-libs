@@ -47,9 +47,9 @@ public class VehicleScheduleWriter {
 	private int standingRoom;
 	private TransitSchedule schedule;
 	private List<Id> vehicleIDs;
-	Map<Integer, TimePeriod> day;
+	private Map<Integer, TimePeriod> day;
+	private double pausenzeit;
 	
-
 	public VehicleScheduleWriter(Map<Integer, TimePeriod> day, int capacity, String networkFile, String directoryExtIt) {
 		
 		this.networkFile = networkFile;
@@ -82,6 +82,7 @@ public class VehicleScheduleWriter {
 	
 		generator.setStopTime(20); // for schedule!
 		generator.setScheduleSpeed(8.33333); // for schedule!
+		generator.setPausenzeit(5*60);
 		generator.setNetworkFile(networkFile);
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");

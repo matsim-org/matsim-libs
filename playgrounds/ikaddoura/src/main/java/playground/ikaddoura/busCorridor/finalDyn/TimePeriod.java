@@ -24,7 +24,6 @@
 package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -58,7 +57,7 @@ public class TimePeriod {
 	}
 	
 	public String toString(){
-		String tag = Time.writeTime(this.getFromTime(), Time.TIMEFORMAT_HHMMSS)+"-"+Time.writeTime(this.getToTime(), Time.TIMEFORMAT_HHMMSS)+"-"+this.getNumberOfBuses();
+		String tag = this.getId()+"-"+Time.writeTime(this.getFromTime(), Time.TIMEFORMAT_HHMMSS)+"-"+Time.writeTime(this.getToTime(), Time.TIMEFORMAT_HHMMSS)+"-"+this.getNumberOfBuses();
 		return tag;
 	}
 	
