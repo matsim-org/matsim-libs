@@ -44,15 +44,15 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int numberOfExternalIterations = 4;
+	static int numberOfExternalIterations = 10;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, 1, 3*3600, 4*3600); // orderId, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, 5, 4*3600, 9*3600);
-	TimePeriod p3 = new TimePeriod(3, 2, 9*3600, 14*3600);
-	TimePeriod p4 = new TimePeriod(4, 5, 14*3600, 17*3600);
-	TimePeriod p5 = new TimePeriod(5, 1, 17*3600, 23*3600);
+	TimePeriod p1 = new TimePeriod(1, "periodA", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p2 = new TimePeriod(2, "periodB", 5, 6*3600, 9*3600);
+	TimePeriod p3 = new TimePeriod(3, "periodC", 2, 9*3600, 14*3600);
+	TimePeriod p4 = new TimePeriod(4, "periodD", 5, 14*3600, 17*3600);
+	TimePeriod p5 = new TimePeriod(5, "periodE", 1, 17*3600, 23*3600);
 
 	private double fare = -2.5; // negative!
 	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
@@ -130,11 +130,10 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < numberOfExternalIterations){
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
-				this.setDay(increaseBuses(2, 2)); // timePeriod, number of buses
-				this.setDay(increaseBuses(4, 2)); // timePeriod, number of buses
+				this.setDay(increaseBuses("periodB", 2)); // id, number of buses
 
-				this.setDay(extend(2, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
-//				this.setDay(extend(4, 60 * 60)); // stoppt wenn eine Zeitperiode von einer anderen verdrängt werden würde!
+				this.setDay(extend("periodB", 60 * 60));
+//				this.setDay(extend("periodD", 60 * 60));
 	//			this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
 	//			this.setCapacity(operator.increaseCapacity(2)); // absolute value
 			}
@@ -163,9 +162,17 @@ public class ExternalControler {
 	 * @param j
 	 * @return
 	 */
-	private Map<Integer, TimePeriod> increaseBuses(int period, int increase) {
+	private Map<Integer, TimePeriod> increaseBuses(String periodId, int increase) {
 		Map<Integer, TimePeriod> dayMod = this.getDay();	
-		dayMod.get(period).increaseNumberOfBuses(increase);
+		int period = 0;
+		for (TimePeriod tt : dayMod.values()){
+			if (tt.getId().equals(periodId)){
+				period = tt.getOrderId();
+			}
+		}
+		if (dayMod.containsKey(period)){
+			dayMod.get(period).increaseNumberOfBuses(increase);
+		}
 		return dayMod;
 	}
 
@@ -174,45 +181,70 @@ public class ExternalControler {
 	 * @param j
 	 * @return
 	 */
-	private Map<Integer, TimePeriod> extend(int period, double time) {
-		Map<Integer, TimePeriod> dayNextExtItOutput = this.getDay();	
-		log.info("vorher: "+this.getDay().toString());
-		
-		boolean test = true;
-		
-		if (dayNextExtItOutput.containsKey(period-1)){
-			System.out.println("A");
-			if(dayNextExtItOutput.get(period-1).getFromTime() + time/2 >= dayNextExtItOutput.get(period-1).getToTime()){
-				test = false;
-			}	
-		}
-		if (dayNextExtItOutput.containsKey(period+1)){
-			System.out.println("B");
-			if(dayNextExtItOutput.get(period+1).getFromTime() + time/2 >= dayNextExtItOutput.get(period+1).getToTime()){
-				test = false;
-			}	
-		}
-		if(dayNextExtItOutput.get(period).getFromTime() + time/2 >= dayNextExtItOutput.get(period).getToTime()){
-			test = false;
-		}
-		
-		if (test == true){	
-			dayNextExtItOutput.get(period).changeFromTime(-time/2);
-			dayNextExtItOutput.get(period).changeToTime(time/2);
-			if (dayNextExtItOutput.containsKey(period-1)){
-				dayNextExtItOutput.get(period-1).changeToTime(-time/2);
-			}
-			if (dayNextExtItOutput.containsKey(period+1)){
-				dayNextExtItOutput.get(period+1).changeFromTime(time/2);
+	private Map<Integer, TimePeriod> extend(String periodId, double time) {
+		Map<Integer, TimePeriod> dayNextExtIt = this.getDay();	
+		int period = 0;
+		for (TimePeriod timePeriod : dayNextExtIt.values()){
+			if (timePeriod.getId().equals(periodId)){
+				period = timePeriod.getOrderId();
 			}
 		}
 		
-		else {
-			log.warn("Time Period not modified!");
+		if (dayNextExtIt.containsKey(period)){
+			
+			dayNextExtIt.get(period).changeFromTime(-time/2);
+			dayNextExtIt.get(period).changeToTime(time/2);
+			if (dayNextExtIt.containsKey(period-1)){
+				dayNextExtIt.get(period-1).changeToTime(-time/2);
+			}
+			if (dayNextExtIt.containsKey(period+1)){
+				dayNextExtIt.get(period+1).changeFromTime(time/2);
+			}
+			
+			int removeNr = 0;
+			if (dayNextExtIt.containsKey(period-1)){
+				System.out.println("A");
+				if(dayNextExtIt.get(period-1).getFromTime() >= dayNextExtIt.get(period-1).getToTime()){
+					removeNr = period-1;
+				}	
+			}
+			
+			if (removeNr > 0){
+				dayNextExtIt.remove(removeNr);
+			}
+			
+			removeNr = 0;
+			if (dayNextExtIt.containsKey(period+1)){
+				System.out.println("B");
+				if(dayNextExtIt.get(period+1).getFromTime() >= dayNextExtIt.get(period+1).getToTime()){
+					removeNr = period+1;
+				}	
+			}
+			
+			if (removeNr > 0){
+				dayNextExtIt.remove(removeNr);
+			}
+			
+			removeNr = 0;
+			if(dayNextExtIt.get(period).getFromTime() >= dayNextExtIt.get(period).getToTime()){
+				removeNr = period;
+			}
+			
+			if (removeNr > 0){
+				dayNextExtIt.remove(removeNr);
+			}
 		}
+		
+		int nr = 1;
+		Map<Integer, TimePeriod> dayNextExtItOutput = new HashMap<Integer, TimePeriod>();	
+		for (TimePeriod t : dayNextExtIt.values()){
+			t.setOrderId(nr);
+			dayNextExtItOutput.put(nr, t);
+			nr++;
+		}
+		
 		
 		log.info("Time periods for next external Iteration: "+dayNextExtItOutput.toString());
-		System.out.println(test);
 		return dayNextExtItOutput;
 	}
 

@@ -24,6 +24,7 @@
 package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -34,13 +35,15 @@ public class TimePeriod {
 
 	private final static Logger log = Logger.getLogger(TimePeriod.class);
 
+	private String id;
 	private int orderId;
 	private int numberOfBuses;
 	private double fromTime;
 	private double toTime;
 	
-	public TimePeriod(int orderId, int numberOfBuses, double fromTime, double toTime){
+	public TimePeriod(int orderId, String id, int numberOfBuses, double fromTime, double toTime){
 		this.orderId = orderId;
+		this.id = id;
 		this.numberOfBuses = numberOfBuses;
 		this.fromTime = fromTime;
 		this.toTime = toTime;
@@ -112,6 +115,12 @@ public class TimePeriod {
 	
 	public void changeToTime(double time) {
 		this.setToTime(this.getToTime() + time);
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getId() {
+		return id;
 	}
 	
 }
