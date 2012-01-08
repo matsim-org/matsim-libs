@@ -13,7 +13,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.ChartListener;
 import org.matsim.contrib.freight.vrp.algorithms.rr.InitialSolution;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.RuinAndRecreateWithTimeWindowsFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
@@ -138,7 +138,7 @@ public class LiLim {
 	}
 
 	private RuinAndRecreate createAlgo(VehicleRoutingProblem vrp) {
-		RuinAndRecreateWithTimeWindowsFactory factory = new RuinAndRecreateWithTimeWindowsFactory();
+		PickupAndDeliveryTourWithTimeWindowsAlgoFactory factory = new PickupAndDeliveryTourWithTimeWindowsAlgoFactory();
 		factory.setIterations(100);
 		factory.setWarmUp(10);
 		ChartListener chartListener = new ChartListener();

@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 
 import vrp.vrpInstances.TDSolomon.MyLocations;
-import vrp.vrpInstances.TDSolomon.TDCosts;
 
 public class TDSolomonTest extends TestCase{
 
@@ -38,30 +37,30 @@ public class TDSolomonTest extends TestCase{
 	}
 	
 	public void testTravelTimeWithinTimeBin(){
-		assertEquals(20.0, tdCosts.getGeneralizedCost("1", "2", 0.0));
+		assertEquals(40.0, tdCosts.getGeneralizedCost("1", "2", 0.0));
 	}
 	
 	public void testTravelTimeViaTwoTimeBins(){
-		assertEquals(15.0, tdCosts.getGeneralizedCost("1", "2", 10.0));
+		assertEquals(35.0, tdCosts.getGeneralizedCost("1", "2", 10.0));
 	}
 	
 	public void testTravleTimeViaThreeTimeBins(){
 		loc.addLocation("3", new Coordinate(0,0));
 		loc.addLocation("4", new Coordinate(80,0));
-		assertEquals(55.0, tdCosts.getGeneralizedCost("3", "4", 10.0));
+		assertEquals(135.0, tdCosts.getGeneralizedCost("3", "4", 10.0));
 	}
 	
 	public void testBackwardsTravelTime(){
-		assertEquals(20.0, tdCosts.getBackwardGeneralizedCost("1", "2", 20.0));
+		assertEquals(40.0, tdCosts.getBackwardGeneralizedCost("1", "2", 20.0));
 	}
 	
 	public void testTravelBackwardsTTViaTwoTimeBins(){
-		assertEquals(15.0, tdCosts.getBackwardGeneralizedCost("1", "2", 25.0));
+		assertEquals(35.0, tdCosts.getBackwardGeneralizedCost("1", "2", 25.0));
 	}
 	
 	public void testBackwardsTravelTimeViaThreeTimeBins(){
 		loc.addLocation("3", new Coordinate(0,0));
 		loc.addLocation("4", new Coordinate(80,0));
-		assertEquals(55.0, tdCosts.getBackwardGeneralizedCost("3", "4", 65.0));
+		assertEquals(135.0, tdCosts.getBackwardGeneralizedCost("3", "4", 65.0));
 	}
 }

@@ -15,7 +15,7 @@ import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreate;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateFactory;
 import org.matsim.contrib.freight.vrp.algorithms.rr.RuinAndRecreateReport;
 import org.matsim.contrib.freight.vrp.algorithms.rr.factories.DistributionTourWithTimeWindowsAlgoFactory;
-import org.matsim.contrib.freight.vrp.algorithms.rr.factories.RuinAndRecreateWithTimeWindowsFactory;
+import org.matsim.contrib.freight.vrp.algorithms.rr.factories.PickupAndDeliveryTourWithTimeWindowsAlgoFactory;
 import org.matsim.contrib.freight.vrp.basics.Coordinate;
 import org.matsim.contrib.freight.vrp.basics.CrowFlyCosts;
 import org.matsim.contrib.freight.vrp.basics.Job;
