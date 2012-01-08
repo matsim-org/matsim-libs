@@ -45,6 +45,7 @@ import org.matsim.vehicles.VehicleUtils;
  * Date: 10/31/11
  * Time: 5:59 PM
  * To change this template use File | Settings | File Templates.
+ * 
  */
 public class QSimAgentSource implements AgentSource {
 
@@ -66,7 +67,7 @@ public class QSimAgentSource implements AgentSource {
         for (Plan plan : plans) {
             MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(plan.getPerson());
             agents.add(agent);
-            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getCurrentLinkId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
+            qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
         }
         return agents;
     }
