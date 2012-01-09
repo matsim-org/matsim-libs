@@ -87,6 +87,10 @@ public class ScheduleVehiclesGenerator {
 
 	private Map<Integer, Double> vehNr2lastPeriodDepTimeHin = new HashMap<Integer, Double>();
 	private int periodNr = 0;
+	
+	private double lastPeriodDepTimeHin;
+	private int lastPeriodLastDepTimeHinVehID;
+	private double lastPeriodTakt;
 
 	TransitScheduleFactory sf = new TransitScheduleFactoryImpl();
 	private TransitSchedule schedule = sf.createTransitSchedule();
@@ -276,65 +280,74 @@ public class ScheduleVehiclesGenerator {
 			double departureTime = 0;
 			double firstDepartureTime = 0;
 			double lastDepartureTime = 0;
+			int startVehIndex = 0;
 			int routeNrCounter = 0;
 			for (Id routeId : routeId2transitRoute.keySet()){
 				routeNrCounter++;
 				if (this.periodNr > 1 && routeNrCounter == 1){  // nicht der erste Zeitraum, hin
 					
-					lastDepartureTime = endTime - umlaufzeit;
+					lastDepartureTime = endTime;
 				
 					if (day.get(periodNr-1).getNumberOfBuses()==0){
 						firstDepartureTime = startTime;
 					}
-					if (day.get(periodNr-1).getNumberOfBuses() > 0){
-						if (day.get(periodNr-1).getNumberOfBuses() > numberOfBusesZeitraum){
-							// weniger Busse als in der Periode davor
-							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIDsZeitraum.size()-1) + umlaufzeit;
+					else {
+						
+						firstDepartureTime = this.lastPeriodDepTimeHin + umlaufzeit;
+						System.out.println("lastDepTimeHin "+lastPeriodDepTimeHin);
+						System.out.println("vehId last dep time "+this.lastPeriodLastDepTimeHinVehID);
+
+						System.out.println(vehicleIDsZeitraum);
+						if (this.lastPeriodLastDepTimeHinVehID>=vehicleIDsZeitraum.size()-1){
+							startVehIndex = 0;
+							System.out.println("B");
 						}
-						else if (day.get(periodNr-1).getNumberOfBuses() < numberOfBusesZeitraum){
-							// mehr Busse als in der Periode davor
-							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;
-						}
-						else if (day.get(periodNr-1).getNumberOfBuses() == numberOfBusesZeitraum){
-							// Busanzahl gleich der in der Vorperiode
-							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;
-						}
-					}
+						else {
+							startVehIndex = this.lastPeriodLastDepTimeHinVehID + 1;
+							System.out.println("C");
+						}							
+					}						
 				}
 				else if (this.periodNr > 1 && routeNrCounter == 2) { // nicht der erste Zeitraum, rück
-					lastDepartureTime = endTime - umlaufzeit + umlaufzeit/2;
+					lastDepartureTime = endTime + umlaufzeit/2;
 					firstDepartureTime = firstDepartureTime + umlaufzeit/2;
 				}
 				else if (this.periodNr == 1 && routeNrCounter == 1) { // erster Zeitraum, hin
 					firstDepartureTime = startTime;
-					lastDepartureTime = endTime - umlaufzeit;
+					lastDepartureTime = endTime;
+					startVehIndex = 0;
 				}
 				else if (this.periodNr == 1 && routeNrCounter == 2) { // erster Zeitraum, rück
 					firstDepartureTime = startTime + umlaufzeit/2;
-					lastDepartureTime = endTime - umlaufzeit + umlaufzeit/2;
+					lastDepartureTime = endTime + umlaufzeit/2;
+					startVehIndex = 0;
 				}
 				else {
 					System.out.println("ERROR!");
 				}
 	
-				int vehicleIndex = vehicleIDsZeitraum.size()-1;
+				int vehicleIndex = startVehIndex;
 				departureTime = firstDepartureTime;
-					for (int depNr=1 ; departureTime <= lastDepartureTime ; depNr++){
+					for (int depNr=1 ; departureTime < lastDepartureTime; depNr++){
 						Departure departure = sf.createDeparture(new IdImpl(zeitraum+"_"+depNr), departureTime);
 						departure.setVehicleId(vehicleIDsZeitraum.get(vehicleIndex));
 						routeId2transitRoute.get(routeId).addDeparture(departure);
 						
 						if (routeNrCounter == 1){
-							this.vehNr2lastPeriodDepTimeHin.put(vehicleIndex, departureTime);
+							this.lastPeriodDepTimeHin = departureTime;
+							this.lastPeriodLastDepTimeHinVehID = vehicleIndex;
+							this.lastPeriodTakt = takt;
+							System.out.println("set last depTime: "+departureTime);
+							System.out.println("set last VehId: "+(vehicleIndex));
 						}
 						
 						departureTime = departureTime+takt;
 						
-						if (vehicleIndex==0){
-							vehicleIndex = vehicleIDsZeitraum.size()-1;
+						if (vehicleIndex==vehicleIDsZeitraum.size()-1){
+							vehicleIndex = 0;
 						}
 						else {
-							vehicleIndex--;
+							vehicleIndex++;
 						}	
 					}
 			}

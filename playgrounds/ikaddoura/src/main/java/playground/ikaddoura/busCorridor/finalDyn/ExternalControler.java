@@ -48,8 +48,8 @@ public class ExternalControler {
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 5, 6*3600, 9*3600);
+	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 2, 8*3600, 9*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 3, 9*3600, 10*3600);
 	TimePeriod p3 = new TimePeriod(3, "NVZ", 2, 9*3600, 14*3600);
 	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 5, 14*3600, 17*3600);
 	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 1, 17*3600, 23*3600);
@@ -86,9 +86,9 @@ public class ExternalControler {
 		
 		day.put(p1.getOrderId(), p1);
 		day.put(p2.getOrderId(), p2);
-		day.put(p3.getOrderId(), p3);
-		day.put(p4.getOrderId(), p4);
-		day.put(p5.getOrderId(), p5);
+//		day.put(p3.getOrderId(), p3);
+//		day.put(p4.getOrderId(), p4);
+//		day.put(p5.getOrderId(), p5);
 		
 		for (int extIt = 0; extIt <= numberOfExternalIterations ; extIt++){
 			log.info("************* EXTERNAL ITERATION "+extIt+" BEGINS *************");
@@ -132,11 +132,11 @@ public class ExternalControler {
 				
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
 				
-				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
-				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
-
-				this.setDay(extend("HVZ_1", 30 * 60));
-				this.setDay(extend("HVZ_2", 30 * 60));
+//				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
+//				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
+//
+//				this.setDay(extend("HVZ_1", 30 * 60));
+//				this.setDay(extend("HVZ_2", 30 * 60));
 				
 //				this.setFare(operator.increaseFare(this.getFare(), -0.5)); // absolute value
 //				this.setCapacity(operator.increaseCapacity(2)); // absolute value
