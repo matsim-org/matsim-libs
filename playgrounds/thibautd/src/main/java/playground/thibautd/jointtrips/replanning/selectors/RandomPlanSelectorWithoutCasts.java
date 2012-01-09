@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReRouteStrategy.java
+ * RandomPlanSelectorWithoutCasts.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.strategies;
+package playground.thibautd.jointtrips.replanning.selectors;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
+import java.util.List;
 
-import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
-import playground.thibautd.jointtrips.replanning.modules.reroute.JointReRouteModule;
-import playground.thibautd.jointtrips.replanning.selectors.RandomPlanSelectorWithoutCasts;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
- * {@link JointPlanStrategy} using an {@link BestPlanSelector} to select a plan
- * and uses {@link JointReRouteModule} on it.
- *
+ * A selector which selects a random plan, without requiring a PersonImpl
  * @author thibautd
  */
-public class ReRouteStrategy extends JointPlanStrategy {
+public class RandomPlanSelectorWithoutCasts implements PlanSelector {
 
-	public ReRouteStrategy(final Controler controler) {
-		// TODO: use a JointPlan specific selector?
-		// + pass it from the config file
-		// super( new BestPlanSelector() );
-		super( new RandomPlanSelectorWithoutCasts() );
+	@Override
+	public Plan selectPlan(final Person person) {
+		List<? extends Plan> plans = person.getPlans();
 
-		this.addStrategyModule(new JointReRouteModule(controler));
+		if ( plans.size() == 0 ) {
+			return null;
+		}
+
+		int index = MatsimRandom.getRandom().nextInt( plans.size() );
+
+		return plans.get(index);
 	}
 }
 

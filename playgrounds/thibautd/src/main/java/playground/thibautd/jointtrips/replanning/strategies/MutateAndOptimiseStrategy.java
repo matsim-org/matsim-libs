@@ -25,12 +25,12 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
 import playground.thibautd.jointtrips.replanning.JointPlanStrategy;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
 import playground.thibautd.jointtrips.replanning.modules.jointtripsmutator.JointTripsMutatorModule;
+import playground.thibautd.jointtrips.replanning.selectors.RandomPlanSelectorWithoutCasts;
 
 /**
  * The strategy using the {@link playground.thibautd.jointtrips.replanning.modules.jointtripsmutator.JointTripsMutatorAlgorithm}.
@@ -66,7 +66,7 @@ public class MutateAndOptimiseStrategy extends JointPlanStrategy {
 			case BEST_SCORE:
 				return new BestPlanSelector();
 			case RANDOM:
-				return new RandomPlanSelector();
+				return new RandomPlanSelectorWithoutCasts();
 			case SELECTED:
 				return new KeepSelected();
 			default:
