@@ -28,12 +28,12 @@
 
 package playground.christoph.controler;
 
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -77,9 +77,24 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		if (!this.scenarioLoaded) {
 			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
 			loader.loadScenario();
+			if (this.config.scenario().isUseHouseholds()) {
+				this.loadHouseholds();
+			}
 			this.network = this.scenarioData.getNetwork();
 			this.population = this.scenarioData.getPopulation();
 			this.scenarioLoaded = true;
+		}
+	}
+	
+	private void loadHouseholds() {
+		if ((this.scenarioData.getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
+			String hhFileName = this.config.households().getInputFile();
+			log.info("loading households from " + hhFileName);
+			new HouseholdsReaderV10(this.scenarioData.getHouseholds()).parse(hhFileName);
+			log.info("households loaded.");
+		}
+		else {
+			log.info("no households file set in config or feature disabled, not able to load anything");
 		}
 	}
 	
@@ -105,7 +120,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
-		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
+//		this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));
 		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
 		this.addControlerListener(new CalcLegTimesKTIListener(CALC_LEG_TIMES_KTI_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME));
