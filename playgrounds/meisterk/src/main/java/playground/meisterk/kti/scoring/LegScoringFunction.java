@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -36,6 +37,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -110,7 +112,14 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = route.getDistance();
+				/*
+				 * route.getDistance() is deprecated and might return null.
+				 * Therefore, replacing it with call to calcDistance as in the
+				 * default MATSim LegScoringFunction.
+				 * cdobler, Jan'12
+				 */
+//				dist = route.getDistance();
+				dist = RouteUtils.calcDistance((LinkNetworkRoute) route, network);
 				tmpScore += this.params.marginalUtilityOfDistanceCar_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
