@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms;
 import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -57,8 +58,6 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkTeleatlasAddManeuverRestrictions.class);
-
-	private final NetworkExpandNode neModule = new NetworkExpandNode();
 
 	/**
 	 * path and name to the Tele Atlas MultiNet maneuver (mn) Shape file
@@ -169,6 +168,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 
 	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
+		NetworkExpandNode neModule = new NetworkExpandNode(network, expansionRadius, this.linkSeparation);
 		FileChannel in = new FileInputStream(this.mpDbfFileName).getChannel();
 		DbaseFileReader r = new DbaseFileReader(in,true);
 		// get header indices
@@ -333,7 +333,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					}
 				}
 				// expand the node
-				Tuple<ArrayList<Node>,ArrayList<Link>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+				Tuple<List<Node>, List<Link>> t = neModule.expandNode(nodeId, turns);
 				virtualNodesCnt += t.getFirst().size();
 				virtualLinksCnt += t.getSecond().size();
 				nodesAssignedCnt++;

@@ -21,16 +21,15 @@
 package org.matsim.core.network.algorithms;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -40,87 +39,60 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  * A Procedure to expand a node of the {@link Network network}.
  *
- * <p><b>Note:</b> it is actually not completely clear that this should be a
- * MATSim network module. It could also be a method in the network layer
- * or---probably even better---a MATSim utility/procedure/algo/etc... The
- * logical organization of <code>org.matsim</code> still needs to be discussed</p>
- *
  * @author balmermi
+ * @author mrieser / senozon
  */
-public class NetworkExpandNode implements NetworkRunnable {
+public class NetworkExpandNode {
 
-	//////////////////////////////////////////////////////////////////////
-	// member variables
-	//////////////////////////////////////////////////////////////////////
-
-	private final static Logger log = Logger.getLogger(NetworkExpandNode.class);
-
-	private Id nId = null;
-	private ArrayList<Tuple<Id,Id>> turns = null;
-	private double radius = Double.NaN;
-	private double offset = Double.NaN;
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public NetworkExpandNode() {
-		log.info("init " + this.getClass().getName() + " module...");
-		log.info("done.");
+	private final Network network;
+	private double expRadius = 1.0;
+	private double offset = 0.0;
+	private double dist = 1.0; // cache a value that is often used in the method expandNode
+	
+	public NetworkExpandNode(final Network network, final double expRadius, final double offset) {
+		if (network == null) {
+			throw new IllegalArgumentException("network must not be null.");
+		}
+		this.network = network;
+		this.setExpRadius(expRadius);
+		this.setOffset(offset);
 	}
-
-	//////////////////////////////////////////////////////////////////////
-	// set methods
-	//////////////////////////////////////////////////////////////////////
-
-	public final void setNodeId(Id nodeId) {
-		this.nId = nodeId;
-	}
-
-	public final void setTurns(ArrayList<Tuple<Id,Id>> turns) {
-		this.turns = turns;
-	}
-
-	public final void setNodeExpansionRadius(double radius) {
-		this.radius = radius;
-	}
-
-	public final void setNodeExpansionOffset(double offset) {
-		this.offset = offset;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// run method
-	//////////////////////////////////////////////////////////////////////
-
+	
 	/**
-	 * The run method such that it is still consistent with the other network algorithms.
-	 * But rather use {@link #expandNode(Network,Id,ArrayList,double,double)}.
-	 *
-	 * @param network
+	 * @param expRadius the expansion radius. If zero, all new nodes have the same coordinate
+	 * and the new links with have length equals zero
 	 */
-	@Override
-	public void run(final Network network) {
-		log.info("running " + this.getClass().getName() + " module...");
-		this.expandNode(network,this.nId,this.turns,this.radius,this.offset);
-		log.info("running " + this.getClass().getName() + " module...");
+	public void setExpRadius(final double expRadius) {
+		if (Double.isNaN(expRadius)) {
+			throw new IllegalArgumentException("expansion radius must not be NaN.");
+		}
+		this.expRadius = expRadius;
+		this.dist = Math.sqrt(this.expRadius * this.expRadius - this.offset * this.offset);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// expand method
-	//////////////////////////////////////////////////////////////////////
+	/**
+	 * @param offset the offset between a link pair with the same incident nodes. If zero, the two new
+	 * nodes created for that link pair will have the same coordinates
+	 */
+	public void setOffset(final double offset) {
+		if (Double.isNaN(offset)) {
+			throw new IllegalArgumentException("expansion offset must not be NaN.");
+		}
+		this.offset = offset;
+		this.dist = Math.sqrt(this.expRadius * this.expRadius - this.offset * this.offset);
+	}
 
 	/**
-	 * Expands the {@link Node node} that is part of the {@link Network network} and holds
-	 * {@link Id nodeId}.
+	 * Expands the specified {@link Node node} that is part of the {@link Network network} and
+	 * adds turning restrictions/maneuvers to it. 
 	 *
 	 * <p>It is done in the following way:
 	 * <ol>
-	 * <li>creates for each in- and out-{@link Link link} a new {@link Node node} with
+	 * <li>creates for each in- and out-link a new node with
 	 * <ul>
-	 * <li><code>{@link Id new_nodeId} = {@link Id nodeId+"-"+index}; index=[0..#incidentLinks]</code></li>
-	 * <li><code>{@link Coord new_coord}</code> with distance <code>r</code> to the given {@link Node node}
-	 * in direction of the corresponding incident {@link Link link} of the given {@link Node node} with
+	 * <li><code>new_nodeId = nodeId+"-"+index; index=[0..#incidentLinks]</code></li>
+	 * <li><code>new_coord</code> with distance <code>r</code> to the given node
+	 * in direction of the corresponding incident Link of the given node with
 	 * offset <code>e</code>.</li>
 	 * </ul>
 	 * <pre>
@@ -139,8 +111,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *               v       |
 	 * </pre>
 	 * </li>
-	 * <li>connects each incident {@link Link link} of the given {@link Node node} with the corresponding
-	 * {@link Node new_node}
+	 * <li>connects each incident link of the given node with the corresponding <code>new_node</code>
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *                   O
@@ -154,7 +125,7 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>removes the given {@link Node node} from the {@link Network network}
+	 * <li>removes the given node from the network
 	 * <pre>
 	 * <-----12------ o     o <----21-------
 	 *
@@ -168,10 +139,10 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 *                 v   |
 	 * </pre>
 	 * </li>
-	 * <li>inter-connects the {@link Node new_nodes} with {@link Link new_links} as defined in the
+	 * <li>inter-connects the <code>new_node</code>s with new links as defined in the
 	 * <code>turns</code> list, with:<br>
 	 * <ul>
-	 * <li><code>{@link Id new_linkId} = {@link Id fromLinkId+"-"+index}; index=[0..#turn-tuples]</code></li>
+	 * <li><code>new_linkId = fromLinkId+"-"+index; index=[0..#turn-tuples]</code></li>
 	 * <li>length equals the Euclidean distance</li>
 	 * <li>freespeed, capacity, permlanes, origId and type are equals to the attributes of the fromLink.</li>
 	 * </ul>
@@ -195,33 +166,38 @@ public class NetworkExpandNode implements NetworkRunnable {
 	 * </ol>
 	 * </p>
 	 *
-	 * @param network MATSim {@link Network network} DB
 	 * @param nodeId the {@link Id} of the {@link Node} to expand
-	 * @param turns The {@link ArrayList} of {@link Tuple tuples} of {@link Id linkIds}
+	 * @param turns The {@link List} of {@link Tuple tuples} of {@link Id linkIds}
 	 * of the incident {@link Link links} of the given {@link Node node} that define
 	 * which driving direction is allowed on that {@link Node node}.
-	 * @param r the expansion radius. If zero, all new nodes have the same coordinate
-	 * and the new links with have length equals zero
-	 * @param e the offset between a link pair with the same incident nodes. If zero, the two new
-	 * nodes created for that link pair will have the same coordinates
-	 * @return The {@link Tuple} of {@link ArrayList array lists} containing the new
-	 * {@link Node nodes}, new {@link Link links} resp.
+	 * @return The {@link Tuple} of {@link List lists} containing the newly created
+	 * {@link Node nodes} and {@link Link links}.
 	 */
-	public final Tuple<ArrayList<Node>,ArrayList<Link>> expandNode(final Network network, final Id nodeId, final ArrayList<Tuple<Id,Id>> turns, final double r, final double e) {
-		// check the input
-		if (Double.isNaN(r)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
-		if (Double.isNaN(e)) { throw new IllegalArgumentException("nodeid="+nodeId+": expansion radius is NaN."); }
-		if (network == null) { throw new IllegalArgumentException("network not defined."); }
+	public final Tuple<List<Node>,List<Link>> expandNode(final Id nodeId, final List<Tuple<Id,Id>> turns) {
+		double e = this.offset;
 		Node node = network.getNodes().get(nodeId);
-		if (node == null) { throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network."); }
-		if (turns == null) {throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!"); }
+		if (node == null) {
+			throw new IllegalArgumentException("nodeid="+nodeId+": not found in the network.");
+		}
+		if (turns == null) {
+			throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!");
+		}
+		
 		for (int i=0; i<turns.size(); i++) {
 			Id first = turns.get(i).getFirst();
-			if (first == null) { throw new IllegalArgumentException("given list contains 'null' values."); }
-			if (!node.getInLinks().containsKey(first)) { throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+first+": link not an inlink of given node."); }
+			if (first == null) {
+				throw new IllegalArgumentException("given list contains 'null' values.");
+			}
+			if (!node.getInLinks().containsKey(first)) {
+				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+first+": link not an inlink of given node.");
+			}
 			Id second = turns.get(i).getSecond();
-			if (second == null) { throw new IllegalArgumentException("given list contains 'null' values."); }
-			if (!node.getOutLinks().containsKey(second)) { throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+second+": link not an outlink of given node."); }
+			if (second == null) {
+				throw new IllegalArgumentException("given list contains 'null' values.");
+			}
+			if (!node.getOutLinks().containsKey(second)) {
+				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+second+": link not an outlink of given node.");
+			}
 		}
 
 		// remove the node
@@ -233,14 +209,36 @@ public class NetworkExpandNode implements NetworkRunnable {
 		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
 		// add new nodes and connect them with the in and out links
 		int nodeIdCnt = 0;
-		double d = Math.sqrt(r*r-e*e);
+		double d = this.dist;
 		for (Link inlink : inlinks.values()) {
 			Coord c = node.getCoord();
 			Coord p = inlink.getFromNode().getCoord();
-			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
-			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
-			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
-			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
+			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
+			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
+			if (Math.abs(lcp) < 1e-8) {
+				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
+				lcp = d;
+			}
+			double dx = cp.getX() / lcp;
+			double dy = cp.getY() / lcp;
+			double x = c.getX() + d * dx - e * dy;
+			double y = c.getY() + d * dy + e * dx;
+			
+			
+			
+//			Coord c = node.getCoord();
+//			Coord p = inlink.getFromNode().getCoord();
+//			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
+//			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
+//			if (Math.abs(lpc) < 1e-8) {
+//				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
+//				lpc = d;
+//			}
+//			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
+//			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
+			
+			
+			
 			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
 			network.addNode(n);
 			newNodes.add(n);
@@ -250,8 +248,11 @@ public class NetworkExpandNode implements NetworkRunnable {
 			l.setFreespeed(inlink.getFreespeed());
 			l.setCapacity(inlink.getCapacity());
 			l.setNumberOfLanes(inlink.getNumberOfLanes());
-			((LinkImpl) l).setOrigId(((LinkImpl) inlink).getOrigId());
-			((LinkImpl) l).setType(((LinkImpl) inlink).getType());
+			l.setAllowedModes(inlink.getAllowedModes());
+			if (inlink instanceof LinkImpl) {
+				((LinkImpl) l).setOrigId(((LinkImpl) inlink).getOrigId());
+				((LinkImpl) l).setType(((LinkImpl) inlink).getType());
+			}
 			network.addLink(l);
 		}
 		for (Link outlink : outlinks.values()) {
@@ -259,8 +260,14 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Coord p = outlink.getToNode().getCoord();
 			Coord cp = new CoordImpl(p.getX()-c.getX(),p.getY()-c.getY());
 			double lcp = Math.sqrt(cp.getX()*cp.getX()+cp.getY()*cp.getY());
-			double x = c.getX()+d/lcp*cp.getX()+e/lcp*cp.getY();
-			double y = c.getY()+d/lcp*cp.getY()-e/lcp*cp.getX();
+			if (Math.abs(lcp) < 1e-8) {
+				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
+				lcp = d;
+			}
+			double dx = cp.getX() / lcp;
+			double dy = cp.getY() / lcp;
+			double x = c.getX() + d * dx + e * dy;
+			double y = c.getY() + d * dy - e * dx;
 			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
 			network.addNode(n);
 			newNodes.add(n);
@@ -270,8 +277,11 @@ public class NetworkExpandNode implements NetworkRunnable {
 			l.setFreespeed(outlink.getFreespeed());
 			l.setCapacity(outlink.getCapacity());
 			l.setNumberOfLanes(outlink.getNumberOfLanes());
-			((LinkImpl) l).setOrigId(((LinkImpl) outlink).getOrigId());
-			((LinkImpl) l).setType(((LinkImpl) outlink).getType());
+			l.setAllowedModes(outlink.getAllowedModes());
+			if (outlink instanceof LinkImpl) {
+				((LinkImpl) l).setOrigId(((LinkImpl) outlink).getOrigId());
+				((LinkImpl) l).setType(((LinkImpl) outlink).getType());
+			}
 			network.addLink(l);
 		}
 
@@ -281,15 +291,24 @@ public class NetworkExpandNode implements NetworkRunnable {
 			Link fromLink = network.getLinks().get(turn.getFirst());
 			Link toLink = network.getLinks().get(turn.getSecond());
 			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode(), toLink.getFromNode());
-			l.setLength(CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord()));
+			double dist = CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord());
+			if (dist < 0.1 * this.expRadius) {
+				// mostly the case when nodes are on top of each other
+				// use a small length, but not really hard-coded because of different coordinate systems ("1" is not always 1 meter)
+				dist = 0.1 * this.expRadius;
+			}
+			l.setLength(dist);
 			l.setFreespeed(fromLink.getFreespeed());
 			l.setCapacity(fromLink.getCapacity());
 			l.setNumberOfLanes(fromLink.getNumberOfLanes());
-			((LinkImpl) l).setOrigId(((LinkImpl) fromLink).getOrigId());
-			((LinkImpl) l).setType(((LinkImpl) fromLink).getType());
+			l.setAllowedModes(fromLink.getAllowedModes());
+			if (fromLink instanceof LinkImpl) {
+				((LinkImpl) l).setOrigId(((LinkImpl) fromLink).getOrigId());
+				((LinkImpl) l).setType(((LinkImpl) fromLink).getType());
+			}
 			network.addLink(l);
 			newLinks.add(l);
 		}
-		return new Tuple<ArrayList<Node>, ArrayList<Link>>(newNodes,newLinks);
+		return new Tuple<List<Node>, List<Link>>(newNodes,newLinks);
 	}
 }

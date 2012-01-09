@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -50,8 +51,6 @@ public class NetworkAddEmmeManeuverRestrictions {
 	//////////////////////////////////////////////////////////////////////
 
 	private final static Logger log = Logger.getLogger(NetworkAddEmmeManeuverRestrictions.class);
-
-	private final NetworkExpandNode neModule = new NetworkExpandNode();
 
 	private final String maneuversTextFileName;
 
@@ -130,6 +129,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 
 	public void run(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
+		
+		NetworkExpandNode neModule = new NetworkExpandNode(network, this.expansionRadius, this.linkSeparation);
 
 		int nodesAssignedCnt = 0;
 		int virtualNodesCnt = 0;
@@ -162,7 +163,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 		}
 		for (Id nodeId : maneuvers.keySet()) {
 			ArrayList<Tuple<Id,Id>> turns = maneuvers.get(nodeId);
-			Tuple<ArrayList<Node>,ArrayList<Link>> t = neModule.expandNode(network,nodeId,turns,expansionRadius,linkSeparation);
+			Tuple<List<Node>, List<Link>> t = neModule.expandNode(nodeId,turns);
 			virtualNodesCnt += t.getFirst().size();
 			virtualLinksCnt += t.getSecond().size();
 			nodesAssignedCnt++;
