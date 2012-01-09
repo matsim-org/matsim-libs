@@ -5,8 +5,10 @@ package herbie.creation.ptAnalysis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -15,7 +17,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -33,7 +34,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-import utils.Bins;
 
 public class QuickLegAnalysisPtPlanbased {
 	
@@ -124,8 +124,8 @@ public class QuickLegAnalysisPtPlanbased {
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
 		
-		NetworkImpl network = scenario.getNetwork();
-		network.setCapacityPeriod(3600.0);
+		Network network = scenario.getNetwork();
+//		network.setCapacityPeriod(3600.0);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		this.transitFactory = schedule.getFactory();

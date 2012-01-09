@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.events;
+package playground.julia.emissions.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.benjamin.emissions.types.ColdPollutant;
+import playground.julia.emissions.types.ColdPollutant;
 
 /**
  * Event to indicate that emissions were produced.

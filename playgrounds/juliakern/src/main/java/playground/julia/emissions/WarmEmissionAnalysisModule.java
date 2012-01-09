@@ -1,5 +1,4 @@
-/* *********************************************************************** *
- /* ********************************************************************** *
+/* ********************************************************************** *
  * project: org.matsim.*												   *
  * WarmEmissionAnalysisModule.java									       *
  *                                                                         *
@@ -19,7 +18,7 @@
  *                                                                         *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions;
+package playground.julia.emissions;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -35,13 +34,13 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.benjamin.emissions.events.WarmEmissionEventImpl;
-import playground.benjamin.emissions.types.HbefaTrafficSituation;
-import playground.benjamin.emissions.types.HbefaVehicleAttributes;
-import playground.benjamin.emissions.types.HbefaVehicleCategory;
-import playground.benjamin.emissions.types.HbefaWarmEmissionFactor;
-import playground.benjamin.emissions.types.HbefaWarmEmissionFactorKey;
-import playground.benjamin.emissions.types.WarmPollutant;
+import playground.julia.emissions.events.WarmEmissionEventImpl;
+import playground.julia.emissions.types.HbefaTrafficSituation;
+import playground.julia.emissions.types.HbefaVehicleAttributes;
+import playground.julia.emissions.types.HbefaVehicleCategory;
+import playground.julia.emissions.types.HbefaWarmEmissionFactor;
+import playground.julia.emissions.types.HbefaWarmEmissionFactorKey;
+import playground.julia.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin

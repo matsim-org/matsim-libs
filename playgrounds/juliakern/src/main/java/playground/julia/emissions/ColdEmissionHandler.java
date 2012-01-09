@@ -19,7 +19,7 @@
  *                                                                         *
  *                                                                         
  * *********************************************************************** */
-package playground.benjamin.emissions;
+package playground.julia.emissions;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import playground.benjamin.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+import playground.julia.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 
 /**
  * @author benjamin

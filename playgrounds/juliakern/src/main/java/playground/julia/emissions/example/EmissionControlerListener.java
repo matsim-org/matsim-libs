@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.emissions.example;
+package playground.julia.emissions.example;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

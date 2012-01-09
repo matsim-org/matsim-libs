@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.benjamin.emissions.types;
+package playground.julia.emissions.types;
 
 /**
  * @author benjamin
