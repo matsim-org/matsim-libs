@@ -23,6 +23,7 @@ package org.matsim.core.network.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -167,13 +168,11 @@ public class NetworkExpandNode {
 	 * </p>
 	 *
 	 * @param nodeId the {@link Id} of the {@link Node} to expand
-	 * @param turns The {@link List} of {@link Tuple tuples} of {@link Id linkIds}
-	 * of the incident {@link Link links} of the given {@link Node node} that define
-	 * which driving direction is allowed on that {@link Node node}.
+	 * @param turns The {@link List} of allowed turns at the given {@link Node node}.
 	 * @return The {@link Tuple} of {@link List lists} containing the newly created
 	 * {@link Node nodes} and {@link Link links}.
 	 */
-	public final Tuple<List<Node>,List<Link>> expandNode(final Id nodeId, final List<Tuple<Id,Id>> turns) {
+	public final Tuple<List<Node>,List<Link>> expandNode(final Id nodeId, final List<TurnInfo> turns) {
 		double e = this.offset;
 		Node node = network.getNodes().get(nodeId);
 		if (node == null) {
@@ -184,14 +183,14 @@ public class NetworkExpandNode {
 		}
 		
 		for (int i=0; i<turns.size(); i++) {
-			Id first = turns.get(i).getFirst();
+			Id first = turns.get(i).getFromLinkId();
 			if (first == null) {
 				throw new IllegalArgumentException("given list contains 'null' values.");
 			}
 			if (!node.getInLinks().containsKey(first)) {
 				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+first+": link not an inlink of given node.");
 			}
-			Id second = turns.get(i).getSecond();
+			Id second = turns.get(i).getToLinkId();
 			if (second == null) {
 				throw new IllegalArgumentException("given list contains 'null' values.");
 			}
@@ -287,9 +286,9 @@ public class NetworkExpandNode {
 
 		// add virtual links for the turn restrictions
 		for (int i=0; i<turns.size(); i++) {
-			Tuple<Id,Id> turn = turns.get(i);
-			Link fromLink = network.getLinks().get(turn.getFirst());
-			Link toLink = network.getLinks().get(turn.getSecond());
+			TurnInfo turn = turns.get(i);
+			Link fromLink = network.getLinks().get(turn.getFromLinkId());
+			Link toLink = network.getLinks().get(turn.getToLinkId());
 			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode(), toLink.getFromNode());
 			double dist = CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord());
 			if (dist < 0.1 * this.expRadius) {
@@ -301,7 +300,11 @@ public class NetworkExpandNode {
 			l.setFreespeed(fromLink.getFreespeed());
 			l.setCapacity(fromLink.getCapacity());
 			l.setNumberOfLanes(fromLink.getNumberOfLanes());
-			l.setAllowedModes(fromLink.getAllowedModes());
+			if (turn.getModes() == null) {
+				l.setAllowedModes(fromLink.getAllowedModes());
+			} else {
+				l.setAllowedModes(turn.getModes());
+			}
 			if (fromLink instanceof LinkImpl) {
 				((LinkImpl) l).setOrigId(((LinkImpl) fromLink).getOrigId());
 				((LinkImpl) l).setType(((LinkImpl) fromLink).getType());
@@ -311,4 +314,50 @@ public class NetworkExpandNode {
 		}
 		return new Tuple<List<Node>, List<Link>>(newNodes,newLinks);
 	}
+	
+	public static class TurnInfo {
+		
+		private final Id fromLinkId;
+		private final Id toLinkId;
+		private final Set<String> modes;
+		
+		public TurnInfo(final Id fromLinkId, final Id toLinkId) {
+			this.fromLinkId = fromLinkId;
+			this.toLinkId = toLinkId;
+			this.modes = null;
+		}
+		
+		public TurnInfo(final Id fromLinkId, final Id toLinkId, final Set<String> modes) {
+			this.fromLinkId = fromLinkId;
+			this.toLinkId = toLinkId;
+			this.modes = modes;
+		}
+		
+		public Id getFromLinkId() {
+			return this.fromLinkId;
+		}
+		
+		public Id getToLinkId() {
+			return this.toLinkId;
+		}
+		
+		public Set<String> getModes() {
+			return this.modes;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof TurnInfo)) {
+				return false;
+			}
+			TurnInfo ti = (TurnInfo) obj;
+			return (ti.fromLinkId.equals(this.fromLinkId))
+					&& (ti.toLinkId.equals(this.toLinkId))
+					&& ((ti.modes == null && this.modes == null)
+							|| (ti.modes.equals(this.modes))
+							);
+		}
+		
+	}
+	
 }

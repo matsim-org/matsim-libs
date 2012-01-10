@@ -37,6 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -72,9 +73,9 @@ public class NetworkAddEmmeManeuverRestrictions {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final Map<Id,ArrayList<Tuple<Id,Id>>> parseManeuvers(final Network network) {
+	private final Map<Id,ArrayList<TurnInfo>> parseManeuvers(final Network network) {
 		log.info("  parsing maneuvers...");
-		Map<Id,ArrayList<Tuple<Id,Id>>> illegalManeuvers = new HashMap<Id, ArrayList<Tuple<Id,Id>>>();
+		Map<Id,ArrayList<TurnInfo>> illegalManeuvers = new HashMap<Id, ArrayList<TurnInfo>>();
 		try {
 			FileReader fr = new FileReader(maneuversTextFileName);
 			BufferedReader br = new BufferedReader(fr);
@@ -94,13 +95,24 @@ public class NetworkAddEmmeManeuverRestrictions {
 				Node tn = network.getNodes().get(tnid);
 				if ((n != null) && (fn != null) && (tn != null)) {
 					if (((NodeImpl) n).getInNodes().containsKey(fn.getId()) && (((NodeImpl) n).getOutNodes().containsKey(tn.getId()))) {
-						ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(n.getId());
-						if (mns == null) { mns = new ArrayList<Tuple<Id,Id>>(); illegalManeuvers.put(n.getId(),mns); }
+						ArrayList<TurnInfo> mns = illegalManeuvers.get(n.getId());
+						if (mns == null) {
+							mns = new ArrayList<TurnInfo>();
+							illegalManeuvers.put(n.getId(),mns);
+						}
 						Link inlink = null;
-						for (Link l : n.getInLinks().values()) { if (l.getFromNode().getId().equals(fn.getId())) { inlink = l; } }
+						for (Link l : n.getInLinks().values()) {
+							if (l.getFromNode().getId().equals(fn.getId())) {
+								inlink = l;
+							}
+						}
 						Link outlink = null;
-						for (Link l : n.getOutLinks().values()) { if (l.getToNode().getId().equals(tn.getId())) { outlink = l; } }
-						mns.add(new Tuple<Id, Id>(inlink.getId(),outlink.getId()));
+						for (Link l : n.getOutLinks().values()) {
+							if (l.getToNode().getId().equals(tn.getId())) {
+								outlink = l;
+							}
+						}
+						mns.add(new TurnInfo(inlink.getId(),outlink.getId()));
 						mnCnt++;
 					}
 					else { log.warn("line="+lineCnt+", nid="+nid+", fnid="+fnid+", tnid="+tnid+": either from_node or to_node are not neighbours of node."); }
@@ -116,8 +128,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 		return illegalManeuvers;
 	}
 
-	private final boolean contains(Tuple<Id,Id> tuple, ArrayList<Tuple<Id,Id>> tuples) {
-		for (Tuple<Id,Id> t : tuples) {
+	private final boolean contains(TurnInfo tuple, ArrayList<TurnInfo> tuples) {
+		for (TurnInfo t : tuples) {
 			if (t.equals(tuple)) { return true; }
 		}
 		return false;
@@ -136,17 +148,17 @@ public class NetworkAddEmmeManeuverRestrictions {
 		int virtualNodesCnt = 0;
 		int virtualLinksCnt = 0;
 
-		Map<Id,ArrayList<Tuple<Id,Id>>> illegalManeuvers = this.parseManeuvers(network);
-		Map<Id,ArrayList<Tuple<Id,Id>>> maneuvers = new HashMap<Id, ArrayList<Tuple<Id,Id>>>();
+		Map<Id,ArrayList<TurnInfo>> illegalManeuvers = this.parseManeuvers(network);
+		Map<Id,ArrayList<TurnInfo>> maneuvers = new HashMap<Id, ArrayList<TurnInfo>>();
 
 		for (Id nodeId : illegalManeuvers.keySet()) {
-			ArrayList<Tuple<Id,Id>> mns = illegalManeuvers.get(nodeId);
-			ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
+			ArrayList<TurnInfo> mns = illegalManeuvers.get(nodeId);
+			ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
 
 			Node n = network.getNodes().get(nodeId);
 			for (Link inLink : n.getInLinks().values()) {
 				for (Link outLink : n.getOutLinks().values()) {
-					Tuple<Id,Id> tuple = new Tuple<Id, Id>(inLink.getId(),outLink.getId());
+					TurnInfo tuple = new TurnInfo(inLink.getId(), outLink.getId());
 					if (!this.contains(tuple,mns)) {
 						if (removeUTurns) {
 							if (!inLink.getFromNode().getId().equals(outLink.getToNode().getId())) {
@@ -162,8 +174,8 @@ public class NetworkAddEmmeManeuverRestrictions {
 			maneuvers.put(n.getId(),turns);
 		}
 		for (Id nodeId : maneuvers.keySet()) {
-			ArrayList<Tuple<Id,Id>> turns = maneuvers.get(nodeId);
-			Tuple<List<Node>, List<Link>> t = neModule.expandNode(nodeId,turns);
+			ArrayList<TurnInfo> turns = maneuvers.get(nodeId);
+			Tuple<List<Node>, List<Link>> t = neModule.expandNode(nodeId, turns);
 			virtualNodesCnt += t.getFirst().size();
 			virtualLinksCnt += t.getSecond().size();
 			nodesAssignedCnt++;

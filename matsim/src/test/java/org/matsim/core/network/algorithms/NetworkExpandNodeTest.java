@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -50,11 +50,11 @@ public class NetworkExpandNodeTest {
 		f.createNetwork_ThreeWayIntersection();
 		
 		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);
-		ArrayList<Tuple<Id, Id>> turns = new ArrayList<Tuple<Id, Id>>();
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("1"), f.scenario.createId("6")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("3"), f.scenario.createId("6")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("5"), f.scenario.createId("2")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("5"), f.scenario.createId("4")));
+		ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4")));
 		
 		exp.expandNode(f.scenario.createId("3"), turns);
 		Network n = f.scenario.getNetwork();
@@ -150,7 +150,6 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
 		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
-
 	}
 
 	@Test
@@ -162,11 +161,11 @@ public class NetworkExpandNodeTest {
 		
 		
 		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);
-		ArrayList<Tuple<Id, Id>> turns = new ArrayList<Tuple<Id, Id>>();
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("1"), f.scenario.createId("6")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("3"), f.scenario.createId("6")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("5"), f.scenario.createId("2")));
-		turns.add(new Tuple<Id, Id>(f.scenario.createId("5"), f.scenario.createId("4")));
+		ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4")));
 		
 		exp.expandNode(f.scenario.createId("3"), turns);
 		Network n = f.scenario.getNetwork();
@@ -262,8 +261,131 @@ public class NetworkExpandNodeTest {
 		Assert.assertFalse(Double.isInfinite(c.getX()));
 		Assert.assertFalse(Double.isInfinite(c.getY()));
 		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
-		
 	}
+
+	@Test
+	public void testExpandNode_specificModes() {
+		Fixture f = new Fixture();
+		f.createNetwork_ThreeWayIntersection();
+		
+		Set<String> carOnly = new HashSet<String>();
+		carOnly.add(TransportMode.car);
+		Set<String> walkOnly = new HashSet<String>();
+		walkOnly.add(TransportMode.walk);
+		
+		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);
+		ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2"), walkOnly));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4"), carOnly));
+		
+		exp.expandNode(f.scenario.createId("3"), turns);
+		Network n = f.scenario.getNetwork();
+		Assert.assertEquals(12, n.getLinks().size());
+		Assert.assertEquals(10, n.getNodes().size());
+		Assert.assertNotNull(findLinkBetween(n, f.scenario.createId("1"), f.scenario.createId("6")));
+		Assert.assertNotNull(findLinkBetween(n, f.scenario.createId("3"), f.scenario.createId("6")));
+		Assert.assertNotNull(findLinkBetween(n, f.scenario.createId("5"), f.scenario.createId("2")));
+		Assert.assertNotNull(findLinkBetween(n, f.scenario.createId("5"), f.scenario.createId("4")));
+		Assert.assertNull(findLinkBetween(n, f.scenario.createId("1"), f.scenario.createId("2")));
+		Assert.assertNull(findLinkBetween(n, f.scenario.createId("1"), f.scenario.createId("4")));
+		Assert.assertNull(findLinkBetween(n, f.scenario.createId("3"), f.scenario.createId("2")));
+		Assert.assertNull(findLinkBetween(n, f.scenario.createId("3"), f.scenario.createId("4")));
+		Assert.assertNull(findLinkBetween(n, f.scenario.createId("5"), f.scenario.createId("6")));
+		
+		// test correct attributes on new links
+		Link l = findLinkBetween(n, f.scenario.createId("1"), f.scenario.createId("6"));
+		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
+		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
+		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		Set<String> modes = l.getAllowedModes();
+		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.walk));
+		Assert.assertTrue(modes.contains(TransportMode.car));
+
+		l = findLinkBetween(n, f.scenario.createId("5"), f.scenario.createId("2"));
+		modes = l.getAllowedModes();
+		Assert.assertEquals("Allowed modes are not correct", 1, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.walk));
+
+		l = findLinkBetween(n, f.scenario.createId("5"), f.scenario.createId("4"));
+		modes = l.getAllowedModes();
+		Assert.assertEquals("Allowed modes are not correct", 1, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.car));
+
+		// test correct attributes on modified in-links
+		l = n.getLinks().get(f.scenario.createId("3"));
+		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
+		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
+		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		
+		modes = l.getAllowedModes();
+		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.walk));
+		Assert.assertTrue(modes.contains(TransportMode.car));
+
+		// test correct attributes on modified out-links
+		l = n.getLinks().get(f.scenario.createId("6"));
+		Assert.assertEquals("Capacity attribute is not correct", 1800.0, l.getCapacity(), 1e-8);
+		Assert.assertEquals("Number of lanes is not correct", 2.0, l.getNumberOfLanes(), 1e-8);
+		Assert.assertEquals("Freespeed is not correct", 10.0, l.getFreespeed(), 1e-8);
+		
+		modes = l.getAllowedModes();
+		Assert.assertEquals("Allowed modes are not correct", 2, modes.size());
+		Assert.assertTrue(modes.contains(TransportMode.walk));
+		Assert.assertTrue(modes.contains(TransportMode.car));
+		
+		// test coordinates of new nodes
+		l = n.getLinks().get(f.scenario.createId("1"));
+		Coord c = l.getToNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+
+		l = n.getLinks().get(f.scenario.createId("2"));
+		c = l.getFromNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+
+		l = n.getLinks().get(f.scenario.createId("3"));
+		c = l.getToNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		
+		l = n.getLinks().get(f.scenario.createId("4"));
+		c = l.getFromNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		
+		l = n.getLinks().get(f.scenario.createId("5"));
+		c = l.getToNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+		
+		l = n.getLinks().get(f.scenario.createId("6"));
+		c = l.getFromNode().getCoord();
+		Assert.assertFalse(Double.isNaN(c.getX()));
+		Assert.assertFalse(Double.isNaN(c.getY()));
+		Assert.assertFalse(Double.isInfinite(c.getX()));
+		Assert.assertFalse(Double.isInfinite(c.getY()));
+		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
+	}
+
 	
 	private static Link findLinkBetween(final Network network, final Id fromLinkId, final Id toLinkId) {
 		Link fromLink = network.getLinks().get(fromLinkId);

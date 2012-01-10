@@ -40,6 +40,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NodeImpl;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
@@ -323,12 +324,12 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					}
 				}
 				// create arraylist with turn tuples
-				ArrayList<Tuple<Id,Id>> turns = new ArrayList<Tuple<Id,Id>>();
+				ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
 				for (Map.Entry<Id, TreeMap<Id, Boolean>> fromLinkEntry : mmatrix.entrySet()) {
 					Id fromLinkId = fromLinkEntry.getKey();
 					for (Map.Entry<Id, Boolean> toLinkEntry : fromLinkEntry.getValue().entrySet()) {
 						if (toLinkEntry.getValue().booleanValue()) {
-							turns.add(new Tuple<Id, Id>(fromLinkId, toLinkEntry.getKey()));
+							turns.add(new TurnInfo(fromLinkId, toLinkEntry.getKey()));
 						}
 					}
 				}
