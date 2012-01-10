@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -31,11 +30,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.AgentStuckEventImpl;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.pt.qsim.TransitDriverAgent;
@@ -65,6 +62,8 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
 
 	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
+	
+	private final Map<Id, MobsimDriverAgent> agentsWaitingForCars = new LinkedHashMap<Id, MobsimDriverAgent>();
 
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
@@ -140,31 +139,9 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 	}
 
 	void makeVehicleAvailableToNextDriver(QVehicle veh, double now) {
-		Iterator<MobsimAgent> i = additionalAgentsOnLink.values().iterator();
-		while (i.hasNext()) {
-			MobsimAgent agent = i.next();
-			//			Leg currentLeg = agent.getCurrentLeg();
-			String mode = agent.getMode() ;
-			//			if (currentLeg != null && currentLeg.getMode().equals(TransportMode.car)) {
-			if (TransportMode.car.equals(mode)) {
-				// We are not in an activity, but in a car leg, and we are an "additional agent".
-				// This currently means that we are waiting for our car to become available.
-				// So our current route must be a NetworkRoute.
-				//				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
-				//				Id requiredVehicleId = route.getVehicleId();
-
-				// new: so we are a driver:
-				DriverAgent drAgent = (DriverAgent) agent ;
-				Id requiredVehicleId = drAgent.getPlannedVehicleId() ;
-				if (requiredVehicleId == null) {
-					requiredVehicleId = agent.getId();
-				}
-				if (veh.getId().equals(requiredVehicleId)) {
-					i.remove();
-					this.letAgentDepartWithVehicle((MobsimDriverAgent) agent, veh, now);
-					return;
-				}
-			}
+		MobsimDriverAgent agentWaitingForCar = agentsWaitingForCars.remove(veh.getId());
+		if (agentWaitingForCar != null) {
+			this.letAgentDepartWithVehicle(agentWaitingForCar, veh, now);
 		}
 	}
 	
@@ -229,6 +206,14 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 
 	public void setNetElementActivator(NetElementActivator qSimEngineRunner) {
 		this.netElementActivator = qSimEngineRunner;
+	}
+
+	public void registerAgentWaitingForCar(MobsimDriverAgent agent) {
+		Id vehicleId = agent.getPlannedVehicleId() ;
+		if (vehicleId == null) {
+			vehicleId = agent.getId(); // backwards-compatibility
+		}
+		agentsWaitingForCars.put(vehicleId, agent);
 	}
 	
 }

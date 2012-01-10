@@ -78,7 +78,7 @@ class CarDepartureHandler implements DepartureHandler {
 				// logic.  kai, nov'11)
 			} else if (vehicleBehavior == VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG) {
 				// While we are waiting for our car
-				qlink.registerAdditionalAgentOnLink(agent);
+				qlink.registerAgentWaitingForCar(agent);
 			} else {
 				throw new RuntimeException("vehicle not available for agent " + agent.getId() + " on link " + linkId);
 			}
