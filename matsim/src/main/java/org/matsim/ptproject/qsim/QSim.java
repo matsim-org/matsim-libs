@@ -50,13 +50,13 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.qsim.AbstractTransitDriver;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.pt.qsim.TransitAgentFactory;
 import org.matsim.pt.qsim.TransitDriver;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.qsim.UmlaufDriver;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
@@ -160,15 +160,11 @@ public final class QSim implements VisMobsim, Netsim {
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
     private TransitQSimEngine transitEngine;
     
-//    static boolean NEW = true ;
 
 	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
 		@Override
 		public final void arrangeNextAgentState(MobsimAgent agent) {
-//			if ( NEW ) {
 				QSim.this.arrangeNextAgentAction(agent) ;
-//			} else {
-//			}
 		}
 
 		@Override
@@ -178,32 +174,16 @@ public final class QSim implements VisMobsim, Netsim {
 		
 		@Override
 		public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-//			if ( NEW ) { 
 				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
-//			} else {
-//			}
 		}
 		
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-//			if ( NEW ) {
 				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-//			} else {
-//				return null ;
-//			}
 		}
 		
 
 	};
-	
-//	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
-//	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
-//		if ( NEW ) {
-//		} else {
-//			this.arrangeNextAgentAction( agent) ;
-//		}
-//	}
-
 
     // everything above this line is private and should remain private. pls
 	// contact me if this is in your way. kai, oct'10
@@ -339,10 +319,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private void createAgents() {
 		for (AgentSource agentSource : agentSources) {
-			List<MobsimAgent> theseAgents = agentSource.insertAgentsIntoMobsim();
-			for (MobsimAgent agent : theseAgents) {
-				agents.add(agent);
-			}
+			agentSource.insertAgentsIntoMobsim();
 		}
 	}
 
@@ -471,6 +448,8 @@ public final class QSim implements VisMobsim, Netsim {
 		if ( this.agents.contains(agent) ) {
 			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
 		}
+		agents.add(agent);
+		this.getAgentCounter().incLiving();
 		arrangeNextAgentAction(agent);
 	}
 	
@@ -557,16 +536,7 @@ public final class QSim implements VisMobsim, Netsim {
 			this.activityEndsList.add(agent);
 		}
 	}
-
-//	@Deprecated // use InternalInterface
-//	@Override
-//	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-//		if ( NEW ) { 
-//		} else {
-//			netEngine.registerAdditionalAgentOnLink(planAgent);
-//		}
-//	}
-
+	
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		if (!(agent instanceof TransitDriver)) {
 			Id agentId = agent.getId();
@@ -574,16 +544,6 @@ public final class QSim implements VisMobsim, Netsim {
 			netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
 		}
 	}
-
-//	@Deprecated // use InternalInterface
-//	@Override
-//	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-//		if ( NEW ) {
-//			return null ;
-//		} else {
-//			return netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-//		}
-//	}
 
 	private void handleActivityEnds(final double time) {
 		while (this.activityEndsList.peek() != null) {

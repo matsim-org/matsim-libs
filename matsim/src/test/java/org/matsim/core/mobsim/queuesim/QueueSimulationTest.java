@@ -72,6 +72,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
@@ -674,7 +675,7 @@ public class QueueSimulationTest extends TestCase {
 		qlink2.addParkedVehicle(vehicle2);
 
 		sim.getSimTimer().setTime(100.0);
-		MobsimDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(person, sim);
+		MobsimDriverAgent agent = createQueuePersonAgent(person, sim);
 		agent.endActivityAndAssumeControl(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent) ;
 
@@ -1216,4 +1217,11 @@ public class QueueSimulationTest extends TestCase {
 		}
 
 	}
+	
+	public static MobsimDriverAgent createQueuePersonAgent(Person p, QueueSimulation simulation) {
+		MobsimDriverAgent createMobsimAgentFromPersonAndInsert = new DefaultAgentFactory( simulation ).createMobsimAgentFromPerson( p );
+		simulation.insertAgentIntoMobsim(createMobsimAgentFromPersonAndInsert);
+		return createMobsimAgentFromPersonAndInsert ;
+	}
+	
 }

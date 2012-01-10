@@ -826,7 +826,8 @@ public class QSimTest {
 		sim.addParkedVehicle(vehicle2, id2);
 
 		sim.getSimTimer().setTime(100.0);
-		PersonDriverAgentImpl agent = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, sim);
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, sim);
+		sim.insertAgentIntoMobsim(agent); 
 		agent.endActivityAndAssumeControl(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent);
 		sim.getSimTimer().setTime(101.0);

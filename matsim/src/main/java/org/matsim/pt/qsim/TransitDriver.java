@@ -54,9 +54,6 @@ public class TransitDriver extends AbstractTransitDriver {
 
 	private final Leg currentLeg;
 	
-
-	// as long as all instance variables are final, it should be ok to leave "resetCaches" empty.  kai, oct'10
-
 	public TransitDriver(final TransitLine line, final TransitRoute route, final Departure departure, 
 			final TransitStopAgentTracker agentTracker, final MobsimEngine trEngine) {
 		super(trEngine, agentTracker);
@@ -84,24 +81,15 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public void endActivityAndAssumeControl(double now) {
 		sendTransitDriverStartsEvent(now);
-
-//		this.sim.arrangeAgentDeparture(this);
-		
 		this.state = MobsimAgent.State.LEG ;
-//		this.sim.reInsertAgentIntoMobsim(this) ;
-		// yyyyyy 000000
 	}
 
 	@Override
 	public void endLegAndAssumeControl(final double now) {
-//		this.getSimulation().handleAgentArrival(now, this);
 		this.getSimulation().getEventsManager().processEvent(
 				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
 						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
-
-//		this.getSimulation().getAgentCounter().decLiving();
 		this.state = MobsimAgent.State.ABORT ;
-//		this.sim.reInsertAgentIntoMobsim(this) ;
 	}
 
 	@Override
@@ -143,14 +131,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	public Id getPlannedVehicleId() {
 		return ((NetworkRoute)this.currentLeg.getRoute()).getVehicleId() ;
 	}
-	
-	
 
-//	@Override
-//	public Activity getCurrentActivity() {
-//		// As far as I can see, there is never a current Activity. cdobler, nov'10
-//		return null;
-//	}
 
 	@Override
 	public PlanElement getCurrentPlanElement() {

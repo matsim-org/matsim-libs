@@ -43,6 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -78,12 +79,19 @@ public class QLinkTest extends MatsimTestCase {
 		p.addPlan(new PlanImpl());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		v.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, QSim.createQSimAndAddAgentSource(scenario, (EventsUtils.createEventsManager()))));
+		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		f.qlink1.addFromIntersection(v);
 		assertEquals(1, f.qlink1.vehOnLinkCount());
 		assertFalse(f.qlink1.hasSpace());
 		assertTrue(f.qlink1.bufferIsEmpty());
+	}
+
+
+	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(PersonImpl p, Netsim simulation) {
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p, simulation);
+		simulation.insertAgentIntoMobsim(agent); 
+		return agent;
 	}
 
 	/**
@@ -99,7 +107,7 @@ public class QLinkTest extends MatsimTestCase {
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(23));
 		p.addPlan(new PlanImpl());
-		veh.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
+		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -144,7 +152,7 @@ public class QLinkTest extends MatsimTestCase {
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		PersonImpl p = new PersonImpl(new IdImpl(42));
 		p.addPlan(new PlanImpl());
-		veh.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
+		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.bufferIsEmpty());
@@ -187,7 +195,7 @@ public class QLinkTest extends MatsimTestCase {
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		PersonDriverAgentImpl driver = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(pers, f.sim);
+		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(pers, f.sim);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		f.qlink1.addParkedVehicle(veh);
@@ -255,12 +263,12 @@ public class QLinkTest extends MatsimTestCase {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		PersonDriverAgentImpl pa1 = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, qsim);
+		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 
 		QVehicle v2 = new QVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
-		PersonDriverAgentImpl pa2 = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, qsim);
+		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
 
@@ -308,11 +316,11 @@ public class QLinkTest extends MatsimTestCase {
 
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QVehicle veh1 = new QVehicle(new VehicleImpl(new IdImpl(1), vehType));
-		veh1.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, f.sim));
+		veh1.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		QVehicle veh25 = new QVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
-		veh25.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, null));
+		veh25.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		QVehicle veh5 = new QVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
-		veh5.setDriver(PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, null));
+		veh5.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
 		f.qlink2.addFromIntersection(veh5);  // used vehicle equivalents: 5

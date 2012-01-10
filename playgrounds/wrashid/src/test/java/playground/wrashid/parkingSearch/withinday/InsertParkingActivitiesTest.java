@@ -127,7 +127,8 @@ public class InsertParkingActivitiesTest extends TestCase {
 		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc);
 		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, plansAlgorithm, parkingInfrastructure);
 		
-		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(person, null);
+		ExperimentalBasicWithindayAgent agent = ExperimentalBasicWithindayAgent
+				.createExperimentalBasicWithindayAgent(person, null);
 		insertParkingActivities.run(agent.getSelectedPlan());
 		
 		assertEquals(17, agent.getSelectedPlan().getPlanElements().size());
@@ -146,7 +147,8 @@ public class InsertParkingActivitiesTest extends TestCase {
 		plan.addLeg(factory.createLeg(TransportMode.car));
 		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
 		
-		agent = new ExperimentalBasicWithindayAgent(person, null);
+		agent = ExperimentalBasicWithindayAgent
+				.createExperimentalBasicWithindayAgent(person, null);
 		try {
 			insertParkingActivities.run(agent.getSelectedPlan());
 			Assert.fail("Expected RuntimeException, but there was none.");

@@ -53,10 +53,7 @@ public class DynAgent
 
         if (activityEndTime != Time.UNDEFINED_TIME || activityEndTime != Double.POSITIVE_INFINITY) {
             state = MobsimAgent.State.ACTIVITY;
-            simulation.insertAgentIntoMobsim(this); // ini
-			// yyyyyy 000000
-
-            simulation.getAgentCounter().incLiving();
+            simulation.insertAgentIntoMobsim(this);
         }
     }
 

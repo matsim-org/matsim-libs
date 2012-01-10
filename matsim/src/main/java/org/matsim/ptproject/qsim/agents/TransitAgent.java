@@ -18,19 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.qsim;
+package org.matsim.ptproject.qsim.agents;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 
@@ -39,7 +40,12 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  */
 public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
 
-	public TransitAgent(final Person p, final Netsim simulation) {
+	public static TransitAgent createTransitAgent(Person p, Netsim simulation) {
+		TransitAgent agent = new TransitAgent(p, simulation);
+		return agent;
+	}
+
+	private TransitAgent(final Person p, final Netsim simulation) {
 		super(p, simulation);
 	}
 
@@ -59,6 +65,11 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		}
 	}
 
+	public Leg getCurrentLeg() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		return (Leg) currentPlanElement;
+	}
+
 	private boolean containsId(List<TransitRouteStop> stopsToCome,
 			Id egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
@@ -72,12 +83,6 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	@Override
 	public double getWeight() {
 		return 1.0;
-	}
-	
-	@Override
-	public Leg getCurrentLeg() {
-		// needed by the passenger agent, since the leg was not removed there.  kai, jun'11
-		return super.getCurrentLeg();
 	}
 
 }

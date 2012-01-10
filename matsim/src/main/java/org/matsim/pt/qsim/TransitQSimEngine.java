@@ -45,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.InternalInterface;
+import org.matsim.ptproject.qsim.agents.TransitAgent;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
@@ -158,12 +159,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
 		Id startLinkId = firstLeg.getRoute().getStartLinkId();
 		this.qSim.addParkedVehicle(veh, startLinkId);
-
-//		this.qSim.arrangeActivityStart(driver);
-		this.qSim.insertAgentIntoMobsim(driver) ; // ini
-		// yyyyyy 000000
-		
-		this.qSim.getAgentCounter().incLiving();
+		this.qSim.insertAgentIntoMobsim(driver); 
 		return driver;
 	}
 
@@ -184,12 +180,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 					driver.setVehicle(veh);
 					Id startLinkId = driver.getCurrentLeg().getRoute().getStartLinkId();
 					this.qSim.addParkedVehicle(veh, startLinkId);
-
-//					this.qSim.arrangeActivityStart(driver);
-					this.qSim.insertAgentIntoMobsim(driver) ; // ini
-					// yyyyyy 000000
-
-					this.qSim.getAgentCounter().incLiving();
+					this.qSim.insertAgentIntoMobsim(driver); 
 					drivers.add(driver);
 				}
 			}
@@ -265,13 +256,12 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	}
 
     @Override
-    public List<MobsimAgent> insertAgentsIntoMobsim() {
+    public void insertAgentsIntoMobsim() {
         if (useUmlaeufe ) {
             ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
         } else {
             ptDrivers = createVehiclesAndDriversWithoutUmlaeufe(this.schedule, this.agentTracker);
         }
-        return Collections.unmodifiableList(new ArrayList(ptDrivers));
     }
 
     public Collection<MobsimAgent> getPtDrivers() {

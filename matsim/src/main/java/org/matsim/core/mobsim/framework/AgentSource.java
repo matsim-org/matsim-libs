@@ -19,7 +19,6 @@
 
 package org.matsim.core.mobsim.framework;
 
-import java.util.List;
 
 public interface AgentSource {
 
@@ -35,6 +34,6 @@ public interface AgentSource {
      * which at this point is not yet there.  And there is no non-invasive way to insert that vehicle. (This may be changed,
      * I don't know.)
      */
-    public List<MobsimAgent> insertAgentsIntoMobsim();
+    public void insertAgentsIntoMobsim();
 
 }

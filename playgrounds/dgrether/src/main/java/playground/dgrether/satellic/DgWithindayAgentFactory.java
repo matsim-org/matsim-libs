@@ -43,8 +43,9 @@ public class DgWithindayAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public PersonDriverAgentImpl createMobsimAgentFromPersonAndInsert(final Person p) {
-		PersonDriverAgentImpl agent = new DgWithindayQPersonAgent(p, this.simulation, this.random);
+	public PersonDriverAgentImpl createMobsimAgentFromPerson(final Person p) {
+		PersonDriverAgentImpl agent = DgWithindayQPersonAgent.createDgWithindayQPersonAgent(p,
+				this.simulation, this.random);
 		return agent;
 	}
 	

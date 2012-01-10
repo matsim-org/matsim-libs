@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
@@ -37,9 +38,15 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
  */
 public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements PlanBasedWithinDayAgent {
 
+	public static ExperimentalBasicWithindayAgent createExperimentalBasicWithindayAgent(
+			Person p, Netsim simulation) {
+		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(p, simulation);
+		return agent;
+	}
+
 	private Plan executedPlan;
 	
-	public ExperimentalBasicWithindayAgent(Person p, Netsim simulation) {
+	protected ExperimentalBasicWithindayAgent(Person p, Netsim simulation) {
 		super(p, simulation);
 		
 		/*
@@ -51,11 +58,6 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 		executedPlan = new PlanImpl(p);
 		((PlanImpl)executedPlan).copyPlan(p.getSelectedPlan());
 	}
-
-//	public final List<PlanElement> getModifiablePlanElements() {
-//		return this.person.getSelectedPlan().getPlanElements() ;
-//	}
-	// use getModifiablePlan.  kai, nov'10
 
 	@Override
 	public final Integer getCurrentPlanElementIndex() {
@@ -101,7 +103,11 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	
 	@Override
 	public final Leg getCurrentLeg() {
-		return super.getCurrentLeg();
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		if (!(currentPlanElement instanceof Leg)) {
+			return null;
+		}
+		return (Leg) currentPlanElement;
 	}
 
 }

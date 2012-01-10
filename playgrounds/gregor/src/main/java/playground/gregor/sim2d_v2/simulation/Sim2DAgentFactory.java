@@ -19,8 +19,8 @@ public class Sim2DAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public MobsimAgent createMobsimAgentFromPersonAndInsert(Person p) {
-		MobsimDriverAgent pda = this.defaultAgentFactory.createMobsimAgentFromPersonAndInsert(p);
+	public MobsimAgent createMobsimAgentFromPerson(Person p) {
+		MobsimDriverAgent pda = this.defaultAgentFactory.createMobsimAgentFromPerson(p);
 		return null;
 	}
 

@@ -20,9 +20,6 @@
 
 package playground.christoph.evacuation.mobsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -52,8 +49,7 @@ public class EvacuationPopulationAgentSource implements AgentSource {
     }
 	
 	@Override
-	public List<MobsimAgent> insertAgentsIntoMobsim() {
-        List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+	public void insertAgentsIntoMobsim() {
         Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
         
         for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
@@ -62,8 +58,8 @@ public class EvacuationPopulationAgentSource implements AgentSource {
         	
         	for (Id personId : household.getMemberIds()) {
         		Person p = scenario.getPopulation().getPersons().get(personId);
-        		MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(p);
-    			agents.add(agent);
+        		MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+        		qsim.insertAgentIntoMobsim(agent);
         	}
         	
         	// get first household member
@@ -78,6 +74,5 @@ public class EvacuationPopulationAgentSource implements AgentSource {
         		qsim.createAndParkVehicleOnLink(veh, homeLinkId);
         	}
         }
-        return agents;
 	}
 }

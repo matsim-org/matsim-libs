@@ -48,6 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.TransitAgent;
 
 
 /**
@@ -89,7 +90,8 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
-		TransitAgent agent = new TransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndAssumeControl(10);
 
 		assertTrue(agent.getEnterTransitRoute(line1, route1a, route1a.getStops()));
@@ -127,7 +129,8 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		QSim sim = QSim.createQSimAndAddAgentSource(scenario, EventsUtils.createEventsManager());
-		TransitAgent agent = new TransitAgent(person, sim);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndAssumeControl(10);
 
 		assertFalse(agent.getExitAtStop(stop1));

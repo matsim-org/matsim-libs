@@ -1,18 +1,21 @@
 package playground.michalm.vrp.taxi.taxicab;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.*;
-import org.matsim.vehicles.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.vehicles.VehicleUtils;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
-import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.*;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.driver.*;
-import playground.michalm.vrp.taxi.*;
+import playground.michalm.dynamic.DynAgent;
+import playground.michalm.dynamic.DynAgentWithPlan;
+import playground.michalm.vrp.data.MATSimVRPData;
+import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.driver.VRPSchedulePlanFactory;
+import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class TaxiAgentSource
@@ -38,7 +41,7 @@ public class TaxiAgentSource
 
 
     @Override
-    public List<MobsimAgent> insertAgentsIntoMobsim()
+    public void insertAgentsIntoMobsim()
     {
         QSim qSim = (QSim)taxiSimEngine.getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
@@ -67,7 +70,5 @@ public class TaxiAgentSource
                     VehicleUtils.getFactory().createVehicle(taxiAgent.getId(),
                             VehicleUtils.getDefaultVehicleType()), taxiAgent.getCurrentLinkId());
         }
-
-        return taxiAgents;
     }
 }

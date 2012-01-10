@@ -20,9 +20,6 @@
 
 package playground.wrashid.parkingSearch.mobsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -64,11 +61,10 @@ public class ParkingPopulationAgentSource implements AgentSource {
     }
 	
 	@Override
-	public List<MobsimAgent> insertAgentsIntoMobsim() {
-        List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+	public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(p);
-			agents.add(agent);
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+			qsim.insertAgentIntoMobsim(agent);
 			
 			/*
 			 * If it is a  within-day replanning agent, we use its plan instead of the
@@ -89,7 +85,6 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			
 			parkVehicle(plan);
 		}
-        return agents;
 	}
 
 	/**

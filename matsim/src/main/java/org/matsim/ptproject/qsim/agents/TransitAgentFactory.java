@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TransitAgentFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.queuesim;
+package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
-/**
- * @author dgrether
- */
-/* package */ class AgentFactory implements MatsimFactory {
 
-	private final QueueSimulation simulation;
+public class TransitAgentFactory implements AgentFactory {
 
-	/*package*/ AgentFactory(final QueueSimulation simulation) {
+	private final Netsim simulation;
+
+
+	public TransitAgentFactory(final Netsim simulation) {
 		this.simulation = simulation;
 	}
 
-	/*package*/ MobsimDriverAgent createPersonAgent(final Person p) {
-		MobsimDriverAgent agent = StaticFactoriesContainer.createQueuePersonAgent(p, this.simulation);
+	@Override
+	public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
+		MobsimDriverPassengerAgent agent = TransitAgent.createTransitAgent(p, this.simulation);
 		return agent;
 	}
 

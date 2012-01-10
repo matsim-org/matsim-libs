@@ -31,7 +31,7 @@ package playground.mzilske.city2000w;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.mobsim.QSimAgentSource;
+import org.matsim.contrib.freight.mobsim.FreightAgentSource;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
@@ -75,7 +75,7 @@ public class City2000WQSimFactory implements MobsimFactory {
 		} else {
 			final QSim sim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
             Collection<Plan> plans = carrierAgentTracker.createPlans();
-            sim.addAgentSource(new QSimAgentSource(plans, new DefaultAgentFactory(sim), sim));
+            sim.addAgentSource(new FreightAgentSource(plans, new DefaultAgentFactory(sim), sim));
 			return sim;
 		}
     }

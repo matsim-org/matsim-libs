@@ -49,7 +49,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
 import org.matsim.pt.qsim.SimpleTransitStopHandler;
-import org.matsim.pt.qsim.TransitAgentFactory;
 import org.matsim.pt.qsim.TransitDriver;
 import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.pt.qsim.TransitQVehicle;
@@ -64,6 +63,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
@@ -1091,7 +1091,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.normalVehicle = new QVehicle(new VehicleImpl(id2, vehicleType));
             this.qlink1.addParkedVehicle(this.normalVehicle);
 
-            PersonDriverAgentImpl nDriver = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person, qsim);
+            PersonDriverAgentImpl nDriver = createAndInsertPersonDriverAgentImpl(person);
             this.normalVehicle.setDriver(nDriver);
             nDriver.setVehicle(this.normalVehicle);
             nDriver.endActivityAndAssumeControl(100);
@@ -1118,13 +1118,20 @@ public class TransitQueueNetworkTest extends TestCase {
                 plan2.addActivity(pb.createActivityFromLinkId("work", id2));
                 population.addPerson(person2);
 
-                PersonDriverAgentImpl nDriver2 = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(person2, qsim);
+                PersonDriverAgentImpl nDriver2 = createAndInsertPersonDriverAgentImpl(person2);
                 this.normalVehicle2.setDriver(nDriver2);
                 nDriver2.setVehicle(this.normalVehicle);
             } else {
                 this.normalVehicle2 = null;
             }
         }
+        
+		private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person person) {
+			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, qsim);
+			qsim.insertAgentIntoMobsim(agent); 
+			return agent;
+		}
+		
     }
 
     /**

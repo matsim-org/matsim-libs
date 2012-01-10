@@ -223,7 +223,6 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, SimulationBefor
 		this.simulation = simulation;
 		this.eventsManager = simulation.getEventsManager();
 		
-		this.simulation.getAgentCounter().incLiving();
 	}
 	
 	

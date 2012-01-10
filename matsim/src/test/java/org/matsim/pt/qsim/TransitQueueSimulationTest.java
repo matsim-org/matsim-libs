@@ -88,6 +88,7 @@ import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -560,7 +561,7 @@ public class TransitQueueSimulationTest {
             qSim = qSim1;
             qSim.addAgentSource(new AgentSource() {
                 @Override
-                public List<MobsimAgent> insertAgentsIntoMobsim() {
+                public void insertAgentsIntoMobsim() {
                     TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, 
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine );
@@ -577,17 +578,7 @@ public class TransitQueueSimulationTest {
                     TestHandleStopSimulation.this.driver.setVehicle(veh);
                     TestHandleStopSimulation.this.departure.setVehicleId(veh.getVehicle().getId());
                     qSim.addParkedVehicle(veh, TestHandleStopSimulation.this.driver.getCurrentLeg().getRoute().getStartLinkId() );
-
-//                    qSim.arrangeActivityStart(TestHandleStopSimulation.this.driver);
-                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver) ; // ini
-    				// yyyyyy 000000
-
-
-                    
-                    qSim.getAgentCounter().incLiving();
-                    List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
-                    agents.add(TestHandleStopSimulation.this.driver);
-                    return agents;
+                    qSim.insertAgentIntoMobsim(TestHandleStopSimulation.this.driver); 
                 }
             });
 

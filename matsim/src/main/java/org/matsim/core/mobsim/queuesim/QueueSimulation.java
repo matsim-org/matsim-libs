@@ -55,6 +55,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.ptproject.qsim.InternalInterface;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
 import org.matsim.ptproject.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.ptproject.qsim.helpers.AgentCounter;
@@ -164,22 +166,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			throw new UnsupportedOperationException() ;
 		}
 
-//		@Override
-//		public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
-//			throw new UnsupportedOperationException() ;
-//		}
-
 	};
-	
-//	@Deprecated // to be replaced by internalInterface.arrangeNextAgentState()
-//	@Override
-//	public final void reInsertAgentIntoMobsim( MobsimAgent agent ) {
-//		if ( NEW ) {
-//		} else {
-//			this.arrangeNextAgentAction( agent) ;
-//		}
-//	}
-
 
 	/**
 	 * Initialize the QueueSimulation without signal systems
@@ -215,7 +202,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 
 		this.network = new QueueNetwork(this.networkLayer, factory, this);
 
-		this.agentFactory = new AgentFactory( this);
+		this.agentFactory = new DefaultAgentFactory( this);
 
 		this.notTeleportedModes.add(TransportMode.car);
 
@@ -267,7 +254,8 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
-			MobsimDriverAgent agent = this.agentFactory.createPersonAgent(p);
+			MobsimDriverAgent agent = (MobsimDriverAgent) this.agentFactory.createMobsimAgentFromPerson(p);
+			insertAgentIntoMobsim(agent);
 			agents.add( agent ) ;
 			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			agent.setVehicle(veh);
@@ -455,6 +443,7 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	
 	@Override
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
+		this.getAgentCounter().incLiving();
 		this.arrangeNextAgentAction(agent) ;
 	}
 	
@@ -485,7 +474,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	 *
 	 * @see MobsimDriverAgent#getActivityEndTime()
 	 */
-//	@Override
 	private void arrangeActivityStart(final MobsimAgent agent) {
 		this.activityEndsList.add(agent);
 		if ( agent.getActivityEndTime()==Double.POSITIVE_INFINITY ) {
@@ -559,7 +547,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			}
 			vehicle.setDriver(driverAgent);
 			if (
-//					(route.getEndLinkId().equals(linkId))
 					agent.getDestinationLinkId().equals(linkId)
 					&& (driverAgent.chooseNextLinkId() == null)) {
 				driverAgent.endLegAndAssumeControl(now) ;
@@ -576,7 +563,8 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		this.snapshotWriters.add(writer);
 	}
 
-	/*package*/ void setAgentFactory(final AgentFactory fac) {
+	@Override
+	public void setAgentFactory(final AgentFactory fac) {
 		this.agentFactory = fac;
 	}
 
@@ -595,18 +583,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		this.teleportVehicles = teleportVehicles;
 	}
 
-	//	private static class TeleportationArrivalTimeComparator implements Comparator<Tuple<Double, PersonDriverAgent>>, Serializable {
-	//		private static final long serialVersionUID = 1L;
-	//		@Override
-	//		public int compare(final Tuple<Double, PersonDriverAgent> o1, final Tuple<Double, PersonDriverAgent> o2) {
-	//			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
-	//			if (ret == 0) {
-	//				ret = o2.getSecond().getPerson().getId().compareTo(o1.getSecond().getPerson().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
-	//			}
-	//			return ret;
-	//		}
-	//	}
-
 	QueueNetwork getQueueNetwork() {
 		return this.network;
 	}
@@ -615,11 +591,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	public VisNetwork getVisNetwork() {
 		return this.network ;
 	}
-
-	//	@Override
-	//	public CapacityInformationNetwork getCapacityInformationNetwork() {
-	//		return this.network ;
-	//	}
 
 	@Override
 	public Scenario getScenario() {
@@ -657,24 +628,10 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		return this.simTimer ;
 	}
 
-
-	@Override
-	public void setAgentFactory( org.matsim.ptproject.qsim.agents.AgentFactory agentFactory) {
-		throw new UnsupportedOperationException() ;
-	}
-
-
 	@Override
 	public Collection<MobsimAgent> getAgents() {
 		throw new UnsupportedOperationException() ;
 	}
-
-
-//	@Override
-//	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
-//		throw new UnsupportedOperationException() ;
-//	}
-
 
 	@Override
 	public Collection<MobsimAgent> getActivityEndsList() {
@@ -686,13 +643,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	public void rescheduleActivityEnd(MobsimAgent agent, double oldTime, double newTime) {
 		throw new UnsupportedOperationException() ;
 	}
-
-
-//	@Override
-//	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-//		throw new UnsupportedOperationException() ;
-//	}
-
 
 	@Override
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {

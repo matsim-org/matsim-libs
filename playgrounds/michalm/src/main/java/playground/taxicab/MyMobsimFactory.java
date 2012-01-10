@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.taxicab;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.*;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
 /**
  * @author nagel
@@ -46,14 +46,9 @@ public class MyMobsimFactory implements MobsimFactory {
 		// add one taxi:
 		AgentSource taxiDriverSource = new AgentSource() {
 			@Override
-			public List<MobsimAgent> insertAgentsIntoMobsim() {
-				List<MobsimAgent> agents = new ArrayList<MobsimAgent>() ;
-				
+			public void insertAgentsIntoMobsim() {
 				TaxicabAgent taxiagent = TaxicabAgent.insertTaxicabAgent(mobsim) ;
-				agents.add(taxiagent) ;
 				mobsim.getEventsManager().addHandler(taxiagent) ;
-				
-				return agents ;
 			}
 		} ;
 		mobsim.addAgentSource(taxiDriverSource) ;

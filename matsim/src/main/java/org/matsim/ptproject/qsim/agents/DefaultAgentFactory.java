@@ -37,8 +37,8 @@ public final class DefaultAgentFactory implements AgentFactory {
 	}
 
 	@Override
-	public MobsimDriverAgent createMobsimAgentFromPersonAndInsert(final Person p) {
-		MobsimDriverAgent agent = PersonDriverAgentImpl.createAndInsertPersonDriverAgentImpl(p, this.simulation);
+	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p, this.simulation); 
 		return agent;
 	}
 

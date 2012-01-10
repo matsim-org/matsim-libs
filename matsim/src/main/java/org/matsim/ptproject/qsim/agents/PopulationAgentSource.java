@@ -19,9 +19,6 @@
 
 package org.matsim.ptproject.qsim.agents;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -42,14 +39,12 @@ public class PopulationAgentSource implements AgentSource {
     }
 
     @Override
-    public List<MobsimAgent> insertAgentsIntoMobsim() {
-        List<MobsimAgent> agents = new ArrayList<MobsimAgent>();
+    public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPersonAndInsert(p);
-			agents.add(agent);
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
+			qsim.insertAgentIntoMobsim(agent);
 			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
 		}
-        return agents;
     }
 
 }
