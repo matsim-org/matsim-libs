@@ -27,7 +27,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableSimulation;
-import org.matsim.ptproject.qsim.agents.AgentFactory;
 
 /**The logic is as follows:<ul>
  * <li>When the agent starts something (an activity, a leg), the agent requests this from the central simulation.</li>
@@ -95,20 +94,10 @@ public interface Mobsim extends ObservableSimulation {
 	 * InternalInterface .  kai, nov'11
 	 */
 	void insertAgentIntoMobsim( MobsimAgent agent ) ;
-//	void reInsertAgentIntoMobsim( MobsimAgent agent ) ;
-	
-//	void arrangeAgentDeparture(MobsimAgent planAgent);
 
 	EventsManager getEventsManager();
 
 	AgentCounterI getAgentCounter();
-
-	/**Method that inserts the agent (back) into the mobsim, where the agent will be at an activity until its scheduled end
-	 * (coming from the plan).
-	 * 
-	 * @param planAgent
-	 */
-//	void arrangeActivityStart(MobsimAgent planAgent);
 
 	/**Method that reschedules the activity end for an agent that is already at an activity.  Necessary for within-day replanning.
 	 * 
@@ -122,12 +111,8 @@ public interface Mobsim extends ObservableSimulation {
 
 	Scenario getScenario();
 
-	void setAgentFactory(AgentFactory agentFactory);
-
 	MobsimTimer getSimTimer();
 
 	Collection<MobsimAgent> getActivityEndsList() ;
-	
-
 
 }

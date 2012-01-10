@@ -563,12 +563,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		this.snapshotWriters.add(writer);
 	}
 
-	@Override
-	public void setAgentFactory(final AgentFactory fac) {
-		this.agentFactory = fac;
-	}
-
-
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception
 	 * if an agent tries to use a car on a link where the car is not available, or not.
 	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a

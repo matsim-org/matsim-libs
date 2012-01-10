@@ -260,16 +260,6 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	// ============================================================================================================================
-	// setters that should reasonably be called between constructor and
-	// "prepareSim" (triggered by "run"):
-
-	@Override
-	@Deprecated // use agent source instead.  kai/michaz, nov'11
-	public void setAgentFactory(final AgentFactory fac) {
-		throw new RuntimeException();
-	}
-
-	// ============================================================================================================================
 	// prepareSim and related:
 
 	/**

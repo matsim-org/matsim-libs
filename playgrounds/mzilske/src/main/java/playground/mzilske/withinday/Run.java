@@ -15,8 +15,14 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
+import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
 import playground.mzilske.city2000w.GridCreator;
 import playground.mzilske.logevents.LogOutputEventHandler;
@@ -62,19 +68,23 @@ public class Run {
 		
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
+		final QSim qSim = new QSim(scenario, events, new DefaultQSimEngineFactory());
+
 		
-		final QSim queueSimulation = QSim.createQSimAndAddAgentSource(scenario, events);
-		
-		queueSimulation.setAgentFactory(new AgentFactory() {
+		AgentFactory fac = new AgentFactory() {
 
 			@Override
 			public MobsimAgent createMobsimAgentFromPerson(Person p) {
-				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), queueSimulation);
-				queueSimulation.addQueueSimulationListeners(adapterAgent);
+				AdapterAgent adapterAgent = new AdapterAgent(p.getSelectedPlan(), qSim);
+				qSim.addQueueSimulationListeners(adapterAgent);
 				return adapterAgent;
 			}
 			
-		});
+		};
+		
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), fac, qSim);
+		qSim.addAgentSource(agentSource);
+		
 		
 //		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 //		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(queueSimulation);
@@ -92,7 +102,7 @@ public class Run {
 //		client.setSwing(false);
 //		client.run();
 		
-		queueSimulation.run();
+		qSim.run();
 		
 	}
 

@@ -25,6 +25,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
 import org.matsim.ptproject.qsim.QSim;
+import org.matsim.ptproject.qsim.agents.AgentFactory;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
 
 /**
@@ -38,9 +41,11 @@ public class DgWithindayMobsimFactory implements MobsimFactory {
 	 */
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSim qsim = QSim.createQSimAndAddAgentSource(sc, eventsManager);
-		qsim.setAgentFactory(new DgWithindayAgentFactory(qsim, MatsimRandom.getLocalInstance()));
-		return qsim;
+		QSim qSim = new QSim(sc, eventsManager, new DefaultQSimEngineFactory());
+		AgentFactory agentFactory = new DgWithindayAgentFactory(qSim, MatsimRandom.getLocalInstance());
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		qSim.addAgentSource(agentSource);
+		return qSim;
 	}
 
 }

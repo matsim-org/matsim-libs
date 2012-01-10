@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package tutorial.unsupported.example50VeryExperimentalWithinDayReplanning;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -28,14 +27,14 @@ import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.ptproject.qsim.interfaces.Netsim;
+import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
+import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 
 /**
  * @author nagel
  *
  */
 public class MyMobsimFactory implements MobsimFactory {
-	private static final Logger log = Logger.getLogger(MyMobsimFactory.class);
 
 	private PersonalizableTravelCost travCostCalc;
 	private PersonalizableTravelTime travTimeCalc;
@@ -50,20 +49,16 @@ public class MyMobsimFactory implements MobsimFactory {
 
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager events) {
-
-		Netsim mobsim = QSim.createQSimAndAddAgentSource(sc, events);
-
+		QSim qSim = new QSim(sc, events, new DefaultQSimEngineFactory());
 		if ( replanningType.equals( ReplanningType.general ) ) {
-			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
-
+			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
 		} else if ( replanningType.equals( ReplanningType.carPlans ) ) {
-			mobsim.addQueueSimulationListeners(new MyWithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
-
+			qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener2(this.travCostCalc,this.travTimeCalc)) ;
 		}
-
-		mobsim.setAgentFactory( new ExperimentalBasicWithindayAgentFactory(mobsim) ) ;
-
-		return mobsim ;
+		ExperimentalBasicWithindayAgentFactory fac = new ExperimentalBasicWithindayAgentFactory(qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), fac, qSim);
+		qSim.addAgentSource(agentSource);		
+		return qSim ;
 	}
 
 }
