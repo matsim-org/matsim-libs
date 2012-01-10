@@ -85,6 +85,10 @@ public class LegTravelTimeEstimatorWrapper implements PlanAlgorithm {
 					leg,
 					true);
 
+			// not set by the estimator, and safer if set,
+			// as some scoring function may require it
+			leg.setDepartureTime( origin.getEndTime() );
+			leg.setTravelTime( tt );
 			double startTime = origin.getEndTime() + tt;
 			destination.setStartTime( startTime );
 
