@@ -43,48 +43,58 @@ public class BikeTravelTime extends WalkTravelTime {
 	 */
 	private final double defaultReferenceSpeed = 6.01;	// [m/s]
 	
-	private final double referenceSpeed;	// 6.01 according to Prakin and Rotheram
+	private final double referenceBikeSpeed;		// 6.01 according to Prakin and Rotheram
 	private final double maxBikeSpeed = 35.0 / 3.6;	// according to Parkin and Rotheram
 	
 	private final double downhillFactor = 0.2379;	// 0%..-15%
 	private final double uphillFactor = -0.4002;	// 0%..12%
 	
-	private double personSpeed;
-	private double maxPersonSpeed;
+	private double personBikeSpeed;
+	private double maxPersonBikeSpeed;
 	private double personDownhillFactor;
 	private double personUphillFactor;
 	
 	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
 		super(plansCalcGroup);
-		this.referenceSpeed = plansCalcGroup.getBikeSpeed();
+		this.referenceBikeSpeed = plansCalcGroup.getBikeSpeed();
 	}
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
-		double slope = 0.0;
 		
 		double walkTravelTime = super.getLinkTravelTime(link, time);
 		
-		double linkSpeed = this.personSpeed;
-		if (slope > 0.0) linkSpeed = linkSpeed + personUphillFactor*slope;
-		else linkSpeed = linkSpeed + personDownhillFactor*slope;
+		double slope = super.calcSlope(link);
+		double slopeShift = getSlopeShift(slope);
 		
-		// limit max speed
-		if (linkSpeed > maxPersonSpeed) linkSpeed = maxPersonSpeed;
-			
+		double linkSpeed = this.personBikeSpeed + slopeShift;
+		
+		// limit min and max speed
+		if (linkSpeed > maxPersonBikeSpeed) linkSpeed = maxPersonBikeSpeed;
+		else if (linkSpeed < 0.0) linkSpeed = Double.MIN_VALUE;
+		
 		double bikeTravelTime = link.getLength() / linkSpeed;
 		return Math.min(walkTravelTime, bikeTravelTime);
+	}
+	
+	/*
+	 * It is assumed, that there is a linear relation between speed and slope.
+	 * The returned values shifts the speed on a flat area.
+	 * E.g. speed(10%) = speed(0%) + slopeShift(10%)
+	 */
+	/*package*/ double getSlopeShift(double slope) {
+		if (slope > 0.0) return personUphillFactor * slope;
+		else return personDownhillFactor * slope;
 	}
 	
 	@Override
 	public void setPerson(Person person) {
 		super.setPerson(person);
 		
-		// calculate personalized speed including age, gender and scatter
-		this.personSpeed = this.referenceSpeed * personFactor;
+		this.personBikeSpeed = this.referenceBikeSpeed * this.personFactor;
 		
-		this.maxPersonSpeed = maxBikeSpeed * personFactor;
-		this.personUphillFactor = uphillFactor * personFactor * referenceSpeed/defaultReferenceSpeed;
-		this.personDownhillFactor = downhillFactor * personFactor * referenceSpeed/defaultReferenceSpeed;
+		this.maxPersonBikeSpeed = maxBikeSpeed * personFactor;
+		this.personUphillFactor = uphillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
+		this.personDownhillFactor = downhillFactor * personFactor * referenceBikeSpeed / defaultReferenceSpeed;
 	}
 }

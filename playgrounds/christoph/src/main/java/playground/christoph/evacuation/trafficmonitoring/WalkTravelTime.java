@@ -33,7 +33,6 @@ import org.matsim.core.router.util.PersonalizableTravelTime;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 
-
 /**
  * Data to calculate a person's travel time on a link is taken from:
  * Weidmann, Ulrich (1992) Transporttechnik der Fussgänger - Transporttechnische Eigenschaften des Fussgängerverkehrs, 
@@ -45,7 +44,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 
 	private static final Logger log = Logger.getLogger(WalkTravelTime.class);
 	
-	private final double referenceSpeed; // 1.34 according to Weidmann, [m/s]
+	private final double referenceWalkSpeed; 				// 1.34 according to Weidmann, [m/s]
 	
 	private final double maleScaleFactor = 1.41 / 1.34;		// according to Weidmann
 	private final double femaleScaleFactor = 1.27 / 1.34;	// according to Weidmann
@@ -85,7 +84,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	private final Random random;
 	
 	/*package*/ double personFactor = 1.0;	// includes scatter, age and gender
-	private double personSpeed;
+	private double personWalkSpeed;
 	
 	private int linkLengthWarnCount = 0;
 	private int genderWarnCount = 0;
@@ -93,15 +92,22 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	private int ageWarnCount = 0;
 
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
-		this.referenceSpeed = plansCalcGroup.getWalkSpeed();
+		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
 		this.random = MatsimRandom.getLocalInstance();
 	}
 	
 	@Override
-	public double getLinkTravelTime(Link link, double time) {
-		double slopeFactor = 1.0;
+	public double getLinkTravelTime(Link link, double time) {		
 		
 		double slope = calcSlope(link);
+		double slopeFactor = getSlopeFactor(slope);
+				
+		return link.getLength() / (personWalkSpeed * slopeFactor);
+	}
+
+	/*package*/ double getSlopeFactor(double slope) {
+		double slopeFactor = 1.0;
+		
 		if (slope > 80.0) {
 			if (slopeWarnCount < 10) {
 				incSlopeWarnCount("Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use 80.0 instead.");
@@ -112,16 +118,15 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 				incSlopeWarnCount("Slope is out of expected range (-40% .. -80%). Found slope of " + slope + ". Use -40.0 instead.");
 			}
 			slope = -40.0;
-		}		
-		slopeFactor = slopeFactors[(int)Math.round(slope) + 80];			
-	
-		return link.getLength() / (personSpeed * slopeFactor);
+		}
+		slopeFactor = slopeFactors[-(int)Math.round(slope) + 80];			
+		return slopeFactor;
 	}
-
+	
 	/*
 	 * Returns the slope of a link in %.
 	 */
-	private double calcSlope(Link link) {
+	/*package*/ final double calcSlope(Link link) {
 		double slope = 0.0;
 		double length = link.getLength();
 		if (length > 0.0) {
@@ -171,7 +176,6 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 	@Override
 	public void setPerson(Person person) {
 		
-		double personReferenceSpeed = this.referenceSpeed;
 		double scatterFactor = 1.0;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;
@@ -181,13 +185,13 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		for (int i = 0; i < 5; i++) random.nextDouble();
 		
 		// limit scatter factor to +/- 4 times the standard deviation
-		personReferenceSpeed = random.nextGaussian() * scatterStandardDeviation + referenceSpeed;
-		if (personReferenceSpeed < referenceSpeed - 4 * scatterStandardDeviation) {
-			personReferenceSpeed = referenceSpeed - 4 * scatterStandardDeviation;
-		} else if (personReferenceSpeed > referenceSpeed + 4 * scatterStandardDeviation) {
-			personReferenceSpeed = referenceSpeed + 4 * scatterStandardDeviation;
+		double scatterSpeed = random.nextGaussian() * scatterStandardDeviation + referenceWalkSpeed;
+		if (scatterSpeed < referenceWalkSpeed - 4 * scatterStandardDeviation) {
+			scatterSpeed = referenceWalkSpeed - 4 * scatterStandardDeviation;
+		} else if (scatterSpeed > referenceWalkSpeed + 4 * scatterStandardDeviation) {
+			scatterSpeed = referenceWalkSpeed + 4 * scatterStandardDeviation;
 		}
-		scatterFactor = this.referenceSpeed / personReferenceSpeed;
+		scatterFactor = this.referenceWalkSpeed / scatterSpeed;
 		
 		if (person instanceof PersonImpl) {
 			PersonImpl p = (PersonImpl) person;
@@ -225,7 +229,7 @@ public class WalkTravelTime implements PersonalizableTravelTime {
 		}
 		
 		this.personFactor = scatterFactor * ageFactor * genderFactor;
-		this.personSpeed = personReferenceSpeed * ageFactor * genderFactor;
+		this.personWalkSpeed = this.referenceWalkSpeed * this.personFactor;
 	}
 
 }
