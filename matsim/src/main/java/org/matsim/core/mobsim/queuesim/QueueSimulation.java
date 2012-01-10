@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -47,7 +46,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -67,8 +65,6 @@ import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -80,7 +76,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author mrieser
  * @author dgrether
  */
-public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim {
+public final class QueueSimulation implements VisMobsim, Netsim {
 	// yyyy not sure if I want this public but something has to give for integration with OTFVis.  kai, may'10
 
 	private int snapshotPeriod = 0;
@@ -95,8 +91,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 	private Network networkLayer;
 
 	private static EventsManager events = null;
-
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 
@@ -234,7 +228,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
-			afterSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
 			if (cont) {
 				this.simTimer.incrementTime();
@@ -340,10 +333,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 		this.activityEndsList.clear();
 
-		for (SnapshotWriter writer : this.snapshotWriters) {
-			writer.finish();
-		}
-
 		this.netSimEngine = null;
 		QueueSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
@@ -377,27 +366,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 		}
 
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
-	}
-
-	final void afterSimStep(final double time) {
-		if (time >= this.snapshotTime) {
-			this.snapshotTime += this.snapshotPeriod;
-			doSnapshot(time);
-		}
-	}
-
-	final void doSnapshot(final double time) {
-		if (!this.snapshotWriters.isEmpty()) {
-			Collection<AgentSnapshotInfo> positions = this.network.getVehiclePositions();
-			for (SnapshotWriter writer : this.snapshotWriters) {
-				writer.beginSnapshot(time);
-				for (AgentSnapshotInfo position : positions) {
-					writer.addAgent(position);
-				}
-				writer.endSnapshot();
-			}
-		}
-
 	}
 
 	/* package */ static final EventsManager getEvents() {
@@ -556,11 +524,6 @@ public class QueueSimulation implements ObservableSimulation, VisMobsim, Netsim 
 				qlink.addDepartingVehicle(vehicle);
 			}
 		}
-	}
-
-	@Override
-	public void addSnapshotWriter(final SnapshotWriter writer) {
-		this.snapshotWriters.add(writer);
 	}
 
 	/** Specifies whether the simulation should track vehicle usage and throw an Exception

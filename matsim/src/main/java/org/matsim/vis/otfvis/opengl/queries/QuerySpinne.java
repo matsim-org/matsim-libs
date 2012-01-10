@@ -55,6 +55,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
 import org.matsim.vis.otfvis.interfaces.OTFQueryOptions;
@@ -63,7 +64,6 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 

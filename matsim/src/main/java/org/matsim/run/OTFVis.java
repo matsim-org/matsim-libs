@@ -64,6 +64,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -205,13 +206,13 @@ public class OTFVis {
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(server, qSim);
+		OTFVisMobsimFeature queueSimulationFeature = new OTFVisMobsimFeature(scenario, server, qSim);
 		qSim.addQueueSimulationListeners(queueSimulationFeature);
 		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
 		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
-
 		server.setSimulation(queueSimulationFeature);
-
+		VisNetwork visNetwork = qSim.getVisNetwork();
+		
 		if (config.scenario().isUseTransit()) {
 			
             Network network = scenario.getNetwork();

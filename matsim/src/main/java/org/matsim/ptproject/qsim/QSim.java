@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
 import org.matsim.core.utils.collections.Tuple;
@@ -111,10 +112,6 @@ public final class QSim implements VisMobsim, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
-	/** time since last snapshot */
-	private double snapshotTime = 0.0;
-
-	private int snapshotPeriod = 0;
 
 	/** time since last "info" */
 	private double infoTime = 0;
@@ -154,7 +151,6 @@ public final class QSim implements VisMobsim, Netsim {
 	private final SimulationListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private AgentCounterI agentCounter;
 	private Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
 	private List<AgentSource> agentSources = new ArrayList<AgentSource>();
@@ -280,26 +276,12 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		createAgents();
-
 		this.initSimTimer();
-
-		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig()
-				.getQSimConfigGroup();
-		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime()
 				/ INFO_PERIOD)
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
 		// to print out the info at the very first
 		// timestep already
-		this.snapshotTime = Math.floor(this.simTimer.getSimStartTime()
-				/ this.snapshotPeriod)
-				* this.snapshotPeriod;
-
-		this.snapshotPeriod = (int) qSimConfigGroup.getSnapshotPeriod();
-		if (this.snapshotTime < this.simTimer.getSimStartTime()) {
-			this.snapshotTime += this.snapshotPeriod;
-		}
-
 		this.changeEventsEngine = new NetworkChangeEventsEngine(this);
 		this.changeEventsEngine.setInternalInterface(internalInterface) ;
 		if (this.changeEventsEngine != null) {
@@ -369,11 +351,6 @@ public final class QSim implements VisMobsim, Netsim {
 			}
 		}
 		this.activityEndsList.clear();
-
-		for (SnapshotWriter writer : this.snapshotWriters) {
-			writer.finish();
-		}
-
 	}
 
 	/**
@@ -407,13 +384,6 @@ public final class QSim implements VisMobsim, Netsim {
 
 		// console printout:
 		this.printSimLog(time);
-
-		// snapshots:
-		if (time >= this.snapshotTime) {
-			this.snapshotTime += this.snapshotPeriod;
-			doSnapshot(time);
-		}
-
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
 	}
 
@@ -693,22 +663,6 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	private void doSnapshot(final double time) {
-		if (!this.snapshotWriters.isEmpty()) {
-			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-			for (NetsimLink link : this.getNetsimNetwork().getNetsimLinks()
-					.values()) {
-				link.getVisData().getVehiclePositions(positions);
-			}
-			for (SnapshotWriter writer : this.snapshotWriters) {
-				writer.beginSnapshot(time);
-				for (AgentSnapshotInfo position : positions) {
-					writer.addAgent(position);
-				}
-				writer.endSnapshot();
-			}
-		}
-	}
 
 	// ############################################################################################################################
 	// no real functionality beyond this point
@@ -748,11 +702,6 @@ public final class QSim implements VisMobsim, Netsim {
 	// the corresponding test could be moved into this package. kai
 	public final MultiModalSimEngine getMultiModalSimEngine() {
 		return this.multiModalEngine;
-	}
-	
-	@Override
-	public final void addSnapshotWriter(SnapshotWriter snapshotWriter) {
-		this.snapshotWriters.add(snapshotWriter);
 	}
 
 	public final void addMobsimEngine(MobsimEngine mobsimEngine) {

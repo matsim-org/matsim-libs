@@ -159,6 +159,7 @@ import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactor
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
 /**
@@ -963,8 +964,7 @@ public class Controler {
 
 	/* package */Simulation getNewMobsim() {
 		if (this.mobsimFactory != null) {
-			Simulation simulation = this.mobsimFactory.createMobsim(
-					this.getScenario(), this.getEvents());
+			Simulation simulation = this.mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		}
@@ -1002,6 +1002,7 @@ public class Controler {
 			}
 		}
 		if (simulation instanceof VisMobsim) {
+			SnapshotWriterManager manager = new SnapshotWriterManager(config);
 			SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
 			SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
 			int itNumber = this.getIterationNumber();
@@ -1010,8 +1011,9 @@ public class Controler {
 				String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 				String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
 				SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
-				((VisMobsim) simulation).addSnapshotWriter(snapshotWriter);
+				manager.addSnapshotWriter(snapshotWriter);
 			}
+			((ObservableSimulation) simulation).addQueueSimulationListeners(manager);
 		}
 	}
 

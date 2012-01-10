@@ -54,7 +54,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 /**
  * OnTheFlyServer is the live server of the OTFVis.

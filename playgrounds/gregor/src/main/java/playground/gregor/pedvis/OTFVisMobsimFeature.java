@@ -6,15 +6,23 @@ import java.util.LinkedHashMap;
 import javax.swing.SwingUtilities;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -32,26 +40,28 @@ import org.matsim.vis.otfvis.opengl.layer.OGLSimpleQuadDrawer;
 import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisMobsim;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
 
-public class OTFVisMobsimFeature implements VisMobsimFeature,XYVxVyEventsHandler{
+public class OTFVisMobsimFeature implements XYVxVyEventsHandler, VisMobsimFeature, SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener,
+AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler{
 
 	protected OnTheFlyServer server = null;
 	private final VisMobsim queueSimulation;
 
 	private OTFAgentsListHandler.Writer walk2dWriter;
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
+	private EventsManager eventsManager;
 
-	public OTFVisMobsimFeature(VisMobsim queueSimulation) {
+	public OTFVisMobsimFeature(VisMobsim queueSimulation, Scenario scenario, EventsManager eventsManager) {
 		this.queueSimulation = queueSimulation;
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getScenario(), this.queueSimulation.getEventsManager());
+		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getScenario(), this.eventsManager);
 		this.server.setSimulation(this);
 
 

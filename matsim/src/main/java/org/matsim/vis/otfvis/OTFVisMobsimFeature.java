@@ -27,10 +27,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.events.AdditionalTeleportationDepartureEvent;
+import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
@@ -45,10 +48,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
-import org.matsim.vis.snapshotwriters.VisMobsimFeature;
 
-public class OTFVisMobsimFeature implements VisMobsimFeature,
-SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener {
+public class OTFVisMobsimFeature implements VisMobsimFeature, SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener,
+AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(OTFVisMobsimFeature.class);
 
@@ -64,7 +66,10 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 
 	private final Set<Id> trackedAgents = new HashSet<Id>();
 
-	public OTFVisMobsimFeature(OnTheFlyServer server, VisMobsim queueSimulation) {
+	private Scenario scenario;
+
+	public OTFVisMobsimFeature(Scenario scenario, OnTheFlyServer server, VisMobsim queueSimulation) {
+		this.scenario = scenario;
 		this.server = server;
 		this.queueSimulation = queueSimulation;
 	}
@@ -137,8 +142,8 @@ SimulationInitializedListener, SimulationBeforeSimStepListener, SimulationAfterS
 		 */
 		Id agentId = ev.getAgentId() ;
 		double now = ev.getTime() ;
-		Link currLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getLinkId() ) ;
-		Link destLink = this.getVisMobsim().getScenario().getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
+		Link currLink = this.scenario.getNetwork().getLinks().get( ev.getLinkId() ) ;
+		Link destLink = this.scenario.getNetwork().getLinks().get( ev.getDestinationLinkId() ) ;
 		double travTime = ev.getTravelTime() ;
 		TeleportationVisData agentInfo = new TeleportationVisData( now, agentId, currLink, destLink, travTime );
 		this.teleportationData.put( agentId , agentInfo );

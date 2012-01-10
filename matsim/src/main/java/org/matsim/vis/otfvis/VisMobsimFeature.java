@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.vis.snapshotwriters;
+package org.matsim.vis.otfvis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
@@ -10,6 +10,7 @@ import org.matsim.core.events.handler.AdditionalTeleportationDepartureEventHandl
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.vis.snapshotwriters.VisMobsim;
 
 /**This is a combination of capabilities that is needed to that the otfvis live mode can connect with the mobsim.  Historically,
  * this used to be the MobsimFeature.  kai, aug'10
@@ -17,11 +18,8 @@ import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
  * @author nagel
  *
  */
-public interface VisMobsimFeature 
-extends 
-SimulationInitializedListener, SimulationAfterSimStepListener, SimulationBeforeCleanupListener,
-AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler
-{
+public interface VisMobsimFeature {
+	
 	VisMobsim getVisMobsim() ;
 
 	Plan findPlan(Id agentId);
@@ -29,4 +27,5 @@ AgentArrivalEventHandler, AdditionalTeleportationDepartureEventHandler
 	void addTrackedAgent(Id agentId);
 
 	void removeTrackedAgent(Id agentId);
+	
 }
