@@ -225,6 +225,18 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 
 	@Override
 	public void modifyBackPlan(final IChromosome chromosome) {
+		for (PlanAlgorithm algo : preAlgos) {
+			algo.run( plan );
+		}
+
+		decodePlan( chromosome );
+
+		for (PlanAlgorithm algo : postAlgos) {
+			algo.run( plan );
+		}
+	}
+
+	private void decodePlan(final IChromosome chromosome) {
 		Gene[] genes = chromosome.getGenes();
 
 		// counter to step in genes array
@@ -284,15 +296,7 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 	protected double evaluate(final IChromosome chromosome) {
 		// decode
 		// ---------------------------------------------------------------------
-		for (PlanAlgorithm algo : preAlgos) {
-			algo.run( plan );
-		}
-
 		modifyBackPlan( chromosome );
-
-		for (PlanAlgorithm algo : postAlgos) {
-			algo.run( plan );
-		}
 
 		// score
 		// ---------------------------------------------------------------------
