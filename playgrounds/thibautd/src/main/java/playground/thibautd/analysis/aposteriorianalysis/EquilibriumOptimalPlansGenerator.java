@@ -31,6 +31,8 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.selectors.KeepSelected;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
@@ -84,14 +86,15 @@ public class EquilibriumOptimalPlansGenerator {
 	 * @param directory the outptut directory
 	 */
 	public void writePopulations(final String directory) {
-		String file = directory+"/plans-with-all-joint-trips.xml.gz";
-		String configFile = directory+"/untoggledConfig.xml.gz";
-		log.info( "creating untoggled plans. Output to: "+file );
-		writeUntoggledOptimalJointTrips( file );
+		String file = directory+"/plans-with-equilibrium-joint-trips.xml.gz";
+		String configFile = directory+"/equilibriumConfig.xml.gz";
+		log.info( "creating equilibrium plans. Output to: "+file );
+		writeOptimalPlanWithJointTrips( file );
+		//writeUntoggledOptimalJointTrips( file );
 		log.info( "writing corresponding config file to: "+configFile );
 		writeConfigFile( configFile , file );
 
-		file = directory+"/plans-with-best-joint-trips.xml.gz";
+		file = directory+"/plans-with-toggled-joint-trips.xml.gz";
 		configFile = directory+"/toggledConfig.xml.gz";
 		log.info( "creating toggled plans. Output to: "+file );
 		writeToggledOptimalJointTrips( file );
@@ -138,8 +141,9 @@ public class EquilibriumOptimalPlansGenerator {
 		(new ConfigWriter( newConfig )).write( configFile );
 	}
 
-	private void writeUntoggledOptimalJointTrips(final String file) {
-		PlanWithLongestTypeSelector selector = new PlanWithLongestTypeSelector();
+	private void writeOptimalPlanWithJointTrips(final String file) {
+		//PlanWithLongestTypeSelector selector = new PlanWithLongestTypeSelector();
+		PlanSelector selector = new KeepSelected();
 		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
 		for (Clique clique : scenario.getCliques().getCliques().values()) {
@@ -161,8 +165,32 @@ public class EquilibriumOptimalPlansGenerator {
 		writePopulation( file );
 	}
 
+
+	//private void writeUntoggledOptimalJointTrips(final String file) {
+	//	PlanWithLongestTypeSelector selector = new PlanWithLongestTypeSelector();
+	//	ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+
+	//	for (Clique clique : scenario.getCliques().getCliques().values()) {
+	//		Plan plan = selector.selectPlan( clique );
+	//		clique.setSelectedPlan( plan );
+
+	//		List<Plan> unselectedPlans = new ArrayList<Plan>( clique.getPlans() );
+	//		unselectedPlans.remove( plan );
+
+	//		for ( Plan currentPlan : unselectedPlans ) {
+	//			if (currentPlan != plan) {
+	//				clique.removePlan( currentPlan );
+	//			}
+	//		}
+	//	}
+
+	//	configGroup.setOptimizeToggle( "false" );
+	//	optimiseSelectedPlans();
+	//	writePopulation( file );
+	//}
+
 	private void writeToggledOptimalJointTrips(final String file) {
-		PlanWithLongestTypeSelector selector = new PlanWithLongestTypeSelector();
+		PlanSelector selector = new PlanWithLongestTypeSelector();
 		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
 		for (Clique clique : scenario.getCliques().getCliques().values()) {
