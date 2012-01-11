@@ -46,6 +46,7 @@ public class TestChromosome {
 	@Before
 	public void createFixtureChromosome() throws InvalidConfigurationException {
 		List<Gene> genes = new ArrayList<Gene>();
+		Configuration.reset();
 		Configuration conf = new Configuration();
 
 		genes.add( new BooleanGene( conf ) );

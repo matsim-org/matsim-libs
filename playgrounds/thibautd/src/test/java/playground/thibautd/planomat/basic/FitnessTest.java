@@ -122,6 +122,11 @@ public class FitnessTest {
 					estFactory);
 	}
 
+	@Before
+	public void jgapClean() {
+		Configuration.reset();
+	}
+
 	@Test
 	public void testFactory() {
 		Configuration jgapConfig  = new Configuration();
