@@ -328,12 +328,16 @@ public class JointTripPossibilitiesUtils {
 }
 
 class PuDoFactory {
+	//one instance per joint trip
+	private static long count = Long.MIN_VALUE;
+	private final String puName;
 	private final Id puLink, doLink;
 	private final Coord puCoord, doCoord;
 
 	public PuDoFactory(
 			final JointTripPossibility possibility,
 			final JointPlan plan) {
+		puName = JointActingTypes.PICK_UP_BEGIN + JointActingTypes.PICK_UP_SPLIT_EXPR + getCount();
 		Activity origin = plan.getActById( (Id) possibility.getPassenger().getOriginActivityId() );
 		Activity destination  = plan.getActById( (Id) possibility.getPassenger().getDestinationActivityId() );
 
@@ -344,9 +348,13 @@ class PuDoFactory {
 		doCoord = destination.getCoord();
 	}
 
+	private static synchronized long getCount() {
+		return count++;
+	}
+
 	public JointActivity createPickUp(final Person person) {
 		return new JointActivity(
-				JointActingTypes.PICK_UP,
+				puName,
 				puCoord,
 				puLink,
 				person);
