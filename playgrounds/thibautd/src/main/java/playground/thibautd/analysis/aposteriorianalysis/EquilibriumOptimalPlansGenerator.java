@@ -190,13 +190,13 @@ public class EquilibriumOptimalPlansGenerator {
 	//}
 
 	private void writeToggledOptimalJointTrips(final String file) {
-		PlanSelector selector = new PlanWithLongestTypeSelector();
-		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+		//PlanSelector selector = new PlanWithLongestTypeSelector();
+		//ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
-		for (Clique clique : scenario.getCliques().getCliques().values()) {
-			Plan plan = selector.selectPlan( clique );
-			clique.setSelectedPlan( plan );
-		}
+		//for (Clique clique : scenario.getCliques().getCliques().values()) {
+		//	Plan plan = selector.selectPlan( clique );
+		//	clique.setSelectedPlan( plan );
+		//}
 
 		configGroup.setOptimizeToggle( "true" );
 		optimiseSelectedPlans();
