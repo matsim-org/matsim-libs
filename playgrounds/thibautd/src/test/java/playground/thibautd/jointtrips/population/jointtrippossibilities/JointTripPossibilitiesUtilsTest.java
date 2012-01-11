@@ -40,6 +40,7 @@ import org.matsim.core.population.PlanImpl;
 import playground.thibautd.jointtrips.population.Clique;
 import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointActivity;
+import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
 
 /**
@@ -125,6 +126,73 @@ public class JointTripPossibilitiesUtilsTest {
 				"incorrect number of joint trip possibilities",
 				countPassengerLegs( plan ),
 				possibilities.getJointTripPossibilities().size());
+	}
+
+	/**
+	 * tests whether the linkage encoded by the pick-up "inital type" values
+	 * is correct.
+	 */
+	@Test
+	public void testInitialTypeMatching() {
+		JointPlan plan = getPlanWithoutJointTrips();
+		JointTripPossibilities possibilities = getExNihiloPossibilities( plan );
+
+		plan.setJointTripPossibilities( possibilities );
+
+		Map<JointTripPossibility, Boolean> participation =
+			JointTripPossibilitiesUtils.getPerformedJointTrips( plan );
+
+		for (Map.Entry<JointTripPossibility, Boolean> entry : participation.entrySet()) {
+			entry.setValue( true );
+		}
+
+		JointTripPossibilitiesUtils.includeJointTrips( participation , plan );
+
+		// check that type and inital type are as expected
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof JointActivity) {
+				JointActivity act = (JointActivity) pe;
+
+				if (act.getType().equals( JointActingTypes.PICK_UP )) {
+					Assert.assertTrue(
+							"unexpected initial type for pick up: "+act.getInitialType(),
+							act.getInitialType().matches( JointActingTypes.PICK_UP_REGEXP ));
+				}
+				else {
+					Assert.assertFalse(
+							"unexpected type for activity: "+act.getType(),
+							act.getType().matches( JointActingTypes.PICK_UP_REGEXP ));
+				}
+			}
+			else if ( !(pe instanceof JointLeg) ) {
+				Assert.fail( "unexpected plan element type "+pe.getClass().getName()+" inserted at trip creation" );
+			}
+		}
+
+		// now, check that all pick-ups before a given joint leg have the same
+		// initial type
+		Map<Id, String> sharedLeg2Type = new HashMap<Id, String>();
+
+		String lastInitialType = null;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof JointActivity) {
+				lastInitialType = ((JointActivity) pe).getInitialType();
+			}
+			else if ( ((JointLeg) pe).getJoint() ) {
+				for (Id id : ((JointLeg) pe).getLinkedElementsIds()) {
+					// associate the previous activity type at the joint legs
+					String oldType = sharedLeg2Type.put( id , lastInitialType );
+
+					if (oldType != null) {
+						// if a type already attached, check that it is the same
+						Assert.assertEquals(
+								"pick up types do not match",
+								oldType,
+								lastInitialType);
+					}
+				}
+			}
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
