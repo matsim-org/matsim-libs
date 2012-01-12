@@ -20,26 +20,16 @@
 
 package playground.thibautd.planomat;
 
-import java.util.TreeSet;
-
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
-import org.jgap.Gene;
-import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.event.EventManager;
 import org.jgap.impl.BestChromosomesSelector;
 import org.jgap.impl.ChromosomePool;
 import org.jgap.impl.CrossoverOperator;
-import org.jgap.impl.GABreeder;
-import org.jgap.impl.IntegerGene;
 import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.planomat.PlanomatJGAPChromosome;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.planomat.api.ActivityWhiteList;
 import playground.thibautd.planomat.api.PlanomatChromosome;
@@ -53,7 +43,7 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 	public PlanomatJGAPConfiguration(
 			final Plan plan,
-			final PlanomatFitnessFunctionFactory fitnessFuntionFactory,
+			final PlanomatFitnessFunctionFactory fitnessFunctionFactory,
 			final long seed,
 			final ActivityWhiteList whiteList,
 			final Planomat2ConfigGroup planomatConfigGroup) {
@@ -66,28 +56,16 @@ public class PlanomatJGAPConfiguration extends Configuration {
 
 		try {
 			// initialize random number generator
-			this.setRandomGenerator(new StockRandomGenerator());
+			setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed( seed );
 
 			setEventManager(new EventManager());
-
-			this.setBreeder(new PlanomatGABreeder());
-
-			// initialize selection:
-			BestChromosomesSelector bestChromsSelector =
-				new BestChromosomesSelector(
-					this, 0.90d);
-			bestChromsSelector.setDoubletteChromosomesAllowed(false);
-			this.addNaturalSelector(bestChromsSelector, false);
-
-			// - elitism (de Jong, 1975)
-			this.setPreservFittestIndividual(true);
+			setBreeder(new PlanomatGABreeder());
 
 			// initialize population properties
-			// - population size: equal to the string length, if not specified otherwise (de Jong, 1975)
 			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
 			PlanomatFitnessFunction fitness =
-				fitnessFuntionFactory.createFitnessFunction(
+				fitnessFunctionFactory.createFitnessFunction(
 						this,
 						plan,
 						whiteList);
@@ -96,17 +74,24 @@ public class PlanomatJGAPConfiguration extends Configuration {
 			PlanomatChromosome sampleChromosome = fitness.getSampleChomosome();
 			this.setSampleChromosome( sampleChromosome );
 
+			// GA parameters
 			int populationSize = (int) Math.ceil(planomatConfigGroup.getPopIntercept() +
 				planomatConfigGroup.getPopSlope() * sampleChromosome.size());
 			this.setPopulationSize( Math.max( 2 , populationSize ) );
 
 			// initialize genetic operators
-			this.setChromosomePool(new ChromosomePool());
-			this.addGeneticOperator(new CrossoverOperator(this, 0.6d));
-			this.addGeneticOperator(new MutationOperator(this, this.getPopulationSize()));
+			setChromosomePool(new ChromosomePool());
+			addGeneticOperator(new CrossoverOperator(this, 0.6d));
+			addGeneticOperator(new MutationOperator(this, this.getPopulationSize()));
 
-		} catch (InvalidConfigurationException e) {
-			throw new RuntimeException(e.getMessage());
+			// initialize selection:
+			BestChromosomesSelector bestChromsSelector =
+				new BestChromosomesSelector(
+					this, 0.90d);
+			bestChromsSelector.setDoubletteChromosomesAllowed(false);
+			addNaturalSelector(bestChromsSelector, false);
+		} catch (Exception e) {
+			throw new RuntimeException("problem at initialisation of "+getClass(), e);
 		}
 	}
 }
