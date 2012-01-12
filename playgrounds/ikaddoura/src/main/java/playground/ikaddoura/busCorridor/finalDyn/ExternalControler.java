@@ -44,15 +44,15 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int numberOfExternalIterations = 2;
+	static int lastExternalIteration = 15;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 0, 6*3600, 9*3600);
-	TimePeriod p3 = new TimePeriod(3, "NVZ", 2, 9*3600, 14*3600);
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 8, 6*3600, 9*3600);
+	TimePeriod p3 = new TimePeriod(3, "NVZ", 4, 9*3600, 14*3600);
 	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 6, 14*3600, 17*3600);
-	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 1, 17*3600, 18*3600);
+	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 2, 17*3600, 23*3600);
 
 	private double fare = -2.5; // negative!
 	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
@@ -90,7 +90,7 @@ public class ExternalControler {
 //		day.put(p4.getOrderId(), p4);
 //		day.put(p5.getOrderId(), p5);
 		
-		for (int extIt = 0; extIt <= numberOfExternalIterations ; extIt++){
+		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
 			log.info("************* EXTERNAL ITERATION "+extIt+" BEGINS *************");
 			this.setExtItNr(extIt);
 			this.setDirectoryExtIt(outputExternalIterationDirPath +"/extITERS/extIt."+extIt);
@@ -132,12 +132,12 @@ public class ExternalControler {
 			stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2day, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorEarnings, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 			
 			// settings for next external iteration	
-			if (this.getExtItNr() < numberOfExternalIterations){
+			if (this.getExtItNr() < lastExternalIteration){
 				
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
 				
-//				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
-//				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
+				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
+				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
 //
 				this.setDay(extend("HVZ_1", 60 * 60));
 				this.setDay(extend("HVZ_2", 60 * 60));
@@ -205,64 +205,10 @@ public class ExternalControler {
 			if (dayNextExtIt.containsKey(period+1)){
 				dayNextExtIt.get(period+1).changeFromTime(time/2);
 			}
-		}
-			
-//			int removeNr = 0;
-//			if (dayNextExtIt.containsKey(period-1)){
-//				System.out.println("A");
-//				double fromTime = dayNextExtIt.get(period-1).getFromTime();
-//				double toTime = dayNextExtIt.get(period-1).getToTime();
-//				if(fromTime >= toTime){
-//					removeNr = period-1;
-//					System.out.println("remove vorherige: "+removeNr);
-//				}	
-//			}
-//			
-//			if (removeNr > 0){
-//				dayNextExtIt.remove(removeNr);
-//			}
-//			
-//			removeNr = 0;
-//			if (dayNextExtIt.containsKey(period+1)){
-//				System.out.println("B");
-//				if(dayNextExtIt.get(period+1).getFromTime() >= dayNextExtIt.get(period+1).getToTime()){
-//					removeNr = period+1;
-//					System.out.println("remove nächste: "+removeNr);
-//				}	
-//			}
-//			
-//			if (removeNr > 0){
-//				dayNextExtIt.remove(removeNr);
-//			}
-//			
-//			removeNr = 0;
-//			if(dayNextExtIt.get(period).getFromTime() >= dayNextExtIt.get(period).getToTime()){
-//				removeNr = period;
-//				System.out.println("remove diese: "+removeNr);
-//			}
-//			
-//			if (removeNr > 0){
-//				dayNextExtIt.remove(removeNr);
-//			}
-//		}
-		
-//		int nr = 1;
-//		Map<Integer, TimePeriod> dayNextExtItOutput = new HashMap<Integer, TimePeriod>();	
-//		for (TimePeriod t : dayNextExtIt.values()){
-//			t.setOrderId(nr);
-//			dayNextExtItOutput.put(nr, t);
-//			nr++;
-//		}
-//		log.info("Time periods for next external Iteration: "+dayNextExtItOutput.toString());
-		
-		
+		}		
 		return dayNextExtIt;
 	}
-
-	/**
-	 * @param i
-	 * @return
-	 */
+	
 	private Map<Integer, TimePeriod> increaseNumberOfBusesAllTimePeriods(int i) {
 		Map<Integer, TimePeriod> dayNextExtIt = new HashMap<Integer, TimePeriod>();
 		for (TimePeriod t : this.getDay().values()){
@@ -273,16 +219,10 @@ public class ExternalControler {
 		return dayNextExtIt;
 	}
 
-	/**
-	 * @return the numberOfBuses
-	 */
 	public int getMaxNumberOfBuses() {
 		return maxNumberOfBuses;
 	}
 
-	/**
-	 * @param numberOfBuses the numberOfBuses to set
-	 */
 	public void setMaxNumberOfBuses(Map<Integer, TimePeriod> day) {
 		int maxBusNumber = 0;
 		for (TimePeriod t : day.values()){
