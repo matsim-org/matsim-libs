@@ -272,22 +272,17 @@ public class ScheduleVehiclesGenerator {
 			}
 		}
 		
-		System.out.println("vorher: "+this.day.toString());
 		for (Integer pNr : removePeriods){
 			this.day.remove(pNr);
 		}
-		System.out.println("nachher: "+this.day.toString());
 
 		// die PeriodNr in eine Reihenfolge bringen
 		int nr = 1;
 		for (TimePeriod t : this.day.values()){
-			System.out.println("vorher1: "+this.newDay.toString());
 			t.setOrderId(nr);
 			this.newDay.put(nr, t);
-			System.out.println("nachher1: "+this.newDay.toString());
 			nr++;
 		}
-		System.out.println("newDay: "+newDay.toString());
 		
 		for (TimePeriod period : newDay.values()){
 			setDepartureIDs(routeId2transitRoute, "period_"+period.getOrderId(), period.getToTime(), period.getFromTime(), period.getNumberOfBuses(), createVehicles(period.getNumberOfBuses()));
@@ -325,14 +320,13 @@ public class ScheduleVehiclesGenerator {
 					if (newDay.get(periodNr-1).getNumberOfBuses() > 0){
 						if (newDay.get(periodNr-1).getNumberOfBuses() > numberOfBusesZeitraum){
 							// weniger Busse als in der Periode davor
-							System.out.println("test1");
 							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIDsZeitraum.size()-1) + umlaufzeit;
 						}
 						else if (newDay.get(periodNr-1).getNumberOfBuses() < numberOfBusesZeitraum){
 							// mehr Busse als in der Periode davor
 							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
 								firstDepartureTime = startTime;
-								log.warn("vehNr2lastPeriodDepTimeHin is empty --> first Departure Time set to startTime!");
+								log.warn("No departure in last period! --> first Departure Time set to startTime!");
 							}
 							else {
 								firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;
@@ -344,7 +338,7 @@ public class ScheduleVehiclesGenerator {
 							// Busanzahl gleich der in der Vorperiode
 							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
 								firstDepartureTime = startTime;
-								log.warn("vehNr2lastPeriodDepTimeHin is empty --> first Departure Time set to startTime!");
+								log.warn("No departure in last period! --> first Departure Time set to startTime!");
 							}
 							else {
 								firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;

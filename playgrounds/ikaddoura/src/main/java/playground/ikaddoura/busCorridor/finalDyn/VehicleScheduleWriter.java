@@ -82,7 +82,7 @@ public class VehicleScheduleWriter {
 	
 		generator.setStopTime(20); // for schedule!
 		generator.setScheduleSpeed(8.33333); // for schedule!
-		generator.setPausenzeit(3*60);
+		generator.setPausenzeit(0*60);
 		generator.setNetworkFile(networkFile);
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");

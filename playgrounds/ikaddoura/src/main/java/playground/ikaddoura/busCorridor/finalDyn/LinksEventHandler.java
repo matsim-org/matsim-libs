@@ -54,7 +54,6 @@ public class LinksEventHandler implements LinkLeaveEventHandler, LinkEnterEventH
 	public void handleEvent(LinkLeaveEvent event) {
 		Id vehicleId = event.getVehicleId();
 		if (vehicleId.toString().contains("bus")){
-			
 			// vehicleKm
 			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength()/1000;
 		}
