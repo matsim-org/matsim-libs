@@ -210,9 +210,6 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 
 	public void registerAgentWaitingForCar(MobsimDriverAgent agent) {
 		Id vehicleId = agent.getPlannedVehicleId() ;
-		if (vehicleId == null) {
-			vehicleId = agent.getId(); // backwards-compatibility
-		}
 		agentsWaitingForCars.put(vehicleId, agent);
 	}
 	

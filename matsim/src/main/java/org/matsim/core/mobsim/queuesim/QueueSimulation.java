@@ -488,9 +488,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			}
 			MobsimDriverAgent driverAgent = (MobsimDriverAgent) agent ;
 			Id vehicleId = driverAgent.getPlannedVehicleId() ;
-			if (vehicleId == null) {
-				vehicleId = driverAgent.getId(); // backwards-compatibility
-			}
 			QueueLink qlink = this.network.getQueueLink(linkId);
 			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 			if (vehicle == null) {

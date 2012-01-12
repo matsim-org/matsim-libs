@@ -434,14 +434,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	@Override
 	public final Id getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
+		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
+		if (route.getVehicleId() != null) {
+			return route.getVehicleId();
+		} else {
+			return this.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
-		Route route = ((Leg) currentPlanElement).getRoute() ;
-		if ( !(route instanceof NetworkRoute) ) {
-			return null ;
-		}
-		return ((NetworkRoute)route).getVehicleId() ;
 	}
 
 	@Override

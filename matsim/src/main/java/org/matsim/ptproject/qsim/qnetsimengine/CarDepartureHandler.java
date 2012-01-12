@@ -64,9 +64,6 @@ class CarDepartureHandler implements DepartureHandler {
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
 		Id vehicleId = agent.getPlannedVehicleId() ;
-		if (vehicleId == null) {
-			vehicleId = agent.getId(); // backwards-compatibility
-		}
 		AbstractQLink qlink = (AbstractQLink) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
