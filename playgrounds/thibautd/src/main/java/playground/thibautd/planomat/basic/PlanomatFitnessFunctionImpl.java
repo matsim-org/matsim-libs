@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -97,6 +99,9 @@ import playground.thibautd.planomat.api.PlanomatFitnessFunction;
  * @author thibautd
  */
 public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
+	private static final Logger log =
+		Logger.getLogger(PlanomatFitnessFunctionImpl.class);
+
 	private static final long serialVersionUID = 1L;
 
 	private final PlanomatConfigGroup.TripStructureAnalysisLayerOption subtourLevel;
