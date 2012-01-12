@@ -560,6 +560,27 @@ public class P3DRenderer extends PApplet
 	public void draw()
 	{
 		
+		if ((this.extremeValues != null) && (this.factorX == 0.0f))
+		{
+			//get max values
+			float maxWidth = (float)(this.extremeValues[0]-this.extremeValues[3]);
+			float maxHeight = (float)(this.extremeValues[1]-this.extremeValues[4]);
+
+			float longerSide = Math.max(maxWidth,  maxHeight);
+			float shorterSide = Math.min(maxWidth, maxHeight);
+			
+			if (maxWidth == longerSide)
+				offset.y = (int)(longerSide - shorterSide) / this.height;
+			else
+				offset.x = (int)(longerSide - shorterSide) / this.width;
+			
+			//refactor min/max values of event+network file
+			this.factorX = longerSide / this.width;
+			this.factorY = longerSide / this.height;
+
+			//console.println(((this.maxPosX-this.minPosX) /factorX));
+		}		
+		
 		//mouse drag
 		if (mouseDragged)
 		{
@@ -649,18 +670,7 @@ public class P3DRenderer extends PApplet
 	private void drawAgents()
 	{
 
-		if ((this.extremeValues != null) && (this.factorX == 0.0f))
-		{
-			//get max values
-			float maxWidth = (float)(this.extremeValues[0]-this.extremeValues[3]);
-			float maxHeight = (float)(this.extremeValues[1]-this.extremeValues[4]);
-
-			//refactor min/max values of event+network file
-			this.factorX = maxWidth / this.width;
-			this.factorY = maxHeight / this.height;
-
-			//console.println(((this.maxPosX-this.minPosX) /factorX));
-		}
+		
 
 
 
