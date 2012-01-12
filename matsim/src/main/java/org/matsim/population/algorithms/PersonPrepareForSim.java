@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -122,9 +121,6 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
-						}
-						else if (leg.getRoute() instanceof LinkNetworkRoute){
-							dist = RouteUtils.calcDistance((LinkNetworkRoute)leg.getRoute(), this.network);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

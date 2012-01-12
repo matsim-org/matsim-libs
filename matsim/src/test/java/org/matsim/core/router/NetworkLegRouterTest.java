@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -69,7 +68,7 @@ public class NetworkLegRouterTest {
 		double tt = new NetworkLegRouter(f.s.getNetwork(), routeAlgo, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(100.0, tt, 1e-8);
 		Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-		Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+		Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 	}
 
 	@Test
@@ -98,7 +97,7 @@ public class NetworkLegRouterTest {
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(100.0, tt, 1e-8);
 			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
 			Assert.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
@@ -118,7 +117,7 @@ public class NetworkLegRouterTest {
 			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(100.0, tt, 1e-8);
 			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof LinkNetworkRoute);
+			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
 			Assert.assertEquals(1000.3333333333, route.getTravelCost(), 1e-8 ) ;

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityEvent;
@@ -45,6 +44,7 @@ import org.matsim.core.events.ActivityEndEventImpl;
 import org.matsim.core.events.ActivityStartEventImpl;
 import org.matsim.core.events.AgentArrivalEventImpl;
 import org.matsim.core.events.AgentDepartureEventImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.johannes.socialnetworks.utils.CollectionUtils;
@@ -140,7 +140,7 @@ public class ParallelPseudoSim {
 						 * If this is not the first activity, then there must exist
 						 * a leg before.
 						 */
-						LinkNetworkRoute route = (LinkNetworkRoute) ((Leg) elements.get(idx - 1)).getRoute();
+						NetworkRoute route = (NetworkRoute) ((Leg) elements.get(idx - 1)).getRoute();
 						double travelTime = calcRouteTravelTime(route, prevEndTime, linkTravelTimes, network);
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
@@ -189,7 +189,7 @@ public class ParallelPseudoSim {
 			
 		}
 		
-		private double calcRouteTravelTime(LinkNetworkRoute route, double startTime, TravelTime travelTime, Network network) {
+		private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network) {
 			double tt = 0;
 			if (route.getStartLinkId() != route.getEndLinkId()) {
 

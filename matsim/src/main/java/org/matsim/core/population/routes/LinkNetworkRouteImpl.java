@@ -26,14 +26,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 
 /**
  * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
  *
  * @author mrieser
  */
-public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, LinkNetworkRoute, Cloneable {
+public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
 	private ArrayList<Id> route = new ArrayList<Id>();
 	private List<Id> safeRoute = Collections.unmodifiableList(this.route);

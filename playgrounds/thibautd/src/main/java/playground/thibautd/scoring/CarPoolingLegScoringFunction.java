@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -74,11 +74,11 @@ public class CarPoolingLegScoringFunction extends LegScoringFunction {
 
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
-				LinkNetworkRoute route = null;
+				NetworkRoute route = null;
 				boolean isValidRoute = true;
 
 				try {
-					route = (LinkNetworkRoute) leg.getRoute();
+					route = (NetworkRoute) leg.getRoute();
 				} catch (ClassCastException e) {
 					isValidRoute = false;
 				}

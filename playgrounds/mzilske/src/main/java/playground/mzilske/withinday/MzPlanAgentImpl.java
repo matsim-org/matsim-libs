@@ -7,9 +7,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class MzPlanAgentImpl implements RealAgent {
 
@@ -17,7 +17,7 @@ public class MzPlanAgentImpl implements RealAgent {
 
 		private Queue<Id> route;
 
-		public DriveThisRoute(LinkNetworkRoute route) {
+		public DriveThisRoute(NetworkRoute route) {
 			this.route = new ArrayDeque<Id>(route.getLinkIds());
 			this.route.add(route.getEndLinkId());
 		}
@@ -116,7 +116,7 @@ public class MzPlanAgentImpl implements RealAgent {
 		} else if (nextThingToDo instanceof Leg) {
 			Leg nextLeg = (Leg) nextThingToDo;
 			if (nextLeg.getMode().equals(TransportMode.car)) {
-				LinkNetworkRoute route = (LinkNetworkRoute) nextLeg.getRoute();
+				NetworkRoute route = (NetworkRoute) nextLeg.getRoute();
 				world.getRoadNetworkPlane().startDriving(new DriveThisRoute(route));
 			} else {
 				world.getTeleportationPlane().startTeleporting(new TeleportTo(nextLeg.getRoute().getEndLinkId(), nextLeg.getMode(), nextLeg.getTravelTime()));

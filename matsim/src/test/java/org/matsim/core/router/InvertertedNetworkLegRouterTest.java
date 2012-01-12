@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -39,6 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -74,7 +74,7 @@ public class InvertertedNetworkLegRouterTest {
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		LinkNetworkRoute route = (LinkNetworkRoute) leg.getRoute();
+		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
 		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
 		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());
@@ -86,7 +86,7 @@ public class InvertertedNetworkLegRouterTest {
 		//test 2
 		tt.setTurningMoveCosts(100.0, 0.0, 50.0);
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		route = (LinkNetworkRoute) leg.getRoute();
+		route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
 		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
 		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());
@@ -99,7 +99,7 @@ public class InvertertedNetworkLegRouterTest {
 		tt.setTurningMoveCosts(50.0, 100.0, 0.0);
 		
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
-		route = (LinkNetworkRoute) leg.getRoute();
+		route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
 		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
 		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());

@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
@@ -45,6 +44,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.QuadTree;
@@ -94,10 +94,10 @@ public class RetailerRelocation implements IterationStartsListener {
 					if (act.getType().startsWith("s")) {						
 						// get trip to and trip from
 						LegImpl tripTo = (LegImpl)selectedPlan.getNextLeg(act);
-						LinkNetworkRoute routeTo = (LinkNetworkRoute) tripTo.getRoute();
+						NetworkRoute routeTo = (NetworkRoute) tripTo.getRoute();
 						this.iterateRoute(routeTo);	
 						LegImpl tripFrom = (LegImpl)selectedPlan.getPreviousLeg(act);
-						LinkNetworkRoute routeFrom = (LinkNetworkRoute) tripFrom.getRoute();
+						NetworkRoute routeFrom = (NetworkRoute) tripFrom.getRoute();
 						this.iterateRoute(routeFrom);	
 					}
 				}
@@ -144,7 +144,7 @@ public class RetailerRelocation implements IterationStartsListener {
 		return competitors.size() + 1; 	//TODO: weight with distance and size of competitors
 	}
 	
-	private void iterateRoute(LinkNetworkRoute route) {
+	private void iterateRoute(NetworkRoute route) {
 		for (Id linkId : route.getLinkIds()) {
 			this.updateLinkCandidate(linkId, 1);
 		}

@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.LinkNetworkRoute;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;
 import org.matsim.core.scoring.interfaces.LegScoring;
@@ -104,7 +104,7 @@ public class LegScoringFunction implements LegScoring, BasicScoring {
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (this.params.marginalUtilityOfDistanceCar_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = RouteUtils.calcDistance((LinkNetworkRoute) route, network);
+				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
                 if ( distanceWrnCnt<1 ) {
 				/*
 				 * TODO the route-distance does not contain the length of the
