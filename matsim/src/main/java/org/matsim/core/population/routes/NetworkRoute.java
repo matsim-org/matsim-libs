@@ -23,6 +23,7 @@ package org.matsim.core.population.routes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 
 
 /**
@@ -31,7 +32,7 @@ import org.matsim.api.core.v01.Id;
  *
  * @author mrieser
  */
-public interface NetworkRoute extends RouteWRefs {
+public interface NetworkRoute extends Route {
 
 	public void setLinkIds(final Id startLinkId, final List<Id> linkIds, final Id endLinkId);
 

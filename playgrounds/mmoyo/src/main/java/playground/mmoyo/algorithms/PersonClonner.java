@@ -11,13 +11,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.mmoyo.utils.DataLoader;
@@ -57,9 +57,7 @@ public class PersonClonner{
 					
 					newLeg.setRoute(leg.getRoute());			     			
 					if (leg.getRoute() != null){
-						if(leg.getRoute() instanceof RouteWRefs) { 
-							newLeg.setRoute(((RouteWRefs) leg.getRoute()).clone());
-						}
+							newLeg.setRoute(((Route) leg.getRoute()).clone());
 					}
 					
 					newPlan.getPlanElements().add(newLeg);

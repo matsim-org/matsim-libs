@@ -63,4 +63,15 @@ public interface Route extends MatsimPopulationObject {
 
 	public Id getEndLinkId();
 
+
+	public void setStartLinkId(final Id linkId);
+
+	public void setEndLinkId(final Id linkId);
+
+	/* make the clone method public, but do NOT implement Cloneable
+	 * so that implementations can decide on their own if they support
+	 * clone() or not.
+	 */
+	public Route clone();
+
 }

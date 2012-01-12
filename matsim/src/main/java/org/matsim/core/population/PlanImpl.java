@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.routes.RouteWRefs;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
@@ -273,8 +273,8 @@ public class PlanImpl implements Plan {
 					// get the arrival time information only if available
 					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
 				}
-				if (l.getRoute() != null && l.getRoute() instanceof RouteWRefs) {
-					l2.setRoute(((RouteWRefs) l.getRoute()).clone());
+				if (l.getRoute() != null) {
+					l2.setRoute(((Route) l.getRoute()).clone());
 				}
 			} else {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");

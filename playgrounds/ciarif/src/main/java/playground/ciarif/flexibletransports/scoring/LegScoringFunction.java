@@ -1,27 +1,23 @@
 package playground.ciarif.flexibletransports.scoring;
 
 import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
+
 import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.data.MyTransportMode;
 import playground.ciarif.flexibletransports.router.FtCarSharingRoute;
-import playground.ciarif.flexibletransports.router.FtPtRoute;
 import playground.ciarif.flexibletransports.router.PlansCalcRouteFT;
-import playground.meisterk.kti.router.PlansCalcRouteKti;
 
 public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.LegScoringFunction
 {

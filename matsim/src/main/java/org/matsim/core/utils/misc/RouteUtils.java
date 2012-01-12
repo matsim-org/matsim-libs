@@ -132,6 +132,11 @@ public class RouteUtils {
 	 * @return
 	 */
 	public static double calcDistance(final NetworkRoute route, final Network network) {
+		/*
+		 * TODO the route-distance does not contain the length of the
+		 * first or last link of the route, because the route doesn't
+		 * know those. Should be fixed somehow, but how? MR, jan07
+		 */
 		double dist = 0;
 		for (Id linkId : route.getLinkIds()) {
 			dist += network.getLinks().get(linkId).getLength();

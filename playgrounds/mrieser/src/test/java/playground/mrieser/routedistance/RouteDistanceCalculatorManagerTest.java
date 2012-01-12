@@ -193,6 +193,25 @@ public class RouteDistanceCalculatorManagerTest {
 		public Id getEndLinkId() {
 			throw new UnsupportedOperationException();
 		}
+		
+		@Override
+		public DummyRoute clone() {
+			try {
+				return (DummyRoute) super.clone();
+			} catch (CloneNotSupportedException e) {
+				throw new AssertionError(e);
+			}
+		}
+
+		@Override
+		public void setStartLinkId(Id linkId) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void setEndLinkId(Id linkId) {
+			throw new UnsupportedOperationException();
+		}
 
 	}
 

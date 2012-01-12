@@ -21,13 +21,14 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
 
 /**
  * A route for public transport trips.
  *
  * @author mrieser
  */
-public interface GenericRoute extends RouteWRefs {
+public interface GenericRoute extends Route {
 
 	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId);
 

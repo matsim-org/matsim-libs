@@ -22,7 +22,6 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.RouteWRefs;
 import org.matsim.core.utils.misc.Time;
 
 public class LegImpl implements Leg {
@@ -49,8 +48,8 @@ public class LegImpl implements Leg {
 		this.setDepartureTime(leg.getDepartureTime());
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
-		if (leg.getRoute() != null && leg.getRoute() instanceof RouteWRefs) {
-			this.setRoute(((RouteWRefs) leg.getRoute()).clone());
+		if (leg.getRoute() != null) {
+			this.setRoute(((Route) leg.getRoute()).clone());
 		}
 	}
 
