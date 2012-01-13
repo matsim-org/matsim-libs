@@ -64,7 +64,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -211,11 +210,10 @@ public class OTFVis {
 		qSim.getEventsManager().addHandler(queueSimulationFeature) ;
 		queueSimulationFeature.setVisualizeTeleportedAgents(config.otfVis().isShowTeleportedAgents());
 		server.setSimulation(queueSimulationFeature);
-		VisNetwork visNetwork = qSim.getVisNetwork();
 		
 		if (config.scenario().isUseTransit()) {
 			
-            Network network = scenario.getNetwork();
+			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
