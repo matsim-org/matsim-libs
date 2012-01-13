@@ -118,8 +118,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 				 * default MATSim LegScoringFunction.
 				 * cdobler, Jan'12
 				 */
-//				dist = route.getDistance();
-				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+				dist = getDistance(route);
 				tmpScore += this.params.marginalUtilityOfDistanceCar_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s;
@@ -232,4 +231,20 @@ public class LegScoringFunction extends org.matsim.core.scoring.charyparNagel.Le
 
 	}
 
+	/*
+	 * EventsToLegs creates dummy routes from events.
+	 * If a car leg starts and end on the same link, a GenericRouteImpl
+	 * is created, otherwise a NetworkRoute. Therefore, we have to
+	 * check whether the route is a NetworkRoute or not when
+	 * calculating its distance.
+	 */
+	private double getDistance(Route route) {
+		double dist;
+		if (route instanceof NetworkRoute) {
+			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+		} else {
+			dist = route.getDistance();
+		}
+		return dist;
+	}
 }
