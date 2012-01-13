@@ -21,6 +21,8 @@
 package org.matsim.core.network.algorithms;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -223,21 +225,6 @@ public class NetworkExpandNode {
 			double x = c.getX() + d * dx - e * dy;
 			double y = c.getY() + d * dy + e * dx;
 			
-			
-			
-//			Coord c = node.getCoord();
-//			Coord p = inlink.getFromNode().getCoord();
-//			Coord pc = new CoordImpl(c.getX()-p.getX(),c.getY()-p.getY());
-//			double lpc = Math.sqrt(pc.getX()*pc.getX()+pc.getY()*pc.getY());
-//			if (Math.abs(lpc) < 1e-8) {
-//				// c and p seem to lay on top of each other, leading to Double.NaN in some calculations
-//				lpc = d;
-//			}
-//			double x = p.getX()+(1-d/lpc)*pc.getX()+e/lpc*pc.getY();
-//			double y = p.getY()+(1-d/lpc)*pc.getY()-e/lpc*pc.getX();
-			
-			
-			
 			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
 			network.addNode(n);
 			newNodes.add(n);
@@ -313,6 +300,73 @@ public class NetworkExpandNode {
 			newLinks.add(l);
 		}
 		return new Tuple<List<Node>, List<Link>>(newNodes,newLinks);
+	}
+	
+	/**
+	 * Checks whether it makes sense to expand the node with turning links or not. For example, it might 
+	 * not make sense to expand the node if no real restrictions are given, but just all possible options
+	 * are listed -- the exact same turning options could be available without expanding the node.
+	 * Thus, it usually only makes sense to expand a node if {@link #turnsAreSameAsSingleNode(Id, List)}
+	 * returns <code>false</code>.
+	 * The algorithm can optionally ignore u-turns, that means that it is not checked if all u-turns are
+	 * allowed according to the given turning options. 
+	 * 
+	 * 
+	 * @param nodeId
+	 * @param turns the allowed turning options
+	 * @param ignoreUTurns set this to <code>true</code> if u-turns are excluded from the check
+	 * @return <code>true</code> if the list of explicit turns given results in the same turning options available as when the node is not expanded, <code>false</code> otherwise. 
+	 */
+	public boolean turnsAreSameAsSingleNode(final Id nodeId, final List<TurnInfo> turns, final boolean ignoreUTurns) {
+		Node node = this.network.getNodes().get(nodeId);
+
+		// first create list of all possible turning options
+		Map<Id, Map<Id, Set<String>>> allTurns = new HashMap<Id, Map<Id, Set<String>>>();
+		
+		for (Link inLink : node.getInLinks().values()) {
+			Map<Id, Set<String>> t2 = new HashMap<Id, Set<String>>();
+			for (Link outLink : node.getOutLinks().values()) {
+				if (inLink.getFromNode() != outLink.getToNode() || !ignoreUTurns) {
+					HashSet<String> modes = new HashSet<String>();
+					modes.addAll(inLink.getAllowedModes());
+					modes.retainAll(outLink.getAllowedModes()); // modes contains now all useful modes
+					t2.put(outLink.getId(), modes);
+				}
+			}
+			allTurns.put(inLink.getId(), t2);
+		}
+		
+		/* now compare the given turning options and remove them from all possible options.
+		 * if there remain some options in the "all possibles", we know that the given turns
+		 * act indeed as restrictions. */
+		for (TurnInfo ti : turns) {
+			Id from = ti.fromLinkId;
+			Id to = ti.toLinkId;
+			Map<Id, Set<String>> t2 = allTurns.get(from);
+			if (t2 != null) {
+				Set<String> modes = t2.get(to);
+				if (modes != null) {
+					if (ti.getModes() == null) {
+						// no specific modes are set, so remove all modes from the inLink
+						// because the modes are the intersection of modes from inLink and outLink, we can just clear it
+						modes.clear();
+					} else {
+						modes.removeAll(ti.getModes());
+					}
+				}
+			}
+		}
+		
+		// now do the check
+		for (Map<Id, Set<String>> m : allTurns.values()) {
+			for (Set<String> modes : m.values()) {
+				if (modes.size() > 0) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	public static class TurnInfo {

@@ -386,6 +386,82 @@ public class NetworkExpandNodeTest {
 		Assert.assertTrue(CoordUtils.calcDistance(c, f.scenario.createCoord(1000, 0)) < 30);
 	}
 
+	@Test
+	public void testTurnsAreSameAsSingleNode_IncludeUTurns() {
+		Fixture f = new Fixture();
+		f.createNetwork_ThreeWayIntersection();
+		
+		Set<String> carOnly = new HashSet<String>();
+		carOnly.add(TransportMode.car);
+		Set<String> walkOnly = new HashSet<String>();
+		walkOnly.add(TransportMode.walk);
+		Set<String> walkCar = new HashSet<String>();
+		walkCar.add(TransportMode.walk);
+		walkCar.add(TransportMode.car);
+
+		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);
+
+		ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2"), walkOnly));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4"), carOnly));
+
+		Id nodeId = f.scenario.createId("3");
+		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
+
+		turns.clear();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("2")));
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("4")));
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("2"), walkCar));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("4"), walkCar));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6"), walkCar));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("6")));
+
+		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
+	}
+
+	@Test
+	public void testTurnsAreSameAsSingleNode_IgnoreUTurns() {
+		Fixture f = new Fixture();
+		f.createNetwork_ThreeWayIntersection();
+		
+		Set<String> emptySet = new HashSet<String>();
+		Set<String> carOnly = new HashSet<String>();
+		carOnly.add(TransportMode.car);
+		Set<String> walkOnly = new HashSet<String>();
+		walkOnly.add(TransportMode.walk);
+		Set<String> walkCar = new HashSet<String>();
+		walkCar.add(TransportMode.walk);
+		walkCar.add(TransportMode.car);
+		
+		NetworkExpandNode exp = new NetworkExpandNode(f.scenario.getNetwork(), 25, 5);
+		
+		ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2"), walkOnly));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4"), carOnly));
+		
+		Id nodeId = f.scenario.createId("3");
+		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
+		
+		turns.clear();
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("2"))); // u-turn
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("4")));
+		turns.add(new TurnInfo(f.scenario.createId("1"), f.scenario.createId("6")));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("2"), walkCar));
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("4"), walkCar)); // u-turn
+		turns.add(new TurnInfo(f.scenario.createId("3"), f.scenario.createId("6"), walkCar));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("2")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("4")));
+		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("6"), emptySet)); // u-turn
+		
+		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
+	}
 	
 	private static Link findLinkBetween(final Network network, final Id fromLinkId, final Id toLinkId) {
 		Link fromLink = network.getLinks().get(fromLinkId);
