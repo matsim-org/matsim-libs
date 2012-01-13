@@ -91,6 +91,7 @@ public class ExternalControler {
 		day.put(p5.getOrderId(), p5);
 		
 		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
+			
 			log.info("************* EXTERNAL ITERATION "+extIt+" BEGINS *************");
 			this.setExtItNr(extIt);
 			this.setDirectoryExtIt(outputExternalIterationDirPath +"/extITERS/extIt."+extIt);
@@ -107,12 +108,13 @@ public class ExternalControler {
 			internalControler.run();
 
 			Operator operator = new Operator(this.getExtItNr(), this.getMaxNumberOfBuses(), this.getCapacity());
-			operator.calculateScore(this.getDirectoryExtIt(), lastInternalIteration, networkFile);
-//			operator.analyzeScores();
+			Users users = new Users(this.getDirectoryExtIt(), networkFile);
 			
-			Users users = new Users();
-			users.analyzeScores(this.getDirectoryExtIt(), networkFile);
-			users.analyzeLegModes(this.getDirectoryExtIt(), lastInternalIteration);
+			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
+			analysis.readEvents(operator, users);
+			
+			users.analyzeScores();
+			operator.calculateScore();
 
 			this.iteration2operatorProfit.put(this.getExtItNr(), operator.getProfit());
 			this.iteration2operatorCosts.put(this.getExtItNr(), operator.getCosts());

@@ -23,18 +23,7 @@
  */
 package playground.ikaddoura.busCorridor.finalDyn;
 
-import java.util.Map;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author Ihab
@@ -52,6 +41,9 @@ public class Operator {
 	private int numberOfBuses;
 	private double profit;
 	private double earnings;
+	private int numberOfBusesFromEvents;
+	private double vehicleKm;
+	private double vehicleHours;
 	private double costs;
 	private double highestScore = 0;
 	private int iterationWithHighestScore = 0;
@@ -78,49 +70,12 @@ public class Operator {
 		return costsPerVehicleDay;
 	}
 
-	public void calculateScore(String directoryExtIt, int lastInternalIteration, String networkFile) {
+	public void calculateScore() {
 		
-		Scenario scen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
-		Config config = scen.getConfig();
-		config.network().setInputFile(networkFile);
-		ScenarioUtils.loadScenario(scen);		
-		Network network = scen.getNetwork();
-		
-		String lastEventFile = directoryExtIt+"/internalIterations/ITERS/it."+lastInternalIteration+"/"+lastInternalIteration+".events.xml.gz";
-		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		MoneyEventHandler moneyHandler = new MoneyEventHandler();
-		TransitEventHandler transitHandler = new TransitEventHandler();
-		LinksEventHandler linksHandler = new LinksEventHandler(network);
-		DepartureArrivalEventHandler departureArrivalEventHandler = new DepartureArrivalEventHandler();
-		
-		events.addHandler(moneyHandler);	
-		events.addHandler(transitHandler);
-		events.addHandler(linksHandler);
-		events.addHandler(departureArrivalEventHandler);
-		
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(lastEventFile);
-		
-		this.earnings = moneyHandler.getEarnings();
-		int numberOfBuses = transitHandler.getVehicleIDs().size(); // Anzahl der Busse aus den Events!		
-		double vehicleKm = linksHandler.getVehicleKm(); // vehicle-km aus den Events!
-		double vehicleHours = departureArrivalEventHandler.getVehicleHours(); // vehicle-hours aus den Events, nicht aus dem Fahrplan!
-		
-		this.costs = (numberOfBuses * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
+		this.costs = (numberOfBusesFromEvents * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
 		this.profit = this.getEarnings() - this.getCosts();
 
 		log.info("OperatorScore calculated: "+this.getProfit());
-	}
-
-	public void analyzeScores() {
-		if (this.profit > this.highestScore){
-			this.setHighestScore(this.profit);
-			this.setIterationWithHighestScore(this.extItNr);
-		}
-		else {}
-		
-		log.info("OperatorScore analyzed.");	
 	}
 
 	/**
@@ -171,52 +126,6 @@ public class Operator {
 	public double getProfit() {
 		return profit;
 	}
-
-	public int strategy(Map<Integer, Integer> iteration2numberOfBuses, Map<Integer, Double> iteration2operatorScore) {
-		
-		int numberOfBuses = iteration2numberOfBuses.get(this.extItNr);
-		int newNumberOfBuses = 0;
-		
-		if (this.extItNr==0){
-			newNumberOfBuses = numberOfBuses + 1;  // Start-Strategie
-		}
-		
-		else {
-			
-			int numberOfBusesBefore = iteration2numberOfBuses.get(this.extItNr-1);
-			double score = this.getProfit(); // iteration2providerScore.get(this.extItNr);
-			double scoreBefore = iteration2operatorScore.get(this.extItNr-1);
-			
-			if(numberOfBusesBefore < numberOfBuses & scoreBefore < score){
-				// mehr Busse, score angestiegen
-				newNumberOfBuses = numberOfBuses+1;
-			}
-			else if(numberOfBusesBefore < numberOfBuses & scoreBefore > score){
-				// mehr Busse, score gesunken
-				newNumberOfBuses = numberOfBuses-1;
-			}
-			else if (numberOfBusesBefore > numberOfBuses & scoreBefore < score){
-				// weniger Busse, score angestiegen
-				newNumberOfBuses = numberOfBuses-1;
-			}
-			else if (numberOfBusesBefore > numberOfBuses & scoreBefore > score){
-				// weniger Busse, score gesunken
-				newNumberOfBuses = numberOfBuses+1;
-			}
-			else {
-				log.info("Operator score did not change.");
-				newNumberOfBuses = numberOfBuses;
-			}
-		}
-		
-		if (newNumberOfBuses == 0){
-			log.warn("At least one Bus expected!");
-			newNumberOfBuses = 1;
-		}
-		
-		log.info("OperatorStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
-		return newNumberOfBuses;
-	}
 	
 	public int increaseCapacity(int increase) {
 		int newCapacity = this.capacity + increase;
@@ -257,8 +166,110 @@ public class Operator {
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
-	
-	
-	
 
+	/**
+	 * @return the vehicleKm
+	 */
+	public double getVehicleKm() {
+		return vehicleKm;
+	}
+
+	/**
+	 * @param vehicleKm the vehicleKm to set
+	 */
+	public void setVehicleKm(double vehicleKm) {
+		this.vehicleKm = vehicleKm;
+	}
+
+	/**
+	 * @return the vehicleHours
+	 */
+	public double getVehicleHours() {
+		return vehicleHours;
+	}
+
+	/**
+	 * @param vehicleHours the vehicleHours to set
+	 */
+	public void setVehicleHours(double vehicleHours) {
+		this.vehicleHours = vehicleHours;
+	}
+
+	/**
+	 * @param earnings the earnings to set
+	 */
+	public void setEarnings(double earnings) {
+		this.earnings = earnings;
+	}
+
+	/**
+	 * @return the numberOfBusesFromEvents
+	 */
+	public int getNumberOfBusesFromEvents() {
+		return numberOfBusesFromEvents;
+	}
+
+	/**
+	 * @param numberOfBusesFromEvents the numberOfBusesFromEvents to set
+	 */
+	public void setNumberOfBusesFromEvents(int numberOfBusesFromEvents) {
+		this.numberOfBusesFromEvents = numberOfBusesFromEvents;
+	}
+	
+//	public void analyzeScores() {
+//		if (this.profit > this.highestScore){
+//			this.setHighestScore(this.profit);
+//			this.setIterationWithHighestScore(this.extItNr);
+//		}
+//		else {}
+//		
+//		log.info("OperatorScore analyzed.");	
+//	}
+	
+//	public int strategy(Map<Integer, Integer> iteration2numberOfBuses, Map<Integer, Double> iteration2operatorScore) {
+//		
+//		int numberOfBuses = iteration2numberOfBuses.get(this.extItNr);
+//		int newNumberOfBuses = 0;
+//		
+//		if (this.extItNr==0){
+//			newNumberOfBuses = numberOfBuses + 1;  // Start-Strategie
+//		}
+//		
+//		else {
+//			
+//			int numberOfBusesBefore = iteration2numberOfBuses.get(this.extItNr-1);
+//			double score = this.getProfit(); // iteration2providerScore.get(this.extItNr);
+//			double scoreBefore = iteration2operatorScore.get(this.extItNr-1);
+//			
+//			if(numberOfBusesBefore < numberOfBuses & scoreBefore < score){
+//				// mehr Busse, score angestiegen
+//				newNumberOfBuses = numberOfBuses+1;
+//			}
+//			else if(numberOfBusesBefore < numberOfBuses & scoreBefore > score){
+//				// mehr Busse, score gesunken
+//				newNumberOfBuses = numberOfBuses-1;
+//			}
+//			else if (numberOfBusesBefore > numberOfBuses & scoreBefore < score){
+//				// weniger Busse, score angestiegen
+//				newNumberOfBuses = numberOfBuses-1;
+//			}
+//			else if (numberOfBusesBefore > numberOfBuses & scoreBefore > score){
+//				// weniger Busse, score gesunken
+//				newNumberOfBuses = numberOfBuses+1;
+//			}
+//			else {
+//				log.info("Operator score did not change.");
+//				newNumberOfBuses = numberOfBuses;
+//			}
+//		}
+//		
+//		if (newNumberOfBuses == 0){
+//			log.warn("At least one Bus expected!");
+//			newNumberOfBuses = 1;
+//		}
+//		
+//		log.info("OperatorStrategy changed numberOfBuses for next external Iteration to "+newNumberOfBuses+".");
+//		return newNumberOfBuses;
+//	}
+	
 }

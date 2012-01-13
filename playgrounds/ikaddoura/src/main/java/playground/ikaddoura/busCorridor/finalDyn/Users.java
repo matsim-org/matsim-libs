@@ -30,10 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 
@@ -50,17 +47,24 @@ public class Users {
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs;
-	
-	public void analyzeScores(String directoryExtIt, String networkFile) {
+	private String directoryExtIt;
+	private String networkFile;
+
+	public Users(String directoryExtIt, String networkFile) {
+		this.directoryExtIt = directoryExtIt;
+		this.networkFile = networkFile;
+	}
+
+	public void analyzeScores() {
 		
 		List<Double> scores = new ArrayList<Double>();
 		double scoreSum = 0.0;
 		
-		String outputPlanFile = directoryExtIt+"/internalIterations/output_plans.xml.gz";		
+		String outputPlanFile = this.directoryExtIt+"/internalIterations/output_plans.xml.gz";		
 		
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(outputPlanFile);
-		config.network().setInputFile(networkFile);
+		config.network().setInputFile(this.networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 
@@ -74,7 +78,7 @@ public class Users {
 		}
 		
 		this.setAvgExecScore(scoreSum/scores.size());
-		this.setScoreSum(scoreSum);
+		this.setScoreSum(scoreSum); // !!! toDo: LogSum !!!
 		
 		log.info("Users Scores analyzed.");
 	}
@@ -99,30 +103,23 @@ public class Users {
 		return numberOfWalkLegs;
 	}
 
-	public void analyzeLegModes(String directoryExtIt, int lastInternalIteration) {
-		String lastEventFile = directoryExtIt+"/internalIterations/ITERS/it."+lastInternalIteration+"/"+lastInternalIteration+".events.xml.gz";
-		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		DepartureArrivalEventHandler departureHandler = new DepartureArrivalEventHandler();
-		
-		events.addHandler(departureHandler);	
-		
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(lastEventFile);
-		
-		this.numberOfPtLegs = departureHandler.getNumberOfPtLegs();
-		this.numberOfCarLegs = departureHandler.getNumberOfCarLegs();
-		this.numberOfWalkLegs = departureHandler.getNumberOfWalkLegs();
-		
-		log.info("Leg Modes analyzed.");
-
-	}
-
 	public void setScoreSum(double scoreSum) {
 		this.scoreSum = scoreSum;
 	}
 
 	public double getScoreSum() {
 		return scoreSum;
+	}
+	
+	public void setNumberOfPtLegs(int numberOfPtLegs) {
+		this.numberOfPtLegs = numberOfPtLegs;
+	}
+
+	public void setNumberOfCarLegs(int numberOfCarLegs) {
+		this.numberOfCarLegs = numberOfCarLegs;
+	}
+
+	public void setNumberOfWalkLegs(int numberOfWalkLegs) {
+		this.numberOfWalkLegs = numberOfWalkLegs;
 	}
 }
