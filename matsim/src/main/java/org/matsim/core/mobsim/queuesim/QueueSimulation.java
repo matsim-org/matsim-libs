@@ -82,7 +82,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	private int snapshotPeriod = 0;
 	private double snapshotTime = 0.0; 	/* time since lasat snapshot */
 
-	protected static final int INFO_PERIOD = 3600;
+	private static final int INFO_PERIOD = 3600;
 	private double infoTime = 0; 	/* time since last "info" message */
 
 	private final Config config;
