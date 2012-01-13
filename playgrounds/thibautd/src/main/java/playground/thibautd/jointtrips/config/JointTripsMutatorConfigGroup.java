@@ -40,10 +40,12 @@ public class JointTripsMutatorConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "JointTripsMutator";
 
-	public static final String PROB = "mutationProbability";
+	public static final String START_PROB = "startMutationProbability";
+	public static final String END_PROB = "endMutationProbability";
 	public static final String SELECTOR = "planSelector";
 
-	private double prob = 0.1d;
+	private double startProb = 0.6d;
+	private double endProb = 0.1d;
 	private SelectorName selector = SelectorName.EXP_BETA;
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -60,10 +62,13 @@ public class JointTripsMutatorConfigGroup extends Module {
 	public void addParam(
 			final String param_name,
 			final String value) {
-		if (param_name.equals( PROB )) {
-			setMutationProbability( value );
+		if (param_name.equals( START_PROB )) {
+			setStartMutationProbability( value );
 		}
-		if (param_name.equals( SELECTOR )) {
+		else if (param_name.equals( END_PROB )) {
+			setEndMutationProbability( value );
+		}
+		else if (param_name.equals( SELECTOR )) {
 			setSelector( value );
 		}
 		else {
@@ -74,10 +79,13 @@ public class JointTripsMutatorConfigGroup extends Module {
 	@Override
 	public String getValue(
 			final String param_name) {
-		if (param_name.equals( PROB )) {
-			return ""+getMutationProbability();
+		if (param_name.equals( START_PROB )) {
+			return ""+getStartMutationProbability();
 		}
-		if (param_name.equals( SELECTOR )) {
+		else if (param_name.equals( END_PROB )) {
+			return ""+getStartMutationProbability();
+		}
+		else if (param_name.equals( SELECTOR )) {
 			return ""+getSelector();
 		}
 		return null;
@@ -87,7 +95,8 @@ public class JointTripsMutatorConfigGroup extends Module {
 	public TreeMap<String,String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 
-		addParameterToMap( map , PROB );
+		addParameterToMap( map , START_PROB );
+		addParameterToMap( map , END_PROB );
 		addParameterToMap( map , SELECTOR );
 		return map;
 	}
@@ -95,24 +104,44 @@ public class JointTripsMutatorConfigGroup extends Module {
 	// /////////////////////////////////////////////////////////////////////////
 	// getters/setters
 	// /////////////////////////////////////////////////////////////////////////
-	private void setMutationProbability(final String value) {
+	private void setStartMutationProbability(final String value) {
 		try {
 			double p = Double.parseDouble( value );
 
 			if (p >= 0 && p <= 1) {
-				prob = p;
+				startProb = p;
 			}
 			else {
-				log.warn( "invalid probability "+p+": keeping mutation probability to "+prob );
+				log.warn( "invalid probability "+p+": keeping start mutation probability to "+startProb );
 			}
 		}
 		catch (NumberFormatException e) {
-			log.warn( "invalid number "+value+": keeping mutation probability to "+prob );
+			log.warn( "invalid number "+value+": keeping start mutation probability to "+startProb );
 		}
 	}
 
-	public double getMutationProbability() {
-		return prob;
+	private void setEndMutationProbability(final String value) {
+		try {
+			double p = Double.parseDouble( value );
+
+			if (p >= 0 && p <= 1) {
+				endProb = p;
+			}
+			else {
+				log.warn( "invalid probability "+p+": keeping end mutation probability to "+endProb );
+			}
+		}
+		catch (NumberFormatException e) {
+			log.warn( "invalid number "+value+": keeping end mutation probability to "+endProb );
+		}
+	}
+
+	public double getStartMutationProbability() {
+		return startProb;
+	}
+
+	public double getEndMutationProbability() {
+		return endProb;
 	}
 
 	private void setSelector(final String value) {
