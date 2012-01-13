@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -461,6 +462,42 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(f.scenario.createId("5"), f.scenario.createId("6"), emptySet)); // u-turn
 		
 		Assert.assertTrue(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
+	}
+	
+	@Test
+	public void testTurnInfo_equals() {
+		Set<String> modes1 = new HashSet<String>();
+		Set<String> modes2 = new HashSet<String>();
+		modes2.add(TransportMode.car);
+		Id id1 = new IdImpl("1");
+		Id id2 = new IdImpl("2");
+		
+		TurnInfo ti1 = new TurnInfo(id1, id2);
+		TurnInfo ti2 = new TurnInfo(id1, id2, modes1);
+		TurnInfo ti3 = new TurnInfo(id1, id2, modes2);
+		TurnInfo ti4 = new TurnInfo(id2, id1);
+		TurnInfo ti5 = new TurnInfo(id2, id1, modes1);
+		TurnInfo ti6 = new TurnInfo(id2, id1, modes2);
+
+		TurnInfo ti22 = new TurnInfo(id1, id2, modes1);
+		TurnInfo ti44 = new TurnInfo(id2, id1);
+		
+		Assert.assertFalse(ti1.equals(null));
+		Assert.assertFalse(ti1.equals(ti2));
+		Assert.assertFalse(ti1.equals(ti3));
+		Assert.assertFalse(ti1.equals(ti4));
+		Assert.assertFalse(ti1.equals(ti5));
+		Assert.assertFalse(ti1.equals(ti6));
+		
+		Assert.assertFalse(ti2.equals(null));
+		Assert.assertFalse(ti2.equals(ti1));
+		Assert.assertFalse(ti2.equals(ti3));
+		Assert.assertFalse(ti2.equals(ti4));
+		Assert.assertFalse(ti2.equals(ti5));
+		Assert.assertFalse(ti2.equals(ti6));
+		
+		Assert.assertTrue(ti2.equals(ti22));
+		Assert.assertTrue(ti4.equals(ti44));
 	}
 	
 	private static Link findLinkBetween(final Network network, final Id fromLinkId, final Id toLinkId) {

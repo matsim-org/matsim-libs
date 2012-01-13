@@ -408,7 +408,7 @@ public class NetworkExpandNode {
 			return (ti.fromLinkId.equals(this.fromLinkId))
 					&& (ti.toLinkId.equals(this.toLinkId))
 					&& ((ti.modes == null && this.modes == null)
-							|| (ti.modes.equals(this.modes))
+							|| (ti.modes != null && ti.modes.equals(this.modes))
 							);
 		}
 		
