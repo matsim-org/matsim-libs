@@ -47,13 +47,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
 
 /**
@@ -74,9 +74,8 @@ public class RunInternalizationTest {
 	private Scenario scenario;
 	private Controler controler;
 	private Vehicles emissionVehicles;
+	private EmissionModule emissionModule;
 	
-	EmissionScoringFunctionFactory emissionSff;
-
 	private void run() {
 		
 		this.config = new Config();
@@ -87,24 +86,29 @@ public class RunInternalizationTest {
 		
 		createNetwork();
 		createActiveAgents();
-		createPassiveAgents();
+//		createPassiveAgents();
 		createVehicles();
 		
 		this.controler = new Controler(this.scenario);
 		specifyControler();
-		installScoringFunctionFactory();
-//		installTravelCostCalculatorFactory();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles, emissionSff.getScoringFromEmissions()));
+		
+		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
+		
+//		installScoringFunctionFactory();
+		installTravelCostCalculatorFactory();
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles, emissionModule));
 		this.controler.run();
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		TravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory();
+		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
 		controler.setTravelCostCalculatorFactory(emissionTccf);
 	}
 
 	private void installScoringFunctionFactory() {
-		emissionSff = new EmissionScoringFunctionFactory(controler);
+		EmissionScoringFunctionFactory emissionSff = new EmissionScoringFunctionFactory(controler);
 		controler.setScoringFunctionFactory(emissionSff);
 	}
 	

@@ -20,7 +20,6 @@
 package playground.benjamin.internalization;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -32,7 +31,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.EmissionModule;
@@ -45,35 +43,26 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
 	
 	Vehicles emissionVehicles;
-	Scenario scenario;
 	Controler controler;
 	EmissionModule emissionModule;
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
 
-	EventHandler emissionScoringFunction;
 
 
-	public InternalizeEmissionsControlerListener(Vehicles emissionVehicles, EventHandler emissionScoringFunction) {
+	public InternalizeEmissionsControlerListener(Vehicles emissionVehicles, EmissionModule emissionModule) {
 		this.emissionVehicles = emissionVehicles;
-		this.emissionScoringFunction = emissionScoringFunction;
+		this.emissionModule = emissionModule;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
 		
-		scenario = controler.getScenario() ;
-		emissionModule = new EmissionModule(scenario, this.emissionVehicles);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
-		
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
-		
-		emissionModule.getEmissionEventsManager().addHandler(emissionScoringFunction);
 	}
 
 	@Override
@@ -81,10 +70,10 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		Integer iteration = event.getIteration();
 		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
 		
-//		logger.info("creating new emission internalization handler...");
-//		emissionInternalizationHandler = new EmissionInternalizationHandler(controler);
-//		logger.info("adding emission internalization module to emission events stream...");
-//		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
+		logger.info("creating new emission internalization handler...");
+		emissionInternalizationHandler = new EmissionInternalizationHandler(controler);
+		logger.info("adding emission internalization module to emission events stream...");
+		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
 		
 		logger.info("creating new emission events writer...");
 		emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
@@ -95,10 +84,8 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-//		calculateNewScore();
-		
-//		logger.info("removing emission internalization module from emission events stream...");
-//		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
+		logger.info("removing emission internalization module from emission events stream...");
+		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
 		
 		logger.info("removing emission events writer from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
@@ -110,26 +97,5 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
-
-//	private void calculateNewScore() {
-//		logger.info("entering calculateNewScore...");
-//		
-//		Population pop = scenario.getPopulation();
-//		for(Person person : pop.getPersons().values()){
-//			Id personId = person.getId();
-//			double oldScore = person.getSelectedPlan().getScore();
-//			double emissionCosts;
-//			double newScore;
-//			if(emissionInternalizationHandler.getPersonId2EmissionCosts().get(personId) != null){
-//				emissionCosts = emissionInternalizationHandler.getPersonId2EmissionCosts().get(personId);
-//				newScore = oldScore - emissionCosts;
-//				logger.info("setting score for person " + personId + " from " + oldScore + " to " + newScore + "...");
-//			} else {
-//				newScore = oldScore;
-//			}
-//			person.getSelectedPlan().setScore(newScore);
-//		}
-//		logger.info("leaving calculateNewScore...");
-//	}
 	
 }

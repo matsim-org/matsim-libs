@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmissionTravelCostCalculatorFactory.java
+ * EmissionCostModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,44 +19,36 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
-import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.router.util.PersonalizableTravelTime;
+import java.util.Map;
 
-import playground.benjamin.emissions.EmissionModule;
+import playground.benjamin.emissions.types.ColdPollutant;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
  *
  */
-public class EmissionTravelCostCalculatorFactory implements	TravelCostCalculatorFactory {
-
-	private final EmissionModule emissionModule;
-
-	public EmissionTravelCostCalculatorFactory(EmissionModule emissionModule) {
-		this.emissionModule = emissionModule;
+public class EmissionCostModule {
+	
+	public double calculateWarmEmissionCosts(Map<WarmPollutant, Double> warmEmissions) {
+		double warmEmissionCosts = 10.0;
+		
+		for(WarmPollutant wp : warmEmissions.keySet()){
+			
+		}
+		
+		return warmEmissionCosts;
+	}
+	
+	public double calculateColdEmissionCosts(Map<ColdPollutant, Double> coldEmissions) {
+		double coldEmissionCosts = 5.0;
+		
+		for(ColdPollutant cp : coldEmissions.keySet()){
+			
+		}
+		
+		return coldEmissionCosts;
 	}
 
-	@Override
-	public PersonalizableTravelCost createTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
-		final EmissionTravelCostCalculator etcc = new EmissionTravelCostCalculator(timeCalculator, cnScoringGroup, emissionModule);
-
-		return new PersonalizableTravelCost(){
-
-			@Override
-			public void setPerson(Person person) {
-				etcc.setPerson(person);
-			}
-
-			@Override
-			public double getLinkGeneralizedTravelCost(Link link, double time) {
-				double generalizedTravelCost = etcc.getLinkGeneralizedTravelCost(link, time);
-				return generalizedTravelCost;
-			}
-		};
-	}
 
 }

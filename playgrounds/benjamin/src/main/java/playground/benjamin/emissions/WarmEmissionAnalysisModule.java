@@ -113,13 +113,11 @@ public class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
-	public void calculateWarmEmissionsAndThrowEvent(
-			Id linkId,
+	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
 			Id personId,
 			Integer roadType,
 			Double freeVelocity,
 			Double linkLength,
-			Double enterTime,
 			Double travelTime,
 			String vehicleInformation) {
 
@@ -137,7 +135,11 @@ public class WarmEmissionAnalysisModule {
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
-		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
+		return warmEmissions;
+	}
+	
+	public void throwWarmEmissionEvent(double enterTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
+		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 

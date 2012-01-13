@@ -43,6 +43,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import playground.benjamin.emissions.types.WarmPollutant;
 
 /**
  * @author benjamin
@@ -185,15 +186,15 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 //		}
 		// ===
 		
-		warmEmissionAnalysisModule.calculateWarmEmissionsAndThrowEvent(
+		Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				linkId,
-				personId,
 				roadType,
 				freeVelocity,
 				linkLength,
 				enterTime,
-				travelTime,
 				vehicleInformation);
+		
+		warmEmissionAnalysisModule.throwWarmEmissionEvent(enterTime, linkId, vehicleId, warmEmissions);
 	}
 
 	public int getLinkLeaveCnt() {

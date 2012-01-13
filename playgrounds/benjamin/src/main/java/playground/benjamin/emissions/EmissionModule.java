@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
@@ -405,16 +404,20 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public EventHandler getWarmEmissionsHandler() {
+	public WarmEmissionHandler getWarmEmissionsHandler() {
 		return warmEmissionHandler;	
 	}
 
-	public EventHandler getColdEmissionsHandler() {
+	public ColdEmissionHandler getColdEmissionsHandler() {
 		return coldEmissionHandler;
 	}
 
 	public EventsManager getEmissionEventsManager() {
 		return emissionEventsManager;
+	}
+
+	public Vehicles getEmissionVehicles() {
+		return emissionVehicles;
 	}
 
 	public void writeEmissionInformation(String emissionEventOutputFile) {
