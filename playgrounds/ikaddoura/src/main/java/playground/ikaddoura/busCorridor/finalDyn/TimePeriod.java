@@ -39,6 +39,8 @@ public class TimePeriod {
 	private int numberOfBuses;
 	private double fromTime;
 	private double toTime;
+	private double averageTaktFromEvents; // average over timePeriods and all transitStops
+	private double scheduleTakt;
 	
 	public TimePeriod(int orderId, String id, int numberOfBuses, double fromTime, double toTime){
 		this.orderId = orderId;
@@ -57,7 +59,7 @@ public class TimePeriod {
 	}
 	
 	public String toString(){
-		String tag = this.getId()+"-"+Time.writeTime(this.getFromTime(), Time.TIMEFORMAT_HHMMSS)+"-"+Time.writeTime(this.getToTime(), Time.TIMEFORMAT_HHMMSS)+"-"+this.getNumberOfBuses();
+		String tag = this.getId()+"-"+Time.writeTime(this.getFromTime(), Time.TIMEFORMAT_HHMMSS)+"-"+Time.writeTime(this.getToTime(), Time.TIMEFORMAT_HHMMSS)+"-numberOfbuses"+this.getNumberOfBuses()+"-averageTaktEvents"+Time.writeTime(this.averageTaktFromEvents, Time.TIMEFORMAT_HHMMSS)+"-scheduleTakt"+Time.writeTime(this.scheduleTakt, Time.TIMEFORMAT_HHMMSS);
 		return tag;
 	}
 	
@@ -120,6 +122,18 @@ public class TimePeriod {
 	}
 	public String getId() {
 		return id;
+	}
+	public void setAverageTaktFromEvents(double takt) {
+		this.averageTaktFromEvents = takt;
+	}
+	public double getAverageTaktFromEvents() {
+		return averageTaktFromEvents;
+	}
+	public void setScheduleTakt(double scheduleTakt) {
+		this.scheduleTakt = scheduleTakt;
+	}
+	public double getScheduleTakt() {
+		return scheduleTakt;
 	}
 	
 }

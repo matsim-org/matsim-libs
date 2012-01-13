@@ -43,12 +43,12 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int lastExternalIteration = 10;
+	static int lastExternalIteration = 0;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 6, 6*3600, 9*3600);
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 2, 6*3600, 9*3600);
 	TimePeriod p3 = new TimePeriod(3, "NVZ", 2, 9*3600, 14*3600);
 	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 6, 14*3600, 17*3600);
 	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 2, 17*3600, 23*3600);
@@ -110,7 +110,8 @@ public class ExternalControler {
 			Users users = new Users(this.getDirectoryExtIt(), networkFile);
 			
 			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
-			analysis.readEvents(operator, users);
+			analysis.readEvents(operator, users, this.day);
+			System.out.println(day.toString());
 			
 			users.analyzeScores();
 			operator.calculateScore();
@@ -150,17 +151,17 @@ public class ExternalControler {
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
 		}
 
-		ChartFileWriter chartWriter = new ChartFileWriter();
-		
-		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
-		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
-		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
-
-		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
-		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
-		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
-		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
+//		ChartFileWriter chartWriter = new ChartFileWriter();
+//		
+//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
+//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
+//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
+//
+//		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
+//		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
+//		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
+//		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
+//		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
 	}
 
 	/**

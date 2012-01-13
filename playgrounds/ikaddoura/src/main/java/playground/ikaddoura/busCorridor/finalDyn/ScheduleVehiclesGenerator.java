@@ -288,6 +288,9 @@ public class ScheduleVehiclesGenerator {
 		}
 		//-------------------------------------------------------------
 
+		for (TimePeriod t : this.day.values()){
+			t.setScheduleTakt(umlaufzeit / t.getNumberOfBuses());
+		}
 		
 		for (TimePeriod period : newDay.values()){
 			setDepartureIDs(routeId2transitRoute, "period_"+period.getOrderId(), period.getToTime(), period.getFromTime(), period.getNumberOfBuses(), createVehicles(period.getNumberOfBuses()));

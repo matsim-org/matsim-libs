@@ -23,6 +23,9 @@
  */
 package playground.ikaddoura.busCorridor.finalDyn;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -54,7 +57,7 @@ public class OperatorUserAnalysis {
 		this.network = scen.getNetwork();
 	}
 	
-	public void readEvents(Operator operator, Users users){
+	public void readEvents(Operator operator, Users users, Map<Integer, TimePeriod> day){
 		
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		DepartureArrivalEventHandler departureHandler = new DepartureArrivalEventHandler();
@@ -79,6 +82,7 @@ public class OperatorUserAnalysis {
 		operator.setNumberOfBusesFromEvents(transitHandler.getVehicleIDs().size()); // Anzahl der Busse aus den Events!		
 		operator.setVehicleKm(linksHandler.getVehicleKm()); // vehicle-km aus den Events!
 		operator.setVehicleHours(departureHandler.getVehicleHours()); // vehicle-hours aus den Events, nicht aus dem Fahrplan!
+		linksHandler.setTakt(day);
 		log.info("Operator analyzed.");
 		
 	}
