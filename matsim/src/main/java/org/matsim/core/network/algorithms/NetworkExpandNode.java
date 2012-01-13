@@ -412,6 +412,11 @@ public class NetworkExpandNode {
 							);
 		}
 		
+		@Override
+		public int hashCode() {
+			return this.fromLinkId.hashCode() & this.toLinkId.hashCode() & this.modes.hashCode();
+		}
+		
 	}
 	
 }
