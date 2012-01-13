@@ -90,6 +90,7 @@ public class ScheduleVehiclesGenerator {
 
 	private Map<Integer, Double> vehNr2lastPeriodDepTimeHin = new HashMap<Integer, Double>();
 	private int vehicleIndexLastDepartureHin = 0;
+	private double lastPeriodDepTimeHin = 0;
 	private int vehicleIndexRueck = 0;
 	private int periodNr = 0;
 
@@ -392,7 +393,7 @@ public class ScheduleVehiclesGenerator {
 								log.warn("No departure in last period! --> first Departure Time set to startTime!");
 							}
 							else {
-								firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;
+								firstDepartureTime = this.lastPeriodDepTimeHin + takt;
 							}
 							this.vehicleIndexRueck = vehicleIndex;
 						}
@@ -441,6 +442,7 @@ public class ScheduleVehiclesGenerator {
 							}
 							this.vehNr2lastPeriodDepTimeHin.put(vehicleIndex, departureTime);
 							this.vehicleIndexLastDepartureHin = vehicleIndex;
+							this.lastPeriodDepTimeHin = departureTime;
 						}
 						
 						departureTime = departureTime+takt;

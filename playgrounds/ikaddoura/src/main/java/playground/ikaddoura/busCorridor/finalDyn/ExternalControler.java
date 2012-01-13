@@ -44,7 +44,7 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int lastExternalIteration = 3;
+	static int lastExternalIteration = 0;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
