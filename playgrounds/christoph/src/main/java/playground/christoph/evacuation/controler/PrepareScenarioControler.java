@@ -20,32 +20,25 @@
 
 package playground.christoph.evacuation.controler;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
-import org.matsim.ptproject.qsim.QSim;
-import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.christoph.controler.KTIEnergyFlowsController;
-import playground.christoph.energyflows.controller.EnergyFlowsController;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
-import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
-import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
@@ -55,57 +48,43 @@ import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader
  * 
  * <ul>
  * 	<li>Creates vehicles on household level based on model from bjaeggi (writes vehicles file and add vehicles to households).</li>
- * 	<li>Adapts plans to have consistent leg mode chains - it is ensured, that for each car leg a vehicles is available</li>
- * 	<li>Ensures that within a household with n vehicles only n persons have car legs in their plans</li>
+ * 	<li>Adapts plans to have consistent leg mode chains - it is ensured, that for each car leg a vehicles is available.</li>
+ * 	<li>Ensures that within a household with n vehicles only n persons have car legs in their plans.</li>
  * </ul>
  * 
  * @author cdobler
  */
-//public class PrepareScenarioControler extends EnergyFlowsController implements StartupListener, ReplanningListener {
-public class PrepareScenarioControler extends KTIEnergyFlowsController implements StartupListener, ReplanningListener {
+public class PrepareScenarioControler extends KTIEnergyFlowsController implements StartupListener, IterationStartsListener, ReplanningListener {
 
+	protected String[] householdVehicleFiles = new String[] {
+			"Fahrzeugtypen_Kanton_AG.txt", "Fahrzeugtypen_Kanton_AI.txt", "Fahrzeugtypen_Kanton_AR.txt",
+			"Fahrzeugtypen_Kanton_BE.txt", "Fahrzeugtypen_Kanton_BL.txt", "Fahrzeugtypen_Kanton_BS.txt",
+			"Fahrzeugtypen_Kanton_FR.txt", "Fahrzeugtypen_Kanton_GE.txt", "Fahrzeugtypen_Kanton_GL.txt",
+			"Fahrzeugtypen_Kanton_GR.txt", "Fahrzeugtypen_Kanton_JU.txt", "Fahrzeugtypen_Kanton_LU.txt",
+			"Fahrzeugtypen_Kanton_NE.txt", "Fahrzeugtypen_Kanton_NW.txt", "Fahrzeugtypen_Kanton_OW.txt",
+			"Fahrzeugtypen_Kanton_SG.txt", "Fahrzeugtypen_Kanton_SH.txt", "Fahrzeugtypen_Kanton_SO.txt",
+			"Fahrzeugtypen_Kanton_SZ.txt", "Fahrzeugtypen_Kanton_TG.txt", "Fahrzeugtypen_Kanton_TI.txt",
+			"Fahrzeugtypen_Kanton_UR.txt", "Fahrzeugtypen_Kanton_VD.txt", "Fahrzeugtypen_Kanton_VS.txt",
+			"Fahrzeugtypen_Kanton_ZG.txt", "Fahrzeugtypen_Kanton_ZH.txt"};
 
-	protected String[] householdVehicleFiles = new String[]{
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AI.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_AR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BL.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_BS.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_FR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GL.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_GR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_JU.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_LU.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NE.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_NW.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_OW.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SH.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SO.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_SZ.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_TI.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_UR.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VD.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VS.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
-			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
-
-	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
-	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+//	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
+//	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
 	
-	protected AddZCoordinatesToNetwork zCoordinateAdder;
+//	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected LegModeChecker legModeChecker;
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
 	
 	public PrepareScenarioControler(String[] args) {
-		super(args);
-
+		// don't hand path to vehicles files over to super class
+		super(Arrays.copyOfRange(args, 0, 2));
+		
 		this.addCoreControlerListener(this);
+		
+		String vehiclesFilesPath = args[2];
+		if (!vehiclesFilesPath.endsWith("/")) vehiclesFilesPath = vehiclesFilesPath + "/";
+		for (int i = 0; i < householdVehicleFiles.length; i++) householdVehicleFiles[i] = vehiclesFilesPath + householdVehicleFiles[i];
 	}
 	
 	/*
@@ -130,6 +109,13 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 //		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
 //		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
 //		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
+		
+		/*
+		 * Remove all un-selected plans from agents' memories
+		 */
+		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
+			((PersonImpl) person).removeUnselectedPlans();
+		}
 		
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
@@ -169,6 +155,18 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		MobsimFactory mobsimFactory = new EvacuationQSimFactory();
 		this.setMobsimFactory(mobsimFactory);
+	}
+	
+	/*
+	 * PersonPrepareForSim is run before the first iteration is started.
+	 * There, some routes might be recalculated and their vehicleIds set to null.
+	 * As a result, we have to reassign the vehicles to the agents.
+	 */
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (event.getIteration() == this.config.controler().getFirstIteration()) {
+			this.assignVehiclesToPlans.reassignVehicles();
+		}
 	}
 	
 	/*

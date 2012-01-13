@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,6 +46,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
+	private static Logger log = Logger.getLogger(AssignVehiclesToPlans.class);
+	
 	private final Scenario scenario;
 	private final PlanAlgorithm routingAlgorithm;
 	private final Counter counter;
@@ -116,10 +119,11 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 				Leg leg = (Leg) planElement;
 				if (leg.getMode().equals(TransportMode.car)) {
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
-					if (route.getVehicleId() == null) {
-						System.out.println("Vehicle Id is null!");
-					} else if(!route.getVehicleId().toString().contains("_veh")) {
-						System.out.println("Unexpected vehicle Id!");
+					Id vehicleId = route.getVehicleId();
+					if (vehicleId == null) {
+						log.warn("Person " + plan.getPerson().getId().toString() + ": Vehicle Id is null!");
+					} else if(!vehicleId.toString().contains("_veh")) {
+						log.warn("Person " + plan.getPerson().getId().toString() + " has an unexpected vehicle Id: " + vehicleId.toString());
 					}
 				}
 			}
