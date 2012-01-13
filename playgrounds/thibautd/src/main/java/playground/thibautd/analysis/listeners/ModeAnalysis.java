@@ -127,7 +127,7 @@ public class ModeAnalysis implements
 	}
 
 	private void writeChart(final XYLineChart chart, final String fileName) {
-		XYChartUtils.integerXAxis(chart.getChart());
+		// XYChartUtils.integerXAxis(chart.getChart());
 		chart.addMatsimLogo();
 		chart.saveAsPng(fileName, width, height);
 	}
