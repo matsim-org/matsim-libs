@@ -47,6 +47,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -73,6 +74,8 @@ public class RunInternalizationTest {
 	private Scenario scenario;
 	private Controler controler;
 	private Vehicles emissionVehicles;
+	
+	EmissionScoringFunctionFactory emissionSff;
 
 	private void run() {
 		
@@ -89,10 +92,22 @@ public class RunInternalizationTest {
 		
 		this.controler = new Controler(this.scenario);
 		specifyControler();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles));
+		installScoringFunctionFactory();
+//		installTravelCostCalculatorFactory();
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles, emissionSff.getScoringFromEmissions()));
 		this.controler.run();
 	}
 
+	private void installTravelCostCalculatorFactory() {
+		TravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory();
+		controler.setTravelCostCalculatorFactory(emissionTccf);
+	}
+
+	private void installScoringFunctionFactory() {
+		emissionSff = new EmissionScoringFunctionFactory(controler);
+		controler.setScoringFunctionFactory(emissionSff);
+	}
+	
 	private void specifyControler() {
 	// controler settings	
 		controler.setOverwriteFiles(true);
@@ -102,7 +117,7 @@ public class RunInternalizationTest {
 		ControlerConfigGroup ccg = controler.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
 		ccg.setFirstIteration(0);
-		ccg.setLastIteration(1);
+		ccg.setLastIteration(10);
 		ccg.setMobsim("qsim");
 		Set set = new HashSet();
 		set.add(EventsFileFormat.xml);
