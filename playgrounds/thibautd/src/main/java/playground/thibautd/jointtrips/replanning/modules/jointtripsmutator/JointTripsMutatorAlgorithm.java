@@ -22,6 +22,7 @@ package playground.thibautd.jointtrips.replanning.modules.jointtripsmutator;
 import java.util.Map;
 import java.util.Random;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
@@ -40,13 +41,24 @@ import playground.thibautd.jointtrips.replanning.JointPlanAlgorithm;
  * @author thibautd
  */
 public class JointTripsMutatorAlgorithm extends JointPlanAlgorithm {
-	private final JointTripsMutatorConfigGroup params;
+	//private final JointTripsMutatorConfigGroup params;
+	private final Controler controler;
 	private final Random random;
 
+	private final double startProb;
+	private final double slope;
+
 	public JointTripsMutatorAlgorithm(
-			final JointTripsMutatorConfigGroup configGroup) {
-		params = configGroup;
+			final Controler controler) {
+		JointTripsMutatorConfigGroup params = (JointTripsMutatorConfigGroup)
+			controler.getConfig().getModule( JointTripsMutatorConfigGroup.GROUP_NAME );
 		random = MatsimRandom.getLocalInstance();
+		this.controler = controler;
+
+		startProb = params.getStartMutationProbability();
+		slope = (params.getEndMutationProbability() - startProb) /
+			(controler.getConfig().controler().getLastIteration() -
+			 controler.getConfig().controler().getFirstIteration() - 1);
 	}
 
 	@Override
@@ -54,7 +66,8 @@ public class JointTripsMutatorAlgorithm extends JointPlanAlgorithm {
 		Map<JointTripPossibility, Boolean> participation =
 			JointTripPossibilitiesUtils.getPerformedJointTrips( plan );
 
-		double prob = params.getMutationProbability();
+		double prob = startProb + slope * (controler.getIterationNumber() - 1);
+
 		for (Map.Entry<JointTripPossibility, Boolean> entry :
 				participation.entrySet() ) {
 			if (random.nextDouble() < prob) {

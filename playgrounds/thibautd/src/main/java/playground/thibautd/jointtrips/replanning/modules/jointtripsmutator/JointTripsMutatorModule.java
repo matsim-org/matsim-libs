@@ -20,6 +20,7 @@
 package playground.thibautd.jointtrips.replanning.modules.jointtripsmutator;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -30,21 +31,20 @@ import playground.thibautd.jointtrips.config.JointTripsMutatorConfigGroup;
  * @author thibautd
  */
 public class JointTripsMutatorModule extends AbstractMultithreadedModule {
-	private final JointTripsMutatorConfigGroup configGroup;
+	private final Controler controler;
 
 	/**
 	 * @param config the config for the current run
 	 */
 	public JointTripsMutatorModule(
-			final Config config) {
-		super( config.global() );
-		configGroup = (JointTripsMutatorConfigGroup)
-			config.getModule( JointTripsMutatorConfigGroup.GROUP_NAME );
+			final Controler controler) {
+		super( controler.getConfig().global() );
+		this.controler = controler;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new JointTripsMutatorAlgorithm( configGroup );
+		return new JointTripsMutatorAlgorithm( controler );
 	}
 }
 

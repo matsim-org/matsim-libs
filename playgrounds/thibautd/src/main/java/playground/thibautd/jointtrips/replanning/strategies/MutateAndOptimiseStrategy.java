@@ -51,7 +51,7 @@ public class MutateAndOptimiseStrategy extends JointPlanStrategy {
 			final Controler controler) {
 		super( extractSelector( controler.getConfig() ) );
 
-		addStrategyModule( new JointTripsMutatorModule( controler.getConfig() ) );
+		addStrategyModule( new JointTripsMutatorModule( controler ) );
 		addStrategyModule( new JointPlanOptimizerModule( controler ) );
 	}
 
