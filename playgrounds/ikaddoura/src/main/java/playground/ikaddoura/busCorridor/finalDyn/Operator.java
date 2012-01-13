@@ -36,7 +36,6 @@ public class Operator {
 	private final double COSTS_PER_VEH_HOUR = 33; // in AUD
 	private final double OVERHEAD_PERCENTAGE = 1.21; // on top of direct operating costs
 
-	private int extItNr;
 	private int capacity;
 	private int numberOfBuses;
 	private double profit;
@@ -50,8 +49,7 @@ public class Operator {
 	private double costsPerVehicleDay;
 	private double costsPerVehicleKm;
 
-	public Operator(int extItNr, int numberOfBuses, int capacity) {
-		this.extItNr = extItNr;
+	public Operator(int numberOfBuses, int capacity) {
 		this.setNumberOfBuses(numberOfBuses);
 		this.setCapacity(capacity);
 		this.costsPerVehicleDay = getCostsPerVehicleDay();

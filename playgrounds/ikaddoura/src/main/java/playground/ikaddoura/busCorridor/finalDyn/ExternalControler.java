@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author Ihab
@@ -107,7 +106,7 @@ public class ExternalControler {
 			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath, this.getMaxNumberOfBuses(), networkFile, fare);
 			internalControler.run();
 
-			Operator operator = new Operator(this.getExtItNr(), this.getMaxNumberOfBuses(), this.getCapacity());
+			Operator operator = new Operator(this.getMaxNumberOfBuses(), this.getCapacity());
 			Users users = new Users(this.getDirectoryExtIt(), networkFile);
 			
 			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
@@ -305,7 +304,5 @@ public class ExternalControler {
 	public void setDay(Map<Integer, TimePeriod> day) {
 		this.day = day;
 	}
-	
-	
 	
 }
