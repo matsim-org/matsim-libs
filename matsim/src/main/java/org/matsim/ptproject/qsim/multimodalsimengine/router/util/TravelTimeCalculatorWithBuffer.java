@@ -39,14 +39,12 @@ import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.EventsReaderTXTv1;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
-public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements BufferedTravelTime, AgentDepartureEventHandler {
+public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator implements BufferedTravelTime {
 
 	private static final Logger log = Logger.getLogger(TravelTimeCalculatorWithBuffer.class);
 
@@ -81,19 +79,11 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		}
 
 		// We use a new EventsManager where we only register the TravelTimeCalculator.
-		EventsManager eventsManager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(this);
 
 		log.info("Processing events file to get initial travel times...");
-		if (eventsFile.toLowerCase().endsWith(".txt") || eventsFile.toLowerCase().endsWith(".txt.gz")) {
-			EventsReaderTXTv1 reader = new EventsReaderTXTv1(eventsManager);
-			reader.readFile(eventsFile);		
-		} else if (eventsFile.toLowerCase().endsWith(".xml") || eventsFile.toLowerCase().endsWith(".xml.gz")) {
-			EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-			reader.parse(eventsFile);
-		}
-
-		eventsManager.removeHandler(this);
+		new MatsimEventsReader(eventsManager).readFile(eventsFile);
 	}
 
 	/*
@@ -140,6 +130,7 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 		return slice;
 	}
 
+	@Override
 	public double getBufferedLinkTravelTime(Link link, double time) {
 		double[] travelTimeArray = bufferedTravelTimes.get(link.getId());
 
@@ -165,7 +156,10 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	 */
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (!event.getLegMode().equals(TransportMode.car)) nonCarAgents.add(event.getPersonId());
+		if (!event.getLegMode().equals(TransportMode.car)) {
+			nonCarAgents.add(event.getPersonId());
+		}
+		super.handleEvent(event);
 	}
 
 	/*
@@ -183,7 +177,9 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	 */
 	@Override
 	public void handleEvent(final LinkEnterEvent e) {
-		if (!nonCarAgents.contains(e.getPersonId())) super.handleEvent(e);
+		if (!nonCarAgents.contains(e.getPersonId())) {
+			super.handleEvent(e);
+		}
 	}
 
 	/*
@@ -191,7 +187,9 @@ public class TravelTimeCalculatorWithBuffer extends TravelTimeCalculator impleme
 	 */
 	@Override
 	public void handleEvent(final LinkLeaveEvent e) {
-		if (!nonCarAgents.contains(e.getPersonId())) super.handleEvent(e);
+		if (!nonCarAgents.contains(e.getPersonId())) {
+			super.handleEvent(e);
+		}
 	}
 
 	/*
