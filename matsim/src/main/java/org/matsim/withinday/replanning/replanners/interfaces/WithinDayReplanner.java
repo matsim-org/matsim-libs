@@ -133,13 +133,17 @@ public abstract class WithinDayReplanner<T extends AgentsToReplanIdentifier>
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override	
 	public boolean equals(Object o) {
 		if (o instanceof WithinDayReplanner) {
-			WithinDayReplanner<AgentsToReplanIdentifier> replanner = (WithinDayReplanner<AgentsToReplanIdentifier>) o;
+			WithinDayReplanner<?> replanner = (WithinDayReplanner<?>) o;
 			return replanner.getId().equals(this.getId());
 		}
 		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getId().hashCode();
 	}
 }
