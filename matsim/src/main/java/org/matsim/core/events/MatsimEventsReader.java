@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import java.util.Locale;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -56,9 +57,10 @@ public class MatsimEventsReader implements MatsimSomeReader {
 	 * @param filename The name of the file to parse.
 	 */
 	public void readFile(final String filename) {
-		if (filename.endsWith(".txt") || filename.endsWith(".txt.gz")) {
+		String lcFilename = filename.toLowerCase(Locale.ROOT);
+		if (lcFilename.endsWith(".txt") || lcFilename.endsWith(".txt.gz")) {
 			new EventsReaderTXTv1(this.events).readFile(filename);
-		} else if (filename.endsWith(".xml") || filename.endsWith(".xml.gz")) {
+		} else if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz")) {
 			new XmlEventsReader(this.events).readFile(filename);
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
