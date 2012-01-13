@@ -450,7 +450,9 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		Set<Feature> featureSet = FeatureSHP.readFeatures(psrcSHPFile);
 		logger.info("Extracting boundary of the shape file ...");
 		Geometry boundary = featureSet.iterator().next().getDefaultGeometry();
-		boundary.setSRID( Constants.SRID_WASHINGTON_NORTH );
+		// boundary.setSRID( Constants.SRID_WASHINGTON_NORTH );
+		boundary.setSRID( Constants.SRID_SWITZERLAND );
+		logger.warn("Using SRID of Switzerland: " + Constants.SRID_SWITZERLAND);
 		logger.info("Done extracting boundary ...");
 		
 		return boundary;
