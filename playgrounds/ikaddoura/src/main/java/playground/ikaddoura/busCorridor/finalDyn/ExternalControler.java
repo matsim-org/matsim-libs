@@ -44,14 +44,14 @@ public class ExternalControler {
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
-	static int lastExternalIteration = 0;
+	static int lastExternalIteration = 3;
 	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 8, 6*3600, 9*3600);
-	TimePeriod p3 = new TimePeriod(3, "NVZ", 3, 9*3600, 14*3600);
-	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 7, 14*3600, 17*3600);
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 6, 6*3600, 9*3600);
+	TimePeriod p3 = new TimePeriod(3, "NVZ", 2, 9*3600, 14*3600);
+	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 6, 14*3600, 17*3600);
 	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 2, 17*3600, 23*3600);
 
 	private double fare = -2.5; // negative!
@@ -135,10 +135,10 @@ public class ExternalControler {
 			if (this.getExtItNr() < lastExternalIteration){
 				
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
-				
+//				
 				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
 				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
-//
+
 				this.setDay(extend("HVZ_1", 60 * 60));
 				this.setDay(extend("HVZ_2", 60 * 60));
 				

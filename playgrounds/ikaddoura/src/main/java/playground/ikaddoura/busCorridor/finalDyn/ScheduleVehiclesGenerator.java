@@ -273,10 +273,10 @@ public class ScheduleVehiclesGenerator {
 				removePeriods.add(pNr);
 			}
 		}
-		
 		for (Integer pNr : removePeriods){
 			this.day.remove(pNr);
 		}
+		//-------------------------------------------------------------
 
 		// die PeriodNr in eine Reihenfolge bringen
 		int nr = 1;
@@ -285,6 +285,8 @@ public class ScheduleVehiclesGenerator {
 			this.newDay.put(nr, t);
 			nr++;
 		}
+		//-------------------------------------------------------------
+
 		
 		for (TimePeriod period : newDay.values()){
 			setDepartureIDs(routeId2transitRoute, "period_"+period.getOrderId(), period.getToTime(), period.getFromTime(), period.getNumberOfBuses(), createVehicles(period.getNumberOfBuses()));
@@ -302,10 +304,10 @@ public class ScheduleVehiclesGenerator {
 		if (numberOfBusesZeitraum > 0){
 			log.info("Number of buses in time period "+periodNr+": "+numberOfBusesZeitraum);
 			
-			//-----------
+			//-------------------------------------------------------------
 			double takt = umlaufzeit / numberOfBusesZeitraum; //sec
 			log.info("Takt für diesen Zeitraum: "+Time.writeTime(takt, Time.TIMEFORMAT_HHMMSS));
-			//------------
+			//-------------------------------------------------------------
 
 			double departureTime = 0;
 			double firstDepartureTime = 0;
@@ -325,28 +327,61 @@ public class ScheduleVehiclesGenerator {
 					if (newDay.get(periodNr-1).getNumberOfBuses() >= 0){
 						if (newDay.get(periodNr-1).getNumberOfBuses() > numberOfBusesZeitraum){
 							// weniger Busse als in der Periode davor
-							System.out.println("vorherigePeriode (Index): "+this.vehicleIndexLastDepartureHin);
-//							System.out.println("vorherigePeriode (ID): "+vehicleIDsZeitraum.get(this.vehicleIndexLastDeparture));
-
+							
 							if (this.vehicleIndexLastDepartureHin == 0){
 								vehicleIndex = vehicleIDsZeitraum.size()-1;
-								System.out.println("111 jetzt vehicleIndex: "+vehicleIndex);
-								System.out.println("111 jetzt (ID): "+vehicleIDsZeitraum.get(vehicleIndex));
 							}
 							else {
 								System.out.println("vehIDsZeitraum: "+vehicleIDsZeitraum);
 								System.out.println("size: "+vehicleIDsZeitraum.size());
 								vehicleIndex = this.vehicleIndexLastDepartureHin-1;
 								
-								for (int i = 0; vehicleIDsZeitraum.size()-1 < vehicleIndex; i++){
-									vehicleIndex = vehicleIndex - 1;
+								if (vehicleIDsZeitraum.size()-1 < vehicleIndex){
+									for (int i = 0; vehicleIDsZeitraum.size()-1 < vehicleIndex; i++){
+										vehicleIndex = vehicleIndex - 1;
+									}
 								}
-								System.out.println("222 vehicleIndex nach do-schleife: "+vehicleIndex);
-								System.out.println("222 jetzt (ID): "+vehicleIDsZeitraum.get(vehicleIndex));
 							}
 							
-							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit;
+							System.out.println(vehicleIDsZeitraum.toString());
+							Map<Integer,Double> vehNr2minimalFirstDeparture = new HashMap<Integer, Double>();
+							
+							int vehNr = 0;
+							for (Id vehID : vehicleIDsZeitraum){
+								double depNotBefore = this.vehNr2lastPeriodDepTimeHin.get(vehNr) + umlaufzeit;
+								System.out.println("vehNr: "+vehNr+" / lastPeriodDepTime: " + Time.writeTime(this.vehNr2lastPeriodDepTimeHin.get(vehNr), Time.TIMEFORMAT_HHMMSS) + " / no departure before: "+Time.writeTime(depNotBefore, Time.TIMEFORMAT_HHMMSS));
+								vehNr2minimalFirstDeparture.put(vehNr, depNotBefore);
+								vehNr++;
+							}
 							this.vehicleIndexRueck = vehicleIndex;
+							
+							
+							double maximalAufschlag = 0;
+							double firstDepartureTimeTmp = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit;
+							int vehNummer = vehicleIndex;
+							for (int zz = 0; zz < vehicleIDsZeitraum.size(); zz++){
+								System.out.println("*** vehNummer: "+vehNummer+" --> " +vehicleIDsZeitraum.get(vehNummer));
+								System.out.println("firstDepartureTimeTmp: "+Time.writeTime(firstDepartureTimeTmp, Time.TIMEFORMAT_HHMMSS)); 
+								System.out.println("first departure not before: "+Time.writeTime(vehNr2minimalFirstDeparture.get(vehNummer), Time.TIMEFORMAT_HHMMSS)); 
+								double aufschlag = 0;
+								if (firstDepartureTimeTmp < vehNr2minimalFirstDeparture.get(vehNummer)){
+									aufschlag = vehNr2minimalFirstDeparture.get(vehNummer) - firstDepartureTimeTmp;
+									System.out.println("Aufschlag = "+aufschlag);
+								}
+								if (aufschlag > maximalAufschlag){
+									maximalAufschlag = aufschlag;
+								}
+								firstDepartureTimeTmp = firstDepartureTimeTmp + takt;
+								
+								if (vehNummer == 0){
+									vehNummer = vehicleIDsZeitraum.size()-1;
+								}
+								else {
+									vehNummer--;
+								}
+							}
+							System.out.println("maximalAufschlag: "+maximalAufschlag);
+							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit + maximalAufschlag;
 						}
 
 						else if (newDay.get(periodNr-1).getNumberOfBuses() < numberOfBusesZeitraum){
