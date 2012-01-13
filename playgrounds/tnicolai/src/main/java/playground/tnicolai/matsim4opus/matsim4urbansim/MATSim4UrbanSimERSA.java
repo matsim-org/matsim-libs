@@ -227,13 +227,14 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		gridSizeInMeter = 1000.; // default value, if nothing else is given (1000m)
 		
 		try{
+			logger.warn("No conversion from meter to feed for the Zurich sceanrio!");
 			if(args.length >= 3){
 				gridSizeInMeter = Double.parseDouble( args[2].trim() );
-				gridSizeInFeet = gridSizeInMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR;
-				logger.info("The grid size was set to " + gridSizeInMeter + " meter (this approximately corresponds to " + gridSizeInFeet + " feet).");
+				gridSizeInFeet = gridSizeInMeter; //* Constants.METER_IN_FEET_CONVERSION_FACTOR;
+				// logger.info("The grid size was set to " + gridSizeInMeter + " meter (this approximately corresponds to " + gridSizeInFeet + " feet).");
 			} else{
-				gridSizeInFeet = gridSizeInMeter * Constants.METER_IN_FEET_CONVERSION_FACTOR;
-				logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSizeInMeter + " meter (default setting)! This approximately corresponds to " + gridSizeInFeet + " feet.");
+				gridSizeInFeet = gridSizeInMeter; //* Constants.METER_IN_FEET_CONVERSION_FACTOR;
+				// logger.warn("No parameter for the grid size was given. The grid size is set to " + gridSizeInMeter + " meter (default setting)! This approximately corresponds to " + gridSizeInFeet + " feet.");
 			}
 		} catch (NumberFormatException nfe){
 			nfe.printStackTrace();
