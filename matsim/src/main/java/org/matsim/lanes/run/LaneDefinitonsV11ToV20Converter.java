@@ -86,43 +86,6 @@ public class LaneDefinitonsV11ToV20Converter {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	private static void convertTests(){
-		String base = "./test/input/org/matsim/";
-
-		//fourWaysTest
-		String inputDir = base + "signalsystems/TravelTimeFourWaysTest/";
-		
-		String net = inputDir + "network.xml.gz";
-		String lanes = inputDir + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = inputDir + "testLaneDefinitions_v2.0.xml";
-		
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, net);
-		
-		//one agent test
-		inputDir = base + "signalsystems/SignalSystemsOneAgentTest/";
-		net = inputDir + "network.xml.gz";
-		lanes = inputDir + "testLaneDefinitions_v1.1.xml";
-		lanes20 = inputDir + "testLaneDefinitions_v2.0.xml";
-
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, net);
-		
-		//travel time one way test
-		inputDir = base + "signalsystems/TravelTimeOneWayTest/";
-		net = inputDir + "network.xml.gz";
-		lanes = inputDir + "testLaneDefinitions_v1.1.xml";
-		lanes20 = inputDir + "testLaneDefinitions_v2.0.xml";
-
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, net);
-		//signalsystems integration test
-		inputDir = base + "integration/signalsystems/SignalSystemsIntegrationTest/";
-		net = inputDir + "network.xml.gz";
-		lanes = inputDir + "testLaneDefinitions_v1.1.xml";
-		lanes20 = inputDir + "testLaneDefinitions_v2.0.xml";
-
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, net);
-	}
 
 	private static void printUsage(){
 		log.info("Expects three arguments:");
@@ -131,11 +94,7 @@ public class LaneDefinitonsV11ToV20Converter {
 		log.info("  path to network file");
 	}
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-//		convertTests();
 		if (args.length != 3){
 			printUsage();
 		}
