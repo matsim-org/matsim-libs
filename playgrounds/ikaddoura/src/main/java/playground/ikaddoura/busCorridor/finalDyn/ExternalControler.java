@@ -84,10 +84,10 @@ public class ExternalControler {
 	private void externalIteration() throws IOException {
 		
 		day.put(p1.getOrderId(), p1);
-		day.put(p2.getOrderId(), p2);
-		day.put(p3.getOrderId(), p3);
-		day.put(p4.getOrderId(), p4);
-		day.put(p5.getOrderId(), p5);
+//		day.put(p2.getOrderId(), p2);
+//		day.put(p3.getOrderId(), p3);
+//		day.put(p4.getOrderId(), p4);
+//		day.put(p5.getOrderId(), p5);
 		
 		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
 			
@@ -111,7 +111,6 @@ public class ExternalControler {
 			
 			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
 			analysis.readEvents(operator, users, this.day);
-			System.out.println(day.toString());
 			
 			users.analyzeScores();
 			operator.calculateScore();
@@ -139,7 +138,7 @@ public class ExternalControler {
 //				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
 //				
 				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
-				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
+				this.setDay(increaseBuses("HVZ_2", 1)); // id, number of buses
 
 				this.setDay(extend("HVZ_1", 60 * 60));
 				this.setDay(extend("HVZ_2", 60 * 60));
@@ -151,24 +150,19 @@ public class ExternalControler {
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
 		}
 
-//		ChartFileWriter chartWriter = new ChartFileWriter();
-//		
-//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
-//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
-//		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
-//
-//		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
-//		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
-//		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
-//		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
-//		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
+		ChartFileWriter chartWriter = new ChartFileWriter();
+		
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2capacity, "Vehicle capacity per iteration", "Capacity");
+		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2fare, "Bus fare per iteration", "Fare");
+
+		chartWriter.writeChart_LegModes(outputExternalIterationDirPath, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs);
+		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
+		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
+		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
+		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
 	}
 
-	/**
-	 * @param i
-	 * @param j
-	 * @return
-	 */
 	private Map<Integer, TimePeriod> increaseBuses(String periodId, int increase) {
 		Map<Integer, TimePeriod> dayMod = this.getDay();	
 		int period = 0;
@@ -183,11 +177,6 @@ public class ExternalControler {
 		return dayMod;
 	}
 
-	/**
-	 * @param i
-	 * @param j
-	 * @return
-	 */
 	private Map<Integer, TimePeriod> extend(String periodId, double time) {
 		Map<Integer, TimePeriod> dayNextExtIt = this.getDay();	
 		int period = 0;

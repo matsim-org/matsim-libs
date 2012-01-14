@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 public class VehicleScheduleWriter {
 	
-	private final static Logger log = Logger.getLogger(Operator.class);
+	private final static Logger log = Logger.getLogger(VehicleScheduleWriter.class);
 	private String networkFile;
 	private String directoryExtIt;
 	private int capacity;
@@ -82,7 +82,7 @@ public class VehicleScheduleWriter {
 	
 		generator.setStopTime(20); // for schedule!
 		generator.setScheduleSpeed(8.33333); // for schedule!
-		generator.setPausenzeit(0*60);
+		generator.setPausenzeit(5*60);
 		generator.setNetworkFile(networkFile);
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");

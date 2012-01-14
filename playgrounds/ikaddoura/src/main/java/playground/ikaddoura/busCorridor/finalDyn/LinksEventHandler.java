@@ -34,7 +34,6 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author Ihab
@@ -44,7 +43,6 @@ public class LinksEventHandler implements LinkLeaveEventHandler, LinkEnterEventH
 	private double vehicleKm;
 	private Network network;
 	private Map<Id, List<Double>> linkId2linkLeaveTime = new HashMap<Id, List<Double>>();
-	
 	
 	public LinksEventHandler(Network network) {
 		this.network = network;
@@ -84,9 +82,7 @@ public class LinksEventHandler implements LinkLeaveEventHandler, LinkEnterEventH
 		return this.vehicleKm;
 	}
 
-	public void setTakt(Map<Integer, TimePeriod> day) {
-		System.out.println(this.linkId2linkLeaveTime);
-		
+	public void setTakt(Map<Integer, TimePeriod> day) {		
 		for (TimePeriod period : day.values()){
 			Map<Id, List<Double>> linkId2diff = new HashMap<Id, List<Double>>();
 			double fromTime = period.getFromTime();

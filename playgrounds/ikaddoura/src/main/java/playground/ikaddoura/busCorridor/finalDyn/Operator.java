@@ -24,6 +24,7 @@
 package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author Ihab
@@ -69,7 +70,8 @@ public class Operator {
 	}
 
 	public void calculateScore() {
-		
+		log.info("Vehicle-km: "+this.getVehicleKm());
+		log.info("Veh-Time: "+Time.writeTime(this.getVehicleHours()*60*60 , Time.TIMEFORMAT_HHMMSS));
 		this.costs = (numberOfBusesFromEvents * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
 		this.profit = this.getEarnings() - this.getCosts();
 

@@ -65,7 +65,7 @@ import org.matsim.vehicles.Vehicles;
  */
 public class ScheduleVehiclesGenerator {
 	
-	private final static Logger log = Logger.getLogger(Operator.class);
+	private final static Logger log = Logger.getLogger(ScheduleVehiclesGenerator.class);
 			
 	private double stopTime;
 	private String networkFile;
