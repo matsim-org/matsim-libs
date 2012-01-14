@@ -73,8 +73,10 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		try {
 			stream = IOUtils.getInputstream(filename);
 			xmlatdefs = (XMLAmberTimes) u.unmarshal(stream);
-		} catch (Exception ex) {
-			ex.printStackTrace();
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+			// do not generically catch (and swallow) exception, but let it escalate
+			// if it is just printed out here, a NullPointerException will happen a few lines later, which is not really better.
 		} finally {
 			try {
 				if (stream != null) {
