@@ -61,6 +61,11 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Per
 		return this.vehicleId;
 	}
 
+	/**
+	 * @deprecated PersonEntersVehicleEvent is a generic event, and not transit-specific, so this is wrong here
+	 * @return
+	 */
+	@Deprecated
 	public Id getTransitRouteId() {
 		return transitRouteId;
 	}

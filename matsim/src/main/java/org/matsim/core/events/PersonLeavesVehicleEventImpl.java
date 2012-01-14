@@ -61,7 +61,12 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
-	
+
+	/**
+	 * @return
+	 * @deprecated This event is not specific to transit, so this info is wrong here
+	 */
+	@Deprecated
 	public Id getTransitRouteId() {
 		return this.transitRouteId;
 	}
