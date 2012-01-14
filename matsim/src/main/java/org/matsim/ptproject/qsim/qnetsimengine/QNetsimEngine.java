@@ -20,6 +20,7 @@
 
 package org.matsim.ptproject.qsim.qnetsimengine;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,7 +54,7 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavi
  */
 public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
-	private static final class NodeIdComparator implements Comparator<QNode> {
+	private static final class NodeIdComparator implements Comparator<QNode>, Serializable {
 		@Override
 		public int compare(final QNode o1, final QNode o2) {
 			return o1.getNode().getId().compareTo(o2.getNode().getId());
@@ -199,6 +200,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		}
 	}
 
+	@Override
 	public void afterSim() {
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -214,6 +216,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
 	 */
+	@Override
 	public void doSimStep(final double time) {
 		moveNodes(time);
 		moveLinks(time);
