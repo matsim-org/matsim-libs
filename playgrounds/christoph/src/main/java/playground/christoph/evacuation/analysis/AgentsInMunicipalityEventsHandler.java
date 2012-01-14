@@ -173,7 +173,11 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		    	// write header
 		    	bw.write("time");
 		    	bw.write(separator);
-		    	bw.write("agents inside area");
+		    	bw.write("total inside area");
+		    	bw.write(separator);
+		    	bw.write("residents inside area");
+		    	bw.write(separator);
+		    	bw.write("commuters inside area");
 		    	bw.write(newLine);
 		    	
 		    	// write statistics before first event
@@ -184,7 +188,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 			}
 	}
 	
-	public void afterEventsEventsReading() {
+	public void afterEventsReading() {
 		 try {
 		    	// write statistics after last event
 		    	printStatistics();
@@ -228,7 +232,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		if (isInside) insideAgents.add(event.getPersonId());
 	}
 	
-
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		checkTime(event);
@@ -301,16 +304,26 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	private void printStatistics() {
 		try {
+			int residents = 0;
+			for (Id insideAgent : insideAgents) {
+				if (residentAgents.contains(insideAgent)) residents++;
+			}
+			
 			bw.write(String.valueOf(currentSecond));
 			bw.write(separator);
 			bw.write(String.valueOf(insideAgents.size()));
+			bw.write(separator);
+			bw.write(String.valueOf(residents));
+			bw.write(separator);
+			bw.write(String.valueOf(insideAgents.size() - residents));
 			bw.write(newLine);
 			
 			if (currentSecond <= maxTime) {
 				PlotData pd = new PlotData();
 				pd.time = currentSecond;
-				pd.agentCount = insideAgents.size();
-				plotData.add(pd);				
+				pd.residentAgentCount = residents;
+				pd.commuterAgentCount = insideAgents.size() - residents;
+				plotData.add(pd);
 			}
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -327,20 +340,26 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	private JFreeChart getGraphic() {
 		final XYSeriesCollection xyData = new XYSeriesCollection();
-		final XYSeries insideSerie = new XYSeries("inside area", false, true);
+		final XYSeries insideSerie = new XYSeries("total inside area", false, true);
+		final XYSeries residentsSerie = new XYSeries("residents inside area", false, true);
+		final XYSeries commutersSerie = new XYSeries("commuters inside area", false, true);
 
 		for (int i = 0; i < plotData.size(); i++) {
 			PlotData pd = plotData.get(i);
 			double hour = pd.time / 3600.0;
-			insideSerie.add(hour, pd.agentCount);
+			insideSerie.add(hour, pd.commuterAgentCount + pd.residentAgentCount);
+			residentsSerie.add(hour, pd.residentAgentCount);
+			commutersSerie.add(hour, pd.commuterAgentCount);
 		}
 		xyData.addSeries(insideSerie);
+		xyData.addSeries(residentsSerie);
+		xyData.addSeries(commutersSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(
         "agents inside area", "time [hour]", "# agents",
         xyData,
         PlotOrientation.VERTICAL,
-        false,   // legend
+        true,   // legend
         false,   // tooltips
         false   // urls
     );
@@ -357,6 +376,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	private static class PlotData {
 		int time;
-		int agentCount;
+		int commuterAgentCount;
+		int residentAgentCount;
 	}
 }
