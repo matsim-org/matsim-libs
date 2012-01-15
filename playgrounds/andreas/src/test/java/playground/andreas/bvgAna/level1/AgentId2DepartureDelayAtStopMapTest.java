@@ -27,8 +27,6 @@ public class AgentId2DepartureDelayAtStopMapTest {
         
 //        assign Ids to routes, vehicles and agents to be used in Test
         
-        Id routeId1 = ida[2];
-        Id routeId2 = ida[3];
         Id vehId1 = ida[4];
         Id vehId2 = ida[1];
         Id persId1 = ida[0];
@@ -47,9 +45,9 @@ public class AgentId2DepartureDelayAtStopMapTest {
 		AgentDepartureEvent event4 = ef.createAgentDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
 		handler.handleEvent(event4);
         
-        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2.9*3600, persId1, vehId1, routeId1);
+        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
         handler.handleEvent(event1);
-        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1*3600, persId2, vehId2, routeId2);
+        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1*3600, persId2, vehId2);
         handler.handleEvent(event2);
         
 //        run tests

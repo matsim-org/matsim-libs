@@ -265,7 +265,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
-					agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
+					agent.getId(), this.vehicle.getVehicle().getId()));
 		}
 		return handled;
 	}
@@ -276,7 +276,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		if(handled){
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.sim.getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId(), this.getTransitRoute().getId()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getVehicle().getId()));
 			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 			agent.endLegAndAssumeControl(time);
 			((TransitQSimEngine)this.trEngine).internalInterface.arrangeNextAgentState(agent) ;
@@ -390,6 +390,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, Passe
 		}
 
 		@Override
+		@Deprecated
 		public double getDistance() {
 			return this.delegate.getDistance();
 		}

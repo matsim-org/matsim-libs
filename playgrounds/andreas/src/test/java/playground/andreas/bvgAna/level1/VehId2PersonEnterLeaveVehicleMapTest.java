@@ -37,19 +37,15 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 	    Id persId2 = ida[5];
 	    Id persId3 = ida[6];
 	    Id persId4 = ida[7];
-	    Id transitRouteId1 = ida[14];
-	    Id transitRouteId2 = ida[2];
-	    Id transitRouteId3 = ida[4];
-	    Id transitRouteId4 = ida[6];
 
 //	    create events
 	    
 	    EventsFactoryImpl ef = new EventsFactoryImpl();
 	    
-	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2., persId1, vehId1, transitRouteId1);
-	    PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1, persId2, vehId1, transitRouteId2);  
-	    PersonLeavesVehicleEvent event3 = ef.createPersonLeavesVehicleEvent(2.2, persId3, vehId2, transitRouteId3);
-	    PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(2.3, persId4, vehId2, transitRouteId4);
+	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2., persId1, vehId1);
+	    PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1, persId2, vehId1);  
+	    PersonLeavesVehicleEvent event3 = ef.createPersonLeavesVehicleEvent(2.2, persId3, vehId2);
+	    PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(2.3, persId4, vehId2);
 	    
 //	    create instance of class to be tested
 	    

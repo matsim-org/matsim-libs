@@ -19,15 +19,18 @@
 
 package playground.taxicab;
 
-import org.apache.log4j.*;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.basic.v01.*;
-import org.matsim.core.events.*;
-import org.matsim.core.mobsim.framework.*;
-import org.matsim.ptproject.qsim.*;
-import org.matsim.ptproject.qsim.interfaces.*;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsFactoryImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
+import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
  * @author nagel
@@ -185,8 +188,7 @@ public class TaxicabAgent implements MobsimDriverAgent, DispatcherTaxiRequestEve
 		} else if ( this.expectedPassengerId==null && this.currentPassenger!=null ) {
 			// (= passenger on board, but having no request)
 			
-			events.processEvent( evFac.createPersonLeavesVehicleEvent(now, this.currentPassenger.getId(), this.vehicle.getId(), 
-					this.getId() ) ) ;
+			events.processEvent( evFac.createPersonLeavesVehicleEvent(now, this.currentPassenger.getId(), this.vehicle.getId()));
 			
 			this.currentPassenger.notifyTeleportToLink(this.currentLinkId) ;
 //			this.currentPassenger.endLegAndAssumeControl(now) ;

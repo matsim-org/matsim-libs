@@ -20,38 +20,35 @@
 
 package playground.mmoyo.cadyts_integration.ptBseAsPlanStrategy;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.pt.counts.SimpleWriter;
-import org.xml.sax.SAXException;
 
 /**
  *   Collects occupancy data of transit-line stations 
  *
  */
-public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler, 
+public class PtBseOccupancyAnalyzer implements TransitDriverStartsEventHandler, 
+										PersonEntersVehicleEventHandler, 
 										PersonLeavesVehicleEventHandler, 
 										VehicleArrivesAtFacilityEventHandler,
 										VehicleDepartsAtFacilityEventHandler{ 
@@ -64,6 +61,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	private static String HEADER = "time\tvehId\tStopId\tno.ofPassengersInVeh\n";
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final static String STR_M44 = "M44";
+	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
 	
 	public PtBseOccupancyAnalyzer() {
 		this.timeBinSize = 3600;
@@ -77,12 +75,18 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 		this.occupancies.clear();
 		this.veh_stops.clear();
 		this.occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
+		this.vehToRouteId.clear();
+	}
+	
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
 	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		//only specific transit line
-		Id transitLineId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
@@ -98,7 +102,7 @@ public class PtBseOccupancyAnalyzer implements PersonEntersVehicleEventHandler,
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		//only specific transit line
-		Id transitLineId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}

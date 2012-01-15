@@ -126,30 +126,13 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 		} else if (PersonEntersVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
 			String personString = atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_PERSON);
 			String vehicleString = atts.getValue(PersonEntersVehicleEventImpl.ATTRIBUTE_VEHICLE);
-			String transitRouteString = atts.getValue(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID);
-			if (transitRouteString != null) {
-				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
-						new IdImpl(personString),
-						new IdImpl(vehicleString),
-						new IdImpl(transitRouteString)));
-			}
-			else {
-				this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
-						new IdImpl(personString),
-						new IdImpl(vehicleString), null));
-			}
+			this.events.processEvent(this.builder.createPersonEntersVehicleEvent(time,
+					new IdImpl(personString),
+					new IdImpl(vehicleString)));
 		} else if (PersonLeavesVehicleEventImpl.EVENT_TYPE.equals(eventType)) {
 			IdImpl pId = new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_PERSON));
 			IdImpl vId = new IdImpl(atts.getValue(PersonLeavesVehicleEventImpl.ATTRIBUTE_VEHICLE));
-			String transitRouteString = atts.getValue(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID);
-			if (transitRouteString != null) {
-				this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time, pId, vId,
-						new IdImpl(transitRouteString)));
-			}
-			else {
-				this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time,
-						pId, vId, null));
-			}
+			this.events.processEvent(this.builder.createPersonLeavesVehicleEvent(time, pId, vId));
 		}
 		else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);

@@ -55,6 +55,8 @@ import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavi
 public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 
 	private static final class NodeIdComparator implements Comparator<QNode>, Serializable {
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public int compare(final QNode o1, final QNode o2) {
 			return o1.getNode().getId().compareTo(o2.getNode().getId());
@@ -345,8 +347,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	void letAgentArrive(QVehicle veh) {
 		double now = qsim.getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		Id transitRouteId = null;
-		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId(), transitRouteId));		
+		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));		
 		driver.endLegAndAssumeControl(now);
 		this.internalInterface.arrangeNextAgentState(driver) ;
 	}

@@ -33,21 +33,16 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Per
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String TRANSIT_ROUTE_ID = "transitRouteId";
 	private final Id vehicleId;
-	private Id transitRouteId = null;
 
-	/*package*/ PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId, Id transitRouteId) {
+	/*package*/ PersonEntersVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
-		this.transitRouteId = transitRouteId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		if (this.transitRouteId != null){
-			attrs.put(TRANSIT_ROUTE_ID, this.transitRouteId.toString());
-		}
 		return attrs;
 	}
 
@@ -59,15 +54,6 @@ public class PersonEntersVehicleEventImpl extends PersonEventImpl implements Per
 	@Override
 	public Id getVehicleId() {
 		return this.vehicleId;
-	}
-
-	/**
-	 * @deprecated PersonEntersVehicleEvent is a generic event, and not transit-specific, so this is wrong here
-	 * @return
-	 */
-	@Deprecated
-	public Id getTransitRouteId() {
-		return transitRouteId;
 	}
 
 }

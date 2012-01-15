@@ -34,21 +34,16 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id vehicleId;
-	private Id transitRouteId = null;
 
-	public PersonLeavesVehicleEventImpl(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
+	public PersonLeavesVehicleEventImpl(final double time, final Id personId, final Id vehicleId) {
 		super(time, personId);
 		this.vehicleId = vehicleId;
-		this.transitRouteId = transitRouteId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
 		attrs.put(ATTRIBUTE_VEHICLE, this.vehicleId.toString());
-		if (this.transitRouteId != null){
-			attrs.put(PersonEntersVehicleEventImpl.TRANSIT_ROUTE_ID, this.transitRouteId.toString());
-		}
 		return attrs;
 	}
 
@@ -61,15 +56,5 @@ public class PersonLeavesVehicleEventImpl extends PersonEventImpl implements Per
 	public Id getVehicleId() {
 		return this.vehicleId;
 	}
-
-	/**
-	 * @return
-	 * @deprecated This event is not specific to transit, so this info is wrong here
-	 */
-	@Deprecated
-	public Id getTransitRouteId() {
-		return this.transitRouteId;
-	}
-	
 
 }

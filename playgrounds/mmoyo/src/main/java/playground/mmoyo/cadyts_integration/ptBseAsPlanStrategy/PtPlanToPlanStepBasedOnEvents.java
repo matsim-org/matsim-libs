@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -55,7 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.mmoyo.utils.ExpTransRouteUtils;
 import cadyts.demand.PlanBuilder;
 
-class PtPlanToPlanStepBasedOnEvents implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
+class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 {
 	private static final Logger log = Logger.getLogger(PtPlanToPlanStepBasedOnEvents.class);
@@ -80,6 +80,9 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 	private final static String STR_M44 = "M44";
 	private final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private final String STR_ITERATION = "iteration";
+	
+	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
+
 	
 	PtPlanToPlanStepBasedOnEvents(Scenario sc/*, PtBseOccupancyAnalyzer delOcupAnalizer 18.jul.2011*/) {
 		this.sc = sc ;
@@ -115,12 +118,18 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 		log.warn("(above values may both be at zero for a couple of iterations if multiple plans per agent all have no score)") ;
 
 		personsFromVehId.clear();
+		this.vehToRouteId.clear();
 		//this.delegOcupAnalizer.reset(iteration);    //it is not needed 18.jul.2011
 	}
 
 	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+	}
+
+	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id transitLineId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}
@@ -130,7 +139,7 @@ VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id transitLineId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitLineId = this.vehToRouteId.get(event.getVehicleId());;
 		if ( !transitLineId.toString().contains(STR_M44)) {
 			return ;
 		}

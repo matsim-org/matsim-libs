@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,22 +14,22 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.PersonEntersVehicleEventImpl;
 import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.PersonLeavesVehicleEventImpl;
+import org.matsim.core.events.TransitDriverStartsEvent;
 import org.matsim.core.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.pt.counts.OccupancyAnalyzer;
 
 import playground.mmoyo.io.TextFileWriter;
 
 
 /** identifies passengers who traveled along a stop reading an event file*/
-public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandler,
+public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandler, 
+											PersonEntersVehicleEventHandler,
 											PersonLeavesVehicleEventHandler, 
 											VehicleArrivesAtFacilityEventHandler,
 											VehicleDepartsAtFacilityEventHandler{
@@ -43,6 +42,7 @@ public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandl
 	private List<Id> stopIdList;
 	private String RouteId;
 	private double binTime=-1;
+	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
 	
 	public PassengerTrackerFromEvents(List<Id> stopIdList, String RouteId, final int bin) {
 		log.setLevel( Level.INFO ) ;
@@ -54,11 +54,17 @@ public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandl
 	@Override
 	public void reset(int iteration) {
 		this.veh_stops.clear();
+		this.vehToRouteId.clear();
 	}
 
 	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.vehToRouteId.put(event.getVehicleId(), event.getTransitRouteId());
+	}
+	
+	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id transitRouteId = ((PersonEntersVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitRouteId = this.vehToRouteId.get(event.getVehicleId());
 		if (!transitRouteId.toString().contains(this.RouteId)) {
 			return ;
 		}
@@ -72,7 +78,7 @@ public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandl
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id transitRouteId = ((PersonLeavesVehicleEventImpl) event).getTransitRouteId() ;
+		Id transitRouteId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitRouteId.toString().contains(this.RouteId)) {
 			return ;
 		}
@@ -145,7 +151,7 @@ public class PassengerTrackerFromEvents implements PersonEntersVehicleEventHandl
 
 	public static void main(String[] args) {
 		String eventFilePath = "../../input/juni/calibration/500/500.events.xml.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 	
 		List<Id> stopList = new ArrayList<Id>();
 		stopList.add(new IdImpl("812020.3"));

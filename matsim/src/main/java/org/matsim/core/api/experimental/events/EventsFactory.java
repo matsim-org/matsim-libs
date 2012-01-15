@@ -57,8 +57,8 @@ public interface EventsFactory extends MatsimFactory {
 
 	AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney);
 
-	PersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId, Id transitRouteId);
+	PersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
 
-	PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId, Id transitRouteId);
+	PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
 
 }

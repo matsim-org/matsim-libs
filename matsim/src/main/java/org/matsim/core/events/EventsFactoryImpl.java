@@ -87,14 +87,14 @@ public class EventsFactoryImpl implements EventsFactory {
 	}
 
 	@Override
-	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
-		PersonEntersVehicleEventImpl e = new PersonEntersVehicleEventImpl(time, personId, vehicleId, transitRouteId);
+	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		PersonEntersVehicleEventImpl e = new PersonEntersVehicleEventImpl(time, personId, vehicleId);
 		return e;
 	}
 
 	@Override
-	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId, final Id transitRouteId) {
-		PersonLeavesVehicleEventImpl e = new PersonLeavesVehicleEventImpl(time, personId, vehicleId, transitRouteId);
+	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+		PersonLeavesVehicleEventImpl e = new PersonLeavesVehicleEventImpl(time, personId, vehicleId);
 		return e;
 	}
 

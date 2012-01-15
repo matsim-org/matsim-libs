@@ -95,7 +95,7 @@ public class VehicleLeavingNetworkRouteDriver implements DriverAgent {
 	public void handleNextAction(final MobsimLink link, final double time) {
 		link.parkVehicle(this.vehicle);
 		EventsManager eventsManager = this.simEngine.getEventsManager();
-		eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId(), null));
+		eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonLeavesVehicleEvent(this.simEngine.getCurrentTime(), agent.getPlan().getPerson().getId(), vehicle.getId()));
 		this.simEngine.handleAgent(this.agent);
 	}
 

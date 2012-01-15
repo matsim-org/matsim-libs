@@ -33,25 +33,13 @@ import org.matsim.vehicles.VehicleTypeImpl;
  */
 public class PersonLeavesVehicleEventTest extends MatsimTestCase {
 
-	public void testWriteReadXml_withRouteId() {
+	public void testWriteReadXml() {
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
 		Vehicle vehicle = new VehicleImpl(new IdImpl(80), vehicleType);
-		PersonLeavesVehicleEventImpl event = new PersonLeavesVehicleEventImpl(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId(), new IdImpl("testRouteId"));
+		PersonLeavesVehicleEventImpl event = new PersonLeavesVehicleEventImpl(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());
 		PersonLeavesVehicleEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);
 		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());
-		assertEquals("wrong route id.", "testRouteId", event2.getTransitRouteId().toString());
-	}
-
-	public void testWriteReadXml_withoutRouteId() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
-		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
-		Vehicle vehicle = new VehicleImpl(new IdImpl(80), vehicleType);
-		PersonLeavesVehicleEventImpl event = new PersonLeavesVehicleEventImpl(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId(), null);
-		PersonLeavesVehicleEventImpl event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
-		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);
-		assertEquals("wrong vehicle id.", "80", event2.getVehicleId().toString());
-		assertNull(event2.getTransitRouteId());
 	}
 }

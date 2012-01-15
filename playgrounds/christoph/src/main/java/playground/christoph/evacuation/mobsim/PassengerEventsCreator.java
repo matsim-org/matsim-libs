@@ -205,7 +205,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 		
 		if (passengers != null) {
 			for (Id passengerId : passengers) {
-				Event e = eventsManager.getFactory().createPersonEntersVehicleEvent(event.getTime(), passengerId, event.getPersonId(), null);
+				Event e = eventsManager.getFactory().createPersonEntersVehicleEvent(event.getTime(), passengerId, event.getPersonId());
 				eventsManager.processEvent(e);
 			}
 		}
@@ -217,7 +217,7 @@ public class PassengerEventsCreator implements AgentDepartureEventHandler, Agent
 		
 		if (passengers != null) {
 			for (Id passengerId : passengers) {
-				Event e = eventsManager.getFactory().createPersonLeavesVehicleEvent(event.getTime(), passengerId, event.getPersonId(), null);
+				Event e = eventsManager.getFactory().createPersonLeavesVehicleEvent(event.getTime(), passengerId, event.getPersonId());
 				eventsManager.processEvent(e);
 			}
 		}	

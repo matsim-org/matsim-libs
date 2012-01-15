@@ -156,9 +156,8 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 			// yyyyyy I think this neither works this way nor when I exchange the last two lines. kai, dec'11
 			
 		} else {
-			Id transitRouteId = null;
 			EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
-			eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, agent.getId(), vehicle.getId(), transitRouteId));
+			eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, agent.getId(), vehicle.getId()));
 			this.addDepartingVehicle(vehicle);
 		}
 	}

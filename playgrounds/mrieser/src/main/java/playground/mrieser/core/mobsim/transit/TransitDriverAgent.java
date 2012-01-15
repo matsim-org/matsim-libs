@@ -97,7 +97,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		this.nextLinkId = this.linkIds[this.nextLinkIndex];
 		List<TransitRouteStop> _stops = this.route.getStops();
 		this.stops = _stops.toArray(new TransitRouteStop[_stops.size()]);
-		this.nextStop = this.stops[nextStopIndex];
+		this.nextStop = this.stops[this.nextStopIndex];
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	}
 
 	@Override
-	public void handleNextAction(MobsimLink link, final double time) {
+	public void handleNextAction(final MobsimLink link, final double time) {
 		if (this.nextStop != null && this.nextStop.getStopFacility().getLinkId().equals(this.currentLinkId)) {
 			double delay = this.handleTransitStop(this.nextStop, time);
 			if (delay > 0.0) {
@@ -199,7 +199,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		EventsManager events = this.simEngine.getEventsManager();
 		events.processEvent(new VehicleDepartsAtFacilityEventImpl(now, this.vehicle.getId(),
 				this.currentStop.getStopFacility().getId(), Double.NaN));
-		if ((nextStopIndex + 1) < this.stops.length) {
+		if ((this.nextStopIndex + 1) < this.stops.length) {
 			this.nextStopIndex++;
 			this.nextStop = this.stops[this.nextStopIndex];
 		} else {
@@ -219,7 +219,7 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 		}
 	}
 
-	private double handleTransitStop(TransitRouteStop stop, double time) {
+	private double handleTransitStop(final TransitRouteStop stop, final double time) {
 		TransitStopFacility stopFac = stop.getStopFacility();
 		assertExpectedStop(stopFac);
 		processEventVehicleArrives(stopFac, time);
@@ -240,23 +240,23 @@ public class TransitDriverAgent implements DriverAgent, PassengerAccessEgress {
 	}
 
 	@Override
-	public boolean handlePassengerEntering(PassengerAgent agent, double time) {
+	public boolean handlePassengerEntering(final PassengerAgent agent, final double time) {
 		boolean handled = this.vehicle.addPassenger(agent);
 		if (handled) {
 			this.ptFeature.getAgentTracker().removeAgentFromStop(agent, this.currentStop.getStopFacility().getId());
 			EventsManager events = this.simEngine.getEventsManager();
 			events.processEvent(((EventsFactoryImpl) events.getFactory()).createPersonEntersVehicleEvent(time,
-					agent.getId(), this.vehicle.getId(), this.route.getId()));
+					agent.getId(), this.vehicle.getId()));
 		}
 		return handled;
 	}
 
 	@Override
-	public boolean handlePassengerLeaving(PassengerAgent agent, double time) {
+	public boolean handlePassengerLeaving(final PassengerAgent agent, final double time) {
 		boolean handled = this.vehicle.removePassenger(agent);
 		if (handled) {
 			EventsManager events = this.simEngine.getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getId(), this.route.getId()));
+			events.processEvent(new PersonLeavesVehicleEventImpl(time, agent.getId(), this.vehicle.getId()));
 //			agent.notifyTeleportToLink(this.currentStop.getStopFacility().getLinkId());
 //			agent.endLegAndAssumeControl(time);
 		}

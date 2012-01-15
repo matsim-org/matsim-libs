@@ -31,24 +31,23 @@ public class TransitLoadByTimeTest {
 	public void testTransitLoad_singleLine() {
 		Id[] id = {new IdImpl(0), new IdImpl(1), new IdImpl(2), new IdImpl(3)};
 
-		Id routeId1 = id[1];
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[3];
 
 		EventsFactoryImpl ef = new EventsFactoryImpl();
 
 		TransitLoadByTime tl = new TransitLoadByTime();
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.1*3600-5, id[0], vehicleIdDep1, routeId1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600, id[1], vehicleIdDep1, routeId1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600+5, id[2], vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.1*3600-5, id[0], vehicleIdDep1));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600, id[1], vehicleIdDep1));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600+5, id[2], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.2*3600-5, id[2], vehicleIdDep1, routeId1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.2*3600-5, id[2], vehicleIdDep1));
+		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1, routeId1));
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1, routeId1));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1));
+		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1));
 
 		Assert.assertEquals(0, tl.getVehicleLoad(vehicleIdDep1, 7.0*3600 - 10));
 		Assert.assertEquals(1, tl.getVehicleLoad(vehicleIdDep1, 7.0*3600 - 5));

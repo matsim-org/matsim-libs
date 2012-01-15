@@ -1,19 +1,28 @@
 package playground.michalm.vrp.taxi.taxicab;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.events.*;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsFactoryImpl;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import pl.poznan.put.vrp.dynamic.data.schedule.Schedule;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import playground.michalm.dynamic.*;
-import playground.michalm.vrp.data.model.*;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.shortestpath.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.ServeTask;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task;
+import pl.poznan.put.vrp.dynamic.data.schedule.WaitTask;
+import playground.michalm.dynamic.DynActivity;
+import playground.michalm.dynamic.DynActivityImpl;
+import playground.michalm.dynamic.DynAgent;
+import playground.michalm.dynamic.DynAgentLogic;
+import playground.michalm.dynamic.DynLeg;
+import playground.michalm.vrp.data.model.TaxiCustomer;
+import playground.michalm.vrp.data.network.MATSimVertex;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPath.SPEntry;
-import playground.michalm.vrp.taxi.*;
+import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class TaxiAgentLogic
@@ -175,7 +184,7 @@ public class TaxiAgentLogic
     // picking-up a passenger
     private TaxiTaskActivity createServeActivity(ServeTask task, double now)
     {
-        currentRequest = ((ServeTask)task).getRequest();
+        currentRequest = task.getRequest();
 
         // serve the customer
         MobsimAgent passenger = ((TaxiCustomer)currentRequest.getCustomer()).getPassanger();
@@ -194,8 +203,7 @@ public class TaxiAgentLogic
         // event handling
         EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
         EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
-        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
-                agent.getId(), agent.getId()));
+        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(), agent.getId()));
 
         return TaxiTaskActivity.createServeActivity(task);
     }
@@ -221,7 +229,7 @@ public class TaxiAgentLogic
                 EventsManager events = taxiSimEngine.getMobsim().getEventsManager();
                 EventsFactoryImpl evFac = (EventsFactoryImpl)events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
-                        agent.getId(), agent.getId()));
+                        agent.getId()));
 
                 passenger.notifyTeleportToLink(passenger.getDestinationLinkId());
                 passenger.endLegAndAssumeControl(now);

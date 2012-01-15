@@ -30,9 +30,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.mrieser.core.mobsim.api.DepartureHandler;
 import playground.mrieser.core.mobsim.api.DriverAgent;
+import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.api.NewMobsimEngine;
 import playground.mrieser.core.mobsim.api.PlanAgent;
-import playground.mrieser.core.mobsim.api.MobsimVehicle;
 import playground.mrieser.core.mobsim.features.NetworkFeature;
 import playground.mrieser.core.mobsim.network.api.MobsimLink;
 
@@ -70,7 +70,7 @@ public class StrictCarDepartureHandler implements DepartureHandler {
 			this.engine.handleAgent(agent);
 		} else {
 			EventsManager eventsManager = this.engine.getEventsManager();
-			eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonEntersVehicleEvent(engine.getCurrentTime(), person.getId(), simVehicle.getId(), null));
+			eventsManager.processEvent(((EventsFactoryImpl) eventsManager.getFactory()).createPersonEntersVehicleEvent(engine.getCurrentTime(), person.getId(), simVehicle.getId()));
 			link.continueVehicle(simVehicle);
 		}
 	}

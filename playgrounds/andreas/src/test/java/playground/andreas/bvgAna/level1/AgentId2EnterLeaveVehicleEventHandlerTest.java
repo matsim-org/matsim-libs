@@ -29,9 +29,6 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         
 //        assign Ids to routes, vehicles and agents to be used in Test
         
-        Id routeId1 = ida[2];
-        Id routeId2 = ida[3];
-        Id routeId3 = ida[7]; 
         Id vehId1 = ida[4];
         Id vehId2 = ida[1];
         Id vehId3 = ida[6];
@@ -44,18 +41,18 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         
 //        create Events
         
-        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(3.0*3600, persId1, vehId1, routeId2);
+        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(3.0*3600, persId1, vehId1);
         handler.handleEvent(event1);
-        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(3.7*3600, persId2, vehId3, routeId1);
+        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(3.7*3600, persId2, vehId3);
         handler.handleEvent(event2);
-        PersonEntersVehicleEvent event3 = ef.createPersonEntersVehicleEvent(3.2*3600, persId3, vehId2, routeId3);
+        PersonEntersVehicleEvent event3 = ef.createPersonEntersVehicleEvent(3.2*3600, persId3, vehId2);
         handler.handleEvent(event3);
         
-        PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(4.0*3600, persId1, vehId2, routeId3);
+        PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(4.0*3600, persId1, vehId2);
         handler.handleEvent(event4);
-        PersonLeavesVehicleEvent event5 = ef.createPersonLeavesVehicleEvent(4.7*3600, persId2, vehId3, routeId1);
+        PersonLeavesVehicleEvent event5 = ef.createPersonLeavesVehicleEvent(4.7*3600, persId2, vehId3);
         handler.handleEvent(event5);
-        PersonLeavesVehicleEvent event6 = ef.createPersonLeavesVehicleEvent(4.2*3600, persId3, vehId1, routeId2);
+        PersonLeavesVehicleEvent event6 = ef.createPersonLeavesVehicleEvent(4.2*3600, persId3, vehId1);
         handler.handleEvent(event6);
         
 //        run tests
