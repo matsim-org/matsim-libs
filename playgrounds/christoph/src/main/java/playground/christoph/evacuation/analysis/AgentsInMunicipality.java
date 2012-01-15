@@ -95,10 +95,7 @@ public class AgentsInMunicipality {
 		
 		List<Feature> municipalities = new ArrayList<Feature>();
 		FeatureSource featureSource = ShapeFileReader.readDataFile(shpFile);
-		int i = 0;
 		for (Object o : featureSource.getFeatures()) {
-			i++;
-			if (i > 20) break;
 			Feature feature = (Feature) o;
 			municipalities.add(feature);
 			

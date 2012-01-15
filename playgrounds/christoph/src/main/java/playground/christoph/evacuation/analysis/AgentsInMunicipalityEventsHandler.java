@@ -51,11 +51,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -68,7 +70,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	ActivityStartEventHandler, ActivityEndEventHandler {
+	ActivityStartEventHandler, ActivityEndEventHandler, AgentStuckEventHandler {
 	
 	final private static Logger log = Logger.getLogger(AgentsInMunicipalityEventsHandler.class);
 	
@@ -83,6 +85,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	private final Set<Id> insideAgents;
 	private final Set<Id> residentAgents;
+	private final Set<Id> residentStuckInsideAgents;
+	private final Set<Id> residentStuckOutsideAgents;
+	private final Set<Id> otherStuckInsideAgents;
+	private final Set<Id> otherStuckOutsideAgents;
 	private final Set<Id> residentHouseholds;
 	private final Map<Integer, List<Id>> residentHouseholdHHTPs;
 	private final CoordAnalyzer coordAnalyzer;
@@ -101,6 +107,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		
 		insideAgents = new HashSet<Id>();
 		residentAgents = new HashSet<Id>();
+		residentStuckInsideAgents = new HashSet<Id>();
+		residentStuckOutsideAgents = new HashSet<Id>();
+		otherStuckInsideAgents = new HashSet<Id>();
+		otherStuckOutsideAgents = new HashSet<Id>();
 		residentHouseholds = new HashSet<Id>();
 		residentHouseholdHHTPs = new TreeMap<Integer, List<Id>>();
 		plotData = new ArrayList<PlotData>();
@@ -190,6 +200,9 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	public void afterEventsReading() {
 		 try {
+			 	// check consistency of counts
+			 	checkConsistency();
+			 
 		    	// write statistics after last event
 		    	printStatistics();
 		    	
@@ -204,10 +217,63 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 			}
 	}
 	
+	private void checkConsistency() {
+
+		int residents = residentAgents.size();
+		int inside = insideAgents.size();
+		int residentsStuckInside = residentStuckInsideAgents.size();
+		int residentsStuckOutside = residentStuckOutsideAgents.size();
+		int otherStuckInside = otherStuckInsideAgents.size();
+		int otherStuckOutside = otherStuckOutsideAgents.size();
+
+		int residentsInsideOrStuck = inside + residentsStuckInside + residentsStuckOutside;
+		
+		// check total number of counted agents
+		if (residents != residentsInsideOrStuck) {
+			StringBuffer sb = new StringBuffer();
+			sb.append("Number of agents does not match: ");
+			sb.append(residents);
+			sb.append(" (residents) vs.");
+			sb.append(residentsInsideOrStuck);
+			sb.append(" (inside: ");
+			sb.append(inside);
+			sb.append(", stuckInside: ");
+			sb.append(residentsStuckInside);
+			sb.append(", stuckOutside: ");
+			sb.append(residentsStuckOutside);
+			sb.append(")");
+			log.warn(sb.toString());
+
+			for (Id id: residentAgents) {
+				if (!insideAgents.contains(id) && 
+						!residentStuckInsideAgents.contains(id) &&
+						!residentStuckOutsideAgents.contains(id)) log.warn("\tAgent " + id.toString() + " is a resident but not inside and not stuck.");
+			}
+			for (Id id : insideAgents) {
+				if (!residentAgents.contains(id)) log.warn("\tAgent " + id.toString() + " is still inside but not a resident.");
+			}
+		}
+	}
+	
 	@Override
 	public void reset(int iteration) {
+		
 	}
 
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		// collect agents that got stuck
+		if (insideAgents.remove(event.getPersonId())) {
+			if (residentAgents.contains(event.getPersonId())) {
+				residentStuckInsideAgents.add(event.getPersonId());
+			} else otherStuckInsideAgents.add(event.getPersonId());
+		} else {
+			if (residentAgents.contains(event.getPersonId())) {
+				residentStuckOutsideAgents.add(event.getPersonId());
+			} else otherStuckOutsideAgents.add(event.getPersonId());
+		}
+	}
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		checkTime(event);
@@ -218,6 +284,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.remove(event.getPersonId());
+		
+//		if (event.getPersonId().toString().equals("6529304")) {
+//			log.info("leave link " + isInside);
+//		}
 	}
 
 	@Override
@@ -230,6 +300,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.add(event.getPersonId());
+		
+//		if (event.getPersonId().toString().equals("6529304")) {
+//			log.info("enter link " + isInside);
+//		}
 	}
 	
 	@Override
@@ -243,6 +317,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		
 		if (isInside) insideAgents.add(event.getPersonId());
 		else insideAgents.remove(event.getPersonId());
+		
+//		if (event.getPersonId().toString().equals("6529304")) {
+//			log.info("activity start " + isInside);
+//		}
 	}
 	
 	@Override
@@ -255,6 +333,10 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.add(event.getPersonId());
+		
+//		if (event.getPersonId().toString().equals("6529304")) {
+//			log.info("activity end " + isInside);
+//		}
 	}
 	
 	private void checkTime(Event event) {
