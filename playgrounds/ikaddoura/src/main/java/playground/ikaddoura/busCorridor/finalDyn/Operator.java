@@ -40,7 +40,7 @@ public class Operator {
 	private int capacity;
 	private int numberOfBuses;
 	private double profit;
-	private double earnings;
+	private double revenue;
 	private int numberOfBusesFromEvents;
 	private double vehicleKm;
 	private double vehicleHours;
@@ -73,7 +73,7 @@ public class Operator {
 		log.info("Vehicle-km: "+this.getVehicleKm());
 		log.info("Veh-Time: "+Time.writeTime(this.getVehicleHours()*60*60 , Time.TIMEFORMAT_HHMMSS));
 		this.costs = (numberOfBusesFromEvents * costsPerVehicleDay) + ((vehicleKm * costsPerVehicleKm) + (vehicleHours * COSTS_PER_VEH_HOUR)) * OVERHEAD_PERCENTAGE;
-		this.profit = this.getEarnings() - this.getCosts();
+		this.profit = this.getRevenue() - this.getCosts();
 
 		log.info("OperatorScore calculated: "+this.getProfit());
 	}
@@ -81,8 +81,8 @@ public class Operator {
 	/**
 	 * @return the earnings
 	 */
-	public double getEarnings() {
-		return earnings;
+	public double getRevenue() {
+		return revenue;
 	}
 
 	/**
@@ -198,8 +198,8 @@ public class Operator {
 	/**
 	 * @param earnings the earnings to set
 	 */
-	public void setEarnings(double earnings) {
-		this.earnings = earnings;
+	public void setRevenue(double earnings) {
+		this.revenue = earnings;
 	}
 
 	/**

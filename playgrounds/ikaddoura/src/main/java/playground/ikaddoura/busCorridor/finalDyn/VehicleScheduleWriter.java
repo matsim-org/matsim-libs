@@ -92,8 +92,8 @@ public class VehicleScheduleWriter {
 		generator.setRouteId2(new IdImpl("Ost-West"));
 		
 		generator.setVehTypeId(new IdImpl("Bus"));
-		generator.setAccessSeconds(1.0); // seconds per person for entering a vehicle 
-		generator.setEgressSeconds(1.0); // seconds per person for leaving a vehicle
+		generator.setAccessSeconds(2.0); // seconds per person for entering a vehicle 
+		generator.setEgressSeconds(1.5); // seconds per person for leaving a vehicle
 		generator.setSeats(busSeats);
 		generator.setStandingRoom(standingRoom);
 		generator.setLength(length);

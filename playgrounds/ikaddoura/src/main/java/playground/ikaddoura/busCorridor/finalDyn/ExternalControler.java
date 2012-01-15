@@ -39,17 +39,17 @@ public class ExternalControler {
 	
 	private final static Logger log = Logger.getLogger(ExternalControler.class);
 	
-	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_test/network10links.xml";
-	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_test/config_busline.xml";
-	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_test/population.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_test";
+	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
+	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline.xml";
+	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/populationWorkOther.xml"; // for first iteration only
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn";
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 0; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
+	static int lastInternalIteration = 60; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 2, 6*3600, 9*3600);
-	TimePeriod p3 = new TimePeriod(3, "NVZ", 2, 9*3600, 14*3600);
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 6, 6*3600, 9*3600);
+	TimePeriod p3 = new TimePeriod(3, "NVZ", 3, 9*3600, 14*3600);
 	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 6, 14*3600, 17*3600);
 	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 2, 17*3600, 23*3600);
 
@@ -64,7 +64,7 @@ public class ExternalControler {
 
 	private Map<Integer, Double> iteration2operatorProfit = new HashMap<Integer, Double>();
 	private Map<Integer, Double> iteration2operatorCosts = new HashMap<Integer, Double>();
-	private Map<Integer, Double> iteration2operatorEarnings = new HashMap<Integer, Double>();
+	private Map<Integer, Double> iteration2operatorRevenue = new HashMap<Integer, Double>();
 	private Map<Integer, Double> iteration2numberOfBuses = new HashMap<Integer, Double>();
 	private Map<Integer, String> iteration2day = new HashMap<Integer, String>();
 	private Map<Integer, Double> iteration2userScore = new HashMap<Integer,Double>();
@@ -84,10 +84,10 @@ public class ExternalControler {
 	private void externalIteration() throws IOException {
 		
 		day.put(p1.getOrderId(), p1);
-//		day.put(p2.getOrderId(), p2);
-//		day.put(p3.getOrderId(), p3);
-//		day.put(p4.getOrderId(), p4);
-//		day.put(p5.getOrderId(), p5);
+		day.put(p2.getOrderId(), p2);
+		day.put(p3.getOrderId(), p3);
+		day.put(p4.getOrderId(), p4);
+		day.put(p5.getOrderId(), p5);
 		
 		for (int extIt = 0; extIt <= lastExternalIteration ; extIt++){
 			
@@ -117,7 +117,7 @@ public class ExternalControler {
 
 			this.iteration2operatorProfit.put(this.getExtItNr(), operator.getProfit());
 			this.iteration2operatorCosts.put(this.getExtItNr(), operator.getCosts());
-			this.iteration2operatorEarnings.put(this.getExtItNr(), operator.getEarnings());
+			this.iteration2operatorRevenue.put(this.getExtItNr(), operator.getRevenue());
 			this.iteration2numberOfBuses.put(this.getExtItNr(), (double) this.getMaxNumberOfBuses());
 			this.iteration2day.put(this.getExtItNr(), this.day.toString());
 			this.iteration2userScoreSum.put(this.getExtItNr(), users.getScoreSum());
@@ -130,7 +130,7 @@ public class ExternalControler {
 			this.iteration2capacity.put(this.getExtItNr(),(double) this.getCapacity());
 			
 			TextFileWriter stats = new TextFileWriter();
-			stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2day, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorEarnings, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
+			stats.writeFile(outputExternalIterationDirPath, this.iteration2numberOfBuses, this.iteration2day, this.iteration2fare, this.iteration2capacity, this.iteration2operatorCosts, this.iteration2operatorRevenue, this.iteration2operatorProfit, this.iteration2userScore, this.iteration2userScoreSum, this.iteration2totalScore, this.iteration2numberOfCarLegs, this.iteration2numberOfPtLegs, this.iteration2numberOfWalkLegs);
 			
 			// settings for next external iteration	
 			if (this.getExtItNr() < lastExternalIteration){
@@ -160,7 +160,7 @@ public class ExternalControler {
 		chartWriter.writeChart_UserScores(outputExternalIterationDirPath, this.iteration2userScore);
 		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
 		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
-		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorEarnings);
+		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
 	}
 
 	private Map<Integer, TimePeriod> increaseBuses(String periodId, int increase) {

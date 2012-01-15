@@ -131,7 +131,7 @@ public class ChartFileWriter {
 		log.info("TotalScore written to "+outputFile);
 	}
 	
-	public void writeChart_OperatorScores(String outputExternalIterationDirPath, Map<Integer, Double> iteration2score, Map<Integer, Double> iteration2operatorCosts, Map<Integer, Double> iteration2operatorEarnings) {
+	public void writeChart_OperatorScores(String outputExternalIterationDirPath, Map<Integer, Double> iteration2score, Map<Integer, Double> iteration2operatorCosts, Map<Integer, Double> iteration2operatorRevenue) {
 		
 		String[] xValues = new String[iteration2score.size()];
 		int counter1 = 0;
@@ -154,15 +154,15 @@ public class ChartFileWriter {
 			yWerte2[counter3] = iteration2operatorCosts.get(iteration);
 			counter3++;
 		}
-		double[] yWerte3 = new double[iteration2operatorEarnings.size()];
+		double[] yWerte3 = new double[iteration2operatorRevenue.size()];
 		int counter4 = 0;
-		for (Integer iteration : iteration2operatorEarnings.keySet()){
-			yWerte3[counter4] = iteration2operatorEarnings.get(iteration);
+		for (Integer iteration : iteration2operatorRevenue.keySet()){
+			yWerte3[counter4] = iteration2operatorRevenue.get(iteration);
 			counter4++;
 		}
 		chart.addSeries("Profit", yWerte1);
 		chart.addSeries("Costs", yWerte2);
-		chart.addSeries("Earnings", yWerte3);
+		chart.addSeries("Revenue", yWerte3);
 		
 		String outputFile = outputExternalIterationDirPath+"/OperatorScore.png";
 		chart.saveAsPng(outputFile, 1000, 800); //File Export

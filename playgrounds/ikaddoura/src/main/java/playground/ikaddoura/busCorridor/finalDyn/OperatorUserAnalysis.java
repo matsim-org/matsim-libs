@@ -77,7 +77,7 @@ public class OperatorUserAnalysis {
 		users.setNumberOfWalkLegs(departureHandler.getNumberOfWalkLegs());
 		log.info("Users analyzed.");
 		
-		operator.setEarnings(moneyHandler.getEarnings());
+		operator.setRevenue(moneyHandler.getEarnings());
 		operator.setNumberOfBusesFromEvents(transitHandler.getVehicleIDs().size()); // Anzahl der Busse aus den Events!		
 		operator.setVehicleKm(linksHandler.getVehicleKm()); // vehicle-km aus den Events!
 		operator.setVehicleHours(departureHandler.getVehicleHours()); // vehicle-hours aus den Events, nicht aus dem Fahrplan!

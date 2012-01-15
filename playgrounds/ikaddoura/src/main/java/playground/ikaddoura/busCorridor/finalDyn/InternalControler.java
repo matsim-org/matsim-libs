@@ -61,6 +61,10 @@ public class InternalControler {
 	private final double CONSTANT_CAR = 0;
 	private final double CONSTANT_PT = 12.20;
 	
+	private final double PERFORMING = 6;
+	private final double LATE_ARRIVAL = -18;
+	private final double EARLY_DEPARTURE = 0;
+	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare) {
 		this.configFile = configFile;
 		this.directoryExtIt = directoryExtIt;
@@ -115,6 +119,10 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setTravelingWalk_utils_hr(TRAVEL_WALK);
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
 		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
+		
+		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
+		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
+		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
 		
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup);
 		controler.setScoringFunctionFactory(scoringfactory);
