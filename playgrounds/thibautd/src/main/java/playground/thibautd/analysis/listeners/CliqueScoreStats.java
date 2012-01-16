@@ -269,7 +269,7 @@ public class CliqueScoreStats implements StartupListener, IterationEndsListener,
 				System.arraycopy(info.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("avg. executed score", iterations, values);
 				chart.addMatsimLogo();
-				XYChartUtils.integerXAxis(chart.getChart());
+				// XYChartUtils.integerXAxis(chart.getChart());
 				chart.saveAsPng(event.getControler().getControlerIO().getOutputFilename(
 							"scorestats-size-"+info.cliqueSize+".png"), 800, 600);
 			}
