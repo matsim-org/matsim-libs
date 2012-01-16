@@ -49,13 +49,20 @@ public class AnalyseEquilibriumOptimalPlans {
 		String individualConfigFile;
 		String outputDir;
 
-		try {
+		if (args.length == 4) {
 			untoggledConfigFile = args[ 0 ];
 			toggledConfigFile = args[ 1 ];
 			individualConfigFile = args[ 2 ];
 			outputDir = args[ 3 ];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			System.out.println( "usage: AnalyseEquilibriumOptimalPlans configUntoggledPopulation configToggledPopulation configIndividualPopulation outputDirectory" );
+		}
+		else if (args.length == 3) {
+			untoggledConfigFile = null;
+			toggledConfigFile = args[ 0 ];
+			individualConfigFile = args[ 1 ];
+			outputDir = args[ 2 ];
+		}
+		else {
+			System.out.println( "usage: AnalyseEquilibriumOptimalPlans [configUntoggledPopulation] configToggledPopulation configIndividualPopulation outputDirectory" );
 			return;
 		}
 
@@ -67,13 +74,18 @@ public class AnalyseEquilibriumOptimalPlans {
 		ScoringFunctionFactory scoringFunctionFactory;
 
 		{
-			Controler controler = JointControlerUtils.createControler( untoggledConfigFile );
-			popUntoggled = (PopulationWithCliques) controler.getScenario().getPopulation();
+			Controler controler = JointControlerUtils.createControler( toggledConfigFile );
+			popToggled = (PopulationWithCliques) controler.getScenario().getPopulation();
 			scoringFunctionFactory = controler.getScoringFunctionFactory();
 		}
 
-		popToggled = (PopulationWithCliques)
-			JointControlerUtils.createScenario( toggledConfigFile ).getPopulation();
+		if (untoggledConfigFile != null) {
+			popUntoggled = (PopulationWithCliques)
+				JointControlerUtils.createScenario( untoggledConfigFile ).getPopulation();
+		}
+		else {
+			popUntoggled = null;
+		}
 		popIndividual = (PopulationWithCliques)
 			JointControlerUtils.createScenario( individualConfigFile ).getPopulation();
 
@@ -90,8 +102,10 @@ public class AnalyseEquilibriumOptimalPlans {
 		chart = analyser.getScoreAbsoluteImprovementsChart();
 		chart.saveAsPng( outputDir+"/scoreImprovements.png", WIDTH, HEIGHT );
 
-		chart = analyser.getScoreAbsoluteImprovementsToggleChart();
-		chart.saveAsPng( outputDir+"/toggleScoreImprovements.png", WIDTH, HEIGHT );
+		if (popUntoggled != null) {
+			chart = analyser.getScoreAbsoluteImprovementsToggleChart();
+			chart.saveAsPng( outputDir+"/toggleScoreImprovements.png", WIDTH, HEIGHT );
+		}
 
 		chart = analyser.getScoreDistributionsChart();
 		chart.saveAsPng( outputDir+"/scoreDistributions.png", WIDTH, HEIGHT );

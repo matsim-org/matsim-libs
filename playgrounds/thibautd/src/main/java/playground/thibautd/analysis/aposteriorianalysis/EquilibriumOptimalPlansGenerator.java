@@ -37,6 +37,8 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import playground.thibautd.jointtrips.config.CliquesConfigGroup;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.population.jointtrippossibilities.JointTripPossibilitiesUtils;
 import playground.thibautd.jointtrips.population.ScenarioWithCliques;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerModule;
 import playground.thibautd.jointtrips.replanning.selectors.PlanWithLongestTypeSelector;
@@ -94,19 +96,20 @@ public class EquilibriumOptimalPlansGenerator {
 		log.info( "writing corresponding config file to: "+configFile );
 		writeConfigFile( configFile , file );
 
-		file = directory+"/plans-with-toggled-joint-trips.xml.gz";
-		configFile = directory+"/toggledConfig.xml.gz";
-		log.info( "creating toggled plans. Output to: "+file );
-		writeToggledOptimalJointTrips( file );
-		log.info( "writing corresponding config file to: "+configFile );
-		writeConfigFile( configFile , file );
-
 		file = directory+"/plans-with-no-joint-trips.xml.gz";
 		configFile = directory+"/individualConfig.xml.gz";
 		log.info( "creating individual plans. Output to: "+file );
 		writeIndividualTrips( file );
 		log.info( "writing corresponding config file to: "+configFile );
 		writeConfigFile( configFile , file );
+
+		file = directory+"/plans-with-all-joint-trips.xml.gz";
+		configFile = directory+"/allConfig.xml.gz";
+		if (writeUntoggledJointTrips( file )) {
+			log.info( "created complete plans. Output to: "+file );
+			log.info( "writing corresponding config file to: "+configFile );
+			writeConfigFile( configFile , file );
+		}
 	}
 
 	private void writeConfigFile(
@@ -166,42 +169,38 @@ public class EquilibriumOptimalPlansGenerator {
 	}
 
 
-	//private void writeUntoggledOptimalJointTrips(final String file) {
-	//	PlanWithLongestTypeSelector selector = new PlanWithLongestTypeSelector();
-	//	ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+	private boolean writeUntoggledJointTrips(final String file) {
+		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
 
-	//	for (Clique clique : scenario.getCliques().getCliques().values()) {
-	//		Plan plan = selector.selectPlan( clique );
-	//		clique.setSelectedPlan( plan );
+		for (Clique clique : scenario.getCliques().getCliques().values()) {
+			JointPlan plan = (JointPlan) clique.getSelectedPlan();
 
-	//		List<Plan> unselectedPlans = new ArrayList<Plan>( clique.getPlans() );
-	//		unselectedPlans.remove( plan );
+			if (plan.getJointTripPossibilities() == null) {
+				return false;
+			}
 
-	//		for ( Plan currentPlan : unselectedPlans ) {
-	//			if (currentPlan != plan) {
-	//				clique.removePlan( currentPlan );
-	//			}
-	//		}
-	//	}
+			JointTripPossibilitiesUtils.includeAllJointTrips( plan );
+		}
 
-	//	configGroup.setOptimizeToggle( "false" );
+		configGroup.setOptimizeToggle( "false" );
+		optimiseSelectedPlans();
+		writePopulation( file );
+		return true;
+	}
+
+	//private void writeToggledOptimalJointTrips(final String file) {
+	//	//PlanSelector selector = new PlanWithLongestTypeSelector();
+	//	//ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
+
+	//	//for (Clique clique : scenario.getCliques().getCliques().values()) {
+	//	//	Plan plan = selector.selectPlan( clique );
+	//	//	clique.setSelectedPlan( plan );
+	//	//}
+
+	//	configGroup.setOptimizeToggle( "true" );
 	//	optimiseSelectedPlans();
 	//	writePopulation( file );
 	//}
-
-	private void writeToggledOptimalJointTrips(final String file) {
-		//PlanSelector selector = new PlanWithLongestTypeSelector();
-		//ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();
-
-		//for (Clique clique : scenario.getCliques().getCliques().values()) {
-		//	Plan plan = selector.selectPlan( clique );
-		//	clique.setSelectedPlan( plan );
-		//}
-
-		configGroup.setOptimizeToggle( "true" );
-		optimiseSelectedPlans();
-		writePopulation( file );
-	}
 
 	private void writeIndividualTrips(final String file) {
 		ScenarioWithCliques scenario = (ScenarioWithCliques) controler.getScenario();

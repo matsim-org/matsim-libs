@@ -83,24 +83,24 @@ public class EquilibriumOptimalPlansAnalyser {
 			final PopulationWithCliques untoggledPopulation,
 			final PopulationWithCliques toggledPopulation,
 			final PopulationWithCliques individualPopulation) {
-		Map<Id, ? extends Person> toggledPersons = new HashMap<Id, Person>(toggledPopulation.getPersons());
+		Map<Id, ? extends Person> untoggledPersons = untoggledPopulation != null ? new HashMap<Id, Person>(untoggledPopulation.getPersons()) : null;
 		Map<Id, ? extends Person> individualPersons = new HashMap<Id, Person>(individualPopulation.getPersons());
 
 		Counter counter = new Counter( this.getClass().getSimpleName()+": processing info for agent # " );
-		for (Clique clique : untoggledPopulation.getCliques().getCliques().values()) {
+		for (Clique clique : toggledPopulation.getCliques().getCliques().values()) {
 			int cliqueSize = clique.getMembers().size();
-			for (Map.Entry<Id, ? extends Person> untoggledPerson :
+			for (Map.Entry<Id, ? extends Person> toggledPerson :
 					clique.getMembers().entrySet()) {
 				counter.incCounter();
-				Person toggledPerson = toggledPersons.remove( untoggledPerson.getKey() );
-				Person individualPerson = individualPersons.remove( untoggledPerson.getKey() );
+				Person untoggledPerson = untoggledPersons != null ? untoggledPersons.remove( toggledPerson.getKey() ) : null;
+				Person individualPerson = individualPersons.remove( toggledPerson.getKey() );
 
 				plans.put(
-						untoggledPerson.getKey(),
+						toggledPerson.getKey(),
 						createComparativePlan(
 							cliqueSize,
-							untoggledPerson.getValue(),
-							toggledPerson,
+							untoggledPerson,
+							toggledPerson.getValue(),
 							individualPerson) );
 
 			}
@@ -115,9 +115,17 @@ public class EquilibriumOptimalPlansAnalyser {
 			final Person individualPerson) {
 		ComparativePlan plan = new ComparativePlan( cliqueSize , untoggledPerson );
 
-		for(List<Leg> trip : extractLegsWithJointTrips( untoggledPerson )) {
-			plan.addUntoggledLeg( trip );
-			plan.setUntoggledScore( getScore( untoggledPerson ) );
+		if (untoggledPerson != null) {
+			for(List<Leg> trip : extractLegsWithJointTrips( untoggledPerson )) {
+				plan.addUntoggledLeg( trip );
+				plan.setUntoggledScore( getScore( untoggledPerson ) );
+			}
+		}
+		else {
+			for(List<Leg> trip : extractLegsWithJointTrips( toggledPerson )) {
+				plan.addUntoggledLeg( null );
+				plan.setUntoggledScore( Double.NaN );
+			}
 		}
 		for(List<Leg> trip : extractLegsWithJointTrips( toggledPerson )) {
 			plan.addToggledLeg( trip );
@@ -362,7 +370,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		}
 
 		JFreeChart chart = ChartFactory.createBoxAndWhiskerChart(
-				"score improvements implied by toggle",
+				"score improvements implied by joint trip selection",
 				"clique size",
 				"improvement",
 				dataset,
@@ -386,7 +394,7 @@ public class EquilibriumOptimalPlansAnalyser {
 		for (ComparativePlan plan : plans.values()) {
 			double improvement = Double.NaN;
 			for (ComparativeLeg leg : plan) {
-				if (leg.isUntoggledJoint()) {
+				if (leg.isUntoggledPassenger() || leg.isToggledPassenger()) {
 					double toggledScore = plan.getToggledScore();
 					double untoggledScore = plan.getUntoggledScore();
 					double individualScore = plan.getIndividualScore();
@@ -399,15 +407,19 @@ public class EquilibriumOptimalPlansAnalyser {
 						toggledScores = new ArrayList<Double>();
 						toggled.put( plan.getCliqueSize() , toggledScores );
 
-						untoggledScores = new ArrayList<Double>();
-						untoggled.put( plan.getCliqueSize() , untoggledScores );
+						if (!Double.isNaN( untoggledScore )) {
+							untoggledScores = new ArrayList<Double>();
+							untoggled.put( plan.getCliqueSize() , untoggledScores );
+						}
 
 						individualScores = new ArrayList<Double>();
 						individual.put( plan.getCliqueSize() , individualScores );
 					}
 
 					toggledScores.add( toggledScore );
-					untoggledScores.add( untoggledScore );
+					if (!Double.isNaN( untoggledScore )) {
+						untoggledScores.add( untoggledScore );
+					}
 					individualScores.add( individualScore );
 					continue planLoop;
 				}
@@ -421,13 +433,15 @@ public class EquilibriumOptimalPlansAnalyser {
 					individual.get( cliqueSize ),
 					"individual",
 					cliqueSize);
-			dataset.add(
-					untoggled.get( cliqueSize ),
-					"no toggle",
-					cliqueSize);
+			if (untoggled.size() > 0) {
+				dataset.add(
+						untoggled.get( cliqueSize ),
+						"all possible joint trips",
+						cliqueSize);
+			}
 			dataset.add(
 					toggledEntry.getValue(),
-					"toggle",
+					"equilibrium joint trips",
 					cliqueSize);
 		}
 
@@ -617,7 +631,7 @@ class ComparativeLeg {
 	// getters
 	// /////////////////////////////////////////////////////////////////////////
 	public boolean isUntoggledJoint() {
-		return untoggledLeg.size() > 1;
+		return untoggledLeg != null && untoggledLeg.size() > 1;
 	}
 
 	public boolean isToggledJoint() {
