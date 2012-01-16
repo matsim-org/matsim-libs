@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.GZIPOutputStream;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -95,6 +96,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	private final List<PlotData> plotData;
 	
 	private FileOutputStream fos;
+	private GZIPOutputStream gzos;
 	private OutputStreamWriter osw;
 	private BufferedWriter bw;
 	
@@ -176,8 +178,9 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	public void beforeEventsReading() {
 		 try {
-		    	fos = new FileOutputStream(outputFile + ".txt");
-		    	osw = new OutputStreamWriter(fos, charset);
+		    	fos = new FileOutputStream(outputFile + ".txt.gz");
+		    	gzos = new GZIPOutputStream(fos);
+		    	osw = new OutputStreamWriter(gzos, charset);
 		    	bw = new BufferedWriter(osw);
 			
 		    	// write header
@@ -208,6 +211,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		    	
 		    	bw.close();
 		    	osw.close();
+		    	gzos.close();
 		    	fos.close();
 		    	
 		    	writeGraphic(outputFile + ".png", getGraphic());
@@ -223,8 +227,8 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		int inside = insideAgents.size();
 		int residentsStuckInside = residentStuckInsideAgents.size();
 		int residentsStuckOutside = residentStuckOutsideAgents.size();
-		int otherStuckInside = otherStuckInsideAgents.size();
-		int otherStuckOutside = otherStuckOutsideAgents.size();
+//		int otherStuckInside = otherStuckInsideAgents.size();
+//		int otherStuckOutside = otherStuckOutsideAgents.size();
 
 		int residentsInsideOrStuck = inside + residentsStuckInside + residentsStuckOutside;
 		
@@ -284,10 +288,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.remove(event.getPersonId());
-		
-//		if (event.getPersonId().toString().equals("6529304")) {
-//			log.info("leave link " + isInside);
-//		}
 	}
 
 	@Override
@@ -300,10 +300,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.add(event.getPersonId());
-		
-//		if (event.getPersonId().toString().equals("6529304")) {
-//			log.info("enter link " + isInside);
-//		}
 	}
 	
 	@Override
@@ -317,10 +313,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		
 		if (isInside) insideAgents.add(event.getPersonId());
 		else insideAgents.remove(event.getPersonId());
-		
-//		if (event.getPersonId().toString().equals("6529304")) {
-//			log.info("activity start " + isInside);
-//		}
 	}
 	
 	@Override
@@ -333,10 +325,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		boolean isInside = coordAnalyzer.isCoordAffected(link.getCoord());
 		
 		if (isInside) insideAgents.add(event.getPersonId());
-		
-//		if (event.getPersonId().toString().equals("6529304")) {
-//			log.info("activity end " + isInside);
-//		}
 	}
 	
 	private void checkTime(Event event) {
@@ -349,8 +337,9 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	public void printInitialStatistics() {
 		try {
-	    	fos = new FileOutputStream(outputFile + "_statistics.txt");
-	    	osw = new OutputStreamWriter(fos, charset);
+	    	fos = new FileOutputStream(outputFile + "_statistics.txt.gz");
+	    	gzos = new GZIPOutputStream(fos);
+	    	osw = new OutputStreamWriter(gzos, charset);
 	    	bw = new BufferedWriter(osw);
 		
 	    	bw.write("residental people");
@@ -378,6 +367,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	    	
 	    	bw.close();
 	    	osw.close();
+	    	gzos.close();
 	    	fos.close();
 		} catch (IOException e) {
 			Gbl.errorMsg(e);
@@ -438,13 +428,13 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		xyData.addSeries(commutersSerie);
 
 		final JFreeChart chart = ChartFactory.createXYStepChart(
-        "agents inside area", "time [hour]", "# agents",
-        xyData,
-        PlotOrientation.VERTICAL,
-        true,   // legend
-        false,   // tooltips
-        false   // urls
-    );
+	        "agents inside area", "time [hour]", "# agents",
+	        xyData,
+	        PlotOrientation.VERTICAL,
+	        true,   // legend
+	        false,   // tooltips
+	        false   // urls
+	    );
 
 		XYPlot plot = chart.getXYPlot();
 
