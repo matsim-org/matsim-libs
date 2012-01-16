@@ -78,8 +78,8 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 		double outLinksCapacitySum = 0.0;
 		if (outlinks.values().size() == 1){
 			Link outLink = outlinks.values().iterator().next();
-			this.setCachedNextLinkId(outLink.getId());
-			return this.getCachedNextLinkId();
+			this.resetCaches();
+			return outLink.getId();
 		}
 		else {
 			for (Link outLink : outlinks.values()){
@@ -96,8 +96,8 @@ public class DgWithindayQPersonAgent extends ExperimentalBasicWithindayAgent {
 			selectedCapacity += outLink.getCapacity(this.getMobsim().getSimTimer().getTimeOfDay());
 //			log.error("selectedCap: " + selectedCapacity + " randomNumber: " + randomNumber);
 			if (selectedCapacity >= randomNumber){
-				this.setCachedNextLinkId(outLink.getId());
-				return this.getCachedNextLinkId();
+				this.resetCaches();
+				return outLink.getId();
 			}
 		}
 		throw new IllegalStateException("selectedCapacity: " + selectedCapacity + " randomNumber: " + randomNumber
