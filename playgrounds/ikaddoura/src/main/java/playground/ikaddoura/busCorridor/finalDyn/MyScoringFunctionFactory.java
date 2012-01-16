@@ -27,6 +27,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -43,9 +44,8 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		scoringFunctionAccumulator.addScoringFunction(new MyLegScoringFunction(plan, params));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
-
 //		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
-//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
 
 		return scoringFunctionAccumulator;
 	}
