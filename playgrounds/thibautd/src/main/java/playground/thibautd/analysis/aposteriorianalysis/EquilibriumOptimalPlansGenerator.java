@@ -20,6 +20,7 @@
 package playground.thibautd.analysis.aposteriorianalysis;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -88,6 +89,8 @@ public class EquilibriumOptimalPlansGenerator {
 	 * @param directory the outptut directory
 	 */
 	public void writePopulations(final String directory) {
+		pruneSingletons();
+
 		String file = directory+"/plans-with-equilibrium-joint-trips.xml.gz";
 		String configFile = directory+"/equilibriumConfig.xml.gz";
 		log.info( "creating equilibrium plans. Output to: "+file );
@@ -110,6 +113,26 @@ public class EquilibriumOptimalPlansGenerator {
 			log.info( "writing corresponding config file to: "+configFile );
 			writeConfigFile( configFile , file );
 		}
+	}
+
+	private void pruneSingletons() {
+		Iterator<? extends Clique> iterator =
+			((ScenarioWithCliques) controler.getScenario()).getCliques().getCliques().values().iterator();
+
+		int count = 0;
+		int tot = 0;
+		log.info( "removing mono-agent cliques before the analysis" );
+
+		while ( iterator.hasNext() ) {
+			tot++;
+			if ( iterator.next().getMembers().size() <= 1 ) {
+				iterator.remove();
+				count++;
+			}
+		}
+
+		log.info( tot+" cliques examined" );
+		log.info( count+" cliques removed" );
 	}
 
 	private void writeConfigFile(
