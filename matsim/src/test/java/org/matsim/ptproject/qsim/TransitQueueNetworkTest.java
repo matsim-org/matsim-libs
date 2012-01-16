@@ -1127,7 +1127,7 @@ public class TransitQueueNetworkTest extends TestCase {
         }
         
 		private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person person) {
-			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, qsim);
+			PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person, person.getSelectedPlan(), qsim);
 			qsim.insertAgentIntoMobsim(agent); 
 			return agent;
 		}

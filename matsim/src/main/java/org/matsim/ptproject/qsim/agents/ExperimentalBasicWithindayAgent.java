@@ -20,7 +20,6 @@
 
 package org.matsim.ptproject.qsim.agents;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -43,20 +42,21 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 		ExperimentalBasicWithindayAgent agent = new ExperimentalBasicWithindayAgent(p, simulation);
 		return agent;
 	}
-
-	private Plan executedPlan;
 	
 	protected ExperimentalBasicWithindayAgent(Person p, Netsim simulation) {
-		super(p, simulation);
-		
 		/*
 		 * Create a copy of the person's selected plan.
 		 * Notice that the executedPlan has a pointer to the person that is
 		 * simulated with this Agent but is NOT added to the person's list of plans!
 		 * The simulation should still score the person's selected plan. 
 		 */
-		executedPlan = new PlanImpl(p);
+		super(p, copySelectedPlan(p), simulation);
+	}
+
+	private static Plan copySelectedPlan(Person p) {
+		Plan executedPlan = new PlanImpl(p);
 		((PlanImpl)executedPlan).copyPlan(p.getSelectedPlan());
+		return executedPlan;
 	}
 
 	@Override
@@ -69,16 +69,6 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 		return this.currentLinkIdIndex ;
 	}
 
-	protected void setCachedNextLinkId(Id cachedNextLinkId) {
-		// yyyy I am not convinced that this method really makes sense.  Needed for DgWithinday...  .  kai, oct'10
-
-		this.cachedNextLinkId = cachedNextLinkId;
-	}
-
-	protected Id getCachedNextLinkId() {
-		return this.cachedNextLinkId;
-	}
-
 	@Override
 	public final void calculateDepartureTime( Activity act ) {
 		super.calculateDepartureTime( act ) ;
@@ -87,18 +77,6 @@ public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl imple
 	@Override
 	public final void resetCaches() {
 		super.resetCaches() ;
-	}
-
-	@Override
-	public Plan getSelectedPlan() {
-		return executedPlan;
-	}
-	
-	@Override
-	//yyyy suggest merging with getExecutedPlan(). cdobler, feb'10
-	public final Plan getModifiablePlan() {
-		// yyyy for the time being, this returns the Person's selected plan, but this should be changed. kai, nov'10
-		return this.person.getSelectedPlan();
 	}
 	
 	@Override

@@ -35,5 +35,4 @@ public interface PlanAgent {
 	
 	public Plan getSelectedPlan() ;
 	
-
 }

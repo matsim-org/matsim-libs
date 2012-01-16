@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.pt.qsim.MobsimDriverPassengerAgent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -46,7 +47,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	private TransitAgent(final Person p, final Netsim simulation) {
-		super(p, simulation);
+		super(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
 	}
 
 	@Override

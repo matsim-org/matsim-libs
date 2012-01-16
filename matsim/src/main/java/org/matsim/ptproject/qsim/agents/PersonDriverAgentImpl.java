@@ -70,7 +70,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	int currentPlanElementIndex = 0;
 	
-	private final Plan selectedPlan;
+	private final Plan plan;
 
 	private transient Id cachedDestinationLinkId;
 
@@ -80,22 +80,22 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	int currentLinkIdIndex;
 
-	private MobsimAgent.State state = MobsimAgent.State.ABORT; 
+	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 
 	// ============================================================================================================================
 	// c'tor
 
-	public PersonDriverAgentImpl(final Person p, final Netsim simulation) {
-		this.person = p;
+	public PersonDriverAgentImpl(final Person person, final Plan plan, final Netsim simulation) {
+		this.person = person;
 		this.simulation = simulation;
-		this.selectedPlan = PopulationUtils.unmodifiablePlan(p.getSelectedPlan());
-		List<? extends PlanElement> planElements = this.selectedPlan.getPlanElements();
+		this.plan = plan;
+		List<? extends PlanElement> planElements = this.plan.getPlanElements();
 		if (planElements.size() > 0) {
 			this.currentPlanElementIndex = 0;
 			Activity firstAct = (Activity) planElements.get(0);				
 			this.currentLinkId = firstAct.getLinkId();
-			this.activityEndTime = firstAct.getEndTime();
 			this.state = MobsimAgent.State.ACTIVITY ;
+			calculateDepartureTime(firstAct);
 		}
 	}
 
@@ -458,10 +458,10 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 	}
 
 	@Override
-	public Plan getSelectedPlan() {
-		return this.selectedPlan;
+	public final Plan getSelectedPlan() {
+		return this.plan;
 	}
-	
+
 	@Override
 	public MobsimAgent.State getState() {
 		return state;

@@ -21,7 +21,6 @@
 package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 
@@ -37,8 +36,6 @@ public interface PlanBasedWithinDayAgent extends MobsimAgent, PlanAgent {
 	public Integer getCurrentPlanElementIndex();
 
 	public Integer getCurrentRouteLinkIdIndex();
-	
-	public Plan getModifiablePlan();
 	
 	public Leg getCurrentLeg() ;
 

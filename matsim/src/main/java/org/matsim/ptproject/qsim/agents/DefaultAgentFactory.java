@@ -21,6 +21,7 @@ package org.matsim.ptproject.qsim.agents;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 /**
@@ -38,7 +39,7 @@ public final class DefaultAgentFactory implements AgentFactory {
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p, this.simulation); 
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
 		return agent;
 	}
 

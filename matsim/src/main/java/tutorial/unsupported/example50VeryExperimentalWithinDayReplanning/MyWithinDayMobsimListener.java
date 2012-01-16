@@ -108,7 +108,7 @@ public class MyWithinDayMobsimListener implements SimulationListener, Simulation
 		}
 		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent;
 
-		Plan plan = withindayAgent.getModifiablePlan();
+		Plan plan = withindayAgent.getSelectedPlan();
 
 		if (plan == null) {
 			log.info(" we don't have a selected plan; returning ... ");
