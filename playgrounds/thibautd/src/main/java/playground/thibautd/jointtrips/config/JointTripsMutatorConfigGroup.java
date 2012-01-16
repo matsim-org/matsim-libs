@@ -83,7 +83,7 @@ public class JointTripsMutatorConfigGroup extends Module {
 			return ""+getStartMutationProbability();
 		}
 		else if (param_name.equals( END_PROB )) {
-			return ""+getStartMutationProbability();
+			return ""+getEndMutationProbability();
 		}
 		else if (param_name.equals( SELECTOR )) {
 			return ""+getSelector();
