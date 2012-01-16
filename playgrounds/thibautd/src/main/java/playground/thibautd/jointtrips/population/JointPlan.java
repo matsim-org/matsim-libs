@@ -555,22 +555,42 @@ public class JointPlan implements Plan {
 	/**
 	 * Returns the "type" of the plan.
 	 * This allows to make sure that the most "general" plan will not be removed.
-	 * @return a string, corresponding to a list of the ids of the shared legs,
-	 * separated by "-". No shared leg corresponds to the type "".
+	 * @return a string, corresponding to a list of the ids of the origins of joint trips,
+	 * separated by "-". No shared leg corresponds to the type "". The Ids are ordered
+	 * by their natural ordering, so that the order is always the same.
 	 */
 	public String getType() {
-		boolean notFirst = false;
 
+		List<Id> jointOrigins = new ArrayList<Id>();
+		Id currentNonPuDoAct = null;
+
+		for (PlanElement pe : getPlanElements()) {
+			if ((pe instanceof JointActivity)) {
+				if( !((Activity) pe).getType().equals( JointActingTypes.PICK_UP ) &&
+					!((Activity) pe).getType().equals( JointActingTypes.DROP_OFF ) ) {
+					currentNonPuDoAct = ((JointActivity) pe).getId();
+				}
+			}
+			else if (pe instanceof JointLeg) {
+				if ( ((JointLeg) pe).getJoint() ) {
+					jointOrigins.add( currentNonPuDoAct );
+				}
+			}
+			else {
+				throw new RuntimeException( "unexpected plan element type "+pe.getClass() );
+			}
+		}
+
+		Collections.sort( jointOrigins );
 		StringBuffer type = new StringBuffer();
-		for (JointLeg currentJointLeg : this.legsMap.values()) {
-			if (currentJointLeg.getJoint()) {
+		boolean notFirst = false;
+		for (Id id : jointOrigins) {
 				if (notFirst) {
 					type.append( "-" );
 				} else {
 					notFirst = true;
 				}
-				type.append( currentJointLeg.getId() );
-			}
+				type.append( id );
 		}
 
 		return type.toString();

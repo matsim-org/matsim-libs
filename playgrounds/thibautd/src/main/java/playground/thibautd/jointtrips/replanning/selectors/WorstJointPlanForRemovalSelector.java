@@ -33,33 +33,23 @@ import playground.thibautd.jointtrips.population.JointPlan;
 
 /**
  * Returns the plan with the lowest score.
- * If it is initalised as "type aware", keeps the more "general" plan, that is, the "father" plan
- * from which we can obtain the others by desaffecting joint trips.
- * This is useful only if not using JointTripPossibilities.
- *
- * Plans which are duplicated are removed in priority.
+ * If there exists duplicated plan types, the plans of those types
+ * only are considered for exclusion (diversity is enforced)
  *
  * @author thibautd
  */
 public class WorstJointPlanForRemovalSelector implements PlanSelector {
-	private final boolean isTypeAware;
-
-	public WorstJointPlanForRemovalSelector(
-			final boolean isTypeAware) {
-		this.isTypeAware = isTypeAware;
-	}
 
 	/**
 	 * initialises a non-type aware instance.
 	 */
 	public WorstJointPlanForRemovalSelector() {
-		this( false );
 	}
 
 	@Override
 	public Plan selectPlan(final Person person) {
 		if (person instanceof Clique) {
-			return isTypeAware ? selectPlanTypeAware((Clique) person) : selectPlan((Clique) person);
+			return  selectPlan((Clique) person);
 		} else {
 			throw new IllegalArgumentException("WorstJointPlanForRemoval used "+
 					"for a non clique agent");
@@ -67,46 +57,22 @@ public class WorstJointPlanForRemovalSelector implements PlanSelector {
 	}
 
 	private static Plan selectPlan(final Clique clique) {
-		List<? extends Plan> plans = clique.getPlans();
-
-		return Collections.min( plans , new ScoreComparator() );
-	}
-
-	private static Plan selectPlanTypeAware(final Clique clique) {
-		Double worstScore = Double.POSITIVE_INFINITY;
-		Double currentScore;
-		String currentType;
-		int currentLongestType = 0;
-		int currentTypeSize;
-		int countFathers = 0;
-		Plan fatherPlan=null;
-		Plan worstPlan=null;
 
 		// hashmap that returns "Integer" count for given plans type:
 		HashMap<String, Integer> typeCounts = new HashMap<String, Integer>();
 
+		// count how many plans per type an agent has:
 		for (Plan plan : clique.getPlans()) {
-			// count how many plans per type an agent has:
-			currentType = ((JointPlan) plan).getType();
-			Integer cnt = typeCounts.get(currentType);
+			Integer cnt = typeCounts.get(((JointPlan) plan).getType());
 			if (cnt == null) {
-				typeCounts.put(currentType, Integer.valueOf(1));
+				typeCounts.put(((JointPlan) plan).getType(), Integer.valueOf(1));
 			} else {
-				typeCounts.put(currentType, Integer.valueOf(cnt.intValue() + 1));
-			}
-
-			// length check (always keep "father")
-			currentTypeSize = ((JointPlan) plan).getType().length();
-			if (currentTypeSize > currentLongestType) {
-				currentLongestType = currentTypeSize;
-				fatherPlan = plan;
-				countFathers = 1;
-			}
-			else if (currentTypeSize == currentLongestType) {
-				countFathers++;
+				typeCounts.put(((JointPlan) plan).getType(), Integer.valueOf(cnt.intValue() + 1));
 			}
 		}
 
+		Plan worst = null;
+		double worstScore = Double.POSITIVE_INFINITY;
 		for (Plan plan : clique.getPlans()) {
 
 			// if we have more than one plan of the same type:
@@ -115,17 +81,14 @@ public class WorstJointPlanForRemovalSelector implements PlanSelector {
 				// if there is a plan without score:
 				if (plan.getScore() == null) {
 					// say that the plan without score now is the "worst":
-					worstPlan = plan;
+					worst = plan;
 
 					// make sure that this one remains the selected plan:
 					worstScore = Double.NEGATIVE_INFINITY;
 
-				// otherwise do the usual logic to find the plan with the minimum score,
-				// avoiding to select the only father (if it exists)
-				} else if ((plan.getScore().doubleValue() < worstScore) &&
-						( (plan != fatherPlan) || (countFathers > 1) )
-						) {
-					worstPlan = plan;
+				// otherwise do the usual logic to find the plan with the minimum score:
+				} else if (plan.getScore().doubleValue() < worstScore) {
+					worst = plan;
 					worstScore = plan.getScore().doubleValue();
 				}
 			}
@@ -133,24 +96,20 @@ public class WorstJointPlanForRemovalSelector implements PlanSelector {
 			// (otherwise we just keep "worst=null") 
 		}
 
-		if (worstPlan == null) {
+		if (worst == null) {
 			// there is exactly one plan, or we have of each plan-type exactly one.
 			// select the one with worst score globally
 			for (Plan plan : clique.getPlans()) {
-				if ( (plan.getScore() == null)  &&
-						( (plan != fatherPlan) || (countFathers > 1) )
-						) {
+				if (plan.getScore() == null) {
 					return plan;
 				}
-				if ( (plan.getScore().doubleValue() < worstScore) &&
-						( (plan != fatherPlan) || (countFathers > 1) )
-						) {
-					worstPlan = plan;
+				if (plan.getScore().doubleValue() < worstScore) {
+					worst = plan;
 					worstScore = plan.getScore().doubleValue();
 				}
 			}
 		}
-		return worstPlan;
+		return worst;
 	}
 }
 
