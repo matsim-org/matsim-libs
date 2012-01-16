@@ -313,6 +313,20 @@ public class JointTripPossibilitiesUtils {
 		plan.resetFromPlan( newPlan );
 	}
 
+	/**
+	 * includes all joint trip possibilities
+	 */
+	public static void includeAllJointTrips(
+			final JointPlan plan) {
+		Map<JointTripPossibility, Boolean> participation = getPerformedJointTrips( plan );
+
+		for (Map.Entry<JointTripPossibility, Boolean> entry : participation.entrySet()) {
+			entry.setValue( true );
+		}
+
+		includeJointTrips( participation , plan );
+	}
+
 	private static int getIndex(
 			final Id actId,
 			final List<PlanElement> pes) {
