@@ -23,6 +23,7 @@ package playground.christoph.evacuation.analysis;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.events.parallelEventsHandler.ParallelEventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -40,10 +42,17 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * @author cdobler
+ */
 public class AgentsInMunicipality {
 
-	private final EventsManager eventsManager;
-	private final List<AgentsInMunicipalityEventsHandler> handlers;
+	final private static Logger log = Logger.getLogger(AgentsInMunicipality.class);
+	
+	private final int maxParallelMunicipalities = 750;
+	private final HandlersCreator[] runnables;
+	private final String eventsFile;
+	private final int numThreads;
 	
 	/**
 	 * Input arguments:
@@ -73,54 +82,127 @@ public class AgentsInMunicipality {
 		String eventsFile = args[5];
 		String shpFile = args[6];
 		String outputPath = args[7];
-		int numThreads = Integer.valueOf(args[8]);
+		int numThreads = Integer.valueOf(args[8]); 
 		
 		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(householdObjectAttributes).parse(householdsObjectAttributesFile);
 		
-		AgentsInMunicipality aim = new AgentsInMunicipality(scenario, householdObjectAttributes, shpFile, outputPath, numThreads);
-		aim.beforeEventsReading();
-		aim.readEventsFile(eventsFile);
-		aim.afterEventsReading();
+		new AgentsInMunicipality(scenario, householdObjectAttributes, shpFile, eventsFile, outputPath, numThreads);
+
 	}
 	
-	public AgentsInMunicipality(Scenario scenario, ObjectAttributes householdObjectAttributes, String shpFile, String outputPath, int numThreads) throws Exception {	
-		if (numThreads < 2) eventsManager = EventsUtils.createEventsManager();
-		else eventsManager = new ParallelEventsManagerImpl(numThreads);
-		handlers = new ArrayList<AgentsInMunicipalityEventsHandler>();
-		
-		if (eventsManager instanceof EventsManagerImpl) {
-			((EventsManagerImpl) eventsManager).initProcessing();
-		}
-		
+	public AgentsInMunicipality(Scenario scenario, ObjectAttributes householdObjectAttributes, String shpFile, String eventsFile, String outputPath, int numThreads) throws Exception {	
+		this.eventsFile = eventsFile;
+		this.numThreads = numThreads;
+
 		List<Feature> municipalities = new ArrayList<Feature>();
 		FeatureSource featureSource = ShapeFileReader.readDataFile(shpFile);
 		for (Object o : featureSource.getFeatures()) {
 			Feature feature = (Feature) o;
 			municipalities.add(feature);
-			
-			Integer id = (Integer) feature.getAttribute(1);
-			String name = (String) feature.getAttribute(4);
-			name = name.replace('/', '_');
-			name = name.replace('\\', '_');
-			String fileName = name + "_" + id.toString();
-			String outputFile = outputPath + "/" + fileName;
-			
-			Geometry area = feature.getDefaultGeometry();
-			
-			AgentsInMunicipalityEventsHandler aim = new AgentsInMunicipalityEventsHandler(scenario, householdObjectAttributes, outputFile, area);
-			aim.printInitialStatistics();
-			
-			eventsManager.addHandler(aim);
-			handlers.add(aim);
-		}		
+		}
+		log.info("Found " + municipalities.size() + " municipalities.");
+
+		runnables = new HandlersCreator[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			runnables[i] = new HandlersCreator(scenario, householdObjectAttributes, outputPath);
+		}
+		
+		if (municipalities.size() <= maxParallelMunicipalities) {
+			handleMunicipalities(municipalities);
+		} else {
+			int startIndex = 0;
+			while (startIndex < municipalities.size()) {
+				int endIndex = Math.min(startIndex + maxParallelMunicipalities, municipalities.size());
+				List<Feature> subList = municipalities.subList(startIndex, endIndex);
+				handleMunicipalities(subList);
+				startIndex += this.maxParallelMunicipalities;
+			}
+		}
 	}
 	
-	public void beforeEventsReading() {
-		for (AgentsInMunicipalityEventsHandler aim : handlers) aim.beforeEventsReading();
+	private void handleMunicipalities(List<Feature> municipalities) throws Exception {
+		log.info("Handling " + municipalities.size() + " municipalities.");
+				
+		for (HandlersCreator handlersCreator : runnables) handlersCreator.reset();
+		
+		// assign municipalities
+		log.info("\t\tAssigning municipalities to threads...");
+		int roundRobin = 0;
+		for (Feature municipality : municipalities) {
+			runnables[roundRobin % numThreads].addMunicipality(municipality);
+			roundRobin++;
+		}
+		log.info("\t\tdone.");
+		
+		Thread[] threads;
+		
+		// create threads to initialize AgentsInMunicipalityEventsHandler
+		log.info("\t\tInitializing AgentsInMunicipalityEventsHandlers...");
+		threads = new Thread[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			threads[i] = new Thread(runnables[i]);
+			threads[i].setName("HandlersCreator");
+		}
+		runThreads(threads);
+		log.info("\t\tdone.");
+		
+		// collecting handlers
+		List<AgentsInMunicipalityEventsHandler> handlers = new ArrayList<AgentsInMunicipalityEventsHandler>();
+		for (HandlersCreator creator : runnables) {
+			for (AgentsInMunicipalityEventsHandler aim : creator.getHandlers()) handlers.add(aim);
+		}
+		
+		EventsManager eventsManager = null;
+		if (numThreads < 2) eventsManager = EventsUtils.createEventsManager();
+		else eventsManager = new ParallelEventsManagerImpl(numThreads);
+			
+		if (eventsManager instanceof EventsManagerImpl) {
+			((EventsManagerImpl) eventsManager).initProcessing();
+		}
+		
+		// adding Handlers to EventsManager
+		log.info("\t\tAdding AgentsInMunicipalityEventsHandlers to EventsManager...");
+		for (EventHandler handler : handlers) eventsManager.addHandler(handler);
+		log.info("\t\tdone.");
+		
+		// before events reading
+		log.info("\t\tBefore events reading...");
+		threads = new Thread[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			threads[i] = new Thread(new BeforeEventsReading(runnables[i].getHandlers()));
+			threads[i].setName("BeforeEventsReading");
+		}
+		runThreads(threads);
+		log.info("\t\tdone.");
+		
+		// read events file
+		log.info("\t\tReading events...");
+		readEventsFile(eventsManager);
+		log.info("\t\tdone.");
+		
+		// after events reading
+		log.info("\t\tAfter events reading...");
+		threads = new Thread[numThreads];
+		for (int i = 0; i < numThreads; i++) {
+			threads[i] = new Thread(new AfterEventsReading(runnables[i].getHandlers()));
+			threads[i].setName("AfterEventsReading");
+		}
+		runThreads(threads);
+		log.info("\t\tdone.");
+
+		log.info("done.");
 	}
 	
-	public void readEventsFile(String eventsFile) {
+	private void runThreads(Thread[] threads) throws Exception {
+		// running threads
+		for (Thread thread : threads) thread.start();
+		
+		// wait until all threads are finished
+		for (Thread thread : threads) thread.join();
+	}
+	
+	private void readEventsFile(EventsManager eventsManager) {
 		if (!eventsFile.toLowerCase().endsWith(".xml.gz") && !eventsFile.toLowerCase().endsWith(".xml")) {
 			return;
 		} else {
@@ -131,8 +213,80 @@ public class AgentsInMunicipality {
 		}
 	}
 	
-	public void afterEventsReading() {
-		for (AgentsInMunicipalityEventsHandler aim : handlers) aim.afterEventsReading();
+	private class BeforeEventsReading implements Runnable {
+		
+		private final List<AgentsInMunicipalityEventsHandler> handlers;
+		
+		public BeforeEventsReading(List<AgentsInMunicipalityEventsHandler> handlers) {
+			this.handlers = handlers;
+		}
+		
+		public void run() {
+			for (AgentsInMunicipalityEventsHandler handler : handlers) handler.beforeEventsReading();
+		}
+	}
+	
+	private class HandlersCreator implements Runnable {
+
+		private final Scenario scenario;
+		private final ObjectAttributes householdObjectAttributes;
+		private final String outputPath;
+		private final List<Feature> municipalities;
+		private final List<AgentsInMunicipalityEventsHandler> handlers;
+		
+		public HandlersCreator(Scenario scenario, ObjectAttributes householdObjectAttributes, String outputPath) {
+			this.scenario = scenario;
+			this.householdObjectAttributes = householdObjectAttributes;
+			this.outputPath = outputPath;
+			
+			this.municipalities = new ArrayList<Feature>();
+			this.handlers = new ArrayList<AgentsInMunicipalityEventsHandler>();
+		}
+		
+		public void reset() {
+			this.municipalities.clear();
+			this.handlers.clear();
+		}
+		
+		public List<AgentsInMunicipalityEventsHandler> getHandlers() {
+			return this.handlers;
+		}
+		
+		public void addMunicipality(Feature municipality) {
+			this.municipalities.add(municipality);
+		}
+		
+		@Override
+		public void run() {
+			for (Feature feature : municipalities) {
+				Integer id = (Integer) feature.getAttribute(1);
+				String name = (String) feature.getAttribute(4);
+				name = name.replace('/', '_');
+				name = name.replace('\\', '_');
+				String fileName = name + "_" + id.toString();
+				String outputFile = outputPath + "/" + fileName;
+				
+				Geometry area = feature.getDefaultGeometry();
+				
+				AgentsInMunicipalityEventsHandler aim = new AgentsInMunicipalityEventsHandler(scenario, householdObjectAttributes, outputFile, area);
+				aim.printInitialStatistics();
+		
+				handlers.add(aim);
+			}
+		}	
+	}
+	
+	private class AfterEventsReading implements Runnable {
+		
+		private final List<AgentsInMunicipalityEventsHandler> handlers;
+		
+		public AfterEventsReading(List<AgentsInMunicipalityEventsHandler> handlers) {
+			this.handlers = handlers;
+		}
+		
+		public void run() {
+			for (AgentsInMunicipalityEventsHandler handler : handlers) handler.afterEventsReading();
+		}
 	}
 
 }
