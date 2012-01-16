@@ -33,7 +33,7 @@ import org.matsim.core.population.ActivityImpl;
 public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
 
     private Map<Id, ActivityImpl> activities = new HashMap<Id, ActivityImpl>();
-    private ActivityHandler activityHandler;
+    private ActivityHandler activityHandler = null;
 
     @Override
     public void handleEvent(ActivityEndEvent event) {

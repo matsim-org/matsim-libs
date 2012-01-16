@@ -19,57 +19,59 @@
 
 package org.matsim.core.scoring;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.TravelEventImpl;
-import org.matsim.testcases.MatsimTestCase;
 
+public class EventsToLegsTest {
 
-public class EventsToLegsTest extends MatsimTestCase {
+	@Test
+	public void testCreatesLeg() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsToLegs eventsToLegs = new EventsToLegs();
+		RememberingLegHandler lh = new RememberingLegHandler();
+		eventsToLegs.setLegHandler(lh);
+		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
+		eventsToLegs.handleEvent(new TravelEventImpl(30.0, new IdImpl("1"), 50.0));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
+		Assert.assertNotNull(lh.handledLeg);
+		Assert.assertEquals(10.0, lh.handledLeg.getDepartureTime(), 1e-9);
+		Assert.assertEquals(20.0, lh.handledLeg.getTravelTime(), 1e-9);
+		Assert.assertEquals(50.0, lh.handledLeg.getRoute().getDistance(), 1e-9);
+	}
 
-    private Leg producedLeg;
+	@Test
+	public void testCreatesLegWithRoute() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsToLegs eventsToLegs = new EventsToLegs();
+		RememberingLegHandler lh = new RememberingLegHandler();
+		eventsToLegs.setLegHandler(lh);
+		IdImpl agentId = new IdImpl("1");
+		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
+		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
+		Assert.assertNotNull(lh.handledLeg);
+		Assert.assertEquals(10.0,lh.handledLeg.getDepartureTime(), 1e-9);
+		Assert.assertEquals(20.0,lh.handledLeg.getTravelTime(), 1e-9);
+		Assert.assertEquals(20.0,lh.handledLeg.getRoute().getTravelTime(), 1e-9);
+	}
+	
+	private static class RememberingLegHandler implements LegHandler {
 
-    public void testCreatesLeg() {
-        EventsManager eventsManager = EventsUtils.createEventsManager();
-        EventsToLegs eventsToLegs = new EventsToLegs();
-        eventsToLegs.setLegHandler(new LegHandler(){
-            @Override
-            public void handleLeg(Id agentId, Leg leg) {
-                producedLeg = leg;
-            }
-        });
-        eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
-        eventsToLegs.handleEvent(new TravelEventImpl(30.0, new IdImpl("1"), 50.0));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
-        assertNotNull(producedLeg);
-        assertEquals(10.0,producedLeg.getDepartureTime());
-        assertEquals(20.0,producedLeg.getTravelTime());
-        assertEquals(50.0,producedLeg.getRoute().getDistance());
-    }
-
-    public void testCreatesLegWithRoute() {
-        EventsManager eventsManager = EventsUtils.createEventsManager();
-        EventsToLegs eventsToLegs = new EventsToLegs();
-        eventsToLegs.setLegHandler(new LegHandler(){
-            @Override
-            public void handleLeg(Id agentId, Leg leg) {
-                producedLeg = leg;
-            }
-        });
-        IdImpl agentId = new IdImpl("1");
-        eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
-        eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
-        assertNotNull(producedLeg);
-        assertEquals(10.0,producedLeg.getDepartureTime());
-        assertEquals(20.0,producedLeg.getTravelTime());
-        assertEquals(20.0,producedLeg.getRoute().getTravelTime());
-    }
+		/*package*/ Leg handledLeg = null;
+		
+		@Override
+		public void handleLeg(Id agentId, Leg leg) {
+			this.handledLeg = leg;
+		}
+	}
 
 }

@@ -73,8 +73,12 @@ public class TransitDriverTest extends MatsimTestCase {
 		public void setInternalInterface( InternalInterface internalInterface ) {
 		}
 
-		FakeEngine( Netsim netsimTmp ) {
-			this.netsim = netsimTmp ;
+		/*package*/ FakeEngine() {
+			this.netsim = null;
+		}
+		
+		/*package*/ FakeEngine(Netsim netsim) {
+			this.netsim = netsim;
 		}
 
 		@Override
@@ -131,9 +135,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = null;
-		QSim tqsim = null;
-		MobsimEngine trEngine = new FakeEngine(tqsim) ;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine );
+		MobsimEngine trEngine = new FakeEngine();
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
@@ -172,9 +175,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
 		TransitStopAgentTracker tracker = null;
-		QSim tqsim = null;
-		MobsimEngine trEngine = new FakeEngine(tqsim) ;
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine );
+		MobsimEngine trEngine = new FakeEngine();
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 
