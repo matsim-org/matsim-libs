@@ -35,12 +35,14 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	private PtLegHandler inVehWaitHandler;
 	private double TRAVEL_PT_IN_VEHICLE;
 	private double TRAVEL_PT_WAITING;
+	protected final double monetaryCostPerKm;
 
-	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup config, PtLegHandler inVehWaitHandler, double TRAVEL_PT_IN_VEHICLE, double TRAVEL_PT_WAITING) {
+	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup config, PtLegHandler inVehWaitHandler, double TRAVEL_PT_IN_VEHICLE, double TRAVEL_PT_WAITING, double monetaryCostPerKm) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.inVehWaitHandler = inVehWaitHandler;
 		this.TRAVEL_PT_IN_VEHICLE = TRAVEL_PT_IN_VEHICLE;
 		this.TRAVEL_PT_WAITING = TRAVEL_PT_WAITING;
+		this.monetaryCostPerKm = monetaryCostPerKm;
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
-		scoringFunctionAccumulator.addScoringFunction(new CarLegScoringFunction(plan, params));
+		scoringFunctionAccumulator.addScoringFunction(new CarLegScoringFunction(plan, params, this.monetaryCostPerKm));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
 //		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
 //		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));

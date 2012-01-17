@@ -23,7 +23,6 @@
  */
 package playground.ikaddoura.busCorridor.finalDyn2;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -63,10 +62,6 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	}
 
 	private double calculateFare(PersonEntersVehicleEvent event, Population population) {
-		// Berechnung des Fahrpreises abhängig von mit/ohne Zeitkarte: event --> personId --> Plan (hat Zeitkarte: ID: z1_ID/hat keine Zeitkarte: ID: z0_ID)
-		// Berechnung des Fahrpreises abhängig vom Alter: event --> personID --> Plan (unter 6 Jahre: fare = 0 / über 6 Jahre: fare = ...)
-		// Berechnung des Fahrpreises abhängig von Distanzen etc.: event --> personId --> Plan --> durchschnittliche Distanz der Legs (unter 2km --> KurzstreckenPreis, über 2km --> Normalpreis)
-//		double fare = -2.3;
 		return this.fare;
 	}
 

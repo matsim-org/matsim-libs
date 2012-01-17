@@ -44,7 +44,7 @@ public class ExternalControler {
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/population1agent.xml"; // for first iteration only
 	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn_test";
 	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 1; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
+	static int lastInternalIteration = 10; // for ChangeTransitLegMode: ModuleDisableAfterIteration = 28
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 6*3600, 8*3600); // orderId, id, numberOfBuses, fromTime, toTime
@@ -106,12 +106,12 @@ public class ExternalControler {
 			InternalControler internalControler = new InternalControler(configFile, this.extItNr, this.getDirectoryExtIt(), lastInternalIteration, populationFile, outputExternalIterationDirPath, this.getMaxNumberOfBuses(), networkFile, fare);
 			internalControler.run();
 
-			Operator operator = new Operator(this.getMaxNumberOfBuses(), this.getCapacity());
-			Users users = new Users(this.getDirectoryExtIt(), networkFile);
-			
-			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
-			analysis.readEvents(operator, users, this.day);
-			
+//			Operator operator = new Operator(this.getMaxNumberOfBuses(), this.getCapacity());
+//			Users users = new Users(this.getDirectoryExtIt(), networkFile);
+//			
+//			OperatorUserAnalysis analysis = new OperatorUserAnalysis(this.directoryExtIt, lastInternalIteration, networkFile);
+//			analysis.readEvents(operator, users, this.day);
+//			
 //			users.analyzeScores();
 //			operator.calculateScore();
 //
@@ -149,7 +149,7 @@ public class ExternalControler {
 			
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
 		}
-
+//
 //		ChartFileWriter chartWriter = new ChartFileWriter();
 //		
 //		chartWriter.writeChart_Parameters(outputExternalIterationDirPath, this.iteration2numberOfBuses, "Number of buses per iteration", "NumberOfBuses");

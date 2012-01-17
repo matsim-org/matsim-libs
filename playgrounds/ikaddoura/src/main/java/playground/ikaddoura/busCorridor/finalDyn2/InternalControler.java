@@ -56,8 +56,11 @@ public class InternalControler {
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
 	private final double CONSTANT_CAR = -2.2118;
 	private final double CONSTANT_PT = 0;
+	
 	private final double TRAVEL_PT_IN_VEHICLE = -3.2982; // Utils per Hour
 	private final double TRAVEL_PT_WAITING = -5.5356; // Utils per Hour
+	
+	private final double monetaryCostPerKm = -0.11; // AUD per km 
 	
 	private final double PERFORMING = 0;
 	private final double LATE_ARRIVAL = 0;
@@ -123,7 +126,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
 		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
 		
-		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING);
+		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm);
 		controler.setScoringFunctionFactory(scoringfactory);
 		controler.run();		
 	}

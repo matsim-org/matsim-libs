@@ -32,22 +32,22 @@ import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
  */
 public class MoneyEventHandler implements AgentMoneyEventHandler {
 
-	private double earnings;
+	private double revenues;
 	
 	@Override
 	public void reset(int iteration) {
-		this.earnings = 0;
+		this.revenues = 0;
 	}
 
 	@Override
 	public void handleEvent(AgentMoneyEvent event) {
-		this.earnings = this.earnings + (-1 * event.getAmount());
+		this.revenues = this.revenues + (-1 * event.getAmount());
 	}
 
 	/**
 	 * @return the earnings
 	 */
-	public double getEarnings() {
-		return earnings;
+	public double getRevenues() {
+		return revenues;
 	}
 }

@@ -42,12 +42,14 @@ public class CarLegScoringFunction implements LegScoring, BasicScoring {
 	private static final double INITIAL_LAST_TIME = 0.0;
 	private static final int INITIAL_INDEX = 1;
 	private static final double INITIAL_SCORE = 0.0;
+	private double monetaryCostPerKm;
 
 	/** The parameters used for scoring */
 	protected final CharyparNagelScoringParameters params;
 
-	public CarLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params) {
+	public CarLegScoringFunction(final Plan plan, final CharyparNagelScoringParameters params, double monetaryCostPerKm) {
 		this.params = params;
+		this.monetaryCostPerKm = monetaryCostPerKm;
 		this.reset();
 		this.plan = plan;
 	}
@@ -114,6 +116,8 @@ public class CarLegScoringFunction implements LegScoring, BasicScoring {
 					distanceWrnCnt++ ;
 				}
 			}
+			double monetaryCostsCar = leg.getRoute().getDistance()/1000 * monetaryCostPerKm;
+			tmpScore += monetaryCostsCar * this.params.marginalUtilityOfMoney;
 			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + this.params.marginalUtilityOfDistanceCar_m * dist;
 			tmpScore += this.params.constantCar ;
 			
