@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
@@ -62,14 +62,14 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 			handler.startNetwork(network, this.writer);
 			handler.writeSeparator(this.writer);
 			handler.startNodes(network, this.writer);
-			for (Node n : NetworkUtils.getSortedNodes(network).values()) {
+			for (Node n : NetworkUtils.getSortedNodes(network)) {
 				handler.startNode(n, this.writer);
 				handler.endNode(this.writer);
 			}
 			handler.endNodes(this.writer);
 			handler.writeSeparator(this.writer);
 			handler.startLinks(network, this.writer);
-			for (Link l : NetworkUtils.getSortedLinks(network).values()) {
+			for (Link l : NetworkUtils.getSortedLinks(network)) {
 				handler.startLink(l, this.writer);
 				handler.endLink(this.writer);
 			}
@@ -79,8 +79,8 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 			this.writer.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new UncheckedIOException(e);
 		}
 	}
-
+	
 }

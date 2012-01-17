@@ -21,11 +21,12 @@
 package org.matsim.core.utils.misc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -71,10 +72,17 @@ public class NetworkUtils {
 
 	/**
 	 * @param network
-	 * @return sorted map containing containing the links as values and their ids as keys.
+	 * @return array containing the nodes, sorted ascending by id.
 	 */
-	public static SortedMap<Id, Node> getSortedNodes(final Network network) {
-		return new TreeMap<Id, Node>(network.getNodes());
+	public static Node[] getSortedNodes(final Network network) {
+		Node[] nodes = network.getNodes().values().toArray(new Node[network.getNodes().size()]);
+		Arrays.sort(nodes, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				return o1.getId().compareTo(o2.getId());
+			}
+		});
+		return nodes;
 	}
 	
 	/**
@@ -106,37 +114,17 @@ public class NetworkUtils {
 
 	/**
 	 * @param network
-	 * @return sorted map containing containing the links as values and their ids as keys.
+	 * @return array containing the links, sorted ascending by id.
 	 */
-	public static SortedMap<Id, Link> getSortedLinks(final Network network) {
-		return new TreeMap<Id, Link>(network.getLinks());
-	}
-	
-	/**
-	 * Sorts the links and nodes in the given network.
-	 * @param network 
-	 */
-	@SuppressWarnings("unchecked")
-	public static void sortNetwork(final Network network) {
-		Map<Id, Link> linksMap = (Map<Id, Link>) network.getLinks();
-		Map<Id, Node> nodesMap = (Map<Id, Node>) network.getNodes(); 
-				
-		Map<Id, Node> sortedNodesMap = getSortedNodes(network);
-		Map<Id, Link> sortedLinksMap = getSortedLinks(network);
-		
-		// if the nodes are already stored in a sorted map
-		if (nodesMap instanceof SortedMap) {
-			// if the links are already stored in a sorted map
-			if (linksMap instanceof SortedMap) return;
-			else {
-				for (Link link : sortedLinksMap.values()) network.removeLink(link.getId());
-				for (Link link : sortedLinksMap.values()) network.addLink(link);
+	public static Link[] getSortedLinks(final Network network) {
+		Link[] links = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
+		Arrays.sort(links, new Comparator<Link>() {
+			@Override
+			public int compare(Link o1, Link o2) {
+				return o1.getId().compareTo(o2.getId());
 			}
-		} else {
-			for (Node node : sortedNodesMap.values()) network.removeNode(node.getId());
-			for (Node node : sortedNodesMap.values()) network.addNode(node);
-			for (Link link : sortedLinksMap.values()) network.addLink(link);			
-		}
+		});
+		return links;
 	}
 	
 	/**

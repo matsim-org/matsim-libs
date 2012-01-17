@@ -123,6 +123,9 @@ import org.matsim.core.utils.misc.Time;
 	// <link ... > ... </link>
 	//////////////////////////////////////////////////////////////////////
 
+	private Set<String> lastSet = null;
+	private String lastModes = null;
+	
 	@Override
 	public void startLink(final Link link, final BufferedWriter out) throws IOException {
 		out.write("\t\t<link");
@@ -137,16 +140,20 @@ import org.matsim.core.utils.misc.Time;
 
 		Set<String> modes = link.getAllowedModes();
 		if (modes != null) {
-			StringBuffer buffer = new StringBuffer();
-			int counter = 0;
-			for (String mode : modes) {
-				if (counter > 0) {
-					buffer.append(',');
+			if (modes != this.lastSet) { // default LinkImpl internally caches the modes-set, thus the != operator works indeed
+				StringBuffer buffer = new StringBuffer();
+				int counter = 0;
+				for (String mode : modes) {
+					if (counter > 0) {
+						buffer.append(',');
+					}
+					buffer.append(mode);
+					counter++;
 				}
-				buffer.append(mode);
-				counter++;
+				this.lastModes = buffer.toString();
+				this.lastSet = modes;
 			}
-			out.write(" modes=\"" + buffer.toString() + "\"");
+			out.write(" modes=\"" + this.lastModes + "\"");
 		}
 
 		if (link instanceof LinkImpl) {

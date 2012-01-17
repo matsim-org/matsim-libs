@@ -391,7 +391,7 @@ public class LinkImpl implements Link {
 				return set3;
 			}
 			for (Set<?> s : list) {
-				if (equalSets(set, s)) {
+				if (s.equals(set)) {
 					return (Set<T>) s;
 				}
 			}
@@ -402,16 +402,5 @@ public class LinkImpl implements Link {
 			return set3;
 		}
 
-		private static boolean equalSets(final Set<?> set1, final Set<?> set2) {
-			if (set1.size() != set2.size()) {
-				return false;
-			}
-			for (Object o : set1) {
-				if (!set2.contains(o)) {
-					return false;
-				}
-			}
-			return true;
-		}
 	}
 }

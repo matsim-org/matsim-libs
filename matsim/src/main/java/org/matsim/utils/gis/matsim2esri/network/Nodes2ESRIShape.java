@@ -70,7 +70,7 @@ public class Nodes2ESRIShape {
 
 	public void write() {
 		Collection<Feature> features = new ArrayList<Feature>();
-		for (Node node : NetworkUtils.getSortedNodes(this.network).values()) {
+		for (Node node : NetworkUtils.getSortedNodes(this.network)) {
 			features.add(getFeature(node));
 		}
 		ShapeFileWriter.writeGeometries(features, this.filename);
