@@ -134,9 +134,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
-		TransitStopAgentTracker tracker = null;
 		MobsimEngine trEngine = new FakeEngine();
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, trEngine);
 
 		assertTrue(driver.getCurrentLeg().getRoute() instanceof NetworkRoute);
 		NetworkRoute netRoute = (NetworkRoute) driver.getCurrentLeg().getRoute();
@@ -174,9 +173,8 @@ public class TransitDriverTest extends MatsimTestCase {
 		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
-		TransitStopAgentTracker tracker = null;
 		MobsimEngine trEngine = new FakeEngine();
-		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, tracker, trEngine);
+		AbstractTransitDriver driver = new TransitDriver(tLine, tRoute, dep, null, trEngine);
 		assertEquals(depTime, driver.getActivityEndTime(), MatsimTestCase.EPSILON);
 	}
 

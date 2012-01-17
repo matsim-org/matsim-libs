@@ -171,7 +171,12 @@ public class KMZWriter implements MatsimSomeWriter {
 			return;
 		}
 		this.nonKmlFiles.put(filename, inZipFilename);
-		addNonKMLFile(new FileInputStream(filename), inZipFilename);
+		FileInputStream fis = new FileInputStream(filename);
+		try {
+			addNonKMLFile(fis, inZipFilename);
+		} finally {
+			fis.close();
+		}
 	}
 
 	/**

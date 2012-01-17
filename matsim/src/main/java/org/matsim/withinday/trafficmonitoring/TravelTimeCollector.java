@@ -445,8 +445,8 @@ public class TravelTimeCollector implements PersonalizableTravelTime,
 	 */
 	private static class UpdateMeanTravelTimesThread extends Thread {
 
-		private CyclicBarrier startBarrier;
-		private CyclicBarrier endBarrier;
+		private CyclicBarrier startBarrier = null;
+		private CyclicBarrier endBarrier = null;
 
 		private double time = 0.0;
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;

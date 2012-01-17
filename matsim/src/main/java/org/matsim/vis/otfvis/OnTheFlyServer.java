@@ -157,8 +157,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 				}
 			}
 		}
-		if (status == Status.PAUSE) {
-			synchronized(paused) {
+		synchronized(paused) {
+			while (status == Status.PAUSE) {
 				try {
 					paused.wait();
 				} catch (InterruptedException e) {

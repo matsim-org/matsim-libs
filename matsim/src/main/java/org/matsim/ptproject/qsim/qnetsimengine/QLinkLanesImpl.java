@@ -485,44 +485,42 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	AbstractQLink getQLink() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	double getInverseSimulatedFlowCapacity() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
 	double getStorageCapacity() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
 	int getBufferStorage() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
 	double getLength() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
 	boolean moveLane(double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
 	void calculateCapacities() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException();
 	}
 
 
