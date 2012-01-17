@@ -21,9 +21,9 @@ package playground.benjamin.internalization;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.PersonalizableTravelCost;
@@ -41,6 +41,7 @@ import playground.benjamin.emissions.types.WarmPollutant;
  *
  */
 public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
+	private static final Logger logger = Logger.getLogger(EmissionTravelCostCalculator.class);
 	
 	TravelTime timeCalculator;
 	double marginalUtlOfMoney;
@@ -48,6 +49,7 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 	double marginalUtlOfTravelTime;
 	Person person;
 	EmissionModule emissionModule;
+	// TODO: get this from somewhere else?
 	EmissionCostModule costModule = new EmissionCostModule();
 
 	public EmissionTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule) {
@@ -74,6 +76,11 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 		double distanceCost = - this.distanceCostRateCar * distance;
 		double generalizedDistanceCost = this.marginalUtlOfMoney * distanceCost;
 		
+		
+		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
+		the average travel time on that link in the last iteration) would have to pay if chosing that link in the next
+		iteration. Cold emission costs are assumed not to change routing; they might change mode choice (not implemented)! */
+		
 		Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
 		VehicleType vehicleType = vehicle.getType();
 		String vehicleInformation = vehicleType.getId().toString();
@@ -86,15 +93,17 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 				linkTravelTime,
 				vehicleInformation
 				);
-		// cold emission costs are assumed not to change routing; they might change mode choice (not implemented)!
+
 		double expectedEmissionCosts = costModule.calculateWarmEmissionCosts(expectedWarmEmissions );
 		double generalizedExpectedEmissionCost = this.marginalUtlOfMoney * expectedEmissionCosts ;
+//		logger.info("expected emission costs for link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
 		
-		if(link.getId().equals(new IdImpl("11"))){
+		// Test the routing:
+//		if(!link.getId().equals(new IdImpl("11"))) 
+//			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
+//		else 
 			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost + generalizedExpectedEmissionCost;
-		} else {
-			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
-		}
+		
 		return generalizedTravelCost;
 	}
 

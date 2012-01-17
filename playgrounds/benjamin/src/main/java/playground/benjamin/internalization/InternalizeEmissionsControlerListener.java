@@ -49,8 +49,6 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
 
-
-
 	public InternalizeEmissionsControlerListener(Vehicles emissionVehicles, EmissionModule emissionModule) {
 		this.emissionVehicles = emissionVehicles;
 		this.emissionModule = emissionModule;

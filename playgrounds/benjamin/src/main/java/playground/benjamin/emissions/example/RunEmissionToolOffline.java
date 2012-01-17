@@ -56,7 +56,7 @@ public class RunEmissionToolOffline {
 	
 	static String eventsFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.events.xml.gz";
 	static String netFile = "../../detailedEval/emissions/testScenario/output/output_network.xml.gz";
-	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_1pct.xml.gz";
+	static String emissionVehicleFile = "../../detailedEval/emissions/testScenario/input/emissionVehicles_10pct.xml.gz";
 	static String emissionEventOutputFile = "../../detailedEval/emissions/testScenario/output/ITERS/it.0/0.emission.events.xml.gz";
 
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
@@ -88,6 +88,9 @@ public class RunEmissionToolOffline {
 		emissionModule.createLookupTables();
 		emissionModule.createEmissionHandler();
 		
+		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
@@ -95,8 +98,6 @@ public class RunEmissionToolOffline {
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
 		
-		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 		emissionEventWriter.closeFile();
 
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);

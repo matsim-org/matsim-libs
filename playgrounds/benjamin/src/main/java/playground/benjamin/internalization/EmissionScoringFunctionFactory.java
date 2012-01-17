@@ -43,13 +43,6 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	Network network;
 	ScoringFromEmissions scoringFromEmissions;
 	
-	/**
-	 * @return the scoringFromEmissions
-	 */
-	public ScoringFromEmissions getScoringFromEmissions() {
-		return scoringFromEmissions;
-	}
-
 	public EmissionScoringFunctionFactory(Controler controler) {
 		this.controler = controler;
 		this.configGroup = controler.getConfig().planCalcScore();
@@ -74,6 +67,10 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 		accumulator.addScoringFunction(this.scoringFromEmissions);
 
 		return accumulator;
+	}
+
+	public ScoringFromEmissions getScoringFromEmissions() {
+		return scoringFromEmissions;
 	}
 
 }

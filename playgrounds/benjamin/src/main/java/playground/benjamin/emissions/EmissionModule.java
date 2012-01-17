@@ -436,7 +436,7 @@ public class EmissionModule {
 		
 		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
 				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go orrured on " + wam.getStopGoKmCounter() + " km of total " +
+		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		
 		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "

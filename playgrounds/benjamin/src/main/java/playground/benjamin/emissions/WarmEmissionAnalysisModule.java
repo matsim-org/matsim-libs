@@ -113,6 +113,11 @@ public class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
+	public void throwWarmEmissionEvent(double enterTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
+		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, vehicleId, warmEmissions);
+		this.eventsManager.processEvent(warmEmissionEvent);
+	}
+
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
 			Id personId,
 			Integer roadType,
@@ -138,11 +143,6 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissions;
 	}
 	
-	public void throwWarmEmissionEvent(double enterTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
-		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, vehicleId, warmEmissions);
-		this.eventsManager.processEvent(warmEmissionEvent);
-	}
-
 	private Map<WarmPollutant, Double> calculateWarmEmissions(
 			Id personId,
 			Double travelTime,
@@ -183,7 +183,7 @@ public class WarmEmissionAnalysisModule {
 		double travelTime_h = travelTime / 3600;
 		int freeFlowSpeed_kmh = (int) Math.round(freeVelocity * 3.6);
 		int averageSpeed_kmh = (int) Math.round(linkLength_km / travelTime_h);
-
+		
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -222,8 +222,8 @@ public class WarmEmissionAnalysisModule {
 			}
 			
 			if (averageSpeed_kmh > freeFlowSpeed_kmh){
-				logger.info("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
-				throw new RuntimeException("Average speed was higher than free flow speed; this might produce negative warm emissions. Aborting...");
+//				logger.warn("averageSpeed_kmh: " + averageSpeed_kmh + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh);
+//				throw new RuntimeException("Average speed was higher than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
 			if(averageSpeed_kmh == freeFlowSpeed_kmh) {
 				generatedEmissions = linkLength_km * efFreeFlow_gpkm;

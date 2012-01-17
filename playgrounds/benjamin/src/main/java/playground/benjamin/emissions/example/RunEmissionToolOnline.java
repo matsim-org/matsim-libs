@@ -44,11 +44,13 @@ public class RunEmissionToolOnline {
 	
 	static String inputPath = "../../detailedEval/emissions/testScenario/input/";
 	static String networkFile = inputPath + "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
-	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+//	static String plansFile = inputPath + "mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
+	static String plansFile = inputPath + "mergedPopulation_All_10pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 	
 	static String emissionInputPath = "../../detailedEval/emissions/hbefaForMatsim/";
 	static String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	static String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
+//	static String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
+	static String emissionVehicleFile = inputPath + "emissionVehicles_10pct.xml.gz";
 	
 	static String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
 	static String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
@@ -85,8 +87,11 @@ public class RunEmissionToolOnline {
 		qcg.setEndTime(30 * 3600.);
 		qcg.setFlowCapFactor(0.1);
 		qcg.setStorageCapFactor(0.3);
+//		qcg.setFlowCapFactor(0.01);
+//		qcg.setStorageCapFactor(0.03);
 		qcg.setNumberOfThreads(1);
 		qcg.setRemoveStuckVehicles(false);
+		qcg.setStuckTime(10.0);
 		controler.getConfig().addQSimConfigGroup(qcg);
 		
 	// planCalcScoreConfigGroup
