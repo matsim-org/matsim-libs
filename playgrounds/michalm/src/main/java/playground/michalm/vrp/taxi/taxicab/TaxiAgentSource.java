@@ -1,11 +1,9 @@
 package playground.michalm.vrp.taxi.taxicab;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -45,7 +43,6 @@ public class TaxiAgentSource
     {
         QSim qSim = (QSim)taxiSimEngine.getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
-        List<MobsimAgent> taxiAgents = new ArrayList<MobsimAgent>(vehicles.size());
 
         for (Vehicle vrpVeh : vehicles) {
             TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, data.getVrpGraph()
@@ -59,11 +56,11 @@ public class TaxiAgentSource
                     taxiAgentLogic);
 
             if (isAgentWithPlan) {
-                taxiAgents.add(new DynAgentWithPlan(taxiAgent, new VRPSchedulePlanFactory(vrpVeh,
+                qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent, new VRPSchedulePlanFactory(vrpVeh,
                         data)));
             }
             else {
-                taxiAgents.add(taxiAgent);
+                qSim.insertAgentIntoMobsim(taxiAgent);
             }
 
             qSim.createAndParkVehicleOnLink(

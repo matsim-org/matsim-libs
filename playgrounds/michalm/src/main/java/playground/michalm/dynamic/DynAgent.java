@@ -51,9 +51,11 @@ public class DynAgent
         vrpActivity = this.agentLogic.init(this);
         activityEndTime = vrpActivity.getEndTime();
 
-        if (activityEndTime != Time.UNDEFINED_TIME || activityEndTime != Double.POSITIVE_INFINITY) {
+        if (activityEndTime != Time.UNDEFINED_TIME) {
             state = MobsimAgent.State.ACTIVITY;
-            simulation.insertAgentIntoMobsim(this);
+        }
+        else {
+            state = MobsimAgent.State.ABORT;// ??????
         }
     }
 
@@ -93,34 +95,20 @@ public class DynAgent
 
     public void startActivity(DynActivity activity, double now)
     {
-        this.vrpActivity = activity;
+        vrpActivity = activity;
         activityEndTime = vrpActivity.getEndTime();
+        state = MobsimAgent.State.ACTIVITY;
 
         eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id,
                 currentLinkId, null, vrpActivity.getActivityType()));
-
-        if (activityEndTime == Double.POSITIVE_INFINITY) {
-            // TODO set state to ACTIVITY??
-            simulation.getAgentCounter().decLiving();
-        }
-        else {
-            state = MobsimAgent.State.ACTIVITY;
-//            simulation.reInsertAgentIntoMobsim(this);
-			// yyyyyy 000000
-
-        }
     }
 
 
     public void startLeg(DynLeg leg, double now)
     {
-        this.vrpLeg = leg;
+        vrpLeg = leg;
         nextLinkId = leg.getNextLinkId();
-
         state = MobsimAgent.State.LEG;
-//        simulation.reInsertAgentIntoMobsim(this);
-		// yyyyyy 000000
-
     }
 
 
@@ -176,7 +164,13 @@ public class DynAgent
     @Override
     public final Id getPlannedVehicleId()
     {
-        return (state == State.LEG) ? id : null;
+        if (state != State.LEG) {
+            throw new IllegalStateException();// return null;
+        }
+
+        // according to PersonDriverAgentImpl:
+        // we still assume the vehicleId is the agentId if no vehicleId is given.
+        return id;
     }
 
 

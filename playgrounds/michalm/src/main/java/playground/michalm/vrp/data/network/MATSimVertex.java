@@ -9,6 +9,7 @@ import pl.poznan.put.vrp.dynamic.data.network.*;
 public interface MATSimVertex
     extends Vertex
 {
+    //usually getCoord() == getLink().getCoord(); however not always!
     Coord getCoord();
 
 
