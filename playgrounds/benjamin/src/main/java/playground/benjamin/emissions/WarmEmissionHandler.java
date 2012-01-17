@@ -177,8 +177,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
 
 		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
-			logger.info("personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
-			logger.info(personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
+			logger.info("enterTime | personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
+			logger.info(enterTime + " | " + personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
 //		
 //			logger.info("departureTime_h: " + this.agentdeparture.get(personId).getSecond() / 3600);
 //			logger.info("arrivalTime_h: " + this.agentarrival.get(personId).getSecond() / 3600);
