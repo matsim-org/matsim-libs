@@ -20,26 +20,34 @@
 
 package playground.christoph.evacuation.vehicles;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.households.Household;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -50,22 +58,31 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	
 	private final Scenario scenario;
 	private final PlanAlgorithm routingAlgorithm;
-	private final Counter counter;
+	private final Counter assignedVehiclesCounter;
+	private final Counter removedCarLegsCounter;
+	private final Counter addedCarLegsCounter;
 	private final Map<Id, Id> mapping;	// <AgentId, VehicleId>
 	
 	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
 		this.scenario = scenario;
 		this.routingAlgorithm = planAlgorithm;
 		
-		this.counter = new Counter("Assigned vehicles: ");
+		this.assignedVehiclesCounter = new Counter("Assigned vehicles: ");
+		this.removedCarLegsCounter = new Counter("Legs with mode changed from car to another mode: ");
+		this.addedCarLegsCounter = new Counter("Legs with mode changed from another mode to car: ");
 		this.mapping = new HashMap<Id, Id>();
+	}
+	
+	public void printStatistics() {
+		assignedVehiclesCounter.printCounter();
+		removedCarLegsCounter.printCounter();
 	}
 	
 	public void run(Household household) {
 		
 		// get a household's persons and check whether they require a car
     	List<Person> persons = new ArrayList<Person>();
-    	List<Person> vehicleRequiringPersons = new ArrayList<Person>();
+    	Queue<Person> vehicleRequiringPersons = new PriorityQueue<Person>(10, new CarLegsComparator(scenario.getNetwork()));
     	for (Id personId : household.getMemberIds()) {
     		Person p = scenario.getPopulation().getPersons().get(personId);
     		persons.add(p);
@@ -78,12 +95,12 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     	List<Id> vehicleIds = household.getVehicleIds();
     	
     	/*
-    	 * If the household requires more vehicles than available.
-    	 * TODO: implement a better methodology to adapt person's plans,
-    	 * e.g. count car legs or take their length into account.
+    	 * If the household requires more vehicles than available, change
+    	 * mode of car legs to another mode. Sort agents according to 
+    	 * the distance they travel by car.
     	 */
     	while (vehicleRequiringPersons.size() > vehicleIds.size()) {
-    		Person p = vehicleRequiringPersons.remove(0);
+    		Person p = vehicleRequiringPersons.poll();
     		run(p);
     		checkVehicleId(p.getSelectedPlan());
     	}
@@ -91,12 +108,13 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
     	/*
     	 * Assign vehicles to person's legs.
     	 */
+    	Iterator<Person> iter = vehicleRequiringPersons.iterator();
     	for (int i = 0; i < vehicleRequiringPersons.size(); i++) {
-    		Person p = vehicleRequiringPersons.get(i);
+    		Person p = iter.next();
     		Id vehicleId = vehicleIds.get(i);
-    		assignVehicleToPerson(vehicleRequiringPersons.get(i), vehicleIds.get(i));
+    		assignVehicleToPerson(p, vehicleIds.get(i));
     		mapping.put(p.getId(), vehicleId);
-    		counter.incCounter();
+    		assignedVehiclesCounter.incCounter();
     	}
 	}
 	
@@ -146,6 +164,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 			Leg leg = (Leg) plan.getPlanElements().get(i);
 
 			if (leg.getMode().equals(TransportMode.car)) {
+				removedCarLegsCounter.incCounter();
 				Id startLinkId = leg.getRoute().getStartLinkId();
 				Id endLinkId = leg.getRoute().getEndLinkId();
 				Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
@@ -212,5 +231,48 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 			((NetworkRoute) route).setVehicleId(vehicleId);
 		}
 	}
+	
+	/*
+	 * Compare the length of car-legs in a plan. 
+	 */
+	private class CarLegsComparator implements Comparator<Person>, Serializable, MatsimComparator {
 
+		private static final long serialVersionUID = 1L;
+		private final Network network;
+		
+		public CarLegsComparator(Network network) {
+			this.network = network;
+		}
+		
+		@Override
+		public int compare(Person p1, Person p2) {
+			double carLegLength1 = 0.0;
+			double carLegLength2 = 0.0;
+
+			for (PlanElement planElement : p1.getSelectedPlan().getPlanElements()) {
+				if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					if (leg.getMode().equals(TransportMode.car)) {
+						carLegLength1 += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), network);
+					}
+				}
+			}
+
+			for (PlanElement planElement : p2.getSelectedPlan().getPlanElements()) {
+				if (planElement instanceof Leg) {
+					Leg leg = (Leg) planElement;
+					if (leg.getMode().equals(TransportMode.car)) {
+						carLegLength2 += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), network);
+					}
+				}
+			}
+			
+			if (carLegLength1 < carLegLength2) return -1;
+			else if (carLegLength1 > carLegLength2) return 1;
+			// if both values are equal, compare persons' Ids: the one with the larger Id should be first
+			else {
+				return p2.getId().compareTo(p1.getId());
+			}
+		}		
+	}
 }

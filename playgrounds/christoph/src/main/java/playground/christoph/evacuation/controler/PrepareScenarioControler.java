@@ -122,7 +122,8 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		legModeChecker = new LegModeChecker(this.createRoutingAlgorithm());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
-		legModeChecker.setToCarProbability(0.5);
+//		legModeChecker.setToCarProbability(0.5);
+		legModeChecker.setToCarProbability(1.0);	// convert all chains to leg chains since AssignVehiclesToPlans will remove any of them again anyway...
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
 
@@ -148,6 +149,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}
+		this.assignVehiclesToPlans.printStatistics();
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
