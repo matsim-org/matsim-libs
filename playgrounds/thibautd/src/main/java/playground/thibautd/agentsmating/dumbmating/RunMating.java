@@ -20,12 +20,15 @@
 package playground.thibautd.agentsmating.dumbmating;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.Desires;
 
 /**
  * Runs the mating algorithm defined in {@link Mater}.
@@ -37,15 +40,15 @@ public class RunMating {
 		Logger.getLogger(RunMating.class);
 
 	private static final Mater.TripChaining chainingMode =
-		//Mater.TripChaining.ALL_TOGETHER;
+		Mater.TripChaining.ALL_TOGETHER;
 		//Mater.TripChaining.ONE_BY_ONE;
-		Mater.TripChaining.BOTH;
-	private static final String popFile = "../../trunk/examples/equil/plans2000.xml.gz";
+		//Mater.TripChaining.BOTH;
+	private static final String popFile = "testcases/equil/plans2000.xml.gz";
 	private static final String netFile = "../../trunk/examples/equil/network.xml";
-	private static final String outputPrefix = "testcases/matings/3-10-both";
-	private static final int minCliqueSize = 3;
+	private static final String outputPrefix = "testcases/matings/2-10-together-";
+	private static final int minCliqueSize = 2;
 	private static final int maxCliqueSize = 10;
-	private static final double pNoCar = 0.7d;
+	private static final double pNoCar = 0.6d;
 
 	public static void main(String[] args) {
 		//String popFile = args[0];
@@ -60,10 +63,18 @@ public class RunMating {
 
 		log.info("reading population");
 		(new MatsimPopulationReader(scenario)).readFile(popFile);
+		scenario.getPopulation().setName( "minCliqueSize: "+minCliqueSize+", maxCliqueSize: "+maxCliqueSize+", pNoCar: "+pNoCar+", chaining: "+chainingMode );
 
 		log.info("mating");
 		Mater matingAlgo = new Mater(scenario, chainingMode, minCliqueSize, maxCliqueSize, pNoCar);
 		matingAlgo.run();
+
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			PersonImpl person = (PersonImpl) p;
+			Desires desires = person.createDesires( null );
+			desires.putActivityDuration( "h" , 12 * 3600 );
+			desires.putActivityDuration( "w" , 12 * 3600 );
+		}
 
 		log.info("writing output");
 		matingAlgo.write(outputPrefix);
