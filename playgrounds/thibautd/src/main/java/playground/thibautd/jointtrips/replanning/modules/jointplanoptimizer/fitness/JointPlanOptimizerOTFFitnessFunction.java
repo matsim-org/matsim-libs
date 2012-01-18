@@ -29,7 +29,6 @@ import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.DurationOnTheFlyScorer;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.DurationSimplexAlgo;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.FinalScorer;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.JointPlanOptimizerDecoderFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.JointPlanOptimizerPartialDecoderFactory;
@@ -58,7 +57,6 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 			final int numJointEpisodes,
 			final int numEpisodes,
 			final int nMembers,
-			final boolean isMemetic,
 			final ScoringFunctionFactory scoringFunctionFactory) {
 		this(plan,
 			configGroup,
@@ -68,7 +66,6 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 			numJointEpisodes,
 			numEpisodes,
 			nMembers,
-			isMemetic,
 			scoringFunctionFactory,
 			(new JointPlanOptimizerPartialDecoderFactory(
 				plan,
@@ -95,7 +92,6 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 			final int numJointEpisodes,
 			final int numEpisodes,
 			final int nMembers,
-			final boolean isMemetic,
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final JointPlanOptimizerDecoder partialDecoder,
 			final JointPlanOptimizerDecoder fullDecoder) {
@@ -103,32 +99,16 @@ public class JointPlanOptimizerOTFFitnessFunction extends AbstractJointPlanOptim
 		this.decoder = partialDecoder;
 		this.fullDecoder = fullDecoder;
 
-		if (isMemetic) {
-			this.scorer = new DurationSimplexAlgo(
+		this.scorer = new DurationOnTheFlyScorer(
+					plan,
 					configGroup,
-					new DurationOnTheFlyScorer(
-						plan,
-						configGroup,
-						scoringFunctionFactory,
-						legTravelTimeEstimatorFactory,
-						routingAlgorithm,
-						network,
-						numJointEpisodes,
-						numEpisodes,
-						nMembers));
-		}
-		else {
-			this.scorer = new DurationOnTheFlyScorer(
-						plan,
-						configGroup,
-						scoringFunctionFactory,
-						legTravelTimeEstimatorFactory,
-						routingAlgorithm,
-						network,
-						numJointEpisodes,
-						numEpisodes,
-						nMembers);
-		}
+					scoringFunctionFactory,
+					legTravelTimeEstimatorFactory,
+					routingAlgorithm,
+					network,
+					numJointEpisodes,
+					numEpisodes,
+					nMembers);
 	}
 
 

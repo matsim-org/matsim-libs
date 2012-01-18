@@ -234,7 +234,6 @@ public class TestJPO {
 					this.jgapConf.getNumJointEpisodes(),
 					this.jgapConf.getNumEpisodes(),
 					this.sampleClique.getMembers().size(),
-					false,
 					this.controler.getScoringFunctionFactory());
 
 		IChromosome sampleChrom;
@@ -271,7 +270,6 @@ public class TestJPO {
 					this.jgapConf.getNumJointEpisodes(),
 					this.jgapConf.getNumEpisodes(),
 					this.sampleClique.getMembers().size(),
-					false,
 					this.controler.getScoringFunctionFactory());
 
 		IChromosome[] sampleChrom = new IChromosome[nChrom];
@@ -303,73 +301,6 @@ public class TestJPO {
 					"evaluating other chromosomes changed the obtained score",
 					score[i],
 					otf.getFitnessValue(sampleChrom[i]),
-					MatsimTestUtils.EPSILON);
-		}
-	}
-
-	/**
-	 * tests whether the score of the optimum given by the Simplex
-	 * fitness optimizer corresponds to the fitness of the modified chromosome.
-	 */
-	@Test
-	public void testSimplexFitness() {
-		int nTries = 10;
-
-		JointPlanOptimizerOTFFitnessFunction otf = new JointPlanOptimizerOTFFitnessFunction(
-					this.samplePlan,
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					this.jgapConf.getNumJointEpisodes(),
-					this.jgapConf.getNumEpisodes(),
-					this.sampleClique.getMembers().size(),
-					false,
-					this.controler.getScoringFunctionFactory());
-
-		JointPlanOptimizerOTFFitnessFunction otfMemetic = new JointPlanOptimizerOTFFitnessFunction(
-					this.samplePlan,
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					this.jgapConf.getNumJointEpisodes(),
-					this.jgapConf.getNumEpisodes(),
-					this.sampleClique.getMembers().size(),
-					true,
-					this.controler.getScoringFunctionFactory());
-
-		IChromosome sampleChrom;
-		
-		for (int i = 0; i < nTries; i++) {
-			try {
-				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomInitialJointPlanOptimizerJGAPChromosome();
-			} catch (InvalidConfigurationException e) {
-				throw new RuntimeException(e);
-			}
-
-			IChromosome beforeOptClone = (IChromosome) sampleChrom.clone();
-			double beforeOptNormalScore = otf.getFitnessValue(sampleChrom);
-			double optimisedScore = otfMemetic.getFitnessValue(sampleChrom);
-			double afterOptNormalScore = otf.getFitnessValue(sampleChrom);
-
-			Assert.assertFalse(
-					"chromosome left unmodified after optimisation",
-					beforeOptClone.equals(sampleChrom));
-
-			Assert.assertFalse(
-					"score of modified chromosome is the same as the score of unmodified chromosome",
-					Math.abs(beforeOptNormalScore - afterOptNormalScore) < MatsimTestUtils.EPSILON);
-
-			Assert.assertTrue(
-					"optimised score is not better than unoptimised one",
-					optimisedScore > beforeOptNormalScore);
-
-			Assert.assertEquals(
-					"score returned by the optimiser not consistent with the chromosome real score",
-					optimisedScore,
-					afterOptNormalScore,
 					MatsimTestUtils.EPSILON);
 		}
 	}
@@ -584,7 +515,6 @@ public class TestJPO {
 					this.jgapConf.getNumJointEpisodes(),
 					this.jgapConf.getNumEpisodes(),
 					this.sampleClique.getMembers().size(),
-					false,
 					this.controler.getScoringFunctionFactory());
 
 
@@ -603,73 +533,6 @@ public class TestJPO {
 					"score returned by chromosome do not correspond to decoded score",
 					decoded, score, MatsimTestUtils.EPSILON);
 		}
-	}
-
-	/**
-	 * Tests whether the scores obtained by the getter on the chromosomes
-	 * correspond to the scores obtained by decoding them, in the memetic setting.
-	 */
-	@Test
-	public void testScoresConsistencyMA() {
-		this.configGroup.setIsMemetic("true");
-		JointPlanOptimizerJGAPConfiguration jgapConfMeme = new JointPlanOptimizerJGAPConfiguration(
-				this.samplePlan,
-				this.configGroup,
-				this.controler.getScoringFunctionFactory(),
-				this.legTTEstFactory,
-				this.routingAlgo,
-				this.controler.getNetwork(),
-				utils.getOutputDirectory(),
-				123);
-
-		JointPlanOptimizerPopulationFactory populationFactory =
-			new JointPlanOptimizerPopulationFactory(jgapConfMeme);
-
-		this.configGroup.setIsMemetic("false");
-		JointPlanOptimizerOTFFitnessFunction scorer = new JointPlanOptimizerOTFFitnessFunction(
-					this.samplePlan,
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					this.jgapConf.getNumJointEpisodes(),
-					this.jgapConf.getNumEpisodes(),
-					this.sampleClique.getMembers().size(),
-					false,
-					this.controler.getScoringFunctionFactory());
-
-		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
-
-		gaPopulation.evolve(2);
-
-		// notify end
-		jgapConfMeme.finish();
-
-		int count = 0;
-		int countLess = 0;
-		int countMore = 0;
-		for ( IChromosome chrom : gaPopulation.getChromosomes() ) {
-			double score = chrom.getFitnessValue();
-			double decoded = scorer.getFitnessValue(chrom);
-			double diff = score - decoded;
-
-			count++;
-
-			// rather than failing on the first inconsistent result,
-			// collect some statistics
-			if (diff > MatsimTestUtils.EPSILON) {
-				countMore++;
-			}
-			else if (diff < -MatsimTestUtils.EPSILON) {
-				countLess++;
-			}
-		}
-
-		Assert.assertEquals(
-				"score returned by some chromosome do not correspond to decoded score: "+
-				"on "+count+" chromosomes, "+countMore+" returned a score greater than the decoded one, "+
-				countLess+" returned a score lower",
-				0, countMore + countLess);
 	}
 
 	/////////////////////////////////// operators //////////////////////////////

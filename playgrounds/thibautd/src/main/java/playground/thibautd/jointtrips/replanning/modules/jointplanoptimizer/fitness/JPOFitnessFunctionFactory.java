@@ -20,22 +20,18 @@
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.JointPlanOptimizerDecoderFactory;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.JointPlanOptimizerPartialDecoderFactory;
 
 /**
  * @author thibautd
  */
-public class JPOFitnessFunctionFactory implements MatsimFactory {
+public class JPOFitnessFunctionFactory {
 	final JointPlanOptimizerJGAPConfiguration jgapConfig;
 	final JointPlan plan;
 	final JointReplanningConfigGroup configGroup;
@@ -71,65 +67,6 @@ public class JPOFitnessFunctionFactory implements MatsimFactory {
 	}
 
 	public AbstractJointPlanOptimizerFitnessFunction createFitnessFunction() {
-		if (configGroup.getIsMemetic()) {
-			JointPlanOptimizerMultiFitnessFunction fitness =
-				new JointPlanOptimizerMultiFitnessFunction(jgapConfig);
-
-			JointPlanOptimizerDecoder partial = (new JointPlanOptimizerPartialDecoderFactory(
-				plan,
-				configGroup,
-				numJointEpisodes,
-				numEpisodes)).createDecoder();
-			JointPlanOptimizerDecoder full = (new JointPlanOptimizerDecoderFactory(
-				plan,
-				configGroup,
-				legTravelTimeEstimatorFactory,
-				routingAlgorithm,
-				network,
-				numJointEpisodes,
-				numEpisodes,
-				nMembers)).createDecoder();
-
-			JointPlanOptimizerOTFFitnessFunction otfFitness = new JointPlanOptimizerOTFFitnessFunction(
-					plan,
-					configGroup,
-					legTravelTimeEstimatorFactory,
-					routingAlgorithm,
-					network,
-					numJointEpisodes,
-					numEpisodes,
-					nMembers,
-					false,
-					scoringFunctionFactory,
-					partial,
-					full);
-
-			JointPlanOptimizerOTFFitnessFunction durationMemeticFitness = new JointPlanOptimizerOTFFitnessFunction(
-					plan,
-					configGroup,
-					legTravelTimeEstimatorFactory,
-					routingAlgorithm,
-					network,
-					numJointEpisodes,
-					numEpisodes,
-					nMembers,
-					true,
-					scoringFunctionFactory,
-					partial,
-					full);
-
-			JointPlanOptimizerToggleLocalSearchFitnessFunction toggleMemetic =
-				new JointPlanOptimizerToggleLocalSearchFitnessFunction(
-					jgapConfig,
-					full,
-					otfFitness);
-
-			fitness.addFitness(otfFitness, configGroup.getDirectFitnessWeight());
-			fitness.addFitness(durationMemeticFitness, configGroup.getDurationMemeticFitnessWeight());
-			fitness.addFitness(toggleMemetic, configGroup.getToggleMemeticFitnessWeight());
-
-			return fitness;
-		} else {
 			return new JointPlanOptimizerOTFFitnessFunction(
 					plan,
 					configGroup,
@@ -139,9 +76,7 @@ public class JPOFitnessFunctionFactory implements MatsimFactory {
 					numJointEpisodes,
 					numEpisodes,
 					nMembers,
-					false,
 					scoringFunctionFactory);
-		}
 	}
 }
 

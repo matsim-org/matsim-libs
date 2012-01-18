@@ -64,10 +64,8 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final double CHF_PER_NANOSEC = CHF_PER_MICROSEC * 1E-3;
 	private static final int N_PLAN_EXEC = 2;
 
-	private static final boolean IS_MEMETIC = true;
-
 	// indices of the genes in the chromosome:
-	private static final int CHROM_LENGTH = 16;
+	private static final int CHROM_LENGTH = 13;
 	//private static final int POP_SIZE_GENE = 0;
 	private static final int POP_INTERCEPT_GENE = 0;
 	private static final int MUT_PROB_GENE = 1;
@@ -83,9 +81,6 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int POP_SLOPE_GENE = 10;
 	private static final int RTS_WINDOW_SLOPE_GENE = 11;
 	private static final int HAMMING_GENE = 12;
-	private static final int TOGGLE_OPT_GENE = 13;
-	private static final int DUR_OPT_GENE = 14;
-	private static final int SIMPLEX_ITERS_GENE = 15;
 
 	// bounds
 	//private static final int MAX_POP_SIZE = 100;
@@ -99,9 +94,6 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 	private static final int MAX_WINDOW_INTERCEPT = 0;
 	private static final double MAX_NON_UNIFORM = 50d;
 	private static final double MAX_CO_RATE = 0.5;
-	private static final double MAX_OPT_WEIGHT = 0.5;
-	private static final int MIN_SIMPLEX_ITERS = 60;
-	private static final int MAX_SIMPLEX_ITERS = 300;
 
 	private static final int MAX_POP_SIZE = Integer.MAX_VALUE;
 
@@ -299,9 +291,6 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		genes[IN_PLACE_GENE] = new BooleanGene(this.jgapConfig);
 		genes[P_NON_UNIFORM_GENE] = new DoubleGene(this.jgapConfig, 0d, 1d);
 		genes[HAMMING_GENE] = new BooleanGene(this.jgapConfig);
-		genes[TOGGLE_OPT_GENE] = new DoubleGene(this.jgapConfig, 0, MAX_OPT_WEIGHT);
-		genes[DUR_OPT_GENE] = new DoubleGene(this.jgapConfig, 0, MAX_OPT_WEIGHT);
-		genes[SIMPLEX_ITERS_GENE] = new IntegerGene(this.jgapConfig, MIN_SIMPLEX_ITERS, MAX_SIMPLEX_ITERS);
 
 		return new Chromosome(this.jgapConfig, genes);
 	}
@@ -321,10 +310,7 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 				+"; mutationNonUniformity = "+genes[NON_UNIFORM_GENE]
 				+"; isMutationInPlace = "+genes[IN_PLACE_GENE]
 				+"; nonUniformMutationProb = "+genes[P_NON_UNIFORM_GENE]
-				+"; hammingOnly = "+genes[HAMMING_GENE]
-				+"; toggleOptWeight = "+genes[TOGGLE_OPT_GENE]
-				+"; durationOptWeight = "+genes[DUR_OPT_GENE]
-				+"; maxNSimplexIters = "+genes[SIMPLEX_ITERS_GENE];
+				+"; hammingOnly = "+genes[HAMMING_GENE];
 	}
 
 	/**
@@ -355,18 +341,6 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		//configGroup.setRtsWindowSize(getIntValue(genes[RTS_WINDOW_GENE]));
 		configGroup.setWindowSizeCoef(getDoubleValue(genes[RTS_WINDOW_SLOPE_GENE]));
 		configGroup.setWindowSizeIntercept(getDoubleValue(genes[RTS_WINDOW_INTERCEPT_GENE]));
-
-		double weightDur = getDoubleValue( genes[DUR_OPT_GENE] );
-		configGroup.setDurationMemeticFitnessWeight( weightDur );
-
-		double weightToggle = getDoubleValue( genes[TOGGLE_OPT_GENE] );
-		configGroup.setToggleMemeticFitnessWeight( weightToggle );
-
-		configGroup.setDirectFitnessWeight( 1d - weightDur - weightToggle );
-
-		configGroup.setMaxSimplexIterations( getIntValue( genes[SIMPLEX_ITERS_GENE] ) );
-
-		configGroup.setIsMemetic(""+IS_MEMETIC);
 
 		return configGroup;
 	}

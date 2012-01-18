@@ -172,26 +172,6 @@ public class JointReplanningConfigGroup extends Module {
 	 */
 	public static final String MAX_CPU_TIME = "maxCpuTimePerMemberNanoSecs";
 	/**
-	 * true to use local optimisers on newly generated solutions
-	 */
-	public static final String MEMETIC ="isMemetic";
-	/**
-	 * Weight of the non-optimizing fitness
-	 */
-	public static final String NON_MEM_FITNESS_WEIGHT = "directFitnessWeight";
-	/**
-	 * Weight of the duration-optimizing fitness
-	 */
-	public static final String DUR_OPT_FITNESS_WEIGHT = "durationOptimizingFitnessWeight";
-	/**
-	 * Weight of the toggle-optimizing fitness
-	 */
-	public static final String TOGGLE_OPT_FITNESS_WEIGHT = "toggleOptimizingFitnessWeight";
-	/**
-	 * Stopping criterion for the duration optimizer, in case no score stagnation occurs
-	 */
-	public static final String N_MAX_SIMPLEX_ITERS = "nMaxMultidirectionnalSearchIterations";
-	/**
 	 * if true, the population size will be multiplied by (1 + n_jointTrips).
 	 */
 	public static final String MULTIPLICATIVE_POP_SIZE = "isMultiplicativePopSize";
@@ -235,11 +215,7 @@ public class JointReplanningConfigGroup extends Module {
 	// default: with or without?
 	//private long maxCpuTimePerMember = (long) (10 * 1E9);
 	private long maxCpuTimePerMember = -1;
-	private boolean isMemetic = true;
-	private double directFitnessWeight = 6;
-	private double durationMemeticFitnessWeight = 0.25;
-	private double toggleMemeticFitnessWeight = 3.75;
-	private int nMaxSimplexIters = 200;
+	//private boolean isMemetic = true;
 	private boolean isMultiplicative = false;
 
 	public JointReplanningConfigGroup() {
@@ -332,21 +308,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_CPU_TIME)) {
 			this.setMaxCpuTimePerMemberNanoSecs(value);
 		}
-		else if (param_name.equals(MEMETIC)) {
-			this.setIsMemetic(value);
-		}
-		else if (param_name.equals(NON_MEM_FITNESS_WEIGHT)) {
-			this.setDirectFitnessWeight(value);
-		}
-		else if (param_name.equals(DUR_OPT_FITNESS_WEIGHT)) {
-			this.setDurationMemeticFitnessWeight(value);
-		}
-		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
-			this.setToggleMemeticFitnessWeight(value);
-		}
-		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
-			this.setMaxSimplexIterations(value);
-		}
 		else if (param_name.equals(MAX_POP_SIZE)) {
 			this.setMaxPopulationSize(value);
 		}
@@ -361,7 +322,6 @@ public class JointReplanningConfigGroup extends Module {
 					param_name+", of value: "+value+".");
 		}
 	}
-
 
 	@Override
 	public String getValue(final String param_name) {
@@ -443,24 +403,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_CPU_TIME)) {
 			return String.valueOf(this.getMaxCpuTimePerMemberNanoSecs());
 		}
-		else if (param_name.equals(MEMETIC)) {
-			return String.valueOf(this.getIsMemetic());
-		}
-		else if(param_name.equals(MAX_POP_SIZE)) {
-			return String.valueOf(this.getMaxPopulationSize());
-		}
-		else if (param_name.equals(NON_MEM_FITNESS_WEIGHT)) {
-			return String.valueOf(this.getDirectFitnessWeight());
-		}
-		else if (param_name.equals(DUR_OPT_FITNESS_WEIGHT)) {
-			return String.valueOf(this.getDurationMemeticFitnessWeight());
-		}
-		else if (param_name.equals(TOGGLE_OPT_FITNESS_WEIGHT)) {
-			return String.valueOf(this.getToggleMemeticFitnessWeight());
-		}
-		else if (param_name.equals(N_MAX_SIMPLEX_ITERS)) {
-			return ""+this.getMaxSimplexIterations();
-		}
 		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
 			return ""+this.getIsMultiplicativePopulationSize();
 		}
@@ -499,12 +441,7 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, POPULATION_INTERCEPT);
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		this.addParameterToMap(map, MAX_CPU_TIME);
-		this.addParameterToMap(map, MEMETIC);
 		this.addParameterToMap(map, MAX_POP_SIZE);
-		this.addParameterToMap(map, NON_MEM_FITNESS_WEIGHT);
-		this.addParameterToMap(map, DUR_OPT_FITNESS_WEIGHT);
-		this.addParameterToMap(map, TOGGLE_OPT_FITNESS_WEIGHT);
-		this.addParameterToMap(map, N_MAX_SIMPLEX_ITERS);
 		this.addParameterToMap(map, PROPORTIONNAL_WINDOW_SIZE);
 		this.addParameterToMap(map, MULTIPLICATIVE_POP_SIZE);
 		return map;
@@ -829,52 +766,12 @@ public class JointReplanningConfigGroup extends Module {
 		return this.maxCpuTimePerMember;
 	}
 
-	public void setIsMemetic(final String value) {
-		this.isMemetic = Boolean.valueOf(value);
-	}
-
-	public boolean getIsMemetic() {
-		return isMemetic;
-	}
-
 	public void setMaxPopulationSize(final String value) {
 		this.maxPopulationSize = Integer.valueOf(value);
 	}
 
 	public int getMaxPopulationSize() {
 		return (this.maxPopulationSize < 2 ? Integer.MAX_VALUE : this.maxPopulationSize);
-	}
-
-	public void setDirectFitnessWeight(final String value) {
-		this.directFitnessWeight = Double.parseDouble(value);
-	}
-
-	public double getDirectFitnessWeight() {
-		return this.directFitnessWeight;
-	}
-
-	public void setDurationMemeticFitnessWeight(final String value) {
-		this.durationMemeticFitnessWeight = Double.parseDouble(value);
-	}
-
-	public double getDurationMemeticFitnessWeight() {
-		return this.durationMemeticFitnessWeight;
-	}
-
-	public void setToggleMemeticFitnessWeight(final String value) {
-		this.toggleMemeticFitnessWeight = Double.parseDouble(value);
-	}
-
-	public double getToggleMemeticFitnessWeight() {
-		return this.toggleMemeticFitnessWeight;
-	}
-
-	public void setMaxSimplexIterations( final String value ) {
-		this.nMaxSimplexIters = Integer.valueOf(value);
-	}
-
-	public int getMaxSimplexIterations() {
-		return this.nMaxSimplexIters;
 	}
 
 	public void setIsMultiplicativePopulationSize(final String value) {
@@ -998,22 +895,6 @@ public class JointReplanningConfigGroup extends Module {
 
 	public void setMaxPopulationSize(final int value) {
 		this.maxPopulationSize = value;
-	}
-
-	public void setDirectFitnessWeight(final double value) {
-		this.directFitnessWeight = value;
-	}
-
-	public void setDurationMemeticFitnessWeight(final double value) {
-		this.durationMemeticFitnessWeight = value;
-	}
-
-	public void setToggleMemeticFitnessWeight(final double value) {
-		this.toggleMemeticFitnessWeight = value;
-	}
-
-	public void setMaxSimplexIterations( final int value ) {
-		this.nMaxSimplexIters = value;
 	}
 }
 
