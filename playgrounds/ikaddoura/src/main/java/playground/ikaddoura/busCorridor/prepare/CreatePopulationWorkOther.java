@@ -104,7 +104,7 @@ public class CreatePopulationWorkOther implements Runnable {
 	
 	private void generatePopulation() {
 		
-		createOtherTrips(500);
+//		createOtherTrips(500);
 		createWorkTrips(1500);
 
 	}
