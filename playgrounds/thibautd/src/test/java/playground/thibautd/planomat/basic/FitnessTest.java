@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.planomat.basic;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
@@ -56,6 +59,7 @@ import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.planomat.api.ActivityWhiteList;
 import playground.thibautd.planomat.api.PlanomatFitnessFunction;
 import playground.thibautd.planomat.config.Planomat2ConfigGroup;
 
@@ -91,11 +95,15 @@ public class FitnessTest {
 		net.addLink( l2 );
 
 		PlanImpl plan = new PlanImpl( new PersonImpl( new IdImpl( "bouh" ) ) );
-		plan.createAndAddActivity( "h" , l1.getId() );
+		plan.createAndAddActivity( "h" , l1.getId() ).setEndTime( 8 * 3600 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "w" , l2.getId() );
+		plan.createAndAddActivity( "w" , l2.getId() ).setEndTime( 10 * 3600 );
 		plan.createAndAddLeg( TransportMode.car );
-		plan.createAndAddActivity( "h" , l1.getId() );
+		plan.createAndAddActivity( "h" , l1.getId() ).setEndTime( 12 * 3600 );
+		plan.createAndAddLeg( TransportMode.car );
+		plan.createAndAddActivity( "w" , l2.getId() ).setEndTime( 19 * 3600 );
+		plan.createAndAddLeg( TransportMode.car );
+		plan.createAndAddActivity( "h" , l1.getId() ).setEndTime( 24 * 3600 );
 		this.plan = plan;
 
 		FreespeedTravelTimeCost travelTimeCost =
@@ -144,21 +152,7 @@ public class FitnessTest {
 
 	@Test
 	public void testModifyBackPlan() throws InvalidConfigurationException {
-		Configuration jgapConfig  = new Configuration();
-		StockRandomGenerator random = new StockRandomGenerator();
-		random.setSeed( 10 );
-		jgapConfig.setRandomGenerator( random );
-
-		PlanomatFitnessFunction fit =
-			fitnessFactory.createFitnessFunction(
-					jgapConfig,
-					plan,
-					new PermissiveWhiteList());
-		IChromosome chrom = fit.getSampleChomosome();
-		for (Gene gene : chrom.getGenes()) {
-			gene.setToRandomValue( random );
-		}
-		fit.modifyBackPlan( chrom );
+		modifyBackPlanFromRandomChrom( new PermissiveWhiteList() );
 
 		boolean isFirstAct = true;
 		double now = 0;
@@ -197,6 +191,74 @@ public class FitnessTest {
 				now += leg.getTravelTime();
 			}
 		}
+	}
+
+	@Test
+	public void testWhiteListBehaviour() throws InvalidConfigurationException {
+		ActivityWhiteListImpl whiteList = new ActivityWhiteListImpl();
+		whiteList.addType( "w" );
+
+		// get the durations of untouchable activities
+		Map<Activity, Double> enforcedDurations = new HashMap<Activity, Double>();
+		double now = 0;
+		int nUntouchable = 0;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+
+				if (!whiteList.isModifiableType( act.getType() )) {
+					// duration includes leg(s)
+					double dur =  act.getEndTime() - now;
+					enforcedDurations.put( act , dur );
+					nUntouchable++;
+				}
+
+				now = act.getEndTime();
+			}
+		}
+		if (nUntouchable == 0) {
+			throw new RuntimeException( "testWhiteListBehaviour operates without untouchable activities. Double check the test code!" );
+		}
+
+		modifyBackPlanFromRandomChrom( whiteList );
+
+		now = 0;
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+
+				if (!whiteList.isModifiableType( act.getType() )) {
+					// duration includes leg(s)
+					double dur =  act.getEndTime() - now;
+					Assert.assertEquals(
+							"untouchable duration were touched",
+							enforcedDurations.get( act ),
+							dur,
+							MatsimTestUtils.EPSILON);
+				}
+
+				now = act.getEndTime();
+			}
+		}
+	}
+
+	private void modifyBackPlanFromRandomChrom(
+			final ActivityWhiteList whiteList ) throws InvalidConfigurationException {
+		Configuration jgapConfig  = new Configuration();
+		StockRandomGenerator random = new StockRandomGenerator();
+		random.setSeed( 10 );
+		jgapConfig.setRandomGenerator( random );
+
+		PlanomatFitnessFunction fit =
+			fitnessFactory.createFitnessFunction(
+					jgapConfig,
+					plan,
+					whiteList);
+		IChromosome chrom = fit.getSampleChomosome();
+		for (Gene gene : chrom.getGenes()) {
+			gene.setToRandomValue( random );
+		}
+		fit.modifyBackPlan( chrom );
 	}
 }
 
