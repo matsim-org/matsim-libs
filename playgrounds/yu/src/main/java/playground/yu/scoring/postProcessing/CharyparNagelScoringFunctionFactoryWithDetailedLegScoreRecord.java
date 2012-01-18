@@ -34,11 +34,11 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 		extends CharyparNagelScoringFunctionFactory {
 
 	public CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord(
-            PlanCalcScoreConfigGroup config, Network network) {
+			PlanCalcScoreConfigGroup config, Network network) {
 		super(config, network);
-		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator

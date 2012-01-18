@@ -30,16 +30,12 @@ import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 import org.matsim.core.scoring.charyparNagel.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 
-
 public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
-CharyparNagelScoringFunctionFactory {
-
-	private final Network network;
+		CharyparNagelScoringFunctionFactory {
 
 	public CharyparNagelScoringFunctionFactory4AttrRecorder(
 			final PlanCalcScoreConfigGroup config, final Network network) {
 		super(config, network);
-		this.network = network;
 	}
 
 	@Override
@@ -48,14 +44,15 @@ CharyparNagelScoringFunctionFactory {
 		ScoringFunctionAccumulatorWithAttrRecorder scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithAttrRecorder(
 				params);
 		scoringFunctionAccumulator
-		.addScoringFunction(new ActivityScoringFunction(params));
+				.addScoringFunction(new ActivityScoringFunction(params));
 		scoringFunctionAccumulator
-		.addScoringFunction(new LegScoringFunctionWithAttrRecorder(plan, params,
-				network));
+				.addScoringFunction(new LegScoringFunctionWithAttrRecorder(
+				// plan,
+						params, network));
 		scoringFunctionAccumulator.addScoringFunction(new MoneyScoringFunction(
 				params));
 		scoringFunctionAccumulator
-		.addScoringFunction(new AgentStuckScoringFunction(params));
+				.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}
 }
