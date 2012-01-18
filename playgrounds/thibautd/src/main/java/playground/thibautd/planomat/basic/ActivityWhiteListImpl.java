@@ -22,7 +22,6 @@ package playground.thibautd.planomat.basic;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import playground.thibautd.planomat.api.ActivityWhiteList;
@@ -46,7 +45,7 @@ public class ActivityWhiteListImpl implements ActivityWhiteList {
 	 * @param whiteList the elements to add to the list
 	 */
 	public ActivityWhiteListImpl(
-			final List whiteList) {
+			final Collection<String> whiteList) {
 		this.whiteList.addAll( whiteList );
 	}
 
