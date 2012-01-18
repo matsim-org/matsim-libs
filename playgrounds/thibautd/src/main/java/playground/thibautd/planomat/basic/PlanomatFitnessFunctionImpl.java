@@ -88,6 +88,10 @@ import playground.thibautd.planomat.api.PlanomatFitnessFunction;
  * It is expected that {@link playground.thibautd.planomat.api.PlanomatFitnessFunctionFactory}s
  * returning instances of this class take care of setting algorithms appropriately.
  * <br>
+ * Also, the activity-leg sequence at decoding start should always be the same.
+ * For example, if a post-decoding algorithm adds activities, there must be a
+ * pre-decoding one to remove them.
+ * <br>
  * Please also be aware that this function is unsuitable to score several chromosomes
  * encoding for the same plan from different parallel threads, as it modifies
  * the plan instance it was passed at initialisation for scoring. It is OK to
@@ -174,6 +178,10 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public PlanomatChromosome getSampleChomosome() throws InvalidConfigurationException {
+		// put the plan in the same state as it should be before decoding
+		beforeDecodingRoutine();
+
+		// extract subtours
 		PlanAnalyzeSubtours subtourAnalyser = new PlanAnalyzeSubtours();
 		subtourAnalyser.setTripStructureAnalysisLayer( subtourLevel );
 		subtourAnalyser.run( plan );
@@ -230,12 +238,18 @@ public class PlanomatFitnessFunctionImpl extends PlanomatFitnessFunction {
 
 	@Override
 	public void modifyBackPlan(final IChromosome chromosome) {
+		beforeDecodingRoutine();
+		decodePlan( chromosome );
+		afterDecodingRoutine();
+	}
+
+	private void beforeDecodingRoutine() {
 		for (PlanAlgorithm algo : preAlgos) {
 			algo.run( plan );
 		}
+	}
 
-		decodePlan( chromosome );
-
+	private void afterDecodingRoutine() {
 		for (PlanAlgorithm algo : postAlgos) {
 			algo.run( plan );
 		}
