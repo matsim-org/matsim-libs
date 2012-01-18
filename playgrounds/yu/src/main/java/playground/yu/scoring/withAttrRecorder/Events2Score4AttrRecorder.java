@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.yu.scoring;
+package playground.yu.scoring.withAttrRecorder;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -55,9 +55,9 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactory4AttrRecorder;
-import playground.yu.scoring.Events2Score4AttrRecorder;
-import playground.yu.scoring.ScorAttrReader;
+import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;

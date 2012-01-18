@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.yu.scoring;
+package playground.yu.scoring.withAttrRecorder;
 
 import java.util.Map;
 

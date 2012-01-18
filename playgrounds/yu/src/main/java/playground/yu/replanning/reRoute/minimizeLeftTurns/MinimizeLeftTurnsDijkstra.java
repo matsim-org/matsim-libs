@@ -319,7 +319,7 @@ public class MinimizeLeftTurnsDijkstra implements
 									.getDeadEndEntryNode().getId()) {
 						// V-----------TESTS-----------V
 						if (prevLink != null) {
-							if (LeftTurnIdentifier.turnLeft(prevLink, outLink)) {
+							if (LeftTurnIdentifier.isLeftTurn(prevLink, outLink)) {
 								currCost *= 2d;
 							}
 						}
@@ -334,7 +334,7 @@ public class MinimizeLeftTurnsDijkstra implements
 				if (canPassLink(outLink)) {
 					// V-----------TESTS-----------V
 					if (prevLink != null) {
-						if (LeftTurnIdentifier.turnLeft(prevLink, outLink)) {
+						if (LeftTurnIdentifier.isLeftTurn(prevLink, outLink)) {
 							currCost *= 2d;
 						}
 					}

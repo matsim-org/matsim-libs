@@ -26,6 +26,7 @@ package playground.yu.utils;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.signalsystems.CalculateAngle;
 
 /**
@@ -35,14 +36,22 @@ import org.matsim.signalsystems.CalculateAngle;
  * 
  */
 public class LeftTurnIdentifier {
-	public static boolean turnLeft(Link inLink, Link outLink) {
+	/**
+	 * @param leg
+	 * @return the number of 
+	 */
+	public static int getNumberOfTurnLeftsFromALeg(Leg leg){
+
+		return 0;
+	}
+	public static boolean isLeftTurn(Link inLink, Link outLink) {
 		if (outLink.getToNode().equals(inLink.getFromNode())) {
 			/* U-Turn (size==0) */
 			return true;
 		}
 
 		TreeMap<Double, Link> outLinksSortedByAngle = CalculateAngle
-				.getOutLinksSortedByAngle(inLink);
+		.getOutLinksSortedByAngle(inLink);
 		int realOutLinksSize = outLinksSortedByAngle.size();
 		if (realOutLinksSize == 1) {
 			/* NOT intersection */
@@ -60,7 +69,7 @@ public class LeftTurnIdentifier {
 				if (higherKey == null) {
 					/* no right turns */
 					return outLinksSortedByAngle.headMap(lowerKey)
-							.containsValue(outLink);
+					.containsValue(outLink);
 				}
 				return outLinksSortedByAngle.headMap(lowerKey,
 						Math.abs(lowerKey) > Math.abs(higherKey))

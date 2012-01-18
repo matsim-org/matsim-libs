@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.scoring;
+package playground.yu.scoring.withAttrRecorder;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;

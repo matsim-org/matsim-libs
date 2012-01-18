@@ -1,4 +1,4 @@
-package playground.yu.scoring;
+package playground.yu.scoring.withAttrRecorder;
 
 /* *********************************************************************** *
  * project: org.matsim.*

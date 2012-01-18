@@ -26,7 +26,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
-import playground.yu.scoring.CharyparNagelScoringFunctionFactory4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
 
 /**
  * @author yu

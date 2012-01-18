@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.scoring;
+package playground.yu.scoring.withAttrRecorder;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;

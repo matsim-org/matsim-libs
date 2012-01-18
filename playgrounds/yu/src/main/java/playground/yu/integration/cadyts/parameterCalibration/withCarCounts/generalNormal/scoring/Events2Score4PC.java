@@ -45,7 +45,7 @@ import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseStrategyManager;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
-import playground.yu.scoring.Events2Score4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.BasicStatistics;
 import utilities.math.MultinomialLogit;
