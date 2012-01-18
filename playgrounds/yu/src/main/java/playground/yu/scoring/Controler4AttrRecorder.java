@@ -20,7 +20,7 @@ public class Controler4AttrRecorder extends Controler {
 		Config config;
 		if (args.length < 1) {
 			config = ConfigUtils
-			.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfg-3_-1.xml");
+			.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfgCar-4_0.xml");
 		} else/* args.length>=1 */{
 			config = ConfigUtils.loadConfig(args[0]);
 		}
