@@ -52,6 +52,8 @@ import org.matsim.households.Household;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.christoph.evacuation.mobsim.LegModeChecker;
+
 public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static Logger log = Logger.getLogger(AssignVehiclesToPlans.class);
@@ -62,6 +64,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private final Counter removedCarLegsCounter;
 	private final Counter addedCarLegsCounter;
 	private final Map<Id, Id> mapping;	// <AgentId, VehicleId>
+	private final LegModeChecker legModeChecker;
 	
 	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
 		this.scenario = scenario;
@@ -71,11 +74,14 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 		this.removedCarLegsCounter = new Counter("Legs with mode changed from car to another mode: ");
 		this.addedCarLegsCounter = new Counter("Legs with mode changed from another mode to car: ");
 		this.mapping = new HashMap<Id, Id>();
+		
+		this.legModeChecker = new LegModeChecker(planAlgorithm);
 	}
 	
 	public void printStatistics() {
 		assignedVehiclesCounter.printCounter();
 		removedCarLegsCounter.printCounter();
+		addedCarLegsCounter.printCounter();
 	}
 	
 	public void run(Household household) {
@@ -214,13 +220,43 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	}
 		
 	private void assignVehicleToPerson(Person p, Id vehicleId) {
-		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+		boolean checkLegModes = false;
+		Plan plan = p.getSelectedPlan();
+		for (int i = 1; i < plan.getPlanElements().size() - 1; i++) {
+			PlanElement planElement = plan.getPlanElements().get(i);
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
-				if (leg.getMode().equals(TransportMode.car)) {
+				String mode = leg.getMode();
+				if (mode.equals(TransportMode.car)) {
 					assignVehicleToLeg(leg, vehicleId);
+				} 
+//				else if (mode.equals(TransportMode.pt) || mode.equals(TransportMode.walk) || 
+//						mode.equals(TransportMode.ride) || mode.equals(TransportMode.bike)) {
+				else if (mode.equals(TransportMode.pt)) {
+					/*
+					 * Set transport mode to car and create a new route for the given leg.
+					 */
+					leg.setMode(TransportMode.car);
+					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
+					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
+					PlanImpl newPlan = new PlanImpl(plan.getPerson());
+					newPlan.addActivity(previousActivity);
+					newPlan.addLeg(leg);
+					newPlan.addActivity(nextActivity);
+					routingAlgorithm.run(newPlan);
+					assignVehicleToLeg(leg, vehicleId);
+					checkLegModes = true;
+					addedCarLegsCounter.incCounter();
 				}
 			}
+		}
+		if (checkLegModes) {
+			legModeChecker.run(p);
+			/*
+			 * re-run vehicle assignment since the leg mode checker might have created
+			 * some additional car legs.
+			 */
+			assignVehicleToPerson(p, vehicleId);
 		}
 	}
 	

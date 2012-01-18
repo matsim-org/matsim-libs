@@ -66,11 +66,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 			"Fahrzeugtypen_Kanton_SZ.txt", "Fahrzeugtypen_Kanton_TG.txt", "Fahrzeugtypen_Kanton_TI.txt",
 			"Fahrzeugtypen_Kanton_UR.txt", "Fahrzeugtypen_Kanton_VD.txt", "Fahrzeugtypen_Kanton_VS.txt",
 			"Fahrzeugtypen_Kanton_ZG.txt", "Fahrzeugtypen_Kanton_ZH.txt"};
-
-//	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
-//	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
 	
-//	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected LegModeChecker legModeChecker;
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
@@ -95,21 +91,6 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-//		/*
-//		 * Adding z-coordinates to the network
-//		 */
-//		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
-//		zCoordinateAdder.addZCoordinatesToNetwork();
-//		zCoordinateAdder.checkSteepness();
-
-//		/*
-//		 * Use advanced walk- and bike travel time calculators
-//		 */
-//		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
-//		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
-		
 		/*
 		 * Remove all un-selected plans from agents' memories
 		 */
@@ -122,8 +103,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		legModeChecker = new LegModeChecker(this.createRoutingAlgorithm());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
-//		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.setToCarProbability(1.0);	// convert all chains to leg chains since AssignVehiclesToPlans will remove any of them again anyway...
+		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
 		legModeChecker.printStatistics();
 

@@ -121,6 +121,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_VS.txt",
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
+
+
+//	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
+//	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -153,6 +157,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
 //	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
 	
+//	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
 	protected HouseholdVehiclesTracker householdVehiclesTracker;
 	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
@@ -213,7 +218,23 @@ public class EvacuationControler extends WithinDayController implements Simulati
 
 		// Add secure Facilities to secure Links.
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
-						
+		
+		
+//		/*
+//		 * Adding z-coordinates to the network
+//		 */
+//		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
+//		zCoordinateAdder.addZCoordinatesToNetwork();
+//		zCoordinateAdder.checkSteepness();
+
+//		/*
+//		 * Use advanced walk- and bike travel time calculators
+//		 */
+//		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+//		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
+//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
+		
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
@@ -257,8 +278,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
 		this.getEvents().addHandler(householdVehiclesTracker);
-		
-		
+				
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.

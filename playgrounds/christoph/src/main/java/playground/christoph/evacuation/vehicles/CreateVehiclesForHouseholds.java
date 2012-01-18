@@ -25,7 +25,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
@@ -34,20 +37,24 @@ import org.matsim.vehicles.Vehicles;
 
 public class CreateVehiclesForHouseholds {
 
+	private final Counter counter3Plus;
 	private final Scenario scenario;
 	private final Map<Id, HouseholdVehiclesInfo> householdVehicles;
 
 	public CreateVehiclesForHouseholds(Scenario scenario, Map<Id, HouseholdVehiclesInfo> householdVehicles) {
 		this.scenario = scenario;
 		this.householdVehicles = householdVehicles;
+		this.counter3Plus = new Counter("Created additional vehicles for households with three or more cars: ");
 	}
 	
 	public void run() {
 		for (Household household : ((ScenarioImpl)this.scenario).getHouseholds().getHouseholds().values()) {
 			this.createVehiclesForHousehold(household);
 		}
+		this.counter3Plus.printCounter();
+
 	}
-	
+
 	private void createVehiclesForHousehold(Household household) {
 		Vehicles vehicles = ((ScenarioImpl)this.scenario).getVehicles();
 
@@ -79,6 +86,26 @@ public class CreateVehiclesForHouseholds {
 			cap.setSeats(info.getThirdCapacity());
 			vehicleIds.add(veh.getId());
 			vehicles.getVehicles().put(veh.getId(), veh);
+		}
+		
+		/*
+		 * We check for each household how many people have always a car available.
+		 * If this is more than the model predicts, we create additional cars.
+		 */
+		int alwaysCarAvailable = 0;
+		for (Id id : household.getMemberIds()) {
+			Person person = scenario.getPopulation().getPersons().get(id);
+			String carAvailability = ((PersonImpl) person).getCarAvail();
+			if (carAvailability != null && carAvailability.equals("always")) alwaysCarAvailable++;
+		}
+		for (int i = numVehicles + 1; i <= alwaysCarAvailable; i++) {
+			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh" + i), VehicleUtils.getDefaultVehicleType());
+			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();
+			veh.getType().setCapacity(cap);
+			cap.setSeats(5);
+			vehicleIds.add(veh.getId());
+			vehicles.getVehicles().put(veh.getId(), veh);
+			counter3Plus.incCounter();
 		}
 	}
 }
