@@ -23,10 +23,17 @@
  */
 package playground.yu.utils;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.signalsystems.CalculateAngle;
 
 /**
@@ -38,12 +45,45 @@ import org.matsim.signalsystems.CalculateAngle;
 public class LeftTurnIdentifier {
 	/**
 	 * @param leg
-	 * @return the number of 
+	 *            a {@code Leg} that will be checked, how many left turns it
+	 *            contains
+	 * @return the number of
 	 */
-	public static int getNumberOfTurnLeftsFromALeg(Leg leg){
+	public static int getNumberOfLeftTurnsFromALeg(Leg leg,
+			Map<Id, ? extends Link> netLinks) {
+		if (leg.getMode().equals(TransportMode.car)) {
+			Route route = leg.getRoute();
+			Id startLinkId = route.getStartLinkId();
+			Id endLinkId = route.getEndLinkId();
+			List<Id> linkIds = ((NetworkRoute) route).getLinkIds();
+			if (startLinkId.equals(endLinkId) && linkIds.size() == 0) {
+				return 0;
+			}
 
-		return 0;
+			List<Link> allLinks = new LinkedList<Link>();
+			// purposely don't add startedLink in the List<Link>
+			for (Id linkId : linkIds) {
+				allLinks.add(netLinks.get(linkId));
+			}
+			allLinks.add(netLinks.get(endLinkId));
+
+			Link currentLink = netLinks.get(startLinkId);
+			int number = 0;
+			for (Link nextLink : allLinks) {
+				if (isLeftTurn(currentLink, nextLink)) {
+					number++;
+				}
+				currentLink = nextLink;
+			}
+
+			return number;
+
+		} else {// pt, walk, whatever else
+			return 0;
+		}
+
 	}
+
 	public static boolean isLeftTurn(Link inLink, Link outLink) {
 		if (outLink.getToNode().equals(inLink.getFromNode())) {
 			/* U-Turn (size==0) */
