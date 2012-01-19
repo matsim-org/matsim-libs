@@ -9,6 +9,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 
 public class Events2ScoreWithLeftTurnPenalty extends Events2Score4PC {
@@ -16,13 +17,14 @@ public class Events2ScoreWithLeftTurnPenalty extends Events2Score4PC {
 	public Events2ScoreWithLeftTurnPenalty(Config config,
 			ScoringFunctionFactory sfFactory, Scenario scenario) {
 		super(config, sfFactory, scenario);
-		attrNameList.add("constantLeftTurn");
+		attrNameList.add(CalibrationConfig.CONSTANT_LEFT_TURN);
 		addLeftTurnCoeffToMNL();
 	}
 
 	private void addLeftTurnCoeffToMNL() {
 		// turn left
-		int attrNameIndex = attrNameList.indexOf("constantLeftTurn");
+		int attrNameIndex = attrNameList
+				.indexOf(CalibrationConfig.CONSTANT_LEFT_TURN);
 		getMultinomialLogit()
 				.setCoefficient(
 						attrNameIndex,
@@ -45,7 +47,7 @@ public class Events2ScoreWithLeftTurnPenalty extends Events2Score4PC {
 			// #########################################
 			if (sf instanceof ScoringFunctionAccumulatorWithLeftTurnPenalty) {
 				// leftTurn
-				attrs.put("constantLeftTurn",
+				attrs.put(CalibrationConfig.CONSTANT_LEFT_TURN,
 						((ScoringFunctionAccumulatorWithLeftTurnPenalty) sf)
 								.getNbOfLeftTurnAttrCar());
 			}

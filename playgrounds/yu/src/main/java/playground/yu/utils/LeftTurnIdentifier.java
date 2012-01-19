@@ -29,11 +29,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.signalsystems.CalculateAngle;
 
 /**
@@ -43,6 +49,12 @@ import org.matsim.signalsystems.CalculateAngle;
  * 
  */
 public class LeftTurnIdentifier {
+	private static String getDirection(boolean leftTurn) {
+
+		return leftTurn ? "left turn" : "right turn";
+
+	}
+
 	/**
 	 * @param leg
 	 *            a {@code Leg} that will be checked, how many left turns it
@@ -91,7 +103,7 @@ public class LeftTurnIdentifier {
 		}
 
 		TreeMap<Double, Link> outLinksSortedByAngle = CalculateAngle
-		.getOutLinksSortedByAngle(inLink);
+				.getOutLinksSortedByAngle(inLink);
 		int realOutLinksSize = outLinksSortedByAngle.size();
 		if (realOutLinksSize == 1) {
 			/* NOT intersection */
@@ -108,11 +120,11 @@ public class LeftTurnIdentifier {
 				}
 				if (higherKey == null) {
 					/* no right turns */
-					return outLinksSortedByAngle.headMap(lowerKey)
-					.containsValue(outLink);
+					return outLinksSortedByAngle.headMap(lowerKey, true)
+							.containsValue(outLink);
 				}
 				return outLinksSortedByAngle.headMap(lowerKey,
-						Math.abs(lowerKey) > Math.abs(higherKey))
+						Math.abs(lowerKey) >= Math.abs(higherKey))
 						.containsValue(outLink);
 				/* ">"-true-inclusive, "<="-false-exclusive */
 			} else {
@@ -121,5 +133,34 @@ public class LeftTurnIdentifier {
 			}
 		}
 		return false;
+	}
+
+	public static void main(String[] args) {
+		String networkFilename = "test/input/2car1ptRoutes/net2.xml";
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		Network network = scenario.getNetwork();
+
+		Map<Id, ? extends Link> links = network.getLinks();
+		Link link1 = links.get(new IdImpl(1)), link2 = links.get(new IdImpl(2)), link10 = links
+				.get(new IdImpl(10)), link11 = links.get(new IdImpl(11)), link19 = links
+				.get(new IdImpl(19)), link20 = links.get(new IdImpl(20)), link21 = links
+				.get(new IdImpl(21)), link22 = links.get(new IdImpl(22)), link23 = links
+				.get(new IdImpl(23));
+
+		System.out.println("link1->link2\t"
+				+ getDirection(isLeftTurn(link1, link2)));
+		System.out.println("link1->link10\t"
+				+ getDirection(isLeftTurn(link1, link10)));
+		System.out.println("link2->link12\t"
+				+ getDirection(isLeftTurn(link2, link11)));
+		System.out.println("link10->link19\t"
+				+ getDirection(isLeftTurn(link10, link19)));
+		System.out.println("link11->link20\t"
+				+ getDirection(isLeftTurn(link11, link20)));
+		System.out.println("link19->link20\t"
+				+ getDirection(isLeftTurn(link19, link20)));
 	}
 }

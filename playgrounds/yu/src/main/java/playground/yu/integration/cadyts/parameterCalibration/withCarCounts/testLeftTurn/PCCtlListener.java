@@ -51,14 +51,14 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.BseLinkCostOffsetsXMLFileIO;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
-import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
+import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+import playground.yu.scoring.withAttrRecorder.leftTurn.Events2ScoreWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -327,9 +327,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				// ****SET CALIBRATED PARAMETERS FOR SCORE CALCULATION
 				// AGAIN!!!***
 				if (scoringCfg.getParams().containsKey(paramNames[i])) {
-					scoringCfg.addParam(paramNames[i],
-							Double.toString(value + 0.1
-							// / paramScaleFactor
+					scoringCfg.addParam(paramNames[i], Double.toString(value
+					// / paramScaleFactor
 							));
 					// ScoringConfigGetSetValues
 					// .setValue(paramNames[i], value);
@@ -341,7 +340,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				}
 				// *****************************************************
 				// ****SET CALIBRATED PARAMETERS IN MNL*****************
-				mnl.setParameter(paramNameIndex, value + 0.1);
+				mnl.setParameter(paramNameIndex, value);
 
 				// text output
 				paramArrays[i][iter - firstIter] = value;
@@ -362,12 +361,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-		((Events2Score4PC) chooser).setMultinomialLogit(mnl);
+		((Events2ScoreWithLeftTurnPenalty) chooser).setMultinomialLogit(mnl);
 
-		CharyparNagelScoringFunctionFactory4AttrRecorder sfFactory = new CharyparNagelScoringFunctionFactory4AttrRecorder(
-				config.planCalcScore(), ctl.getNetwork());
+		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				config, ctl.getNetwork());
 		ctl.setScoringFunctionFactory(sfFactory);
-		((Events2Score4PC) chooser).setSfFactory(sfFactory);
+		((Events2ScoreWithLeftTurnPenalty) chooser).setSfFactory(sfFactory);
 
 		strategyManager.setChooser(chooser);
 

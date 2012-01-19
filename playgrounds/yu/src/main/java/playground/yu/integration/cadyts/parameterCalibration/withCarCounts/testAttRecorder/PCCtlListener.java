@@ -339,7 +339,7 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 				}
 				// *****************************************************
 				// ****SET CALIBRATED PARAMETERS IN MNL*****************
-				mnl.setParameter(paramNameIndex, value + 0.1);
+				mnl.setParameter(paramNameIndex, value);
 
 				// text output
 				paramArrays[i][iter - firstIter] = value;

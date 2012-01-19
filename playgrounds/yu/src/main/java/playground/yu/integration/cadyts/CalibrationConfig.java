@@ -25,12 +25,14 @@ package playground.yu.integration.cadyts;
 
 /**
  * stores some default value of config parameters for Calibration
- *
+ * 
  * @author yu
- *
+ * 
  */
 public interface CalibrationConfig {
 	final static int DEFAULT_CALIBRATION_START_TIME = 1,
 			DEFAULT_CALIBRATION_END_TIME = 24;
-	static final String BSE_CONFIG_MODULE_NAME = "bse";
+	final static String BSE_CONFIG_MODULE_NAME = "bse",
+			CONSTANT_LEFT_TURN = "constantLeftTurn";
+
 }

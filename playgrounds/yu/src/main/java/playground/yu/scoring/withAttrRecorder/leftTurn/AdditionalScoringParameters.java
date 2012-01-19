@@ -9,7 +9,8 @@ public class AdditionalScoringParameters {
 
 	public AdditionalScoringParameters(final Config config) {
 		String constLeftTurnStr = config.findParam(
-				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "constantLeftTurn");
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+				CalibrationConfig.CONSTANT_LEFT_TURN);
 		if (constLeftTurnStr != null) {
 			constantLeftTurn = Double.parseDouble(constLeftTurnStr);
 		} else {
