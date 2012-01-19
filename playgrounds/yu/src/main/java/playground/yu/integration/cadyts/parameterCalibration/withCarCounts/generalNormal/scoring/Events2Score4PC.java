@@ -56,7 +56,7 @@ import utilities.math.Vector;
  * 
  */
 public class Events2Score4PC extends Events2Score4AttrRecorder implements
-MultinomialLogitChoice, CadytsChoice {
+		MultinomialLogitChoice, CadytsChoice {
 	// public final static List<String> attrNameList = new ArrayList<String>();
 	// public final static List<Double> paramScaleFactorList = new
 	// ArrayList<Double>();
@@ -121,17 +121,16 @@ MultinomialLogitChoice, CadytsChoice {
 		}
 	}
 
-	private MultinomialLogit createMultinomialLogit(Config config) {
+	protected MultinomialLogit createMultinomialLogit(Config config) {
 		int choiceSetSize = config.strategy().getMaxAgentPlanMemorySize(), // =4
 		attributeCount = Integer.parseInt(config.findParam(
 				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "attributeCount"));
 
-		PlanCalcScoreConfigGroup scoring = config.planCalcScore();
 		double traveling = scoring.getTraveling_utils_hr();
 		double betaStuck = Math.min(
 				Math.min(scoring.getLateArrival_utils_hr(),
 						scoring.getEarlyDeparture_utils_hr()),
-						Math.min(traveling, scoring.getWaiting_utils_hr()));
+				Math.min(traveling, scoring.getWaiting_utils_hr()));
 
 		// initialize MultinomialLogit
 		MultinomialLogit mnl = new MultinomialLogit(choiceSetSize,// =4
@@ -164,13 +163,13 @@ MultinomialLogitChoice, CadytsChoice {
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRateCar()
-				* scoring.getMarginalUtilityOfMoney());
+						* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = attrNameList.indexOf("monetaryDistanceCostRatePt");
 		mnl.setCoefficient(
 				attrNameIndex,
 				scoring.getMonetaryDistanceCostRatePt()
-				* scoring.getMarginalUtilityOfMoney());
+						* scoring.getMarginalUtilityOfMoney());
 
 		attrNameIndex = attrNameList.indexOf("marginalUtlOfDistanceWalk");
 		mnl.setCoefficient(attrNameIndex,
@@ -197,7 +196,7 @@ MultinomialLogitChoice, CadytsChoice {
 			// outputCalcDetail = true;
 			ControlerIO ctlIO = new ControlerIO(ctlCfg.getOutputDirectory());
 			writer = new SimpleWriter(ctlIO.getIterationFilename(iteration,
-			"scoreCalcDetails.log.gz"));
+					"scoreCalcDetails.log.gz"));
 
 			StringBuilder head = new StringBuilder("AgentID");
 			for (String attrName : attrNameList) {
@@ -269,7 +268,8 @@ MultinomialLogitChoice, CadytsChoice {
 				/*
 				 * ASC (utilityCorrection, ASC for "stay home" Plan in the
 				 * future...), just for experiments, in general ASC should NOT
-				 * be set in MNL
+				 * be set in MNL, because of the newest @
+				 * ChoiceParameterCalibrator4
 				 */
 				// #############################################
 
@@ -307,9 +307,9 @@ MultinomialLogitChoice, CadytsChoice {
 
 			Vector coeff = mnl.getCoeff();
 			double util = coeff/*
-			 * s. the attributes order in
-			 * Events2Score4PC2.attrNameList
-			 */
+								 * s. the attributes order in
+								 * Events2Score4PC2.attrNameList
+								 */
 			.innerProd(attrVector) + utilCorrection
 			/* utilityCorrection is also an important ASC */;
 			plan.setScore(util);

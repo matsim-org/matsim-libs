@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring;
+package playground.yu.scoring.withAttrRecorder.leftTurn;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -42,9 +42,10 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scori
  * @author yu
  * 
  */
-public class PlansScoring4PC implements PlansScoring4PC_I, StartupListener,
-		ScoringListener, IterationStartsListener {
-	private final static Logger log = Logger.getLogger(PlansScoring4PC.class);
+public class PlansScoringWithLeftTurnPenalty implements PlansScoring4PC_I,
+		StartupListener, ScoringListener, IterationStartsListener {
+	private final static Logger log = Logger
+			.getLogger(PlansScoringWithLeftTurnPenalty.class);
 	protected CadytsChoice planScorer;
 
 	@Override
@@ -66,10 +67,10 @@ public class PlansScoring4PC implements PlansScoring4PC_I, StartupListener,
 	public void notifyStartup(final StartupEvent event) {
 		Controler ctl = event.getControler();
 
-		planScorer = new Events2Score4PC(ctl.getConfig(),
+		planScorer = new Events2ScoreWithLeftTurnPenalty(ctl.getConfig(),
 				ctl.getScoringFunctionFactory(), ctl.getScenario());
 
-		log.debug("PlansScoring4PC loaded ScoringFunctionFactory");
+		log.debug("PlansScoringWithLeftTurnPenalty loaded ScoringFunctionFactory");
 
 		ctl.getEvents().addHandler(planScorer);
 	}

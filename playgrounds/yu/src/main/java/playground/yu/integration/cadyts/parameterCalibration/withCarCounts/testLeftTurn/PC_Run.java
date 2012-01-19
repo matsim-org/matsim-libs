@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DummyBseParamCalibrationControler.java
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,44 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection;
+/**
+ *
+ */
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.PlansScoring4PC_I;
+import playground.yu.analysis.RouteTravelTimeSummary;
+import playground.yu.counts.CntSimCap4Chart;
 
 /**
  * @author yu
  * 
  */
-public abstract class BseParamCalibrationControler extends Controler {
+public class PC_Run {
+	/** @param args */
+	/**
+	 * @param args
+	 */
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new PCCtlwithLeftTurnPenalty(config);
+		if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+			ctl.addControlerListener(new CntSimCap4Chart());
+			ctl.addControlerListener(new RouteTravelTimeSummary());
+		}
+		// TODO set in config
+		// ctl.addControlerListener(new QVProfilControlerListener());
 
-	protected BseParamCalibrationControlerListener extension;
-	protected PlansScoring4PC_I plansScoring4PC;
-
-	public BseParamCalibrationControler(Config config) {
-		super(config);
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 	}
-
-	public BseParamCalibrationControler(String[] args) {
-		super(args);
-	}
-
-	public PlansScoring4PC_I getPlansScoring4PC() {
-		return plansScoring4PC;
-	}
-
-	@Override
-	protected abstract void loadCoreListeners();
-
-	@Override
-	protected abstract ScoringFunctionFactory loadScoringFunctionFactory();
-	// {
-	// return new CharyparNagelScoringFunctionFactory4AttrRecorder(
-	// config.planCalcScore(), network);
-	// }
 
 }

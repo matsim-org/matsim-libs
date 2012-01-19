@@ -34,9 +34,12 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.StringUtils;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
+import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
@@ -48,17 +51,17 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
  */
 public class PCCtl extends BseParamCalibrationControler {
 
+	public PCCtl(Config config) {
+		super(config);
+		extension = new PCCtlListener();
+		addControlerListener(extension);
+	}
+
 	@Deprecated
 	public PCCtl(final String[] args) {
 		super(args);
 		// Config config;
 		// config = ConfigUtils.loadConfig(args[0]);
-		extension = new PCCtlListener();
-		addControlerListener(extension);
-	}
-
-	public PCCtl(Config config) {
-		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
 	}
@@ -90,6 +93,12 @@ public class PCCtl extends BseParamCalibrationControler {
 	}
 
 	@Override
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new CharyparNagelScoringFunctionFactory4AttrRecorder(
+				config.planCalcScore(), network);
+	}
+
+	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = new PCStrMn(network, getFirstIteration(),
 				config);
@@ -107,9 +116,10 @@ public class PCCtl extends BseParamCalibrationControler {
 		}
 
 		String[] modules = StringUtils.explode(config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME, "strategyModules"), ',');
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME, "strategyModules"),
+				',');
 		String[] moduleProbs = StringUtils.explode(config.findParam(
-				PCCtlListener.BSE_CONFIG_MODULE_NAME,
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 				"strategyModuleProbabilities"), ',');
 
 		if (modules.length != moduleProbs.length) {

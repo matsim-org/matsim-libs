@@ -9,14 +9,25 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
 
-public class Events2ScoreWithLeftTurnPenalty extends Events2Score4AttrRecorder {
+public class Events2ScoreWithLeftTurnPenalty extends Events2Score4PC {
 
 	public Events2ScoreWithLeftTurnPenalty(Config config,
 			ScoringFunctionFactory sfFactory, Scenario scenario) {
 		super(config, sfFactory, scenario);
 		attrNameList.add("constantLeftTurn");
+		addLeftTurnCoeffToMNL();
+	}
+
+	private void addLeftTurnCoeffToMNL() {
+		// turn left
+		int attrNameIndex = attrNameList.indexOf("constantLeftTurn");
+		getMultinomialLogit()
+				.setCoefficient(
+						attrNameIndex,
+						((CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty) sfFactory)
+								.getAdditionalParams().constantLeftTurn);
 	}
 
 	@Override
@@ -32,10 +43,12 @@ public class Events2ScoreWithLeftTurnPenalty extends Events2Score4AttrRecorder {
 			// **********************codes from {@code EventsToScore}
 			// save attributes as custom attritubes.
 			// #########################################
-			ScoringFunctionAccumulatorWithLeftTurnPenalty sfa = (ScoringFunctionAccumulatorWithLeftTurnPenalty) sf;
-
-			// leftTurn
-			attrs.put("constantLeftTurn", sfa.getNbOfLeftTurnAttrCar());
+			if (sf instanceof ScoringFunctionAccumulatorWithLeftTurnPenalty) {
+				// leftTurn
+				attrs.put("constantLeftTurn",
+						((ScoringFunctionAccumulatorWithLeftTurnPenalty) sf)
+								.getNbOfLeftTurnAttrCar());
+			}
 		}
 	}
 }

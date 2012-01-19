@@ -20,18 +20,18 @@ import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
 public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 		CharyparNagelScoringFunctionFactory {
 	private final Config config;
+	private final AdditionalScoringParameters additionalParams;
 
 	public CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
 			Config config, Network network) {
 		super(config.planCalcScore(), network);
 		this.config = config;
+		additionalParams = new AdditionalScoringParameters(config);
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
 		CharyparNagelScoringParameters params = getParams();
-		AdditionalScoringParameters additionalParams = new AdditionalScoringParameters(
-				config);
 		ScoringFunctionAccumulatorWithLeftTurnPenalty scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithLeftTurnPenalty(
 				params);
 		scoringFunctionAccumulator
@@ -45,5 +45,9 @@ public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 		scoringFunctionAccumulator
 				.addScoringFunction(new AgentStuckScoringFunction(params));
 		return scoringFunctionAccumulator;
+	}
+
+	public AdditionalScoringParameters getAdditionalParams() {
+		return additionalParams;
 	}
 }

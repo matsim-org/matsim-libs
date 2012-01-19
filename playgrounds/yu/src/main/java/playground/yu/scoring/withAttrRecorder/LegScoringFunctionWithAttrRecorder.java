@@ -33,21 +33,21 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 	private final static Logger log = Logger
-	.getLogger(LegScoringFunctionWithAttrRecorder.class);
+			.getLogger(LegScoringFunctionWithAttrRecorder.class);
 	private double travTimeAttrCar/* [h] */= 0d, travTimeAttrPt/* [h] */= 0d,
-	travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/*
-	 * [m*utils/unit_of_money
-	 * ]
-	 */,
-	 distanceAttrPt/* [m*utils/unit_of_money] */,
-	 distanceAttrWalk/* [m] */;
+			travTimeAttrWalk/* [h] */= 0d, distanceAttrCar/*
+														 * [m*utils/unit_of_money
+														 * ]
+														 */,
+			distanceAttrPt/* [m*utils/unit_of_money] */,
+			distanceAttrWalk/* [m] */;
 
 	private int carLegNo = 0, ptLegNo = 0, walkLegNo = 0;
 
 	private static int distanceWrnCnt = 0;
 
 	public LegScoringFunctionWithAttrRecorder(
-			// Plan plan,
+	// Plan plan,
 			CharyparNagelScoringParameters params, Network network) {
 		super(params, network);
 	}
@@ -93,8 +93,8 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 			// distanceCar attr
 			distanceAttrCar += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-			+ params.monetaryDistanceCostRateCar * distanceAttrCar
-			+ params.constantCar;
+					+ params.monetaryDistanceCostRateCar * distanceAttrCar
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
 			// constantCar attr
@@ -107,8 +107,8 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 			// distancePt attr
 			distanceAttrPt += params.marginalUtilityOfMoney * dist;
 			tmpScore += travelTime * params.marginalUtilityOfTravelingPT_s
-			+ params.monetaryDistanceCostRatePt * distanceAttrPt
-			+ params.constantPt;
+					+ params.monetaryDistanceCostRatePt * distanceAttrPt
+					+ params.constantPt;
 			// travelingPt attr
 			travTimeAttrPt += travelTime / 3600d;
 			// constantPt attr
@@ -120,8 +120,8 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 				dist = leg.getRoute().getDistance();
 			}
 			tmpScore += travelTime * params.marginalUtilityOfTravelingWalk_s
-			+ params.marginalUtilityOfDistanceWalk_m * dist
-			+ params.constantWalk;
+					+ params.marginalUtilityOfDistanceWalk_m * dist
+					+ params.constantWalk;
 			// travelingWalk attr
 			travTimeAttrWalk += travelTime / 3600d;
 			// constantWalk attr
@@ -140,8 +140,8 @@ public class LegScoringFunctionWithAttrRecorder extends LegScoringFunction {
 
 			// use the same values as for "car"
 			tmpScore += travelTime * params.marginalUtilityOfTraveling_s
-			+ params.monetaryDistanceCostRateCar * distanceAttrCar
-			+ params.constantCar;
+					+ params.monetaryDistanceCostRateCar * distanceAttrCar
+					+ params.constantCar;
 			// traveling attr
 			travTimeAttrCar += travelTime / 3600d;
 			// constantCar attr

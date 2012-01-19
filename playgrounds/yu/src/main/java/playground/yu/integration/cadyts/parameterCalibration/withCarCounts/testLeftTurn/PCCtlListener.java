@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.gener
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.MultinomialLogitChoice;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.parametersCorrection.BseParamCalibrationControlerListener;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.ScoringConfigGetSetValues;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
@@ -247,7 +248,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		PCCtl ctl = (PCCtl) event.getControler();
+		PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
+				.getControler();
 		Config config = ctl.getConfig();
 		int iter = event.getIteration();
 		int firstIter = ctl.getFirstIteration();
@@ -473,7 +475,8 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		final PCCtl ctl = (PCCtl) event.getControler();
+		final PCCtlwithLeftTurnPenalty ctl = (PCCtlwithLeftTurnPenalty) event
+				.getControler();
 		Config config = ctl.getConfig();
 
 		setMatsimParameters(ctl);

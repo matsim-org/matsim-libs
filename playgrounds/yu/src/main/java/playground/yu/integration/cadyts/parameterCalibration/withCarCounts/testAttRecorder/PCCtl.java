@@ -26,9 +26,11 @@ import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.BseParamCalibrationControler;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.PlansScoring4PC;
+import playground.yu.scoring.withAttrRecorder.CharyparNagelScoringFunctionFactory4AttrRecorder;
 
 /**
  * "traveling", "travelingPt", "travelingWalk","performing", "constantCar",
@@ -79,6 +81,12 @@ public class PCCtl extends BseParamCalibrationControler {
 		addCoreControlerListener(new PlansDumping());
 		// EventsHanding ... very important
 		addCoreControlerListener(new EventsHandling(events));
+	}
+
+	@Override
+	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+		return new CharyparNagelScoringFunctionFactory4AttrRecorder(
+				config.planCalcScore(), network);
 	}
 
 	@Override
