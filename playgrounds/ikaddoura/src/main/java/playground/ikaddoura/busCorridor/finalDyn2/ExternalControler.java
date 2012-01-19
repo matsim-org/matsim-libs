@@ -42,16 +42,16 @@ public class ExternalControler {
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/populationWorkOther.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn2";
-	static int lastExternalIteration = 0;
-	static int lastInternalIteration = 20;
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn2b";
+	static int lastExternalIteration = 15;
+	static int lastInternalIteration = 100;
 	
 	// settings for first iteration or if values not changed for all iterations
 	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 1, 3*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
-	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 8, 6*3600, 9*3600);
-	TimePeriod p3 = new TimePeriod(3, "NVZ", 3, 9*3600, 14*3600);
-	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 6, 14*3600, 17*3600);
-	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 2, 17*3600, 23*3600);
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 1, 6*3600, 9*3600);
+	TimePeriod p3 = new TimePeriod(3, "NVZ", 1, 9*3600, 15*3600);
+	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 1, 15*3600, 17*3600);
+	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 1, 17*3600, 23*3600);
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
 	private double fare = -2.5; // negative!
@@ -136,10 +136,12 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < lastExternalIteration){
 				
-//				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
-//				
-				this.setDay(increaseBuses("HVZ_1", 2)); // id, number of buses
-				this.setDay(increaseBuses("HVZ_2", 2)); // id, number of buses
+				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
+				
+				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
+				this.setDay(increaseBuses("HVZ_2", 1)); // id, number of buses
+				
+//				this.setDay(changeBusesRandomly(1, 15)); // minimalBusNumber, maximalBusNumber
 //
 //				this.setDay(extend("HVZ_1", 60 * 60));
 //				this.setDay(extend("HVZ_2", 60 * 60));
@@ -162,6 +164,11 @@ public class ExternalControler {
 		chartWriter.writeChart_UserScoresSum(outputExternalIterationDirPath, this.iteration2userScoreSum);
 		chartWriter.writeChart_TotalScore(outputExternalIterationDirPath, this.iteration2totalScore);
 		chartWriter.writeChart_OperatorScores(outputExternalIterationDirPath, this.iteration2operatorProfit, this.iteration2operatorCosts, this.iteration2operatorRevenue);
+	}
+
+	private Map<Integer, TimePeriod> changeBusesRandomly(int min, int max) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private Map<Integer, TimePeriod> increaseBuses(String periodId, int increase) {

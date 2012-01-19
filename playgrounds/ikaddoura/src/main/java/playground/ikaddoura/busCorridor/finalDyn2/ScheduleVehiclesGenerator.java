@@ -388,8 +388,8 @@ public class ScheduleVehiclesGenerator {
 							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit + maximalAufschlag;
 						}
 
-						else if (newDay.get(periodNr-1).getNumberOfBuses() < numberOfBusesZeitraum){
-							// mehr Busse als in der Periode davor
+						else if (newDay.get(periodNr-1).getNumberOfBuses() <= numberOfBusesZeitraum){
+							// mehr Busse als in der Periode davor oder gleichviele Busse
 							vehicleIndex = vehicleIDsZeitraum.size()-1;
 							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
 								firstDepartureTime = startTime;
@@ -400,17 +400,6 @@ public class ScheduleVehiclesGenerator {
 							}
 							this.vehicleIndexRueck = vehicleIndex;
 						}
-//						else if (newDay.get(periodNr-1).getNumberOfBuses() == numberOfBusesZeitraum){
-//							// Busanzahl gleich der in der Vorperiode
-//							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
-//								firstDepartureTime = startTime;
-//								log.warn("No departure in last period! --> first Departure Time set to startTime!");
-//							}
-//							else {
-//								firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(0) + umlaufzeit;
-//							}
-//							this.vehicleIndexRueck = vehicleIndex;
-//						}
 					}
 				}
 				else if (this.periodNr > 1 && routeNrCounter == 2) { // nicht der erste Zeitraum, rück

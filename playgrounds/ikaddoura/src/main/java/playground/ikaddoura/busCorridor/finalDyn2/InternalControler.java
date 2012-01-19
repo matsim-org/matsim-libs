@@ -109,8 +109,8 @@ public class InternalControler {
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		controlerConfGroup.setFirstIteration(0);
 		controlerConfGroup.setLastIteration(this.lastInternalIteration);
-		controlerConfGroup.setWriteEventsInterval(1);
-		controlerConfGroup.setWritePlansInterval(1);
+		controlerConfGroup.setWriteEventsInterval(this.lastInternalIteration);
+		controlerConfGroup.setWritePlansInterval(this.lastInternalIteration);
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	
