@@ -241,7 +241,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	void addFromIntersection(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
-		this.originalLane.addToVehicleQueue(veh, now);
+		this.originalLane.addFromIntersection(veh, now);
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
