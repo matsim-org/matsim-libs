@@ -379,7 +379,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * because it is only called by one testcase
 	 * @return
 	 */
-	@Override
 	int vehOnLinkCount() {
 		int count = 0;
 		for (QLane ql : this.queueLanes){
@@ -406,7 +405,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	@Override
 	double getSimulatedFlowCapacity() {
 		return this.originalLane.getSimulatedFlowCapacity();
 	}
@@ -516,12 +514,5 @@ public class QLinkLanesImpl extends AbstractQLink {
 	boolean moveLane(double now) {
 		throw new UnsupportedOperationException();
 	}
-
-
-	@Override
-	void calculateCapacities() {
-		throw new UnsupportedOperationException();
-	}
-
 
 }

@@ -57,7 +57,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author dgrether
  * @author mrieser
  */
-public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
+public final class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	// static variables (no problem with memory)
 	final private static Logger log = Logger.getLogger(QLinkImpl.class);
@@ -141,12 +141,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * @param queueNetwork
 	 * @param toNode
 	 */
-	 QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
-		 super(link2, network) ;
+	QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
+		super(link2, network) ;
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
-		this.calculateCapacities();
+		calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
 
@@ -155,7 +155,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * it is intended this way.  kai, nov'11
 	 */
 	@Override
-	 void activateLink() {
+	void activateLink() {
 		if (!this.active) {
 			netElementActivator.activateLink(this);
 			this.active = true;
@@ -170,10 +170,25 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 *          the vehicle
 	 */
 	@Override
-	final void addFromIntersection(final QVehicle veh) {
+	void addFromIntersection(final QVehicle veh) {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
-		this.add(veh, now);
+		// yyyy only called by "add(veh)", i.e. they can be consolidated. kai, jan'10
+		this.vehQueue.add(veh);
+		this.usedStorageCapacity += veh.getSizeInEquivalents();
+		double departureTime;
+		
+		/* It's not the original lane, so there is a fractional rest we add to this link's freeSpeedTravelTime */
+		departureTime = now + this.freespeedTravelTime + ( veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime()) );
+		// yyyy freespeedTravelTime may be Inf, in which case the vehicle never leaves, even if the time-variant link
+		// is reset to a non-zero speed.  kai, nov'10
+		
+		/* It's a QueueLane that is directly connected to a QueueNode,
+		 * so we have to floor the freeLinkTravelTime in order the get the same
+		 * results compared to the old mobSim */
+		departureTime = Math.floor(departureTime);
+		veh.setLinkEnterTime(now);
+		veh.setEarliestLinkExitTime(departureTime);
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
@@ -183,35 +198,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 	}
 
-	/**
-	 * Adds a vehicle to the lane.
-	 *
-	 * @param veh
-	 * @param now the current time
-	 */
-	private void add(final QVehicle veh, final double now) {
-		// yyyy only called by "add(veh)", i.e. they can be consolidated. kai, jan'10
-		this.vehQueue.add(veh);
-		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		double departureTime;
-
-		/* It's not the original lane, so there is a fractional rest we add to this link's freeSpeedTravelTime */
-		departureTime = now + this.freespeedTravelTime + ( veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime()) );
-		// yyyy freespeedTravelTime may be Inf, in which case the vehicle never leaves, even if the time-variant link
-		// is reset to a non-zero speed.  kai, nov'10
-
-		/* It's a QueueLane that is directly connected to a QueueNode,
-		 * so we have to floor the freeLinkTravelTime in order the get the same
-		 * results compared to the old mobSim */
-		departureTime = Math.floor(departureTime);
-		veh.setLinkEnterTime(now);
-		veh.setEarliestLinkExitTime(departureTime);
-	}
-
 	@Override
-	 void clearVehicles() {
+	void clearVehicles() {
 		super.clearVehicles();
-		
+
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.vehQueue) {
@@ -233,8 +223,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 
 	@Override
-	 boolean moveLink(double now) {
-		// yyyy needs to be final
+	boolean moveLink(double now) {
 		boolean ret = false;
 		ret = this.moveLane(now);
 		this.active = ret;
@@ -246,7 +235,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * @param now current time step
 	 * @return
 	 */
-	 @Override
+	@Override
 	boolean moveLane(final double now) {
 		updateBufferCapacity();
 
@@ -273,7 +262,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * @param now
 	 *          The current time.
 	 */
-	 private void moveLaneToBuffer(final double now) {
+	private void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
 		this.moveTransitToQueue(now);
@@ -459,12 +448,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	final boolean bufferIsEmpty() {
+	boolean bufferIsEmpty() {
 		return this.buffer.isEmpty();
 	}
 
 	@Override
-	final boolean hasSpace() {
+	boolean hasSpace() {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		boolean storageOk = this.usedStorageCapacity < getStorageCapacity();
@@ -496,8 +485,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		calculateStorageCapacity(now);
 	}
 
-	@Override
-	void calculateCapacities() {
+	private void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
 		this.buffercap_accumulate = (this.flowCapFractionCache == 0.0 ? 0.0 : 1.0);
@@ -507,8 +495,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
-		* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-		* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+				* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
@@ -520,7 +508,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
-		/ ((NetworkImpl) network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
+				/ ((NetworkImpl) network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
@@ -587,7 +575,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					+ " len: " + this.link.getLength()
 					+ " bnFlowCap: " + bnFlowCap_s
 					+ " congDens: " + congestedDensity_veh_m
-			) ;
+					) ;
 			for ( int ii=0 ; ii<nHolesMax ; ii++ ) {
 				Hole hole = new Hole() ;
 				hole.setEarliestLinkExitTime( 0. ) ;
@@ -644,12 +632,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return this.storageCapacity;
 	}
 
-	@Override
 	int vehOnLinkCount() {
 		// called by one test case
 		return this.vehQueue.size();
 	}
-
 
 	@Override
 	public Link getLink() {
@@ -669,7 +655,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	@Override
 	double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}

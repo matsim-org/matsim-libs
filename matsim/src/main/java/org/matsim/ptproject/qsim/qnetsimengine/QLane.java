@@ -271,8 +271,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		this.freespeedTravelTime = this.length / this.queueLink.getLink().getFreespeed();
 	}
 
-
-	@Override
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
@@ -611,7 +609,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	@Override
 	double getSimulatedFlowCapacity() {
 		return this.simulatedFlowCapacity;
 	}
@@ -638,7 +635,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	 @Override
 	int vehOnLinkCount() {
 		return this.vehQueue.size();
 	}
