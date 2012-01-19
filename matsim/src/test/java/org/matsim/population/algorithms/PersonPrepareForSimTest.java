@@ -89,7 +89,7 @@ public class PersonPrepareForSimTest {
 			pop.addPerson(person);
 		}
 
-		new PersonPrepareForSim(new DummyRouter(), (((ScenarioImpl) sc).getNetwork())).run(person);
+		new PersonPrepareForSim(new DummyRouter(), ((ScenarioImpl) sc)).run(person);
 
 		Assert.assertEquals(l1.getId(), a1.getLinkId());
 		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
