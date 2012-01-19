@@ -270,8 +270,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
 	}
 
-
-	@Override
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
