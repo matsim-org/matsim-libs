@@ -391,6 +391,9 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(POPULATION_COEF)) {
 			return String.valueOf(this.getPopulationCoef());
 		}
+		else if (param_name.equals(MAX_POP_SIZE)) {
+			return String.valueOf(this.getMaxPopulationSize());
+		}
 		else if (param_name.equals(WINDOW_SIZE_COEF)) {
 			return String.valueOf(this.getWindowSizeCoef());
 		}
