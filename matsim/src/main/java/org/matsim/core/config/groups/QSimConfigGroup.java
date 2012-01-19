@@ -168,7 +168,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				+ ONLY_USE_STARTTIME + "'" ) ;
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
-		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
+		map.put(WRITE_SNAPSHOTS_INTERVAL, "(probably not implemented) iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
 				"to a file. `0' disables snapshots writing completely");
 		return map ;
 	}
