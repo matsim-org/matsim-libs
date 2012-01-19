@@ -76,21 +76,23 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	 * "physical" quantity.)  kai, nov'11
 	 * <li> But maybe it should then go into MobsimVehicle?  kai, nov'11
 	 * <li> Also see comment under setLinkEnterTime().  kai, nov'11 
+	 * <li>removed this while refactoring the visualizer computations, dg jan'12</li>
 	 * </ul>
 	 */
-	public double getLinkEnterTime() {
-		return this.linkEnterTime;
-	}
+//	public double getLinkEnterTime() {
+//		return this.linkEnterTime;
+//	}
 
 	/**Design thoughts:<ul>
 	 * <li> This has to remain public as long as QVehicle/QVehicleImpl is both used by QueueSimulation and QSim.  At best,
 	 * we could say that there should also be a MobsimVehicle interface that does not expose this.  kai, nov'11.
 	 * (This is there now.  kai, nov'11)
+	 * <li>removed this while refactoring the visualizer computations, dg jan'12</li>
 	 * </ul>
 	 */
-	public void setLinkEnterTime(final double time) {
-		this.linkEnterTime = time;
-	}
+//	public void setLinkEnterTime(final double time) {
+//		this.linkEnterTime = time;
+//	}
 
 	@Override
 	public double getEarliestLinkExitTime() {

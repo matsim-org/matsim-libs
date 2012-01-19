@@ -52,7 +52,23 @@ interface AgentSnapshotInfoBuilder {
 	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
 	 * @param laneNumber computed by builder if null
 	 */
-	void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
-			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
-			double offset, Integer laneNumber);	
+//	void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
+//			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
+//			double offset, Integer laneNumber);
+	
+	
+	//new methods 
+	
+	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);
+
+	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
+			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);
+	
+	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
+			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne);
+	
+	//TODO rename to guess lane
+	int calculateLane(QVehicle veh, int numberOfLanes);
+
+	double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed);
 }

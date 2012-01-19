@@ -122,11 +122,14 @@ public class AgentSnapshotInfoFactory {
 			correction = euklideanDistance / lengthOfVector;
 		}
 
-
-		info.setEasting( startCoord.getX() + Math.cos(theta) * distanceOnVector * correction
-		                + Math.sin(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction ) ;
-		info.setNorthing( startCoord.getY() + Math.sin(theta) * distanceOnVector  * correction
-		                - Math.cos(theta) * (0.5*WIDTH_OF_MEDIAN + LANE_WIDTH*lane)*correction );
+		info.setEasting( startCoord.getX() 
+				+ (Math.cos(theta) * distanceOnVector * correction)
+				+ (Math.sin(theta) * (0.5 * WIDTH_OF_MEDIAN + LANE_WIDTH * lane) * correction) ) ;
+		
+		info.setNorthing( startCoord.getY() 
+				+ Math.sin(theta) * distanceOnVector  * correction 
+				- Math.cos(theta) * (0.5 * WIDTH_OF_MEDIAN + LANE_WIDTH * lane) * correction );
+		
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}
 

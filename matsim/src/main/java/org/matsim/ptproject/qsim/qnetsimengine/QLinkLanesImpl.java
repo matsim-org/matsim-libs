@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -67,9 +66,9 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  *<pre>
  * ----------------
- *         ========
+ *         							========
  * =======+========
- *         ========
+ *         							========
  * ----------------
  * </pre>
  *
@@ -130,13 +129,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 	private boolean active = false;
 
 	private VisData visdata = this.new VisDataImpl();
-
-	/**
-	 * All vehicles from parkingList move to the waitingList as soon as their time
-	 * has come. They are then filled into the vehQueue, depending on free space
-	 * in the vehQueue
-	 */
-	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -300,9 +292,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
-			
 			if (!handled) {
-				this.originalLane.addToBuffer(veh, now);
+				this.originalLane.addWaitToBuffer(veh, now);
 			}
 		}
 		return movedAtLeastOne;
@@ -483,36 +474,36 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	AbstractQLink getQLink() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 	@Override
 	double getInverseSimulatedFlowCapacity() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	double getStorageCapacity() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	int getBufferStorage() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	double getLength() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 
 	@Override
 	boolean moveLane(double now) {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException() ;
 	}
 
 }

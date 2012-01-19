@@ -25,11 +25,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.pt.qsim.PassengerAgent;
+import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.qsim.TransitVehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
@@ -41,6 +44,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  *
  */
 abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder{
+
+	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 
 	protected final double storageCapacityFactor;
 
@@ -132,7 +137,33 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		}
 	}
 	
-	protected int calculateLane(QVehicle veh, int numberOfLanes){
+	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
+			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne){
+		MobsimDriverAgent driverAgent = veh.getDriver();
+		AgentSnapshotInfo pos = AgentSnapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), link, 
+				distanceFromFromNode, lane);
+		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
+		if (driverAgent instanceof TransitDriverAgent){
+			pos.setAgentState(AgentState.TRANSIT_DRIVER);
+			TransitVehicle transitVehicle = (TransitVehicle) veh; //currently only TransitVehicles are able to have passengers
+			this.createAndAddSnapshotInfoForPassengers(positions, transitVehicle.getPassengers(), distanceFromFromNode, link, 
+					lane, speedValueBetweenZeroAndOne);
+		}
+		else {
+			pos.setAgentState(AgentState.PERSON_DRIVING_CAR);
+		}
+		positions.add(pos);
+	}
+	
+	public double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
+//		log.error("  earliestLinkExitTime: " + veh.getEarliestLinkExitTime() + " inverseFlowCap: " + inverseSimulatedFlowCapacity);
+		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
+//		log.error("  now: " + now + " cmp: " + cmp);
+		double speed = (now > cmp ? 0.0 : 1.0);
+		return speed;
+	}
+	
+	public  int calculateLane(QVehicle veh, int numberOfLanes){
 		int tmpLane;
 		try {
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;
@@ -143,26 +174,15 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return lane;
 	}
 	
-	protected void createAndAddSnapshotInfoForPeopleInMovingVehicle(Collection<AgentSnapshotInfo> positions,
-			List<MobsimAgent> peopleInVehicle, double distanceOnLink, Link link, int lane, double speedValueBetweenZeroAndOne, double offset)
+	protected void createAndAddSnapshotInfoForPassengers(Collection<AgentSnapshotInfo> positions,
+			Collection<PassengerAgent> passengers, double distanceOnLink, Link link, int lane, double speedValueBetweenZeroAndOne)
 	{
-		distanceOnLink += offset;
-		int cnt = peopleInVehicle.size() - 1 ;
-		//		for (PersonAgent passenger : peopleInVehicle) {
-		for ( ListIterator<MobsimAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
-			// this now runs backwards so that the BVG vehicle type color is on top.  kai, sep'10
-			MobsimAgent passenger = it.previous();
-			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, distanceOnLink, lane+2*cnt);
+		int cnt = passengers.size();
+		for (PassengerAgent passenger : passengers) {
+			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
+					distanceOnLink, lane+2*cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
-			//			double tmp = ( Double.valueOf( passenger.getPerson().getId().toString() ) % 100 ) / 100. ;
-			//			passengerPosition.setColorValueBetweenZeroAndOne(tmp);
-			if (passenger.getId().toString().startsWith("pt")) {
-				passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-			} else if (cnt==0) {
-				passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-			} else {
-				passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
-			}
+			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			positions.add(passengerPosition);
 			cnt-- ;
 		}

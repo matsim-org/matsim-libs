@@ -22,17 +22,10 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 
@@ -61,7 +54,6 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 		super(scenario);
 	}
 	
-	@Override
 	public void addVehiclePositions(VisLane visLane, Collection<AgentSnapshotInfo> positions,
 			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
 			double linkLength, double offset, Integer laneNumber) {
@@ -71,17 +63,17 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 		double currentQueueEnd = linkLength; // queue end initialized at end of link
 
 		// for holes: using the "queue" method, but with different vehSpacing:
-		float vehSpacing = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
+//		float vehSpacing = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
 		//		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity,
 		//				congestedDensity);
 
 		// treat vehicles from buffer:
-		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacing, buffer, offset,
-				laneNumber, visLane);
-
-		// treat other driving vehicles:
-		positionOtherDrivingVehiclesWithHoles(positions, currentQueueEnd, vehSpacing, vehQueue, holes,
-				offset, laneNumber, visLane);
+//		currentQueueEnd = positionVehiclesFromBufferAsQueue(positions, currentQueueEnd, vehSpacing, buffer, offset,
+//				laneNumber, visLane);
+//
+//		// treat other driving vehicles:
+//		positionOtherDrivingVehiclesWithHoles(positions, currentQueueEnd, vehSpacing, vehQueue, holes,
+//				offset, laneNumber, visLane);
 
 	}
 
@@ -89,52 +81,52 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 			double vehSpacing, Collection<QVehicle> vehQueue, Collection<QItem> holes, double offset, Integer laneNumber,
 			VisLane visLane)
 	{
-		if ( visLane instanceof QLane ) {
-			throw new RuntimeException("holes visualization is not implemented for lanes since I don't understand which "
-					+ "quantities refer to the link and which to the lane.  kai, nov'10" ) ;
-		}
-
-		double now = visLane.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-		Link  link = visLane.getQLink().getLink() ;
-
-		Queue<Tuple<Double, QItem>> qItemList = new PriorityQueue<Tuple<Double, QItem>>(30, new TupleDoubleComparator() );
-		for ( QVehicle veh : vehQueue ) {
-			double distanceOnLink_m = (now - veh.getLinkEnterTime() ) * link.getFreespeed(now) ;
-			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, veh ) ) ;
-		}
-		for ( QItem hole : holes ) {
-			double distanceOnLink_m = ( hole.getEarliestLinkExitTime() - now ) * 15.*1000./3600. ;
-			// holes come from the end of the link; the remaining distance is the same as distanceOnLink_m
-			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, hole ) ) ;
-		}
-
-		for (QVehicle veh : vehQueue) {
-			boolean inQueue = false ;
-			double distanceOnLink_m = (now - veh.getLinkEnterTime()) * link.getFreespeed(now) ;
-			if (distanceOnLink_m > queueEnd) { // vehicle is already in queue
-				distanceOnLink_m = queueEnd;
-				queueEnd -= vehSpacing;
-				inQueue = true ;
-			}
-
-			double speedValueBetweenZeroAndOne = 1. ;
-			if ( inQueue ) {
-				speedValueBetweenZeroAndOne = 0. ; // yy could be something more realistic than 0.  kai, nov'10
-			}
-
-			int lane ;
-			if (laneNumber == null){
-				lane  = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-			} else {
-				lane = laneNumber ;
-			}
-
-			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
-
-			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink_m, link, lane,
-					speedValueBetweenZeroAndOne, offset);
-		}
-		throw new RuntimeException("this is not (yet) finished; aborting ...") ;
+//		if ( visLane instanceof QLane ) {
+//			throw new RuntimeException("holes visualization is not implemented for lanes since I don't understand which "
+//					+ "quantities refer to the link and which to the lane.  kai, nov'10" ) ;
+//		}
+//
+//		double now = visLane.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+//		Link  link = visLane.getQLink().getLink() ;
+//
+//		Queue<Tuple<Double, QItem>> qItemList = new PriorityQueue<Tuple<Double, QItem>>(30, new TupleDoubleComparator() );
+//		for ( QVehicle veh : vehQueue ) {
+//			double distanceOnLink_m = (now - veh.getLinkEnterTime() ) * link.getFreespeed(now) ;
+//			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, veh ) ) ;
+//		}
+//		for ( QItem hole : holes ) {
+//			double distanceOnLink_m = ( hole.getEarliestLinkExitTime() - now ) * 15.*1000./3600. ;
+//			// holes come from the end of the link; the remaining distance is the same as distanceOnLink_m
+//			qItemList.add( new Tuple<Double,QItem>( distanceOnLink_m, hole ) ) ;
+//		}
+//
+//		for (QVehicle veh : vehQueue) {
+//			boolean inQueue = false ;
+//			double distanceOnLink_m = (now - veh.getLinkEnterTime()) * link.getFreespeed(now) ;
+//			if (distanceOnLink_m > queueEnd) { // vehicle is already in queue
+//				distanceOnLink_m = queueEnd;
+//				queueEnd -= vehSpacing;
+//				inQueue = true ;
+//			}
+//
+//			double speedValueBetweenZeroAndOne = 1. ;
+//			if ( inQueue ) {
+//				speedValueBetweenZeroAndOne = 0. ; // yy could be something more realistic than 0.  kai, nov'10
+//			}
+//
+//			int lane ;
+//			if (laneNumber == null){
+//				lane  = calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+//			} else {
+//				lane = laneNumber ;
+//			}
+//
+//			List<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
+//
+//			this.createAndAddSnapshotInfoForPeopleInMovingVehicle(positions, peopleInVehicle, distanceOnLink_m, link, lane,
+//					speedValueBetweenZeroAndOne, offset);
+//		}
+//		throw new RuntimeException("this is not (yet) finished; aborting ...") ;
 
 	}
 	//	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
