@@ -539,7 +539,17 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
-		departureTime = now + this.freespeedTravelTime;
+		if (this.isOriginalLane) {
+			/* It's the original lane,
+			 * so we need to start with a 'clean' freeSpeedTravelTime */
+			departureTime = (now + this.freespeedTravelTime);
+		} else {
+			/* It's not the original lane,
+			 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
+			 * of the current lane*/
+			departureTime = now + this.freespeedTravelTime
+			+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
+		}
 		if (this.meterFromLinkEnd == 0.0) {
 			/* It's a QueueLane that is directly connected to a QueueNode,
 			 * so we have to floor the freeLinkTravelTime in order the get the same
