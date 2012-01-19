@@ -44,6 +44,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -313,7 +314,7 @@ public class TestJPO {
 	@Test
 	@Ignore
 	public void testPartialDecoder() {
-		int nTrys = 3;
+		int nTrys = 10;
 
 		DurationDecoderPartial partial = new DurationDecoderPartial(
 					this.samplePlan,
@@ -407,8 +408,9 @@ public class TestJPO {
 	}
 
 	private void testDurationDecoderEndTime(final JointPlanOptimizerDimensionDecoder decoder) {
-		int nTrys = 3;
-		double expectedEndTime = 3600d*24;
+		int nTrys = 10;
+
+		//double expectedEndTime = 3600d*24;
 
 		IChromosome sampleChrom;
 
@@ -423,11 +425,13 @@ public class TestJPO {
 			Collection<Plan> individualPlans = decoder.decode(sampleChrom, this.samplePlan).getIndividualPlans().values();
 
 			for (Plan indivPlan : individualPlans) {
-				Assert.assertEquals(
+				List<PlanElement> pes = indivPlan.getPlanElements();
+				double firstActEnd = ((Activity) pes.get( 0 )).getEndTime();
+				double lastEpisodeStart = ((Activity) pes.get( pes.size() - 3 )).getEndTime();
+
+				Assert.assertTrue(
 						"plan of incorrect duration created by "+decoder.getClass().getSimpleName(),
-						expectedEndTime,
-						((PlanImpl) indivPlan).getLastActivity().getEndTime(),
-						MatsimTestUtils.EPSILON);
+						firstActEnd + 24 * 3600 > lastEpisodeStart);
 			}
 		}
 	}
@@ -464,7 +468,7 @@ public class TestJPO {
 	}
 
 	private void testTimeLine(final JointPlanOptimizerDimensionDecoder decoder) {
-		int nTrys = 3;
+		int nTrys = 10;
 
 		IChromosome sampleChrom;
 		double oldNow=0;
@@ -481,10 +485,20 @@ public class TestJPO {
 			Collection<Plan> indivPlans = decoder.decode(sampleChrom, (this.samplePlan)).getIndividualPlans().values();
 
 			for (Plan indivPlan : indivPlans) {
+				boolean hadUndefined = false;
 				oldNow = 0d;
 				for (PlanElement pe : indivPlan.getPlanElements()) {
+					Assert.assertFalse(
+							"Got an activity with undefined end time which was not the last element",
+							hadUndefined);
+
 					if (pe instanceof Activity) {
 						now = ((Activity) pe).getEndTime();
+
+						if (now == Time.UNDEFINED_TIME) {
+							hadUndefined = true;
+							continue;
+						}
 						
 						Assert.assertTrue(
 								"inconsistency in the timeline in "+decoder.getClass().getSimpleName()

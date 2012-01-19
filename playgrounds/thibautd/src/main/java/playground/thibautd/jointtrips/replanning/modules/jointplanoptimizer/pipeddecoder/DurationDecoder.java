@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.PlanomatConfigGroup;
 import org.matsim.core.config.groups.PlanomatConfigGroup.SimLegInterpretation;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimator;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
@@ -67,7 +68,7 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 	private static final double MIN_DURATION = 0d;
 	private static final double PU_DURATION = 0d;
 	private static final double DO_DURATION = 0d;
-	private static final double DAY_DURATION = 24*3600d;
+	//private static final double DAY_DURATION = 24*3600d;
 
 	private JointPlan plan;
 	// CAUTION: THOSE ARE THE ELEMENTS OF THE INITIAL PLAN, POSSIBLY MODIFIED
@@ -630,12 +631,16 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		if (geneIndex != null) {
 			duration = ((DoubleGene) chromosome.getGene(geneIndex)).doubleValue() - travelTime;
+
+			if (duration < MIN_DURATION) {
+				duration = MIN_DURATION;
+			}
 		} else {
 			// case of the last activity of an individual plan
-			duration = DAY_DURATION - now;
+			duration = Time.UNDEFINED_TIME;
 		}
 
-		return (duration > 0 ? duration : MIN_DURATION);
+		return duration;
 	}
 
 	private boolean isPickUp(final PlanElement pe) {

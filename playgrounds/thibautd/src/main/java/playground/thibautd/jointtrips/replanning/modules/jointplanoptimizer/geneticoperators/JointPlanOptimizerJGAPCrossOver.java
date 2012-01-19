@@ -300,7 +300,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			if (countGenes == currentNGenes) {
 				countGenes = 1;
 				currentNGenes = nGenesIterator.next();
-				mate1PlanDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
+				// skip first act
+				// mate1PlanDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
+				mate1PlanDuration = 0;
 			} else {
 				mate1PlanDuration += ((DoubleGene) mate1Genes[i]).doubleValue();
 				countGenes++;
@@ -316,6 +318,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 						calculatePlanDurCoef(mate1PlanDuration, crossOverSurplus));
 				crossOverSurplus = 0d;
 				mate1PlanDuration = 0d;
+				// skip first act
+				continue;
 			} else {
 				countGenes++;
 			}
@@ -430,20 +434,22 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		double currentEpisodeDuration;
 		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
 		int currentNGenes=nGenesIterator.next();
-		int countGenes = 0;
+		int countGenes = 1;
 		boolean crossingPointIsPast = false;
 		//double randomCoef = this.randomGenerator.nextDouble();
 		double randomCoef = 1d;
 		//double posDurCoef = 1d;
 		double coef;
 	
-		for (int i=this.N_BOOL; i < this.N_BOOL + this.N_DOUBLE; i++) {
+		for (int i=this.N_BOOL + 1; i < this.N_BOOL + this.N_DOUBLE; i++) {
 			if (countGenes == currentNGenes) {
 				if (!crossingPointIsPast) {
 					// end of an individual plan reached.
-					countGenes = 0;
+					countGenes = 1;
 					currentNGenes = nGenesIterator.next();
 					mate1PlanDuration = 0d;
+					// skip first activity
+					continue;
 				}
 				else {
 					coef =// Math.min(posDurCoef,
@@ -459,7 +465,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			currentEpisodeDuration = ((DoubleGene) mate1Genes[i]).doubleValue();
 			mate1PlanDuration += currentEpisodeDuration;
 
-			if (i==crossingPoint) {
+			if ( i >= crossingPoint ) {
 				crossOverSurplus = ((DoubleGene) mate2Genes[i]).doubleValue() -
 					currentEpisodeDuration;
 				// useless

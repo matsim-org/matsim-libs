@@ -372,6 +372,8 @@ public class JointPlanOptimizerJGAPChromosome extends Chromosome {
 			currentUpperBound = currentDoubleGene + planLength;
 			currentDuration = 0d;
 
+			// ignore first act
+			currentDoubleGene++;
 			for (; currentDoubleGene < currentUpperBound; currentDoubleGene++) {
 				currentDuration += ((DoubleGene) this.getGene(currentDoubleGene)).doubleValue();
 			}

@@ -259,7 +259,10 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 			}
 
 			if ((i != indexToMute)) {
-				freeSpace -= ((DoubleGene) gene).doubleValue();
+				// skip first act
+				if (geneCount > 0) {
+					freeSpace -= ((DoubleGene) gene).doubleValue();
+				}
 			}
 			else {
 				inGoodPlan = true;
