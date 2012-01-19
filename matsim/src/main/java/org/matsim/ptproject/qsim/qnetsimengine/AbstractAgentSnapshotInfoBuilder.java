@@ -163,7 +163,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return speed;
 	}
 	
-	public  int calculateLane(QVehicle veh, int numberOfLanes){
+	public  int guessLane(QVehicle veh, int numberOfLanes){
 		int tmpLane;
 		try {
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;

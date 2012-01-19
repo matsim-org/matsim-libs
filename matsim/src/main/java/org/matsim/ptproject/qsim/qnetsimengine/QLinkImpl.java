@@ -785,7 +785,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					double travelTime = now - QLinkImpl.this.linkEnterTimeMap.get(veh);
 					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
 							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					int lane = snapshotInfoBuilder.calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+					int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
 					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);
@@ -794,7 +794,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					double travelTime = now - QLinkImpl.this.linkEnterTimeMap.get(veh);
 					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
 							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					int lane = snapshotInfoBuilder.calculateLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+					int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
 					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);

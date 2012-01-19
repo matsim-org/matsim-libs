@@ -48,27 +48,16 @@ interface AgentSnapshotInfoBuilder {
  	 *  Adds AgentSnapshotInfo instances to the Collection given as parameter for a queue-logic object located on a specific link. A queue-logic object
 	 * can be a QueueLinkImpl or a QueueLane instance or something else.
 	 * @param positions The Collection in that the AgentSnapshotInfo instances are inserted.
-	 * @param linkLength linkLength the length of the queue-based object
-	 * @param offset The distance between the from node of the link to the beginning of the queue-logic object
-	 * @param laneNumber computed by builder if null
 	 */
-//	void addVehiclePositions(VisLane visLane, final Collection<AgentSnapshotInfo> positions, Collection<QVehicle> buffer,
-//			Collection<QVehicle> vehQueue, Collection<QItem> holes, double linkLength,
-//			double offset, Integer laneNumber);
-	
-	
-	//new methods 
+	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
+			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne);
 	
 	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);
 
 	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
 			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);
 	
-	void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
-			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne);
-	
-	//TODO rename to guess lane
-	int calculateLane(QVehicle veh, int numberOfLanes);
+	int guessLane(QVehicle veh, int numberOfLanes);
 
 	double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed);
 }
