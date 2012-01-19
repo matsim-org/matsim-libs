@@ -307,8 +307,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 				"on top of the time (dis)utility.  It is discouraged to use this but in some cases it may make sense.") ;
 
 		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils" ) ;
-		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money" ) ;
-		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money" );
+		map.put(MONETARY_DISTANCE_COST_RATE_CAR, "[unit_of_money/m] conversion of car distance into money. Probably needs to be negative to work." ) ;
+		map.put(MONETARY_DISTANCE_COST_RATE_PT, "[unit_of_money/m] conversion of pt distance into money. Probably needs to be negative to work." );
 		
 		map.put(CONSTANT_CAR, "[utils] alternative-specific constant for car.  no guarantee that this is used anywhere. " +
 		"default=0 to be backwards compatible for the time being" ) ;
