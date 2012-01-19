@@ -114,7 +114,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * The QueueLane instance which always exists.
 	 */
-	private QLane originalLane;
+	private QLane firstLane;
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
@@ -161,8 +161,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + this.link.getId() +
 			"isn't starting at the beginning of the link!");
 		}
-		this.originalLane = new QLane(this, firstLane, true);
-		laneList.add(this.originalLane);
+		this.firstLane = new QLane(this, firstLane, true);
+		laneList.add(this.firstLane);
 		Stack<QLane> laneStack = new Stack<QLane>();
 
 		while (!laneList.isEmpty()){
@@ -241,7 +241,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	void addFromIntersection(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
-		this.originalLane.addFromIntersection(veh, now);
+		this.firstLane.addFromIntersection(veh, now);
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEventImpl(now, veh.getDriver().getId(),
@@ -283,7 +283,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToBuffer(final double now) {
 		boolean movedAtLeastOne = false;
-		while (this.originalLane.hasBufferSpace()) {
+		while (this.firstLane.hasBufferSpace()) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return movedAtLeastOne;
@@ -291,9 +291,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
-			boolean handled = this.originalLane.addTransitToBuffer(now, veh);
+			boolean handled = this.firstLane.addTransitToBuffer(now, veh);
 			if (!handled) {
-				this.originalLane.addWaitToBuffer(veh, now);
+				this.firstLane.addWaitToBuffer(veh, now);
 			}
 		}
 		return movedAtLeastOne;
@@ -303,7 +303,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	boolean bufferIsEmpty() {
 		//if there is only one lane...
 		if (this.toNodeQueueLanes == null){
-			return this.originalLane.bufferIsEmpty();
+			return this.firstLane.bufferIsEmpty();
 		}
 		//otherwise we have to do a bit more work
 		for (QLane lane : this.toNodeQueueLanes){
@@ -316,7 +316,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	boolean hasSpace() {
-		return this.originalLane.hasSpace();
+		return this.firstLane.hasSpace();
 	}
 
 	@Override
@@ -397,7 +397,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
 	double getSimulatedFlowCapacity() {
-		return this.originalLane.getSimulatedFlowCapacity();
+		return this.firstLane.getSimulatedFlowCapacity();
 	}
 
 	/**
@@ -413,7 +413,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	QLane getOriginalLane(){
-		return this.originalLane;
+		return this.firstLane;
 	}
 
 	@Override
