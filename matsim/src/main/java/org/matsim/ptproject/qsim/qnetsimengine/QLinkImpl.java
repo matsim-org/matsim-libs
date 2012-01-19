@@ -236,19 +236,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	boolean moveLink(double now) {
-		boolean ret = false;
-		ret = this.moveLane(now);
-		this.active = ret;
-		return ret;
-	}
-
-	/** called from framework, do everything related to link movement here
-	 *
-	 * @param now current time step
-	 * @return
-	 */
-	 @Override
-	boolean moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -256,8 +243,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		moveLaneToBuffer(now);
 		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
-		return this.isActive();
+		this.active = this.isActive();
+		return active;
 	}
+
 
 	private void updateBufferCapacity() {
 		this.remainingBufferCap = this.flowCapacityPerTimeStep;
@@ -680,12 +669,13 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	private boolean isActive() {
 		/*
-		 * Leave Lane active as long as there are vehicles on the link (ignore
+		 * Leave Link active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty() || (!this.transitVehicleStopQueue.isEmpty()));
+		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) 
+				|| (!this.waitingList.isEmpty() || (!this.transitVehicleStopQueue.isEmpty()));
 		return active;
 	}
 

@@ -131,11 +131,10 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	/*package*/ VisData visdata;
 
 	/**
-	 * This flag indicates whether the QueueLane is
-	 * constructed by the original QueueLink of the network (true)
-	 * or to represent a Lane configured in a signal system definition.
+	 * This flag indicates whether the QLane is the first lane on the link or one
+	 * of the subsequent lanes.
 	 */
-	private final boolean isOriginalLane;
+	private final boolean isFirstLane;
 
 	private double length = Double.NaN;
 
@@ -167,9 +166,9 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isOriginalLane) {
+	/*package*/ QLane(final NetsimLink ql, Lane laneData, boolean isFirstLaneOnLink) {
 		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
-		this.isOriginalLane = isOriginalLane;
+		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;
 	}
 
@@ -322,9 +321,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	/**
-	 * Move vehicles from link to buffer, according to buffer capacity and
-	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
-	 * arrived at its destination.
+	 *  move vehicles from lane to buffer.  Includes possible 
+	 *  vehicle arrival, if this is the first lane on the link.
 	 *
 	 * @param now
 	 *          The current time.
@@ -336,7 +334,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
-			if ((veh.getEarliestLinkExitTime() > now) && this.isOriginalLane && (this.meterFromLinkEnd == 0.0)){
+			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.meterFromLinkEnd == 0.0)){
 				return;
 			}
 			//this is the aneumann PseudoLink behaviour
@@ -443,22 +441,17 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * @param now current time step
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
-	 @Override
 	boolean moveLane(final double now) {
 		updateBufferCapacity();
 
-		// move vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
-		// if this is the original lane.
 		moveLaneToBuffer(now);
 
-		// move vehicles from buffer to next lane.  This is, if I see this correctly, only relevant if this lane has "to-lanes".
-		// A lane can only have to-lanes if it is not an originalLane; in fact, if there are no original lanes at all.
-		// Something like
-		// if ( this.toLanes != null ) {
-		//    moveBufferToNextLane( now ) ;
-		// }
-		// might be easier to read?  In fact, I think even more could be done in terms of readability.  kai, nov'09
-		return moveBufferToNextLane(now);
+		// move vehicles from buffer to next lane if there is one.
+		boolean isOtherLaneActive = false;
+		if ( this.toLanes != null ) {
+			isOtherLaneActive = moveBufferToNextLane( now ) ;
+		 }
+		return isOtherLaneActive;
 	}
 
 	private QLane chooseNextLane(Id toLinkId){
@@ -478,12 +471,9 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 
 	private boolean moveBufferToNextLane(final double now) {
-		// because of the "this.toLanes != null", this method in my does something only when there are downstream
-		// lanes on the same link.  kai, nov'09
-		boolean moveOn = true;
 		boolean movedAtLeastOne = false;
-		while (moveOn && !this.bufferIsEmpty() && (this.toLanes != null)) {
-			QVehicle veh = this.buffer.peek();
+		QVehicle veh;
+		while ((veh = this.buffer.peek()) != null) {
 			Id nextLinkId = veh.getDriver().chooseNextLinkId();
 			QLane toQueueLane = null;
 			toQueueLane = this.chooseNextLane(nextLinkId);
@@ -496,10 +486,10 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 					movedAtLeastOne = true;
 				}
 				else {
-					moveOn = false;
+					return movedAtLeastOne;
 				}
 			}
-			else {
+			else { //error handling
 				StringBuilder b = new StringBuilder();
 				b.append("Person Id: ");
 				b.append(veh.getDriver().getId());
@@ -632,8 +622,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.buffer;
 	}
 
-	boolean isOriginalLane() {
-		return this.isOriginalLane;
+	boolean isFirstLaneOnLink() {
+		return this.isFirstLane;
 	}
 
 	/**

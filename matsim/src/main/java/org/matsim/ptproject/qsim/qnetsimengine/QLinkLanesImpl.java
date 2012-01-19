@@ -416,6 +416,17 @@ public class QLinkLanesImpl extends AbstractQLink {
 		return this.originalLane;
 	}
 
+	@Override
+	AbstractQLink getQLink() {
+		return this;
+	}
+
+	@Override
+	double getLength() {
+		return this.getLink().getLength();
+	}
+
+	
 	/**
 	 * Inner class to capsulate visualization methods
 	 * @author dgrether
@@ -473,37 +484,21 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	AbstractQLink getQLink() {
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
 	double getInverseSimulatedFlowCapacity() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
 	double getStorageCapacity() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
 
 	@Override
 	int getBufferStorage() {
-		throw new UnsupportedOperationException() ;
+		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 
-
-	@Override
-	double getLength() {
-		throw new UnsupportedOperationException() ;
-	}
-
-
-	@Override
-	boolean moveLane(double now) {
-		throw new UnsupportedOperationException() ;
-	}
 
 }
