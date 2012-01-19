@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcLegTimesTest.java
+ * Values.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.kai.bvwp;
 
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.testcases.MatsimTestCase;
+class Values {
+	enum Entry { amount, km, hrs, mon }
 
+	enum Type { GV, PV }
 
-
-public class BvwpTest extends MatsimTestCase {
+	enum Mode { road, rail }
 	
-	public void testOne() {
-		
-		Values economicValues = EconomicValues1.createEconomicValues1();
-		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
-		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
-		
-		new UtilityChangesNEW().utilityChange(economicValues, nullfall, planfall) ;
-		
+	Map<Mode,ValuesForAMode> valuesByMode = new TreeMap<Mode,ValuesForAMode>() ;
+	Values() {
+		for ( Mode mode : Mode.values() ) {
+			ValuesForAMode vals = new ValuesForAMode() ;
+			valuesByMode.put( mode, vals ) ;
+		}
 	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
+	Values createDeepCopy( ) {
+		Values planfall = new Values() ;
+		for ( Mode mode : Mode.values() ) {
+			ValuesForAMode oldValues = this.getByMode(mode) ;
+			ValuesForAMode newValues = oldValues.createDeepCopy() ;
+			planfall.valuesByMode.put( mode, newValues ) ;
+		}
+		return planfall ; 
 	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	ValuesForAMode getByMode( Mode mode ) {
+			return valuesByMode.get(mode) ;
 	}
-
+	void setValuesForMode( Mode mode, ValuesForAMode values ) {
+		valuesByMode.put( mode, values ) ;
+	}
 }
+

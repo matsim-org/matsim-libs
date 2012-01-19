@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcLegTimesTest.java
+ * ValuesByMode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.kai.bvwp;
 
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.testcases.MatsimTestCase;
+import playground.kai.bvwp.Values.Type;
 
-
-
-public class BvwpTest extends MatsimTestCase {
-	
-	public void testOne() {
-		
-		Values economicValues = EconomicValues1.createEconomicValues1();
-		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
-		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
-		
-		new UtilityChangesNEW().utilityChange(economicValues, nullfall, planfall) ;
-		
+class ValuesForAMode {
+	Map<Type,ValuesForAUserType> valuesByType = new TreeMap<Type,ValuesForAUserType>() ;
+	ValuesForAMode createDeepCopy( ) {
+		ValuesForAMode planfall = new ValuesForAMode() ;
+		for ( Type mode : Type.values() ) {
+			ValuesForAUserType old = this.getByType(mode) ;
+			ValuesForAUserType tmp2 = old.createDeepCopy() ;
+			planfall.valuesByType.put( mode, tmp2 ) ;
+		}
+		return planfall ; 
 	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
+	ValuesForAMode() {
+		for ( Type mode : Type.values() ) {
+			ValuesForAUserType vals = new ValuesForAUserType() ;
+			valuesByType.put( mode, vals ) ;
+		}
 	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	ValuesForAUserType getByType( Type type ) {
+			return valuesByType.get(type) ;
 	}
-
+	void setValuesForType( Type type, ValuesForAUserType values ) {
+		valuesByType.put( type, values ) ;
+	}
 }

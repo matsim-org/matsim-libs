@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcLegTimesTest.java
+ * ValuesByType.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.kai.bvwp;
 
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.testcases.MatsimTestCase;
+import playground.kai.bvwp.Values.Entry;
 
-
-
-public class BvwpTest extends MatsimTestCase {
+class ValuesForAUserType {
+	Map<Entry,Double> quantities = new TreeMap<Entry,Double>() ;
+	ValuesForAUserType() {
+		for ( Entry entry : Entry.values() ) {
+			this.setByEntry( entry, 0. ) ;
+		}
+	}
+	double getByEntry( Entry entry ) {
+		return quantities.get(entry) ;
+	}
+	void setByEntry( Entry entry, double dbl ) {
+		quantities.put( entry, dbl ) ;
+	}
+	void incByEntry( Entry entry, double dbl ) {
+		double tmp = quantities.get( entry ) ;
+		quantities.put( entry, tmp + dbl ) ;
+	}
+	ValuesForAUserType createDeepCopy() {
+		ValuesForAUserType newValues = new ValuesForAUserType() ;
+		for ( Entry entry : Entry.values() ) {
+			newValues.setByEntry( entry, this.getByEntry(entry) ) ;
+		}
+		return newValues ;
+	}
 	
-	public void testOne() {
-		
-		Values economicValues = EconomicValues1.createEconomicValues1();
-		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
-		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
-		
-		new UtilityChangesNEW().utilityChange(economicValues, nullfall, planfall) ;
-		
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
 }

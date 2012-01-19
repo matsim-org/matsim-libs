@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcLegTimesTest.java
+ * ValuesByODRelation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.kai.bvwp;
 
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.api.core.v01.Id;
 
-
-
-public class BvwpTest extends MatsimTestCase {
-	
-	public void testOne() {
-		
-		Values economicValues = EconomicValues1.createEconomicValues1();
-		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
-		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
-		
-		new UtilityChangesNEW().utilityChange(economicValues, nullfall, planfall) ;
-		
+class ScenarioForEval {
+		Map<Id,Values> values = new TreeMap<Id,Values>();
+		ScenarioForEval() {
+//			for ( Id id : values.keySet() ) {
+//				Values vals = new Values() ;
+//				values.put( id, vals ) ;
+//			}
+		}
+		ScenarioForEval createDeepCopy() {
+			ScenarioForEval nnn = new ScenarioForEval() ;
+			for ( Id id : values.keySet() ) {
+				Values oldValues = this.getByODRelation(id) ;
+				Values newValues = oldValues.createDeepCopy() ;
+				nnn.values.put( id, newValues ) ;
+			}
+			return nnn ;
+		}
+		Values getByODRelation( Id id ) {
+			return values.get(id) ;
+		}
+		void setValuesForODRelation( Id id , Values tmp ) {
+			values.put( id, tmp ) ;
+		}
 	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
-}

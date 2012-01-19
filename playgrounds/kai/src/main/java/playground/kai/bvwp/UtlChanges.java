@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CalcLegTimesTest.java
+ * UtlChanges.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,37 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.kai.bvwp;
 
-
-import org.matsim.testcases.MatsimTestCase;
-
-
-
-public class BvwpTest extends MatsimTestCase {
-	
-	public void testOne() {
-		
-		Values economicValues = EconomicValues1.createEconomicValues1();
-		
-		ScenarioForEval nullfall = Scenario1.createNullfall1();
-		
-		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
-		
-		new UtilityChangesNEW().utilityChange(economicValues, nullfall, planfall) ;
-		
-	}
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-
-	}
-
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+public class UtlChanges {
+	double deltaQuantity ;
+	double utlGainByOldUsers ;
+	double utlGainByNewUsers ;
 }
