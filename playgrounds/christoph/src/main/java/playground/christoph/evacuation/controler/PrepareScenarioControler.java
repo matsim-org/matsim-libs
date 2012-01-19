@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
+import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.christoph.controler.KTIEnergyFlowsController;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
@@ -56,6 +57,8 @@ import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader
  */
 public class PrepareScenarioControler extends KTIEnergyFlowsController implements StartupListener, IterationStartsListener, ReplanningListener {
 
+	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
+	
 	protected String[] householdVehicleFiles = new String[] {
 			"Fahrzeugtypen_Kanton_AG.txt", "Fahrzeugtypen_Kanton_AI.txt", "Fahrzeugtypen_Kanton_AR.txt",
 			"Fahrzeugtypen_Kanton_BE.txt", "Fahrzeugtypen_Kanton_BL.txt", "Fahrzeugtypen_Kanton_BS.txt",
@@ -121,6 +124,11 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		this.config.scenario().setUseVehicles(true);
 		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
+		
+		/*
+		 * Write vehicles to file.
+		 */
+		new VehicleWriterV1(scenarioData.getVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 		
 		/*
 		 * Assign vehicles to agent's plans.
