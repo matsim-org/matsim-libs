@@ -151,6 +151,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
+		if (Double.isNaN(this.freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+		}
 		this.calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
 	}
@@ -201,18 +204,11 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		double departureTime;
 
-		//FIXME this is completely nonsense
-		departureTime = now + this.freespeedTravelTime + ( veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime()) );
-		// yyyy freespeedTravelTime may be Inf, in which case the vehicle never leaves, even if the time-variant link
-		// is reset to a non-zero speed.  kai, nov'10
-
-		/* It's a QueueLane that is directly connected to a QueueNode,
-		 * so we have to floor the freeLinkTravelTime in order the get the same
-		 * results compared to the old mobSim */
+		departureTime = now + this.freespeedTravelTime;
 		departureTime = Math.floor(departureTime);
-		this.linkEnterTimeMap.put(veh, now);
-		//FIXME this is completely nonsense
 		veh.setEarliestLinkExitTime(departureTime);
+
+		this.linkEnterTimeMap.put(veh, now);
 	}
 
 	@Override

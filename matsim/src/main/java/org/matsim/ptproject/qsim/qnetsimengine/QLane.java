@@ -268,6 +268,9 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	void setLaneLength(final double laneLengthMeters) {
 		this.length = laneLengthMeters;
 		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
+		if (Double.isNaN(this.freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
+		}
 	}
 
 	void calculateCapacities() {
@@ -536,16 +539,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			.processEvent(new LaneEnterEventImpl(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 		double departureTime;
-		if (this.isOriginalLane) {
-			/* It's the original lane,
-			 * so we need to start with a 'clean' freeSpeedTravelTime */
-			departureTime = (now + this.freespeedTravelTime);
-		} else {
-			/* It's not the original lane,
-			 * so there is a fractional rest we add to this link's freeSpeedTravelTime */
-			departureTime = now + this.freespeedTravelTime
-			+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-		}
+		departureTime = now + this.freespeedTravelTime;
 		if (this.meterFromLinkEnd == 0.0) {
 			/* It's a QueueLane that is directly connected to a QueueNode,
 			 * so we have to floor the freeLinkTravelTime in order the get the same
