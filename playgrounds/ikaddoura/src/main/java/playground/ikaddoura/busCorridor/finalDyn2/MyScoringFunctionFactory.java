@@ -27,7 +27,6 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -35,14 +34,17 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 	private PtLegHandler inVehWaitHandler;
 	private double TRAVEL_PT_IN_VEHICLE;
 	private double TRAVEL_PT_WAITING;
-	protected final double monetaryCostPerKm;
+	private double monetaryCostPerKm;
+	private double agentStuckScore;
+	
 
-	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup config, PtLegHandler inVehWaitHandler, double TRAVEL_PT_IN_VEHICLE, double TRAVEL_PT_WAITING, double monetaryCostPerKm) {
+	public MyScoringFunctionFactory(final PlanCalcScoreConfigGroup config, PtLegHandler inVehWaitHandler, double TRAVEL_PT_IN_VEHICLE, double TRAVEL_PT_WAITING, double monetaryCostPerKm, double agentStuckScore) {
 		this.params = new CharyparNagelScoringParameters(config);
 		this.inVehWaitHandler = inVehWaitHandler;
 		this.TRAVEL_PT_IN_VEHICLE = TRAVEL_PT_IN_VEHICLE;
 		this.TRAVEL_PT_WAITING = TRAVEL_PT_WAITING;
 		this.monetaryCostPerKm = monetaryCostPerKm;
+		this.agentStuckScore = agentStuckScore;
 	}
 
 	@Override
@@ -52,11 +54,9 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		scoringFunctionAccumulator.addScoringFunction(new CarLegScoringFunction(plan, params, this.monetaryCostPerKm));
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
-//		scoringFunctionAccumulator.addScoringFunction(new AgentStuckScoringFunction(params));
-//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
-		
+		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.agentStuckScore));
 		scoringFunctionAccumulator.addScoringFunction(new PtLegScoringFunction(plan, inVehWaitHandler.getPersonId2InVehicleTime(), inVehWaitHandler.getPersonId2WaitingTime(), this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
-		
+//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}
 

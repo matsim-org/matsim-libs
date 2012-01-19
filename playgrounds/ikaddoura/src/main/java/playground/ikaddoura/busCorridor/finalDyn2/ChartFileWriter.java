@@ -92,7 +92,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("User score sum per iteration", "Iteration", "User Score (Sum)");
+		LineChart chart = new LineChart("User score sum per iteration", "Iteration", "User Score (LogSum)");
 	    
 		double[] yWerte = new double[iteration2scoreSum.size()];
 		int counter2 = 0;
@@ -100,9 +100,9 @@ public class ChartFileWriter {
 			yWerte[counter2] = iteration2scoreSum.get(iteration);
 			counter2++;
 		}
-		chart.addSeries("User Score", yWerte);
+		chart.addSeries("User Score (AUD)", yWerte);
 		
-		String outputFile = outputExternalIterationDirPath+"/UserScoreSum.png";
+		String outputFile = outputExternalIterationDirPath+"/UserScoreLogSum.png";
 		chart.saveAsPng(outputFile, 1000, 800); //File Export
 		log.info("UserScores written to "+outputFile);
 	}
@@ -116,7 +116,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("Total Score per iteration", "Iteration", "Sum of User and Operator Score");
+		LineChart chart = new LineChart("Total Score per iteration", "Iteration", "Sum of User (LogSum) and Operator Score");
 	    
 		double[] yWerte = new double[iteration2totalScore.size()];
 		int counter2 = 0;

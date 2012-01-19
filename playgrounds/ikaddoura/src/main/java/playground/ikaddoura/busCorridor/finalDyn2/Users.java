@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,23 +43,24 @@ public class Users {
 	
 	private final static Logger log = Logger.getLogger(Users.class);
 
+	private double logSum;
 	private double avgExecScore;
-	private double scoreSum;
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs;
 	private String directoryExtIt;
 	private String networkFile;
+	private final double MONEY_UTILS;
 
-	public Users(String directoryExtIt, String networkFile) {
+	public Users(String directoryExtIt, String networkFile, double MONEY_UTILS) {
 		this.directoryExtIt = directoryExtIt;
 		this.networkFile = networkFile;
+		this.MONEY_UTILS = MONEY_UTILS;
 	}
 
-	public void analyzeScores() {
+	public void calculateScore() {
 		
-		List<Double> scores = new ArrayList<Double>();
-		double scoreSum = 0.0;
+		List<Double> execScores = new ArrayList<Double>();
 		
 		String outputPlanFile = this.directoryExtIt+"/internalIterations/output_plans.xml.gz";		
 		
@@ -68,27 +70,46 @@ public class Users {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 
+		double logSumAllPersons = 0.0;
 		for(Person person : population.getPersons().values()){
+			double expScore = 0.0;
+			for (Plan plan : person.getPlans()){
+				if (plan.getScore()>-100000){
+					expScore = expScore + Math.exp(plan.getScore());
+				}
+				else {
+					log.warn("A plan of "+person.getId()+" is not used for LogSumUserScoring because of Agent would stuck --> Score: "+plan.getScore());
+				}
+			}
+			
 			double score = person.getSelectedPlan().getScore();
-			scores.add(score);
+			if (score > -100000){
+				execScores.add(score);
+			}
+			else {
+				log.warn("A plan of "+person.getId()+" is not used for AvgExecUserScoring because of Agent would stuck --> Score: "+score);
+			}
+			
+			double logSumThisPerson = (1/MONEY_UTILS) * Math.log(expScore);
+			
+			if (logSumThisPerson<-100000){
+				log.warn("All plans of "+person.getId()+" are not used for LogSum User Scoring. (LogSum for this person: "+logSumThisPerson+")");
+			}
+			else {
+				logSumAllPersons = logSumThisPerson + logSumAllPersons;
+			}
 		}
 		
-		for (Double score : scores){
-			scoreSum = scoreSum+score;
+		double execScoreSum = 0.0;
+		for (Double score : execScores){
+			execScoreSum = execScoreSum + score;
 		}
 		
-		this.setAvgExecScore(scoreSum/scores.size());
-		this.setScoreSum(scoreSum); // !!! toDo: LogSum !!!
+		this.setAvgExecScore(execScoreSum/execScores.size());
+		this.setLogSum(logSumAllPersons);
 		
-		log.info("Users Scores analyzed.");
-	}
-	 
-	public void setAvgExecScore(double avgExecScore) {
-		this.avgExecScore = avgExecScore;
-	}
-
-	public double getAvgExecScore() {
-		return avgExecScore;
+		log.info("Average User Score calculated. "+this.avgExecScore);
+		log.info("User Score Sum (LogSum) calculated. "+this.logSum);
 	}
 
 	public int getNumberOfPtLegs() {
@@ -102,14 +123,6 @@ public class Users {
 	public int getNumberOfWalkLegs() {
 		return numberOfWalkLegs;
 	}
-
-	public void setScoreSum(double scoreSum) {
-		this.scoreSum = scoreSum;
-	}
-
-	public double getScoreSum() {
-		return scoreSum;
-	}
 	
 	public void setNumberOfPtLegs(int numberOfPtLegs) {
 		this.numberOfPtLegs = numberOfPtLegs;
@@ -121,5 +134,21 @@ public class Users {
 
 	public void setNumberOfWalkLegs(int numberOfWalkLegs) {
 		this.numberOfWalkLegs = numberOfWalkLegs;
+	}
+
+	public void setLogSum(double logSum) {
+		this.logSum = logSum;
+	}
+
+	public double getLogSum() {
+		return logSum;
+	}
+
+	public void setAvgExecScore(double avgExecScore) {
+		this.avgExecScore = avgExecScore;
+	}
+
+	public double getAvgExecScore() {
+		return avgExecScore;
 	}
 }

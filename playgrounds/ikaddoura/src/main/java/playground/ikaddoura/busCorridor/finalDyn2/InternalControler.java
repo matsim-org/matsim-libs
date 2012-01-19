@@ -48,12 +48,12 @@ public class InternalControler {
 	private String populationFile;
 	private String networkFile;
 	private double fare;
+	private final double MONEY_UTILS;
 	
 	private final double TRAVEL_PT = 0; // not used --> instead: TRAVEL_PT_IN_VEHICLE & TRAVEL_PT_WAITING
 	
 	private final double TRAVEL_CAR = -1.8534;
 	private final double TRAVEL_WALK = -3.6102;
-	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
 	private final double CONSTANT_CAR = -2.2118;
 	private final double CONSTANT_PT = 0;
 	
@@ -62,11 +62,9 @@ public class InternalControler {
 	
 	private final double monetaryCostPerKm = -0.11; // AUD per km 
 	
-	private final double PERFORMING = 0;
-	private final double LATE_ARRIVAL = 0;
-	private final double EARLY_DEPARTURE = 0;
+	private final double agentStuckScore = -100000;
 	
-	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare) {
+	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS) {
 		this.configFile = configFile;
 		this.directoryExtIt = directoryExtIt;
 		this.lastInternalIteration = lastInternalIteration;
@@ -76,6 +74,7 @@ public class InternalControler {
 		this.networkFile = networkFile;
 		this.fare = fare;
 		this.ptLegHandler = new PtLegHandler();
+		this.MONEY_UTILS = MONEY_UTILS;
 	}
 	
 	public void run() {
@@ -122,11 +121,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
 		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
 		
-		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
-		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
-		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
-		
-		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm);
+		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
 		controler.setScoringFunctionFactory(scoringfactory);
 		controler.run();		
 	}
