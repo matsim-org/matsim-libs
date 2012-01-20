@@ -65,6 +65,7 @@ public class DataPloter {
 		Logger.getLogger(DataPloter.class);
 
 	private static final float TITLE_FONT_SIZE = 17;
+	private static final boolean PLOT_STD_DEV = false;
 
 	private final JoinableTrips trips;
 
@@ -91,7 +92,7 @@ public class DataPloter {
 			"time of day (h)",
 			"number of joinable trips",
 			1,
-			true);
+			PLOT_STD_DEV);
 
 		for (JoinableTrips.TripRecord trip : filteredTrips) {
 			int count = 0;
@@ -126,7 +127,7 @@ public class DataPloter {
 			"trip length (km)",
 			"number of joinable trips",
 			1,
-			true);
+			PLOT_STD_DEV);
 
 		for (JoinableTrips.TripRecord trip : filteredTrips) {
 			int count = 0;
@@ -156,7 +157,7 @@ public class DataPloter {
 		String title = "Number of possible joint trips for different criteria";
 
 		TwoCategoriesBoxAndWhiskerChart chart = new TwoCategoriesBoxAndWhiskerChart(
-				title , "", "number of possible joint trips", true);
+				title , "", "number of possible joint trips", PLOT_STD_DEV);
 
 		Collections.sort(conditions, new ConditionComparator());
 		
@@ -248,7 +249,7 @@ public class DataPloter {
 			"driver trip length (km)",
 			"number of possible passengers",
 			1,
-			true);
+			PLOT_STD_DEV);
 
 		// collect data: parse passenger trips and update driver info
 		Map<Id, Integer> counts = new TreeMap<Id, Integer>();
