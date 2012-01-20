@@ -1002,18 +1002,20 @@ public class Controler {
 			}
 		}
 		if (simulation instanceof VisMobsim) {
-			SnapshotWriterManager manager = new SnapshotWriterManager(config);
-			SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
-			SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
 			int itNumber = this.getIterationNumber();
-			for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
-				SnapshotWriterFactory snapshotWriterFactory = register.getInstance(snapshotFormat);
-				String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-				String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
-				SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
-				manager.addSnapshotWriter(snapshotWriter);
+			if (itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
+				SnapshotWriterManager manager = new SnapshotWriterManager(config);
+				SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
+				SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
+				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
+					SnapshotWriterFactory snapshotWriterFactory = register.getInstance(snapshotFormat);
+					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
+					String fileName = this.controlerIO.getIterationFilename(itNumber, baseFileName);
+					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData);
+					manager.addSnapshotWriter(snapshotWriter);
+				}
+				((ObservableSimulation) simulation).addQueueSimulationListeners(manager);
 			}
-			((ObservableSimulation) simulation).addQueueSimulationListeners(manager);
 		}
 	}
 

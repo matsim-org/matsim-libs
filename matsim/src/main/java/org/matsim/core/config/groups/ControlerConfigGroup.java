@@ -52,6 +52,8 @@ public class ControlerConfigGroup extends Module {
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	/*package*/ static final String MOBSIM = "mobsim";
+	public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
+
 
 	private String outputDirectory = "./output";
 	private int firstIteration = 0;
@@ -68,6 +70,7 @@ public class ControlerConfigGroup extends Module {
 	private int writePlansInterval=10;
 	private Set<String> snapshotFormat = Collections.emptySet();
 	private String mobsim = null;
+	private int writeSnapshotsInterval = 1;
 
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -114,7 +117,9 @@ public class ControlerConfigGroup extends Module {
 				isFirst = false;
 			}
 			return str.toString();
-		}else {
+		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)){
+			return Integer.toString(this.getWriteSnapshotsInterval());
+		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -175,6 +180,8 @@ public class ControlerConfigGroup extends Module {
 				}
 			}
 			this.snapshotFormat = formats;
+		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)) {
+			setWriteSnapshotsInterval(Integer.parseInt(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -194,6 +201,7 @@ public class ControlerConfigGroup extends Module {
 		map.put(WRITE_PLANS_INTERVAL, Integer.toString(this.getWritePlansInterval()) );
 		map.put(MOBSIM, getValue(MOBSIM));
 		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
+		map.put(WRITE_SNAPSHOTS_INTERVAL, String.valueOf(getWriteSnapshotsInterval()));
 		return map;
 	}
 
@@ -210,6 +218,8 @@ public class ControlerConfigGroup extends Module {
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: queueSimulation, qsim, jdeqsim, multimodalQSim");
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.") ;
+		map.put(WRITE_SNAPSHOTS_INTERVAL, "iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
+				"to a file. `0' disables snapshots writing completely");
 		return map;
 	}
 
@@ -309,4 +319,13 @@ public class ControlerConfigGroup extends Module {
 	public void setWritePlansInterval(final int writePlansInterval) {
 		this.writePlansInterval = writePlansInterval;
 	}
+	
+	public int getWriteSnapshotsInterval() {
+		return writeSnapshotsInterval;
+	}
+	
+	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
+		this.writeSnapshotsInterval = writeSnapshotsInterval;
+	}
+
 }

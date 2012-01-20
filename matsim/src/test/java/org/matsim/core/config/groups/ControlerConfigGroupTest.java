@@ -149,5 +149,24 @@ public class ControlerConfigGroupTest {
 		Assert.assertFalse(cg.isLinkToLinkRoutingEnabled());
 		Assert.assertEquals("false", cg.getValue("enableLinkToLinkRouting"));
 	}
+
+	/**
+	 * Ensure that the writeSnapshotsInterval value is correctly stored and 
+	 * returned with the getters and setters.
+	 */
+	@Test
+	public void testWriteSnapshotInterval(){
+		ControlerConfigGroup cg = new ControlerConfigGroup();
+		//initial value
+		Assert.assertEquals(1, cg.getWriteSnapshotsInterval());
+		//modify by string
+		cg.addParam("writeSnapshotsInterval", "10");
+		Assert.assertEquals(10, cg.getWriteSnapshotsInterval());
+		//modify by boolean
+		cg.setWriteSnapshotsInterval(42);
+		Assert.assertEquals("42", cg.getValue("writeSnapshotsInterval"));
+		Assert.assertEquals(42, cg.getWriteSnapshotsInterval());
+	}
+
 	
 }
