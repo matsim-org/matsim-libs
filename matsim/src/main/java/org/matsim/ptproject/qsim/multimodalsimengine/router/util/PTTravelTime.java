@@ -20,6 +20,8 @@
 
 package org.matsim.ptproject.qsim.multimodalsimengine.router.util;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -48,15 +50,16 @@ public class PTTravelTime implements PersonalizableTravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time) {
 		/*
-		 * If it is a car link, we use car travel times. Else we check whether it is
+		 * If it is a pt or car link, we use car travel times. Else we check whether it is
 		 * a bike / walk link - if it is one, we use walk travel times.
 		 */
-		if (link.getAllowedModes().contains(TransportMode.car)) {
+		Set<String> allowedModes = link.getAllowedModes();
+		if (allowedModes.contains(TransportMode.car) || allowedModes.contains(TransportMode.pt)) {
 			if (carTravelTime instanceof BufferedTravelTime) {
 				return ptScaleFactor * ((BufferedTravelTime) carTravelTime).getBufferedLinkTravelTime(link, time);
 			} else return ptScaleFactor * carTravelTime.getLinkTravelTime(link, time);
 		}
-		else if (link.getAllowedModes().contains(TransportMode.bike) ||link.getAllowedModes().contains(TransportMode.walk)) {
+		else if (allowedModes.contains(TransportMode.bike) ||allowedModes.contains(TransportMode.walk)) {
 			return walkTravelTime.getLinkTravelTime(link, time);
 		}
 		
