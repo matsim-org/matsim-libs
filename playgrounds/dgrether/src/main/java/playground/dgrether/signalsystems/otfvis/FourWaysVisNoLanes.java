@@ -52,13 +52,14 @@ public class FourWaysVisNoLanes {
     scenario.getConfig().plans().setInputFile(popFile);
     scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
     scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+//    scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("equiDist");
     scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
     
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
     loader.loadScenario();
     
-    EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+    EventsManager events = EventsUtils.createEventsManager();
     QSim otfVisQSim = QSim.createQSimAndAddAgentSource(scenario, events);
     OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 	OTFClientLive.run(scenario.getConfig(), server);

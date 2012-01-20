@@ -23,15 +23,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import playground.dgrether.utils.LogOutputEventHandler;
 
 
 /**
@@ -44,20 +44,21 @@ public class LaneLayoutTestShowLanes {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
 		sc.getConfig().network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
+		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
 		sc.getConfig().scenario().setUseLanes(true);
 		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		sc.getConfig().otfVis().setLinkWidth(50.0f);
+//		sc.getConfig().otfVis().setLinkWidth(50.0f);
 		sc.getConfig().otfVis().setDrawLinkIds(true);
-		
+		sc.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
 		loader.loadScenario();
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		
-		ControlerIO controlerIO = new ControlerIO(sc.getConfig().controler().getOutputDirectory());
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new LogOutputEventHandler());
 		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);

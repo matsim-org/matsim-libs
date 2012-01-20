@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneLayoutTestFileNames
+ * Daganzo2012Run
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.lanes.laneLayoutTest;
+package playground.dgrether.daganzo2012;
+
+import org.matsim.core.controler.Controler;
+
+import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public interface LaneLayoutTestFileNames {
+public class Daganzo2012Run {
 
-	public final static String BASEDIR = "./src/main/resources/laneLayoutTest/";
-	
-	public final static String NETWORK = BASEDIR + "network.xml";
-	
-	public final static String LANEDEFINITIONS = BASEDIR + "lanedefinitions.xml";
+	public static void main(String[] args) {
+//		String config = args[0];
+		String config = "/media/data/work/repos/shared-svn/studies/dgrether/daganzo2012/daganzo_2012_config.xml";
+		Controler controler = new Controler(config);
+		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
+		controler.setOverwriteFiles(true);
+		controler.run();
 
-	public final static String LANEDEFINITIONSV2 = BASEDIR + "lanedefinitionsV2.0.xml";
+	}
 
-	public final static String CONFIG = BASEDIR + "laneLayoutTestConfig.xml";
-	
-	public final static String POPULATION = BASEDIR + "laneLayoutTestPopulation.xml";
 }

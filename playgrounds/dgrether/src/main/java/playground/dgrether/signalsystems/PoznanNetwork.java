@@ -562,6 +562,7 @@ public class PoznanNetwork
             homeAct.setEndTime(120 + i * 5);
             plan.addActivity(homeAct);
             Leg leg = pf.createLeg(TransportMode.car);
+            leg.setRoute(null);
             plan.addLeg(leg);
             homeAct = pf.createActivityFromLinkId("home", scenario.createId("10_12"));
             plan.addActivity(homeAct);

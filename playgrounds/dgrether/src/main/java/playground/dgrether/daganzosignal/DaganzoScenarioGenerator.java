@@ -35,8 +35,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.population.ActivityImpl;
@@ -67,7 +67,7 @@ public class DaganzoScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(DaganzoScenarioGenerator.class);
 
-	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2010/";
+	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2012/";
 
 	public static String DAGANZOBASEDIR = DgPaths.REPOS + DAGANZO_SVN_DIR;
 

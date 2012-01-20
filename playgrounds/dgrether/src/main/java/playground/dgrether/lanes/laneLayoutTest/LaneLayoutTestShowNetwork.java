@@ -19,7 +19,17 @@
  * *********************************************************************** */
 package playground.dgrether.lanes.laneLayoutTest;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.run.OTFVis;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 /**
@@ -32,8 +42,22 @@ public class LaneLayoutTestShowNetwork {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String a = LaneLayoutTestFileNames.NETWORK;
-		OTFVis.playNetwork(a);
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().network().setInputFile(LaneLayoutTestFileNames.NETWORK);
+		sc.getConfig().plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
+		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
+		sc.getConfig().otfVis().setDrawLinkIds(true);
+		sc.getConfig().otfVis().setShowParking(true);
+		sc.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		
+		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);
+		loader.loadScenario();
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		QSim otfVisQSim = QSim.createQSimAndAddAgentSource(sc, events);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, events, otfVisQSim);
+		OTFClientLive.run(sc.getConfig(), server);
+		otfVisQSim.run();
 	}
 
 }

@@ -11,6 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.ControlerIO;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.QSimFactory;
@@ -23,6 +24,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.utils.DgOTFVisUtils;
+import playground.dgrether.utils.LogOutputEventHandler;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -63,6 +65,7 @@ public class DgOTFVis {
 			scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		}
 		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new LogOutputEventHandler());
 		ControlerIO controlerIO = new ControlerIO(scenario.getConfig().controler().getOutputDirectory());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 
@@ -79,8 +82,8 @@ public class DgOTFVis {
 	
 	public void playAndRouteConfig(String config){
 		Config cc = ConfigUtils.loadConfig(config);
-		Scenario sc = ScenarioUtils.loadScenario(cc);
-		DgOTFVisUtils.locateAndRoutePopulation(sc);
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(cc);
+		DgOTFVisUtils.preparePopulation4Simulation(sc);
 		this.playScenario(sc);
 	}
 	

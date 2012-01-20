@@ -20,14 +20,13 @@
 package playground.dgrether.utils;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -45,17 +44,17 @@ public class DgOTFVisUtils {
 		c.logEntries();
 	}
 	
-	public static void locateAndRoutePopulation(Scenario scenario){
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links((NetworkImpl) scenario.getNetwork()));
+	public static void locateAndRoutePopulation(ScenarioImpl scenario){
+		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario));
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory()));
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 	}
 	
-	public static void preparePopulation4Simulation(Scenario scenario) {
+	public static void preparePopulation4Simulation(ScenarioImpl scenario) {
 		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig().planCalcScore());
 		PlansCalcRoute router = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (NetworkImpl) scenario.getNetwork());
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			pp4s.run(p);
 		}
