@@ -39,6 +39,7 @@ import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTrave
 
 public class MultiModalLegRouter implements LegRouter {
 	
+	private Set<String> carModeRestrictions;
 	private Set<String> walkModeRestrictions;
 	private Set<String> bikeModeRestrictions;
 	private Set<String> rideModeRestrictions;
@@ -78,7 +79,7 @@ public class MultiModalLegRouter implements LegRouter {
 		String legMode = leg.getMode();
 		
 		if (TransportMode.car.equals(legMode)) {
-			// nothing to do
+			routeAlgo.setModeRestriction(carModeRestrictions);
 		} else if (TransportMode.walk.equals(legMode)) {
 			routeAlgo.setModeRestriction(walkModeRestrictions);
 		} else if (TransportMode.bike.equals(legMode)) {
@@ -102,13 +103,19 @@ public class MultiModalLegRouter implements LegRouter {
 	}
 
 
-	private void initModeRestrictions() {	
+	private void initModeRestrictions() {
+		/*
+		 * Car
+		 */	
+		carModeRestrictions = new HashSet<String>();
+		carModeRestrictions.add(TransportMode.car);
+		
 		/*
 		 * Walk
 		 */	
 		walkModeRestrictions = new HashSet<String>();
+		walkModeRestrictions.add(TransportMode.bike);
 		walkModeRestrictions.add(TransportMode.walk);
-		walkModeRestrictions.add(TransportMode.car);
 				
 		/*
 		 * Bike
@@ -116,24 +123,11 @@ public class MultiModalLegRouter implements LegRouter {
 		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
 		 */
 		bikeModeRestrictions = new HashSet<String>();
-		bikeModeRestrictions.add(TransportMode.bike);
 		bikeModeRestrictions.add(TransportMode.walk);
-		bikeModeRestrictions.add(TransportMode.car);
-	
+		bikeModeRestrictions.add(TransportMode.bike);
 		
 		/*
 		 * PT
-		 * If possible, we use "real" TravelTimes from previous iterations - if not,
-		 * freeSpeedTravelTimes are used.
-		 */
-//		PersonalizableTravelCost ptTravelCost = costFactory.createTravelCostCalculator(travelTime, cnScoringGroup);
-//		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
-//			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-//			ptTravelCost.setTravelTime(bufferedTravelTime);
-//		}
-		
-		
-		/*
 		 * We assume PT trips are possible on every road that can be used by cars.
 		 * 
 		 * Additionally we also allow pt trips to use walk and / or bike only links.
@@ -142,27 +136,21 @@ public class MultiModalLegRouter implements LegRouter {
 		 * bus station to the destination.
 		 */
 		ptModeRestrictions = new HashSet<String>();
+		ptModeRestrictions.add(TransportMode.pt);
 		ptModeRestrictions.add(TransportMode.car);
 		ptModeRestrictions.add(TransportMode.bike);
 		ptModeRestrictions.add(TransportMode.walk);
 		
-		
 		/*
 		 * Ride
-		 * If possible, we use "real" TravelTimes from previous iterations - if not,
-		 * freeSpeedTravelTimes are used.
-		 */
-//		PersonalizableTravelCost rideTravelCost = costFactory.createTravelCostCalculator(travelTime, cnScoringGroup);
-//		if (travelTime instanceof TravelTimeCalculatorWithBuffer) {
-//			BufferedTravelTime bufferedTravelTime = new BufferedTravelTime((TravelTimeCalculatorWithBuffer) travelTime);
-//			rideTravelCost.setTravelTime(bufferedTravelTime);
-//		}
-		
-		/*
 		 * We assume ride trips are possible on every road that can be used by cars.
+		 * Additionally we also allow ride trips to use walk and / or bike only links.
+		 * For those links walk travel times are used.
 		 */
 		rideModeRestrictions = new HashSet<String>();
 		rideModeRestrictions.add(TransportMode.car);
+		rideModeRestrictions.add(TransportMode.bike);
+		rideModeRestrictions.add(TransportMode.walk);
 	}
 
 }
