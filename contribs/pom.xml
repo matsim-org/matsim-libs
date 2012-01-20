@@ -76,6 +76,7 @@
 		<module>gtfs2matsimtransitschedule</module>
         <module>freight</module>
         <module>matsim4urbansim</module>
+        <module>networkEditor</module>
 	</modules>
 	<repositories>
 		<repository>
