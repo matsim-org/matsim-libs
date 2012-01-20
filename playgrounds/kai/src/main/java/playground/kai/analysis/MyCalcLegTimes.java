@@ -55,9 +55,9 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * <p/>
  * yyyy This is a prototype, which might replace the original class since it is more useful for some practical things.  kai, jul'11 
  */
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
 	
-	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
+	private final static Logger log = Logger.getLogger(MyCalcLegTimes.class);
 	
 	private Scenario scenario = null ;
 	private Population population = null;
@@ -81,12 +81,12 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	// to avoid under- or over-counting with respect to loops.
 //	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
 	
-	public CalcLegTimes(final Scenario scenario) {
+	public MyCalcLegTimes(final Scenario scenario) {
 		this(scenario.getPopulation()) ;
 		this.scenario = scenario ;
 	}
 
-	CalcLegTimes(final Population population) {
+	MyCalcLegTimes(final Population population) {
 		this.population = population ;
 		
 		for ( StatType type : StatType.values() ) {
@@ -276,7 +276,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 				if (first) {
 					first = false;
 					out.write(statType.toString());
-					System.out.print( "counts.length: " + counts.length ) ;
+//					System.out.print( "counts.length: " + counts.length ) ;
 					for (int i = 0; i < counts.length; i++) {
 						out.write("\t" + this.dataBoundaries.get(statType)[i] + "+" ) ;
 					}
