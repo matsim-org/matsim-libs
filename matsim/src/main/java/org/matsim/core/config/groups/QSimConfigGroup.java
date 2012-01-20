@@ -38,6 +38,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String END_TIME = "endTime";
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
+//	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
@@ -60,12 +61,13 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
 	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
 	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
+	public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
-	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
+	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
 	private double stuckTime = 100;
@@ -74,6 +76,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private String trafficDynamics = TRAFF_DYN_QUEUE ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
+	private int writeSnapshotsInterval = 1;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -107,6 +110,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setSimStarttimeInterpretation(value) ;
 		} else if (VEHICLE_BEHAVIOR.equals(key)) {
 			setVehicleBehavior(value);
+		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)) {
+			setWriteSnapshotsInterval(Integer.parseInt(value));
+		} else if ( "snapshotFormat".equals(key) ) {
+			log.error( "The config entry `snapshotFormat' was removed from the qsim config group. " +
+					"It is now in the controler config group; please move it there.  Aborting ...") ;
+			throw new IllegalArgumentException(key);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -134,6 +143,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
+		map.put(WRITE_SNAPSHOTS_INTERVAL, String.valueOf(getWriteSnapshotsInterval()));
 		return map;
 	}
 
@@ -158,7 +168,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				+ ONLY_USE_STARTTIME + "'" ) ;
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
-		return map;
+		map.put(WRITE_SNAPSHOTS_INTERVAL, "(probably not implemented) iterationNumber % " + WRITE_SNAPSHOTS_INTERVAL + " == 0 defines in which iterations snapshots are written " +
+				"to a file. `0' disables snapshots writing completely");
+		return map ;
 	}
 	/* direct access */
 
@@ -294,6 +306,16 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
+	}
+
+	
+	public int getWriteSnapshotsInterval() {
+		return writeSnapshotsInterval;
+	}
+
+	
+	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
+		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
 
 }
