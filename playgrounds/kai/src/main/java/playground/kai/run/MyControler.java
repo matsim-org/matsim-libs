@@ -11,12 +11,12 @@ import org.matsim.core.utils.misc.Time;
 
 class MyControlerListener implements StartupListener, AfterMobsimListener {
 	
-	playground.kai.analysis.CalcLegTimes calcLegTimes = null ;
+	playground.kai.analysis.MyCalcLegTimes calcLegTimes = null ;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		this.calcLegTimes = new playground.kai.analysis.CalcLegTimes( event.getControler().getScenario() ) ;
+		this.calcLegTimes = new playground.kai.analysis.MyCalcLegTimes( event.getControler().getScenario() ) ;
 		event.getControler().getEvents().addHandler( this.calcLegTimes ) ;
 
 	}

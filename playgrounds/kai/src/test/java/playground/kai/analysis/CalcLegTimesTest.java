@@ -92,7 +92,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testNoEvents() {
 
-		CalcLegTimes testee = new CalcLegTimes(this.population);
+		MyCalcLegTimes testee = new MyCalcLegTimes(this.population);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -104,7 +104,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 	public void testAveraging() {
 
-		CalcLegTimes testee = new CalcLegTimes(this.population);
+		MyCalcLegTimes testee = new MyCalcLegTimes(this.population);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
@@ -136,7 +136,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		this.runTest(testee);
 	}
 
-	protected void runTest(CalcLegTimes calcLegTimes) {
+	protected void runTest(MyCalcLegTimes calcLegTimes) {
 
 		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 
