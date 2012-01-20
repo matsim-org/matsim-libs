@@ -36,6 +36,9 @@ public class Events2ScoreWithLeftTurnPenalty4PC extends Events2Score4PC {
 
 	@Override
 	public void finish() {
+		// very important!!!
+		super.finish();
+		// very important!!!
 		for (Tuple<Plan, ScoringFunction> plansScorFunction : agentScorers
 				.values()) {
 
