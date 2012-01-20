@@ -22,10 +22,9 @@ package playground.benjamin;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.HouseholdsConfigGroup;
+import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.Controler;
 
 /**
@@ -34,19 +33,22 @@ import org.matsim.core.controler.Controler;
  */
 public class BkRun {
 	
-	static String baseDirectory = "../../detailedEval/teststrecke/sim/";
+//	static String baseDirectory = "../../detailedEval/teststrecke/sim/";
+//	static String configFile = baseDirectory + "inputVehicles/config_vehiclesTest.xml";
+//	static String networkFile = baseDirectory + "input/network.xml";
+//	static String plansFile = baseDirectory + "input/20090708_plans.xml.gz";
+
+//	static String changeEventsInputFile = baseDirectory + "input/capacityChanges.xml";
+//	static String householdsFile = baseDirectory + "";
 	
-	static String configFile = baseDirectory + "inputVehicles/config_vehiclesTest.xml";
+	static String baseDirectory = "../../runs-svn/run981/";
+	static String configFile = baseDirectory + "981.output_config.xml.gz";
+	static String networkFile = baseDirectory + "981.output_network.xml.gz";
+	static String plansFile = baseDirectory + "981.output_plans.xml.gz";
+	static String countsFile = baseDirectory + "input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml";
 	
-	static String outputDirectory = baseDirectory + "outputVehicles";
+	static String outputDirectory = baseDirectory + "output/";
 	
-	static String networkFile = baseDirectory + "input/network.xml";
-	
-	static String changeEventsInputFile = baseDirectory + "input/capacityChanges.xml";
-	
-	static String plansFile = baseDirectory + "input/20090708_plans.xml.gz";
-	
-	static String householdsFile = baseDirectory + "";
 
 	public static void main(String[] args) {
 		
@@ -63,31 +65,28 @@ public class BkRun {
 	// controlerConfigGroup
 		ControlerConfigGroup ccg = kontrolle.getConfig().controler();
 		ccg.setOutputDirectory(outputDirectory);
-		ccg.setFirstIteration(0);
-		ccg.setLastIteration(0);
+		ccg.setFirstIteration(1500);
+		ccg.setLastIteration(1500);
 
+		CountsConfigGroup countsCg = kontrolle.getConfig().counts();
+		countsCg.setCountsFileName(countsFile);
+		
 	// network
 		NetworkConfigGroup ncg = kontrolle.getConfig().network();
 		ncg.setInputFile(networkFile);
-		ncg.setTimeVariantNetwork(true);
-		ncg.setChangeEventInputFile(changeEventsInputFile);
-		
-	// plansCalcScore
-		
+	//	ncg.setTimeVariantNetwork(true);
+	//	ncg.setChangeEventInputFile(changeEventsInputFile);
 		
 	// plans
 		PlansConfigGroup pcg = kontrolle.getConfig().plans();
 		pcg.setInputFile(plansFile);
 		
-	// plansCalcRoute
-		
-		
 	// scenario
-		ScenarioConfigGroup scg = kontrolle.getConfig().scenario();
-		HouseholdsConfigGroup hcg = kontrolle.getConfig().households();
-		scg.setUseVehicles(false);
-		scg.setUseHouseholds(false);
-		hcg.setInputFile(householdsFile);
+	//	ScenarioConfigGroup scg = kontrolle.getConfig().scenario();
+	//	HouseholdsConfigGroup hcg = kontrolle.getConfig().households();
+	//	scg.setUseVehicles(false);
+	//	scg.setUseHouseholds(false);
+	//	hcg.setInputFile(householdsFile);
 		
 		kontrolle.run();
 	}

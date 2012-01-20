@@ -174,7 +174,6 @@ public class EmissionModule {
 		return emissionVehicles;
 	}
 
-	// TODO: WarmPollutant should also have "HC" and "CO"
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
@@ -211,8 +210,6 @@ public class EmissionModule {
 		return avgHbefaWarmTable;
 	}
 	
-	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC as follows:
-	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
@@ -246,7 +243,6 @@ public class EmissionModule {
 		return avgHbefaColdTable;
 	}
 	
-	// TODO: WarmPollutant should also have "HC" and "CO"
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
@@ -286,8 +282,6 @@ public class EmissionModule {
 		return hbefaWarmTableDetailed;
 	}
 	
-	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC as follows:
-	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String filename) {
 		logger.info("entering createDetailedHbefaColdTable ...");
 		
