@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.droeder.Analysis.handler.NetworkAnalysisHandler;
 import playground.droeder.Analysis.handler.PopulationAnalysisHandler;
 import playground.droeder.gis.DaShapeWriter;
-import playground.kai.analysis.CalcLegTimes;
+import playground.kai.analysis.MyCalcLegTimes;
 
 /**
  * @author droeder
@@ -103,7 +103,7 @@ public class DrAnalysis {
 		String events = getFileDir(this.EVENTS);
 		EventsManager manager = EventsUtils.createEventsManager();
 		
-		CalcLegTimes calcLegTimesKai = new CalcLegTimes(this.sc);
+		MyCalcLegTimes calcLegTimesKai = new MyCalcLegTimes(this.sc);
 		manager.addHandler(calcLegTimesKai);
 
 		org.matsim.analysis.CalcLegTimes calcLegTimes = new org.matsim.analysis.CalcLegTimes();
