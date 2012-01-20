@@ -1,7 +1,4 @@
-/**
- * 
- */
-package playground.yu.scoring.withAttrRecorder.leftTurn;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn;
 
 import java.util.Map;
 
@@ -13,25 +10,32 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.yu.integration.cadyts.CalibrationConfig;
-import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.scoring.Events2Score4PC;
+import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
+import playground.yu.scoring.withAttrRecorder.leftTurn.ScoringFunctionAccumulatorWithLeftTurnPenalty;
 
-/**
- * @author yu
- * 
- */
-public class Events2ScoreWithLeftTurnPenalty extends Events2Score4AttrRecorder {
+public class Events2ScoreWithLeftTurnPenalty4PC extends Events2Score4PC {
 
-	public Events2ScoreWithLeftTurnPenalty(Config config,
+	public Events2ScoreWithLeftTurnPenalty4PC(Config config,
 			ScoringFunctionFactory sfFactory, Scenario scenario) {
 		super(config, sfFactory, scenario);
 		attrNameList.add(CalibrationConfig.CONSTANT_LEFT_TURN);
+		addLeftTurnCoeffToMNL();
+	}
+
+	private void addLeftTurnCoeffToMNL() {
+		// turn left
+		int attrNameIndex = attrNameList
+				.indexOf(CalibrationConfig.CONSTANT_LEFT_TURN);
+		getMultinomialLogit()
+				.setCoefficient(
+						attrNameIndex,
+						((CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty) sfFactory)
+								.getAdditionalParams().constantLeftTurn);
 	}
 
 	@Override
 	public void finish() {
-		// very important!!!
-		super.finish();
-		// very important!!!
 		for (Tuple<Plan, ScoringFunction> plansScorFunction : agentScorers
 				.values()) {
 
@@ -39,9 +43,9 @@ public class Events2ScoreWithLeftTurnPenalty extends Events2Score4AttrRecorder {
 			Map<String, Object> attrs = plan.getCustomAttributes();
 
 			ScoringFunction sf = plansScorFunction.getSecond();
-			// sf.finish();//TEST here at first do NOT do this
+			// sf.finish();//TEST hier at first do NOT do this
 			// **********************codes from {@code EventsToScore}
-			// save attributes as custom attributes.
+			// save attributes as custom attritubes.
 			// #########################################
 			if (sf instanceof ScoringFunctionAccumulatorWithLeftTurnPenalty) {
 				// leftTurn

@@ -14,7 +14,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.generalNormal.paramCorrection.BseParamCalibrationControler;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testAttRecorder.PCStrMn;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
-import playground.yu.scoring.withAttrRecorder.leftTurn.PlansScoringWithLeftTurnPenalty;
 
 /**
  * @author yu
@@ -38,7 +37,7 @@ public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler {
 
 		// ******DEACTIVATE SCORING & ROADPRICING IN MATSIM******
 		// the default handling of plans
-		plansScoring4PC = new PlansScoringWithLeftTurnPenalty();
+		plansScoring4PC = new PlansScoringWithLeftTurnPenalty4PC();
 		addCoreControlerListener(plansScoring4PC);
 
 		// load road pricing, if requested

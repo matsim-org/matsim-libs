@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.yu.scoring.withAttrRecorder;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -31,10 +31,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.handler.EventHandler;
 
-import playground.yu.scoring.Events2ScoreI;
-import playground.yu.scoring.PlansScoringI;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.PlansScoring4PC_I;
 
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
@@ -43,14 +42,14 @@ import playground.yu.scoring.PlansScoringI;
  * @author yu
  * 
  */
-public class PlansScoring4AttrRecorder implements PlansScoringI,
+public class PlansScoringWithLeftTurnPenalty4PC implements PlansScoring4PC_I,
 		StartupListener, ScoringListener, IterationStartsListener {
 	private final static Logger log = Logger
-			.getLogger(PlansScoring4AttrRecorder.class);
-	protected Events2ScoreI planScorer;
+			.getLogger(PlansScoringWithLeftTurnPenalty4PC.class);
+	protected CadytsChoice planScorer;
 
 	@Override
-	public Events2ScoreI getPlanScorer() {
+	public CadytsChoice getPlanScorer() {
 		return planScorer;
 	}
 
@@ -68,12 +67,12 @@ public class PlansScoring4AttrRecorder implements PlansScoringI,
 	public void notifyStartup(final StartupEvent event) {
 		Controler ctl = event.getControler();
 
-		planScorer = new Events2Score4AttrRecorder(ctl.getConfig(),
+		planScorer = new Events2ScoreWithLeftTurnPenalty4PC(ctl.getConfig(),
 				ctl.getScoringFunctionFactory(), ctl.getScenario());
 
-		log.debug("PlansScoring4PC loaded ScoringFunctionFactory");
+		log.debug("PlansScoringWithLeftTurnPenalty loaded ScoringFunctionFactory");
 
-		ctl.getEvents().addHandler((EventHandler) planScorer);
+		ctl.getEvents().addHandler(planScorer);
 	}
 
 }

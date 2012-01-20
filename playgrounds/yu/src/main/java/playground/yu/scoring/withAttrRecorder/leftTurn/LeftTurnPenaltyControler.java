@@ -1,48 +1,54 @@
 /**
  * 
  */
-package playground.yu.scoring.withAttrRecorder;
+package playground.yu.scoring.withAttrRecorder.leftTurn;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.EventsHandling;
 import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.yu.scoring.PlansScoringI;
+import playground.yu.scoring.withAttrRecorder.Controler4AttrRecorder;
+import playground.yu.scoring.withAttrRecorder.ScorAttrWriteTrigger;
 
 /**
  * @author yu
  * 
  */
-public class Controler4AttrRecorder extends Controler {
+public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		Config config;
 		if (args.length < 1) {
-			config = ConfigUtils
-					.loadConfig("test/input/2car1ptRoutes/writeScorAttrs/cfgCar-4_0.xml");
+			config = ConfigUtils.loadConfig("" +
+			// "test/input/2car1ptRoutes/writeScorAttrs/cfgCar-4_0.xml" +
+					"");
 		} else/* args.length>=1 */{
 			config = ConfigUtils.loadConfig(args[0]);
 		}
-		Controler4AttrRecorder controler = new Controler4AttrRecorder(config);
+		LeftTurnPenaltyControler controler = new LeftTurnPenaltyControler(
+				config);
 		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
 		controler.run();
 	}
 
-	private PlansScoring4AttrRecorder planScoring4AttrRecorder = null;
+	private PlansScoringWithLeftTurnPenalty plansScoringLTP = null;
 
-	public Controler4AttrRecorder(Config config) {
+	public LeftTurnPenaltyControler(Config config) {
 		super(config);
 		// ---------------------------------------------------
 		addControlerListener(new ScorAttrWriteTrigger());
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 
+	@Override
 	public PlansScoringI getPlansScoring4AttrRecorder() {
-		return planScoring4AttrRecorder;
+		return plansScoringLTP;
 	}
 
 	@Override
@@ -50,8 +56,8 @@ public class Controler4AttrRecorder extends Controler {
 		addCoreControlerListener(new CoreControlerListener());
 
 		// ------DEACTIVATE SCORING & ROADPRICING IN MATSIM------
-		planScoring4AttrRecorder = new PlansScoring4AttrRecorder();
-		addCoreControlerListener(planScoring4AttrRecorder);
+		plansScoringLTP = new PlansScoringWithLeftTurnPenalty();
+		addCoreControlerListener(plansScoringLTP);
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 		// load road pricing, if requested
@@ -70,8 +76,8 @@ public class Controler4AttrRecorder extends Controler {
 	@Override
 	protected ScoringFunctionFactory loadScoringFunctionFactory() {
 		// ---------------------------------------------------
-		return new CharyparNagelScoringFunctionFactory4AttrRecorder(
-				config.planCalcScore(), network);
+		return new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
+				config, network);
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 }

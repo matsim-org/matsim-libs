@@ -18,7 +18,7 @@ import playground.yu.utils.LeftTurnIdentifier;
  * 
  */
 public class LegScoringFunctionWithLeftTurnPenalty extends
-LegScoringFunctionWithAttrRecorder {
+		LegScoringFunctionWithAttrRecorder {
 
 	private int nbOfLeftTurnAttrCar = 0;
 	protected final AdditionalScoringParameters additionalParams;
@@ -28,7 +28,7 @@ LegScoringFunctionWithAttrRecorder {
 			CharyparNagelScoringParameters params, Network network,
 			AdditionalScoringParameters additionalParams) {
 		super(
-				// plan,
+		// plan,
 				params, network);
 		this.additionalParams = additionalParams;
 	}
@@ -38,8 +38,15 @@ LegScoringFunctionWithAttrRecorder {
 			Leg leg) {
 		nbOfLeftTurnAttrCar += LeftTurnIdentifier.getNumberOfLeftTurnsFromALeg(
 				leg, network.getLinks());
-		return super.calcLegScore(departureTime, arrivalTime, leg)
-		+ additionalParams.constantLeftTurn * nbOfLeftTurnAttrCar;
+		double originalScore = super.calcLegScore(departureTime, arrivalTime,
+				leg);
+		double score = originalScore + additionalParams.constantLeftTurn
+				* nbOfLeftTurnAttrCar;
+		// System.out.println(">>>>>\tconstantLeftTurn:\t"
+		// + additionalParams.constantLeftTurn
+		// + "\t*\tnbOfLeftTurnAttrCar:\t" + nbOfLeftTurnAttrCar
+		// + "\toriginalScore:\t" + originalScore + "\tsum:\t" + score);
+		return score;
 	}
 
 	public int getNbOfLeftTurnAttrCar() {

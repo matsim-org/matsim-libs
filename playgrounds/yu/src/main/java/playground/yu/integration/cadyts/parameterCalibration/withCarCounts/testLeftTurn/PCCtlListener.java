@@ -58,7 +58,6 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testA
 import playground.yu.scoring.withAttrRecorder.Events2Score4AttrRecorder;
 import playground.yu.scoring.withAttrRecorder.ScorAttrReader;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
-import playground.yu.scoring.withAttrRecorder.leftTurn.Events2ScoreWithLeftTurnPenalty;
 import playground.yu.utils.io.SimpleWriter;
 import utilities.math.MultinomialLogit;
 import utilities.math.Vector;
@@ -361,12 +360,12 @@ public class PCCtlListener extends BseParamCalibrationControlerListener
 		}
 		/*-----------------initialStepSize==0, no parameters are changed----------------------*/
 
-		((Events2ScoreWithLeftTurnPenalty) chooser).setMultinomialLogit(mnl);
+		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setMultinomialLogit(mnl);
 
 		CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty sfFactory = new CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
 				config, ctl.getNetwork());
 		ctl.setScoringFunctionFactory(sfFactory);
-		((Events2ScoreWithLeftTurnPenalty) chooser).setSfFactory(sfFactory);
+		((Events2ScoreWithLeftTurnPenalty4PC) chooser).setSfFactory(sfFactory);
 
 		strategyManager.setChooser(chooser);
 

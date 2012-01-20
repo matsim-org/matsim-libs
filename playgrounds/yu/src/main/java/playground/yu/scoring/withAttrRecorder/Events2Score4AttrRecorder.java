@@ -46,6 +46,7 @@ import org.matsim.core.scoring.ScoringFunctionAdapter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.scoring.Events2ScoreI;
 import playground.yu.utils.io.SimpleWriter;
 
 /**
@@ -55,7 +56,8 @@ import playground.yu.utils.io.SimpleWriter;
  * @author yu
  * 
  */
-public class Events2Score4AttrRecorder extends EventsToScore {
+public class Events2Score4AttrRecorder extends EventsToScore implements
+		Events2ScoreI {
 	public final static List<String> attrNameList = new ArrayList<String>();
 
 	protected final Config config;
@@ -217,9 +219,9 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 		if (planAndScoringFunction != null) {
 			int index = getAgentPlanElementIndex(event.getPersonId());
 			((ScoringFunctionAdapter) planAndScoringFunction.getSecond())
-			.endActivity(event.getTime(),
-					(Activity) planAndScoringFunction.getFirst()
-					.getPlanElements().get(index));
+					.endActivity(event.getTime(),
+							(Activity) planAndScoringFunction.getFirst()
+									.getPlanElements().get(index));
 		}
 	}
 
@@ -231,7 +233,7 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
 			((ScoringFunctionAdapter) data.getSecond()).startActivity(
 					event.getTime(), (Activity) data.getFirst()
-					.getPlanElements().get(index));
+							.getPlanElements().get(index));
 		}
 	}
 
@@ -244,7 +246,7 @@ public class Events2Score4AttrRecorder extends EventsToScore {
 			int index = increaseAgentPlanElementIndex(event.getPersonId());
 			((ScoringFunctionAdapter) data.getSecond()).startLeg(
 					event.getTime(), (Leg) data.getFirst().getPlanElements()
-					.get(index));
+							.get(index));
 		}
 	}
 

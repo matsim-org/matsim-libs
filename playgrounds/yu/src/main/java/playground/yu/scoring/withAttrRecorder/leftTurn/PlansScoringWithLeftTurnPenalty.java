@@ -31,9 +31,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
 
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
-import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scoring.PlansScoring4PC_I;
+import playground.yu.scoring.Events2ScoreI;
+import playground.yu.scoring.PlansScoringI;
 
 /**
  * a changed copy of {@code PlansScoring} for the parameter calibration,
@@ -42,14 +43,14 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.scori
  * @author yu
  * 
  */
-public class PlansScoringWithLeftTurnPenalty implements PlansScoring4PC_I,
+public class PlansScoringWithLeftTurnPenalty implements PlansScoringI,
 		StartupListener, ScoringListener, IterationStartsListener {
 	private final static Logger log = Logger
 			.getLogger(PlansScoringWithLeftTurnPenalty.class);
-	protected CadytsChoice planScorer;
+	protected Events2ScoreI planScorer;
 
 	@Override
-	public CadytsChoice getPlanScorer() {
+	public Events2ScoreI getPlanScorer() {
 		return planScorer;
 	}
 
@@ -72,7 +73,7 @@ public class PlansScoringWithLeftTurnPenalty implements PlansScoring4PC_I,
 
 		log.debug("PlansScoringWithLeftTurnPenalty loaded ScoringFunctionFactory");
 
-		ctl.getEvents().addHandler(planScorer);
+		ctl.getEvents().addHandler((EventHandler) planScorer);
 	}
 
 }
