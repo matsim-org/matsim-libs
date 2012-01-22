@@ -71,10 +71,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * Reference to the QueueNetwork instance this link belongs to.
 	 */
 	private final QueueNetwork queueNetwork;
-	/**
-	 * Reference to the QueueNode which is at the end of each QueueLink instance
-	 */
-	private final QueueNode toQueueNode;
 
 	/* package */VisData visdata = this.new VisDataImpl();
 
@@ -140,19 +136,12 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * @param toNode
 	 * @see QueueLink#createLanes(java.util.List)
 	 */
-	/* package */QueueLink(final Link link2, final QueueNetwork queueNetwork,
-			final QueueNode toNode) {
+	/* package */QueueLink(final Link link2, final QueueNetwork queueNetwork) {
 		this.link = link2;
 		this.queueNetwork = queueNetwork;
-		this.toQueueNode = toNode;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
 		this.calculateCapacities();
-	}
-
-	/** Is called after link has been read completely */
-	/* package */void finishInit() {
-		
 	}
 
 	/* package */void setSimEngine(final QueueSimEngine simEngine) {
@@ -353,13 +342,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		return this.usedStorageCapacity < this.storageCapacity;
 	}
 
-	/* package */void recalcTimeVariantAttributes(double now) {
-		this.freespeedTravelTime = this.length
-				/ this.getLink().getFreespeed(now);
-		calculateFlowCapacity(now);
-		calculateStorageCapacity(now);
-	}
-
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
@@ -495,10 +477,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		return this.queueNetwork;
 	}
 
-	/* package */QueueNode getToQueueNode() {
-		return this.toQueueNode;
-	}
-
 	/**
 	 * This method returns the normalized capacity of the link, i.e. the
 	 * capacity of vehicles per second. It is considering the capacity reduction
@@ -544,7 +522,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 		}
-		this.getToQueueNode().activateNode();
 	}
 
 	/* package */QueueVehicle popFirstFromBuffer() {

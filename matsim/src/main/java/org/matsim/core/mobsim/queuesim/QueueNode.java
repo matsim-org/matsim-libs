@@ -47,8 +47,6 @@ class QueueNode implements MatsimNetworkObject {
 	private final QueueLink[] inLinksArrayCache;
 	private final QueueLink[] tempLinks;
 
-	private boolean active = false;
-
 	private final Node node;
 
 	private QueueNetwork queueNetwork;
@@ -153,14 +151,6 @@ class QueueNode implements MatsimNetworkObject {
 		return true;
 	}
 
-	protected final void activateNode() {
-		this.active = true;
-	}
-
-	/*package*/ final boolean isActive() {
-		return this.active;
-	}
-
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -187,11 +177,6 @@ class QueueNode implements MatsimNetworkObject {
 	      inLinksCounter++;
 	      inLinksCapSum += link.getLink().getCapacity(now);
 	    }
-	  }
-
-	  if (inLinksCounter == 0) {
-	    this.active = false;
-	    return; // Nothing to do
 	  }
 
 	  int auxCounter = 0;

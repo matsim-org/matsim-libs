@@ -70,7 +70,6 @@ import org.matsim.core.config.Config;
 			}
 		});
 		for (QueueLink link : this.allLinks) {
-			link.finishInit();
 			link.setSimEngine(this);
 		}
 
