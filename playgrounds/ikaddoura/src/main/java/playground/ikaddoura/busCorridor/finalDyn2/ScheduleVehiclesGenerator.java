@@ -227,8 +227,12 @@ public class ScheduleVehiclesGenerator {
 				}
 					
 				else {
-					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.getScheduleSpeed(); // v = s/t --> t = s/v
-//					travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
+					if (this.getScheduleSpeed()==0){
+						travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / network.getLinks().get(transitStopFacilities.get(ii).getId()).getFreespeed(); // (from link freespeed) v = s/t --> t = s/v
+					}
+					else {
+						travelTimeBus = network.getLinks().get(transitStopFacilities.get(ii).getId()).getLength() / this.getScheduleSpeed(); // v = s/t --> t = s/v
+					}
 				}
 				arrivalTime = departureTime + travelTimeBus;
 				departureTime = arrivalTime + stopTime;	
