@@ -53,6 +53,8 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		if (agent instanceof Agent2D && agent.getMode().equals("walk2d")) {
+			//TODO agents can not depart directly since their actual departure time might be later than now (because of the
+			//sub-second time res. Instead we trap the agents in "limbo" until their time is up. 
 			handleAgent2DDeparture((Agent2D)agent, linkId);
 			return true;
 		}
