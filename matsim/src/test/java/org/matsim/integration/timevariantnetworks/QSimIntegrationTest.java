@@ -34,9 +34,10 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -54,17 +55,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
- * Tests that the QueueSimulation takes a TimeVariant Network into account.
+ * Tests that the QSim takes a TimeVariant Network into account.
  *
  * @author mrieser
  */
-public class QueueSimulationIntegrationTest extends MatsimTestCase {
+public class QSimIntegrationTest extends MatsimTestCase {
 
 	public void testFreespeed() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
+		Config config = loadConfig(null);
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));
@@ -88,7 +92,8 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		
+		Simulation qsim = QSim.createQSimAndAddAgentSource(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -106,7 +111,9 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		final int personsPerWave = 10;
 		final double capacityFactor = 0.5;
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(loadConfig(null));
+		Config config = loadConfig(null);
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(new IdImpl("1"));
@@ -148,7 +155,7 @@ public class QueueSimulationIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		Simulation qsim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation qsim = QSim.createQSimAndAddAgentSource(scenario, events);;
 		qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel

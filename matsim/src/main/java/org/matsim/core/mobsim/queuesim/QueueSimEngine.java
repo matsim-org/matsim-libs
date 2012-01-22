@@ -40,24 +40,11 @@ import org.matsim.core.config.Config;
 /*package*/ class QueueSimEngine {
 	private QueueNetwork qNetwork = null ;
 
-	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
-	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
-	 * car is in one of the many queues).
-	 * One should assume, that the result of a simulation is the same, no matter how "simulateAllLinks" is set. But the order how
-	 * the links are processed influences the order of events within one time step. Thus, just comparing the event-files will not
-	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
-	 */
-	private static boolean simulateAllLinks = false;
-	private static boolean simulateAllNodes = false;
-	// yyyyyy why should these be static?  but run tests before and after.  kai, jun'10
-
 	private final List<QueueLink> allLinks;
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	private final QueueNode[] simNodesArray;
-	/** This is the collection of links that have to be activated in the current time step */
-	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 
 	private final Random random;
 
@@ -86,9 +73,8 @@ import org.matsim.core.config.Config;
 			link.finishInit();
 			link.setSimEngine(this);
 		}
-		if (simulateAllLinks) {
-			this.simLinksArray.addAll(this.allLinks);
-		}
+
+		this.simLinksArray.addAll(this.allLinks);
 	}
 
 	protected void afterSim() {
@@ -113,45 +99,17 @@ import org.matsim.core.config.Config;
 
 	protected void moveNodes(final double time) {
 		for (QueueNode node : this.simNodesArray) {
-			if (node.isActive() || simulateAllNodes) {
-				/* It is faster to first test if the node is active, and only then call moveNode(),
-				 * than calling moveNode() directly and that one returns immediately when it's not
-				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
-				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
-				 * -marcel/20aug2008
-				 */
-				node.moveNode(time, random);
-			}
+			node.moveNode(time, random);
 		}
 	}
 
 	protected void moveLinks(final double time) {
-		reactivateLinks();
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
 		QueueLink link;
-		boolean isActive;
 
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
-			isActive = link.moveLink(time);
-			if (!isActive && !simulateAllLinks) {
-				simLinks.remove();
-			}
-		}
-	}
-
-	protected void activateLink(final QueueLink link) {
-		if (!simulateAllLinks) {
-			this.simActivateThis.add(link);
-		}
-	}
-
-	private void reactivateLinks() {
-		if (!simulateAllLinks) {
-			if (!this.simActivateThis.isEmpty()) {
-				this.simLinksArray.addAll(this.simActivateThis);
-				this.simActivateThis.clear();
-			}
+			link.moveLink(time);
 		}
 	}
 

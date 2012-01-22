@@ -21,7 +21,6 @@
 package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -76,10 +75,6 @@ import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vis.snapshotwriters.VisVehicle;
 
 public class QueueSimulationTest extends TestCase {
 
@@ -112,7 +107,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -150,7 +145,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -187,7 +182,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -231,7 +226,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -282,7 +277,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -309,7 +304,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -340,7 +335,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -398,7 +393,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -455,7 +450,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -524,7 +519,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -536,163 +531,6 @@ public class QueueSimulationTest extends TestCase {
 		assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 		assertEquals(1000, volume[8]); // all the rest
-	}
-
-	/**
-	 * Tests that vehicles are teleported if needed so that agents can use the car wherever they want.
-	 *
-	 * @author mrieser
-	 */
-	public void testVehicleTeleportationTrue() {
-		Fixture f = new Fixture();
-		PersonImpl person = new PersonImpl(new IdImpl(1));
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = plan.createAndAddLeg("other");
-		l1.setTravelTime(10);
-		l1.setRoute(((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link2.getId()));
-		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
-		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route2 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
-		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-		l2.setRoute(route2);
-		plan.createAndAddActivity("l", f.link3.getId());
-		f.plans.addPerson(person);
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsCollector collector = new EventsCollector();
-		events.addHandler(collector);
-
-		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
-		sim.setTeleportVehicles(true);
-		sim.run();
-
-		/* finish */
-		List<Event> allEvents = collector.getEvents();
-		assertEquals("wrong number of events.", 12, allEvents.size());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-        assertEquals("wrong type of event.", TravelEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(3).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(4).getClass());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(6).getClass());
-		assertEquals("wrong type of event.", AgentWait2LinkEventImpl.class, allEvents.get(7).getClass());
-		assertEquals("wrong type of event.", LinkLeaveEventImpl.class, allEvents.get(8).getClass());
-		assertEquals("wrong type of event.", LinkEnterEventImpl.class, allEvents.get(9).getClass());
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(10).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(11).getClass());
-	}
-
-	/**
-	 * Tests that vehicles are not teleported if they are missing, but that an Exception is thrown instead.
-	 *
-	 * @author mrieser
-	 */
-	public void testVehicleTeleportationFalse() {
-		Fixture f = new Fixture();
-		PersonImpl person = new PersonImpl(new IdImpl(1));
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = plan.createAndAddLeg("other");
-		l1.setTravelTime(10);
-		l1.setRoute(((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
-		ActivityImpl a2 = plan.createAndAddActivity("w", f.link2.getId());
-		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route2 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
-		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-		l2.setRoute(route2);
-		plan.createAndAddActivity("l", f.link3.getId());
-		f.plans.addPerson(person);
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsCollector collector = new EventsCollector();
-		events.addHandler(collector);
-
-		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
-		sim.setTeleportVehicles(false);
-		try {
-			sim.run();
-			fail("expected RuntimeException, but there was none.");
-		} catch (RuntimeException e) {
-			log.info("catched expected RuntimeException: " + e.getMessage());
-		}
-
-		/* finish */
-		List<Event> allEvents = collector.getEvents();
-		assertEquals("wrong number of events.", 7, allEvents.size());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(0).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(1).getClass());
-        assertEquals("wrong type of event.", TravelEventImpl.class, allEvents.get(2).getClass());
-		assertEquals("wrong type of event.", AgentArrivalEventImpl.class, allEvents.get(3).getClass());
-		assertEquals("wrong type of event.", ActivityStartEventImpl.class, allEvents.get(4).getClass());
-		assertEquals("wrong type of event.", ActivityEndEventImpl.class, allEvents.get(5).getClass());
-		assertEquals("wrong type of event.", AgentDepartureEventImpl.class, allEvents.get(6).getClass());
-	}
-
-	/**
-	 * Tests that if a specific vehicle is assigned to an agent in its NetworkRoute, that this vehicle
-	 * is used instead of a default one.
-	 *
-	 * @author mrieser
-	 */
-	public void testAssignedVehicles() {
-		Fixture f = new Fixture();
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		PersonImpl person = new PersonImpl(id1); // do not add person to population, we'll do it ourselves for the test
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route1 = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
-		route1.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-		route1.setVehicleId(id2);
-		l1.setRoute(route1);
-		plan.createAndAddActivity("w", f.link3.getId());
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-
-		/* prepare sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
-		QueueNetwork qnet = sim.getQueueNetwork();
-		QueueLink qlink2 = qnet.getQueueLink(id2);
-		QueueLink qlink3 = qnet.getQueueLink(new IdImpl(3));
-
-		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		QueueVehicle vehicle1 = new QueueVehicle(new VehicleImpl(id1, defaultVehicleType));
-		QueueVehicle vehicle2 = new QueueVehicle(new VehicleImpl(id2, defaultVehicleType));
-		qlink2.addParkedVehicle(vehicle1);
-		qlink2.addParkedVehicle(vehicle2);
-
-		sim.getSimTimer().setTime(100.0);
-		MobsimDriverAgent agent = createQueuePersonAgent(person, sim);
-		agent.endActivityAndAssumeControl(100.0);
-		sim.internalInterface.arrangeNextAgentState(agent) ;
-
-		sim.getSimTimer().setTime(101.0);
-		sim.doSimStep(101.0); // agent should be moved to qlink2.buffer
-		sim.getSimTimer().setTime(102.0);
-		sim.doSimStep(102.0); // agent should be moved to qlink3
-
-		Collection<? extends VisVehicle> vehicles = qlink3.getAllVehicles();
-		assertEquals(1, vehicles.size());
-//		assertEquals(id2, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
-		assertEquals(id2, vehicles.iterator().next().getVehicle().getId());
-		// vehicle 1 should still stay on qlink2
-		vehicles = qlink2.getAllVehicles();
-		assertEquals(1, vehicles.size());
-//		assertEquals(id1, vehicles.toArray(new QueueVehicle[1])[0].getBasicVehicle().getId());
-		assertEquals(id1, vehicles.iterator().next().getVehicle().getId());
 	}
 
 	/**
@@ -730,7 +568,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -788,7 +626,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		/* run sim */
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(f.scenario, events);
+		QueueSimulation sim = new QueueSimulation(f.scenario, events);
 		sim.run();
 
 		/* finish */
@@ -954,7 +792,7 @@ public class QueueSimulationTest extends TestCase {
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter(Level.WARN);
 		Logger.getRootLogger().addAppender(logger);
-		QueueSimulationFactory.createMobsimStatic(f.scenario, events).run();
+		new QueueSimulation(f.scenario, events).run();
 		Logger.getRootLogger().removeAppender(logger);
 
 		return logger;
@@ -998,7 +836,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		// first test without special settings
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(act1.getEndTime() + leg.getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1007,7 +845,7 @@ public class QueueSimulationTest extends TestCase {
 		// second test with special start/end times
 		config.simulation().setStartTime(8.0*3600);
 		config.simulation().setEndTime(11.0*3600);
-		sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		sim = new QueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1096,7 +934,7 @@ public class QueueSimulationTest extends TestCase {
 		events.addHandler(collector);
 
 		// run the simulation
-		QueueSimulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		QueueSimulation sim = new QueueSimulation(scenario, events);
 		config.simulation().setEndTime(simEndTime);
 		sim.run();
 		assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);

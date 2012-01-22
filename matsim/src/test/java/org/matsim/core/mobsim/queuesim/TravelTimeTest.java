@@ -26,16 +26,20 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,20 +50,13 @@ public class TravelTimeTest {
 	@Test
 	public void testEquilOneAgent() {
 		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
-		ScenarioImpl data = (ScenarioImpl) sl.getScenario();
-		Config conf = data.getConfig();
-
+		Config conf = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans1.xml";
 		conf.plans().setInputFile(popFileName);
-
-		sl.loadScenario();
-
+		Scenario data = ScenarioUtils.loadScenario(conf);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
-
-		QueueSimulationFactory.createMobsimStatic(data, events).run();
-
+		new QueueSimulation(data, events).run();
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
@@ -72,20 +69,14 @@ public class TravelTimeTest {
 	@Test
 	public void testEquilTwoAgents() {
 		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
-		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
-		Scenario data = sl.getScenario();
-		Config conf = data.getConfig();
-
+		Config conf = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
 		String popFileName = "test/scenarios/equil/plans2.xml";
 		conf.plans().setInputFile(popFileName);
-
-		sl.loadScenario();
-
+		Scenario data = ScenarioUtils.loadScenario(conf);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
-
-		QueueSimulationFactory.createMobsimStatic(data, events).run();
-
+		new QueueSimulation(data, events).run();
+		
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
@@ -93,7 +84,6 @@ public class TravelTimeTest {
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
-
 
 		travelTimes = agentTravelTimes.get(new IdImpl("2"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(5)).intValue(), MatsimTestUtils.EPSILON);
@@ -104,7 +94,7 @@ public class TravelTimeTest {
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
-	private static class EventTestHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private static class EventTestHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, ActivityEndEventHandler, ActivityStartEventHandler {
 
 		private final Map<Id, Map<Id, Double>> agentTravelTimes;
 
@@ -136,6 +126,16 @@ public class TravelTimeTest {
 
 		@Override
 		public void reset(int iteration) {
+		}
+
+		@Override
+		public void handleEvent(ActivityEndEvent event) {
+			System.out.println(event);
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			System.out.println(event);
 		}
 	}
 

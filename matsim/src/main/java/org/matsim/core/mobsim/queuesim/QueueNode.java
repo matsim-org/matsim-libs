@@ -111,7 +111,7 @@ class QueueNode implements MatsimNetworkObject {
 			if (nextQueueLink.hasSpace()) {
 				link.popFirstFromBuffer();
 				veh.getDriver().notifyMoveOverNode(nextLinkId);
-				nextQueueLink.addFromIntersection(veh);
+				nextQueueLink.addFromIntersection(veh, now);
 				return true;
 			}
 
@@ -135,7 +135,7 @@ class QueueNode implements MatsimNetworkObject {
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);
-					nextQueueLink.addFromIntersection(veh);
+					nextQueueLink.addFromIntersection(veh, now);
 					return true;
 				}
 			}

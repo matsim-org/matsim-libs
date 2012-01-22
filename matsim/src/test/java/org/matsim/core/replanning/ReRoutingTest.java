@@ -31,6 +31,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class ReRoutingTest extends MatsimTestCase {
 
@@ -53,12 +54,13 @@ public class ReRoutingTest extends MatsimTestCase {
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
-		long checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "0.events.txt.gz");
-		long checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
-		assertEquals("different event files", checksum1, checksum2);
-
-		checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "1.plans.xml.gz");
-		checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
+		String inputEvents = getInputDirectory() + "0.events.txt.gz";
+		String outputEvents = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
+		assertTrue("different event files", EventsFileComparator.compare(inputEvents, outputEvents) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
+		
+		
+		long checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "1.plans.xml.gz");
+		long checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
 		assertEquals("different plans files", checksum1, checksum2);
 	}
 

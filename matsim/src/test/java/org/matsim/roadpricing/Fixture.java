@@ -36,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Simulation;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -218,7 +219,7 @@ import org.matsim.core.utils.misc.Time;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
-		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation sim = new QueueSimulation(scenario, events);
 		sim.run();
 		scoring.finish();
 

@@ -167,7 +167,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	 * @param scenario
 	 * @param events
 	 */
-	protected QueueSimulation(final Scenario scenario, final EventsManager events) {
+	public QueueSimulation(final Scenario scenario, final EventsManager events) {
 		this(scenario, events, new DefaultQueueNetworkFactory());
 	}
 

@@ -76,8 +76,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 */
 	private final QueueNode toQueueNode;
 
-	private boolean active = false;
-
 	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(
 			10);
 
@@ -157,18 +155,11 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	/** Is called after link has been read completely */
 	/* package */void finishInit() {
-		this.active = false;
+		
 	}
 
 	/* package */void setSimEngine(final QueueSimEngine simEngine) {
 		this.simEngine = simEngine;
-	}
-
-	private void activateLink() {
-		if (!this.active) {
-			this.simEngine.activateLink(this);
-			this.active = true;
-		}
 	}
 
 	/**
@@ -178,12 +169,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * @param veh
 	 *            the vehicle
 	 */
-	/* package */void addFromIntersection(final QueueVehicle veh) {
-
-//		double now = SimulationTimer.getTimeOfDayStatic();
-		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay();
-
-		activateLink();
+	/* package */void addFromIntersection(final QueueVehicle veh, double now) {
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
@@ -287,14 +273,10 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	/* package */void addDepartingVehicle(QueueVehicle queueVehicle) {
 		this.waitingList.add(queueVehicle);
-		this.activateLink();
 	}
 
-	/* package */boolean moveLink(double now) {
-		boolean ret = false;
-		ret = this.moveLane(now);
-		this.active = ret;
-		return ret;
+	/* package */void moveLink(double now) {
+		this.moveLane(now);
 	}
 
 	/**
@@ -304,7 +286,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 *            current time step
 	 * @return
 	 */
-	protected boolean moveLane(final double now) {
+	protected void moveLane(final double now) {
 		updateBufferCapacity();
 
 		// move vehicles from lane to buffer. Includes possible vehicle arrival.
@@ -313,7 +295,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		moveLaneToBuffer(now);
 		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
-		return this.isActive();
 	}
 
 	private void updateBufferCapacity() {
@@ -596,22 +577,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 									// should become interface method)
 		return this.visdata;
 	}
-
-	private boolean isActive() {
-		/*
-		 * Leave Lane active as long as there are vehicles on the link (ignore
-		 * buffer because the buffer gets emptied by nodes and not links) and
-		 * leave link active until buffercap has accumulated (so a newly
-		 * arriving vehicle is not delayed).
-		 */
-		boolean active = (this.buffercap_accumulate < 1.0)
-				|| (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty());
-		return active;
-	}
-
-	// private LinkedList<QueueVehicle> getVehQueue() {
-	// return this.vehQueue;
-	// }
 
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the

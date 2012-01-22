@@ -62,6 +62,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Plan
 
 	Id cachedNextLinkId = null;
 
+	// This agent never seriously calls the simulation back! (That's good.)
+	// It is only held to get to the EventManager and to the Scenario, and, 
+	// in a special case, to the AgentCounter (still necessary?)  michaz 01-2012
 	private final Netsim simulation;
 
 	private double activityEndTime = Time.UNDEFINED_TIME;

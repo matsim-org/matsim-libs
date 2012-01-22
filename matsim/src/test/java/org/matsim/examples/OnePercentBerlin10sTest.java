@@ -21,6 +21,7 @@
 package org.matsim.examples;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -28,13 +29,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
+import org.matsim.core.mobsim.queuesim.QueueSimulation;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class OnePercentBerlin10sTest extends MatsimTestCase {
 
@@ -50,36 +50,31 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		MatsimRandom.reset(7411L);
 
 		config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
-		// this needs to be done before reading the network
-		// because QueueLinks timeCap dependents on SIM_TICK_TIME_S
 		config.simulation().setTimeStepSize(10.0);
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.04);
-
 		config.simulation().setRemoveStuckVehicles(false);
 		config.simulation().setStuckTime(10.0);
-
 		config.planCalcScore().setLearningRate(1.0);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
 		new MatsimNetworkReader(scenario).readFile(netFileName);
-
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
 		EventsManager events = EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
 		events.addHandler(writer);
 
-		Simulation sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
+		Simulation sim = new QueueSimulation(scenario, events);
 		log.info("START testOnePercent10s SIM");
 		sim.run();
 		log.info("STOP testOnePercent10s SIM");
 
 		writer.closeFile();
 
-		final long checksum1 = CRCChecksum.getCRCFromFile(referenceEventsFileName);
-		final long checksum2 = CRCChecksum.getCRCFromFile(eventsFileName);
-		assertEquals("different event files", checksum1, checksum2);
+		assertTrue("different event files", EventsFileComparator.compare(referenceEventsFileName, eventsFileName) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
+		
 	}
 
 }
