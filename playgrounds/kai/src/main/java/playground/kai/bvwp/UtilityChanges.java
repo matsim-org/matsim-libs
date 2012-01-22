@@ -30,20 +30,21 @@ abstract class UtilityChanges {
 					ValuesForAUserType econValues = econValuesByMode.getByType(type) ;
 					ValuesForAUserType quantitiesNullfall = quantitiesNullfallByMode.getByType(type) ;
 					ValuesForAUserType quantitiesPlanfall = quantitiesPlanfallByMode.getByType(type) ;
+					double deltaAmounts = quantitiesPlanfall.getByEntry( Entry.XX ) - quantitiesNullfall.getByEntry( Entry.XX ) ;
+					if ( quantitiesPlanfall.getByEntry(Entry.XX)!=0. && quantitiesNullfall.getByEntry(Entry.XX)!=0. ) {
+						System.out.printf("%10s; %10s; %10s; old demand: %10.1f; new demand: %10.1f; demand change: %10.1f\n", 
+								id, mode, type, quantitiesNullfall.getByEntry(Entry.XX), 
+								quantitiesPlanfall.getByEntry(Entry.XX), deltaAmounts ) ;
+					}
 					for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
-						double deltaAmounts = quantitiesPlanfall.getByEntry( Entry.amount ) 
-						- quantitiesNullfall.getByEntry( Entry.amount ) ;
-						if ( entry == Entry.amount ) {
-							System.out.printf("%10s; %10s; %10s; old demand: %10.1f; demand change: %10.1f\n", id, mode, type, 
-									quantitiesNullfall.getByEntry(Entry.amount) , deltaAmounts ) ;
-						} else {
+						if ( entry != Entry.XX ) {
 							UtlChanges utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry,
 									deltaAmounts);
 
-							if ( utlChanges.deltaQuantity != 0. ) {
-								System.out.printf("%10s; %10s; %10s; change per demand item: %10.1f %10s", id, mode, type, 
+							if ( utlChanges.utlGainByOldUsers != 0. || utlChanges.utlGainByNewUsers != 0. ) {
+								System.out.printf("%35s change per demand item: %10.1f %10s", "-->",
 										utlChanges.deltaQuantity, entry) ;
-								System.out.printf("; utl gain old//new demand: %10.1f", utlChanges.utlGainByOldUsers ) ;
+								System.out.printf("; utl (gain) old//new demand: %10.1f", utlChanges.utlGainByOldUsers ) ;
 								System.out.printf(" //%10.1f\n", utlChanges.utlGainByNewUsers ) ;
 							}
 

@@ -15,7 +15,7 @@ public class Main {
 		ScenarioForEval planfall = Scenario1.createPlanfall1(nullfall);
 		
 		// instantiate the class that defines the utility calculation:
-		UtilityChangesNEW utilityChanges = new UtilityChangesNEW();
+		UtilityChanges utilityChanges = new UtilityChangesRuleOfHalf();
 		
 		// compute the utilities (currently, results are printed to the console):
 		utilityChanges.utilityChange(economicValues, nullfall, planfall) ;

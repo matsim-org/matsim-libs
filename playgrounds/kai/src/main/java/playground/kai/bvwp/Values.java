@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 class Values {
-	enum Entry { amount, km, hrs, mon }
+	enum Entry { XX, km, hrs, mon }
 
 	enum Type { GV, PV }
 

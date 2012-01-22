@@ -21,14 +21,14 @@ class Scenario1 {
 			{
 				// passenger traffic:
 				ValuesForAUserType pvValues = roadValues.getByType(Type.PV) ;
-				pvValues.setByEntry( Entry.amount, 1000. ) ; // number of persons
+				pvValues.setByEntry( Entry.XX, 1000. ) ; // number of persons
 				pvValues.setByEntry( Entry.km, 10. ) ;
 				pvValues.setByEntry( Entry.hrs, 1. ) ;
 			}
 			{
 				// freight traffic:
 				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
-				gvValues.setByEntry( Entry.amount, 1000. ) ; // tons
+				gvValues.setByEntry( Entry.XX, 1000. ) ; // tons
 				gvValues.setByEntry( Entry.km, 10. ) ;
 				gvValues.setByEntry( Entry.hrs, 1. ) ;
 			}				
@@ -58,8 +58,8 @@ class Scenario1 {
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
-			railValues.getByType(Type.GV).incByEntry( Entry.amount, delta ) ;
-			planfall.getByODRelation(new IdImpl("AB")).getByMode(Mode.road).getByType(Type.GV).incByEntry(Entry.amount, -delta ) ;
+			railValues.getByType(Type.GV).incByEntry( Entry.XX, delta ) ;
+			planfall.getByODRelation(new IdImpl("AB")).getByMode(Mode.road).getByType(Type.GV).incByEntry(Entry.XX, -delta ) ;
 		}
 		return planfall;
 	}
