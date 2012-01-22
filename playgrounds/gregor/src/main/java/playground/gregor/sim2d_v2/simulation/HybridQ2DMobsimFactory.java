@@ -43,16 +43,10 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		QSim qSim = new QSim(sc, eventsManager, netsimEngFactory);
 		AgentFactory agentFactory;
 
-		if (sc.getConfig().scenario().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setUseUmlaeufe(true);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
+		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
+			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
 		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
+			agentFactory = new Sim2DAgentFactory(qSim,sc);
 		}
 
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);

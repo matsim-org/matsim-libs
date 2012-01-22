@@ -21,7 +21,6 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.QuadTree;
@@ -30,7 +29,6 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -289,5 +287,9 @@ public class Agent2D implements MobsimAgent {
 	@Override
 	public void notifyTeleportToLink(Id linkId) {
 		this.pda.notifyTeleportToLink(linkId);
+	}
+
+	public MobsimDriverAgent getDelegate() {
+		return this.pda;
 	}
 }

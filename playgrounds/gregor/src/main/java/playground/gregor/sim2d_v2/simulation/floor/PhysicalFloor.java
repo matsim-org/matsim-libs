@@ -40,8 +40,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.LinkEnterEventImpl;
 import org.matsim.core.events.LinkLeaveEventImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -55,13 +53,10 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.Collision
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
-import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
-import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalEnvironmentForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -116,18 +111,6 @@ public class PhysicalFloor implements Floor {
 	 */
 	public void init() {
 		calculateEnvelope();
-
-
-		if (this.sim2DConfig.isEnableMentalLinkSwitch()){
-			this.mlsw = new MentalLinkSwitcher(this.scenario);
-		} else {
-			this.mlsw = new LinkSwitcher() {
-				@Override
-				public void checkForMentalLinkSwitch(Id curr, Id next, Agent2D agent) {
-					// nothing to do here
-				}
-			};
-		}
 
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
@@ -400,9 +383,10 @@ public class PhysicalFloor implements Floor {
 	/**
 	 * @param agent
 	 */
-	public void agentDepart(MobsimDriverAgent pda) {
-		Agent2D agent = new Agent2D(pda,this.scenario,this.mlsw);
-		Activity act = (Activity) getPreviousPlanElement(pda);
+	public void agentDepart(Agent2D agent) {
+		
+		
+		Activity act = (Activity) getPreviousPlanElement(agent);
 		if (act.getCoord() != null) {
 			agent.setPostion(MGC.coord2Coordinate(act.getCoord()));
 		} else {
@@ -417,9 +401,9 @@ public class PhysicalFloor implements Floor {
 	}
 
 	@Deprecated //add method to PlanAgent
-	private PlanElement getPreviousPlanElement(MobsimAgent ma) {
+	private PlanElement getPreviousPlanElement(Agent2D ma) {
 
-		PlanAgent pda = (PlanAgent) ma ;
+		PlanAgent pda = (PlanAgent) ma.getDelegate() ;
 		Leg leg = (Leg) pda.getCurrentPlanElement();
 		Plan plan = pda.getSelectedPlan();
 		List<PlanElement> l = plan.getPlanElements();
