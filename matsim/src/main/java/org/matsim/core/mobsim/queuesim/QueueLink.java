@@ -76,9 +76,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 */
 	private final QueueNode toQueueNode;
 
-	private final Map<Id, QueueVehicle> parkedVehicles = new LinkedHashMap<Id, QueueVehicle>(
-			10);
-
 	/* package */VisData visdata = this.new VisDataImpl();
 
 	private QueueSimEngine simEngine = null;
@@ -205,9 +202,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	}
 
 	/* package */void clearVehicles() {
-		this.parkedVehicles.clear();
-
-//		double now = SimulationTimer.getTimeOfDayStatic();
 		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		for (QueueVehicle veh : this.waitingList) {
@@ -256,19 +250,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 				this.buffer.size());
 
 		this.buffer.clear();
-	}
-
-	/* package */void addParkedVehicle(QueueVehicle vehicle) {
-		this.parkedVehicles.put(vehicle.getId(), vehicle);
-		vehicle.setCurrentLink(this.link);
-	}
-
-	/* package */QueueVehicle getParkedVehicle(Id vehicleId) {
-		return this.parkedVehicles.get(vehicleId);
-	}
-
-	/* package */QueueVehicle removeParkedVehicle(Id vehicleId) {
-		return this.parkedVehicles.remove(vehicleId);
 	}
 
 	/* package */void addDepartingVehicle(QueueVehicle queueVehicle) {
@@ -325,9 +306,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			if ((this.getLink().getId().equals(driver.getDestinationLinkId()))
 					&& (driver.chooseNextLinkId() == null)) {
 				driver.endLegAndAssumeControl(now) ;
-				this.queueNetwork.getMobsim().internalInterface.arrangeNextAgentState(driver) ;
-				this.processVehicleArrival(now, veh);
-				// remove _after_ processing the arrival to keep link active
+				((QueueSimulation) this.queueNetwork.getMobsim()).arrangeNextAgentAction(driver) ;
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 				continue;
@@ -364,16 +343,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 					new AgentWait2LinkEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			addToBuffer(veh, now);
 		}
-	}
-
-	/* package */void processVehicleArrival(final double now, final QueueVehicle mveh) {
-		QueueVehicle veh = mveh ; // cast ok: needs to have runtime type of QueueVehicle when this is called. kai, nov'11
-		// QueueSimulation.getEvents().processEvent(
-		// new AgentArrivalEventImpl(now, veh.getDriver().getPerson(),
-		// this.getLink(), veh.getDriver().getCurrentLeg()));
-		// Need to inform the veh that it now reached its destination.
-		// veh.getDriver().legEnds(now);
-		addParkedVehicle(veh);
 	}
 
 	/* package */boolean bufferIsEmpty() {
@@ -458,10 +427,6 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	}
 
 	/* package */QueueVehicle getVehicle(Id vehicleId) { // needed in tests
-		QueueVehicle ret = getParkedVehicle(vehicleId);
-		if (ret != null) {
-			return ret;
-		}
 		for (QueueVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
@@ -479,27 +444,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	@Override
 	public Collection<VisVehicle> getAllVehicles() {
-
 		Collection<VisVehicle> vehicles = this.getAllNonParkedVehicles();
-		// vehicles.addAll(this.parkedVehicles.values());
-		vehicles.addAll(getAllParkedVehicles());
-		// new ArrayList<QueueVehicle>(this.parkedVehicles.values());
-		// vehicles.addAll(transitQueueLaneFeature.getFeatureVehicles());
-		// vehicles.addAll(this.waitingList);
-		// vehicles.addAll(this.vehQueue);
-		// vehicles.addAll(this.buffer);
-		return vehicles;
-	}
-
-	private Collection<VisVehicle> getAllParkedVehicles() {
-		// return this.parkedVehicles.values();
-		Collection<VisVehicle> vehicles = new ArrayList<VisVehicle>();
-
-		// yy is there a faster type-safe way of doing this? kai, may'10
-		for (VisVehicle veh : this.parkedVehicles.values()) {
-			vehicles.add(veh);
-		}
-
 		return vehicles;
 	}
 

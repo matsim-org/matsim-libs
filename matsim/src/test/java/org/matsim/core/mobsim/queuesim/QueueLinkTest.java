@@ -133,45 +133,6 @@ public class QueueLinkTest extends MatsimTestCase {
 		assertEquals(0, f.qlink1.getAllVehicles().size());
 	}
 
-	/**
-	 * Tests that vehicles parked on a link are found with {@link QueueLink#getVehicle(Id)}
-	 * and {@link QueueLink#getAllVehicles()}.
-	 *
-	 * @author mrieser
-	 */
-	public void testGetVehicle_Parking() {
-		Fixture f = new Fixture();
-		Id id1 = new IdImpl("1");
-
-		QueueSimulation qsim = new QueueSimulation(f.scenario, EventsUtils.createEventsManager());
-
-		QueueVehicle veh = new QueueVehicle(f.basicVehicle);
-		PersonImpl p = new PersonImpl(new IdImpl(42));
-		Plan plan = new PlanImpl();
-		p.addPlan(plan);
-		plan.addActivity(new ActivityImpl("home", f.link1.getId()));
-		Leg leg = new LegImpl(TransportMode.car);
-		leg.setRoute(new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
-		plan.addLeg(leg);
-		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
-		MobsimDriverAgent driver = createQueuePersonAgent(p, qsim);
-		veh.setDriver(driver);
-		driver.setVehicle(veh);
-		driver.endActivityAndAssumeControl(0);
-
-		// start test, check initial conditions
-		assertTrue(f.qlink1.bufferIsEmpty());
-		assertEquals(0, f.qlink1.vehOnLinkCount());
-		assertEquals(0, f.qlink1.getAllVehicles().size());
-
-		f.qlink1.addParkedVehicle(veh);
-		assertTrue(f.qlink1.bufferIsEmpty());
-		assertEquals(0, f.qlink1.vehOnLinkCount());
-		assertEquals("vehicle not found in parking list.", veh, f.qlink1.getVehicle(id1));
-		assertEquals(1, f.qlink1.getAllVehicles().size());
-		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
-
-	}
 
 	/**
 	 * Tests that vehicles departing on a link are found with {@link QueueLink#getVehicle(Id)}

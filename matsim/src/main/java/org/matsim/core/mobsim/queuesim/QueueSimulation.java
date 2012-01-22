@@ -23,16 +23,13 @@ package org.matsim.core.mobsim.queuesim;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.PriorityQueue;
-import java.util.Set;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -48,11 +45,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.SimulationListener;
 import org.matsim.core.mobsim.framework.listeners.SimulationListenerManager;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
 import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.comparators.PlanAgentDepartureTimeComparator;
@@ -92,8 +86,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	private static EventsManager events = null;
 
-	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-
 	private QueueSimEngine netSimEngine = null;
 
 	/**
@@ -101,7 +93,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	 * the QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
 	private final PriorityQueue<Tuple<Double, MobsimAgent>> teleportationList =
-		new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TeleportationArrivalTimeComparator());
+			new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TeleportationArrivalTimeComparator());
 
 	private final Date starttime = new Date();
 
@@ -114,72 +106,21 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	private SimulationListenerManager listenerManager;
 
 	private final PriorityBlockingQueue<MobsimAgent> activityEndsList =
-		new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
+			new PriorityBlockingQueue<MobsimAgent>(500, new PlanAgentDepartureTimeComparator());
 
 	private Scenario scenario = null;
 
-	/** @see #setTeleportVehicles(boolean) */
-	private boolean teleportVehicles = true;
-	private int cntTeleportVehicle = 0;
-
-	private boolean useActivityDurations = true;
-
-	private final Set<String> notTeleportedModes = new HashSet<String>();
-
 	private AgentCounterI agentCounter = new AgentCounter() ;
 	private MobsimTimer simTimer ;
-	
-    static boolean NEW = true ;
 
-	/**
-	 * The InternalInterface technically is not needed for the QueueSimulation since everything is in the same 
-	 * package.  It helps with a stepwise transition, though.  May be removed again once the transition is completed.
-	 * kai, dec'11
-	 */
-    /*package */ InternalInterface internalInterface = new InternalInterface() {
-		@Override
-		public void arrangeNextAgentState(MobsimAgent agent) {
-			if ( NEW ) {
-				QueueSimulation.this.arrangeNextAgentAction(agent) ;
-			} else {
-			}
-		}
-
-		@Override
-		public Netsim getMobsim() {
-			return QueueSimulation.this ;
-		}
-		
-		@Override
-		public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
-			throw new UnsupportedOperationException() ;
-		}
-
-		@Override
-		public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
-			throw new UnsupportedOperationException() ;
-		}
-
-	};
-
-	/**
-	 * Initialize the QueueSimulation without signal systems
-	 * @param scenario
-	 * @param events
-	 */
-	public QueueSimulation(final Scenario scenario, final EventsManager events) {
-		this(scenario, events, new DefaultQueueNetworkFactory());
-	}
-
-
-	protected QueueSimulation(final Scenario sc, final EventsManager events, final QueueNetworkFactory factory){
+	public QueueSimulation(final Scenario sc, final EventsManager events) {
 		this.scenario = sc;
 		this.config = scenario.getConfig();
 
 		if ( this.config.getModule(SimulationConfigGroup.GROUP_NAME) == null ) {
 			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
 					"`simulation' from the core modules in nov/dec'10.  Add simulation config module before calling QueueSimulation " +
-			"creational method to avoid this warning.  kai, dec'10");
+					"creational method to avoid this warning.  kai, dec'10");
 			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
 		}
 
@@ -194,11 +135,9 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 		this.networkLayer = scenario.getNetwork();
 
-		this.network = new QueueNetwork(this.networkLayer, factory, this);
+		this.network = new QueueNetwork(this.networkLayer, this);
 
 		this.agentFactory = new DefaultAgentFactory( this);
-
-		this.notTeleportedModes.add(TransportMode.car);
 
 		this.netSimEngine = new QueueSimEngine(this.network, MatsimRandom.getRandom(), this.scenario.getConfig());
 	}
@@ -221,11 +160,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		//do iterations
 		boolean cont = true;
 		while (cont) {
-
-			//			double time = this.simTimer.getTimeOfDayStatic();
 			double time = simTimer.getTimeOfDay() ;
-
-			beforeSimStep(time);
 			this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 			cont = doSimStep(time);
 			this.listenerManager.fireQueueSimulationAfterSimStepEvent(time);
@@ -251,19 +186,10 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			insertAgentIntoMobsim(agent);
 			agents.add( agent ) ;
 			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
+			veh.setDriver(agent);
 			agent.setVehicle(veh);
-			QueueLink qlink = this.network.getQueueLink(agent.getCurrentLinkId());
-			qlink.addParkedVehicle(veh);
 		}
 
-	}
-
-	private void prepareNetworkChangeEventsQueue() {
-		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)(this.networkLayer)).getNetworkChangeEvents();
-		if ((changeEvents != null) && (changeEvents.size() > 0)) {
-			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
-			this.networkChangeEventsQueue.addAll(changeEvents);
-		}
 	}
 
 	/**
@@ -302,7 +228,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		this.simTimer.setSimStartTime(simStartTime);
 		this.simTimer.setTime(this.simTimer.getSimStartTime());
 
-		prepareNetworkChangeEventsQueue();
 	}
 
 
@@ -337,11 +262,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		QueueSimulation.events = null; // delete events object to free events handlers, if they are nowhere else referenced
 	}
 
-	final void beforeSimStep(final double time) {
-		if ((this.networkChangeEventsQueue != null) && (this.networkChangeEventsQueue.size() > 0)) {
-			handleNetworkChangeEvents(time);
-		}
-	}
 
 	/**
 	 * Do one step of the simulation run.
@@ -395,27 +315,18 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 				MobsimAgent person = entry.getSecond();
 				person.notifyTeleportToLink(person.getDestinationLinkId());
 				person.endLegAndAssumeControl(now) ;
-				this.internalInterface.arrangeNextAgentState(person) ;
+				this.arrangeNextAgentAction(person) ;
 			} else break;
 		}
 	}
 
-	private void handleNetworkChangeEvents(final double time) {
-		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)){
-			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			for (Link link : event.getLinks()) {
-				this.network.getQueueLink(link.getId()).recalcTimeVariantAttributes(time);
-			}
-		}
-	}
-	
 	@Override
 	public final void insertAgentIntoMobsim( MobsimAgent agent ) {
 		this.getAgentCounter().incLiving();
 		this.arrangeNextAgentAction(agent) ;
 	}
-	
-	private void arrangeNextAgentAction(MobsimAgent agent ) {
+
+	void arrangeNextAgentAction(MobsimAgent agent ) {
 
 		switch( agent.getState() ) {
 		case ACTIVITY: 
@@ -455,7 +366,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			if (agent.getActivityEndTime() <= time) {
 				this.activityEndsList.poll();
 				agent.endActivityAndAssumeControl(time);
-				this.internalInterface.arrangeNextAgentState(agent) ;
+				this.arrangeNextAgentAction(agent) ;
 			} else {
 				return;
 			}
@@ -473,68 +384,24 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
 		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, mode ) ) ;
-		if (this.notTeleportedModes.contains(mode)){
-			this.handleKnownLegModeDeparture(now, agent, linkId, mode);
-		}
-		else {
-			this.handleUnknownLegMode(now, agent);
-		}
-	}
-
-	final void handleKnownLegModeDeparture(double now, MobsimAgent agent, Id linkId, String mode) {
 		if (mode.equals(TransportMode.car)) {
 			if ( !(agent instanceof MobsimDriverAgent) ) {
 				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;
 			}
 			MobsimDriverAgent driverAgent = (MobsimDriverAgent) agent ;
-			Id vehicleId = driverAgent.getPlannedVehicleId() ;
 			QueueLink qlink = this.network.getQueueLink(linkId);
-			QueueVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
-			if (vehicle == null) {
-				// try to fix it somehow
-				if (this.teleportVehicles) {
-					vehicle = (QueueVehicle) driverAgent.getVehicle();
-					if (vehicle.getCurrentLink() != null) {
-						if (this.cntTeleportVehicle < 9) {
-							this.cntTeleportVehicle++;
-							log.info("teleport vehicle " + vehicle.getId() + " from link " + vehicle.getCurrentLink().getId() + " to link " + linkId);
-							if (this.cntTeleportVehicle == 9) {
-								log.info("No more occurrences of teleported vehicles will be reported.");
-							}
-						}
-						QueueLink qlinkOld = this.network.getQueueLink(vehicle.getCurrentLink().getId());
-						qlinkOld.removeParkedVehicle(vehicle.getId());
-					}
-				}
-			}
-			if (vehicle == null) {
-				throw new RuntimeException("vehicle not available for agent " + driverAgent.getId() + " on link " + linkId);
-			}
-			vehicle.setDriver(driverAgent);
+			QueueVehicle vehicle = (QueueVehicle) driverAgent.getVehicle();
 			if (
 					agent.getDestinationLinkId().equals(linkId)
 					&& (driverAgent.chooseNextLinkId() == null)) {
 				driverAgent.endLegAndAssumeControl(now) ;
-				qlink.processVehicleArrival(now, vehicle);
-				this.internalInterface.arrangeNextAgentState(agent) ;
+				this.arrangeNextAgentAction(agent) ;
 			} else {
 				qlink.addDepartingVehicle(vehicle);
 			}
+		} else {
+			this.handleUnknownLegMode(now, agent);
 		}
-	}
-
-	/** Specifies whether the simulation should track vehicle usage and throw an Exception
-	 * if an agent tries to use a car on a link where the car is not available, or not.
-	 * Set <code>teleportVehicles</code> to <code>true</code> if agents always have a
-	 * vehicle available. If the requested vehicle is parked somewhere else, the vehicle
-	 * will be teleported to wherever it is requested to for usage. Set to <code>false</code>
-	 * will generate an Exception in the case when an tries to depart with a car on link
-	 * where the car is not parked.
-	 *
-	 * @param teleportVehicles
-	 */
-	/*package*/ void setTeleportVehicles(final boolean teleportVehicles) {
-		this.teleportVehicles = teleportVehicles;
 	}
 
 	QueueNetwork getQueueNetwork() {
@@ -549,20 +416,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	@Override
 	public Scenario getScenario() {
 		return this.scenario;
-	}
-
-
-	final boolean isUseActivityDurations() {
-		return this.useActivityDurations;
-	}
-
-	/*package*/ void setUseActivityDurations(final boolean useActivityDurations) {
-		this.useActivityDurations = useActivityDurations;
-		log.info("QueueSimulation is working with activity durations: " + this.isUseActivityDurations());
-	}
-
-	final Set<String> getNotTeleportedModes() {
-		return notTeleportedModes;
 	}
 
 	@Override

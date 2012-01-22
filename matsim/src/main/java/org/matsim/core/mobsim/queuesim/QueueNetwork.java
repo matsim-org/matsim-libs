@@ -52,28 +52,17 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 
 	private final Network networkLayer;
 
-	private final QueueNetworkFactory<QueueNode, QueueLink> queueNetworkFactory;
-
-	/**
-	 * @param networkLayer2
-	 * @param qSim2 -- may be null, in particular for tests
-	 */
-	/*package*/ QueueNetwork(final Network networkLayer2, QueueSimulation qSim2) {
-		this(networkLayer2, new DefaultQueueNetworkFactory(), qSim2);
-	}
-
-	/*package*/ QueueNetwork(final Network networkLayer, final QueueNetworkFactory<QueueNode, QueueLink> factory, QueueSimulation qSim2) {
+	/*package*/ QueueNetwork(final Network networkLayer, QueueSimulation qSim2) {
 		this.networkLayer = networkLayer;
-		this.queueNetworkFactory = factory;
 		this.qSim = qSim2 ;
 
 		this.queuelinks = new LinkedHashMap<Id, QueueLink>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		this.queuenodes = new LinkedHashMap<Id, QueueNode>((int)(networkLayer.getLinks().size()*1.1), 0.95f);
 		for (Node n : networkLayer.getNodes().values()) {
-			this.queuenodes.put(n.getId(), this.queueNetworkFactory.createQueueNode(n, this));
+			this.queuenodes.put(n.getId(), new QueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.queuelinks.put(l.getId(), this.queueNetworkFactory.createQueueLink(l, this, this.queuenodes.get(l.getToNode().getId())));
+			this.queuelinks.put(l.getId(), new QueueLink(l, this, this.queuenodes.get(l.getToNode().getId())));
 		}
 		for (QueueNode n : this.queuenodes.values()) {
 			n.init();

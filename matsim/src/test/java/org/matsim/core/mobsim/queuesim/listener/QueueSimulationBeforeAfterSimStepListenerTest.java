@@ -29,7 +29,6 @@ import org.matsim.core.mobsim.framework.ObservableSimulation;
 import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -55,7 +54,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		config.simulation().setTimeStepSize(10.0);
 
 		scenario = new ScenarioLoaderImpl(config).loadScenario();
-		qsim = new QueueSimulation(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		qsim = new QueueSimulation(scenario, EventsUtils.createEventsManager());
 
 		mockListener = new MockQueueSimStepListener(10.0);
 		qsim.addQueueSimulationListeners(mockListener);

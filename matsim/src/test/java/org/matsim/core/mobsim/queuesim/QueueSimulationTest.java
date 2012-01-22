@@ -78,8 +78,6 @@ import org.matsim.testcases.utils.LogCounter;
 
 public class QueueSimulationTest extends TestCase {
 
-	private final static Logger log = Logger.getLogger(QueueSimulationTest.class);
-
 	/**
 	 * This test is mostly useful for manual debugging, because only a single agent is simulated
 	 * on a very simple network.
