@@ -222,11 +222,13 @@ public class QueueLinkTest extends MatsimTestCase {
 		MobsimDriverAgent pa1 = createQueuePersonAgent(p, qsim);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
+		pa1.endActivityAndAssumeControl(0.0);
 
 		QueueVehicle v2 = new QueueVehicle(new VehicleImpl(new IdImpl("2"), new VehicleTypeImpl(new IdImpl("defaultVehicleType"))));
 		MobsimDriverAgent pa2 = createQueuePersonAgent(p, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
+		pa2.endActivityAndAssumeControl(0.0);
 
 		// start test
 		assertTrue(qlink.bufferIsEmpty());
@@ -268,15 +270,32 @@ public class QueueLinkTest extends MatsimTestCase {
 	public void testStorageSpaceDifferentVehicleSizes() {
 		Fixture f = new Fixture();
 		PersonImpl p = new PersonImpl(new IdImpl(5));
-		p.addPlan(new PlanImpl());
+		PlanImpl plan = p.createAndAddPlan(true);
+		try {
+			plan.createAndAddActivity("h", f.link1.getId());
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = new LinkNetworkRouteImpl(f.link1.getId(), f.link2.getId());
+			leg.setRoute(route);
+			route.setLinkIds(f.link1.getId(), null, f.link2.getId());
+			leg.setRoute(route);
+			plan.createAndAddActivity("w", f.link2.getId());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
 		QueueVehicle veh1 = new QueueVehicle(new VehicleImpl(new IdImpl(1), vehType));
-		veh1.setDriver(createQueuePersonAgent( p , f.qSim));
+		MobsimDriverAgent agent1 = createQueuePersonAgent( p , f.qSim);
+		veh1.setDriver(agent1);
+		agent1.endActivityAndAssumeControl(0.0);
 		QueueVehicle veh25 = new QueueVehicle(new VehicleImpl(new IdImpl(2), vehType), 2.5);
-		veh25.setDriver(createQueuePersonAgent( p , f.qSim));
+		MobsimDriverAgent agent25 = createQueuePersonAgent( p , f.qSim);
+		veh25.setDriver(agent25);
+		agent25.endActivityAndAssumeControl(0.0);
 		QueueVehicle veh5 = new QueueVehicle(new VehicleImpl(new IdImpl(3), vehType), 5);
-		veh5.setDriver(createQueuePersonAgent( p , f.qSim));
-
+		MobsimDriverAgent agent5 = createQueuePersonAgent( p , f.qSim);
+		veh5.setDriver(agent5);
+		agent5.endActivityAndAssumeControl(0.0);
+		
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getStorageCapacity(), EPSILON);
 		f.qlink2.addFromIntersection(veh5, 0.0);  // used vehicle equivalents: 5
 		assertTrue(f.qlink2.hasSpace());

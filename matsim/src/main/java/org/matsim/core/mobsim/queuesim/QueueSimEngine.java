@@ -46,6 +46,8 @@ import org.matsim.core.config.Config;
 	/** This is the collection of nodes that have to be moved in the simulation */
 	private final QueueNode[] simNodesArray;
 
+	private final List<QueueVehicle> arrivingVehicles = new ArrayList<QueueVehicle>();
+	
 	private final Random random;
 
 	private final Config config;
@@ -90,10 +92,11 @@ import org.matsim.core.config.Config;
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
+	 * @return 
 	 */
-	protected void simStep(final double time) {
+	protected Collection<QueueVehicle> simStep(final double time) {
 		moveNodes(time);
-		moveLinks(time);
+		return moveLinks(time);
 	}
 
 	protected void moveNodes(final double time) {
@@ -102,14 +105,17 @@ import org.matsim.core.config.Config;
 		}
 	}
 
-	protected void moveLinks(final double time) {
+	protected Collection<QueueVehicle> moveLinks(final double time) {
+		arrivingVehicles.clear();
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
 		QueueLink link;
 
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
-			link.moveLink(time);
+			List<QueueVehicle> arrivingVehiclesFromLink = link.moveLink(time);
+			arrivingVehicles.addAll(arrivingVehiclesFromLink);
 		}
+		return arrivingVehicles;
 	}
 
 	/**

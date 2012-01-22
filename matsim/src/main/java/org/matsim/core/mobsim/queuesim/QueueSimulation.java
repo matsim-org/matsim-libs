@@ -272,8 +272,8 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	final boolean doSimStep(final double time) {
 		this.moveVehiclesWithUnknownLegMode(time);
 		this.handleActivityEnds(time);
-		this.netSimEngine.simStep(time);
-
+		Collection<QueueVehicle> arrivingVehicles = this.netSimEngine.simStep(time);
+		handleArrivingVehicles(time, arrivingVehicles);
 		if (time >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
 			Date endtime = new Date();
@@ -286,6 +286,15 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		}
 
 		return (this.agentCounter.isLiving() && (this.stopTime > time));
+	}
+
+	private void handleArrivingVehicles(final double time,
+			Collection<QueueVehicle> arrivingVehicles) {
+		for (QueueVehicle queueVehicle : arrivingVehicles) {
+			MobsimDriverAgent driver = queueVehicle.getDriver();
+			driver.endLegAndAssumeControl(time) ;
+			arrangeNextAgentAction(driver) ;
+		}
 	}
 
 	/* package */ static final EventsManager getEvents() {
@@ -391,9 +400,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			MobsimDriverAgent driverAgent = (MobsimDriverAgent) agent ;
 			QueueLink qlink = this.network.getQueueLink(linkId);
 			QueueVehicle vehicle = (QueueVehicle) driverAgent.getVehicle();
-			if (
-					agent.getDestinationLinkId().equals(linkId)
-					&& (driverAgent.chooseNextLinkId() == null)) {
+			if (driverAgent.chooseNextLinkId() == null) {
 				driverAgent.endLegAndAssumeControl(now) ;
 				this.arrangeNextAgentAction(agent) ;
 			} else {

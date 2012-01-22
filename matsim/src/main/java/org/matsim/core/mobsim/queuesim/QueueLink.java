@@ -22,9 +22,7 @@ package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -127,6 +125,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * flowCapFraction.
 	 */
 	private double buffercap_accumulate = 1.0;
+	
+	private final ArrayList<QueueVehicle> arrivingVehicles = new ArrayList<QueueVehicle>();
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -245,8 +245,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		this.waitingList.add(queueVehicle);
 	}
 
-	/* package */void moveLink(double now) {
+	ArrayList<QueueVehicle> moveLink(double now) {
 		this.moveLane(now);
+		return this.arrivingVehicles;
 	}
 
 	/**
@@ -283,6 +284,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 *            The current time.
 	 */
 	protected void moveLaneToBuffer(final double now) {
+		this.arrivingVehicles.clear();
 		QueueVehicle veh;
 
 		// handle regular traffic
@@ -292,10 +294,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			}
 			MobsimDriverAgent driver = veh.getDriver();
 			// Check if veh has reached destination:
-			if ((this.getLink().getId().equals(driver.getDestinationLinkId()))
-					&& (driver.chooseNextLinkId() == null)) {
-				driver.endLegAndAssumeControl(now) ;
-				((QueueSimulation) this.queueNetwork.getMobsim()).arrangeNextAgentAction(driver) ;
+			if (driver.chooseNextLinkId() == null) {
+				arrivingVehicles.add(veh);
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 				continue;
