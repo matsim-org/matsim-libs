@@ -50,8 +50,10 @@ class QueueNode implements MatsimNetworkObject {
 	private final Node node;
 
 	private QueueNetwork queueNetwork;
-	
-	boolean active = true;
+
+	private QueueSimEngine simEngine;
+
+	boolean active = false;
 
 	/* package */ QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
@@ -120,7 +122,7 @@ class QueueNode implements MatsimNetworkObject {
 			Scenario sc = qSim.getScenario() ;
 			Config config = sc.getConfig() ;
 
-//			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
+			//			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
 			if ((now - link.bufferLastMovedTime) > config.simulation().getStuckTime() ) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
@@ -148,8 +150,8 @@ class QueueNode implements MatsimNetworkObject {
 		this.queueNetwork.getMobsim().getAgentCounter().incLost();
 		log.error(
 				"Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-						+ " currentLink=" + currentLink.getId().toString()
-						+ ". The agent is removed from the simulation.");
+				+ " currentLink=" + currentLink.getId().toString()
+				+ ". The agent is removed from the simulation.");
 		return true;
 	}
 
@@ -170,36 +172,41 @@ class QueueNode implements MatsimNetworkObject {
 	 * @param random the random number generator to be used
 	 */
 	/*package*/ void moveNode(final double now, final Random random) {
-	  int inLinksCounter = 0;
-	  double inLinksCapSum = 0.0;
-	  // Check all incoming links for buffered agents
-	  for (QueueLink link : this.inLinksArrayCache) {
-	    if (!link.bufferIsEmpty()) {
-	      this.tempLinks[inLinksCounter] = link;
-	      inLinksCounter++;
-	      inLinksCapSum += link.getLink().getCapacity(now);
-	    }
-	  }
+		int inLinksCounter = 0;
+		double inLinksCapSum = 0.0;
+		// Check all incoming links for buffered agents
+		for (QueueLink link : this.inLinksArrayCache) {
+			if (!link.bufferIsEmpty()) {
+				this.tempLinks[inLinksCounter] = link;
+				inLinksCounter++;
+				inLinksCapSum += link.getLink().getCapacity(now);
+			}
+		}
 
-	  int auxCounter = 0;
-	  // randomize based on capacity
-	  while (auxCounter < inLinksCounter) {
-	    double rndNum = random.nextDouble() * inLinksCapSum;
-	    double selCap = 0.0;
-	    for (int i = 0; i < inLinksCounter; i++) {
-	      QueueLink link = this.tempLinks[i];
-	      if (link == null)
-	        continue;
-	      selCap += link.getLink().getCapacity(now);
-	      if (selCap >= rndNum) {
-	        auxCounter++;
-	        inLinksCapSum -= link.getLink().getCapacity(now);
-	        this.tempLinks[i] = null;
-	        //move the link
-	        this.clearLaneBuffer(link, now);
-	        break;
-	      }
-	    }
+		if (inLinksCounter == 0) {
+			this.active = false;
+			return; // Nothing to do
+		}
+
+		int auxCounter = 0;
+		// randomize based on capacity
+		while (auxCounter < inLinksCounter) {
+			double rndNum = random.nextDouble() * inLinksCapSum;
+			double selCap = 0.0;
+			for (int i = 0; i < inLinksCounter; i++) {
+				QueueLink link = this.tempLinks[i];
+				if (link == null)
+					continue;
+				selCap += link.getLink().getCapacity(now);
+				if (selCap >= rndNum) {
+					auxCounter++;
+					inLinksCapSum -= link.getLink().getCapacity(now);
+					this.tempLinks[i] = null;
+					//move the link
+					this.clearLaneBuffer(link, now);
+					break;
+				}
+			}
 		}
 	}
 
@@ -220,8 +227,21 @@ class QueueNode implements MatsimNetworkObject {
 		}
 	}
 
+	protected final void activateNode() {
+		if (!this.active) {
+			if (this.simEngine != null) {
+				this.simEngine.activateNode(this);
+			}
+			this.active = true;
+		}
+	}
+
 	public boolean isActive() {
 		return active;
 	}
-	
+
+	void setSimEngine(QueueSimEngine simEngine) {
+		this.simEngine = simEngine;
+	}
+
 }

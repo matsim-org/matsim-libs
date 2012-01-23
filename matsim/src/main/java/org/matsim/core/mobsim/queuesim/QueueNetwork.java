@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 			this.queuenodes.put(n.getId(), new QueueNode(n, this));
 		}
 		for (Link l : networkLayer.getLinks().values()) {
-			this.queuelinks.put(l.getId(), new QueueLink(l, this));
+			this.queuelinks.put(l.getId(), new QueueLink(l, this, this.queuenodes.get(l.getToNode().getId())));
 		}
 		for (QueueNode n : this.queuenodes.values()) {
 			n.init();

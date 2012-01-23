@@ -21,12 +21,13 @@
 package org.matsim.core.mobsim.queuesim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
+import java.util.TreeSet;
 
 import org.matsim.core.config.Config;
 
@@ -44,9 +45,11 @@ import org.matsim.core.config.Config;
 	/** This is the collection of links that have to be moved in the simulation */
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
-	private final QueueNode[] simNodesArray;
+	private final TreeSet<QueueNode> simNodesArray;
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
+	/** This is the collection of links that have to be activated in the current time step */
+	private final ArrayList<QueueNode> simActivateNodes = new ArrayList<QueueNode>();
 
 	private final ArrayList<QueueVehicle> departingVehicles = new ArrayList<QueueVehicle>();
 
@@ -64,15 +67,20 @@ import org.matsim.core.config.Config;
 		this.allLinks = new ArrayList<QueueLink>(links);
 		this.config = config;
 
-		this.simNodesArray = nodes.toArray(new QueueNode[nodes.size()]);
 		//dg[april08] as the order of nodes has an influence on the simulation
 		//results they are sorted to avoid indeterministic simulations
-		Arrays.sort(this.simNodesArray, new Comparator<QueueNode>() {
+		Comparator<QueueNode> comparator = new Comparator<QueueNode>() {
 			@Override
 			public int compare(final QueueNode o1, final QueueNode o2) {
 				return o1.getNode().getId().compareTo(o2.getNode().getId());
 			}
-		});
+		};
+		// Collections.sort(this.simNodesArray, comparator);
+
+		this.simNodesArray = new TreeSet<QueueNode>(comparator);
+		for (QueueNode node : nodes) {
+			node.setSimEngine(this);
+		}
 		for (QueueLink link : this.allLinks) {
 			link.setSimEngine(this);
 		}
@@ -101,15 +109,15 @@ import org.matsim.core.config.Config;
 	}
 
 	protected void moveNodes(final double time) {
-		for (QueueNode node : this.simNodesArray) {
-			if (node.isActive()) {
-				/* It is faster to first test if the node is active, and only then call moveNode(),
-				 * than calling moveNode() directly and that one returns immediately when it's not
-				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
-				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
-				 * -marcel/20aug2008
-				 */
-				node.moveNode(time, random);
+		reactivateNodes();
+		Iterator<QueueNode> simNodes = this.simNodesArray.iterator();
+		
+		QueueNode node;
+		while (simNodes.hasNext()) {
+			node = simNodes.next();
+			node.moveNode(time, random);
+			if (!node.isActive()) {
+				simNodes.remove();
 			}
 		}
 	}
@@ -128,8 +136,17 @@ import org.matsim.core.config.Config;
 		}
 	}
 
+	private void reactivateNodes() {
+		this.simNodesArray.addAll(this.simActivateNodes);
+		this.simActivateNodes.clear();
+	}
+
 	protected void activateLink(final QueueLink link) {
 		this.simActivateThis.add(link);
+	}
+	
+	protected void activateNode(final QueueNode node) {
+		this.simActivateNodes.add(node);
 	}
 
 	private void reactivateLinks() {

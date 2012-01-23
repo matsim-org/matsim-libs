@@ -118,6 +118,8 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 */
 	private final Queue<QueueVehicle> buffer = new LinkedList<QueueVehicle>();
 
+	private final QueueNode toNode;
+
 	private double storageCapacity;
 
 	private double usedStorageCapacity;
@@ -160,8 +162,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * @param toNode
 	 * @see QueueLink#createLanes(java.util.List)
 	 */
-	/* package */QueueLink(final Link link2, final QueueNetwork queueNetwork) {
+	/* package */QueueLink(final Link link2, final QueueNetwork queueNetwork, final QueueNode toNode) {
 		this.link = link2;
+		this.toNode = toNode;
 		this.queueNetwork = queueNetwork;
 		this.length = this.getLink().getLength();
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed();
@@ -549,6 +552,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
 		}
+		toNode.activateNode();
 	}
 
 	/* package */QueueVehicle popFirstFromBuffer() {
@@ -827,7 +831,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			return lane;
 		}
 	}
-	
+
 	public boolean isActive() {
 		return active;
 	}
