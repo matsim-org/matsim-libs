@@ -83,7 +83,7 @@ public class Sim2DEngine implements MobsimEngine {
 	public void doSimStep(double time) {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
-			handleDepartures(time);
+			handleDepartures(sim2DTime);
 			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
 			this.floor.move(sim2DTime);
 
