@@ -54,8 +54,8 @@ public class Bottleneck
 		{
 			//get path
 			//				String scDir = args[0];
-//			String scDir = "C:/temp/bottleneck";
-			String scDir = "/Users/laemmel/devel/bottleneck/";
+			String scDir = "C:/temp/bottleneck/";
+//			String scDir = "/Users/laemmel/devel/bottleneck/";
 
 			//set input directory
 			String inputDir = scDir + "/input/";
@@ -159,7 +159,14 @@ public class Bottleneck
 
 		//			double currPos = 0;
 
-		int personsPerRow = (int)Math.sqrt(persons);
+		//approx. persons per row
+		double pprApprox = Math.sqrt(persons);
+		double gap = Math.abs(Math.floor(pprApprox) - pprApprox + 0.001d);
+		
+		int personsPerRow = (int)(Math.min(waitingAreaWidth*2,Math.floor(Math.sqrt(persons))));
+		
+		System.out.println("persons per row: " + personsPerRow);
+		
 
 		for (int i = 0; i < persons; i++)
 		{
@@ -176,10 +183,12 @@ public class Bottleneck
 			//				double x = currentLink.getFromNode().getCoord().getX() + dx;
 			//				double y = currentLink.getFromNode().getCoord().getY() + dy;
 
-			double step = ((float)((i % personsPerRow) + 0.01f) / (float)personsPerRow);
+			double step = ((float)(((i % personsPerRow) + 0.01f) / (float)personsPerRow) );
 //			System.out.println(step);
-			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth);
-			double y = ((Math.floor((i + 0.01 / personsPerRow))/persons)*waitingAreaWidth);
+			
+			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth) + (float)gap/2f;
+			
+			double y = ((Math.floor((i + 0.01 / personsPerRow))/persons)*waitingAreaWidth/1.5);
 
 			Point p = geofac.createPoint(new Coordinate(x,y));
 			GisDebugger.addGeometry(p, ""+i);
@@ -203,7 +212,10 @@ public class Bottleneck
 
 		//			createPersons(scenario,pb,pop,links,83,0*60);
 
-		createPersons(scenario, populationFactory, population, links, 23, 0, length, width, waitingAreaWidth);
+		createPersons(scenario, populationFactory, population, links, 50, 0*60, length, width, waitingAreaWidth);
+//		createPersons(scenario, populationFactory, population, links, 23, 44, length, width, waitingAreaWidth);
+//		createPersons(scenario, populationFactory, population, links, 23, 88, length, width, waitingAreaWidth);
+//		createPersons(scenario, populationFactory, population, links, 23, 132, length, width, waitingAreaWidth);
 
 		//create plans file
 		String outputPopulationFile = inputDir + "/plans.xml";
