@@ -737,9 +737,9 @@ public class OTFOGLDrawer implements GLEventListener {
 			// So we pass the size of the whole network here and don't rely on anybody else for that.
 			// michaz May '11
 			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
 		}
 		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect, this);
-		this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
 		if (this.queryHandler != null) {
 			this.queryHandler.updateQueries();
 		}

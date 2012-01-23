@@ -234,17 +234,17 @@ public class OTFHostControl {
 				try {
 					delay = OTFClientControl.getInstance().getOTFVisConfig().getDelay_ms();
 					sleep(delay);
+					if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServer.TimePreference.LATER))) {
+						requestNewTime(loopStart, OTFServer.TimePreference.LATER);
+					}
+					simTime.setValue(server.getLocalTime());
 					SwingUtilities.invokeLater(new Runnable() { // This is important. Code below modifies stuff which is "owned" by swing, so it must run on the Swing thread! 
 						
 						int actTime = 0;
 						
 						@Override
 						public void run() {
-							if (hostControlBar.isSynchronizedPlay() && ((getSimTime() >= loopEnd) || !requestNewTime(getSimTime() + 1, OTFServer.TimePreference.LATER))) {
-								requestNewTime(loopStart, OTFServer.TimePreference.LATER);
-							}
 							actTime = getSimTime();
-							simTime.setValue(server.getLocalTime());
 							hostControlBar.updateTimeLabel();
 							if (simTime.getValue() != actTime) {
 								hostControlBar.repaint();
