@@ -265,7 +265,13 @@ public class Agent2D implements MobsimAgent {
 
 	@Override
 	public double getActivityEndTime() {
-		//TODO return my rounded ActivityEndTime
+		//needed for sub-second time res in 2d sim
+		//works for 1s time res in QSim. In general should be something like:
+		// this.pda.getActivityEndTime() - this.scenario.getConfig().simulation().getTimeStepSize() + epsilon
+		return Math.floor(this.pda.getActivityEndTime());
+	}
+	
+	public double getRealActivityEndTime() {
 		return this.pda.getActivityEndTime();
 	}
 

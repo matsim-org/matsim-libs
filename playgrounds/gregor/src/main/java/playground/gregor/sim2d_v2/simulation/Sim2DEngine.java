@@ -19,8 +19,12 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.simulation;
 
-import org.matsim.api.core.v01.Id;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.ptproject.qsim.InternalInterface;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
@@ -28,6 +32,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.TickEvent;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 
 /**
@@ -43,6 +48,9 @@ public class Sim2DEngine implements MobsimEngine {
 	private final QSim sim;
 
 	private PhysicalFloor floor;
+	
+	private final Queue<Agent2D> activityEndsList = new PriorityQueue<Agent2D>(500,new Agent2DDepartureTimeComparator());
+	
 
 	private InternalInterface internalInterface = null ;
 	@Override
@@ -75,11 +83,25 @@ public class Sim2DEngine implements MobsimEngine {
 	public void doSimStep(double time) {
 		double sim2DTime = time;
 		while (sim2DTime < time + this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize()) {
+			handleDepartures(time);
 			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
 			this.floor.move(sim2DTime);
 
 			sim2DTime += this.sim2DStepSize;
 		}
+	}
+
+	private void handleDepartures(double time) {
+		while (this.activityEndsList.peek() != null) {
+			Agent2D agent = this.activityEndsList.peek();
+			if (agent.getRealActivityEndTime() <= time) {
+				this.activityEndsList.poll();
+				this.floor.agentDepart(agent);
+			} else {
+				return;
+			}
+		}
+		
 	}
 
 	/*
@@ -115,13 +137,23 @@ public class Sim2DEngine implements MobsimEngine {
 		return this.sim;
 	}
 
-	/**
-	 * @param currentLinkId
-	 * @return
-	 */
-	public PhysicalFloor getFloor(Id currentLinkId) {
-		return this.floor;
-	}
 
+	public void putDepartingAgentInLimbo(Agent2D agent) {
+		this.activityEndsList.add(agent);
+	}
+	
+	private static class Agent2DDepartureTimeComparator implements Comparator<Agent2D>, MatsimComparator {
+
+		@Override
+		public int compare(Agent2D agent1, Agent2D agent2) {
+			int cmp = Double.compare(agent1.getRealActivityEndTime(), agent2.getRealActivityEndTime());
+			if (cmp == 0) {
+				// Both depart at the same time -> let the one with the larger id be first (=smaller)
+				return agent2.getId().compareTo(agent1.getId());
+			}
+			return cmp;
+		}
+		
+	}
 
 }

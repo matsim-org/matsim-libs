@@ -55,20 +55,16 @@ public class Sim2DDepartureHandler implements DepartureHandler {
 		if (agent instanceof Agent2D && agent.getMode().equals("walk2d")) {
 			//TODO agents can not depart directly since their actual departure time might be later than now (because of the
 			//sub-second time res. Instead we trap the agents in "limbo" until their time is up. 
-			handleAgent2DDeparture((Agent2D)agent, linkId);
+			handleAgent2DDeparture((Agent2D)agent);
 			return true;
 		}
 		return false;
 	}
 
-	/**
-	 * @param now
-	 * @param agent
-	 * @param linkId
-	 * @param leg
-	 */
-	private void handleAgent2DDeparture(Agent2D agent, Id linkId) {
-		this.engine.getFloor(linkId).agentDepart(agent);
+
+	private void handleAgent2DDeparture(Agent2D agent) {
+//		this.engine.getFloor(linkId).agentDepart(agent);
+		this.engine.putDepartingAgentInLimbo(agent);
 	}
 
 }
