@@ -70,6 +70,30 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 */
 	private final QueueNetwork queueNetwork;
 
+	private boolean active = false;
+
+	private void activateLink() {
+		if (!this.active) {
+			if (this.simEngine != null) {
+				this.simEngine.activateLink(this);
+			}
+			this.active = true;
+		}
+	}
+
+	private boolean shouldBeActive() {
+		/*
+		 * Leave Lane active as long as there are vehicles on the link (ignore
+		 * buffer because the buffer gets emptied by nodes and not links) and
+		 * leave link active until buffercap has accumulated (so a newly
+		 * arriving vehicle is not delayed).
+		 */
+		boolean active = (this.buffercap_accumulate < 1.0)
+				|| (!this.vehQueue.isEmpty()) || (!this.waitingList.isEmpty());
+		return active;
+	}
+
+
 	/* package */VisData visdata = this.new VisDataImpl();
 
 	private QueueSimEngine simEngine = null;
@@ -105,13 +129,13 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	private double simulatedFlowCapacity; // previously called timeCap
 
 	private double inverseSimulatedFlowCapacity; // optimization, cache 1.0 /
-													// simulatedFlowCapacity
+	// simulatedFlowCapacity
 
 	private int bufferStorageCapacity; // optimization, cache
-										// Math.ceil(simulatedFlowCap)
+	// Math.ceil(simulatedFlowCap)
 
 	private double flowCapFraction; // optimization, cache simulatedFlowCap -
-									// (int)simulatedFlowCap
+	// (int)simulatedFlowCap
 
 	/**
 	 * The (flow) capacity available in one time step to move vehicles into the
@@ -125,7 +149,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 * flowCapFraction.
 	 */
 	private double buffercap_accumulate = 1.0;
-	
+
 	private final ArrayList<QueueVehicle> arrivingVehicles = new ArrayList<QueueVehicle>();
 
 	/**
@@ -156,6 +180,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	 *            the vehicle
 	 */
 	/* package */void addFromIntersection(final QueueVehicle veh, double now) {
+		this.activateLink();
 		this.add(veh, now);
 		veh.setCurrentLink(this.getLink());
 		QueueSimulation.getEvents().processEvent(
@@ -242,11 +267,13 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	}
 
 	/* package */void addDepartingVehicle(QueueVehicle queueVehicle) {
+		this.activateLink();
 		this.waitingList.add(queueVehicle);
 	}
 
 	ArrayList<QueueVehicle> moveLink(double now) {
 		this.moveLane(now);
+		this.active = shouldBeActive();
 		return this.arrivingVehicles;
 	}
 
@@ -355,9 +382,9 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		// flowCapFactor
 		if ( this.queueNetwork.getMobsim() != null ) {
 			this.simulatedFlowCapacity = this.simulatedFlowCapacity
-				* this.queueNetwork.getMobsim().getSimTimer().getSimTimestepSize()
-//				* Gbl.getConfig().simulation().getFlowCapFactor();
-				* this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getFlowCapFactor();
+					* this.queueNetwork.getMobsim().getSimTimer().getSimTimestepSize()
+					//				* Gbl.getConfig().simulation().getFlowCapFactor();
+					* this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getFlowCapFactor();
 		} // else there is no qsim i.e. it is a test case.  kai, jun'10
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity
@@ -373,7 +400,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		// first guess at storageCapacity:
 		this.storageCapacity = (this.length * numberOfLanes)
 				/ ((NetworkImpl) this.getQueueNetwork().getNetwork())
-						.getEffectiveCellSize() * storageCapFactor;
+				.getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the
 		// cap_per_time_step:
@@ -391,16 +418,16 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log
-						.warn("Link "
-								+ this.getLink().getId()
-								+ " too small: enlarge storage capcity from: "
-								+ this.storageCapacity
-								+ " Vehicles to: "
-								+ tempStorageCapacity
-								+ " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				.warn("Link "
+						+ this.getLink().getId()
+						+ " too small: enlarge storage capcity from: "
+						+ this.storageCapacity
+						+ " Vehicles to: "
+						+ tempStorageCapacity
+						+ " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
 				if (spaceCapWarningCount == 10) {
 					log
-							.warn("Additional warnings of this type are suppressed.");
+					.warn("Additional warnings of this type are suppressed.");
 				}
 				spaceCapWarningCount++;
 			}
@@ -497,7 +524,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	@Override
 	public VisData getVisData() { // needs to remain public (makes sense, but
-									// should become interface method)
+		// should become interface method)
 		return this.visdata;
 	}
 
@@ -526,13 +553,13 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	/* package */QueueVehicle popFirstFromBuffer() {
 
-//		double now = SimulationTimer.getTimeOfDayStatic();
+		//		double now = SimulationTimer.getTimeOfDayStatic();
 		double now = this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		QueueVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle
-										// in the buffer that is now the new
-										// front-most
+		// in the buffer that is now the new
+		// front-most
 		QueueSimulation.getEvents().processEvent(
 				new LinkLeaveEventImpl(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 		return veh;
@@ -582,7 +609,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		private void getVehiclePositionsEquil(
 				final Collection<AgentSnapshotInfo> positions) {
 
-//			double time = SimulationTimer.getTimeOfDayStatic();
+			//			double time = SimulationTimer.getTimeOfDayStatic();
 			double time = QueueLink.this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 			int cnt = QueueLink.this.buffer.size()
@@ -603,7 +630,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 					double speed = (time > cmp ? 0.0 : freespeed);
 					AgentSnapshotInfo position = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh
 							.getDriver().getId(), QueueLink.this
-					.getLink(), distFromFromNode, lane);
+							.getLink(), distFromFromNode, lane);
 					position.setColorValueBetweenZeroAndOne( speed) ;
 					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
@@ -618,7 +645,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 					double speed = (time > cmp ? 0.0 : freespeed);
 					AgentSnapshotInfo position = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh
 							.getDriver().getId(), QueueLink.this
-					.getLink(), distFromFromNode, lane);
+							.getLink(), distFromFromNode, lane);
 					position.setColorValueBetweenZeroAndOne(speed) ;
 					position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
 					positions.add(position);
@@ -642,7 +669,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		private void getVehiclePositionsQueue(
 				final Collection<AgentSnapshotInfo> positions) {
 
-//			double now = SimulationTimer.getTimeOfDayStatic();
+			//			double now = SimulationTimer.getTimeOfDayStatic();
 			double now = QueueLink.this.queueNetwork.getMobsim().getSimTimer().getTimeOfDay() ;
 
 			Link link = QueueLink.this.getLink();
@@ -665,33 +692,33 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			double vehLen = Math
 					.min( // the length of a vehicle in visualization
 							link.getLength()
-									/ (QueueLink.this.storageCapacity + QueueLink.this.bufferStorageCapacity), // all
-																												// vehicles
-																												// must
-																												// have
-																												// place
-																												// on
-																												// the
-																												// link
+							/ (QueueLink.this.storageCapacity + QueueLink.this.bufferStorageCapacity), // all
+							// vehicles
+							// must
+							// have
+							// place
+							// on
+							// the
+							// link
 							cellSize / storageCapFactor); // a vehicle should
-															// not be larger
-															// than it's actual
-															// size
+			// not be larger
+			// than it's actual
+			// size
 			return vehLen;
 		}
 
 		private double getInitialQueueEnd() {
 			double queueEnd = QueueLink.this.getLink().getLength(); // the
-																	// position
-																	// of the
-																	// start of
-																	// the queue
-																	// jammed
-																	// vehicles
-																	// build at
-																	// the end
-																	// of the
-																	// link
+			// position
+			// of the
+			// start of
+			// the queue
+			// jammed
+			// vehicles
+			// build at
+			// the end
+			// of the
+			// link
 			return queueEnd;
 		}
 
@@ -799,6 +826,10 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			}
 			return lane;
 		}
+	}
+	
+	public boolean isActive() {
+		return active;
 	}
 
 }

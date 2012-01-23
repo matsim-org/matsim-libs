@@ -45,9 +45,11 @@ import org.matsim.core.config.Config;
 	private final List<QueueLink> simLinksArray = new ArrayList<QueueLink>();
 	/** This is the collection of nodes that have to be moved in the simulation */
 	private final QueueNode[] simNodesArray;
+	/** This is the collection of links that have to be activated in the current time step */
+	private final ArrayList<QueueLink> simActivateThis = new ArrayList<QueueLink>();
 
-	private final List<QueueVehicle> arrivingVehicles = new ArrayList<QueueVehicle>();
-	
+	private final ArrayList<QueueVehicle> departingVehicles = new ArrayList<QueueVehicle>();
+
 	private final Random random;
 
 	private final Config config;
@@ -74,8 +76,6 @@ import org.matsim.core.config.Config;
 		for (QueueLink link : this.allLinks) {
 			link.setSimEngine(this);
 		}
-
-		this.simLinksArray.addAll(this.allLinks);
 	}
 
 	protected void afterSim() {
@@ -96,26 +96,45 @@ import org.matsim.core.config.Config;
 	 */
 	protected Collection<QueueVehicle> simStep(final double time) {
 		moveNodes(time);
-		return moveLinks(time);
+		moveLinks(time);
+		return departingVehicles;
 	}
 
 	protected void moveNodes(final double time) {
 		for (QueueNode node : this.simNodesArray) {
-			node.moveNode(time, random);
+			if (node.isActive()) {
+				/* It is faster to first test if the node is active, and only then call moveNode(),
+				 * than calling moveNode() directly and that one returns immediately when it's not
+				 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
+				 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
+				 * -marcel/20aug2008
+				 */
+				node.moveNode(time, random);
+			}
 		}
 	}
 
-	protected Collection<QueueVehicle> moveLinks(final double time) {
-		arrivingVehicles.clear();
+	protected void moveLinks(final double time) {
+		reactivateLinks();
+		departingVehicles.clear();
 		ListIterator<QueueLink> simLinks = this.simLinksArray.listIterator();
-		QueueLink link;
-
 		while (simLinks.hasNext()) {
-			link = simLinks.next();
-			List<QueueVehicle> arrivingVehiclesFromLink = link.moveLink(time);
-			arrivingVehicles.addAll(arrivingVehiclesFromLink);
+			QueueLink link = simLinks.next();
+			ArrayList<QueueVehicle> departingVehiclesFromLink = link.moveLink(time);
+			departingVehicles.addAll(departingVehiclesFromLink);
+			if (!link.isActive()) {
+				simLinks.remove();
+			}
 		}
-		return arrivingVehicles;
+	}
+
+	protected void activateLink(final QueueLink link) {
+		this.simActivateThis.add(link);
+	}
+
+	private void reactivateLinks() {
+		this.simLinksArray.addAll(this.simActivateThis);
+		this.simActivateThis.clear();
 	}
 
 	/**

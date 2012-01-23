@@ -50,6 +50,8 @@ class QueueNode implements MatsimNetworkObject {
 	private final Node node;
 
 	private QueueNetwork queueNetwork;
+	
+	boolean active = true;
 
 	/* package */ QueueNode(final Node n, final QueueNetwork queueNetwork) {
 		this.node = n;
@@ -218,4 +220,8 @@ class QueueNode implements MatsimNetworkObject {
 		}
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+	
 }
