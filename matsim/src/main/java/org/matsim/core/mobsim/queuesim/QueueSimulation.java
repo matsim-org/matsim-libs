@@ -130,7 +130,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 		simTimer = new MobsimTimer(this.config.simulation().getTimeStepSize()) ;
 
-		setEvents(events);
+		QueueSimulation.events = events;
 		this.population = scenario.getPopulation();
 
 		this.networkLayer = scenario.getNetwork();
@@ -303,11 +303,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 	@Override
 	public EventsManager getEventsManager() {
-		return this.events;
-	}
-
-	private static final void setEvents(final EventsManager events) {
-		QueueSimulation.events = events;
+		return events;
 	}
 
 	final void handleUnknownLegMode(double now, final MobsimAgent planAgent) {
