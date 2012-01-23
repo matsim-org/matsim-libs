@@ -734,7 +734,7 @@ public class ReadFromUrbansimParcelModel {
 		
 		cnt.allowedJobs = Math.round( jobSample*cnt.NUrbansimJobs );
 		
-		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.NUrbansimJobs + "; number jobs schould count: " + cnt.allowedJobs +
+		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.NUrbansimJobs + "; number jobs should count: " + cnt.allowedJobs +
 				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs);
 		
 		// if job sample size is too low add jobs from backup list
@@ -765,7 +765,7 @@ public class ReadFromUrbansimParcelModel {
 			}
 		}
 		
-		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.NUrbansimJobs + "; number jobs schould count: " + cnt.allowedJobs +
+		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.NUrbansimJobs + "; number jobs should count: " + cnt.allowedJobs +
 				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs +
 				 "; number of jobs added from backupList: " + cnt.addedJobsFromBackup);
 	}
