@@ -94,9 +94,9 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 				vehicleInformation
 				);
 
-		double expectedEmissionCosts = costModule.calculateWarmEmissionCosts(expectedWarmEmissions );
+		double expectedEmissionCosts = costModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		double generalizedExpectedEmissionCost = this.marginalUtlOfMoney * expectedEmissionCosts ;
-//		logger.info("expected emission costs for link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
+//		logger.warn("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
 		
 		// Test the routing:
 //		if(!link.getId().equals(new IdImpl("11"))) 

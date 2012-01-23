@@ -59,7 +59,6 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		double amount2Pay = - warmEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
-//		Event moneyEvent = new AgentMoneyEventImpl(time, personId, 0);
 		
 		eventsManager.processEvent(moneyEvent);
 	}
@@ -72,7 +71,6 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		double amount2Pay = - coldEmissionCosts;
 		
 		Event moneyEvent = new AgentMoneyEventImpl(time, personId, amount2Pay);
-//		Event moneyEvent = new AgentMoneyEventImpl(time, personId, 0);
 		
 		eventsManager.processEvent(moneyEvent);
 	}

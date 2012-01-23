@@ -159,8 +159,8 @@ public class RunInternalizationTest {
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		
 		StrategySettings changePlan = new StrategySettings(new IdImpl("1"));
-		changePlan.setModuleName("BestScore");
-//		changePlan.setModuleName("ChangeExpBeta");
+//		changePlan.setModuleName("BestScore");
+		changePlan.setModuleName("ChangeExpBeta");
 		changePlan.setProbability(0.7);
 		
 		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));

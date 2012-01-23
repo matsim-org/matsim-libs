@@ -167,24 +167,24 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		VehicleType vehicleType = vehicle.getType();
 		vehicleInformation = vehicleType.getId().toString();
 
-		// ===
-		// TODO: remove this after debuging
-		double linkLength_km = linkLength / 1000;
-		double travelTime_h = travelTime / 3600;
-		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
-		double averageSpeed_kmh_double = (linkLength_km / travelTime_h);
-		int freeFlowSpeed_kmh_int = (int) Math.round(freeFlowSpeed_kmh_double);
-		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
-
-		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
-			logger.info("enterTime | personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
-			logger.info(enterTime + " | " + personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
+// ===
+// TODO: remove this after debuging
+//		double linkLength_km = linkLength / 1000;
+//		double travelTime_h = travelTime / 3600;
+//		double freeFlowSpeed_kmh_double = (freeVelocity * 3.6);
+//		double averageSpeed_kmh_double = (linkLength_km / travelTime_h);
+//		int freeFlowSpeed_kmh_int = (int) Math.round(freeFlowSpeed_kmh_double);
+//		int averageSpeed_kmh_int = (int) Math.round(averageSpeed_kmh_double);
+//
+//		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
+//			logger.info("enterTime | personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
+//			logger.info(enterTime + " | " + personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
 //		
 //			logger.info("departureTime_h: " + this.agentdeparture.get(personId).getSecond() / 3600);
 //			logger.info("arrivalTime_h: " + this.agentarrival.get(personId).getSecond() / 3600);
 //			logger.info("averageSpeed_kmh: " + averageSpeed_kmh_int + "; freeFlowSpeed_kmh: " + freeFlowSpeed_kmh_int);
 //			throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
-		}
+//		}
 		
 		Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 				personId,
