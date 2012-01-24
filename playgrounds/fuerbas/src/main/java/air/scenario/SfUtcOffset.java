@@ -16,9 +16,13 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class SfUtcOffset {
 	
+	private static final String FILE_DIR = "";
+	private static final String INPUTFILE_OSM = FILE_DIR+"";
+	private static final String OUTPUTFILE_UTC= FILE_DIR+"";
+	
 //	public static void main(String args[]) throws Exception {
 //		SfUtcOffset test = new SfUtcOffset();
-//		test.getUtcOffset(new CoordImpl(52.8,8.08));
+//		test.getUtcOffset(writeUtcOffset(INPUTFILE_OSM, OUTPUTFILE_UTC));
 //		
 //	}
 	
