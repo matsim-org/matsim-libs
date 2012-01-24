@@ -53,8 +53,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 
-import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEvent;
 import playground.gregor.sim2d_v2.events.DoubleValueStringKeyAtCoordinateEventHandler;
@@ -385,7 +383,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
 		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/oval/output/ITERS/it.0/0.events.xml.gz", true, 100.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/trafficlights/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		vis.play(true);
 
 	}

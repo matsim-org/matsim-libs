@@ -1,4 +1,4 @@
-package playground.gregor.multidestpeds.helper;
+package playground.gregor.scenariogen;
 
 
 import java.util.ArrayList;

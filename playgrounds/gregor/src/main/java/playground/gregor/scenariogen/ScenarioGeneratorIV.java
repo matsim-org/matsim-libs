@@ -1,4 +1,4 @@
-package playground.gregor.multidestpeds.helper;
+package playground.gregor.scenariogen;
 
 
 import org.matsim.api.core.v01.Id;
@@ -15,6 +15,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -24,6 +25,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.helper.gisdebug.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -39,8 +41,11 @@ public class ScenarioGeneratorIV {
 		String scDir = "/Users/laemmel/devel/counter/";
 		String inputDir = scDir + "/input/";
 
+		
 		Config c = ConfigUtils.createConfig();
 
+		c.vspExperimental().setMatsimGlobalTimeFormat("HH:mm:ss.ss");
+		
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		createAndSaveEnvironment(inputDir);
@@ -52,6 +57,7 @@ public class ScenarioGeneratorIV {
 
 		c.controler().setLastIteration(10);
 		c.controler().setOutputDirectory(scDir + "output/");
+		c.controler().setMobsim("hybridQ2D");
 
 		c.strategy().setMaxAgentPlanMemorySize(3);
 
@@ -60,6 +66,22 @@ public class ScenarioGeneratorIV {
 		c.strategy().addParam("ModuleProbability_1", "0.1");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", "0.9");
+		
+		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
+		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
+		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
+
+		s2d.setEnableCircularAgentInterActionModule("false");
+		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
+		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
+		s2d.setEnableDrivingForceModule("false");
+		s2d.setEnableEnvironmentForceModule("false");
+		s2d.setEnablePathForceModule("false");
+		s2d.setEnableVelocityObstacleModule("true");
+		s2d.setEnablePhysicalEnvironmentForceModule("false");
+
+
+		c.addModule("sim2d", s2d);
 
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
@@ -83,7 +105,7 @@ public class ScenarioGeneratorIV {
 					Link l = net.getLinks().get(new IdImpl(0));
 					ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
 					act.setCoord(new CoordImpl(x,y));
-					act.setEndTime(time);
+					act.setEndTime(time+MatsimRandom.getRandom().nextDouble());
 					plan.addActivity(act);
 					Leg leg = pb.createLeg("walk2d");
 					plan.addLeg(leg);
@@ -106,7 +128,7 @@ public class ScenarioGeneratorIV {
 
 		double time = 0;
 		for (double rho = .5; rho < 7; rho+=.5) {
-			double timeSteps = 1;
+			double timeSteps = 10;
 			createPersons(sc,pb,pop,time,timeSteps,rho);
 
 			time += 20*timeSteps;

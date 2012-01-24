@@ -1,4 +1,5 @@
-package playground.gregor.multidestpeds.helper;
+package playground.gregor.scenariogen;
+
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,9 +30,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-public class ScenarioGeneratorII {
+public class ScenarioGeneratorIII {
+
+
 	public static void main(String [] args) {
-		String scDir = "/Users/laemmel/devel/crossing/";
+		String scDir = "/Users/laemmel/devel/counter/";
 		String inputDir = scDir + "/input/";
 
 		Config c = ConfigUtils.createConfig();
@@ -62,20 +65,21 @@ public class ScenarioGeneratorII {
 
 	}
 
+
 	private static void createPop(Scenario sc, String inputDir) {
 		Population pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 
 		int persId = 0;
-		for (int i = 0; i < 20; i++) {
-			for (double y = 2.5; y <= 17.5; y++) {
+		for (int i = 0; i < 10; i ++) {
+			for (double y = 2; y <=2; y++) {
 				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
 				Link l = net.getLinks().get(new IdImpl(0));
 				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
-				act.setCoord(new CoordImpl(2.5,y));
+				act.setCoord(new CoordImpl(1,y));
 				act.setEndTime(i);
 				plan.addActivity(act);
 				Leg leg = pb.createLeg("walk2d");
@@ -88,19 +92,19 @@ public class ScenarioGeneratorII {
 				pers.addPlan(plan);
 			}
 
-			for (double x = 17.5; x <= 32.5; x++) {
+			for (double y = 2; y <= 2; y++) {
 				Person pers = pb.createPerson(sc.createId(Integer.toString(persId++)));
 				pop.addPerson(pers);
 				Plan plan = pb.createPlan();
 				NetworkImpl net = (NetworkImpl) sc.getNetwork();
-				Link l = net.getLinks().get(new IdImpl(6));
+				Link l = net.getLinks().get(new IdImpl(5));
 				ActivityImpl act = (ActivityImpl) pb.createActivityFromLinkId("h", l.getId());
-				act.setCoord(new CoordImpl(x,32.5));
+				act.setCoord(new CoordImpl(13,y));
 				act.setEndTime(i);
 				plan.addActivity(act);
 				Leg leg = pb.createLeg("walk2d");
 				plan.addLeg(leg);
-				Link l1 = net.getLinks().get(new IdImpl(10));
+				Link l1 = net.getLinks().get(new IdImpl(1));
 				Activity act2 = pb.createActivityFromLinkId("h", l1.getId());
 				act2.setEndTime(0);
 				plan.addActivity(act2);
@@ -123,7 +127,16 @@ public class ScenarioGeneratorII {
 		pre.setLatestStartTime(49);
 		pre.setOpeningTime(49);
 
+
+		//		ActivityParams post = new ActivityParams("post-evac");
+		//		post.setTypicalDuration(49); // dito
+		//		post.setMinimalDuration(49);
+		//		post.setClosingTime(49);
+		//		post.setEarliestEndTime(49);
+		//		post.setLatestStartTime(49);
+		//		post.setOpeningTime(49);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
+		//		sc.getConfig().planCalcScore().addActivityParams(post);
 	}
 
 
@@ -133,19 +146,19 @@ public class ScenarioGeneratorII {
 
 
 		Id nid0 = new IdImpl(0);
-		CoordImpl c0 = new CoordImpl(0,10);
+		CoordImpl c0 = new CoordImpl(0,2);
 		NodeImpl n0 = nf.createNode(nid0, c0);
 
 		Id nid1 = new IdImpl(1);
-		CoordImpl c1 = new CoordImpl(5,10);
+		CoordImpl c1 = new CoordImpl(2,2);
 		NodeImpl n1 = nf.createNode(nid1, c1);
 
 		Id nid2 = new IdImpl(2);
-		CoordImpl c2 = new CoordImpl(45,10);
+		CoordImpl c2 = new CoordImpl(12,2);
 		NodeImpl n2 = nf.createNode(nid2, c2);
 
 		Id nid3 = new IdImpl(3);
-		CoordImpl c3 = new CoordImpl(50,10);
+		CoordImpl c3 = new CoordImpl(14,2);
 		NodeImpl n3 = nf.createNode(nid3, c3);
 
 		sc.getNetwork().addNode(n0);
@@ -154,22 +167,22 @@ public class ScenarioGeneratorII {
 		sc.getNetwork().addNode(n3);
 
 		Id lid0 = new IdImpl(0);
-		Link l0 = nf.createLink(lid0, n0, n1, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
+		Link l0 = nf.createLink(lid0, n0, n1, (NetworkImpl) sc.getNetwork(), 2, 1.34, 1, 1);
 
 		Id lid1 = new IdImpl(1);
-		Link l1 = nf.createLink(lid1, n1, n0, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
+		Link l1 = nf.createLink(lid1, n1, n0, (NetworkImpl) sc.getNetwork(), 2, 1.34, 1, 1);
 
 		Id lid2 = new IdImpl(2);
-		Link l2 = nf.createLink(lid2, n1, n2, (NetworkImpl) sc.getNetwork(), 40, 1.34, 1, 1);
+		Link l2 = nf.createLink(lid2, n1, n2, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
 
 		Id lid3 = new IdImpl(3);
-		Link l3 = nf.createLink(lid3, n2, n1, (NetworkImpl) sc.getNetwork(), 40, 1.34, 1, 1);
+		Link l3 = nf.createLink(lid3, n2, n1, (NetworkImpl) sc.getNetwork(), 10, 1.34, 1, 1);
 
 		Id lid4 = new IdImpl(4);
-		Link l4 = nf.createLink(lid4, n2, n3, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
+		Link l4 = nf.createLink(lid4, n2, n3, (NetworkImpl) sc.getNetwork(), 2, 1.34, 1, 1);
 
 		Id lid5 = new IdImpl(5);
-		Link l5 = nf.createLink(lid5, n3, n2, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
+		Link l5 = nf.createLink(lid5, n3, n2, (NetworkImpl) sc.getNetwork(), 2, 1.34, 1, 1);
 
 		sc.getNetwork().addLink(l0);
 		sc.getNetwork().addLink(l1);
@@ -177,53 +190,6 @@ public class ScenarioGeneratorII {
 		sc.getNetwork().addLink(l3);
 		sc.getNetwork().addLink(l4);
 		sc.getNetwork().addLink(l5);
-
-
-		Id nid5 = new IdImpl(5);
-		CoordImpl c5 = new CoordImpl(25,35);
-		NodeImpl n5 = nf.createNode(nid5, c5);
-
-		Id nid6 = new IdImpl(6);
-		CoordImpl c6 = new CoordImpl(25,30);
-		NodeImpl n6 = nf.createNode(nid6, c6);
-
-		Id nid7 = new IdImpl(7);
-		CoordImpl c7 = new CoordImpl(25,-10);
-		NodeImpl n7 = nf.createNode(nid7, c7);
-
-		Id nid8 = new IdImpl(8);
-		CoordImpl c8 = new CoordImpl(25,-15);
-		NodeImpl n8 = nf.createNode(nid8, c8);
-
-		sc.getNetwork().addNode(n5);
-		sc.getNetwork().addNode(n6);
-		sc.getNetwork().addNode(n7);
-		sc.getNetwork().addNode(n8);
-
-		Id lid6 = new IdImpl(6);
-		Link l6 = nf.createLink(lid6, n5, n6, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid7 = new IdImpl(7);
-		Link l7 = nf.createLink(lid7, n6, n5, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid8 = new IdImpl(8);
-		Link l8 = nf.createLink(lid8, n6, n7, (NetworkImpl) sc.getNetwork(), 40, 1.34, 1, 1);
-
-		Id lid9 = new IdImpl(9);
-		Link l9 = nf.createLink(lid9, n7, n6, (NetworkImpl) sc.getNetwork(), 40, 1.34, 1, 1);
-
-		Id lid10 = new IdImpl(10);
-		Link l10 = nf.createLink(lid10, n7, n8, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		Id lid11 = new IdImpl(11);
-		Link l11 = nf.createLink(lid11, n8, n7, (NetworkImpl) sc.getNetwork(), 5, 1.34, 1, 1);
-
-		sc.getNetwork().addLink(l6);
-		sc.getNetwork().addLink(l7);
-		sc.getNetwork().addLink(l8);
-		sc.getNetwork().addLink(l9);
-		sc.getNetwork().addLink(l10);
-		sc.getNetwork().addLink(l11);
 
 
 		String networkOutputFile = dir+"/network.xml";
@@ -238,29 +204,16 @@ public class ScenarioGeneratorII {
 	private static void createAndSaveEnvironment(String dir) {
 		GeometryFactory geofac = new GeometryFactory();
 
+		//hallway 50m length 20m width
 		Coordinate c0 = new Coordinate(0,0);
-		Coordinate c1 = new Coordinate(15,0);
-		Coordinate c2 = new Coordinate(15,-15);
-		LineString ls0 = geofac.createLineString(new Coordinate[]{c0,c1,c2});
+		Coordinate c1 = new Coordinate(14,0);
+		LineString ls0 = geofac.createLineString(new Coordinate[]{c0,c1});
 		GisDebugger.addGeometry(ls0);
 
-		Coordinate c3 = new Coordinate(35,-15);
-		Coordinate c4 = new Coordinate(35,0);
-		Coordinate c5 = new Coordinate(50,0);
-		LineString ls1 = geofac.createLineString(new Coordinate[]{c3,c4,c5});
+		Coordinate c2 = new Coordinate(0,4);
+		Coordinate c3 = new Coordinate(14,4);
+		LineString ls1 = geofac.createLineString(new Coordinate[]{c2,c3});
 		GisDebugger.addGeometry(ls1);
-
-		Coordinate c6 = new Coordinate(50,20);
-		Coordinate c7 = new Coordinate(35,20);
-		Coordinate c8 = new Coordinate(35,35);
-		LineString ls2 = geofac.createLineString(new Coordinate[]{c6,c7,c8});
-		GisDebugger.addGeometry(ls2);
-
-		Coordinate c9 = new Coordinate(15,35);
-		Coordinate c10 = new Coordinate(15,20);
-		Coordinate c11 = new Coordinate(0,20);
-		LineString ls3 = geofac.createLineString(new Coordinate[]{c9,c10,c11});
-		GisDebugger.addGeometry(ls3);
 
 		GisDebugger.dump(dir + "/floorplan.shp");
 
