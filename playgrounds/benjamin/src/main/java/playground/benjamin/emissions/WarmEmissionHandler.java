@@ -179,7 +179,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 //		if (averageSpeed_kmh_int > freeFlowSpeed_kmh_int){
 //			logger.info("enterTime | personId | linkId  | linkLength_km | averageSpeed_kmh_double ; averageSpeed_kmh_int | freeFlowSpeed_kmh_double ; freeFlowSpeed_kmh_int");
 //			logger.info(enterTime + " | " + personId + " | " + linkId + " | " + linkLength_km + " | " + averageSpeed_kmh_double + "; "  + averageSpeed_kmh_int + " | " + freeFlowSpeed_kmh_double + "; " + freeFlowSpeed_kmh_int);
-//			throw new RuntimeException("Average speed was higher than free flow speed; this would produce negative warm emissions. Aborting...");
+//			throw new RuntimeException("Average speed is higher than free flow speed; this would produce negative warm emissions. Aborting...");
 //		}
 		
 		Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
