@@ -89,8 +89,8 @@ public class RunEmissionToolOffline {
 		emissionModule.createEmissionHandler();
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);

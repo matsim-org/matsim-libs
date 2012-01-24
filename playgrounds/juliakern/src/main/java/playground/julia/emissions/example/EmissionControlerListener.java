@@ -62,8 +62,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 		emissionModule.createEmissionHandler();
 		
 		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 	}
 
 	@Override
