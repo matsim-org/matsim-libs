@@ -33,6 +33,8 @@ import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
+import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
+
 
 /**
  * @author dgrether
@@ -41,7 +43,12 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 public class Sim2DSignalsControllerListener implements SignalsControllerListener, StartupListener, ShutdownListener, IterationStartsListener {
 
 	private SignalSystemsManager signalManager;
+	private final HybridQ2DMobsimFactory hQ2DFac;
 	
+	public Sim2DSignalsControllerListener(HybridQ2DMobsimFactory hQ2DFac) {
+		this.hQ2DFac = hQ2DFac;
+	}
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		//load data
@@ -50,7 +57,7 @@ public class Sim2DSignalsControllerListener implements SignalsControllerListener
 		FromDataBuilder modelBuilder = new FromDataBuilder(signalsData, event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		//init mobility simulation
-		Sim2DSignalEngine signalEngie = new Sim2DSignalEngine(this.signalManager);
+		Sim2DSignalEngine signalEngie = new Sim2DSignalEngine(this.signalManager,this.hQ2DFac);
 		event.getControler().getQueueSimulationListener().add(signalEngie);
 	}
 	

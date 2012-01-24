@@ -20,14 +20,16 @@
 package playground.gregor.sim2d_v2.controller;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.events.SimulationBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
-import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
+
+import playground.gregor.sim2d_v2.simulation.HybridQ2DMobsimFactory;
 
 
 /**
@@ -37,14 +39,17 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 public class Sim2DSignalEngine implements SignalEngine {
 
 	private static final Logger log = Logger.getLogger(Sim2DSignalEngine.class);
-	
-	private SignalSystemsManager signalManager;
 
-	public Sim2DSignalEngine(SignalSystemsManager signalManager) {
+	private final SignalSystemsManager signalManager;
+
+	private final HybridQ2DMobsimFactory hQ2DFac;
+
+	public Sim2DSignalEngine(SignalSystemsManager signalManager, HybridQ2DMobsimFactory hQ2DFac) {
 		this.signalManager = signalManager;
+		this.hQ2DFac = hQ2DFac;
 	}
 
-	
+
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		this.initializeSignalizedItems(((Netsim)e.getQueueSimulation()));
@@ -56,31 +61,25 @@ public class Sim2DSignalEngine implements SignalEngine {
 	}
 
 	private void initializeSignalizedItems(Netsim qSim) {
-		
-		NetsimNetwork net = qSim.getNetsimNetwork();
+
+		Network net = qSim.getNetsimNetwork().getNetwork();
+
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
 				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
-//TODO gregor replace with linker to 2DSim Links
-			// get the instance that implements SignalizableItem
-				//				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
-//				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
-//					QLinkImpl l = (QLinkImpl) link; 
-//					l.setSignalized(true);
-//					signal.addSignalizeableItem(l);
-//				}
-//				else {
-//					QLinkLanesImpl l = (QLinkLanesImpl) link;
-//					for (Id laneId : signal.getLaneIds()){
-//						QLane lane = getQLane(laneId, l);
-//						lane.setSignalized(true);
-//						signal.addSignalizeableItem(lane);
-//					}
-//				}
+
+				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+					PedestrianSignal sig = new PedestrianSignal(signal.getLinkId(),net.getLinks().get(signal.getLinkId()).getToNode().getOutLinks().keySet());
+					sig.setSignalized(true);
+					signal.addSignalizeableItem(sig);
+					this.hQ2DFac.getSim2DEngine().addSignal(sig);
+				} else {
+					throw new RuntimeException("not yet implemented");
+				}
 			}
 			system.simulationInitialized(qSim.getSimTimer().getTimeOfDay());
 		}
 	}
 
-	
+
 }

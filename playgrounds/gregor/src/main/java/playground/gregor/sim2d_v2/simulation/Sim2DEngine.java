@@ -20,9 +20,12 @@
 package playground.gregor.sim2d_v2.simulation;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.ptproject.qsim.InternalInterface;
@@ -31,6 +34,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.controller.PedestrianSignal;
 import playground.gregor.sim2d_v2.events.TickEvent;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
@@ -51,6 +55,7 @@ public class Sim2DEngine implements MobsimEngine {
 	
 	private final Queue<Agent2D> activityEndsList = new PriorityQueue<Agent2D>(500,new Agent2DDepartureTimeComparator());
 	
+	private final Map<Id,PedestrianSignal> signals = new HashMap<Id,PedestrianSignal>();
 
 	private InternalInterface internalInterface = null ;
 	@Override
@@ -123,7 +128,7 @@ public class Sim2DEngine implements MobsimEngine {
 	public void onPrepareSim() {
 
 		boolean emitEvents = true;
-		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents);
+		this.floor = new PhysicalFloor(this.scenario, this.sim.getEventsManager(), emitEvents,this.signals);
 		this.floor.init();
 	}
 
@@ -154,6 +159,10 @@ public class Sim2DEngine implements MobsimEngine {
 			return cmp;
 		}
 		
+	}
+
+	public void addSignal(PedestrianSignal sig) {
+		this.signals.put(sig.getLinkId(), sig);
 	}
 
 }

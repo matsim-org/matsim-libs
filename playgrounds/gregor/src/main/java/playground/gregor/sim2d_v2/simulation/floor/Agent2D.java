@@ -164,6 +164,11 @@ public class Agent2D implements MobsimAgent {
 		return this.currentDesiredVelocity;
 	}
 
+	//FIXME remove this method - the desired velocity should never be set externally (because desires can't be enforced)  
+	public void setDesiredVelocity(double v) {
+		this.currentDesiredVelocity = v;
+	}
+	
 	@Deprecated //should be private
 	public void setCurrentVelocity(double vx, double vy) {
 		this.vx = vx;

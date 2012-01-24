@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -44,6 +45,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.controller.PedestrianSignal;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
@@ -52,7 +54,6 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
@@ -89,13 +90,14 @@ public class PhysicalFloor implements Floor {
 	private final EventsManager em;
 	private final Collection<? extends Link> links;
 	private FinishLineCrossedChecker finishLineCrossChecker;
-	private LinkSwitcher mlsw;
+	private final Map<Id, PedestrianSignal> signals;
 
 
 	private static final boolean MS_FORCE_UPDATE = false;
 	private static final int MAX_NUM_OF_THREADS = 4;
 
-	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents) {
+	public PhysicalFloor(Scenario scenario, EventsManager em, boolean emitEvents, Map<Id, PedestrianSignal> signals) {
+		this.signals = signals;
 		this.scenario = scenario;
 		this.sim2DConfig = ((Sim2DConfigGroup)scenario.getConfig().getModule("sim2d"));
 		this.sim2DTimeStepSize = this.sim2DConfig.getTimeStepSize();
@@ -305,6 +307,14 @@ public class PhysicalFloor implements Floor {
 			updateForcesMultiThreaded(time);
 		} else {
 			for (Agent2D agent : this.agents) {
+				PedestrianSignal sig = this.signals.get(agent.getCurrentLinkId());
+				if (sig != null) {//FIXME for testing only - should be handled by the agent itself!!
+					if (!sig.hasGreenForToLink(agent.chooseNextLinkId())) {
+						agent.setDesiredVelocity(0.00001);
+					} else {
+						agent.setDesiredVelocity(1.34);
+					}
+				}
 				updateForces(agent,time);
 			}
 		}

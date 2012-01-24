@@ -95,13 +95,13 @@ public class TrafficLightScenarioGenerator {
 		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
-		s2d.setEnableCircularAgentInterActionModule("false");
+		s2d.setEnableCircularAgentInterActionModule("true");
 		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
 		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnableDrivingForceModule("false");
-		s2d.setEnableEnvironmentForceModule("false");
-		s2d.setEnablePathForceModule("false");
-		s2d.setEnableVelocityObstacleModule("true");
+		s2d.setEnableDrivingForceModule("true");
+		s2d.setEnableEnvironmentForceModule("true");
+		s2d.setEnablePathForceModule("true");
+		s2d.setEnableVelocityObstacleModule("false");
 		s2d.setEnablePhysicalEnvironmentForceModule("false");
 
 
@@ -135,7 +135,7 @@ public class TrafficLightScenarioGenerator {
 		signalsConfig.setSignalControlFile(signalControlFile);
 	}
 	private static void createSignalControl(Scenario scenario, SignalsData sd) {
-		int cycle = 120;
+		int cycle = 10;
 		SignalControlData control = sd.getSignalControlData();
 		
 		//signal system 3, 4 control
@@ -152,7 +152,7 @@ public class TrafficLightScenarioGenerator {
 			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(scenario.createId("1"));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
-			settings1.setDropping(55);
+			settings1.setDropping(5);
 		}
 	}
 	private static void createSignalSystemsAndGroups(Scenario scenario,

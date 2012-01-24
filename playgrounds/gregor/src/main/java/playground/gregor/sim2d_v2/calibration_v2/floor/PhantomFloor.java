@@ -13,16 +13,16 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import playground.gregor.sim2d_v2.calibration_v2.LLCalculator;
 import playground.gregor.sim2d_v2.calibration_v2.PhantomAgent2D;
 import playground.gregor.sim2d_v2.calibration_v2.scenario.PhantomEvents;
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class PhantomFloor extends PhysicalFloor {
 
@@ -47,7 +47,7 @@ public class PhantomFloor extends PhysicalFloor {
 	//	private final double deltaT;
 
 	public PhantomFloor(PhantomEvents phantomEvents, Id calibrationAgentId, Collection<? extends Link> collection, Scenario scenario, LLCalculator llCalc, EventsManager em) {
-		super(scenario,em,true);
+		super(scenario,em,true,null);
 		this.calibrationAgentId = calibrationAgentId;
 
 		this.times = phantomEvents.getTimesArray();

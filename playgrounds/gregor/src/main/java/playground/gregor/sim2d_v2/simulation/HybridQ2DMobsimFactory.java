@@ -7,13 +7,9 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.Simulation;
-import org.matsim.pt.qsim.ComplexTransitStopHandlerFactory;
-import org.matsim.pt.qsim.TransitQSimEngine;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.AgentFactory;
-import org.matsim.ptproject.qsim.agents.DefaultAgentFactory;
 import org.matsim.ptproject.qsim.agents.PopulationAgentSource;
-import org.matsim.ptproject.qsim.agents.TransitAgentFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
@@ -21,6 +17,8 @@ import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngineFactory;
 public class HybridQ2DMobsimFactory implements MobsimFactory {
 
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
+	
+	Sim2DEngine sim2DEngine = null;
 
 	@Override
 	public Simulation createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -53,10 +51,14 @@ public class HybridQ2DMobsimFactory implements MobsimFactory {
 		qSim.addAgentSource(agentSource);
 
 		Sim2DEngine e = new Sim2DEngine(qSim);
+		this.sim2DEngine = e;
 		qSim.addMobsimEngine(e);
 		Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
 		qSim.addDepartureHandler(d);
 		return qSim;
 	}
 
+	public Sim2DEngine getSim2DEngine() {
+		return this.sim2DEngine;
+	}
 }
