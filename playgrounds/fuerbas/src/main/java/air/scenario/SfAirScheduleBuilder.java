@@ -22,6 +22,7 @@ package air.scenario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -59,21 +60,29 @@ public class SfAirScheduleBuilder {
 	private static final String missingAirportsOutputFilename = "missing_airports.txt";
 
 	public static final String CITY_PAIRS_OUTPUT_FILENAME = "city_pairs.txt";
+	
+	public static final String UTC_OFFSET_FILE = "utc_offset.txt";
 
 	protected Map<String, Coord> airportsInOsm = new HashMap<String, Coord>();
 	protected Map<String, Coord> airportsInOag = new HashMap<String, Coord>();
 	protected Map<String, Double> routes = new HashMap<String, Double>();
 	protected Map<String, Integer> missingAirports = new HashMap<String, Integer>();
 	protected Map<String, Double> cityPairDistance = new HashMap<String, Double>();
+	private Map<String, Integer> utcOffset = new HashMap<String, Integer>();
+	private boolean utcFileInUse = false;
 
 	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
-		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null);
+		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, null);
+	}
+	
+	public void filter(String inputOsmFilename, String inputOagFilename, String outputDirectory, String utcOffsetInputfile) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
+		this.filter(inputOsmFilename, inputOagFilename, outputDirectory, null, utcOffsetInputfile);
 	}
 
 	
 	@SuppressWarnings("rawtypes")
 	public void filter(String inputOsmFile, String inputOagFile, String outputDirectory,
-			String[] countries) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
+			String[] countries, String utcOffsetInputfile) throws IOException, SAXException, ParserConfigurationException, InterruptedException {
 		String outputOagFile = outputDirectory + OAG_FLIGHTS_OUTPUT_FILENAME;
 
 		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
@@ -87,7 +96,10 @@ public class SfAirScheduleBuilder {
 		
 //		new UTC Offset functionality, work in progress!
 		/**@todo check UTC offsets for errors **/ 
-		SfUtcOffset utcOffsetNew = new SfUtcOffset();
+		if (utcOffsetInputfile!=null) {
+			getUtcOffsetMap(utcOffsetInputfile);
+			this.utcFileInUse = true;
+		}
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFile)));
 		BufferedWriter bwOag = new BufferedWriter(new FileWriter(new File(outputOagFile)));
@@ -147,14 +159,21 @@ public class SfAirScheduleBuilder {
 								+ Double.parseDouble(lineEntries[10].substring(0, 2)) * 3600;
 //					Getting UTC Offset of current airport's time zone
 //						worldwide version (gets offset from web service) 
-						System.out.println("Getting UTC offset for "+originAirport+" in coutry: "+originCountry);
-						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
-						departureInSec = departureInSec - utcOffset;
-						System.out.println("UTC offset was calculated as: "+utcOffset);
+//						System.out.println("Getting UTC offset for "+originAirport+" in coutry: "+originCountry);
+//						double utcOffset = utcOffsetNew.getUtcOffset(this.airportsInOsm.get(originAirport));
+						
+//						Getting UTC Offset from separate file which need to be created with SfUtcOffset
+						if (this.utcFileInUse) {
+							double utcOffset = this.utcOffset.get(originAirport);
+							departureInSec = departureInSec - utcOffset;
+							System.out.println("UTC offset was calculated as: "+utcOffset);
+						}
 
 //						version for Europe ONLY (based on manually entered offsets, see below)
-//						double utcOffset = getOffsetUTC(originCountry) * 3600;
-//						departureInSec = departureInSec - utcOffset;
+						if (this.utcFileInUse==false) {
+							double utcOffset = getOffsetUTC(originCountry) * 3600;
+							departureInSec = departureInSec - utcOffset;
+						}
 //					
 						if (departureInSec < 0)
 							departureInSec += 86400.0; // shifting flights with departure on previous day in UTC time +24 hours
@@ -264,6 +283,17 @@ public class SfAirScheduleBuilder {
 		bwcityPairs.close();
 		br.close();
 
+	}
+	
+	private void getUtcOffsetMap(String inputfile) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(new File(inputfile)));
+		while (br.ready()) {
+			String oneLine = br.readLine();
+			String[] lineEntries = new String[2];
+			lineEntries = oneLine.split("\t");
+			this.utcOffset.put(lineEntries[0], Integer.parseInt(lineEntries[1]));
+		}
+		br.close();
 	}
 
 	private double getOffsetUTC(String originCountry) {
@@ -400,14 +430,14 @@ public class SfAirScheduleBuilder {
 		String outputDirectory = "/media/data/work/repos/"
 				+ "shared-svn/studies/countries/eu/flight/sf_oag_flight_model/";
 
-		builder.filter(osmFile, oagFile, outputDirectory, EURO_COUNTRIES);
+		builder.filter(osmFile, oagFile, outputDirectory, EURO_COUNTRIES, UTC_OFFSET_FILE);
 
 		// GERMAN AIR TRAFFIC ONLY BELOW
 
 		outputDirectory = "/media/data/work/repos/"
 				+ "shared-svn/studies/countries/de/flight/sf_oag_flight_model/";
 		builder = new SfAirScheduleBuilder();
-		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES);
+		builder.filter(osmFile, oagFile, outputDirectory, GERMAN_COUNTRIES, UTC_OFFSET_FILE);
 
 	}
 

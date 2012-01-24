@@ -1,12 +1,18 @@
 package air.scenario;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
 
 public class SfUtcOffset {
 	
@@ -16,7 +22,26 @@ public class SfUtcOffset {
 //		
 //	}
 	
-	public int getUtcOffset(Coord coord) throws IOException, InterruptedException {
+	private Map<String, Coord> airportsInOsm;
+	
+	public void writeUtcOffset(String inputOsmFile, String outputFile) throws IOException, InterruptedException{
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputFile)));
+		SfOsmAerowayParser osmReader = new SfOsmAerowayParser(
+				TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+						TransformationFactory.WGS84));
+		osmReader.parse(inputOsmFile);
+		this.airportsInOsm = osmReader.airports;
+		
+		Iterator it = this.airportsInOsm.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry) it.next();
+			bw.write(pairs.getKey().toString() + "\t" + getUtcOffset(this.airportsInOsm.get(pairs.getKey())));
+			bw.newLine();
+		}
+		bw.close();
+	}
+	
+	public static int getUtcOffset(Coord coord) throws IOException, InterruptedException {
 		
 		Thread.sleep(2*1000);
 		
