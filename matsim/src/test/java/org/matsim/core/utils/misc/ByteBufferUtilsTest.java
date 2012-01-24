@@ -51,4 +51,26 @@ public class ByteBufferUtilsTest extends MatsimTestCase {
 		assertFalse(buffer.hasRemaining());
 	}
 	
+	/**
+	 * Tests {@link ByteBufferUtils#putObject(java.nio.ByteBuffer, Serializable)} and
+	 * {@link ByteBufferUtils#getObject(java.nio.ByteBuffer)}. 
+	 */
+	public void testPutGetObject() {
+		final ByteBuffer buffer = ByteBuffer.allocate(100);
+		buffer.putInt(5);
+		ByteBufferUtils.putObject(buffer, "foo bar");
+		buffer.putChar('?');
+		ByteBufferUtils.putObject(buffer, "Hello World");
+		buffer.putChar('!');
+		
+		buffer.flip();
+		
+		assertEquals(5, buffer.getInt());
+		assertEquals("foo bar", ByteBufferUtils.getObject(buffer));
+		assertEquals('?', buffer.getChar());
+		assertEquals("Hello World", ByteBufferUtils.getObject(buffer));
+		assertEquals('!', buffer.getChar());
+		assertFalse(buffer.hasRemaining());
+	}
+	
 }

@@ -20,6 +20,14 @@
 
 package org.matsim.core.utils.misc;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
 /**
@@ -59,6 +67,56 @@ public class ByteBufferUtils {
 			chBuffer[i] = buffer.getChar();
 		}
 		return new String(chBuffer);
+	}
+
+	/**
+	 * Writes the given Serializable to the ByteBuffer. First writes the length of the Serializable as int,
+	 * then writes the single bytes of the serialized object. The ByteBuffer's position is incremented according
+	 * to the length of the Serializable.
+	 * 
+	 */
+	public static void putObject(final ByteBuffer buffer, Serializable o){
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			ObjectOutput oout = new ObjectOutputStream(bos);   
+			oout.writeObject(o);
+			byte[] laneBytes = bos.toByteArray(); 
+			buffer.putInt(laneBytes.length);
+			for (int i = 0; i < laneBytes.length; i++) {
+				buffer.put(laneBytes[i]);
+			}
+			oout.close();
+			bos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+
+	/**
+	 * Reads a Object (Serializable) from a ByteBuffer. Reads first an int for the length of the Object,
+	 * and then the corresponding number of bytes. Increments the position of the
+	 * ByteBuffer according to the length of the object's byte array. 
+	 */
+	public static Object getObject(ByteBuffer buffer) {
+		int length = buffer.getInt();
+		byte[] bytes = new byte[length];
+		for (int i = 0; i < length; i++) {
+			bytes[i] = buffer.get();
+		}
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+		ObjectInput oin;
+		Object o = null;
+		try {
+			oin = new ObjectInputStream(bis);
+			o = oin.readObject();
+			bis.close();
+			oin.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return o;
 	}
 
 }
