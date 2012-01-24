@@ -25,199 +25,325 @@ import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
-import org.jgap.IChromosomePool;
+import org.jgap.IGeneConstraintChecker;
+import org.jgap.IInitializer;
+import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
-import org.jgap.impl.BooleanGene;
-import org.jgap.impl.DoubleGene;
 
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.JointPlanOptimizerFitnessFunction;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 
 /**
  * Extends org.jgap.Chromosome so that it can take negative fitness values.
  * @author thibautd
  */
-public class JointPlanOptimizerJGAPChromosome extends Chromosome {
+public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializer {
 	private static final long serialVersionUID = 1L;
-	private static final double EPSILON = 1E-7;
 
-	private final int nBooleanGenes;
-	private final int nDoubleGenes;
-	private final int nModeGenes;
-	private final double dayDuration;
-	private final List<Integer> nDurationGenes;
+	private final Chromosome delegate;
 
 	public JointPlanOptimizerJGAPChromosome(
-			final Configuration a_configuration,
-			final Gene[] genes) throws InvalidConfigurationException {
-		super(a_configuration, genes);
-		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
-
-		try {
-			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
-			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
-			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
-			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
-			this.nDurationGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNDurationGenesPerIndiv();
-		} catch (ClassCastException e) {
-			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
-					"must be initialized with JointPlanOptimizerJGAPConfiguration");
-		}
+			final Configuration configuration) throws InvalidConfigurationException {
+		this( new Chromosome( configuration ) );
 	}
 
 	public JointPlanOptimizerJGAPChromosome(
-			final Configuration a_configuration) throws InvalidConfigurationException {
-		super(a_configuration);
-		super.m_fitnessValue = JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE;
+			final Configuration configuration,
+			final List<Gene> genes) throws InvalidConfigurationException {
+		this( configuration , genes.toArray( new Gene[0] ) );
+	}
 
+	public JointPlanOptimizerJGAPChromosome(
+			final Configuration configuration,
+			final Gene[] genes) throws InvalidConfigurationException {
+		this( new Chromosome( configuration , genes ) );
+	}
+
+	// provide the constructors with constaint checker?
+
+	private JointPlanOptimizerJGAPChromosome(final Chromosome delegate) throws InvalidConfigurationException {
+		if ( !(delegate.getConfiguration() instanceof JointPlanOptimizerJGAPConfiguration) ) {
+			throw new InvalidConfigurationException(
+					"a "+this.getClass()+" instance must be initialised with a "
+					+"configuration of type JointPlanOptimizerJGAPConfiguration."
+					+" Got a "+delegate.getConfiguration().getClass()+" instead." );
+		}
+		this.delegate = delegate;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// modified methods
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * @see Chromosome#clone()
+	 */
+	@Override
+	public Object clone() {
 		try {
-			this.nBooleanGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumJointEpisodes();
-			this.nDoubleGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumEpisodes();
-			this.nModeGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNumModeGenes();
-			this.dayDuration = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getDayDuration();
-			this.nDurationGenes = ((JointPlanOptimizerJGAPConfiguration) a_configuration).getNDurationGenesPerIndiv();
-		} catch (ClassCastException e) {
-			throw new InvalidConfigurationException("JointPlanOptimizer chromosomes "+
-					"must be initialized with JointPlanOptimizerJGAPConfiguration");
+			return new JointPlanOptimizerJGAPChromosome( (Chromosome) delegate.clone() );
+		}
+		catch (InvalidConfigurationException e) {
+			throw new RuntimeException( e );
 		}
 	}
 
 	/**
-	 * Returns a deep clone of the chromosome, but with its fitness set to the
-	 * "no fitness" value.
+	 * @see org.jgap.IChromosome#setFitnessValue(double)
 	 */
 	@Override
-	public synchronized Object clone() {
-		// Before doing anything, make sure that a Configuration object
-		// has been set on this Chromosome. If not, then throw an
-		// IllegalStateException.
-		// ------------------------------------------------------------
-		if (getConfiguration() == null) {
-			throw new IllegalStateException(
-					"The active Configuration object must be set on this " +
-			"Chromosome prior to invocation of the clone() method.");
-		}
-		IChromosome copy = null;
-		// Now, first see if we can pull a Chromosome from the pool and just
-		// set its gene values (alleles) appropriately.
-		// ------------------------------------------------------------
-		IChromosomePool pool = getConfiguration().getChromosomePool();
-		if (pool != null) {
-			copy = pool.acquireChromosome();
-			if (copy != null) {
-				Gene[] genes = copy.getGenes();
-				for (int i = 0; i < size(); i++) {
-					genes[i].setAllele(getGene(i).getAllele());
-				}
-			}
-		}
-		try {
-			if (copy == null) {
-				// We couldn't fetch a Chromosome from the pool, so we need to create
-				// a new one. First we make a copy of each of the Genes. We explicity
-				// use the Gene at each respective gene location (locus) to create the
-				// new Gene that is to occupy that same locus in the new Chromosome.
-				// -------------------------------------------------------------------
-				int size = size();
-				if (size > 0) {
-					Gene[] copyOfGenes = new Gene[size];
-					for (int i = 0; i < copyOfGenes.length; i++) {
-						copyOfGenes[i] = getGene(i).newGene();
-						copyOfGenes[i].setAllele(getGene(i).getAllele());
-					}
-					// Now construct a new Chromosome with the copies of the genes and
-					// return it. Also clone the IApplicationData object.
-					// ---------------------------------------------------------------
-					/**@todo clone Config!*/
-					copy = new JointPlanOptimizerJGAPChromosome(getConfiguration(), copyOfGenes);
-				}
-				else {
-					copy = new JointPlanOptimizerJGAPChromosome(getConfiguration());
-				}
-				// do NOT clone the fitness, as this function is mainly used to
-				// create new chromosomes to be modified, and thus re-evaluated.
-				//copy.setFitnessValue(m_fitnessValue);
-				copy.setFitnessValueDirectly(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE);
-			}
-			// Clone constraint checker.
-			// -------------------------
-			copy.setConstraintChecker(getConstraintChecker());
-		}
-		catch (InvalidConfigurationException iex) {
-			throw new IllegalStateException(iex.getMessage());
-		}
-		// Also clone the IApplicationData object.
-		// ---------------------------------------
-		try {
-			copy.setApplicationData(cloneObject(getApplicationData()));
-		}
-		catch (Exception ex) {
-			throw new IllegalStateException(ex.getMessage());
-		}
-		return copy;
+	public void setFitnessValue(final double fitness) {
+		delegate.setFitnessValueDirectly( fitness );
 	}
+
+	/**
+	 * @see org.jgap.IChromosome#getFitnessValue()
+	 */
+	@Override
+	public double getFitnessValue() {
+		// should be OK not to modify
+		return delegate.getFitnessValue();
+	}
+
+	/**
+	 * @see Chromosome#equals(Object)
+	 */
+	@Override
+	public boolean equals(final Object other) {
+		// as the equality is interface based, this should be ok
+		return delegate.equals( other );
+	}
+
+	///**
+	// * @param conf 
+	// * @return 
+	// * @throws InvalidConfigurationException 
+	// * @see Chromosome#randomInitialChromosome(Configuration)
+	// */
+	//public static IChromosome randomInitialChromosome(final Configuration conf)
+	//	throws InvalidConfigurationException {
+	//	return new JointPlanOptimizerJGAPChromosome( (Chromosome) Chromosome.randomInitialChromosome(conf) );
+	//}
 
 	@Override
 	public boolean isHandlerFor(
 			final Object a_obj,
 			final Class a_class) {
-		return (a_class == JointPlanOptimizerJGAPChromosome.class);
+		return getClass().equals( a_class );
 	}
 
+	/**
+	 * Creates a new random chromosome, respecting the constraints defined by the
+	 * {@link ConstraintsManager} obtained from the configuration.
+	 */
 	@Override
 	public Object perform(
 			final Object a_obj,
 			final Class a_class,
-			final Object a_params)
-	throws Exception {
-		throw new UnsupportedOperationException("cannot create a random chromosome via perform");
-	}
+			final Object a_params) throws Exception {
+		IChromosome newChrom = new JointPlanOptimizerJGAPChromosome( (Chromosome) delegate.clone() );
+		JointPlanOptimizerJGAPConfiguration conf =
+			(JointPlanOptimizerJGAPConfiguration) newChrom.getConfiguration();
+		RandomGenerator random = conf.getRandomGenerator();
 
-	public static IChromosome randomInitialChromosome() 
-			throws InvalidConfigurationException {
-		throw new UnsupportedOperationException("cannot create a random chromosome"
-				+" in a static way, as the constraints depend on the corresponding plan.");
-	}
-
-	@Override
-	public double getFitnessValue() {
-		if ((JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != super.m_fitnessValue)) {
-			return super.m_fitnessValue;
+		for (Gene gene : newChrom.getGenes()) {
+			if ( !(gene instanceof DoubleGene) ) {
+				gene.setToRandomValue( random );
+			}
 		}
-		return super.calcFitnessValue();
-	}
 
-	@Override
-	public void setFitnessValue(final double a_newFitnessValue) {
-		if (
-				(JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE != a_newFitnessValue) &&
-				(Math.abs(m_fitnessValue - a_newFitnessValue) > 0.0000001)) {
+		conf.getConstraintsManager().randomiseChromosome( newChrom );
 
-			super.m_fitnessValue = a_newFitnessValue;
-		}
+		return newChrom;
 	}
 
 	/**
-	 * Exactly the same as the Chromosome method, but with a more efficient
-	 * implementation (less getter calls). Pass from 6% of CPU time used to 3%.
+	 * @see Chromosome#compareTo(Object)
 	 */
+	@Override
+	public int compareTo(final Object arg0) {
+		// as the comparison is interface based, this should be ok
+		return delegate.compareTo(arg0);
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// delegate methods
+	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * @see org.jgap.IChromosome#getGene(int)
+	 */
+	@Override
+	public Gene getGene(final int index) {
+		return delegate.getGene( index );
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#getGenes()
+	 */
+	@Override
+	public Gene[] getGenes() {
+		return delegate.getGenes();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setGenes(Gene[])
+	 */
+	@Override
+	public void setGenes(final Gene[] genes)
+		throws InvalidConfigurationException {
+		delegate.setGenes(genes);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#size()
+	 */
+	@Override
+	public int size() {
+		return delegate.size();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setFitnessValueDirectly(double)
+	 */
+	@Override
+	public void setFitnessValueDirectly(final double arg0) {
+		delegate.setFitnessValueDirectly(arg0);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#getFitnessValueDirectly()
+	 */
+	@Override
+	public double getFitnessValueDirectly() {
+		return delegate.getFitnessValueDirectly();
+	}
+
+	/**
+	 * @see Chromosome#toString()
+	 */
+	@Override
+	public String toString() {
+		return delegate.toString();
+	}
+
+	/**
+	 * @see Chromosome#hashCode()
+	 */
+	@Override
 	public int hashCode() {
-		Gene[] genes = getGenes();
-		int geneHashcode;
-		int hashCode = 1;
-		if (genes != null) {
-			for (int i = 0; i < genes.length; i++) {
-				Gene gene = genes[i];
-				if (gene == null) {
-					geneHashcode = -55;
-				}
-				else {
-					geneHashcode = gene.hashCode();
-				}
-				hashCode = 31 * hashCode + geneHashcode;
-			}
-		}
-		return hashCode;
+		return delegate.hashCode();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setIsSelectedForNextGeneration(boolean)
+	 */
+	@Override
+	public void setIsSelectedForNextGeneration(final boolean arg0) {
+		delegate.setIsSelectedForNextGeneration(arg0);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#isSelectedForNextGeneration()
+	 */
+	@Override
+	public boolean isSelectedForNextGeneration() {
+		return delegate.isSelectedForNextGeneration();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setConstraintChecker(IGeneConstraintChecker)
+	 */
+	@Override
+	public void setConstraintChecker(final IGeneConstraintChecker arg0)
+		throws InvalidConfigurationException {
+		delegate.setConstraintChecker(arg0);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setApplicationData(Object)
+	 */
+	@Override
+	public void setApplicationData(Object arg0) {
+		delegate.setApplicationData(arg0);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#getApplicationData()
+	 */
+	@Override
+	public Object getApplicationData() {
+		return delegate.getApplicationData();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#cleanup()
+	 */
+	@Override
+	public void cleanup() {
+		delegate.cleanup();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#getConfiguration()
+	 */
+	@Override
+	public Configuration getConfiguration() {
+		return delegate.getConfiguration();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#increaseAge()
+	 */
+	@Override
+	public void increaseAge() {
+		delegate.increaseAge();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#resetAge()
+	 */
+	@Override
+	public void resetAge() {
+		delegate.resetAge();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#setAge(int)
+	 */
+	@Override
+	public void setAge(int arg0) {
+		delegate.setAge(arg0);
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#getAge()
+	 */
+	@Override
+	public int getAge() {
+		return delegate.getAge();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#increaseOperatedOn()
+	 */
+	@Override
+	public void increaseOperatedOn() {
+		delegate.increaseOperatedOn();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#resetOperatedOn()
+	 */
+	@Override
+	public void resetOperatedOn() {
+		delegate.resetOperatedOn();
+	}
+
+	/**
+	 * @see org.jgap.IChromosome#operatedOn()
+	 */
+	@Override
+	public int operatedOn() {
+		return delegate.operatedOn();
 	}
 }
 

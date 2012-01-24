@@ -22,6 +22,7 @@ package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 import java.util.Random;
 
 import org.jgap.Genotype;
+import org.jgap.InvalidConfigurationException;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
@@ -84,10 +85,12 @@ public class JointPlanOptimizer extends JointPlanAlgorithm {
 					this.outputPath,
 					this.randomGenerator.nextLong());
 
-		JointPlanOptimizerPopulationFactory populationFactory =
-			new JointPlanOptimizerPopulationFactory(jgapConfig);
-
-		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
+		Genotype gaPopulation;
+		try {
+			gaPopulation = Genotype.randomInitialGenotype( jgapConfig );
+		} catch (InvalidConfigurationException e) {
+			throw new RuntimeException( e );
+		}
 
 		if (this.configGroup.getFitnessToMonitor()) {
 			//log.debug("monitoring fitness");

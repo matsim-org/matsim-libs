@@ -27,6 +27,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jgap.Configuration;
 import org.jgap.Genotype;
+import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.audit.IEvolutionMonitor;
 import org.matsim.api.core.v01.network.Network;
@@ -38,7 +39,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerPopulationFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
@@ -92,10 +92,12 @@ public class JPOForOptimization {
 					this.outputPath,
 					this.randomGenerator.nextLong());
 
-		JointPlanOptimizerPopulationFactory populationFactory =
-			new JointPlanOptimizerPopulationFactory(jgapConfig);
-
-		Genotype gaPopulation = populationFactory.createRandomInitialGenotype();
+		Genotype gaPopulation;
+		try {
+			gaPopulation = Genotype.randomInitialGenotype( jgapConfig );
+		} catch (InvalidConfigurationException e) {
+			throw new RuntimeException( e );
+		}
 
 		if (configGroup.getFitnessToMonitor()) {
 			//log.debug("monitoring fitness");
