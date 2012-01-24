@@ -1,7 +1,7 @@
 package util.algebra;
 
 
-public class MatrixNDImpl<T> implements MatrixND<T>, Cloneable {
+public class MatrixNDImpl<T> implements MatrixND<T> {
 
 	//Attributes
 	private int[] dimensions;
@@ -30,7 +30,9 @@ public class MatrixNDImpl<T> implements MatrixND<T>, Cloneable {
 		}
 	}
 	public MatrixNDImpl(MatrixNDImpl<T> matrixNDimensions) {
-		this.dimensions = matrixNDimensions.getDimensions();
+		dimensions = new int[matrixNDimensions.getNumDimensions()];
+		for(int d=0; d<matrixNDimensions.getNumDimensions(); d++)
+			dimensions[d] = matrixNDimensions.getDimension(d);
 		if(dimensions.length==0)
 			value = matrixNDimensions.getElement(new int[]{});
 		else {
@@ -46,8 +48,8 @@ public class MatrixNDImpl<T> implements MatrixND<T>, Cloneable {
 		return dimensions.length;
 	}
 	@Override
-	public int[] getDimensions() {
-		return dimensions;
+	public int getDimension(int pos) {
+		return dimensions[pos];
 	}
 	@Override
 	public T getElement(int[] position) {
@@ -81,7 +83,7 @@ public class MatrixNDImpl<T> implements MatrixND<T>, Cloneable {
 	public static void main(String[] args) {
 		MatrixND<Double> matrixNDimensions = new MatrixNDImpl<Double>(new int[]{3,2,4});
 		System.out.println(matrixNDimensions.getNumDimensions());
-		System.out.println(matrixNDimensions.getDimensions()[2]);
+		System.out.println(matrixNDimensions.getDimension(2));
 		matrixNDimensions.setElement(new int[]{0,1,2}, 7.0);
 		System.out.println(matrixNDimensions.getElement(new int[]{0,1,2}));
 		MatrixND<Double> matrixNDimensions2 = new MatrixNDImpl<Double>((MatrixNDImpl<Double>)matrixNDimensions);

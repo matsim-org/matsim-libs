@@ -6,13 +6,15 @@ public class Trip {
 	private String purpose;
 	private Integer startTime;
 	private Integer endTime;
+	private String placeType;
 	
 	//Constructors
-	public Trip(String purpose, Integer startTime, Integer endTime) {
+	public Trip(String purpose, Integer startTime, Integer endTime, String placeType) {
 		super();
 		this.purpose = purpose;
 		this.startTime = startTime;
 		this.endTime = endTime;
+		this.placeType = placeType;
 	}
 	
 	//Methods
@@ -25,6 +27,9 @@ public class Trip {
 	}
 	public Integer getEndTime() {
 		return endTime;
+	}
+	public String getPlaceType() {
+		return placeType;
 	}
 	
 }

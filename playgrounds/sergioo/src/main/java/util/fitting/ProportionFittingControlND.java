@@ -29,7 +29,7 @@ public class ProportionFittingControlND extends FittingControlND {
 				if(dimensionsFrom[i]==dimensionsTo[d])
 					inDimension=true;
 			if(!inDimension) {
-				positionSize[j] = data.getDimensions()[dimensionsFrom[i]];
+				positionSize[j] = data.getDimension(dimensionsFrom[i]);
 				j++;
 			}
 		}
@@ -101,7 +101,7 @@ public class ProportionFittingControlND extends FittingControlND {
 		if(ds==dimensions.length)
 			sum[0]+=data.getElement(matrixPosition);
 		else
-			for(int d=0; d<data.getDimensions()[dimensions[ds]]; d++) {
+			for(int d=0; d<data.getDimension(dimensions[ds]); d++) {
 				matrixPosition[dimensions[ds]]=d;
 				sum(sum, ds+1, dimensions, matrixPosition, data);
 			}
@@ -110,7 +110,7 @@ public class ProportionFittingControlND extends FittingControlND {
 		if(ds==dimensionsTo.length)
 			data.setElement(matrixPosition, data.getElement(matrixPosition)*sum/sum2);
 		else
-			for(int d=0; d<data.getDimensions()[dimensionsTo[ds]]; d++) {
+			for(int d=0; d<data.getDimension(dimensionsTo[ds]); d++) {
 				matrixPosition[dimensionsTo[ds]]=d;
 				modifyData(sum, sum2, ds+1, matrixPosition, data);
 			}

@@ -178,22 +178,22 @@ public class SecondaryFacilitiesGenerator {
 			int[] dimensions = new int[] {facilitiesPostalSector.size(), numURAPlaceTypes};
 			FittingControl1D[] fittingControls = new FittingControl1D[dimensions.length];
 			MatrixND<Double> controlConstants1=new MatrixNDImpl<Double>(new int[]{numURAPlaceTypes});
-			for(int i=0; i<controlConstants1.getDimensions()[0]; i++)
+			for(int i=0; i<controlConstants1.getDimension(0); i++)
 				controlConstants1.setElement(new int[]{i}, URA_PLACE_TYPES.values()[i].getNumPositions(areas.get(URA_PLACE_TYPES.values()[i])));
 			fittingControls[0]=new TotalFittingControl1D(controlConstants1);
 			MatrixND<Double> controlConstants2=new MatrixNDImpl<Double>(new int[]{facilitiesPostalSector.size(), numURAPlaceTypes});
 			Iterator<Tuple<String, Coord>> facilitiesI = facilitiesPostalSector.values().iterator();
-			for(int i=0; i<controlConstants2.getDimensions()[0]; i++) {
+			for(int i=0; i<controlConstants2.getDimension(0); i++) {
 				String facilityType = facilitiesI.next().getFirst();
 				Set<Integer> zeroPositions = new HashSet<Integer>();
-				for(int j=0; j<controlConstants2.getDimensions()[1]; j++)
+				for(int j=0; j<controlConstants2.getDimension(1); j++)
 					if(controlConstants1.getElement(new int[]{j})==0 && fractions.get(facilityType)[j]>0)
 						zeroPositions.add(j);
 				double sum=0;
-				for(int j=0; j<controlConstants2.getDimensions()[1]; j++)		
+				for(int j=0; j<controlConstants2.getDimension(1); j++)		
 					if(!zeroPositions.contains(j))
 						sum += fractions.get(facilityType)[j];
-				for(int j=0; j<controlConstants2.getDimensions()[1]; j++)
+				for(int j=0; j<controlConstants2.getDimension(1); j++)
 					if(!zeroPositions.contains(j))
 						controlConstants2.setElement(new int[]{i,j}, sum==0?0:fractions.get(facilityType)[j]/sum);
 					else

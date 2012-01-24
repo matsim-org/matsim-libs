@@ -15,13 +15,13 @@ public class TotalFittingControl1D extends FittingControl1D{
 		int[] matrixPosition = new int[data.getNumDimensions()];
 		getMatrixPosition(matrixPosition, position, dimension);
 		double sum = 0;
-		for(int d=0; d<data.getDimensions()[dimension]; d++) {
-			matrixPosition[dimension]=d;
+		for(int d=0; d<data.getDimension(dimension); d++) {
+			matrixPosition[dimension] = d;
 			sum += data.getElement(matrixPosition);
 		}
 		if(!(controlConstants.getElement(position)==0 && sum==0))
-			for(int d=0; d<data.getDimensions()[dimension]; d++) {
-				matrixPosition[dimension]=d;
+			for(int d=0; d<data.getDimension(dimension); d++) {
+				matrixPosition[dimension] = d;
 				data.setElement(matrixPosition, data.getElement(matrixPosition)*controlConstants.getElement(position)/sum);
 			}
 	}

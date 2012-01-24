@@ -27,8 +27,8 @@ public class TotalFittingControlND extends FittingControlND {
 		if(ds==dimensions.length)
 			sum[0]+=data.getElement(matrixPosition);
 		else
-			for(int d=0; d<data.getDimensions()[dimensions[ds]]; d++) {
-				matrixPosition[dimensions[ds]]=d;
+			for(int d=0; d<data.getDimension(dimensions[ds]); d++) {
+				matrixPosition[dimensions[ds]] = d;
 				sum(sum, ds+1, dimensions, matrixPosition, data);
 			}
 	}
@@ -37,8 +37,8 @@ public class TotalFittingControlND extends FittingControlND {
 		if(ds==dimensions.length)
 			data.setElement(matrixPosition, data.getElement(matrixPosition)*controlConstants.getElement(position)/sum);
 		else
-			for(int d=0; d<data.getDimensions()[dimensions[ds]]; d++) {
-				matrixPosition[dimensions[ds]]=d;
+			for(int d=0; d<data.getDimension(dimensions[ds]); d++) {
+				matrixPosition[dimensions[ds]] = d;
 				modifyData(sum, ds+1, dimensions, matrixPosition, data, position);
 			}
 	}

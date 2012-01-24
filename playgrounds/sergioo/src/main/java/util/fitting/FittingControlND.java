@@ -14,6 +14,9 @@ public abstract class FittingControlND {
 	}
 	
 	//Methods
+	public MatrixND<Double> getControlConstants() {
+		return controlConstants;
+	}
 	public void iterate(MatrixND<Double> data, int[] dimensions) {
 		int[] positionSize = new int[data.getNumDimensions()-dimensions.length];
 		int j=0;
@@ -23,7 +26,7 @@ public abstract class FittingControlND {
 				if(i==dimensions[d])
 					inDimension = true;
 			if(!inDimension) {
-				positionSize[j] = data.getDimensions()[i];
+				positionSize[j] = data.getDimension(i);
 				j++;
 			}
 		}

@@ -13,12 +13,15 @@ public abstract class FittingControl1D {
 	}
 	
 	//Methods
+	public MatrixND<Double> getControlConstants() {
+		return controlConstants;
+	}
 	public void iterate(MatrixND<Double> data, int dimension) {
 		int[] positionSize = new int[data.getNumDimensions()-1];
 		int j=0;
 		for(int i=0; i<data.getNumDimensions(); i++)
 			if(i!=dimension) {
-				positionSize[j] = data.getDimensions()[i];
+				positionSize[j] = data.getDimension(i);
 				j++;
 			}
 		applyRules(data, 0, new int[positionSize.length], positionSize, dimension);

@@ -15,11 +15,11 @@ public class ProportionFittingControl1D extends FittingControl1D {
 		int[] matrixPosition = new int[data.getNumDimensions()];
 		getMatrixPosition(matrixPosition, position, dimension);
 		double sum = 0;
-		for(int d=0; d<data.getDimensions()[dimension]; d++) {
+		for(int d=0; d<data.getDimension(dimension); d++) {
 			matrixPosition[dimension]=d;
 			sum += data.getElement(matrixPosition);
 		}
-		for(int d=0; d<data.getDimensions()[dimension]; d++) {
+		for(int d=0; d<data.getDimension(dimension); d++) {
 			matrixPosition[dimension]=d;
 			int[] controlPosition = new int[position.length+1];
 			for(int i=0; i<position.length; i++)

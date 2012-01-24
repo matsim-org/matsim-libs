@@ -1,6 +1,6 @@
 package playground.sergioo.FacilitiesGenerator;
 
-public class BuildingData {
+public class MPAreaData {
 
 	//Attributes
 	private int id;
@@ -9,7 +9,7 @@ public class BuildingData {
 	private double modeShare;
 
 	//Methods
-	public BuildingData(int id, String type, double maxArea, double modeShare) {
+	public MPAreaData(int id, String type, double maxArea, double modeShare) {
 		super();
 		this.id = id;
 		this.type = type;

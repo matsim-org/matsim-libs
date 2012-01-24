@@ -7,18 +7,19 @@ import org.apache.commons.math.stat.clustering.Clusterable;
 import util.algebra.PointNDImpl;
 
 public class PointPerson extends PointNDImpl.Double implements Clusterable<PointPerson> {
-
 	
 	//Attributes
 	private String id;
 	private String occupation;
 	private double weight = 1;
+	private String placeType;
 	
 	//Constructors
-	public PointPerson(String id, String occupation, java.lang.Double[] times) {
+	public PointPerson(String id, String occupation, java.lang.Double[] times, String placeType) {
 		super(times);
 		this.id = id;
 		this.occupation = occupation;
+		this.placeType = placeType;
 	}
 	private PointPerson(int dimension, java.lang.Double initialElement) {
 		super(dimension, initialElement);
@@ -30,6 +31,9 @@ public class PointPerson extends PointNDImpl.Double implements Clusterable<Point
 	}
 	public String getOccupation() {
 		return occupation;
+	}
+	public String getPlaceType() {
+		return placeType;
 	}
 	public double getWeight() {
 		return weight;
