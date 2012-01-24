@@ -98,7 +98,7 @@ public class RunInternalizationTest {
 		
 //		installScoringFunctionFactory();
 		installTravelCostCalculatorFactory();
-		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(this.emissionVehicles, emissionModule));
+		this.controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule));
 		this.controler.run();
 	}
 

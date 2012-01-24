@@ -398,11 +398,11 @@ public class EmissionModule {
 		return hbefaTrafficSituation;
 	}
 
-	public WarmEmissionHandler getWarmEmissionsHandler() {
+	public WarmEmissionHandler getWarmEmissionHandler() {
 		return warmEmissionHandler;	
 	}
 
-	public ColdEmissionHandler getColdEmissionsHandler() {
+	public ColdEmissionHandler getColdEmissionHandler() {
 		return coldEmissionHandler;
 	}
 

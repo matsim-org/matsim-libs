@@ -91,8 +91,8 @@ public class RunEmissionToolOffline {
 		
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 		
 		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);

@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.EmissionModule;
 
@@ -42,15 +41,13 @@ import playground.benjamin.emissions.EmissionModule;
 public class InternalizeEmissionsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
 	
-	Vehicles emissionVehicles;
 	Controler controler;
 	EmissionModule emissionModule;
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
 
-	public InternalizeEmissionsControlerListener(Vehicles emissionVehicles, EmissionModule emissionModule) {
-		this.emissionVehicles = emissionVehicles;
+	public InternalizeEmissionsControlerListener(EmissionModule emissionModule) {
 		this.emissionModule = emissionModule;
 	}
 
@@ -59,8 +56,8 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		controler = event.getControler();
 		
 		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionsHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionsHandler());
+		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
 	}
 
 	@Override

@@ -52,6 +52,7 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 	// TODO: get this from somewhere else?
 	EmissionCostModule costModule = new EmissionCostModule();
 
+
 	public EmissionTravelCostCalculator(PersonalizableTravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, EmissionModule emissionModule) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
@@ -75,36 +76,34 @@ public class EmissionTravelCostCalculator implements PersonalizableTravelCost{
 		double distance = link.getLength();
 		double distanceCost = - this.distanceCostRateCar * distance;
 		double generalizedDistanceCost = this.marginalUtlOfMoney * distanceCost;
-		
-		
+
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
 		the average travel time on that link in the last iteration) would have to pay if chosing that link in the next
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice (not implemented)! */
-		
-		Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
-		VehicleType vehicleType = vehicle.getType();
-		String vehicleInformation = vehicleType.getId().toString();
-		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionsHandler().getWarmEmissionAnalysisModule();
-		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-				person.getId(),
-				Integer.parseInt(((LinkImpl) link).getType()),
-				link.getFreespeed(),
-				distance,
-				linkTravelTime,
-				vehicleInformation
-				);
-
-		double expectedEmissionCosts = this.costModule.calculateWarmEmissionCosts(expectedWarmEmissions);
-		double generalizedExpectedEmissionCost = this.marginalUtlOfMoney * expectedEmissionCosts ;
-		logger.warn("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
-		
-		// Test the routing:
-//		if(!link.getId().equals(new IdImpl("11"))) 
-//			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
-//		else 
+			
+			Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+			VehicleType vehicleType = vehicle.getType();
+			String vehicleInformation = vehicleType.getId().toString();
+			WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
+			Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
+					person.getId(),
+					Integer.parseInt(((LinkImpl) link).getType()),
+					link.getFreespeed(),
+					distance,
+					linkTravelTime,
+					vehicleInformation
+			);
+			
+			double expectedEmissionCosts = this.costModule.calculateWarmEmissionCosts(expectedWarmEmissions);
+			double generalizedExpectedEmissionCost = this.marginalUtlOfMoney * expectedEmissionCosts ;
+//			logger.warn("expected emission costs for person " + person.getId() + " on link " + link.getId() + " at time " + time + " are calculated to " + expectedEmissionCosts);
+			
+////		// Test the routing:
+////		if(!link.getId().equals(new IdImpl("11"))) 
+////			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost;
+////		else 
 			generalizedTravelCost = generalizedTravelTimeCost + generalizedDistanceCost + generalizedExpectedEmissionCost;
-		
-		return generalizedTravelCost;
-	}
 
+			return generalizedTravelCost;
+	}
 }

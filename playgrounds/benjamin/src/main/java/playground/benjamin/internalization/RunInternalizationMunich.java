@@ -49,6 +49,8 @@ public class RunInternalizationMunich {
 		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
 		controler.setTravelCostCalculatorFactory(emissionTccf);
 		
+		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule));
+		
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}
