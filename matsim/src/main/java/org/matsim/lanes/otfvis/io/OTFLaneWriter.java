@@ -80,11 +80,16 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 			double corrFactor = this.writeLinkData(out, visLink);
 			linkLengthCorrectionFactorsByLinkId.put(visLink.getLink().getId(), corrFactor);
 		}
-		//write the data for the lanes
-		out.putInt(this.lanes.getLanesToLinkAssignments().size());
-		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
-			VisLink visLink = this.network.getVisLinks().get(l2l.getLinkId());
-			this.writeLaneData(out, visLink, l2l, linkLengthCorrectionFactorsByLinkId);
+		//write the data for the lanes 
+		if (this.lanes.getLanesToLinkAssignments() != null){
+			out.putInt(this.lanes.getLanesToLinkAssignments().size());
+			for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
+				VisLink visLink = this.network.getVisLinks().get(l2l.getLinkId());
+				this.writeLaneData(out, visLink, l2l, linkLengthCorrectionFactorsByLinkId);
+			}
+		}
+		else {
+			out.putInt(0);
 		}
 	}
 	
