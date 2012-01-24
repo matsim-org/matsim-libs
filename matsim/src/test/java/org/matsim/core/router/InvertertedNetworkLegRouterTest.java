@@ -36,8 +36,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
@@ -57,8 +55,6 @@ public class InvertertedNetworkLegRouterTest {
 	@Test
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
-
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
 		TravelCostCalculatorFactory tc = new TravelCostCalculatorFactoryImpl();
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
@@ -68,8 +64,8 @@ public class InvertertedNetworkLegRouterTest {
 		Activity fromAct = new ActivityImpl("h", new IdImpl("12"));
 		Activity toAct = new ActivityImpl("h", new IdImpl("78"));
 
-		InvertedNetworkLegRouter router = new InvertedNetworkLegRouter(f.s.getNetwork(), routeFactory, lcpFactory, 
-				tc, f.s.getConfig().planCalcScore(), tt);
+		InvertedNetworkLegRouter router = new InvertedNetworkLegRouter(f.s, lcpFactory, 
+				tc, tt);
 		//test 1
 		tt.setTurningMoveCosts(0.0, 100.0, 50.0);
 		

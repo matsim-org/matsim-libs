@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
@@ -66,11 +68,11 @@ public class InvertedNetworkLegRouter implements LegRouter{
 
 	private Network network = null;
 
-	public InvertedNetworkLegRouter(Network network, ModeRouteFactory routeFactory, 
-			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelCostCalculatorFactory travelCostCalculatorFactory, 
-			PlanCalcScoreConfigGroup cnScoringGroup, TravelTime travelTimes) {
-		this.network = network;
-		this.routeFactory = routeFactory;
+	public InvertedNetworkLegRouter(Scenario sc, LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelCostCalculatorFactory travelCostCalculatorFactory, 
+			TravelTime travelTimes) {
+		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
+		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
+		this.network = sc.getNetwork();
 
 		if (!(travelTimes instanceof PersonalizableLinkToLinkTravelTime)){
 			throw new IllegalStateException("If link to link travel times should be used for routing the TravelTime instance must be an instance of PersonalizableLinkToLinkTravelTime" +

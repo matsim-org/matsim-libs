@@ -1270,9 +1270,8 @@ public class Controler {
 		}
 
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
-			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.network,
-					((PopulationFactoryImpl) this.population.getFactory()).getModeRouteFactory(), this.getLeastCostPathCalculatorFactory(), 
-					this.getTravelCostCalculatorFactory(), this.getConfig().planCalcScore(), travelTimes);
+			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.getScenario(),
+					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), travelTimes);
 			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);
 			log.warn("Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.");
 		}
