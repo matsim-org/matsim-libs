@@ -46,6 +46,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
+import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.pt.qsim.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.ptproject.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
@@ -782,17 +784,17 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 */
 	class VisDataImpl implements VisData {
 		//TODO should be the same value as in OTFLaneWriter
-//		private static final double nodeOffsetMeter = 0.0;
-		
-//		private double visLaneLength;
-//		private double visLinkLength;
-//		private double linkScale;
+		private static final double nodeOffsetMeter = 20.0;
+		private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+		private double linkScale;
+		private 	OTFLane visLane ;
 		private double laneStartPointOnLink;
+		
 		VisDataImpl(){
-//			this.linkScale = (QLane.this.queueLink.getLink().getLength() - 2.0 * nodeOffsetMeter) / QLane.this.queueLink.getLink().getLength();
-//			this.linkScale = 1.0;
-//			this.visLaneLength = linkScale * QLane.this.length;
-//			this.visLinkLength = linkScale * QLane.this.queueLink.getLink().getLength();
+			this.linkScale = (QLane.this.qLink.getLink().getLength() - 2.0 * nodeOffsetMeter) / QLane.this.qLink.getLink().getLength();
+			double linkLengthCorrectionFactor = ((LinkImpl)QLane.this.qLink.getLink()).getEuklideanDistance() / QLane.this.qLink.getLink().getLength();
+			visLane = laneModelBuilder.createOTFLane(QLane.this.laneData, QLane.this, QLane.this.qLink.getLink().getLength(), 
+					linkScale, linkLengthCorrectionFactor);
 			this.laneStartPointOnLink = QLane.this.qLink.getLink().getLength() -  QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();
 		}
 		
@@ -818,7 +820,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
 					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //					log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.laneStartPointOnLink + lastDistanceFromFromNode, lane, speedValue);
+//					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.laneStartPointOnLink + lastDistanceFromFromNode, lane, speedValue);
+					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.visLane.getStartPosition() + lastDistanceFromFromNode, lane, speedValue);
 				}
 				for (QVehicle veh : QLane.this.vehQueue) {
 					double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
@@ -827,7 +830,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
 					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //					log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.laneStartPointOnLink +  lastDistanceFromFromNode, lane, speedValue);
+//					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.laneStartPointOnLink +  lastDistanceFromFromNode, lane, speedValue);
+					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, this.visLane.getStartPosition() +  lastDistanceFromFromNode, lane, speedValue);
 				}
 			}
 			return positions;

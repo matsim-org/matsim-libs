@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
@@ -35,6 +34,7 @@ import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LaneDefinitions;
 import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
@@ -50,7 +50,7 @@ import org.matsim.vis.vecmathutils.VectorUtils;
  */
 public class OTFLaneWriter extends OTFDataWriter<Void> {
 
-	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
+//	private static final Logger log = Logger.getLogger(OTFLaneWriter.class);
 	
 	public static final boolean DRAW_LINK_TO_LINK_LINES = true;
 	
@@ -61,6 +61,8 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 	private final transient LaneDefinitions lanes;
 	
 	private Map<Id, java.lang.Double> linkScaleByLinkIdMap;
+	
+	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
 	
 	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions laneDefinitions){
 		this.network = visNetwork;
@@ -139,19 +141,11 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 		out.putInt(noLanes);
 		//write the lane data
 		for (Lane lane : l2l.getLanes().values()){
-			String id = lane.getId().toString();
-			double startPoint = (visLink.getLink().getLength() -  lane.getStartsAtMeterFromLinkEnd()) * linkScale * linkLengthCorrectionFactor;
-//			log.error("lane " + qLane.getId() + " starts at: " + startPoint);
 			QLane ql = this.getQLane(lane.getId(), (QLinkLanesImpl)visLink);
-			double endPoint = startPoint + (ql.getLength() *  linkScale * linkLengthCorrectionFactor);
-			int alignment = lane.getAlignment();
-			ByteBufferUtils.putString(out, id);
-			out.putDouble(startPoint);
-			out.putDouble(endPoint);
-			out.putInt(alignment);
-			out.putDouble(lane.getNumberOfRepresentedLanes());
-			if (alignment > maxAlignment) {
-				maxAlignment = alignment;
+			OTFLane visLane = laneModelBuilder.createOTFLane(lane, ql, visLink.getLink().getLength(), linkScale, linkLengthCorrectionFactor);
+			ByteBufferUtils.putObject(out, visLane);
+			if (visLane.getAlignment() > maxAlignment) {
+				maxAlignment = visLane.getAlignment();
 			}
 		}
 		out.putInt(maxAlignment);
@@ -190,26 +184,6 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 			out.putInt(0);
 		}
 	}
-	
-//	private Point2D.Double calculateNormalOfLink(Link link) {
-//		//get coordinates
-//		Point2D.Double linkStartPoint = new Point2D.Double(link.getFromNode().getCoord().getX() - OTFServerQuad2.offsetEast,
-//				link.getFromNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-//		Point2D.Double linkEndPoint = new Point2D.Double(link.getToNode().getCoord().getX()  - OTFServerQuad2.offsetEast,
-//				link.getToNode().getCoord().getY() - OTFServerQuad2.offsetNorth);
-//		//scale
-//		Tuple<Double, Double> scaledTuple = VectorUtils.scaleVector(linkStartPoint, linkEndPoint, this.linkScale);
-//		linkStartPoint = scaledTuple.getFirst();
-//		linkEndPoint = scaledTuple.getSecond();
-//
-//		//calculate middle of toLink start
-//		Point2D.Double deltaLink = new Point2D.Double(linkEndPoint.x - linkStartPoint.x, linkEndPoint.y - linkStartPoint.y);
-//		double euclideanLinkLength = this.calculateEuclideanLinkLength(deltaLink);
-//		Point2D.Double deltaLinkNorm = new Point2D.Double(deltaLink.x / euclideanLinkLength, deltaLink.y / euclideanLinkLength);
-//		Point2D.Double normalizedLinkOrthogonal = new Point2D.Double(deltaLinkNorm.y, - deltaLinkNorm.x);
-//		return normalizedLinkOrthogonal;
-//	}
-	
 	
   private double calculateEuclideanLinkLength(Point2D.Double deltaLink) {
   	return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));

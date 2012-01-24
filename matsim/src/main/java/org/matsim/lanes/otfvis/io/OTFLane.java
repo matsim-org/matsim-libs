@@ -20,6 +20,7 @@
 package org.matsim.lanes.otfvis.io;
 
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,8 @@ import org.matsim.signalsystems.otfvis.io.OTFSignal;
 /**
  * @author dgrether
  */
-public class OTFLane {
+public class OTFLane implements Serializable {
+	
 	private String id = null;
 	private double endPosition;
 	private double startPosition;

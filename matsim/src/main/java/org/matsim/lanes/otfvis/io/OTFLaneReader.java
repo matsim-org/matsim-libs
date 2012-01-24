@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
@@ -41,6 +42,8 @@ public class OTFLaneReader extends OTFDataReader {
 	
 	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
+	private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
+	
 	public OTFLaneReader(){
 	}
 	
@@ -98,13 +101,8 @@ public class OTFLaneReader extends OTFDataReader {
 		laneLinkData = this.drawer.getLanesLinkData().get(linkId);
 		int noLanes = in.getInt();
 		for (int i = 0; i < noLanes; i++){
-			String laneId = ByteBufferUtils.getString(in);
-			OTFLane data = new OTFLane(laneId);
+			OTFLane data = (OTFLane) ByteBufferUtils.getObject(in);
 			laneLinkData.addLaneData(data);
-			data.setStartPosition(in.getDouble());
-			data.setEndPosition(in.getDouble());
-			data.setAlignment(in.getInt());
-			data.setNumberOfLanes(in.getDouble());
 		}
 		laneLinkData.setMaximalAlignment(in.getInt());
 		//read and process the connections
