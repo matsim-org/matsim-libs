@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ScoringFromEmissions.java
+ * RunMunich1pct.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,63 +19,38 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.scoring.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.interfaces.BasicScoring;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.Controler;
 
-import playground.benjamin.emissions.events.ColdEmissionEvent;
-import playground.benjamin.emissions.events.ColdEmissionEventHandler;
-import playground.benjamin.emissions.events.WarmEmissionEvent;
-import playground.benjamin.emissions.events.WarmEmissionEventHandler;
+import playground.benjamin.emissions.EmissionModule;
 
 /**
  * @author benjamin
  *
  */
-@Deprecated
-public class ScoringFromEmissions implements BasicScoring, WarmEmissionEventHandler, ColdEmissionEventHandler{
+public class RunInternalizationMunich {
 	
-	private static final Logger logger = Logger.getLogger(ScoringFromEmissions.class);
+	private static String configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+	
+	public static void main(String[] args) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		confReader.readFile(configFile);
+		Controler controler = new Controler(config);
+		Scenario scenario = controler.getScenario();
 
-	CharyparNagelScoringParameters params;
-
-	public ScoringFromEmissions(CharyparNagelScoringParameters params) {
-		this.params = params;
-		logger.info("using " + ScoringFromEmissions.class.getName() + "...");
-	}
-
-	@Override
-	public void finish() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public double getScore() {
-		return 0;
-	}
-
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void handleEvent(WarmEmissionEvent event) {
-		// TODO Auto-generated method stub
+		EmissionModule emissionModule = new EmissionModule(scenario);
+		emissionModule.createLookupTables();
+		emissionModule.createEmissionHandler();
 		
-	}
-
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
+		EmissionTravelCostCalculatorFactory emissionTccf = new EmissionTravelCostCalculatorFactory(emissionModule);
+		controler.setTravelCostCalculatorFactory(emissionTccf);
 		
-	}
-
-	@Override
-	public void handleEvent(ColdEmissionEvent event) {
-		// TODO Auto-generated method stub
-		
+		controler.setOverwriteFiles(true);
+		controler.run();
 	}
 
 }

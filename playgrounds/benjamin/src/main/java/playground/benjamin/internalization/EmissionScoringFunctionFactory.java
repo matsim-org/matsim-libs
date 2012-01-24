@@ -35,6 +35,7 @@ import org.matsim.core.scoring.charyparNagel.LegScoringFunction;
  * @author benjamin
  *
  */
+@Deprecated
 public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	Controler controler;
