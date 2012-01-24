@@ -32,13 +32,16 @@ import playground.benjamin.emissions.EmissionModule;
  */
 public class RunInternalizationMunich {
 	
-	private static String configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
+//	private static String configFile = "../../detailedEval/internalization/munich1pct/input/config_munich_1pct.xml";
 	
 	public static void main(String[] args) {
+		
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
-		confReader.readFile(configFile);
+//		confReader.readFile(configFile);
+		confReader.readFile(args[0]);
+		
 		Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 
