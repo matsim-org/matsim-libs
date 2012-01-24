@@ -19,18 +19,11 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis.gui;
 
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
-import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-
-import org.matsim.vis.otfvis.OTFClientControl;
 
 
 /**
@@ -68,45 +61,45 @@ public class OTFFrame extends JFrame {
 	}
 
 	public void endProgram(int code) {
-		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
-			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
-			final JOptionPane optionPane = new JOptionPane(
-					"There are potentially unsaved changes in Preferences.\nQuit anyway?",
-					JOptionPane.QUESTION_MESSAGE,
-					JOptionPane.YES_NO_OPTION);
-			dialog.setContentPane(optionPane);
-			dialog.setDefaultCloseOperation(
-					JDialog.DO_NOTHING_ON_CLOSE);
-			dialog.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent we) {
-
-				}
-			});
-			optionPane.addPropertyChangeListener(
-					new PropertyChangeListener() {
-						@Override
-						public void propertyChange(PropertyChangeEvent e) {
-							String prop = e.getPropertyName();
-
-							if (dialog.isVisible()
-									&& (e.getSource() == optionPane)
-									&& (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-								//If you were going to check something
-								//before closing the window, you'd do
-								//it here.
-								dialog.setVisible(false);
-							}
-						}
-					});
-			dialog.pack();
-			dialog.setVisible(true);
-			int value = ((Integer)optionPane.getValue()).intValue();
-			if (value == JOptionPane.NO_OPTION) {
-				return; // do not quit
-			}
-
-		}
+//		if(OTFClientControl.getInstance().getOTFVisConfig().isModified()) {
+//			final JDialog dialog = new JDialog((JFrame)null, "Preferences are unsaved and modified...", true);
+//			final JOptionPane optionPane = new JOptionPane(
+//					"There are potentially unsaved changes in Preferences.\nQuit anyway?",
+//					JOptionPane.QUESTION_MESSAGE,
+//					JOptionPane.YES_NO_OPTION);
+//			dialog.setContentPane(optionPane);
+//			dialog.setDefaultCloseOperation(
+//					JDialog.DO_NOTHING_ON_CLOSE);
+//			dialog.addWindowListener(new WindowAdapter() {
+//				@Override
+//				public void windowClosing(WindowEvent we) {
+//
+//				}
+//			});
+//			optionPane.addPropertyChangeListener(
+//					new PropertyChangeListener() {
+//						@Override
+//						public void propertyChange(PropertyChangeEvent e) {
+//							String prop = e.getPropertyName();
+//
+//							if (dialog.isVisible()
+//									&& (e.getSource() == optionPane)
+//									&& (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+//								//If you were going to check something
+//								//before closing the window, you'd do
+//								//it here.
+//								dialog.setVisible(false);
+//							}
+//						}
+//					});
+//			dialog.pack();
+//			dialog.setVisible(true);
+//			int value = ((Integer)optionPane.getValue()).intValue();
+//			if (value == JOptionPane.NO_OPTION) {
+//				return; // do not quit
+//			}
+//
+//		}
 		System.exit(code);
 	}
 
