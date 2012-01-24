@@ -55,6 +55,7 @@ public class Controller2D extends Controler {
 		setOverwriteFiles(true);
 		setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		this.addMobsimFactory("hybridQ2D",new HybridQ2DMobsimFactory());
+		this.setSignalsControllerListenerFactory(new Sim2DSignalsControllerListenerFactory());
 	}
 
 	@Override
