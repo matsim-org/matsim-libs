@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
+import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesOSMNetwork;
 
 /**
  * Potential MATSim input files (from shared-svn/studies/schweiz-ivtch/baseCase/)
@@ -46,7 +46,7 @@ public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 		}
 		else{
 			String scenarioArray[] = testParameter.split(",");
-			ZurichUtilities.modifyNetwork(network, scenarioArray);
+			ZurichUtilitiesOSMNetwork.modifyNetwork(network, scenarioArray);
 			log.info("Done modifying network.");
 			log.info("");
 		}
@@ -58,7 +58,7 @@ public class MATSim4UrbanSimZurichTest extends MATSim4UrbanSim{
 	 */
 	@Override
 	void modifyPopulation(Population population){
-		ZurichUtilities.deleteRoutesContainingRemovedLinks(population);
+		ZurichUtilitiesOSMNetwork.deleteRoutesContainingRemovedLinks(population);
 	}
 	
 	/**

@@ -47,10 +47,10 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigTy
 import playground.tnicolai.matsim4opus.utils.DateUtil;
 import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
 import playground.tnicolai.matsim4opus.utils.JAXBUnmaschal;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
+import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 
@@ -327,7 +327,7 @@ public class MATSim4UrbanSim {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
 		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
-		String savePath = UtilityCollection.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
+		String savePath = Paths.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
 		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
 		
 		String newPlansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
@@ -401,6 +401,3 @@ public class MATSim4UrbanSim {
 		return MATSim4UrbanSim.isSuccessfulMATSimRun;
 	}
 }
-
-
-

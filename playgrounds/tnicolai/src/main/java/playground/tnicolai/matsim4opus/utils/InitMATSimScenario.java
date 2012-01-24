@@ -29,6 +29,7 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -41,6 +42,7 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.ConfigType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.Matsim4UrbansimType;
 import playground.tnicolai.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import playground.tnicolai.matsim4opus.utils.ids.IdFactory;
+import playground.tnicolai.matsim4opus.utils.io.Paths;
 
 /**
  * @author thomas
@@ -68,6 +70,38 @@ public class InitMATSimScenario {
 	}
 	
 	/**
+	 * constructor
+	 * 
+	 * @param scenario stores MATSim parameters
+	 * @param matsimConfiFile path to matsim config file
+	 */
+	public InitMATSimScenario(ScenarioImpl scenario, String matsimConfiFile){
+		
+		this.scenario = scenario;
+		this.matsimConfig = unmarschal(matsimConfiFile); // loading and initializing MATSim config		
+	}
+	
+	/**
+	 * loading, validating and initializing MATSim config.
+	 */
+	MatsimConfigType unmarschal(String matsimConfigFile){
+		
+		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
+		// the current xsd (checks e.g. the presents and data type of parameter) and generates
+		// an Java object representing the config file.
+		JAXBUnmaschal unmarschal = new JAXBUnmaschal( matsimConfigFile );
+		
+		MatsimConfigType matsimConfig = null;
+		
+		// binding the parameter from the MATSim Config into the JAXB data structure
+		if( (matsimConfig = unmarschal.unmaschalMATSimConfig()) == null){
+			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
+			System.exit(Constants.UNMARSCHALLING_FAILED);
+		}
+		return matsimConfig;
+	}
+	
+	/**
 	 * Transferring all parameter from matsim4urbansim config to internal MATSim config/scenario
 	 * @return boolean true if initialization successful
 	 */
@@ -78,6 +112,7 @@ public class InitMATSimScenario {
 			ConfigType matsimParameter = matsimConfig.getConfig();
 			Matsim4UrbansimType matsim4UrbanSimParameter = matsimConfig.getMatsim4Urbansim();
 			
+			initGlobalSettings(); // tnicolai: experimental
 			initMATSim4UrbanSimParameter(matsim4UrbanSimParameter);
 			initNetwork(matsimParameter);
 			initInputPlansFile(matsimParameter);
@@ -91,7 +126,17 @@ public class InitMATSimScenario {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * Determines and sets available processors into MATSim config
+	 */
+	private void initGlobalSettings(){
 		
+		log.info("Setting number of Threads to " + Runtime.getRuntime().availableProcessors() + " ...");
+		GlobalConfigGroup globalCG = (GlobalConfigGroup) scenario.getConfig().getModule(GlobalConfigGroup.GROUP_NAME);
+		globalCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		log.info("... done!");
 	}
 	
 	/**
@@ -103,13 +148,13 @@ public class InitMATSimScenario {
 		log.info("Setting MATSim4UrbanSim parameter to config...");
 		double samplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
 		int year = matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
-		String opusHome = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
-		String opusDataPath = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
-		String matsim4Opus = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
-		String matsim4OpusConfig = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusConfig() );
-		String matsim4OpusOutput = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusOutput() );
-		String matsim4OpusTemp = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp() );
-		String matsim4OpusBackup = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() ) + UtilityCollection.checkPathEnding( "backup" );
+		String opusHome = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
+		String opusDataPath = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
+		String matsim4Opus = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
+		String matsim4OpusConfig = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusConfig() );
+		String matsim4OpusOutput = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusOutput() );
+		String matsim4OpusTemp = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp() );
+		String matsim4OpusBackup = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() ) + Paths.checkPathEnding( "backup" );
 		boolean isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
 		boolean backupRunData = matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter = matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();

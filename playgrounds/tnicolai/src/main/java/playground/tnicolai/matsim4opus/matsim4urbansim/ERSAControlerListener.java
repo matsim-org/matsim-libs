@@ -46,6 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
@@ -207,21 +208,29 @@ public class ERSAControlerListener implements ShutdownListener{
 				dumpCSVData(accessibilityIndicatorWriter, startZone, coordFromZone);
 			}
 			System.out.println("");
-			// finish and close writing
-			closeCSVFile(accessibilityIndicatorWriter);
 			
-			dumpWorkplaceData();
+			if( this.benchmark != null && benchmarkID > 0 ){
+				this.benchmark.stoppMeasurement(benchmarkID);
+				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.jobClusterArray.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
+			}
+			
+			dumpResults(accessibilityIndicatorWriter);
 		
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		if( this.benchmark != null && benchmarkID > 0 ){
-			this.benchmark.stoppMeasurement(benchmarkID);
-			log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.jobClusterArray.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
-		}
+	}
+	
+	private void dumpResults(BufferedWriter accessibilityIndicatorWriter) throws IOException{
+		log.info("Writing files ...");
+		// finish and close writing
+		closeCSVFile(accessibilityIndicatorWriter);
+		dumpWorkplaceData();
+		GridUtils.writeSpatialGridTables(this);
+		GridUtils.writeKMZFiles(this);
+		log.info("Writing files done!");
 	}
 
 	/**
@@ -290,27 +299,6 @@ public class ERSAControlerListener implements ShutdownListener{
 		bwAggregatedWP.flush();
 		bwAggregatedWP.close();
 		
-		log.info("... done!");
-	}
-
-	/**
-	 * This runs through the jobClusterArray and determines and assigns
-	 * the nearest Node for each (aggregated) job.
-	 * Expensive queries like "getNearestNode" are performed only 
-	 * once in this pre-processing in order to save computing time
-	 * @param network
-	 */
-	private void addNearestNodeToJobClusterArray(NetworkImpl network) {
-		
-		log.info("Determining nearest Nodes ...");
-		for(int i = 0; i < this.jobClusterArray.length; i++){
-			
-			assert ( jobClusterArray[ i ].getCoordinate() != null );
-			Node nearestNode = network.getNearestNode( jobClusterArray[ i ].getCoordinate() );
-			assert ( nearestNode != null );
-			// add nearest node to job object
-			jobClusterArray[ i ].setNearestNode( nearestNode );
-		}
 		log.info("... done!");
 	}
 
@@ -407,186 +395,19 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	// getter methods
 	
-	ZoneLayer<ZoneAccessibilityObject> getStartZones(){
+	public ZoneLayer<ZoneAccessibilityObject> getStartZones(){
 		return startZones;
 	}
-	JobClusterObject[] getJobObjectMap(){
+	public JobClusterObject[] getJobObjectMap(){
 		return jobClusterArray;
 	}
-	SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
+	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
 		return travelTimeAccessibilityGrid;
 	}
-	SpatialGrid<Double> getTravelCostAccessibilityGrid(){
+	public SpatialGrid<Double> getTravelCostAccessibilityGrid(){
 		return travelCostAccessibilityGrid;
 	}
-	SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
+	public SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
 		return travelDistanceAccessibilityGrid;
 	}
-	
-	
-	
-//	/**
-//	 * cost calculator for travel distances
-//	 * @author thomas
-//	 *
-//	 */
-//	static class TravelDistanceCostCalculator implements TravelCost{
-//		private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
-//		
-//		@Override
-//		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-//			if(link != null)
-//				return link.getLength();
-//			log.warn("Link is null. Returned 0 as link length.");
-//			return 0.;
-//		}
-//	}
-	
-//	/**
-//	 * cost calculator for travel times
-//	 * @author thomas
-//	 *
-//	 */
-//	static class TravelTimeCostCalculator implements TravelCost{
-////		private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
-//		
-//		protected final TravelTime timeCalculator;
-//		
-//		public TravelTimeCostCalculator(final TravelTime timeCalculator) {
-//			this.timeCalculator = timeCalculator;
-//		}
-//		
-//		@Override
-//		public double getLinkGeneralizedTravelCost(final Link link, final double time) {
-//			return this.timeCalculator.getLinkTravelTime(link, time);
-//		}
-//	}
-	
-	// tnicolai: these methods are not needed anymore 
-//	/**
-//	 * @param st
-//	 * @param toNode
-//	 */
-//	@Deprecated
-//	private double getZone2WorkplaceDistance(LeastCostPathTree st, Node toNode) {
-//		HashMap<Id, NodeData> tree = st.getTree();
-//		List<Node> nodeList = new ArrayList<Node>();
-//		
-//		// set destination node ...
-//		// ... from there we get the route to the origin node by the following iteration
-//		Node tmpNode = toNode;
-//		while(true){
-//			
-//			nodeList.add( tmpNode );
-//			
-//			NodeData nodeData = tree.get(tmpNode.getId());
-//			assert(nodeData != null);
-//			tmpNode = nodeData.getPrevNode();
-//			
-//			if(tmpNode == null)
-//				break;
-//		}
-//		
-//		// now we have list with all nodes on the route between "fromNode" and "toNode"
-//		// out of that we create a list with all the links (which connect the nodes)
-//		List<Link> linkList = RouteUtils.getLinksFromNodes(nodeList);
-//		
-//		// we are now able to compute the distance
-//		// this calculation includes the distance traveled on the start- and end-link of the route
-//		// if you don't want that, you can exclude the first and the last link in "linkList"
-//		
-//		double distance = 0.;
-//		for(Link link: linkList)
-//			distance += link.getLength();
-//		
-//		return distance;
-//	}
-//	
-//	/**
-//	 * Calculates the travel distance (in meters) between an origin and destination coordinate on the traffic network.
-//	 * 
-//	 * @param originCoordinate
-//	 * @param destinationCoordinate
-//	 * @param network
-//	 * @param controler
-//	 * @return distance in meter between a given origin and destination coordinate
-//	 */
-//	@Deprecated
-//	private double getZone2ZoneDistance(Coord originCoordinate, Coord destinationCoordinate, NetworkImpl network, Controler controler, Scenario sc, double depatureTime){
-//		
-//		double distance = 0.;
-//		Link fromLink = network.getNearestLink(originCoordinate);
-//		Link toLink = network.getNearestLink(destinationCoordinate);
-//		
-//		Node fromNode = fromLink.getToNode();	// start at the end of the "current" link
-//		Node toNode = toLink.getFromNode(); 	// the target is the start of the link
-//		
-//		PlansCalcRoute plancalcrouter = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), 
-//				controler.getTravelCostCalculatorFactory().createTravelCostCalculator(controler.getTravelTimeCalculator(),
-//						controler.getConfig().planCalcScore()), controler.getTravelTimeCalculator(), new DijkstraFactory(), 
-//						((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory());
-//		
-//		LeastCostPathCalculator lcpc = plancalcrouter.getLeastCostPathCalculator();
-//		Path path = lcpc.calcLeastCostPath(fromNode, toNode, depatureTime);
-//		
-//		// tnicolai: this part is not needed anymore but may helps to understand how the routing in MATSim works ...
-////		NetworkFactoryImpl routeFactory = new NetworkFactoryImpl(network);
-////		NetworkRoute routeTest = (NetworkRoute) routeFactory.createRoute(TransportMode.car, fromLink.getId(), toLink.getId());
-////		
-////		routeTest.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-////		routeTest.setTravelTime((int) path.travelTime);
-////		routeTest.setTravelCost(path.travelCost);
-////		routeTest.setDistance(RouteUtils.calcDistance(routeTest, network)); 
-//		
-//		List<Id> linkIdList = new ArrayList<Id>();
-//		Iterator<Link> linkIterator = path.links.iterator();
-//		while(linkIterator.hasNext()) // create link id list
-//			linkIdList.add(linkIterator.next().getId());
-//		
-//		if(linkIdList.size() >= 1){
-//			NetworkRoute routeNRT = RouteUtils.createNetworkRoute(linkIdList, network);
-//			distance = RouteUtils.calcDistance(routeNRT, network);
-//		}
-////		else // tnicolai: for debugging
-////			log.warn("LinkIList has no element!!! FromLink: " + fromLink.getId() + " ToLink:" + toLink.getId());
-//		return distance;
-//	}
-//	
-//	/**
-//	 * Calculates the travel distance (in meters) between an origin and destination zone on the traffic network.
-//	 * 
-//	 * @return distance between 2 zones in meter
-//	 */
-//	@Deprecated
-//	private double getZone2ZoneDistanceOld(Coord originCoordinate, Coord destinationCoordinate, NetworkImpl network, Controler controler){
-//		
-//		double distance = 0.0; // tnicolai: should we take another default value???
-//		
-//		PersonImpl dummyPerson = new PersonImpl( new IdImpl(1L) );
-//		PlanImpl plan = dummyPerson.createAndAddPlan(true);
-//		CommonMATSimUtilities.makeHomePlan(plan, originCoordinate, new ActivityFacilitiesImpl("origin_centroid").createFacility(new IdImpl(2L), originCoordinate));
-//		CommonMATSimUtilities.completePlanToHwh(plan, destinationCoordinate, new ActivityFacilitiesImpl("destination_centroid").createFacility( new IdImpl(3L), destinationCoordinate));
-//		
-//		PersonPrepareForSim pps = new PersonPrepareForSim( controler.createRoutingAlgorithm() , network);
-//		pps.run(dummyPerson);
-//		
-//		if( plan.getPlanElements().size() >= 2 ){
-//			
-//			// get first leg. this contains the route from "fromZone" to "toZone"
-//			PlanElement pe = plan.getPlanElements().get(1);
-//			if (pe instanceof LegImpl) {
-//				LegImpl l = (LegImpl) pe;
-//				
-//				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) l.getRoute();
-//
-//				if(route.getLinkIds().size()  > 0){
-//					NetworkRoute nr = RouteUtils.createNetworkRoute(route.getLinkIds(), network);
-//					distance = RouteUtils.calcDistance(nr, network);
-//				}
-//			}
-//		}
-//		return distance;
-//	}
-	
 }
-

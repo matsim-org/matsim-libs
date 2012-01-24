@@ -278,44 +278,44 @@ public class MATSim4UrbanSimControlerListenerV1 implements ShutdownListener {
 	}
 	
 	
-	/**
-	 * Calculates the travel distance (in meters) between an origin and destination zone on the traffic network.
-	 * 
-	 * @param fromZone
-	 * @param toZone
-	 * @param network
-	 * @param controler
-	 * @return distance between 2 zones in meter
-	 */
-	private double getZone2ZoneDistance(ActivityFacility fromZone, ActivityFacility toZone, NetworkImpl network, Controler controler){
-		
-		double distance = 0.0; // tnicolai: should we take another default value???
-		
-		PersonImpl dummyPerson = new PersonImpl( fromZone.getId() );
-		PlanImpl plan = dummyPerson.createAndAddPlan(true);
-		UtilityCollection.makeHomePlan(plan, fromZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+fromZone.getId()).createFacility(fromZone.getId(), fromZone.getCoord()));
-		UtilityCollection.completePlanToHwh(plan, toZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+toZone.getId()).createFacility(toZone.getId(), toZone.getCoord()));
-		
-		PersonPrepareForSim pps = new PersonPrepareForSim( controler.createRoutingAlgorithm() , network);
-		pps.run(dummyPerson);
-		
-		if( plan.getPlanElements().size() >= 2 ){
-			
-			// get first leg. this contains the route from "fromZone" to "toZone"
-			PlanElement pe = plan.getPlanElements().get(1);
-			if (pe instanceof LegImpl) {
-				LegImpl l = (LegImpl) pe;
-				
-				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) l.getRoute();
-
-				if(route.getLinkIds().size()  > 0){
-					NetworkRoute nr = RouteUtils.createNetworkRoute(route.getLinkIds(), network);
-					distance = RouteUtils.calcDistance(nr, network);
-				}
-			}
-		}
-		return distance;
-	}
+//	/**
+//	 * Calculates the travel distance (in meters) between an origin and destination zone on the traffic network.
+//	 * 
+//	 * @param fromZone
+//	 * @param toZone
+//	 * @param network
+//	 * @param controler
+//	 * @return distance between 2 zones in meter
+//	 */
+//	private double getZone2ZoneDistance(ActivityFacility fromZone, ActivityFacility toZone, NetworkImpl network, Controler controler){
+//		
+//		double distance = 0.0; // tnicolai: should we take another default value???
+//		
+//		PersonImpl dummyPerson = new PersonImpl( fromZone.getId() );
+//		PlanImpl plan = dummyPerson.createAndAddPlan(true);
+//		UtilityCollection.makeHomePlan(plan, fromZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+fromZone.getId()).createFacility(fromZone.getId(), fromZone.getCoord()));
+//		UtilityCollection.completePlanToHwh(plan, toZone.getCoord(), new ActivityFacilitiesImpl("centroid_zone_"+toZone.getId()).createFacility(toZone.getId(), toZone.getCoord()));
+//		
+//		PersonPrepareForSim pps = new PersonPrepareForSim( controler.createRoutingAlgorithm() , network);
+//		pps.run(dummyPerson);
+//		
+//		if( plan.getPlanElements().size() >= 2 ){
+//			
+//			// get first leg. this contains the route from "fromZone" to "toZone"
+//			PlanElement pe = plan.getPlanElements().get(1);
+//			if (pe instanceof LegImpl) {
+//				LegImpl l = (LegImpl) pe;
+//				
+//				LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) l.getRoute();
+//
+//				if(route.getLinkIds().size()  > 0){
+//					NetworkRoute nr = RouteUtils.createNetworkRoute(route.getLinkIds(), network);
+//					distance = RouteUtils.calcDistance(nr, network);
+//				}
+//			}
+//		}
+//		return distance;
+//	}
 	
 	/**
 	 * goes through all person ant their plans and stores their trips into a matrix

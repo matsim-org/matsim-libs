@@ -85,7 +85,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Computing and writing accessibility measures ..." );
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
-			ZoneObject[] zones = UtilityCollection.preProcessZoneData(this.zones, network);
+			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);
 			assert( zones != null );
 			log.info("Calculating " + zones.length + " zones ...");
 			

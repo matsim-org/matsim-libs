@@ -35,6 +35,7 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.utils.io.HeaderParser;
 import playground.tnicolai.matsim4opus.utils.io.filter.TabFilter;
 
 
@@ -509,8 +510,8 @@ public class Convert4Gnuplot {
 			sortedHeaderArray[i] = unsortedHeaderArray[i];
 		}
 		// stores unsorted array as a map of <YEAR, INDEX>
-		Map<Integer,Integer> idxFromKey = UtilityCollection.createIdxFromKey( unsortedHeaderArray );
-		// sorted array in chonological order. The zone id is stored as -1 and schould be the first value
+		Map<Integer,Integer> idxFromKey = HeaderParser.createIdxFromKey( unsortedHeaderArray );
+		// sorted array in chronological order. The zone id is stored as -1 and should be the first value
 		UtilityCollection.ArrayQuicksort( sortedHeaderArray );
 		
 		return new HeaderObject(idxFromKey, sortedHeaderArray);

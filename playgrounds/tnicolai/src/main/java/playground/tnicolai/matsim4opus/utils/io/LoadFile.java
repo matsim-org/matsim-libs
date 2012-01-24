@@ -34,7 +34,6 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 
 
 /**
@@ -62,7 +61,7 @@ public class LoadFile {
 	 */
 	public LoadFile(String source, String destination, String fileName){
 		this.source = source;
-		this.destinationPath = UtilityCollection.checkPathEnding( destination );
+		this.destinationPath = Paths.checkPathEnding( destination );
 		this.fileName = fileName;
 	}
 	

@@ -3,8 +3,8 @@ package playground.tnicolai.matsim4opus.matsimTestData;
 import org.apache.log4j.Logger;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.io.FileCopy;
+import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.TempDirectoryUtil;
 
 public class GenerateOPUSTestEnvironment {
@@ -38,8 +38,8 @@ public class GenerateOPUSTestEnvironment {
 		TempDirectoryUtil.createOPUSDirectories();
 		
 		// copying matsim input data into fresh created opus directories
-		String urbanSimOutputDir = UtilityCollection.getTestUrbanSimInputDataDir( GenerateOPUSTestEnvironment.class );
-		String matsimNetwork = UtilityCollection.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
+		String urbanSimOutputDir = Paths.getTestUrbanSimInputDataDir( GenerateOPUSTestEnvironment.class );
+		String matsimNetwork = Paths.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
 
 		// copy UrbanSim data to temp dir
 		copyTestData(urbanSimOutputDir, Constants.MATSIM_4_OPUS_TEMP);
@@ -58,9 +58,9 @@ public class GenerateOPUSTestEnvironment {
 		TempDirectoryUtil.createOPUSDirectories();
 		
 		// copying matsim input data into fresh created opus directories
-		String urbanSimOutputDir = UtilityCollection.getWarmStartUrbanSimInputData( GenerateOPUSTestEnvironment.class );
-		String plansFileDir = UtilityCollection.getWarmStartInputPlansFile( GenerateOPUSTestEnvironment.class );
-		String matsimNetwork = UtilityCollection.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
+		String urbanSimOutputDir = Paths.getWarmStartUrbanSimInputData( GenerateOPUSTestEnvironment.class );
+		String plansFileDir = Paths.getWarmStartInputPlansFile( GenerateOPUSTestEnvironment.class );
+		String matsimNetwork = Paths.getWarmStartNetwork( GenerateOPUSTestEnvironment.class );
 
 		// copy UrbanSim data to temp dir
 		copyTestData(urbanSimOutputDir, Constants.MATSIM_4_OPUS_TEMP);

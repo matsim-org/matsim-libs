@@ -33,9 +33,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
-
 /**
  * @author thomas
  *
@@ -71,7 +68,7 @@ public class FileCopy {
 	        }
 	        	
 	        // set destination path         
-	        String targetRootName = UtilityCollection.checkPathEnding( root.getCanonicalPath() );
+	        String targetRootName = Paths.checkPathEnding( root.getCanonicalPath() );
 
 	        // list all source files
 	        ArrayList<File> fileNames = listAllFiles(source, true); 

@@ -40,8 +40,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
@@ -92,7 +92,7 @@ public class ReadFromUrbansimParcelModel {
 			String line = reader.readLine();
 
 			// get and initialize the column number of each header element
-			Map<String,Integer> idxFromKey = UtilityCollection.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
 			final int indexParcelID 	= idxFromKey.get( Constants.PARCEL_ID );
 			final int indexXCoodinate 	= idxFromKey.get( Constants.X_COORDINATE );
 			final int indexYCoodinate 	= idxFromKey.get( Constants.Y_COORDINATE );
@@ -151,9 +151,10 @@ public class ReadFromUrbansimParcelModel {
 			e.printStackTrace();
 			System.exit( Constants.EXCEPTION_OCCURED );
 		}
-
+		
+		log.info("Done reading urbansim parcels. Found " + parcels.getFacilities().size() + " parcels.");
 		// create urbansim zones from the intermediate pseudo zones
-		constructZones ( zones, pseudoZones) ;
+		constructZones ( zones, pseudoZones);
 	}
 
 	/**
@@ -179,7 +180,7 @@ public class ReadFromUrbansimParcelModel {
 			coord = new CoordImpl( pz.sumXCoordinate/pz.count , pz.sumYCoordinate/pz.count );
 			zones.createFacility(zone_ID, coord);
 		}
-		log.info( "Done with constructing urbansim zones" ) ;
+		log.info( "Done with constructing urbansim zones. Constucted " + zones.getFacilities().size() + " zones.");
 	}
 	
 	/**
@@ -222,7 +223,7 @@ public class ReadFromUrbansimParcelModel {
 
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = UtilityCollection.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
 			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
 			final int indexParcelID_WORK 	= idxFromKey.get( Constants.PARCEL_ID_WORK );
 			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
@@ -262,7 +263,7 @@ public class ReadFromUrbansimParcelModel {
 
 				// add home location to plan
 				PlanImpl plan = newPerson.createAndAddPlan(true);
-				UtilityCollection.makeHomePlan(plan, homeCoord, homeLocation) ;
+				CreateHomeWorkHomePlan.makeHomePlan(plan, homeCoord, homeLocation) ;
 
 				// determine employment status
 				if ( parts[ indexParcelID_WORK ].equals("-1") )
@@ -290,7 +291,7 @@ public class ReadFromUrbansimParcelModel {
 					}
 					// complete agent plan
 					Coord workCoord = jobLocation.getCoord() ;
-					UtilityCollection.completePlanToHwh(plan, workCoord, jobLocation) ;
+					CreateHomeWorkHomePlan.completePlanToHwh(plan, workCoord, jobLocation) ;
 				}
 
 				// at this point, we have a full "new" person.  Now check against pre-existing population ...
@@ -489,7 +490,7 @@ public class ReadFromUrbansimParcelModel {
 			// reading header
 			String line = reader.readLine();
 			// get columns for home, work and person id
-			Map<String,Integer> idxFromKey = UtilityCollection.createIdxFromKey( line, Constants.TAB );
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB );
 			final int indexZoneID_WORK	   = idxFromKey.get( Constants.ZONE_ID_WORK );
 			
 			ZoneId zone_ID;
@@ -669,7 +670,7 @@ public class ReadFromUrbansimParcelModel {
 				// reading header
 				String line = reader.readLine();
 				// get columns for job, parcel and zone id
-				Map<String,Integer> idxFromKey = UtilityCollection.createIdxFromKey( line, Constants.TAB );
+				Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB );
 				final int indexJobID = idxFromKey.get( Constants.JOB_ID );
 				final int indexParcelID = idxFromKey.get( Constants.PARCEL_ID_WORK );
 				final int indexZoneID =idxFromKey.get( Constants.ZONE_ID_WORK );

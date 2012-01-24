@@ -17,15 +17,16 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.PopulationUtils;
 
-public class ZurichUtilities {
+public class ZurichUtilitiesOSMNetwork {
 
 	/** logger */
-	private static final Logger log = Logger.getLogger(ZurichUtilities.class);
+	private static final Logger log = Logger.getLogger(ZurichUtilitiesOSMNetwork.class);
 
 	/** scenario/test case identifier */
 	private static String CLOSE_UETLIBERGTUNNEL = "uetlibergtunnel";
 	private static String CLOSE_BIRMSDORFERSTRASSE = "birmsdorferstrasse";
 	private static String CLOSE_SCHWAMENDINGERTUNNEL = "schwamendingertunnel";
+	private static String CLOSE_MILCHBUCKTUNNEL = "milchbucktunnel";
 	
 	/** links to remove */
 	private static ArrayList<Id> linksToRemove = null;
@@ -46,6 +47,9 @@ public class ZurichUtilities {
 			else if (scenarioArray[i]
 					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE))
 				removeBirmensdorferstrasse(network);
+			else if (scenarioArray[i]
+					.equalsIgnoreCase(CLOSE_MILCHBUCKTUNNEL))
+				removeMilchbuckTunnel(network);
 		}
 	}
 
@@ -106,6 +110,24 @@ public class ZurichUtilities {
 		// remove links from network
 		applyScenario(network);
 		log.info("Done closing Schwamendingertunnel!");
+	}
+
+	/**
+	 * removes the Milchbucktunnel links from MATSim network
+	 * 
+	 * @param network
+	 */
+	private static void removeMilchbuckTunnel(final Network network) {
+		log.info("Closing Milchbucktunnel from network ...");
+
+		linksToRemove = new ArrayList<Id>();
+		
+		linksToRemove.add(new IdImpl(21130));
+		linksToRemove.add(new IdImpl(21129));
+
+		// remove links from network
+		applyScenario(network);
+		log.info("Done closing Milchbucktunnel!");
 	}
 	
 	/**

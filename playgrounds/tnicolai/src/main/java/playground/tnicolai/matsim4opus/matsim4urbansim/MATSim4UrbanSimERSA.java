@@ -309,8 +309,9 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		logger.info("Finished computations ...");
 		logger.info("Running contoler took " + benchmark.getDurationInSeconds(cID) + " seconds.");
 		
-		writeKMZFiles(myListener);
-		writeSpatialGridTables(myListener);
+		// tnicolai: now writers integrated into ERSAControlerLitener
+		// writeKMZFiles(myListener);
+		// writeSpatialGridTables(myListener);
 		
 		// dumping benchmark results
 		benchmark.dumpResults(Constants.MATSIM_4_OPUS_TEMP + "matsim4ersa_benchmark.txt");

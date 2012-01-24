@@ -47,6 +47,7 @@ import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
@@ -93,7 +94,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
-//		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculator()); // tnicolai: check with kai
+		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculator()); // tnicolai: check with kai
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
@@ -109,7 +110,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			log.info("Computing and writing travel_data ..." );
 
 			// init array with zone informations
-			ZoneObject[] zones = UtilityCollection.preProcessZoneData(this.zones, network);
+			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);
 			// init progress bar
 			ProgressBar bar = new ProgressBar( zones.length );
 			log.info("Processing " + zones.length + " UrbanSim zones ...");
@@ -126,7 +127,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				
 				// run dijksrtra for current node as origin
 				lcptTravelTime.calculate(network, fromNode, depatureTime);
-//				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					
@@ -144,9 +145,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 						travelTime_min = 1.2;
 					
 					// get travel cost (marginal cost of time * travel time)
-//					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
+					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
 					// get travel distance (link lengths in meter)
-//					double distance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
+					double distance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
 					
 					// query trips in OD Matrix
 					double trips = 0.0;
@@ -156,14 +157,14 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					
 					// IMPORTANT: Do adapt the travel_data header in "initZone2ZoneImpedaceWriter"
 					// 			  when changing anything at this call.
-					travelDataWriter.write ( originZoneID.toString()	//origin zone id
-							+ "," + destinationZoneID.toString()		//destination zone id
-							+ "," + travelTime_min //travelCost 		//tcost
-							+ "," + travelTime_min 						//ttimes
-							+ "," + travelTime_min*10.					//walk ttimes
-							+ "," + trips								//vehicle trips
-							// + "," + distance_meter					// distance
-							);		
+					travelDataWriter.write ( originZoneID.toString()			//origin zone id
+										+ "," + destinationZoneID.toString()	//destination zone id
+										+ "," + travelCost //travelCost 		//tcost
+										+ "," + travelTime_min 					//ttimes
+										+ "," + travelTime_min*10.				//walk ttimes
+										+ "," + trips							//vehicle trips
+										+ "," + distance_meter					// distance
+					);		
 					travelDataWriter.newLine();
 				}
 			}
@@ -198,8 +199,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		// tnicolai: add single_vehicle_to_work_travel_distance:f4 for distance output
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4:single_vehicle_to_work_travel_distance:f4" ) ; 
+		
 		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 		travelDataWriter.newLine();
 		return travelDataWriter;
