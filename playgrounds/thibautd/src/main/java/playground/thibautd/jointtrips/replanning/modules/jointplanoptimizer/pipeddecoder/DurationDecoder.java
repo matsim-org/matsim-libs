@@ -65,9 +65,9 @@ public class DurationDecoder implements JointPlanOptimizerDimensionDecoder {
 		new HashMap<Id, List<Integer>>();
 
 	//TODO: import from config group
-	private static final double MIN_DURATION = 0d;
-	private static final double PU_DURATION = 0d;
-	private static final double DO_DURATION = 0d;
+	public static final double MIN_DURATION = 0d;
+	public static final double PU_DURATION = 0d;
+	public static final double DO_DURATION = 0d;
 	//private static final double DAY_DURATION = 24*3600d;
 
 	private JointPlan plan;

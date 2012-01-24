@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
@@ -50,9 +49,11 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.Clique;
+import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.UpperBoundsConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPChromosome;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
@@ -159,19 +160,15 @@ public class TestJPO {
 	@Test
 	public void testJointTravelTimes() {
 		IChromosome sampleChrom;
+		JointPlanOptimizerPopulationFactory popFactory = new JointPlanOptimizerPopulationFactory( jgapConf );
 
-		try {
-			sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-				.randomInitialJointPlanOptimizerJGAPChromosome();
+		sampleChrom = popFactory.createRandomChromosome();
 
-			//set joint trips on
-			for (Gene gene : sampleChrom.getGenes()) {
-				if (gene instanceof BooleanGene) {
-					gene.setAllele(true);
-				}
+		//set joint trips on
+		for (Gene gene : sampleChrom.getGenes()) {
+			if (gene instanceof BooleanGene) {
+				gene.setAllele(true);
 			}
-		} catch (InvalidConfigurationException e) {
-			throw new RuntimeException(e);
 		}
 
 		JointPlanOptimizerDecoder decoder = jgapConf.getDecoder();
@@ -237,15 +234,8 @@ public class TestJPO {
 					this.sampleClique.getMembers().size(),
 					this.controler.getScoringFunctionFactory());
 
-		IChromosome sampleChrom;
+		IChromosome sampleChrom = (new JointPlanOptimizerPopulationFactory( jgapConf )).createRandomChromosome();
 		
-		try {
-			sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-				.randomInitialJointPlanOptimizerJGAPChromosome();
-		} catch (InvalidConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-
 		Assert.assertEquals(
 				"inconsistency between the two scoring approaches.",
 				full.getFitnessValue(sampleChrom),
@@ -276,14 +266,10 @@ public class TestJPO {
 		IChromosome[] sampleChrom = new IChromosome[nChrom];
 		double[] score = new double[nChrom];
 		
+		JointPlanOptimizerPopulationFactory popFact = new JointPlanOptimizerPopulationFactory( jgapConf );
 		// first try each chromosome
 		for (int i=0; i < nChrom; i++) {
-			try {
-				sampleChrom[i] = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomInitialJointPlanOptimizerJGAPChromosome();
-			} catch (InvalidConfigurationException e) {
-				throw new RuntimeException(e);
-			}
+			sampleChrom[i] = popFact.createRandomChromosome();
 
 			score[i] = otf.getFitnessValue(sampleChrom[i]);
 
@@ -339,13 +325,9 @@ public class TestJPO {
 
 		IChromosome sampleChrom;
 
+		JointPlanOptimizerPopulationFactory popFact = new JointPlanOptimizerPopulationFactory( jgapConf );
 		for (int tryCount=0; tryCount < nTrys; tryCount++) {
-			try {
-				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomInitialJointPlanOptimizerJGAPChromosome();
-			} catch (InvalidConfigurationException e) {
-				throw new RuntimeException(e);
-			}
+			sampleChrom = popFact.createRandomChromosome();
 
 			List<PlanElement> planPartial = partial.decode(sampleChrom, /*new JointPlan*/(this.samplePlan)).getPlanElements();
 			List<PlanElement> planClassical = classical.decode(sampleChrom, /*new JointPlan*/(this.samplePlan)).getPlanElements();
@@ -408,31 +390,69 @@ public class TestJPO {
 	}
 
 	private void testDurationDecoderEndTime(final JointPlanOptimizerDimensionDecoder decoder) {
-		int nTrys = 10;
+		int nTrys = 100;
 
 		//double expectedEndTime = 3600d*24;
 
 		IChromosome sampleChrom;
+		JointPlanOptimizerPopulationFactory popFact = new JointPlanOptimizerPopulationFactory( jgapConf );
 
+		boolean plansActuallyTested = false;
 		for (int tryCount=0; tryCount < nTrys; tryCount++) {
-			try {
-				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomInitialJointPlanOptimizerJGAPChromosome();
-			} catch (InvalidConfigurationException e) {
-				throw new RuntimeException(e);
-			}
+			sampleChrom = popFact.createRandomChromosome();
 
 			Collection<Plan> individualPlans = decoder.decode(sampleChrom, this.samplePlan).getIndividualPlans().values();
 
 			for (Plan indivPlan : individualPlans) {
 				List<PlanElement> pes = indivPlan.getPlanElements();
 				double firstActEnd = ((Activity) pes.get( 0 )).getEndTime();
-				double lastEpisodeStart = ((Activity) pes.get( pes.size() - 3 )).getEndTime();
+				int anteLastActIndex = pes.size() - 3;
+				Activity anteLastAct = (Activity) pes.get( anteLastActIndex );
+				while (anteLastAct.getType().equals( JointActingTypes.DROP_OFF ) || anteLastAct.getType().equals( JointActingTypes.PICK_UP )) {
+					// we are in fact in a trip
+					anteLastActIndex -= 2;
+					anteLastAct = (Activity) pes.get( anteLastActIndex );
+				}
+				double lastEpisodeStart = anteLastAct.getEndTime();
 
-				Assert.assertTrue(
-						"plan of incorrect duration created by "+decoder.getClass().getSimpleName(),
-						firstActEnd + 24 * 3600 > lastEpisodeStart);
+				if ( anteLastAct.getEndTime() - anteLastAct.getStartTime() > DurationDecoder.MIN_DURATION ) {
+					// due to travel time, decoded plans finishing too late are possible.
+					// such plans would have a last activity duration equal to the mininal
+					// allowed one
+					plansActuallyTested = true;
+					Assert.assertTrue(
+							"plan of incorrect duration created by "+decoder.getClass().getSimpleName()
+							+": first act ends at "+Time.writeTime( firstActEnd )+
+							" and last act starts at "+Time.writeTime( lastEpisodeStart )
+							+" ("+Time.writeTime( lastEpisodeStart - 24 * 3600 )+" the next day)",
+							firstActEnd + 24 * 3600 > lastEpisodeStart);
+				}
 			}
+		}
+
+		if (!plansActuallyTested) {
+			throw new RuntimeException( "no plan was actually tested!" );
+		}
+	}
+
+	@Test
+	public void testRandomInitialChromosome() {
+		int nTrys = 10;
+		IChromosome sampleChrom;
+		JointPlanOptimizerPopulationFactory popFact = new JointPlanOptimizerPopulationFactory( jgapConf );
+
+		for (int tryCount=0; tryCount < nTrys; tryCount++) {
+			sampleChrom = popFact.createRandomChromosome();
+
+			for (Gene gene : sampleChrom.getGenes()) {
+				Assert.assertNotNull(
+						"got a null allele in random initial chromosome for gene "+gene.getClass(),
+						gene.getAllele());
+			}
+
+			Assert.assertTrue(
+					"radom initial chromosome does not respects constraints!",
+					jgapConf.getConstraintsManager().respectsConstraints( sampleChrom ));
 		}
 	}
 
@@ -474,13 +494,9 @@ public class TestJPO {
 		double oldNow=0;
 		double now =0;
 
+		JointPlanOptimizerPopulationFactory popFact = new JointPlanOptimizerPopulationFactory( jgapConf );
 		for (int tryCount=0; tryCount < nTrys; tryCount++) {
-			try {
-				sampleChrom = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomInitialJointPlanOptimizerJGAPChromosome();
-			} catch (InvalidConfigurationException e) {
-				throw new RuntimeException(e);
-			}
+			sampleChrom = popFact.createRandomChromosome();
 
 			Collection<Plan> indivPlans = decoder.decode(sampleChrom, (this.samplePlan)).getIndividualPlans().values();
 
@@ -563,10 +579,7 @@ public class TestJPO {
 			new JointPlanOptimizerJGAPCrossOver(
 					this.jgapConf,
 					this.configGroup,
-					this.jgapConf.getNumJointEpisodes(),
-					this.jgapConf.getNumEpisodes(),
-					this.jgapConf.getNumModeGenes(),
-					this.jgapConf.getNDurationGenesPerIndiv());
+					this.jgapConf.getConstraintsManager());
 
 		List<IChromosome> offsprings = new ArrayList<IChromosome>();
 		Population jgapPop = createSampleGeneticPopulation();
@@ -585,8 +598,7 @@ public class TestJPO {
 			new JointPlanOptimizerJGAPMutation(
 					this.jgapConf,
 					this.configGroup,
-					this.jgapConf.getSampleChromosome().size(),
-					this.jgapConf.getNDurationGenesPerIndiv());
+					this.jgapConf.getConstraintsManager());
 
 		List<IChromosome> offsprings = new ArrayList<IChromosome>();
 		Population jgapPop = createSampleGeneticPopulation();
@@ -619,24 +631,27 @@ public class TestJPO {
 			final List<IChromosome> offsprings) {
 		operator.operate(pop, offsprings);
 
+		UpperBoundsConstraintsManager constr = (UpperBoundsConstraintsManager) jgapConf.getConstraintsManager();
 		for (IChromosome chrom : offsprings) {
 			Assert.assertTrue(
 					operator.getClass().getSimpleName()+"returned offspring not"+
 						" respecting the constraints.",
-					((JointPlanOptimizerJGAPChromosome) chrom).respectsConstraints());
+					constr.respectsConstraints( chrom ));
 		}
 	}
 
 	private Population createSampleGeneticPopulation() {
 		IChromosome[] chromosomes = new IChromosome[N_TEST_CHROM];
 
+		UpperBoundsConstraintsManager constr = (UpperBoundsConstraintsManager) jgapConf.getConstraintsManager();
+		JointPlanOptimizerPopulationFactory popFactory = new JointPlanOptimizerPopulationFactory( jgapConf );
 		try {
 			for (int i=0; i < chromosomes.length; i++) {
 				// create "full" chromosomes so that the propability of creating
 				// invalid chromosomes is high in the case the constraints are not
 				// well considered in the operators.
-				chromosomes[i] = ((JointPlanOptimizerJGAPChromosome) this.jgapConf.getSampleChromosome())
-					.randomFullChromosome();
+				chromosomes[i] = popFactory.createRandomChromosome();
+				constr.fillChromosome( chromosomes[i] );
 			}
 
 			return new Population(this.jgapConf, chromosomes);

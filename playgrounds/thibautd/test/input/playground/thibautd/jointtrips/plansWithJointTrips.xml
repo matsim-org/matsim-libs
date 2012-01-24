@@ -7,7 +7,7 @@
  		<leg mode="car">
  			<route>2 7 12</route>
  		</leg>
- 		<act type="w" x="10000" y="0" link="20" dur="1:59" />
+ 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 
 		<!-- joint trip -->
 		<leg mode="car">
@@ -29,7 +29,7 @@
  		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" /> 
  		<leg mode="pt" trav_time="1800"> 
  		</leg>
- 		<act type="w" x="10000" y="0" link="20" dur="02:01" />
+ 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 
 		<!-- joint trip -->
 		<leg mode="walk">
@@ -53,9 +53,9 @@
 		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
-<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /> --> 
 
-		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 
 		<!-- joint trip -->
 		<leg mode="pt">
@@ -79,7 +79,7 @@
 		<act type="h" x="-25000" y="0" link="1" end_time="06:42:02" />
 		<leg mode="pt">
 		</leg>
-		<act type="w" x="10000" y="0" link="20" dur="09:02:22" />
+		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 		<leg mode="pt">
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -93,8 +93,8 @@
 		<leg mode="car">
 			<route>2 7 12</route>
 		</leg>
-<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
-		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 		<leg mode="car">
 			<route>13 14 15 1</route>
 		</leg>
@@ -109,8 +109,8 @@
 		<leg mode="car">
 			<route>2 7 12</route>
 		</leg>
-<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
-		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 		<leg mode="car">
 			<route>13 14 15 1</route>
 		</leg>
@@ -125,8 +125,8 @@
 		<leg mode="car">
 			<route>2 7 12</route>
 		</leg>
-<!-- 		<act type="w" x="10000" y="0" link="20" dur="9:14:24" /> --> 
-		<act type="w" x="10000" y="0" link="20" dur="09:59:00" />
+<!-- 		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /> --> 
+		<act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" /><leg mode="pt"></leg><act type="w" x="10000" y="0" link="20" dur="1:59" />
 		<leg mode="car">
 			<route>13 14 15 1</route>
 		</leg>

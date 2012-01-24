@@ -49,9 +49,11 @@ import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.AbstractJointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.JPOFitnessFunctionFactory;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.UpperBoundsConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.HammingChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.RestrictedTournamentSelector;
@@ -66,7 +68,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPConfiguration.class);
 
-	private static final Double DAY_DUR = 24*3600d;
+	private static final double DAY_DUR = 24*3600d;
 
 	private static final long serialVersionUID = 1L;
 
@@ -83,6 +85,7 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	private final AbstractJointPlanOptimizerFitnessFunction fitnessFunction;
 	private final IEvolutionMonitor monitor;
 	private final JointPlanOptimizerPopulationAnalysisOperator populationAnalysis;
+	private final ConstraintsManager constraints;
 
 	private final boolean optimizeToggle;
 
@@ -187,6 +190,8 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setPreservFittestIndividual(false);
 
 			// genetic operators definitions
+			// creation of the constraints
+			constraints = createConstraintsManager();
 			if (configGroup.getPlotFitness()) {
 				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
@@ -201,21 +206,36 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
 						this,
 						configGroup,
-						this.numToggleGenes,
-						this.numEpisodes,
-						this.numModeGenes,
-						this.nDurationGenes) );
+						constraints));
 
 			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
 						this,
 						configGroup,
-						this.numToggleGenes + this.numEpisodes + this.numModeGenes,
-						this.nDurationGenes));
+						constraints));
 
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e.getMessage());
 		}
 	 }
+
+	private ConstraintsManager createConstraintsManager() {
+		List<Integer> nGenes = new ArrayList<Integer>();
+		List<Double> maxDurations = new ArrayList<Double>();
+
+		for (int nGenesTotal : nDurationGenes) {
+			// the first activity of an individual plan can start at any time
+			// before midnight
+			nGenes.add( 1 );
+			maxDurations.add( DAY_DUR );
+
+			// the sum of other activity durations must be below the day duration
+			// (the last one must end before the end of the first one)
+			nGenes.add( nGenesTotal - 1 );
+			maxDurations.add( DAY_DUR );
+		}
+
+		return new UpperBoundsConstraintsManager( nGenes , maxDurations );
+	}
 
 	/**
 	 * Sets the private variables numEpisodes and numToggleGenes.
@@ -314,6 +334,10 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	public IEvolutionMonitor getEvolutionMonitor() {
 		return this.monitor;
+	}
+
+	public ConstraintsManager getConstraintsManager() {
+		return constraints;
 	}
 
 	/**

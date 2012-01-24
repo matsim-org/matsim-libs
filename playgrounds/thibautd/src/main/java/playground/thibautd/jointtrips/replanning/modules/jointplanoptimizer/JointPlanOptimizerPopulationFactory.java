@@ -19,10 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 
+import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
+import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
+import org.jgap.RandomGenerator;
+
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 
 /**
  * Creates suitable initial random populations.
@@ -44,18 +49,35 @@ public class JointPlanOptimizerPopulationFactory {
 
 		try {
 			for (int i=0; i < populationSize; i++) {
-				chromosomes[i] = sampleChrom.randomInitialJointPlanOptimizerJGAPChromosome();
+				chromosomes[i] = createRandomChromosome();
 			}
 			if (chromosomes[0].equals(chromosomes[1])) {
-				throw new RuntimeException();
+				// would be better in a unit test...
+				throw new RuntimeException( "random initial genotype creation created identical chromosomes!" );
 			}
 
 			return new Population(this.jgapConfig, chromosomes);
 		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
+			throw new RuntimeException( e );
 		}
-		//should never get there!
-		throw new RuntimeException("GA population has not been initialized");
+	}
+
+	public JointPlanOptimizerJGAPChromosome createRandomChromosome() {
+		JointPlanOptimizerJGAPChromosome sampleChrom = (JointPlanOptimizerJGAPChromosome)
+			this.jgapConfig.getSampleChromosome();
+		JointPlanOptimizerJGAPChromosome newChrom = (JointPlanOptimizerJGAPChromosome) sampleChrom.clone();
+
+		RandomGenerator random = jgapConfig.getRandomGenerator();
+		ConstraintsManager constraints = jgapConfig.getConstraintsManager();
+
+		for (Gene gene : newChrom.getGenes()) {
+			if ( !(gene instanceof DoubleGene) ) {
+				gene.setToRandomValue( random );
+			}
+		}
+
+		constraints.randomiseChromosome( newChrom );
+		return newChrom;
 	}
 
 	public Genotype createRandomInitialGenotype() {

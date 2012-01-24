@@ -35,6 +35,8 @@ import org.jgap.RandomGenerator;
 import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 
+import org.matsim.core.utils.collections.Tuple;
+
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPModeGene;
@@ -60,15 +62,11 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	private static final long serialVersionUID = 1L;
 
 	private final double MUTATION_PROB;
-	private final int CHROMOSOME_SIZE;
-	private final double DAY_DURATION;
 
 	private final int NUM_ITER;
 	private final double NON_UNIFORMITY_PARAM;
 
-	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
-	private final List<Integer> geneIndices = new ArrayList<Integer>();
-
+	private final ConstraintsManager constraintsManager;
 	private final RandomGenerator randomGenerator;
 	private final Configuration jgapConfig;
 	private final boolean inPlace;
@@ -77,30 +75,15 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	public JointPlanOptimizerJGAPMutation(
 			final JointPlanOptimizerJGAPConfiguration config,
 			final JointReplanningConfigGroup configGroup,
-			final int chromosomeSize,
-			final List<Integer> nDurationGenes) {
-		this.CHROMOSOME_SIZE = chromosomeSize;
+			final ConstraintsManager constraintsManager) {
 		this.MUTATION_PROB = configGroup.getMutationProbability();
 		this.NUM_ITER = configGroup.getMaxIterations();
 		this.NON_UNIFORMITY_PARAM = configGroup.getMutationNonUniformity();
-		this.DAY_DURATION = config.getDayDuration();
 		this.inPlace = configGroup.getInPlaceMutation();
 		this.nonUniformProb = configGroup.getNonUniformMutationProbability();
 
-		// construct the list of gene indices.
-		// the order in which genes are examined is determined by the
-		// order of this list, shuffled for each chromosome.
-		// This ensures that all genes have the same "status", as mutation
-		// of a gene influences the mutation on the following.
-		for (int i=0; i < chromosomeSize; i++) {
-			this.geneIndices.add(i);
-		}
-
-		this.nDurationGenes.clear();
-		this.nDurationGenes.addAll(nDurationGenes);
-
+		this.constraintsManager = constraintsManager;
 		this.jgapConfig = config;
-
 		this.randomGenerator = config.getRandomGenerator();
 	}
 
@@ -120,42 +103,36 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	 * Randomly mutates the offsprings of the previously applied operators
 	 * (classical mutation).
 	 */
-	public void operateInPlace(
+	private void operateInPlace(
 			final Population a_population,
 			final List a_candidateChromosome
 			) {
 		int populationSize = a_population.size();
 		int nOffsprings = a_candidateChromosome.size();
 		Gene geneToMute;
-		double freeSpace;
+		Tuple<Double, Double> allowedRange;
 		IChromosome currentChromosome;
-		//IChromosome copyOfChromosome = null;
 
 		for (int j= populationSize; j < nOffsprings; j++) {
 			currentChromosome = a_population.getChromosome(j);
-			Collections.shuffle(this.geneIndices, (Random) this.randomGenerator);
 
 			//for each gene in the chromosome:
-			for (int i : this.geneIndices) {
+			for (int i = 0; i < currentChromosome.size(); i++) {
 				if (this.randomGenerator.nextDouble() < this.MUTATION_PROB) {
 					//perform mutation
-
 					geneToMute = currentChromosome.getGene(i);
 
 					if (geneToMute instanceof BooleanGene) {
 						mutateBoolean((BooleanGene) geneToMute);
 					}
 					else if (geneToMute instanceof DoubleGene) {
-
-						freeSpace = getFreeSpace(
-								i,
-								currentChromosome);
+						allowedRange = constraintsManager.getAllowedRange( currentChromosome , i );
 
 						if (this.randomGenerator.nextDouble() < this.nonUniformProb) {
-							mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+							mutateDoubleNonUniform((DoubleGene) geneToMute, allowedRange);
 						}
 						else {
-							mutateDouble((DoubleGene) geneToMute, freeSpace);
+							mutateDouble((DoubleGene) geneToMute, allowedRange);
 						}
 					}
 					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
@@ -170,22 +147,20 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	 * Mutates copies of the chromosomes of the previous generation ("jgap-like"
 	 * mutation)
 	 */
-	public void operateOnPreviousGen(
+	private void operateOnPreviousGen(
 			final Population a_population,
-			final List a_candidateChromosome
-			) {
+			final List a_candidateChromosome) {
 		int populationSize = a_population.size();
 		Gene geneToMute;
-		double freeSpace;
+		Tuple<Double, Double> allowedRange;
 		IChromosome currentChromosome;
 		IChromosome copyOfChromosome = null;
 
 		for (int j=0; j < populationSize; j++) {
 			currentChromosome = a_population.getChromosome(j);
-			Collections.shuffle(this.geneIndices, (Random) this.randomGenerator);
 
 			//for each gene in the chromosome:
-			for (int i : this.geneIndices) {
+			for (int i = 0; i < currentChromosome.size(); i++) {
 				if (this.randomGenerator.nextDouble() < this.MUTATION_PROB) {
 					//perform mutation
 
@@ -201,16 +176,13 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 						mutateBoolean((BooleanGene) geneToMute);
 					}
 					else if (geneToMute instanceof DoubleGene) {
-
-						freeSpace = getFreeSpace(
-								i,
-								copyOfChromosome);
+						allowedRange = constraintsManager.getAllowedRange( currentChromosome , i );
 
 						if (this.randomGenerator.nextDouble() < this.nonUniformProb) {
-							mutateDoubleNonUniform((DoubleGene) geneToMute, freeSpace);
+							mutateDoubleNonUniform((DoubleGene) geneToMute, allowedRange);
 						}
 						else {
-							mutateDouble((DoubleGene) geneToMute, freeSpace);
+							mutateDouble((DoubleGene) geneToMute, allowedRange);
 						}
 					}
 					else if (geneToMute instanceof JointPlanOptimizerJGAPModeGene) {
@@ -222,58 +194,6 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		}
 	}
 
-	/**
-	 * @param indexToMute index of the DoubleGene to mute in the Chromosome.
-	 * @param chromosome the chromosome to mute.
-	 * @return the upper bound on the gene value.
-	 */
-	protected final double getFreeSpace(
-			final int indexToMute,
-			final IChromosome chromosome) {
-		double freeSpace = DAY_DURATION;
-		int geneCount = 0;
-		int totalCount = 0;
-		Iterator<Integer> nGenesIterator = this.nDurationGenes.iterator();
-		int currentNGenes = nGenesIterator.next();
-		boolean inGoodPlan = false;
-
-		Gene[] genes = chromosome.getGenes();
-		Gene gene;
-		for (int i=0; i < genes.length; i++) {
-			gene = genes[i];
-			if ( !(gene instanceof DoubleGene) ) {
-				continue;
-			}
-
-			if (geneCount == currentNGenes) {
-				// end of an individual plan reached
-				if (inGoodPlan) {
-					// we were in the plan of the mutated chromosome:
-					// we are done.
-					return freeSpace;
-				}
-				// else, we begin a new initial plan
-				freeSpace = DAY_DURATION;
-				geneCount = 0;
-				currentNGenes = nGenesIterator.next();
-			}
-
-			if ((i != indexToMute)) {
-				// skip first act
-				if (geneCount > 0) {
-					freeSpace -= ((DoubleGene) gene).doubleValue();
-				}
-			}
-			else {
-				inGoodPlan = true;
-			}
-
-			geneCount++;
-		}
-
-		return freeSpace;
-	}
-
 	private final void mutateBoolean(
 			final BooleanGene gene) {
 		gene.setAllele(!gene.booleanValue());
@@ -281,11 +201,11 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	private final void mutateDoubleNonUniform(
 			final DoubleGene gene,
-			final Double freeSpace) {
+			final Tuple<Double, Double> allowedRange) {
 		// GENOCOP (Michalewicz, Janikow, 1996) like "non uniform" mutation.
 		double value = gene.doubleValue();
-		double lowerBound = 0;
-		double upperBound = freeSpace;
+		double lowerBound = allowedRange.getFirst();
+		double upperBound = lowerBound + allowedRange.getSecond();
 		int iter = this.jgapConfig.getGenerationNr();
 
 		if (this.randomGenerator.nextInt(2) == 0) {
@@ -299,11 +219,13 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 
 	private final void mutateDouble(
 			final DoubleGene gene,
-			final Double freeSpace) {
-		gene.setAllele(this.randomGenerator.nextDouble() * freeSpace);
+			final Tuple<Double, Double> allowedRange) {
+		gene.setAllele(allowedRange.getFirst() + this.randomGenerator.nextDouble() * allowedRange.getSecond());
 	}
 
-	private final double delta(final int t,final double y) {
+	private final double delta(
+			final int t,
+			final double y) {
 		double r = this.randomGenerator.nextDouble();
 		double exponant = Math.pow((1d - ((double) t)/this.NUM_ITER), this.NON_UNIFORMITY_PARAM);
 
