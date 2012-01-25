@@ -1,10 +1,10 @@
-/* **********************************import java.util.List;
-
-import org.matsim.interfaces.basic.v01.Id;
-                                                                         *
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BasicLaneDefinitionBuilder
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,28 @@ import org.matsim.interfaces.basic.v01.Id;
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package org.matsim.lanes;
-
-import java.util.SortedMap;
+package org.matsim.lanes.data.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.internal.MatsimFactory;
+
+
 /**
- *
+ * Builder for the content of BasicLaneDefinitions
  * @author dgrether
- *
  */
-public interface LanesToLinkAssignment {
+public interface LaneDefinitionsFactory extends MatsimFactory {
 
-	public SortedMap<Id, Lane> getLanes();
-
-	public void addLane(Lane lane);
-
-	public Id getLinkId();
-
+	/**
+	 * 
+	 * @param linkIdReference id of the links the lanes of the created object belong to
+	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
+	 */
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference);
+	/**
+	 * Creates an instance of BasicLane with the id given as parameter.
+	 * @param laneId
+	 * @return
+	 */
+	public Lane createLane(Id laneId);
 }

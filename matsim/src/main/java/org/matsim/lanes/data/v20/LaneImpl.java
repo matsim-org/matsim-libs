@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.lanes;
+package org.matsim.lanes.data.v20;
 
 import java.util.ArrayList;
 import java.util.List;

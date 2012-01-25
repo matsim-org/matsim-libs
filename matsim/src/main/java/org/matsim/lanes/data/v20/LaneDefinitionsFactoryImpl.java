@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitions
+ * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
+package org.matsim.lanes.data.v20;
 
 import org.matsim.api.core.v01.Id;
 
 
 /**
+ * 
  * @author dgrether
+ * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory
  */
-public class LaneDefinitionsImpl implements LaneDefinitions {
-
-	private SortedMap<Id, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<Id, LanesToLinkAssignment>();
-
-	private final LaneDefinitionsFactory builder = new LaneDefinitionsFactoryImpl();
-
+public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
+	/**
+	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 */
 	@Override
-	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments() {
-		return this.lanesToLinkAssignments;
+	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
+		return new LanesToLinkAssignmentImpl(linkIdReference);
 	}
-
+	/**
+	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
+	 */
 	@Override
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
-		if (this.lanesToLinkAssignments == null) {
-			this.lanesToLinkAssignments = new TreeMap<Id, LanesToLinkAssignment>();
-		}
-		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
+	public Lane createLane(Id id) {
+		return new LaneImpl(id);
 	}
-
-	@Override
-	public LaneDefinitionsFactory getFactory(){
-		return this.builder;
-	}
-
 }

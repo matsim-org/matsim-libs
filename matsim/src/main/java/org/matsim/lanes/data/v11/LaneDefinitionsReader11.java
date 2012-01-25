@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data.v11;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +37,10 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.xml.sax.SAXException;
 
 

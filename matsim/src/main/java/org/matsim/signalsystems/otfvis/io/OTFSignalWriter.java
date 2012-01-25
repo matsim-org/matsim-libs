@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.SignalGroupStateChangedEvent;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitions;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;

@@ -127,7 +127,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.population.VspPlansCleaner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;

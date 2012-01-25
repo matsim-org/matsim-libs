@@ -25,6 +25,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

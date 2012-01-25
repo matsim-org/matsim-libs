@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LanesTurnInfoBuilder
+ * LaneMeterFromLinkEndComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,30 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data.v20;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.Serializable;
+import java.util.Comparator;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-
+import org.matsim.core.api.internal.MatsimComparator;
 
 /**
+ * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
+ * attribute.
  * @author dgrether
- *
  */
-public class LanesTurnInfoBuilder {
+public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
 
-	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitions ld) {
-		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
-		Set<Id> toLinkIds = new HashSet<Id>(); 
-		for (LanesToLinkAssignment l2l : ld.getLanesToLinkAssignments().values()){
-			toLinkIds.clear();
-			for (Lane lane : l2l.getLanes().values()){
-				if (lane.getToLinkIds() != null){
-					toLinkIds.addAll(lane.getToLinkIds());
-				}
-			}
-			if (! toLinkIds.isEmpty()){
-				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
-				for (Id toLinkId : toLinkIds){
-					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
-				}
-				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);
-			}
-		}
-		
-		return inLinkIdTurnInfoMap;
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public int compare(Lane o1, Lane o2) {
+    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
+      return -1;
+    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
+      return 1;
+    } else {
+      return 0;
+    }
 	}
-
-
 }

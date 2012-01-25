@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data.v20;
 
-package org.matsim.lanes;
-
-import java.util.SortedMap;
+import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
-
 /**
- * Top level container for lanes within MATSim. See package-info for documentation.
+ * 
  * @author dgrether
  *
  */
-public interface LaneDefinitions extends MatsimToplevelContainer {
+public interface Lane {
 
 	/**
-	 *
-	 * @return Map with Link Ids as keys and assignments as values
+	 * @param number
 	 */
-	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments();
+	public void setNumberOfRepresentedLanes(double number);
 
-	/**
-	 * Adds a LanesToLinkAssignment to the container.
-	 * @param assignment
-	 */
-	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
-	/**
-	 * Get the factory to create container content.
-	 */
-	@Override
-	public LaneDefinitionsFactory getFactory();
+	public void setStartsAtMeterFromLinkEnd(double meter);
 
+	public Id getId();
+
+	public double getNumberOfRepresentedLanes();
+
+	public double getStartsAtMeterFromLinkEnd();
+
+	public void addToLinkId(Id id);
+	
+	public void addToLaneId(Id id);
+	/**
+	 * 
+	 * @return List may be null if nothing is set
+	 */
+	public List<Id> getToLinkIds();
+	/**
+	 * 
+	 * @return List may be null if nothing is set
+	 */
+	public List<Id> getToLaneIds();
+
+	public void setAlignment(int alignment);
+
+	public int getAlignment();
+	
 }

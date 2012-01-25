@@ -30,10 +30,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsFactory;
-import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.testcases.MatsimTestCase;
 

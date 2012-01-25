@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitions;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.qsim.TransitQSimEngine;

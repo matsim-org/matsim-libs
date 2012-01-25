@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data.v20;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -26,42 +26,43 @@ import java.io.IOException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.crypto.MarshalException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.jaxb.lanedefinitions11.ObjectFactory;
-import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
-import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
-import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
-import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
+import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
+import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
+import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
+import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 /**
- * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
+ * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
  * file format.
  * @author dgrether
  *
  */
-public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
+public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger
-			.getLogger(LaneDefinitionsWriter11.class);
+			.getLogger(LaneDefinitionsWriter20.class);
 
 	private LaneDefinitions laneDefinitions;
 
 	private XMLLaneDefinitions xmlLaneDefinitions;
 
 	/**
-	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd
+	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
 	 * file format.
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter11(LaneDefinitions lanedefs) {
-		log.info("Using LaneDefinitionWriter11...");
+	public LaneDefinitionsWriter20(LaneDefinitions lanedefs) {
+		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
-		this.xmlLaneDefinitions = convertBasicToXml();
 	}
 
 	/**
@@ -72,9 +73,10 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 		log.info("writing to file: " + filename);
   	JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions11.ObjectFactory.class);
+			this.xmlLaneDefinitions = convertDataToXml();
+			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, m);
+			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV20, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.xmlLaneDefinitions, bufout);
 			bufout.close();
@@ -84,10 +86,12 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (MarshalException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private XMLLaneDefinitions convertBasicToXml() {
+	private XMLLaneDefinitions convertDataToXml() throws MarshalException {
 		ObjectFactory fac = new ObjectFactory();
 		XMLLaneDefinitions xmllaneDefs = fac.createXMLLaneDefinitions();
 
@@ -99,20 +103,40 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 
-				for (Id id : bl.getToLinkIds()) {
-					XMLIdRefType xmlToLink = fac.createXMLIdRefType();
-					xmlToLink.setRefId(id.toString());
-					xmllane.getToLink().add(xmlToLink);
+				if ((bl.getToLinkIds() == null && bl.getToLaneIds() != null) || 
+						(bl.getToLinkIds() != null && bl.getToLaneIds() == null)){
+					xmllane.setLeadsTo(fac.createXMLLaneTypeXMLLeadsTo());
+				}
+				else {
+					throw new MarshalException("Either at least one toLinkId or (exclusive) one toLaneId must" +
+							"be set for Lane Id " + bl.getId() + " on link Id " + ltla.getLinkId() + "! Cannot write according to XML grammar.");
+				}
+				
+				if (bl.getToLinkIds() != null){
+					for (Id id : bl.getToLinkIds()) {
+						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
+						xmlToLink.setRefId(id.toString());
+						xmllane.getLeadsTo().getToLink().add(xmlToLink);
+					}
+				}
+				else if (bl.getToLaneIds() != null){
+					for (Id id : bl.getToLaneIds()) {
+						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
+						xmlToLink.setRefId(id.toString());
+						xmllane.getLeadsTo().getToLane().add(xmlToLink);
+					}
 				}
 
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				lanes.setNumber(bl.getNumberOfRepresentedLanes());
+				lanes.setNumber(Double.valueOf(bl.getNumberOfRepresentedLanes()));
 				xmllane.setRepresentedLanes(lanes);
 
-				XMLLaneType.XMLLength length = new XMLLaneType.XMLLength();
-				length.setMeter(Double.valueOf(bl.getStartsAtMeterFromLinkEnd()));
-				xmllane.setLength(length);
+				XMLLaneType.XMLStartsAt startsAt = new XMLLaneType.XMLStartsAt();
+				startsAt.setMeterFromLinkEnd(Double.valueOf(bl.getStartsAtMeterFromLinkEnd()));
+				xmllane.setStartsAt(startsAt);
 
+				xmllane.setAlignment(bl.getAlignment());
+				
 				xmlltla.getLane().add(xmllane);
 			}
 			xmllaneDefs.getLanesToLinkAssignment().add(xmlltla);

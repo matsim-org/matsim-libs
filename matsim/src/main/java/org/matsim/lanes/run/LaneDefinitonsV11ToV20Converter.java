@@ -31,18 +31,18 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsImpl;
-import org.matsim.lanes.LaneDefinitionsReader11;
-import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.LaneDefinitionsWriter20;
-import org.matsim.lanes.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.xml.sax.SAXException;
 
 
 /**
  * Class with main for LaneDefinitionsV11ToV20Conversion, see printUsage() for details.
- * @see org.matsim.lanes.LaneDefinitionsV11ToV20Conversion
+ * @see org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion
  * @author dgrether
  */
 public class LaneDefinitonsV11ToV20Converter {

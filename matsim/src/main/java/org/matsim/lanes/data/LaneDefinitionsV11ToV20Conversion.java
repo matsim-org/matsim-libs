@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +30,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneMeterFromLinkEndComparator;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.matsim.signalsystems.CalculateAngle;
 
 

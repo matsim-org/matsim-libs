@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LaneMeterFromLinkEndComparator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
 
-import java.io.Serializable;
-import java.util.Comparator;
+package org.matsim.lanes.data.v20;
 
-import org.matsim.core.api.internal.MatsimComparator;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
 
 /**
- * Comparator which implements a comparision function for the Lane.getStartsAtMeterFromLinkEnd()
- * attribute.
  * @author dgrether
  */
-public class LaneMeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
+public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
 
-	private static final long serialVersionUID = 1L;
+	private final Id linkId;
+
+	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
+
+	public LanesToLinkAssignmentImpl(Id linkId) {
+		this.linkId = linkId;
+	}
 
 	@Override
-	public int compare(Lane o1, Lane o2) {
-    if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
-      return -1;
-    } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
-      return 1;
-    } else {
-      return 0;
-    }
+	public void addLane(Lane lane) {
+		this.lanes.put(lane.getId(), lane);
 	}
+
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	@Override
+	public SortedMap<Id, Lane> getLanes() {
+		return this.lanes;
+	}
+
 }

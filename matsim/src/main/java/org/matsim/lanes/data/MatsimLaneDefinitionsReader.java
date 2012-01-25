@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data;
 
 import java.io.IOException;
 
@@ -28,6 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
+import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
 import org.xml.sax.SAXException;
 
 /**

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneDefinitionWriter
+ * BasicLaneDefinitions
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,35 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data.v20;
 
-import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
 
 
 /**
- * Writes the lane definitions according to
- * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
- * grammar.
  * @author dgrether
- *
  */
-public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
-	
-	private MatsimJaxbXmlWriter writerDelegate;
-	 
-	/**
-	 * Writes the file with the default format for 
-	 * LaneDefinitions within MATSim.
-	 * @param lanedefs
-	 */
-	public MatsimLaneDefinitionsWriter(LaneDefinitions lanedefs){
-		this.writerDelegate = new LaneDefinitionsWriter20(lanedefs);
+public class LaneDefinitionsImpl implements LaneDefinitions {
+
+	private SortedMap<Id, LanesToLinkAssignment> lanesToLinkAssignments =  new TreeMap<Id, LanesToLinkAssignment>();
+
+	private final LaneDefinitionsFactory builder = new LaneDefinitionsFactoryImpl();
+
+	@Override
+	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments() {
+		return this.lanesToLinkAssignments;
 	}
-	
-	
-	public void writeFile(String filename){
-		this.writerDelegate.write(filename);
+
+	@Override
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment) {
+		if (this.lanesToLinkAssignments == null) {
+			this.lanesToLinkAssignments = new TreeMap<Id, LanesToLinkAssignment>();
+		}
+		this.lanesToLinkAssignments.put(assignment.getLinkId(), assignment);
 	}
-	
+
+	@Override
+	public LaneDefinitionsFactory getFactory(){
+		return this.builder;
+	}
+
 }

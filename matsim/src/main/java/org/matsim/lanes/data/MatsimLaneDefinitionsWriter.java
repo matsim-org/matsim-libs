@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MatsimLaneDefinitionWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,40 +17,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.lanes.data;
 
-package org.matsim.lanes;
+import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Id;
 
 /**
+ * Writes the lane definitions according to
+ * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
+ * grammar.
  * @author dgrether
+ *
  */
-public class LanesToLinkAssignmentImpl implements LanesToLinkAssignment {
-
-	private final Id linkId;
-
-	private final SortedMap<Id, Lane> lanes = new TreeMap<Id, Lane>();
-
-	public LanesToLinkAssignmentImpl(Id linkId) {
-		this.linkId = linkId;
+public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
+	
+	private MatsimJaxbXmlWriter writerDelegate;
+	 
+	/**
+	 * Writes the file with the default format for 
+	 * LaneDefinitions within MATSim.
+	 * @param lanedefs
+	 */
+	public MatsimLaneDefinitionsWriter(LaneDefinitions lanedefs){
+		this.writerDelegate = new LaneDefinitionsWriter20(lanedefs);
 	}
-
-	@Override
-	public void addLane(Lane lane) {
-		this.lanes.put(lane.getId(), lane);
+	
+	
+	public void writeFile(String filename){
+		this.writerDelegate.write(filename);
 	}
-
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
-
-	@Override
-	public SortedMap<Id, Lane> getLanes() {
-		return this.lanes;
-	}
-
+	
 }

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LanesTurnInfoBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+
+
 /**
- * 
  * @author dgrether
  *
  */
-public interface Lane {
+public class LanesTurnInfoBuilder {
 
-	/**
-	 * @param number
-	 */
-	public void setNumberOfRepresentedLanes(double number);
+	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitions ld) {
+		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
+		Set<Id> toLinkIds = new HashSet<Id>(); 
+		for (LanesToLinkAssignment l2l : ld.getLanesToLinkAssignments().values()){
+			toLinkIds.clear();
+			for (Lane lane : l2l.getLanes().values()){
+				if (lane.getToLinkIds() != null){
+					toLinkIds.addAll(lane.getToLinkIds());
+				}
+			}
+			if (! toLinkIds.isEmpty()){
+				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
+				for (Id toLinkId : toLinkIds){
+					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
+				}
+				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);
+			}
+		}
+		
+		return inLinkIdTurnInfoMap;
+	}
 
-	public void setStartsAtMeterFromLinkEnd(double meter);
 
-	public Id getId();
-
-	public double getNumberOfRepresentedLanes();
-
-	public double getStartsAtMeterFromLinkEnd();
-
-	public void addToLinkId(Id id);
-	
-	public void addToLaneId(Id id);
-	/**
-	 * 
-	 * @return List may be null if nothing is set
-	 */
-	public List<Id> getToLinkIds();
-	/**
-	 * 
-	 * @return List may be null if nothing is set
-	 */
-	public List<Id> getToLaneIds();
-
-	public void setAlignment(int alignment);
-
-	public int getAlignment();
-	
 }

@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.lanes.Lane;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.pt.qsim.TransitDriverAgent;

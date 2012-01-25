@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes.otfvis;
 
-import org.matsim.lanes.Lane;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.otfvis.io.OTFLane;
 import org.matsim.ptproject.qsim.qnetsimengine.QLane;
 

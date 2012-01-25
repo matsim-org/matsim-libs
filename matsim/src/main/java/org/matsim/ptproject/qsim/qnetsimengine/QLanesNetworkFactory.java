@@ -22,7 +22,7 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitions;
 
 
 public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, AbstractQLink> {

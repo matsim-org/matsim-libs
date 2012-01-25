@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BasicLaneDefinitionsBuilderImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+
+package org.matsim.lanes.data.v20;
+
+import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
-
+import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
- * 
+ * Top level container for lanes within MATSim. See package-info for documentation.
  * @author dgrether
- * @see org.matsim.lanes.LaneDefinitionsFactory
+ *
  */
-public class LaneDefinitionsFactoryImpl implements LaneDefinitionsFactory {
+public interface LaneDefinitions extends MatsimToplevelContainer {
+
 	/**
-	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
+	 *
+	 * @return Map with Link Ids as keys and assignments as values
+	 */
+	public SortedMap<Id, LanesToLinkAssignment> getLanesToLinkAssignments();
+
+	/**
+	 * Adds a LanesToLinkAssignment to the container.
+	 * @param assignment
+	 */
+	public void addLanesToLinkAssignment(LanesToLinkAssignment assignment);
+	/**
+	 * Get the factory to create container content.
 	 */
 	@Override
-	public LanesToLinkAssignment createLanesToLinkAssignment(Id linkIdReference) {
-		return new LanesToLinkAssignmentImpl(linkIdReference);
-	}
-	/**
-	 * @see org.matsim.lanes.LaneDefinitionsFactory#createLane(org.matsim.api.core.v01.Id)
-	 */
-	@Override
-	public Lane createLane(Id id) {
-		return new LaneImpl(id);
-	}
+	public LaneDefinitionsFactory getFactory();
+
 }
