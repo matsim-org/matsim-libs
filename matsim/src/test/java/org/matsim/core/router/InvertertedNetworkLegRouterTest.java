@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -45,6 +46,7 @@ import org.matsim.core.router.util.PersonalizableLinkToLinkTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
+
 /**
  * Tests the routing under consideration of different link to link travel times (turning moves)
  * @author dgrether
@@ -52,6 +54,13 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class InvertertedNetworkLegRouterTest {
 
+	
+	public void writeNetwork(){
+		Fixture f = new Fixture();
+		NetworkWriter netwriter = new NetworkWriter(f.s.getNetwork());
+		netwriter.write("/media/data/work/matsim/matsimWorkspace/matsim/test/input/org/matsim/integration/lanes/network.xml");
+	}
+	
 	@Test
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
