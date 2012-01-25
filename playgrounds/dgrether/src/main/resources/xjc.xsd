@@ -1,0 +1,404 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<xs:schema
+   targetNamespace = "http://java.sun.com/xml/ns/jaxb"
+   xmlns:jaxb = "http://java.sun.com/xml/ns/jaxb"
+   xmlns:xs = "http://www.w3.org/2001/XMLSchema"
+   elementFormDefault = "qualified"
+   attributeFormDefault = "unqualified">
+  <xs:annotation>
+    <xs:documentation>Schema for binding schema.  JAXB Version 1.0</xs:documentation>
+  </xs:annotation>
+  <xs:group name = "declaration">
+    <xs:annotation>
+      <xs:documentation>
+         Model group that represents a binding declaration.
+   Each new binding declaration added to the jaxb namespace
+         that is not restricted to globalBindings should
+   be added as a child element to this model group.
+
+      </xs:documentation>
+      <xs:documentation>
+               Allow for extension binding declarations.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <!-- each new binding declaration, not restricted to
+           globalBindings, should be added here -->
+    <xs:choice>
+      <xs:element ref = "jaxb:globalBindings"/>
+      <xs:element ref = "jaxb:schemaBindings"/>
+      <xs:element ref = "jaxb:class"/>
+      <xs:element ref = "jaxb:property"/>
+      <xs:element ref = "jaxb:typesafeEnumClass"/>
+      <xs:element ref = "jaxb:typesafeEnumMember"/>
+      <xs:element ref = "jaxb:javaType"/>
+      <xs:any namespace = "##other" processContents = "lax"/>
+    </xs:choice>
+  </xs:group>
+  <xs:attribute name = "version" type="xs:token" >
+    <xs:annotation><xs:documentation>
+       Used to specify the version of the binding schema on the
+       schema element for inline annotations or jaxb:bindings
+       for external binding.
+    </xs:documentation></xs:annotation>
+  </xs:attribute>
+  <xs:attributeGroup name = "propertyAttributes">
+    <xs:annotation>
+      <xs:documentation>Attributes used for property customization. The attribute group
+        can be referenced either from the globalBindings declaration or from the 
+        property declaration. 
+        The following defaults are defined by the JAXB specification in global
+        scope only. Thus they apply when the propertyAttributes group is referenced
+        from the globalBindings declaration but not when referenced from the
+        property declaration.
+          collectionType            a class that implements java.util.List. The
+                                    class is JAXB implementation dependent.
+          fixedAttributeAsConstantProperty  false
+          enableFailFastCheck        false
+          generateIsSetMethod        false
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name = "collectionType" type="jaxb:referenceCollectionType"/>
+    <xs:attribute name = "fixedAttributeAsConstantProperty" type = "xs:boolean"/>
+    <xs:attribute name = "enableFailFastCheck" type = "xs:boolean"/>
+    <xs:attribute name = "generateIsSetMethod" type = "xs:boolean"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name = "XMLNameToJavaIdMappingDefaults">
+    <xs:annotation>
+      <xs:documentation>Customize XMlNames to Java id mapping </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name = "underscoreBinding" default = "asWordSeparator" type = "jaxb:underscoreBindingType"/>
+    <xs:attribute name = "typesafeEnumMemberName" default = "generateError" type = "jaxb:typesafeEnumMemberNameType"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name = "typesafeEnumClassDefaults">
+    <xs:attribute name = "typesafeEnumBase" default = "xs:NCname" type = "jaxb:typesafeEnumBaseType"/>
+  </xs:attributeGroup>
+ 
+  <xs:element name = "globalBindings">
+    <xs:annotation>
+      <xs:documentation>Customization values defined in global scope.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence minOccurs = "0">
+        <xs:element ref = "jaxb:javaType" minOccurs = "0" maxOccurs = "unbounded"/>
+        <xs:any namespace = "##other" processContents = "lax">
+          <xs:annotation> <xs:documentation>
+            allows extension binding declarations to be specified.
+        </xs:documentation></xs:annotation>
+        </xs:any>
+      </xs:sequence>
+      <xs:attributeGroup ref = "jaxb:XMLNameToJavaIdMappingDefaults"/>
+      <xs:attributeGroup ref = "jaxb:typesafeEnumClassDefaults"/>
+      <xs:attributeGroup ref = "jaxb:propertyAttributes"/>
+      <xs:attribute name = "enableJavaNamingConventions" default = "true" type = "xs:boolean"/>
+      <xs:attribute name = "bindingStyle" default = "elementBinding" type = "jaxb:bindingStyleType"/>
+      <xs:attribute name = "choiceContentProperty" default = "false" type = "xs:boolean"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:element name = "schemaBindings">
+    <xs:annotation>
+      <xs:documentation>Customization values with schema scope</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name = "package" type = "jaxb:packageType" minOccurs = "0"/>
+        <xs:element name = "nameXmlTransform" type = "jaxb:nameXmlTransformType" minOccurs = "0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "class">
+    <xs:annotation>
+      <xs:documentation>Customize interface and implementation class.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "javadoc" type = "xs:string" minOccurs = "0"/>
+      </xs:sequence>
+      <xs:attribute name = "name" type = "jaxb:javaIdentifierType">
+        <xs:annotation>
+          <xs:documentation>Java class name without package prefix.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name = "implClass" type = "jaxb:javaIdentifierType">
+        <xs:annotation>
+          <xs:documentation>Implementation class name including package prefix.  </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "property">
+    <xs:annotation>
+      <xs:documentation>Customize property.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:all>
+        <xs:element name = "javadoc" type = "xs:string" minOccurs="0"/>
+        <xs:element name = "baseType" type="jaxb:propertyBaseType" minOccurs="0"/>
+      </xs:all>
+      <xs:attribute name = "name" type = "jaxb:javaIdentifierType"/>
+      <xs:attributeGroup ref = "jaxb:propertyAttributes"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "javaType">
+    <xs:annotation>
+      <xs:documentation>Data type conversions;  overriding builtins</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name = "name" use = "required" type = "jaxb:javaIdentifierType">
+        <xs:annotation>
+          <xs:documentation>name of the java type to which xml type is to be bound.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name = "xmlType" type = "xs:QName">
+        <xs:annotation>
+          <xs:documentation> xml type to which java datatype has to be bound.
+Must be present when javaType is scoped to globalBindings
+         
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name = "parseMethod" type = "jaxb:javaIdentifierType"/>
+      <xs:attribute name = "printMethod" type = "jaxb:javaIdentifierType"/>
+      <xs:attribute name = "hasNsContext" default = "false" type = "xs:boolean" >
+        <xs:annotation>
+          <xs:documentation> 
+If true, the parsMethod and printMethod must reference a method
+signtature that has a second parameter of type NamespaceContext.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "typesafeEnumClass">
+    <xs:annotation>
+      <xs:documentation> Bind to a type safe enumeration class.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "javadoc" type = "xs:string" minOccurs = "0"/>
+        <xs:element ref = "jaxb:typesafeEnumMember" minOccurs = "0" maxOccurs = "unbounded"/>
+      </xs:sequence>
+      <xs:attribute name = "name" type = "jaxb:javaIdentifierType"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name = "typesafeEnumMember">
+    <xs:annotation>
+      <xs:documentation> Enumeration member name in a type safe enumeration class.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name = "javadoc" type = "xs:string" minOccurs = "0"/>
+      </xs:sequence>
+      <xs:attribute name = "value" type="xs:anySimpleType"/>
+      <xs:attribute name = "name" use = "required" type = "jaxb:javaIdentifierType"/>
+    </xs:complexType>
+  </xs:element>
+  
+  <!-- TYPE DEFINITIONS -->
+
+  <xs:complexType name = "propertyBaseType">
+    <xs:annotation>
+      <xs:documentation>
+        Customize the base type of a property. For V1.0, only
+        javaType is allowed for customization of simple types
+        at point of reference to a simple type.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element ref = "jaxb:javaType" minOccurs = "0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:simpleType name = "bindingStyleType">
+    <xs:annotation>
+      <xs:documentation>Allows selection of a binding algorithm</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base = "xs:string">
+      <xs:enumeration value = "elementBinding"/>
+      <xs:enumeration value = "modelGroupBinding"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name = "packageType">
+    <xs:sequence>
+      <xs:element name = "javadoc" type = "xs:string" minOccurs = "0"/>
+    </xs:sequence>
+    <xs:attribute name = "name" type = "jaxb:javaIdentifierType"/>
+  </xs:complexType>
+  <xs:simpleType name = "underscoreBindingType">
+    <xs:annotation>
+      <xs:documentation>Treate underscore  in XML Name to Java identifier mapping.  </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base = "xs:string">
+      <xs:enumeration value = "asWordSeparator"/>
+      <xs:enumeration value = "asCharInWord"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name = "typesafeEnumBaseType">
+    <xs:annotation>
+      <xs:documentation> XML types or types derived from them which have enumeration facet(s) which
+                            are be mapped to typesafeEnumClass by default. 
+         The following types cannot be specified in this list:
+         "xsd:QName", "xsd:base64Binary", "xsd:hexBinary", 
+         "xsd:date", "xsd:time", "xsd:dateTime", "xsd:duration",
+         "xsd:gDay", "xsd:gMonth", "xsd:Year", "xsd:gMonthDay", "xsd:YearMonth"
+      </xs:documentation>
+    </xs:annotation>
+    <xs:list itemType = "xs:QName"/>
+  </xs:simpleType>
+  <xs:simpleType name = "typesafeEnumMemberNameType">
+    <xs:annotation>
+      <xs:documentation>Used to customize how to handle name collisions.
+i.  generate VALUE_1, VALUE_2... if  generateName.
+ii.  generate an error  if value is generateError. This is JAXB default behavior.
+      
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base = "xs:string">
+      <xs:enumeration value = "generateName"/>
+      <xs:enumeration value = "generateError"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name = "javaIdentifierType">
+    <xs:annotation>
+      <xs:documentation>Placeholder type to indicate Legal Java identifier.</xs:documentation>
+    </xs:annotation>
+    <xs:list itemType = "xs:NCName"/>
+  </xs:simpleType>
+  <xs:complexType name = "nameXmlTransformRule">
+    <xs:annotation>
+      <xs:documentation>Rule to transform an Xml name into another Xml name</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name = "prefix" type = "xs:string">
+      <xs:annotation>
+        <xs:documentation>prepend the string to QName.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name = "suffix" type = "xs:string">
+      <xs:annotation>
+        <xs:documentation>Append the string to QName.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+  <xs:complexType name = "nameXmlTransformType">
+    <xs:annotation>
+      <xs:documentation>
+        Allows transforming an xml name into another xml name. Use case UDDI 2.0 schema.
+     
+      </xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name = "typeName" type = "jaxb:nameXmlTransformRule" minOccurs = "0">
+        <xs:annotation>
+          <xs:documentation>Mapping rule for type definitions.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name = "elementName" type = "jaxb:nameXmlTransformRule" minOccurs = "0">
+        <xs:annotation>
+          <xs:documentation>Mapping rule for elements</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name = "modelGroupName" type = "jaxb:nameXmlTransformRule" minOccurs = "0">
+        <xs:annotation>
+          <xs:documentation>Mapping rule  for model group</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name = "anonymousTypeName" type = "jaxb:nameXmlTransformRule" minOccurs = "0">
+        <xs:annotation>
+          <xs:documentation>Mapping rule for class names generated for an anonymous type.</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:attribute name = "extensionBindingPrefixes">
+    <xs:annotation>
+      <xs:documentation>
+A binding compiler only processes this attribute when it occurs on an
+an instance of xs:schema element.  The value of this attribute is a
+whitespace-separated list of namespace prefixes.  The namespace bound
+to each of the prefixes is designated as a customization declaration
+namespace.
+      
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:list itemType = "xs:normalizedString"/>
+    </xs:simpleType>
+  </xs:attribute>
+  <xs:element name = "bindings">
+    <xs:annotation>
+      <xs:documentation>
+  Binding declaration(s) for a remote schema.
+  If attribute node is set, the binding declaraions
+  are associated with part of the remote schema
+  designated by schemaLocation attribute. The node
+  attribute identifies the node in the remote schema
+  to associate the binding declaration(s) with.
+    
+      </xs:documentation>
+    </xs:annotation>
+    <!-- a <bindings> element can contain arbitrary number of binding declarations or nested <bindings> elements -->
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs = "0" maxOccurs = "unbounded">
+          <xs:group ref = "jaxb:declaration"/>
+          <xs:element ref = "jaxb:bindings"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name = "schemaLocation" type = "xs:anyURI">
+        <xs:annotation>
+          <xs:documentation>
+    Location of the remote schema to associate binding declarations with.
+          
+          
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name = "node" type = "xs:string">
+        <xs:annotation>
+          <xs:documentation>
+             The value of the string is an XPATH 1.0 compliant string that
+             resolves to a node in a remote schema to associate
+       binding declarations with. The remote schema is specified
+       by the schemaLocation attribute occuring in the current
+       element or in a parent of this element.
+           
+        
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name = "version" type = "xs:token">
+        <xs:annotation>
+          <xs:documentation>
+             Used to indicate the version of binding declarations.
+             Only valid on root level bindings element.
+             Either this or "jaxb:version" attribute but not both may be specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute ref = "jaxb:version">
+        <xs:annotation>
+          <xs:documentation>
+             Used to indicate the version of binding declarations.
+             Only valid on root level bindings element.
+             Either this attribute or "version" attribute but not both may be specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="referenceCollectionType">
+    <xs:union>
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="indexed"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType>
+        <xs:restriction base="jaxb:javaIdentifierType"/>
+      </xs:simpleType>
+    </xs:union>
+  </xs:simpleType> 
+</xs:schema>
+
