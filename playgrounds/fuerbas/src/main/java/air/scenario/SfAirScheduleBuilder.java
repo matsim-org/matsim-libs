@@ -22,7 +22,6 @@ package air.scenario;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -186,6 +185,8 @@ public class SfAirScheduleBuilder {
 						String aircraftType = lineEntries[21];
 						int seatsAvail = Integer.parseInt(lineEntries[23]);
 
+						
+						//some error correction code
 						if (lineEntries[14].contains("2") && !flights.containsKey(flightDesignator)
 								&& seatsAvail > 0 && !originAirport.equalsIgnoreCase(destinationAirport)
 								&& this.airportsInOsm.containsKey(originAirport)

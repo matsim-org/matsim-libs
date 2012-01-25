@@ -35,6 +35,27 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
+ * Reads UTC Offsets for all airports in a OSM file from the webservice www.earthtools.org.
+ * 
+ * The response from the webservice is a xml document, example:
+ *<?xml version="1.0" encoding="ISO-8859-1" ?>
+ *<timezone xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.earthtools.org/timezone-1.1.xsd">
+ *	<version>1.1</version>
+ *	<location>
+ *		<latitude>41.8543</latitude>
+ *  	<longitude>12.6453</longitude>
+ * 	</location>
+ * 	<offset>1</offset>
+ * 	<suffix>A</suffix>
+ * 	<localtime>25 Jan 2012 15:30:59</localtime>
+ *	<isotime>2012-01-25 15:30:59 +0100</isotime>
+ *	<utctime>2012-01-25 14:30:59</utctime>
+ * 	<dst>False</dst>
+ *</timezone>
+ * 
+ * 
+ * @see http://www.earthtools.org/webservices.htm
+ * 
  * @author sfuerbas
  * @author dgrether
  *
@@ -56,6 +77,8 @@ public class SfUtcOffset {
 						TransformationFactory.WGS84));
 		osmReader.parse(inputOsmFile);
 	
+		log.warn("This tool creates UTC offsets, however ignores daylight saving time");
+		
 		this.airportsInOsm = osmReader.airports;
 		log.info("Getting UTC offsets for " + this.airportsInOsm.size() + " airports. This will take 2 seconds per airport, at least...");
 		int count = 0;
@@ -93,7 +116,7 @@ public class SfUtcOffset {
 		double offset = 0;
 		
 		while ((inputLine = in.readLine()) != null) {
-			
+			log.debug(inputLine);
 			if (inputLine.contains("offset")) {
 				inputLine = inputLine.replaceAll("<offset>", "");
 				inputLine = inputLine.replaceAll("</offset>", "");
@@ -101,16 +124,17 @@ public class SfUtcOffset {
 				offset = Double.parseDouble(inputLine);
 //				System.out.println(offset);
 			}
-			else if (inputLine.contains("dst")) {
-				inputLine = inputLine.replaceAll("<dst>", "");
-				inputLine = inputLine.replaceAll("</dst>", "");
-				inputLine = inputLine.replaceAll(" ", "");
-				if (inputLine.equalsIgnoreCase("true"))  {
-					offset++;
-				}
+// currently ignore daylight saving time
+			//			if (inputLine.contains("dst")) {
+//				inputLine = inputLine.replaceAll("<dst>", "");
+//				inputLine = inputLine.replaceAll("</dst>", "");
+//				inputLine = inputLine.replaceAll(" ", "");
+//				if (inputLine.equalsIgnoreCase("true"))  {
+//					offset++;
+//				}
 //				System.out.println("neu"+offset);
 //				System.out.println(inputLine);
-			}
+//			}
 		}
 		in.close();
 		return offset;
