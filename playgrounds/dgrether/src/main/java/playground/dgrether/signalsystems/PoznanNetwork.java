@@ -578,6 +578,7 @@ public class PoznanNetwork
         config.addQSimConfigGroup(new QSimConfigGroup());
         config.getQSimConfigGroup().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
         config.getQSimConfigGroup().setStartTime(0.0);
+        config.getQSimConfigGroup().setSnapshotStyle("queue");
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
