@@ -36,20 +36,20 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.config.ConfigUtils;
 import org.xml.sax.SAXException;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 import playground.gregor.sim2d_v2.events.XYVxVyEvent;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsFileReader;
 import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author laemmel
@@ -57,15 +57,20 @@ import playground.gregor.sim2d_v2.events.XYVxVyEventsHandler;
  */
 public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHandler {
 
-	private final ScenarioImpl sc;
+	private final Scenario sc;
 
 	Map<Id, P> lastPosition = new HashMap<Id, P>();
 
 	private final PopulationFactory fac;
 
-	public XYZEvents2Plan() {
-		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	protected XYZEvents2Plan() {
+		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.fac = this.sc.getPopulation().getFactory();
+	}
+	
+	public XYZEvents2Plan(Scenario sc) {
+		this.sc = sc;
+		this.fac = sc.getPopulation().getFactory();
 	}
 
 	/*
@@ -116,7 +121,8 @@ public class XYZEvents2Plan implements XYVxVyEventsHandler, AgentArrivalEventHan
 		Activity actS = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.orig));
 		actS.setEndTime(p.dep);
 		Leg leg = this.fac.createLeg("walk2d");
-		Activity actE = this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.dest));
+		ActivityImpl actE = (ActivityImpl) this.fac.createActivityFromCoord("h", MGC.coordinate2Coord(p.dest));
+		actE.setLinkId(event.getLinkId());
 		plan.addActivity(actS);
 		plan.addLeg(leg);
 		plan.addActivity(actE);

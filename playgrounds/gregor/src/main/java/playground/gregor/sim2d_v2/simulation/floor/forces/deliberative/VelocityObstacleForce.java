@@ -6,15 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.QuadTree;
-
-
-import com.vividsolutions.jts.algorithm.NonRobustLineIntersector;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
-
 
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
@@ -25,6 +17,9 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.ConfigurationSpaceObstacle;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
+
+import com.vividsolutions.jts.algorithm.NonRobustLineIntersector;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class VelocityObstacleForce implements DynamicForceModule{
 
@@ -65,6 +60,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
 		this.velocityChooser = new RandomAlternativeVelocityChooser();
+//		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
 	}
 
 

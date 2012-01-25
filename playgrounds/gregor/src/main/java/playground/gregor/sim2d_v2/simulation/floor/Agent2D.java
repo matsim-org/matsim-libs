@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
@@ -164,11 +165,7 @@ public class Agent2D implements MobsimAgent {
 		return this.currentDesiredVelocity;
 	}
 
-	//FIXME remove this method - the desired velocity should never be set externally (because desires can't be enforced)  
-	public void setDesiredVelocity(double v) {
-		this.currentDesiredVelocity = v;
-	}
-	
+
 	@Deprecated //should be private
 	public void setCurrentVelocity(double vx, double vy) {
 		this.vx = vx;
@@ -193,6 +190,16 @@ public class Agent2D implements MobsimAgent {
 		double sp = this.sc.getNetwork().getLinks().get(newLinkId).getFreespeed(time);
 		this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
 		this.mentalSwitched = false;
+	}
+	
+	public void informAboutSignalState(SignalGroupState red, double time) {
+		if (red == SignalGroupState.RED) {
+			this.currentDesiredVelocity = 0.000001; //FIXME can't use 0 here, since we get NaNs in force modules if v0=0;
+		} else {
+			double sp = this.sc.getNetwork().getLinks().get(getCurrentLinkId()).getFreespeed(time);
+			this.currentDesiredVelocity = Math.min(this.desiredVelocity, sp);
+		}
+		
 	}
 
 	public void switchMental() {
@@ -303,4 +310,6 @@ public class Agent2D implements MobsimAgent {
 	public MobsimDriverAgent getDelegate() {
 		return this.pda;
 	}
+
+
 }

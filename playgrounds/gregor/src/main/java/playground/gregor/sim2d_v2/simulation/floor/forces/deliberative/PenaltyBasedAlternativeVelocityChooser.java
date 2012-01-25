@@ -13,7 +13,7 @@ public class PenaltyBasedAlternativeVelocityChooser extends AlternativeVelocityC
 
 
 
-	private final double w_i = 0.15;
+	private final double w_i = 0.5;
 	private static final double COS_PI_QUARTER = Math.cos(Math.PI/4);
 	private static final double SIN_PI_QUARTER = Math.sin(Math.PI/4);
 

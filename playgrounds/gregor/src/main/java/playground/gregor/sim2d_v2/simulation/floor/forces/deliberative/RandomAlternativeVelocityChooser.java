@@ -47,15 +47,18 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 				double testPen = candC.distance(c1) + W_I/colTime;
 
 				//FIXME use simStepTime instead of 0.04
-				if (colTime > 0.12 && testPen < penalty) {
+//				if (colTime > 0.12 && testPen < penalty) {
+				if (testPen < penalty) {
 					penalty = testPen;
 					bestVx = candX;
 					bestVy = candY;
 				}
 			}
-			candX = this.random.nextDouble() * agent.getDesiredVelocity() * MAX_V_COEFF;
-			candY = this.random.nextDouble() * agent.getDesiredVelocity() * MAX_V_COEFF;
+			candX = df[0] + 0.5*(this.random.nextDouble()-0.5) * agent.getDesiredVelocity();
+			candY = df[1] + 0.5*(this.random.nextDouble()-0.5) * agent.getDesiredVelocity();
 		}
+		
+		
 		df[0] = bestVx;
 		df[1] = bestVy;
 	}

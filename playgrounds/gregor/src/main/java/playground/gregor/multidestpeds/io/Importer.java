@@ -27,8 +27,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 
 import com.jmatio.io.MatFileReader;
 import com.jmatio.types.MLArray;
@@ -42,10 +40,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class Importer {
 
 
-	private static final Scenario SC = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-
-	private static final File file = new File("/Users/laemmel/svn/shared-svn/projects/120multiDestPeds/experimental_data/Dez2010/joined/gr90.mat");
 
 	private final List<Ped> peds = new ArrayList<Ped>();
 
@@ -53,7 +47,15 @@ public class Importer {
 
 	private final List<Double> timeSteps = new ArrayList<Double>();
 
-	public void read() throws IOException {
+	private Scenario sc;
+
+	public void read(String inputMat, Scenario sc) throws IOException {
+		this.timeSteps.clear();
+		this.peds.clear();
+		this.sc = sc;
+		
+		File file = new File(inputMat);
+		
 		MatFileReader reader = new MatFileReader();
 		Map<String, MLArray> map = reader.read(file);
 		MLDouble redX = (MLDouble) map.get("xr");
@@ -91,7 +93,7 @@ public class Importer {
 		double[][] vy = aVY.getArray();
 
 		for (int i = 0; i < numPeds; i++) {
-			Id id = SC.createId(color + i);
+			Id id = this.sc.createId(color + i);
 			Ped p = new Ped();
 			p.id = id;
 			this.peds.add(p);

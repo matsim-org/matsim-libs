@@ -95,13 +95,13 @@ public class TrafficLightScenarioGenerator {
 		//		s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
 
-		s2d.setEnableCircularAgentInterActionModule("true");
+		s2d.setEnableCircularAgentInterActionModule("false");
 		s2d.setEnableCollisionPredictionAgentInteractionModule("false");
 		s2d.setEnableCollisionPredictionEnvironmentForceModule("false");
-		s2d.setEnableDrivingForceModule("true");
-		s2d.setEnableEnvironmentForceModule("true");
-		s2d.setEnablePathForceModule("true");
-		s2d.setEnableVelocityObstacleModule("false");
+		s2d.setEnableDrivingForceModule("false");
+		s2d.setEnableEnvironmentForceModule("false");
+		s2d.setEnablePathForceModule("false");
+		s2d.setEnableVelocityObstacleModule("true");
 		s2d.setEnablePhysicalEnvironmentForceModule("false");
 
 
@@ -152,7 +152,7 @@ public class TrafficLightScenarioGenerator {
 			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(scenario.createId("1"));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
-			settings1.setDropping(5);
+			settings1.setDropping(2);
 		}
 	}
 	private static void createSignalSystemsAndGroups(Scenario scenario,
@@ -222,7 +222,7 @@ public class TrafficLightScenarioGenerator {
 		PopulationFactory pb = pop.getFactory();
 
 
-		createPersons(sc,pb,pop,links,200,0*60);
+		createPersons(sc,pb,pop,links,500,0*60);
 
 		String outputPopulationFile = inputDir + "/plans.xml";
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), 1).write(outputPopulationFile);
@@ -256,7 +256,7 @@ public class TrafficLightScenarioGenerator {
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 		coords.add(new Coordinate(0,5));
 		coords.add(new Coordinate(5,5));
-		coords.add(new Coordinate(20,5));
+		coords.add(new Coordinate(24.5,5));
 		coords.add(new Coordinate(25,5));
 		coords.add(new Coordinate(35,5));
 		coords.add(new Coordinate(40,5));

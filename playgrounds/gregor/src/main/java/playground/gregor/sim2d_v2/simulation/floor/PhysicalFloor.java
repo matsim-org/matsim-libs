@@ -55,6 +55,7 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.Collision
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.CollisionPredictionEnvironmentForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.SignalsPerception;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
@@ -114,6 +115,9 @@ public class PhysicalFloor implements Floor {
 	public void init() {
 		calculateEnvelope();
 
+		
+		
+		
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
 		}
@@ -126,6 +130,12 @@ public class PhysicalFloor implements Floor {
 			this.dynamicForceModules.add(new  CollisionPredictionAgentInteractionModule(this, this.scenario));
 		}
 
+		if (this.scenario.getConfig().scenario().isUseSignalSystems()) {
+			//this is not the right way to do this, if driving velocity is calculated before SingalsPerception then we lag one
+			//time step behind
+			this.forceModules.add(new SignalsPerception(this.signals));
+		}
+		
 		if (this.sim2DConfig.isEnableDrivingForceModule()) {
 			this.forceModules.add(new DrivingForceModule(this, this.scenario));
 		}
@@ -141,6 +151,7 @@ public class PhysicalFloor implements Floor {
 		if (this.sim2DConfig.isEnablePathForceModule()){
 			this.forceModules.add(new PathForceModule(this, this.scenario));
 		}
+
 
 		//		//testing only
 		//		this.forceModules.add(new PhysicalEnvironmentForce(this, this.scenario));
@@ -199,7 +210,6 @@ public class PhysicalFloor implements Floor {
 
 		for (; it.hasNext();) {
 			Agent2D agent = it.next();
-
 			if (moveAgentAndCheckForEndOfLeg(agent, time)){
 
 				it.remove();
@@ -307,14 +317,6 @@ public class PhysicalFloor implements Floor {
 			updateForcesMultiThreaded(time);
 		} else {
 			for (Agent2D agent : this.agents) {
-				PedestrianSignal sig = this.signals.get(agent.getCurrentLinkId());
-				if (sig != null) {//FIXME for testing only - should be handled by the agent itself!!
-					if (!sig.hasGreenForToLink(agent.chooseNextLinkId())) {
-						agent.setDesiredVelocity(0.00001);
-					} else {
-						agent.setDesiredVelocity(1.34);
-					}
-				}
 				updateForces(agent,time);
 			}
 		}

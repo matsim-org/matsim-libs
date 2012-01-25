@@ -32,18 +32,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PersonalizableTravelCost;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTimeCalculator;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -58,9 +54,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author laemmel
  * 
  */
-//TODO rewrite
-@Deprecated
-public class Mat2XYZAzimuthEvents {
+public class Mat2XYVxVyEvents {
 
 
 	// needed to generated "finish lines"
@@ -71,33 +65,45 @@ public class Mat2XYZAzimuthEvents {
 	private static final double COS_RIGHT = Math.cos(-Math.PI / 2);
 	// needed to generated "finish lines"
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
-	private static HashMap<Id, LineString> finishLines;
+	private  HashMap<Id, LineString> finishLines;
 
-	private static final GeometryFactory geofac = new GeometryFactory();
+	private  final GeometryFactory geofac = new GeometryFactory();
+	private final Scenario sc;
+	private final String inputDir;
+	private final String inputMat;
 
-	public static void main(String[] args) {
+	public  Mat2XYVxVyEvents(Scenario sc, String inputDir, String inputMat){
+		this.sc = sc;
+		this.inputDir = inputDir;
+		this.inputMat = inputMat;
+	}
+	
+	public void run() {
+		
 		Importer imp = new Importer();
 		try {
-			imp.read();
+			imp.read(this.inputMat, this.sc);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Config conf = ConfigUtils.loadConfig("/Users/laemmel/devel/dfg/config2d.xml");
-		Scenario sc = ScenarioUtils.loadScenario(conf);
-		createFinishLines(sc);
+		createFinishLines(this.sc);
 
 
-		EventWriterXML writer = new EventWriterXML("/Users/laemmel/devel/dfg/input/events.xml");
+		EventWriterXML writer = new EventWriterXML(this.inputDir + "/events.xml");
 		EventsManager manager = EventsUtils.createEventsManager();
+		
+		XYZEvents2Plan planGen = new XYZEvents2Plan(this.sc);
+		
 		manager.addHandler(writer);
+		manager.addHandler(planGen);
 		EventsFactory fac = manager.getFactory();
 
 		List<Ped> peds = imp.getPeds();
 		List<Double> timeSteps = imp.getTimeSteps();
 
-		Network network = sc.getNetwork();
+		Network network = this.sc.getNetwork();
 		FreeSpeedTravelTimeCalculator fs = new FreeSpeedTravelTimeCalculator();
-		PersonalizableTravelCost cost = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(fs,sc.getConfig().planCalcScore() );
+		PersonalizableTravelCost cost = new TravelCostCalculatorFactoryImpl().createTravelCostCalculator(fs,this.sc.getConfig().planCalcScore() );
 		LeastCostPathCalculator dijkstra = new Dijkstra(network, cost, fs);
 
 		Set<Ped> excl = new HashSet<Ped>();
@@ -114,7 +120,7 @@ public class Mat2XYZAzimuthEvents {
 				if (time == ped.depart) {
 
 					try {
-						calculateRoute(time,ped,sc,dijkstra);
+						calculateRoute(time,ped,this.sc,dijkstra);
 					} catch (Exception e) {
 						excl.add(ped);
 						continue;
@@ -134,7 +140,9 @@ public class Mat2XYZAzimuthEvents {
 
 				ped.lastPos = c;
 				if (time == ped.arrived) {
-					Id linkId = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
+					Id linkId = ped.path.links.get(ped.path.links.size()-1).getId(); 
+							
+//							getLinkId(ped.coords.get(time),ped.velocities.get(time),this.sc);
 					manager.processEvent(fac.createAgentArrivalEvent(time, ped.id, linkId, "walk2d"));
 				} else if (checkForNextLink(ped,c)) {
 					manager.processEvent(fac.createLinkLeaveEvent(time, id, ped.path.links.get(ped.currLink).getId(), null));
@@ -149,21 +157,34 @@ public class Mat2XYZAzimuthEvents {
 
 	}
 
-	private static boolean checkForNextLink(Ped ped, Coordinate c) {
+	private  boolean checkForNextLink(Ped ped, Coordinate c) {
 		Id currLinkId = ped.path.links.get(ped.currLink).getId();
-		LineString finishLine = finishLines.get(currLinkId);
-		LineString trajectory = geofac.createLineString(new Coordinate[] { ped.lastPos, c });
+		LineString finishLine = this.finishLines.get(currLinkId);
+		LineString trajectory = this.geofac.createLineString(new Coordinate[] { ped.lastPos, c });
 		if (trajectory.crosses(finishLine)) {
 			return true;
 		}
 		return false;
 	}
 
-	private static void calculateRoute(double time, Ped ped, Scenario sc, LeastCostPathCalculator dijkstra) {
+	private  void calculateRoute(double time, Ped ped, Scenario sc, LeastCostPathCalculator dijkstra) {
+		
 		Id startLink = getLinkId(ped.coords.get(time),ped.velocities.get(time),sc);
-		Id endLink = getLinkId(ped.coords.get(ped.arrived),ped.velocities.get(ped.arrived),sc);
+
 		Node from = sc.getNetwork().getLinks().get(startLink).getFromNode();
-		Node to = sc.getNetwork().getLinks().get(endLink).getToNode();
+		
+		Node to = null;
+		Id endLink = null;
+		if (ped.id.toString().contains("g")) {
+			Coordinate toC = new Coordinate(2,-5);
+			endLink = getLinkId(toC,ped.velocities.get(ped.arrived),sc);
+			to = sc.getNetwork().getLinks().get(endLink).getToNode();
+		} else {
+			Coordinate toC = new Coordinate(14,-2);
+			endLink = getLinkId(toC,ped.velocities.get(ped.arrived),sc);
+			to = sc.getNetwork().getLinks().get(endLink).getToNode();
+		}
+		
 		Path path = dijkstra.calcLeastCostPath(from, to , 0);
 		boolean routeAgain = false;
 		if (!path.links.get(0).getId().equals(startLink)) {
@@ -202,34 +223,37 @@ public class Mat2XYZAzimuthEvents {
 		ped.path = path;
 	}
 
-	private static Id getLinkId(Coordinate loc, Coordinate vel,
+	private  Id getLinkId(Coordinate loc, Coordinate vel,
 			Scenario sc) {
 
-		LinkImpl l1 = ((NetworkImpl)sc.getNetwork()).getNearestLink(MGC.coordinate2Coord(loc));
-		LinkImpl l2 = null;
-		for (Link l : l1.getToNode().getOutLinks().values()) {
-			if (l.getToNode() == l1.getFromNode()) {
-				l2 = (LinkImpl) l;
-			}
-		}
-
-		Coordinate next = new Coordinate(loc.x+vel.x,loc.y+vel.y);
-		double distNow = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(loc);
-		double distNext = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(next);
-		if (distNow > distNext) {
-			return l1.getId();
-		} else {
-			return l2.getId();
-		}
+		Link l1 = ((NetworkImpl)sc.getNetwork()).getNearestNode(MGC.coordinate2Coord(loc)).getOutLinks().values().iterator().next();
+		Id id = l1.getToNode().getOutLinks().values().iterator().next().getId();
+				
+		return id;
+//		LinkImpl l2 = null;
+//		for (Link l : l1.getToNode().getOutLinks().values()) {
+//			if (l.getToNode() == l1.getFromNode()) {
+//				l2 = (LinkImpl) l;
+//			}
+//		}
+//
+//		Coordinate next = new Coordinate(loc.x+vel.x,loc.y+vel.y);
+//		double distNow = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(loc);
+//		double distNext = MGC.coord2Coordinate(l1.getToNode().getCoord()).distance(next);
+//		if (distNow > distNext) {
+//			return l1.getId();
+//		} else {
+//			return l2.getId();
+//		}
 
 	}
 
 
-	private static void createFinishLines(Scenario sc) {
+	private  void createFinishLines(Scenario sc) {
 
 		GeometryFactory geofac = new GeometryFactory();
 
-		finishLines = new HashMap<Id, LineString>();
+		this.finishLines = new HashMap<Id, LineString>();
 		for (Link link : sc.getNetwork().getLinks().values()) {
 			Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
 			Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
@@ -246,7 +270,7 @@ public class Mat2XYZAzimuthEvents {
 			c2.y += to.y;
 			LineString ls = geofac.createLineString(new Coordinate[] { c1, c2 });
 
-			finishLines.put(link.getId(), ls);
+			this.finishLines.put(link.getId(), ls);
 		}
 	}
 }

@@ -302,20 +302,20 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		this.locations.put(event.getPersonId(), new Coordinate((float) ((x - this.ofX)* this.scale), (float) ((y - this.ofY)* this.scale), 0));
 
 
-		float r = 0;
-		float g = 0;
-		float b = 0;
-
-
-		int intId = Integer.parseInt(event.getLinkId().toString());
-		double frac = intId/1229.;
-		// experimental id dependent colorization
-		MatsimRandom.reset(event.getLinkId().toString().hashCode());
-		MatsimRandom.getRandom().nextDouble();
-		MatsimRandom.getRandom().nextDouble();
-		b = MatsimRandom.getRandom().nextFloat();
-		g = MatsimRandom.getRandom().nextFloat();
-		r = (float) frac;
+//		float r = 0;
+//		float g = 0;
+//		float b = 0;
+//
+//
+//		int intId = Integer.parseInt(event.getLinkId().toString());
+//		double frac = intId/1229.;
+//		// experimental id dependent colorization
+//		MatsimRandom.reset(event.getLinkId().toString().hashCode());
+//		MatsimRandom.getRandom().nextDouble();
+//		MatsimRandom.getRandom().nextDouble();
+//		b = MatsimRandom.getRandom().nextFloat();
+//		g = MatsimRandom.getRandom().nextFloat();
+//		r = (float) frac;
 		//		if (event.getLinkId().toString().equals("3")) {
 		//			r = 1.f;
 		//			MatsimRandom.reset(event.getPersonId().toString().hashCode());
@@ -324,6 +324,21 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//			MatsimRandom.reset(event.getPersonId().toString().hashCode());
 		//			r = MatsimRandom.getRandom().nextFloat();
 		//		}
+		
+		float r = 0;
+		float g = 0;
+		float b = 0;
+
+		// experimental id dependent colorization
+		MatsimRandom.reset(event.getPersonId().toString().hashCode());
+		MatsimRandom.getRandom().nextDouble();
+		MatsimRandom.getRandom().nextDouble();
+		b = MatsimRandom.getRandom().nextFloat();
+		if (event.getPersonId().toString().contains("r")) {
+			r = 1.f;
+		} else {
+			g = 1.f;
+		}
 		this.pc.setBotColorII(event.getPersonId().toString().hashCode(), r, g, b);
 	}
 
@@ -383,7 +398,8 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/Documents/workspace/playgrounds/gregor/test/output/playground/gregor/sim2d_v2/controller/Controller2DTest/testController2D/ITERS/it.10/10.events.xml.gz", true, 1);
 		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
-		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/trafficlights/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz", true, 1.);
+//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, .1);
 		vis.play(true);
 
 	}
