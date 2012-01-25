@@ -28,7 +28,6 @@ import org.jgap.GeneticOperator;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.IInitializer;
-import org.jgap.InvalidConfigurationException;
 import org.jgap.Population;
 import org.jgap.impl.BooleanGene;
 import org.junit.Assert;
@@ -54,9 +53,9 @@ import playground.thibautd.jointtrips.population.JointActingTypes;
 import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.PopulationWithCliques;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.UpperBoundsConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerDecoder;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPChromosome;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.JointPlanOptimizerFitnessFunction;
@@ -72,6 +71,7 @@ import playground.thibautd.jointtrips.utils.JointControlerUtils;
 /**
  * various tests related to the JointPlanOptimizer.
  * Those tests are grouped here not to split too much all the initialisation procedures.
+ * It should be split in the future.
  * @author thibautd
  */
 public class TestJPO {
@@ -606,12 +606,62 @@ public class TestJPO {
 	public void testMutationInPlace() {
 	}
 
+	/////////////////////////////// chromosome /////////////////////////////////
 	/**
 	 * Tests whether the randomly generated chromosomes respect the constraints.
 	 */
 	@Test
-	@Ignore
-	public void testConstraintsRandomChromosome() {
+	public void testConstraintsRandomChromosome() throws Exception {
+		int nTrys = 1000;
+		jgapConf.setPopulationSize( nTrys );
+		Genotype genotype = Genotype.randomInitialGenotype( jgapConf );
+
+		ConstraintsManager constr = jgapConf.getConstraintsManager();
+
+		int countTrys = 0;
+		List<Object> examined = new ArrayList<Object>();
+		for (Object chromosome : genotype.getPopulation().getChromosomes()) {
+			Assert.assertTrue(
+					"random initial genotype does not respects constraints!",
+					constr.respectsConstraints( (IChromosome) chromosome ));
+
+			Assert.assertFalse(
+					"random initial genotype produced identical chromosomes!",
+					examined.contains( chromosome ));
+
+			examined.add( chromosome );
+			countTrys++;
+		}
+
+		Assert.assertEquals(
+				"unexpected number of chromosomes examined",
+				nTrys,
+				countTrys);
+	}
+
+	@Test
+	public void testFitnessChromosome() throws Exception {
+		JointPlanOptimizerJGAPChromosome chrom = (JointPlanOptimizerJGAPChromosome)
+			((JointPlanOptimizerJGAPChromosome) jgapConf.getSampleChromosome()).createRandomChromosome();
+
+		Assert.assertEquals(
+				"newly created chromosome has unexpected fitness!",
+				JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE,
+				chrom.getFitnessValueDirectly(),
+				MatsimTestUtils.EPSILON);
+
+		Assert.assertFalse(
+				"getFitnessValue gives undefined fitness!",
+				JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE == chrom.getFitnessValue());
+
+		double testFit = 123;
+		chrom.setFitnessValue( testFit );
+
+		Assert.assertEquals(
+				"fitness badly set!",
+				testFit,
+				chrom.getFitnessValue(),
+				MatsimTestUtils.EPSILON);
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

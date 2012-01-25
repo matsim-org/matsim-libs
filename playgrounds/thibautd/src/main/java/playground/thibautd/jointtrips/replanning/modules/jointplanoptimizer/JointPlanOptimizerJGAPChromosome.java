@@ -31,6 +31,7 @@ import org.jgap.impl.DoubleGene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.RandomGenerator;
 
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.JointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 
 /**
@@ -69,6 +70,7 @@ public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializ
 					+" Got a "+delegate.getConfiguration().getClass()+" instead." );
 		}
 		this.delegate = delegate;
+		delegate.setFitnessValueDirectly( JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -80,6 +82,8 @@ public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializ
 	@Override
 	public Object clone() {
 		try {
+			// the fitness will be invalidated. As we clone only to modify afterwards,
+			// it is not a big deal.
 			return new JointPlanOptimizerJGAPChromosome( (Chromosome) delegate.clone() );
 		}
 		catch (InvalidConfigurationException e) {
@@ -100,8 +104,14 @@ public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializ
 	 */
 	@Override
 	public double getFitnessValue() {
-		// should be OK not to modify
-		return delegate.getFitnessValue();
+		 double fit = delegate.getFitnessValueDirectly();
+
+		 if (fit == JointPlanOptimizerFitnessFunction.NO_FITNESS_VALUE) {
+			 fit = delegate.getConfiguration().getFitnessFunction().getFitnessValue( delegate );
+			 delegate.setFitnessValueDirectly( fit );
+		 }
+
+		 return fit;
 	}
 
 	/**
@@ -112,17 +122,6 @@ public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializ
 		// as the equality is interface based, this should be ok
 		return delegate.equals( other );
 	}
-
-	///**
-	// * @param conf 
-	// * @return 
-	// * @throws InvalidConfigurationException 
-	// * @see Chromosome#randomInitialChromosome(Configuration)
-	// */
-	//public static IChromosome randomInitialChromosome(final Configuration conf)
-	//	throws InvalidConfigurationException {
-	//	return new JointPlanOptimizerJGAPChromosome( (Chromosome) Chromosome.randomInitialChromosome(conf) );
-	//}
 
 	@Override
 	public boolean isHandlerFor(
@@ -140,6 +139,10 @@ public class JointPlanOptimizerJGAPChromosome implements IChromosome, IInitializ
 			final Object a_obj,
 			final Class a_class,
 			final Object a_params) throws Exception {
+		return createRandomChromosome();
+	}
+
+	public IChromosome createRandomChromosome() throws InvalidConfigurationException {
 		IChromosome newChrom = new JointPlanOptimizerJGAPChromosome( (Chromosome) delegate.clone() );
 		JointPlanOptimizerJGAPConfiguration conf =
 			(JointPlanOptimizerJGAPConfiguration) newChrom.getConfiguration();
