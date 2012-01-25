@@ -39,6 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.utils.DgNet2Tex;
 
 /**
  * @author dgrether
@@ -49,22 +50,19 @@ public class Daganzo2012ScenarioGenerator {
 	private static final Logger log = Logger
 			.getLogger(Daganzo2012ScenarioGenerator.class);
 
-	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2012/";
+	public static String DAGANZO_SVN_DIR = "shared-svn/studies/dgrether/daganzo2012/scenario_1/";
 
 	public static String DAGANZOBASEDIR = DgPaths.REPOS + DAGANZO_SVN_DIR;
 
 	public static final String NETWORK_INPUTFILE = DAGANZOBASEDIR
-			+"daganzo_2012_network.xml";
+			+"network.xml";
 
 	private static final String PLANS_OUTPUTFILE = DAGANZOBASEDIR
-			+ "daganzo_2012_plans.xml";
+			+ "plans.xml";
 
 	private static final String CONFIG_INPUTFILE = DAGANZOBASEDIR
-			+ "daganzo_2012_config.xml";
+			+ "config.xml";
 
-	public static final String SIGNALS_OUTPUTFILE = "daganzo_2012_signal_systems.xml";
-
-	public static final String SIGNALS_CONFIG_OUTPUTFILE = "daganzo_signal_system_configuration.xml";
 
 	public static int iterations = 4000;
 
@@ -89,11 +87,13 @@ public class Daganzo2012ScenarioGenerator {
 		config.network().setInputFile(NETWORK_INPUTFILE);
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
-		//TODO plans, signals
 		this.createPlans(this.scenario);
 
 		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
 		popWriter.writeV5(PLANS_OUTPUTFILE);
+		
+		DgNet2Tex net2tex = new DgNet2Tex();
+		net2tex.convert(this.scenario.getNetwork(), NETWORK_INPUTFILE + ".tex");
 		
 		log.info("scenario written!");
 	}

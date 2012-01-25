@@ -70,11 +70,11 @@ public class DgNet2Tex {
 
 			writer.write("\\end{tabular}");
 			writer.newLine();
-			writer.write("\\label{fig:}");
-			writer.newLine();
 			writer.write("\\end{center}");
 			writer.newLine();
 			writer.write("\\caption{}");
+			writer.newLine();
+			writer.write("\\label{fig:}");
 			writer.newLine();
 			writer.write("\\end{figure}");
 			writer.newLine();
