@@ -47,12 +47,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsFactory;
-import org.matsim.lanes.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.LaneDefinitionsWriter20;
-import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.DgPlaygroundJobfileCreator;

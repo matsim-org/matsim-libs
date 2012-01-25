@@ -34,12 +34,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsImpl;
-import org.matsim.lanes.LaneDefinitionsReader20;
-import org.matsim.lanes.LaneDefinitionsWriter20;
-import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.xml.sax.SAXException;
 
 import playground.jbischoff.BAsignals.JbBaPaths;

@@ -30,11 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.LaneDefinitions;
-import org.matsim.lanes.LaneDefinitionsImpl;
-import org.matsim.lanes.LaneImpl;
-import org.matsim.lanes.LanesToLinkAssignment;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsImpl;
+import org.matsim.lanes.data.v20.LaneImpl;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 
 
 /**

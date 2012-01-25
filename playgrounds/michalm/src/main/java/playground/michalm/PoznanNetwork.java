@@ -7,6 +7,13 @@ import org.matsim.core.api.internal.*;
 import org.matsim.core.config.*;
 import org.matsim.core.scenario.*;
 import org.matsim.lanes.*;
+import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment;
 import org.matsim.run.*;
 
 public class PoznanNetwork

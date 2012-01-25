@@ -39,8 +39,8 @@ import org.matsim.core.events.LaneLeaveEvent;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
 import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.Lane;
-import org.matsim.lanes.LaneDefinitions;
+import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitions;
 
 
 /**
