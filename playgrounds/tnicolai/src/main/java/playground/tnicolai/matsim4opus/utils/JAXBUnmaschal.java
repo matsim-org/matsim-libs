@@ -87,15 +87,14 @@ public class JAXBUnmaschal {
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
-			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD_V1, tempDir , Constants.XSD_FILE_NAME_V1);
+			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG , tempDir , Constants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			// tnicolai: debugging
-			// file2XSD = new File("/Users/thomas/Development/vspworkspace/matsim/dtd/matsim4urbansim_v1.xsd");
+//			file2XSD = new File("/Users/thomas/Development/workspace/matsim/dtd/matsim4urbansim_v1.xsd");
 			
-			if(file2XSD == null || !file2XSD.exists()){
-				log.error(file2XSD.getCanonicalPath() + " not found!!!");
+			if(file2XSD == null || !file2XSD.exists())
 				return null;
-			}
+			
 			printOutXSD(file2XSD);
 			
 			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());

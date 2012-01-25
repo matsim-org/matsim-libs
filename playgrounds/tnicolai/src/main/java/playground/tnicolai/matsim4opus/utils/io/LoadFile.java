@@ -32,6 +32,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.InputSource;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 
@@ -127,21 +128,42 @@ public class LoadFile {
 			isInternetStream = Boolean.FALSE;
 			output = null;	// set to null
 		}
-		
-		// if no internet connection, trying to load xsd schema locally from matsim/dtd/ directory
-		if(! isInternetStream){
-			log.info("Trying to access local dtd folder at standard location ./dtd...");
-			File dtdFile = new File( Constants.MATSIM_4_URBANSIM_XSD_LOCAL_V1 );
-			log.debug("dtdfile: " + dtdFile.getAbsolutePath());
-			URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_V1);
-			System.out.println( localUrl.getPath() );
-			output = new File( localUrl.getPath() );
-			log.info("Found local xsd at: " + localUrl.getPath() );
-		}
 
-		// return path to local xsd file
-		return output;
+		// if no internet connection, trying to load xsd schema locally
+		if(! isInternetStream){
+			
+			// This should work for jar files (dtd folder located in root)
+			log.info("Trying to access local dtd folder at standard location " + Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR + " ...");
+			File dtdFile = new File( Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+			
+			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+				log.info("Using the local DTD " + dtdFile.getAbsolutePath());
+				output = new File( dtdFile.getAbsolutePath() );
+				// URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_CURRENT);
+				// output = new File( localUrl.getPath() );
+				return output; // return path to local xsd file
+			}
+			
+			// This works in Eclipse environment for debugging ...
+			String currentDir = System.getProperty("user.dir");
+			int index = (currentDir.indexOf("playground") > 0) ? currentDir.indexOf("playground") : currentDir.indexOf("contrib");
+			String root = currentDir.substring(0, index);
+				
+			dtdFile = new File( root + "/matsim" + Constants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+			log.info("Trying to access local dtd folder at standard location " + dtdFile.getAbsolutePath() + " ...");
+			
+			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+				log.info("Using the local DTD " + dtdFile.getAbsolutePath());
+				output = new File( dtdFile.getAbsolutePath() );
+				// URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_CURRENT);
+				// output = new File( localUrl.getPath() );
+				return output; // return path to local xsd file
+			}			
+		}
+		
+		// could neither get the remote nor the local version of the xsd
+		log.warn("Could neither get the XSD from the web nor a local one.");
+		return null;
 	}
-	
 }
 

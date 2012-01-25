@@ -46,7 +46,27 @@ import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 /**
  * @author thomas
- *
+ * 
+ * improvements jan'12:
+ * 
+ * - This class is a revised version of "MATSim4UrbanSim".
+ * - Increased Configurability: 
+ * 	First approach to increase the configurability of MATSim4UrbanSim modules such as
+ * 	the zonz2zone impedance matrix, zone based- and grid based accessibility computation. Modules can be en-disabled
+ * 	additional modules can be added by other classes extending MATSim4UrbanSimV2.
+ * - Data Processing on Demand:
+ *  Particular input data is processed when a corresponding module is enabled, e.g. an array of aggregated workplaces will
+ *  be generated when either the zone based- or grid based accessibility computation is activated.
+ * - Extensibility:
+ * 	This class provides standard functionality such as configuring MATSim, reading UrbanSim input data, running the 
+ * 	mobility simulation and so forth... This functionality can be extended by an inheriting class (e.g. MATSim4UrbanSimZurichAccessibility) 
+ * 	by implementing certain stub methods such as "addFurtherControlerListener", "modifyNetwork", "modifyPopulation" ...
+ * - Backup Results:
+ *  This was also available before but not documented. Some data is overwritten with each run, e.g. the zone2zone impedance matrix or data
+ *  in the MATSim output folder. If the backup is activated the most imported files (see BackupRun class) are saved in a new folder. In order 
+ *  to match the saved data with the corresponding run or year the folder names contain the "simulation year" and a time stamp.
+ * - Other improvements:
+ * 	For a better readability of code some functionality is outsourced into helper classes
  */
 public class MATSim4UrbanSimV2 {
 

@@ -82,7 +82,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
 		
 		try{
-			log.info("Computing and writing accessibility measures ..." );
+			log.info("Computing and writing zone based accessibility measures ..." );
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
 			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);

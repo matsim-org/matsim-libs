@@ -46,6 +46,12 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
 
 /**
  * @author thomas
+ * 
+ * improvements jan'12:
+ * - initGlobalSettings sets the number of available processors in the 
+ * 	GlobalConfigGroup to speed up MATSim computations. Before that only
+ * 	2 processors were used even if there are more.
+ * 
  *
  */
 public class InitMATSimScenario {

@@ -34,7 +34,6 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesOSMNetwork;
 import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesZurichBigRoads;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
@@ -136,8 +135,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 		}
 		else{
 			String scenarioArray[] = testParameter.split(",");
-			// ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
-			ZurichUtilitiesOSMNetwork.modifyNetwork(network, scenarioArray);
+			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
+			// ZurichUtilitiesOSMNetwork.modifyNetwork(network, scenarioArray);
 			log.info("Done modifying network.");
 			log.info("");
 		}
@@ -149,8 +148,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	 */
 	@Override
 	void modifyPopulation(Population population){
-		// ZurichUtilitiesZurichBigRoads.deleteRoutesContainingRemovedLinks(population);
-		ZurichUtilitiesOSMNetwork.deleteRoutesContainingRemovedLinks(population);
+		ZurichUtilitiesZurichBigRoads.deleteRoutesContainingRemovedLinks(population);
+		// ZurichUtilitiesOSMNetwork.deleteRoutesContainingRemovedLinks(population);
 	}
 	
 	/**

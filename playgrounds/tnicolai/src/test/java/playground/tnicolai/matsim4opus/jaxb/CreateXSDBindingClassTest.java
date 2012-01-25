@@ -139,7 +139,7 @@ public class CreateXSDBindingClassTest extends MatsimTestCase {
 			String tempDir = TempDirectoryUtil.createCustomTempDirectory("tmp");
 
 			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
-			LoadFile loadFile = new LoadFile(Constants.MATSIM_4_URBANSIM_XSD_V1, tempDir , Constants.XSD_FILE_NAME_V1);
+			LoadFile loadFile = new LoadFile(Constants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, tempDir , Constants.CURRENT_XSD_FILE_NAME);
 			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
 			
 			if(file2XSD == null || !file2XSD.exists()){

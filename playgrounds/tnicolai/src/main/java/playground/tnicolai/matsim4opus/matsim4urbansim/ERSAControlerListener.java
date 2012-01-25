@@ -26,9 +26,7 @@ package playground.tnicolai.matsim4opus.matsim4urbansim;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -54,7 +52,6 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDis
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 
 import com.vividsolutions.jts.geom.Point;
@@ -66,20 +63,39 @@ import com.vividsolutions.jts.geom.Point;
 public class ERSAControlerListener implements ShutdownListener{
 	
 	/**
+	 * improvements sep'11:
+	 * 
 	 * Code improvements since last version (deadline ersa paper):
-	 * - aggregated workplaces: workplaces with same parcel_id are aggregated to a weighted job (see JobClusterObject)
-	 * 							This means much less iteration cycles
-	 * - less time consuming look-ups: all workplaces are assigned to their nearest node in an pre-proscess step
-	 * 							(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
-	 * 							iteration cycle
-	 * - distance based accessibility: like the travel time accessibility computation now also distances are computed
-	 * 							with LeastCostPathTree -> CHECK WITH KAI IF TRAVELDISTANCECOSTCALULATOR IS OK!
-	 * tnicolai: sep'11
+	 * - Aggregated Workplaces: 
+	 * 	Workplaces with same parcel_id are aggregated to a weighted job (see JobClusterObject)
+	 * 	This means much less iteration cycles
+	 * - Less time consuming look-ups: 
+	 * 	All workplaces are assigned to their nearest node in an pre-proscess step
+	 * 	(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
+	 * 	iteration cycle
+	 * - Distance based accessibility added: 
+	 * 	like the travel time accessibility computation now also distances are computed
+	 * 	with LeastCostPathTree -> CHECK WITH KAI IF TRAVELDISTANCECOSTCALULATOR IS OK!
+	 * 
+	 * improvements jan'12:
+	 * 
+	 * - Better readability:
+	 * 	Removed unused methods such as "addNearestNodeToJobClusterArray" (this is done while gathering/processing
+	 * 	workplaces). Also all results are now dumped directly from this class. Before, the SpatialGrid 
+	 * 	tables were transfered to another class to dump out the results. This also improves readability
+	 * - Workplace data dump:
+	 * 	Dumping out the used workplace data was simplified, since the simulation now already uses aggregated data.
+	 * 	Corresponding subroutines aggregating the data are not needed any more (see dumpWorkplaceData()).
+	 * 
+	 * TODO: implement configurable betas for different accessibility measures based on different costs
+	 * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
+	 * betaPowerTravelCosts, betaTravelDistance, betaLnTravelDistance, betaPowerTravelDistance
+	 * 
 	 */
 	
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
-	private JobClusterObject[] jobClusterArray;
+	private JobClusterObject[] aggregatedWorkplaces;
 	private ZoneLayer<ZoneAccessibilityObject> startZones;
 	
 	private SpatialGrid<Double> travelTimeAccessibilityGrid;
@@ -94,21 +110,22 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * constructor
 	 * @param jobClusterMap
 	 */
-	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, JobClusterObject[] jobClusterArray, 
+	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, JobClusterObject[] aggregatedWorkplaces, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
 			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
 		assert ( startZones != null );
-		this.startZones			= startZones;	
-		assert ( jobClusterArray != null );
-		this.jobClusterArray 	= jobClusterArray;
+		this.startZones	= startZones;	
+		assert ( aggregatedWorkplaces != null );
+		this.aggregatedWorkplaces 	= aggregatedWorkplaces;
 		assert ( travelTimeAccessibilityGrid != null );
 		this.travelTimeAccessibilityGrid = travelTimeAccessibilityGrid;
 		assert ( travelCostAccessibilityGrid != null );
 		this.travelCostAccessibilityGrid = travelCostAccessibilityGrid;
 		assert ( travelDistanceAccessibilityGrid != null );
 		this.travelDistanceAccessibilityGrid = travelDistanceAccessibilityGrid;
-		this.benchmark 			= benchmark;
+		assert( benchmark != null );
+		this.benchmark = benchmark;
 	}
 	
 	/**
@@ -118,18 +135,16 @@ public class ERSAControlerListener implements ShutdownListener{
 	public void notifyShutdown(ShutdownEvent event){
 		log.info("Entering notifyShutdown ..." );
 		
-		int benchmarkID = -1;
-		if(this.benchmark != null)
-			benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");
+		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation");
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		// this calculates the workplace accessibility travel times
+		// this calculates the workplace accessibility travel times based on (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
-		// this calculates the workplace accessibility distances
+		// this calculates the workplace accessibility distances (based on link lengths)
 		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
@@ -141,11 +156,13 @@ public class ERSAControlerListener implements ShutdownListener{
 		try{
 			BufferedWriter accessibilityIndicatorWriter = initCSVWriter( sc );
 			
-			log.info("Computing and writing accessibility measures ..." );
+			log.info("Computing and writing grid based accessibility measures with following settings:" );
+			log.info("Depature time (in seconds): " + depatureTime);
+			log.info("Beta per hour: " + beta_per_hr);
+			log.info("Beta per minute: " + beta_per_min);
+			
 			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
-			
-			// addNearestNodeToJobClusterArray( network ); // tnicolai: unnecessary step, since this is now done while gathering workplaces
 			
 			ProgressBar bar = new ProgressBar( startZones.getZones().size() );
 		
@@ -160,10 +177,11 @@ public class ERSAControlerListener implements ShutdownListener{
 				// get coordinate from origin (start point)
 				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
 				assert( coordFromZone!=null );
+				// determine nearest network node
 				Node fromNode = network.getNearestNode(coordFromZone);
 				assert( fromNode != null );
-				// starting Dijkstra
-				lcptTravelTime.calculate(network, fromNode, depatureTime);			// run dijkstra on network
+				// run dijkstra on network
+				lcptTravelTime.calculate(network, fromNode, depatureTime);			
 				lcptDistance.calculate(network, fromNode, depatureTime);	
 				
 				// from here: accessibility computation for current starting point ("fromNode")
@@ -173,11 +191,13 @@ public class ERSAControlerListener implements ShutdownListener{
 				double accessibilityTravelDistanceCosts = 0.;
 
 				// go through all jobs (nearest network node) and calculate workplace accessibility
-				for ( int i = 0; i < this.jobClusterArray.length; i++ ) {
+				for ( int i = 0; i < this.aggregatedWorkplaces.length; i++ ) {
 					
-					Node destinationNode = this.jobClusterArray[i].getNearestNode();
+					// get stored network node (this is the nearest node next to an aggregated workplace)
+					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
-					int jobCounter = this.jobClusterArray[i].getNumberOfJobs();
+					// using number of aggregated workplaces as weight for log sum measure
+					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfJobs();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
 					
@@ -189,17 +209,18 @@ public class ERSAControlerListener implements ShutdownListener{
 					double travelDistance_meter = lcptDistance.getTree().get( nodeID ).getCost();
 					
 					// sum travel times
-					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobCounter;
+					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
 					// sum travel costs (mention the beta)
-					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobCounter; // tnicolai: find another beta for travel costs
+					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
 					// sum travel distances (mention the beta)
-					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobCounter; // tnicolai: find another beta for travel distance
+					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
 				
-				// assign log sums (accessibilities) to current starZone object. 
+				// assign accessibilities sums to current starZone object. 
 				setAccessibilityValue2StartZone(startZone,
-						accessibilityTravelTimes, accessibilityTravelTimeCosts,
-						accessibilityTravelDistanceCosts);
+												accessibilityTravelTimes, 
+												accessibilityTravelTimeCosts,
+												accessibilityTravelDistanceCosts);
 				
 				// accessibility values stored in current starZone object are now used in spatial grid
 				setAccessiblityValue2SpatialGrid(startZone);
@@ -211,7 +232,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			
 			if( this.benchmark != null && benchmarkID > 0 ){
 				this.benchmark.stoppMeasurement(benchmarkID);
-				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.jobClusterArray.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
+				log.info("Accessibility computation with " + startZones.getZones().size() + " starting points (origins) and " + this.aggregatedWorkplaces.length + " destinations (workplaces) took " + this.benchmark.getDurationInSeconds(benchmarkID) + " seconds (" + this.benchmark.getDurationInSeconds(benchmarkID) / 60. + " minutes).");
 			}
 			
 			dumpResults(accessibilityIndicatorWriter);
@@ -240,85 +261,66 @@ public class ERSAControlerListener implements ShutdownListener{
 		
 		log.info("Dumping workplace information as csv ...");
 
-		BufferedWriter bwWeightedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv" );
 		BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv" );
+//		BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv" );
 		
-		log.info("Dumping workplace data used for this simulation: " + Constants.MATSIM_4_OPUS_TEMP + "weighted_workplaces.csv");
+		log.info("Dumping workplace data used for this simulation: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
 		
-		// dumping out data from jobClusterArray
-		bwWeightedWP.write("zone_ID,x_coord,y_coord,job_count,nearest_node_ID,nearest_node_x_coord,nearest_node_y_coord");
-		bwWeightedWP.newLine();
-		for(int i = 0; i < jobClusterArray.length; i++){
-			bwWeightedWP.write(jobClusterArray[i].getZoneID() + "," + 
-					 jobClusterArray[i].getCoordinate().getX() + "," +
-					 jobClusterArray[i].getCoordinate().getY() + "," +
-					 jobClusterArray[i].getNumberOfJobs() + "," +
-					 jobClusterArray[i].getNearestNode().getId()  + "," +
-					 jobClusterArray[i].getNearestNode().getCoord().getX()  + "," +
-					 jobClusterArray[i].getNearestNode().getCoord().getX());
-			bwWeightedWP.newLine();
-		}
-		bwWeightedWP.flush();
-		bwWeightedWP.close();
-		
-		log.info("... done!");
-		
-		log.info("Aggregating workplaces to their nearest network node and dumping results as csv: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
-		
-		// aggregate number of workplaces to their nearest network node and dump out the results
-		Map<Id,WorkplaceObject> aggregatedWorkplaces = new HashMap<Id,WorkplaceObject>();
-		Map<Id,Node> nearestNode = new HashMap<Id, Node>();
-		for(int i = 0; i < jobClusterArray.length; i++){
-			Id nodeID = jobClusterArray[i].getNearestNode().getId();
-			if(aggregatedWorkplaces.containsKey( nodeID )){
-				WorkplaceObject numWorkplaces = aggregatedWorkplaces.get( nodeID );
-				numWorkplaces.counter += jobClusterArray[i].getNumberOfJobs();
-			}
-			else{
-				WorkplaceObject numWorkplaces = new WorkplaceObject();
-				numWorkplaces.counter = jobClusterArray[i].getNumberOfJobs();
-				aggregatedWorkplaces.put(nodeID, numWorkplaces);
-				nearestNode.put( nodeID, jobClusterArray[i].getNearestNode());
-			}
-		}
-		bwAggregatedWP.write("nearest_node_ID,nearest_node_x_coord,nearest_node_y_coord,job_count");
+		// dumping out data from jobClusterArray (containing aggregated workplace data)
+		bwAggregatedWP.write("zone_ID,num_of_jobs,x_grid_coord,y_grid_coord,x_nearest_node_coord,y_nearest_node_coord,nearest_node_ID");
 		bwAggregatedWP.newLine();
-		Iterator<Node> nodeIterator = nearestNode.values().iterator();
-		while(nodeIterator.hasNext()){
-			Node node = nodeIterator.next();
-			long count = 0L; 
-			if(aggregatedWorkplaces.get( node.getId() ) != null){
-				count = aggregatedWorkplaces.get( node.getId() ).counter;
-			}
-			bwAggregatedWP.write(node.getId() + "," +
-								 node.getCoord().getX() + "," +
-								 node.getCoord().getY() + "," +
-								 count);
+		for(int i = 0; i < aggregatedWorkplaces.length; i++){
+			bwAggregatedWP.write(aggregatedWorkplaces[i].getZoneID() + "," + 
+						   	   aggregatedWorkplaces[i].getNumberOfJobs() + "," +
+					 		   aggregatedWorkplaces[i].getCoordinate().getX() + "," +
+					 		   aggregatedWorkplaces[i].getCoordinate().getY() + "," +
+					 		   aggregatedWorkplaces[i].getNearestNode().getCoord().getX()  + "," +
+					 		   aggregatedWorkplaces[i].getNearestNode().getCoord().getX()  + "," +
+					 		   aggregatedWorkplaces[i].getNearestNode().getId());
 			bwAggregatedWP.newLine();
 		}
 		bwAggregatedWP.flush();
 		bwAggregatedWP.close();
 		
 		log.info("... done!");
-	}
-
-	/**
-	 * @param startZone
-	 * @param accessibilityTravelTimes
-	 * @param accessibilityTravelCosts
-	 * @param accessibilityTravelDistance
-	 */
-	private void setAccessibilityValue2StartZone(Zone<ZoneAccessibilityObject> startZone,
-			double accessibilityTravelTimes, double accessibilityTravelCosts,
-			double accessibilityTravelDistance) {
 		
-		double tt = Math.log( accessibilityTravelTimes );
-		double tc = Math.log( accessibilityTravelCosts );
-		double td =  Math.log( accessibilityTravelDistance);
-		
-		startZone.getAttribute().setTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
-		startZone.getAttribute().setTravelCostAccessibility( tc < 0.0 ? 0.0 : tc );
-		startZone.getAttribute().setTravelDistanceAccessibility(td < 0.0 ? 0.0 : td );
+//		log.info("Aggregating workplaces to their nearest network node and dumping results as csv: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
+//		
+//		// aggregate number of workplaces to their nearest network node and dump out the results
+//		Map<Id,WorkplaceObject> aggregatedWorkplacesHashMap = new HashMap<Id,WorkplaceObject>();
+//		Map<Id,Node> nearestNode = new HashMap<Id, Node>();
+//		for(int i = 0; i < aggregatedWorkplaces.length; i++){
+//			Id nodeID = aggregatedWorkplaces[i].getNearestNode().getId();
+//			if(aggregatedWorkplacesHashMap.containsKey( nodeID )){
+//				WorkplaceObject numWorkplaces = aggregatedWorkplacesHashMap.get( nodeID );
+//				numWorkplaces.counter += aggregatedWorkplaces[i].getNumberOfJobs();
+//			}
+//			else{
+//				WorkplaceObject numWorkplaces = new WorkplaceObject();
+//				numWorkplaces.counter = aggregatedWorkplaces[i].getNumberOfJobs();
+//				aggregatedWorkplacesHashMap.put(nodeID, numWorkplaces);
+//				nearestNode.put( nodeID, aggregatedWorkplaces[i].getNearestNode());
+//			}
+//		}
+//		bwAggregatedWP.write("nearest_node_ID,nearest_node_x_coord,nearest_node_y_coord,job_count");
+//		bwAggregatedWP.newLine();
+//		Iterator<Node> nodeIterator = nearestNode.values().iterator();
+//		while(nodeIterator.hasNext()){
+//			Node node = nodeIterator.next();
+//			long count = 0L; 
+//			if(aggregatedWorkplacesHashMap.get( node.getId() ) != null){
+//				count = aggregatedWorkplacesHashMap.get( node.getId() ).counter;
+//			}
+//			bwAggregatedWP.write(node.getId() + "," +
+//								 node.getCoord().getX() + "," +
+//								 node.getCoord().getY() + "," +
+//								 count);
+//			bwAggregatedWP.newLine();
+//		}
+//		bwAggregatedWP.flush();
+//		bwAggregatedWP.close();
+//		
+//		log.info("... done!");
 	}
 
 	/**
@@ -331,6 +333,49 @@ public class ERSAControlerListener implements ShutdownListener{
 		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
 		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getTravelCostAccessibility() , startZone.getGeometry().getCentroid());
 		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getTravelDistanceAccessibility() , startZone.getGeometry().getCentroid());
+	}
+	
+	/**
+	 * @param sc
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private BufferedWriter initCSVWriter(Scenario sc)
+			throws FileNotFoundException, IOException {
+		String filename = sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
+		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
+		
+		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
+		// create header
+		accessibilityIndicatorWriter.write( Constants.ERSA_ZONE_ID + "," +
+											Constants.ERSA_X_COORDNIATE + "," +
+											Constants.ERSA_Y_COORDINATE + "," + 
+											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
+											Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
+											Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
+		accessibilityIndicatorWriter.newLine();
+		return accessibilityIndicatorWriter;
+	}	
+	
+	/**
+	 * @param startZone
+	 * @param accessibilityTravelTimes
+	 * @param accessibilityTravelCosts
+	 * @param accessibilityTravelDistance
+	 */
+	private void setAccessibilityValue2StartZone(Zone<ZoneAccessibilityObject> startZone,
+												 double accessibilityTravelTimes, 
+												 double accessibilityTravelCosts,
+												 double accessibilityTravelDistance) {
+		
+		double tt = Math.log( accessibilityTravelTimes );
+		double tc = Math.log( accessibilityTravelCosts );
+		double td =  Math.log( accessibilityTravelDistance);
+		
+		startZone.getAttribute().setTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
+		startZone.getAttribute().setTravelCostAccessibility( tc < 0.0 ? 0.0 : tc );
+		startZone.getAttribute().setTravelDistanceAccessibility(td < 0.0 ? 0.0 : td );
 	}
 
 	/**
@@ -369,29 +414,6 @@ public class ERSAControlerListener implements ShutdownListener{
 		benchmark.stoppMeasurement(csvID);
 		log.info("Done with writing CSV-File. This took " + benchmark.getDurationInSeconds(csvID) + " seconds.");
 	}
-
-	/**
-	 * @param sc
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private BufferedWriter initCSVWriter(Scenario sc)
-			throws FileNotFoundException, IOException {
-		String filename = sc.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM) + "accessibility_indicators_ersa.csv";
-		csvID = benchmark.addMeasure("Writing CSV File (Accessibility Measures)", filename, false);
-		
-		BufferedWriter accessibilityIndicatorWriter = IOUtils.getBufferedWriter( filename );
-		// create header
-		accessibilityIndicatorWriter.write( Constants.ERSA_ZONE_ID + "," +
-											Constants.ERSA_X_COORDNIATE + "," +
-											Constants.ERSA_Y_COORDINATE + "," + 
-											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
-											Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
-											Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
-		accessibilityIndicatorWriter.newLine();
-		return accessibilityIndicatorWriter;
-	}	
 	
 	// getter methods
 	
@@ -399,7 +421,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		return startZones;
 	}
 	public JobClusterObject[] getJobObjectMap(){
-		return jobClusterArray;
+		return aggregatedWorkplaces;
 	}
 	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
 		return travelTimeAccessibilityGrid;

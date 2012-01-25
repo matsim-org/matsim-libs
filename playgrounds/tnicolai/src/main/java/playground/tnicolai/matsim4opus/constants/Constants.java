@@ -128,17 +128,19 @@ public class Constants {
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
 	
-	/** test run */
-	public static final int TEST_RUN_SUCCESSFUL = 0;
-	public static final int TEST_RUN_FAILD = -1;
-	
 	/** xsd on matsim.org */
-	public static final String MATSIM_4_URBANSIM_XSD_V1 = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V1 = "/dtd/matsim4urbansim_v1";
-	public static final String XSD_FILE_NAME_V1 = "matsim4urbansim_v1";
-	public static final String MATSIM_4_URBANSIM_XSD_V2 = "http://matsim.org/files/dtd/matsim4urbansim_v2.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V2 = "/dtd/matsim4urbansim_v2";
-	public static final String XSD_FILE_NAME_V2 = "matsim4urbansim_v2";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_XSD_FILE_NAME = "matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_XSD_FILE_NAME = "matsim4urbansim_v1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_XSD_FILE_NAME = "matsim4urbansim_v1.1.xsd";
 	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfig";
 	
 	/** MATSim properties */
@@ -157,6 +159,10 @@ public class Constants {
 	public static final String MATSIM_CONFIG_PARAMETER_SAMPLING_RATE = "samplingRate";
 	public static final String MATSIM_CONFIG_PARAMETER_YEAR = "year";
 	public static final String MATSIM_CONFIG_PARAMETER_TEMP_DIRECTORY = "tempDirectory";
+	
+	/** test run */
+	public static final int TEST_RUN_SUCCESSFUL = 0;
+	public static final int TEST_RUN_FAILD = -1;
 	
 	/** exit codes */
 	public static final int NOT_VALID_PATH	= 0;
@@ -220,7 +226,7 @@ public class Constants {
 	
 	/** Spatial IDs and spatial conversion factors */
 	public static final int SRID_WASHINGTON_NORTH = 2926;// srid 2285 also worked, but was last updated in 2001 instead of 2007
-	public static final int SRID_SWITZERLAND = 21781; // tnicolai: from johannes, check id!!!
+	public static final int SRID_SWITZERLAND = 21781;
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	

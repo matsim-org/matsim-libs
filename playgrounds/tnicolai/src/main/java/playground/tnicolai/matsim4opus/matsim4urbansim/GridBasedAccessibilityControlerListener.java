@@ -84,28 +84,32 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
+		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation");
+		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		
-		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation");
-		
 		// init LeastCostPathTree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 //		tnicolai: testing travel time calculator
 //		LeastCostPathTree lcptTravelTimeTest = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
-		// this calculates a least cost path for (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance)   with marginalCostOfDistance = 0
+		// this calculates the workplace accessibility travel times based on (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptTravelTimeDistance = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
-		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
+		// this calculates the workplace accessibility distances (based on link lengths)
 		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
+		
 		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
 		double beta_per_min = beta_per_hr / 60.; // get utility per minute
 		
 		try{
-			log.info("Computing and writing accessibility measures ..." );
+			log.info("Computing and writing grid based accessibility measures with following settings:" );
+			log.info("Depature time (in seconds): " + depatureTime);
+			log.info("Beta per hour: " + beta_per_hr);
+			log.info("Beta per minute: " + beta_per_min);
+			
 			Iterator<? extends Node> startNodeIterator = network.getNodes().values().iterator();
 			int numberOfStartNodes = network.getNodes().values().size();
 			log.info("Calculating " + numberOfStartNodes + " starting points ...");
@@ -167,10 +171,15 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 
 				// assigning each storage object with its corresponding node id
 				this.resultMap.put(originNode.getId(), 
-						new AccessibilityStorage(travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility));
+								   new AccessibilityStorage(travelTimeAccessibility, 
+										   					travelCostAccessibility, 
+										   					travelDistanceAccessibility));
 				
 				// writing accessibility measures of current node in csv format
-				GridBasedAccessibilityCSVWriter.write(originNode, travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility);
+				GridBasedAccessibilityCSVWriter.write(originNode, 
+													  travelTimeAccessibility, 
+													  travelCostAccessibility, 
+													  travelDistanceAccessibility);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);

@@ -107,7 +107,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			
 			computeZoneToZoneTrips(sc, originDestinationMatrix);
 
-			log.info("Computing and writing travel_data ..." );
+			log.info("Computing and writing zone2zone impedance matrix ..." );
 
 			// init array with zone informations
 			ZoneObject[] zones = UtilityCollection.assertZoneCentroid2NearestNode(this.zones, network);
