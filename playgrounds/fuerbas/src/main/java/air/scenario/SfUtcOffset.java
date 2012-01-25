@@ -57,14 +57,20 @@ public class SfUtcOffset {
 		osmReader.parse(inputOsmFile);
 	
 		this.airportsInOsm = osmReader.airports;
-		
+		log.info("Getting UTC offsets for " + this.airportsInOsm.size() + " airports. This will take 2 seconds per airport, at least...");
+		int count = 0;
 		Map<String, Double> airportUTCOffsetMap = new HashMap<String, Double>();
 		for (Entry<String, Coord> e : this.airportsInOsm.entrySet()) {
 			Double utcOffset = getUtcOffset(this.airportsInOsm.get(e.getKey()));
-			log.info("Got offset for airport: " + e.getKey() + " offset: " + utcOffset);
+			log.info("  Got offset for airport: " + e.getKey() + " offset: " + utcOffset);
 			airportUTCOffsetMap.put(e.getKey(), utcOffset);
+			count++;
+			if (count % 100 == 0){
+				log.info("  Got UTC offset for " + count + " airports of in total " + this.airportsInOsm.size() + " airports");
+			}
 		}
 		
+		log.info("Writing to file: " + outputFile);
 		//Output
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputFile)));
 		for (Entry<String, Double> e : airportUTCOffsetMap.entrySet()) {
