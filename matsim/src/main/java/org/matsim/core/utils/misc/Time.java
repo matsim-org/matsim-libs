@@ -183,7 +183,7 @@ public abstract class Time {
 			if ((m < 0) || (m > 59)) {
 				throw new IllegalArgumentException("minutes are out of range in " + time);
 			}
-			if ((s < 0) || (s > 59)) {
+			if ((s < 0) || (s >= 60)) {
 				throw new IllegalArgumentException("seconds are out of range in " + time);
 			}
 
