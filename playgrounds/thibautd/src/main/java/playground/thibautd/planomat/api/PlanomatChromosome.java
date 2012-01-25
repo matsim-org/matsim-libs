@@ -65,6 +65,7 @@ public class PlanomatChromosome implements IChromosome , IInitializer {
 
 	private PlanomatChromosome(final Chromosome delegate) {
 		this.delegate = delegate;
+		delegate.setFitnessValueDirectly( PlanomatFitnessFunction.NO_FITNESS_VALUE );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -91,8 +92,14 @@ public class PlanomatChromosome implements IChromosome , IInitializer {
 	 */
 	@Override
 	public double getFitnessValue() {
-		// should be OK not to modify
-		return delegate.getFitnessValue();
+		 double fit = delegate.getFitnessValueDirectly();
+
+		 if (fit == PlanomatFitnessFunction.NO_FITNESS_VALUE) {
+			 fit = delegate.getConfiguration().getFitnessFunction().getFitnessValue( delegate );
+			 delegate.setFitnessValueDirectly( fit );
+		 }
+
+		 return fit;
 	}
 
 	/**
