@@ -2,14 +2,17 @@ package org.matsim.core.router.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 
 /**
  * Converts a network to an inverted network. Inverted nodes are situated at
@@ -29,6 +32,8 @@ public class NetworkInverter {
 
 	private NetworkImpl invertedNetwork = null;
 
+	private Map<Id, List<TurnInfo>>  inLinkTurnInfoMap;
+
 	public NetworkInverter(Network originalNet) {
 		this.originalNetwork = originalNet;
 	}
@@ -38,6 +43,10 @@ public class NetworkInverter {
 			invertNetwork();
 		}
 		return this.invertedNetwork;
+	}
+	
+	public void setInLinkTurnInfoMap(Map<Id, List<TurnInfo>>  inLinkTurnInfoMap) {
+		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
 	}
 
 	private void invertNetwork(){

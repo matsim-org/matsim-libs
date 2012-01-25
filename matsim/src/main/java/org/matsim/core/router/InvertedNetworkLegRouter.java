@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -80,6 +82,13 @@ public class InvertedNetworkLegRouter implements LegRouter{
 					"  Set the enableLinkToLinkRouting config parameter in the" +
 					" controler config module and the calculateLinkToLinkTravelTimes in the travelTimeCalculator module!");
 		}
+		
+		Map<Id, List<TurnInfo>> inLinkTurnInfoMap = null;
+		if (sc.getConfig().scenario().isUseLanes()) {
+//			LaneDefinitions ld = ((ScenarioImpl) sc).getLaneDefinitions();
+//			inLinkTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
+		}
+		
 		
 		NetworkInverter networkInverter = new NetworkInverter(network);
 		this.invertedNetwork = networkInverter.getInvertedNetwork();
