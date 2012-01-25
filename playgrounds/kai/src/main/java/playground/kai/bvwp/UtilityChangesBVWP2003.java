@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtlChanges.java
+ * UtilityChangesBVWP2003.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,12 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
+/**
+ * 
+ */
 package playground.kai.bvwp;
 
-public class UtlChanges {
-	double deltaQuantity ;
-	double utlGainByOldUsers ;
-	double utlGainByNewUsers ;
+import playground.kai.bvwp.Values.Entry;
+
+
+/**
+ * @author Ihab
+ *
+ */
+public class UtilityChangesBVWP2003 extends UtilityChanges {
+	UtilityChangesBVWP2003() {
+		System.out.println("\nSetting utility computation method to " + this.getClass() ) ;
+	}
 	
-	double utl;
+	@Override
+	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, ValuesForAUserType quantitiesPlanfall, Entry entry, double deltaAmounts) {
+		
+		UtlChanges utlChanges = new UtlChanges() ;
+		
+		double personenXNull = quantitiesNullfall.getByEntry(Entry.XX) * quantitiesNullfall.getByEntry(entry);
+		double personenXPlan = quantitiesPlanfall.getByEntry(Entry.XX) * quantitiesPlanfall.getByEntry(entry);
+		double diff = personenXPlan - personenXNull;
+		
+		utlChanges.utl = diff * econValues.getByEntry(entry);				
+		return utlChanges;
+	}
+
 }
