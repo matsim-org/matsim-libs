@@ -2,6 +2,9 @@ package playground.ikaddoura.busCorridor.finalDyn2;
 
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
 import org.matsim.core.utils.charts.LineChart;
 
 public class ChartFileWriter {
@@ -25,8 +28,7 @@ public class ChartFileWriter {
 				yWerte[counter2] = myMap.get(iteration);
 				counter2++;
 			}
-			chart.addSeries(parameter, yWerte);
-			
+			chart.addSeries(parameter, yWerte);			
 			String outputFile = outputExternalIterationDirPath+"/Parameters_"+parameter+".png";
 			chart.saveAsPng(outputFile, 1000, 800); //File Export
 			log.info("Parameters written to "+outputFile);
