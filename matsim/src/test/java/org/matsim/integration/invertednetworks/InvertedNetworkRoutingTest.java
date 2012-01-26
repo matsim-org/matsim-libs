@@ -251,6 +251,8 @@ public class InvertedNetworkRoutingTest {
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			scd.addSignalSystemControllerData(controller);
 			SignalPlanData plan = fsc.createSignalPlanData(getId(1));
+			plan.setStartTime(0.0);
+			plan.setEndTime(23 * 3600.0);
 			plan.setCycleTime(100);
 			controller.addSignalPlanData(plan);
 			SignalGroupSettingsData group = fsc.createSignalGroupSettingsData(getId(2));
