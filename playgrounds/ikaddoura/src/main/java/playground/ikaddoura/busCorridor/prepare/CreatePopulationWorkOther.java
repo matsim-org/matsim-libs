@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
@@ -63,7 +64,7 @@ public class CreatePopulationWorkOther implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final/populationWorkOther.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final/populationBusCorridor.xml");
 	}
 
 	private void fillZoneData() {
@@ -104,16 +105,21 @@ public class CreatePopulationWorkOther implements Runnable {
 	
 	private void generatePopulation() {
 		
-//		createOtherTrips(500);
-		createWorkTrips(1500);
+		createOtherTrips(1300);
+		createWorkTrips(700);
 
 	}
 	
 	private void createWorkTrips(int quantity) {
 		for (int i=0; i<quantity; i++){
 			Coord homeLocation = getRndCoord();
+//			Coord homeLocation = new CoordImpl(0, 0);
+			
 			Coord workLocation = getRndCoord();
-			double homeEndTimeRnd = calculateNormallyDistributedTime(8*60*60, 2*60*60);
+//			Coord workLocation = new CoordImpl(5000, 0);
+
+			
+			double homeEndTimeRnd = calculateNormallyDistributedTime(8*60*60, 1*60*60);
 			
 			Person person = population.getFactory().createPerson(createId("person_HomeWorkHome_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 			Plan plan = population.getFactory().createPlan();
