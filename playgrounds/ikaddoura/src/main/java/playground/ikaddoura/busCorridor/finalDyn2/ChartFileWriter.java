@@ -16,11 +16,12 @@ public class ChartFileWriter {
 				cc++;
 			}
 			
-			LineChart chart = new LineChart(title, "Iteration", parameter);
+			LineChart chart = new LineChart(title, "Iteration", parameter, xValues);
 		    
 			double[] yWerte = new double[myMap.size()];
 			int counter2 = 0;
 			for (Integer iteration : myMap.keySet()){
+				xValues[counter2] = iteration.toString();
 				yWerte[counter2] = myMap.get(iteration);
 				counter2++;
 			}
@@ -68,7 +69,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("User score per iteration", "Iteration", "User Score (avg. executed)");
+		LineChart chart = new LineChart("User score per iteration", "Iteration", "User Score (avg. executed)", xValues);
 	    
 		double[] yWerte = new double[iteration2score.size()];
 		int counter2 = 0;
@@ -92,7 +93,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("User score sum per iteration", "Iteration", "User Score (LogSum)");
+		LineChart chart = new LineChart("User score sum per iteration", "Iteration", "User Score (LogSum)", xValues);
 	    
 		double[] yWerte = new double[iteration2scoreSum.size()];
 		int counter2 = 0;
@@ -116,7 +117,7 @@ public class ChartFileWriter {
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("Total Score per iteration", "Iteration", "Sum of User (LogSum) and Operator Score");
+		LineChart chart = new LineChart("Total Score per iteration", "Iteration", "Sum of User (LogSum) and Operator Score", xValues);
 	    
 		double[] yWerte = new double[iteration2totalScore.size()];
 		int counter2 = 0;
@@ -135,12 +136,12 @@ public class ChartFileWriter {
 		
 		String[] xValues = new String[iteration2score.size()];
 		int counter1 = 0;
-		for (Double xValue : iteration2score.values()){
+		for (Integer xValue : iteration2score.keySet()){
 			xValues[counter1] = xValue.toString();
 			counter1++;
 		}
 		
-		LineChart chart = new LineChart("Operator score per iteration", "Iteration", "AUD");
+		LineChart chart = new LineChart("Operator score per iteration", "Iteration", "AUD", xValues);
 	    
 		double[] yWerte1 = new double[iteration2score.size()];
 		int counter2 = 0;
