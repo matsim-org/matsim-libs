@@ -4,8 +4,6 @@
         <signalSystemController>
             <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
             <signalPlan id="5">
-                <start daytime="00:00:00"/>
-                <stop daytime="00:00:00"/>
                 <cycleTime sec="57"/>
                 <offset sec="0"/>
                 <signalGroupSettings refId="3">

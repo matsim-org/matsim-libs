@@ -108,7 +108,7 @@ public class TravelTimeOneWayTest {
 	}
 
 	private void runTrafficLightIntersection2arms_w_TrafficLight_0_60(ScenarioImpl scenario){
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 //		events.addHandler(new LogOutputEventHandler());
@@ -128,7 +128,9 @@ public class TravelTimeOneWayTest {
 			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(id2);
 			signalPlan.setCycleTime(circulationTime);
 			signalPlan.getSignalGroupSettingsDataByGroupId().get(id100).setDropping(dropping);
-			
+			signalPlan.setStartTime(0.0);
+			signalPlan.setEndTime(0.0);
+
 			//build the signal model
 			FromDataBuilder builder = new FromDataBuilder(signalsData, events);
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
@@ -165,7 +167,7 @@ public class TravelTimeOneWayTest {
 	
 	private void runTrafficLightIntersection2arms_w_TrafficLight(Scenario scenario){
 		//test with signal systems
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
@@ -178,7 +180,7 @@ public class TravelTimeOneWayTest {
 		
 	
 		//test without signal systems 
-		events = (EventsManager) EventsUtils.createEventsManager();
+		events = EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 		QSim.createQSimAndAddAgentSource(scenario, events).run();

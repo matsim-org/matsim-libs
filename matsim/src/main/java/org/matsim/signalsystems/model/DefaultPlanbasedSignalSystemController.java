@@ -19,9 +19,12 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.model;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 
@@ -35,21 +38,27 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 //	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
-	private Map<Id, SignalPlan> plans;
-	private SignalSystem signalSystem;
-	private SignalPlan activePlan;
+	private Queue<SignalPlan> planQueue = null;
+	private Map<Id, SignalPlan> plans = null;
+	private SignalSystem signalSystem = null;
+	private SignalPlan activePlan = null;
+	private double nextActivePlanCheckTime;
 	
 	public DefaultPlanbasedSignalSystemController(){}
 	
 	@Override
 	public void updateState(double timeSeconds) {
-		this.checkActivePlan();
+		if (nextActivePlanCheckTime <= timeSeconds){
+			this.checkActivePlan(timeSeconds);
+		}
+		if (this.activePlan != null){
 //		log.error("update state of system: " + this.signalSystem.getId());
-		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
-		this.processDroppingGroupIds(timeSeconds, droppingGroupIds);
-		
-		List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
-		this.processOnsetGroupIds(timeSeconds, onsetGroupIds);
+			List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
+			this.processDroppingGroupIds(timeSeconds, droppingGroupIds);
+			
+			List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
+			this.processOnsetGroupIds(timeSeconds, onsetGroupIds);
+		}
 	}
 	
 	private void processOnsetGroupIds(double timeSeconds, List<Id> onsetGroupIds) {
@@ -68,13 +77,36 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		}
 	}
 	
-	private void checkActivePlan(){
-		//TODO implement active plan logic
+	private void checkActivePlan(double timeSeconds){
+		SignalPlan nextPlan = this.planQueue.peek();
+		if (nextPlan != null && nextPlan.getStartTime() <= timeSeconds) {
+			this.activePlan = nextPlan;
+			this.planQueue.poll();
+			this.nextActivePlanCheckTime = Math.min(this.activePlan.getEndTime(), this.planQueue.peek().getStartTime());
+		}
+		else if (this.activePlan != null &&  timeSeconds >= this.activePlan.getEndTime()) {
+			this.activePlan = null;
+			this.signalSystem.switchOff(timeSeconds);
+			if (nextPlan != null){
+				this.nextActivePlanCheckTime = nextPlan.getStartTime();
+			}
+		}
 	}
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
-		
+		this.planQueue = new PriorityBlockingQueue<SignalPlan>(this.plans.size(), new SignalPlanStartTimeComparator());
+		this.planQueue.addAll(this.plans.values());
+		//first check if there is a plan that shall be active all the time (i.e. 0.0 as start and end time)
+		this.activePlan = this.planQueue.poll();
+		if ((this.activePlan.getStartTime() == null || this.activePlan.getStartTime() == 0.0) 
+				&& (this.activePlan.getEndTime() == null || this.activePlan.getEndTime() == 0.0)){
+			this.nextActivePlanCheckTime = Double.POSITIVE_INFINITY;
+			this.planQueue = null;
+		}
+		else {
+			this.checkActivePlan(simStartTimeSeconds);
+		}
 	}
 	
 	@Override
@@ -82,7 +114,6 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 //		log.error("addPlan to system : " + this.signalSystem.getId());
 		if (this.plans == null){
 			this.plans = new HashMap<Id, SignalPlan>();
-			//TODO remove when checkActive is implemented
 			this.activePlan = plan;
 		}
 		this.plans.put(plan.getId(), plan);
@@ -98,5 +129,25 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		
 	}
 
+	
+	private static class SignalPlanStartTimeComparator implements Comparator<SignalPlan>{
+
+		@Override
+		public int compare(SignalPlan p1, SignalPlan p2) {
+			if (p1.getStartTime() != null && p2.getStartTime() != null) {
+				return p1.getStartTime().compareTo(p2.getStartTime());
+			}
+			else if (p1.getStartTime() != null && p2.getStartTime() == null){
+				return -1;
+			}
+			else if (p1.getStartTime() == null && p2.getStartTime() != null){
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+		
+	}
 
 }

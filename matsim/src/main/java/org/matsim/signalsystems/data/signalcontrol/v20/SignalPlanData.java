@@ -39,13 +39,17 @@ public interface SignalPlanData {
 	 * @return null if not set
 	 */
 	public Double getStartTime();
-
+	/**
+	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
+	 */
 	public void setStartTime(Double seconds);
 	/**
 	 * @return null if not set
 	 */
 	public Double getEndTime();
-
+	/**
+	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
+	 */
 	public void setEndTime(Double seconds);
 	/**
 	 * @return null if not set

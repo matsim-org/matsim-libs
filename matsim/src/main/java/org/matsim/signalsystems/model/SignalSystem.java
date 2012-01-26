@@ -56,4 +56,6 @@ public interface SignalSystem extends Identifiable {
 
 	public void simulationInitialized(double simStartTimeSeconds);
 	
+	public void switchOff(double timeSeconds);
+	
 }

@@ -33,7 +33,7 @@ public interface SignalPlan {
 	public List<Id> getDroppings(double timeSeconds);
 
 	public List<Id> getOnsets(double timeSeconds);
-	
+
 	public Double getEndTime();
 	
 	public Double getStartTime();

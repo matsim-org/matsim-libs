@@ -77,7 +77,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	}
 
 	private boolean checkGreen(SignalGroupState state) {
-		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW));
+		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW) || state.equals(SignalGroupState.OFF));
 	}
 
 	public boolean isLinkGreen() {

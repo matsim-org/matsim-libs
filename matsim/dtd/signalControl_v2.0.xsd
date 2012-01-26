@@ -70,7 +70,7 @@
 								<xs:sequence>
 										<xs:element name="start" minOccurs="0" maxOccurs="1">
 												<xs:annotation>
-														<xs:documentation>The time of day at which the plan should be activated</xs:documentation>
+														<xs:documentation>The time of day at which the plan should be activated, set start and stop to 00:00:00 if the plan shall be always active or simply remove start and stop element completely</xs:documentation>
 												</xs:annotation>
 												<xs:complexType>
 														<xs:attribute name="daytime" type="xs:time" use="required" />
@@ -78,7 +78,7 @@
 										</xs:element>
 										<xs:element name="stop" minOccurs="0" maxOccurs="1">
 												<xs:annotation>
-														<xs:documentation>At which time of day to stop using this plan</xs:documentation>
+														<xs:documentation>At which time of day to stop using this plan, set start and stop to 00:00:00 if the plan shall be always active or simply remove start and stop element completely</xs:documentation>
 												</xs:annotation>
 												<xs:complexType>
 														<xs:attribute name="daytime" type="xs:time" use="required" />

@@ -115,7 +115,7 @@ public class SignalSystemsOneAgentTest implements
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		this.link2EnterTime = 38.0;
 		
@@ -144,12 +144,14 @@ public class SignalSystemsOneAgentTest implements
 		
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
+		planData.setStartTime(0.0);
+		planData.setEndTime(0.0);
 		planData.setCycleTime(5 * 3600);
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
 		groupData.setDropping(0);
 		groupData.setOnset(100);
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
 		this.link2EnterTime = 100.0;
 		

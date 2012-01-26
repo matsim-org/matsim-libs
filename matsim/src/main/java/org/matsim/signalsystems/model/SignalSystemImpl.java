@@ -102,6 +102,17 @@ public class SignalSystemImpl implements SignalSystem {
 			request = this.sortedRequests.peek();
 		}
 	}
+	
+	@Override
+	public void switchOff(double timeSeconds) {
+		Set<SignalGroupStateChangeRequest> req = new HashSet<SignalGroupStateChangeRequest>();
+		for (SignalGroup sg : this.getSignalGroups().values()){
+			req.add(new SignalGroupStateChangeRequestImpl(sg.getId(), SignalGroupState.YELLOW, timeSeconds));
+			req.add(new SignalGroupStateChangeRequestImpl(sg.getId(), SignalGroupState.OFF, timeSeconds + 5.0));
+		}
+		this.sortedRequests.addAll(req);
+	}
+
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
