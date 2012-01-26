@@ -62,7 +62,7 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 
 	@Override
 	public void reset() {
-        this.firstAct = true;
+		this.firstAct = true;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
@@ -86,14 +86,18 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		} else {
 			this.score += calcActScore(this.currentActivityStartTime, time, act);
 		}
+		currentActivity = null;
 	}
 
 	@Override
 	public void finish() {
 		if (this.currentActivity != null) {
-			handleLastActivity(this.currentActivity); 
-//		} else {
-			// No activity has started so far.
+			handleOvernightActivity(this.currentActivity); 
+		} else {
+			if (this.firstActivity != null) {
+				handleMorningActivity();
+			}
+			// Else, no activity has started so far.
 			// This probably means that the plan contains at most one activity.
 			// We cannot handle that correctly, because we do not know what it is.
 		}
@@ -228,21 +232,21 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		return openInterval;
 	}
 
-	private void handleLastActivity(Activity lastActivity) {
-        assert firstActivity != null;
-        assert lastActivity != null;
+	private void handleOvernightActivity(Activity lastActivity) {
+		assert firstActivity != null;
+		assert lastActivity != null;
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
 			// the first Act and the last Act have the same type
 			this.score += calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity); // SCENARIO_DURATION
 		} else {
 			if (this.params.scoreActs) {
-			    if (firstLastActWarning <= 10) {
-			    	log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
-			        if (firstLastActWarning == 10) {
-			            log.warn("Additional warnings of this type are suppressed.");
-			        }
-			        firstLastActWarning++;
-			    }
+				if (firstLastActWarning <= 10) {
+					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+					if (firstLastActWarning == 10) {
+						log.warn("Additional warnings of this type are suppressed.");
+					}
+					firstLastActWarning++;
+				}
 
 				// score first activity
 				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
@@ -252,4 +256,11 @@ public class ActivityScoringFunction implements ActivityScoring, BasicScoring {
 		}
 	}
 
+	private void handleMorningActivity() {
+		assert firstActivity != null;
+		// score first activity
+		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+	}
+
 }
+

@@ -469,20 +469,55 @@ public class CharyparNagelScoringFunctionTest {
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8*3600);
 		f.config.planCalcScore().addActivityParams(params);
-
+		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(6.0 * 3600);
+		
 		double perf = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
 		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
-		double zeroUtilDurH = getZeroUtilDuration_h(15.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_h(6.0, 1.0);
 		double zeroUtilDurH2 = getZeroUtilDuration_h(8.0, 1.0);
 
 		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.75/zeroUtilDurW)
 				+ perf * 3.0 * Math.log(2.5/zeroUtilDurW)
-				+ Math.max(0.0, perf * 15.0 * Math.log(7.0 / zeroUtilDurH))
+				+ perf * 6.0 * Math.log(7.0 / zeroUtilDurH)
 				+ perf * 8.0 * Math.log(7.75 / zeroUtilDurH2), calcScore(f), EPSILON);
 	}
 
+	/**
+	 * Test that the scoring function works even when we don't spend the night at home, but
+	 * don't end the day with an ongoing activity at all. This is half of the case
+	 * when the first and last activity aren't the same.
+	 */
+	@Test
+	public void testNoNightActivity() {
+		
+		double zeroUtilDurW = getZeroUtilDuration_h(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_h(7.0, 1.0);
+		double perf = +3.0;
+		
+		Fixture f = new Fixture();
+		// Need to change the typical duration of the home activity
+		// for this test, since with the setting of 15 hours for "home",
+		// this would amount to a smaller-than-zero expected contribution of
+		// the home activity at 7 hours, and smaller-than-zero contributions
+		// are truncated, so we wouldn't test anything. :-/
+		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(7.0 * 3600);
+		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		
+		ScoringFunction testee = getScoringFunctionInstance(f, f.plan);
+		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
+		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
+		testee.handleActivity((Activity) f.plan.getPlanElements().get(2));
+		testee.finish();
+		
+		assertEquals(
+				perf * 3.0 * Math.log(2.5 / zeroUtilDurW) +
+				perf * 7.0 * Math.log(7.0 / zeroUtilDurH), 
+				testee.getScore(), EPSILON);
+	}
+	
+	
 	/**
 	 * Sets up the configuration to be useful for scoring plans. This implementation
 	 * sets the parameters for scoring functions returned by
@@ -610,6 +645,7 @@ public class CharyparNagelScoringFunctionTest {
 			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h");
 			params.setTypicalDuration(15*3600);
 			scoring.addActivityParams(params);
+			
 
 			params = new PlanCalcScoreConfigGroup.ActivityParams("w");
 			params.setTypicalDuration(3*3600);

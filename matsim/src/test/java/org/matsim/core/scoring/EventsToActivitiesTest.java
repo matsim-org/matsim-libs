@@ -62,6 +62,22 @@ public class EventsToActivitiesTest {
 		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getEndTime(), 1e-8);
 		Assert.assertEquals(90.0, ah.handledActivity.getStartTime(), 1e-8);
 	}
+	
+	@Test
+	public void testDontCreateNightActivityIfNoneIsBeingPerformedWhenSimulationEnds() {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EventsToActivities testee = new EventsToActivities();
+		MockActivityHandler ah = new MockActivityHandler();
+		testee.setActivityHandler(ah);
+		testee.reset(0);
+		testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
+		Assert.assertNotNull(ah.handledActivity);
+		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getStartTime(), 1e-8);
+		Assert.assertEquals(10.0, ah.handledActivity.getEndTime(), 1e-8);
+		ah.reset();
+		testee.finish();
+		Assert.assertNull(ah.handledActivity);
+	}
 
 	private static class MockActivityHandler implements ActivityHandler {
 		public Activity handledActivity = null;
