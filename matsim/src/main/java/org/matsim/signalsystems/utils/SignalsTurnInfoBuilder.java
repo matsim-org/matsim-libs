@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LanesTurnInfoBuilder
+ * SignalsTurnInfoBuilder
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.utils;
+package org.matsim.signalsystems.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,42 +26,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment;
+import org.matsim.lanes.utils.LanesTurnInfoBuilder;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+
 
 /**
- * Creates TurnInfo objects from lanes data.
+ * Creates TurnInfo objects from traffic signal data.
  * 
  * @author dgrether
- * 
+ *
  */
-public class LanesTurnInfoBuilder {
+public class SignalsTurnInfoBuilder {
+	
+	private static final Logger log = Logger.getLogger(LanesTurnInfoBuilder.class);
 
-	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitions ld) {
+	private static int warnCount = 0;
+
+	
+	public Map<Id, List<TurnInfo>> createSignalsTurnInfos(SignalSystemsData ssd) {
 		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
-		Set<Id> toLinkIds = new HashSet<Id>();
-		for (LanesToLinkAssignment l2l : ld.getLanesToLinkAssignments().values()) {
-			toLinkIds.clear();
-			for (Lane lane : l2l.getLanes().values()) {
-				if (lane.getToLinkIds() != null
-						&& (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty())) { // make sure that it is a lane at the
-																																									// end of a link
-					toLinkIds.addAll(lane.getToLinkIds());
+		for (SignalSystemData signalSystem : ssd.getSignalSystemData().values()){
+			for (SignalData signal : signalSystem.getSignalData().values()){
+				if (signal.getTurningMoveRestrictions() != null && ! signal.getTurningMoveRestrictions().isEmpty()){
+					if (warnCount < 1){
+						log.warn("Turning move restrictions for signals are implemented for TransportMode.car only, yet!");
+						warnCount++;
+					}
+					inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
+					Set<String> modeCar = new HashSet<String>();
+					modeCar.add(TransportMode.car);
+					for (Id toLinkId : signal.getTurningMoveRestrictions()){
+						TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
+						inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
+					}
 				}
-			}
-			if (!toLinkIds.isEmpty()) {
-				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
-				for (Id toLinkId : toLinkIds) {
-					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
-				}
-				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);
 			}
 		}
-
 		return inLinkIdTurnInfoMap;
 	}
-
 }

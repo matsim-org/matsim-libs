@@ -1270,6 +1270,7 @@ public class Controler {
 		}
 
 		if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
+			//Note that the inverted network is created once per thread
 			InvertedNetworkLegRouter invertedNetLegRouter = new InvertedNetworkLegRouter(this.getScenario(),
 					this.getLeastCostPathCalculatorFactory(), this.getTravelCostCalculatorFactory(), travelTimes);
 			plansCalcRoute.addLegHandler(TransportMode.car,	invertedNetLegRouter);

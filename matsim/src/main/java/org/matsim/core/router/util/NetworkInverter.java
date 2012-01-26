@@ -3,6 +3,7 @@ package org.matsim.core.router.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,10 +33,11 @@ public class NetworkInverter {
 
 	private NetworkImpl invertedNetwork = null;
 
-	private Map<Id, List<TurnInfo>>  inLinkTurnInfoMap;
+	private Map<Id, List<TurnInfo>>  inLinkTurnInfoMap = null;
 
-	public NetworkInverter(Network originalNet) {
+	public NetworkInverter(Network originalNet, Map<Id, List<TurnInfo>>  inLinkTurnInfoMap) {
 		this.originalNetwork = originalNet;
+		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
 	}
 
 	public Network getInvertedNetwork() {
@@ -43,10 +45,6 @@ public class NetworkInverter {
 			invertNetwork();
 		}
 		return this.invertedNetwork;
-	}
-	
-	public void setInLinkTurnInfoMap(Map<Id, List<TurnInfo>>  inLinkTurnInfoMap) {
-		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
 	}
 
 	private void invertNetwork(){
@@ -59,17 +57,15 @@ public class NetworkInverter {
 			numberOfNodesGenerated++;
 		}
 
+		NetworkTurnInfoBuilder turnInfoBuilder = new NetworkTurnInfoBuilder();
 		for (Node node : this.originalNetwork.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated + 1), // start counting link ids with 1 instead of 0
-							this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
-							outLink.getLength(),
-							outLink.getFreespeed(),
-							outLink.getCapacity(),
-							outLink.getNumberOfLanes());
-					((LinkImpl) link).setType(((LinkImpl) outLink).getType());
-					numberOfLinksGenerated++;
+					List<TurnInfo> turnInfos = this.inLinkTurnInfoMap.get(inLink.getId());
+						TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
+						if (ti != null){
+							numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
+						}
 				}
 			}
 		}
@@ -80,6 +76,18 @@ public class NetworkInverter {
 		// NetworkWriter myNetworkWriter = new NetworkWriter(wrappedNetwork,
 		// "wrappedNetwork");
 		// myNetworkWriter.write();
+	}
+
+	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
+		Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated + 1), // start counting link ids with 1 instead of 0
+				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
+				outLink.getLength(),
+				outLink.getFreespeed(),
+				outLink.getCapacity(),
+				outLink.getNumberOfLanes());
+		link.setAllowedModes(modes);
+		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
+		return numberOfLinksGenerated + 1;
 	}
 
 	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
