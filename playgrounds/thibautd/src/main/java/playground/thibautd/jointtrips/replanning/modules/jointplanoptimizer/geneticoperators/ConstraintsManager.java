@@ -51,10 +51,12 @@ public interface ConstraintsManager {
 	 * (x_1, x_2, ..., x_(i-1), (1 - a)x_i + a*y_i, ..., (1 - a)x_n + a*y_n)
 	 * respects the constraints. A value of one corresponds to a classical single
 	 * point cross-over.
+	 * Note that the coefficient depends on the "direction" of the CO: to use the
+	 * same coefficient in both directions, the minimum of the two must be taken.
 	 *
-	 * @param firstMate the first parent chromosome: its genes values after the crossing
+	 * @param firstMate the first parent chromosome (x): its genes values after the crossing
 	 * point will be multiplied by the crossing coeff before the combinaison
-	 * @param secondMate the second parent chromosome: its genes values after the crossing
+	 * @param secondMate the second parent chromosome (y): its genes values after the crossing
 	 * point will be multiplied by one minus the crossing coeff before the combinaison
 	 * @param crossingPoint the index of the first gene which is part of the
 	 * linear recombination.

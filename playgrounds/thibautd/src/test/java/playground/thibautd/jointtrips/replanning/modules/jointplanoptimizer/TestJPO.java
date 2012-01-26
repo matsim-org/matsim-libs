@@ -80,8 +80,8 @@ public class TestJPO {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	// sample clique
 	private static final Id idSample = new IdImpl("2593674");
-	private static final int N_TEST_CHROM = 100;
-	private static final double P_MUT = 0.3;
+	private static final int N_TEST_CHROM = 1000;
+	private static final double P_MUT = 0.4;
 	private static final double P_CO = 1;
 
 	private JointControler controler;
@@ -97,7 +97,7 @@ public class TestJPO {
 	// Fixtures setting
 	// /////////////////////////////////////////////////////////////////////////
 	@Before
-	public void initConf() {
+	public void initConf() throws Exception {
 		String inputPath = getParentDirectory(utils.getPackageInputDirectory(), 3);
 		String outputPath = utils.getOutputDirectory();
 
@@ -137,6 +137,8 @@ public class TestJPO {
 				this.controler.getNetwork(),
 				outputPath,
 				123);
+
+		jgapConf.setPopulationSize( N_TEST_CHROM );
 	}
 
 	private String getParentDirectory(final String path, final int levels) {
@@ -575,7 +577,24 @@ public class TestJPO {
 
 		List<IChromosome> offsprings = new ArrayList<IChromosome>();
 		Population jgapPop = createSampleGeneticPopulation();
-		testGeneticOperator(crossOver, jgapPop, offsprings);
+		testGeneticOperatorConstraints(crossOver, jgapPop, offsprings);
+	}
+
+	@Test
+	public void testSideEffectsCO() throws Exception {
+		this.configGroup.setWholeCrossOverProbability(P_CO);
+		this.configGroup.setSingleCrossOverProbability(P_CO);
+		this.configGroup.setSimpleCrossOverProbability(P_CO);
+
+		JointPlanOptimizerJGAPCrossOver crossOver =
+			new JointPlanOptimizerJGAPCrossOver(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+		testGeneticOperatorSideEffects(crossOver, jgapPop, offsprings);	
 	}
 
 	/**
@@ -594,16 +613,73 @@ public class TestJPO {
 
 		List<IChromosome> offsprings = new ArrayList<IChromosome>();
 		Population jgapPop = createSampleGeneticPopulation();
-		testGeneticOperator(mutation, jgapPop, offsprings);
+		testGeneticOperatorConstraints(mutation, jgapPop, offsprings);
 	}
 
-	/**
-	 * Tests the behaviour of the mutation depending on the "in place"
-	 * parameter.
-	 */
 	@Test
-	@Ignore
-	public void testMutationInPlace() {
+	public void testMutationSideEffects() throws Exception {
+		this.configGroup.setInPlaceMutation(false);
+		this.configGroup.setMutationProbability(P_MUT);
+
+		JointPlanOptimizerJGAPMutation mutation =
+			new JointPlanOptimizerJGAPMutation(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+		testGeneticOperatorSideEffects(mutation, jgapPop, offsprings);	
+	}
+
+	@Test
+	public void testMutationInPlaceConstraints() throws Exception {
+		this.configGroup.setInPlaceMutation(true);
+		this.configGroup.setMutationProbability(P_MUT);
+
+		JointPlanOptimizerJGAPMutation mutation =
+			new JointPlanOptimizerJGAPMutation(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+
+		// the mutation "in place" acts on the "candidate solutions":
+		// generate some.
+		for (Object chrom : jgapPop.getChromosomes()) {
+			offsprings.add( (IChromosome) ((IChromosome) chrom).clone() );
+		}
+
+		testGeneticOperatorConstraints(mutation, jgapPop, offsprings);	
+	}
+
+	@Test
+	public void testMutationInPlaceSideEffects() throws Exception {
+		this.configGroup.setInPlaceMutation(true);
+		this.configGroup.setMutationProbability(P_MUT);
+
+		JointPlanOptimizerJGAPMutation mutation =
+			new JointPlanOptimizerJGAPMutation(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+
+		// the mutation "in place" acts on the "candidate solutions":
+		// generate some. Moreover, mimic the behaviour during the iterations
+		// (the first chromosomes are the chromosomes of the previous gen)
+		for (Object chrom : jgapPop.getChromosomes()) {
+			offsprings.add( (IChromosome) chrom );
+		}
+		for (Object chrom : jgapPop.getChromosomes()) {
+			offsprings.add( (IChromosome) ((IChromosome) chrom).clone() );
+		}
+
+		testGeneticOperatorSideEffects(mutation, jgapPop, offsprings);	
 	}
 
 	/////////////////////////////// chromosome /////////////////////////////////
@@ -664,10 +740,26 @@ public class TestJPO {
 				MatsimTestUtils.EPSILON);
 	}
 
+	@Test
+	public void testCloneChromosome() throws Exception {
+		IChromosome chrom = createRandomChromosome();
+		IChromosome clone = (IChromosome) chrom.clone();
+
+		Assert.assertNotSame(
+				"cloning chromosome just copies the reference!",
+				chrom,
+				clone);
+
+		Assert.assertEquals(
+				"clone and cloned are not equal!",
+				chrom,
+				clone);
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
-	private void testGeneticOperator(
+	private void testGeneticOperatorConstraints(
 			final GeneticOperator operator,
 			final Population pop,
 			final List<IChromosome> offsprings) {
@@ -682,8 +774,22 @@ public class TestJPO {
 		}
 	}
 
+	private void testGeneticOperatorSideEffects(
+			final GeneticOperator operator,
+			final Population pop,
+			final List<IChromosome> offsprings) {
+		Population previousPop = (Population) pop.clone();
+
+		operator.operate(pop, offsprings);
+
+		Assert.assertEquals(
+				"applying the operator "+operator.getClass()+" modified the previous generation!",
+				previousPop,
+				pop);
+	}
+
 	private Population createSampleGeneticPopulation() throws Exception {
-		IChromosome[] chromosomes = new IChromosome[N_TEST_CHROM];
+		IChromosome[] chromosomes = new IChromosome[jgapConf.getPopulationSize()];
 
 		UpperBoundsConstraintsManager constr = (UpperBoundsConstraintsManager) jgapConf.getConstraintsManager();
 

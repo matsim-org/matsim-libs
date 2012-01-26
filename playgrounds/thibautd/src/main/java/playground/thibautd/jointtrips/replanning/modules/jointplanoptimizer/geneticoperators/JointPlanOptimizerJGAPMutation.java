@@ -105,16 +105,18 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	 */
 	private void operateInPlace(
 			final Population a_population,
-			final List a_candidateChromosome
+			final List a_candidateChromosomes
 			) {
-		int populationSize = a_population.size();
-		int nOffsprings = a_candidateChromosome.size();
+		int populationSize = jgapConfig.getPopulationSize();
+		int nOffsprings = a_candidateChromosomes.size();
 		Gene geneToMute;
 		Tuple<Double, Double> allowedRange;
 		IChromosome currentChromosome;
 
+		// Kind of ugly, but this is the way to do it: the 
+		// "candidate chromosomes" are in fact pop.getChromosomes()!
 		for (int j= populationSize; j < nOffsprings; j++) {
-			currentChromosome = a_population.getChromosome(j);
+			currentChromosome = (IChromosome) a_candidateChromosomes.get(j);
 
 			//for each gene in the chromosome:
 			for (int i = 0; i < currentChromosome.size(); i++) {
@@ -150,12 +152,16 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 	private void operateOnPreviousGen(
 			final Population a_population,
 			final List a_candidateChromosome) {
-		int populationSize = a_population.size();
+		// use the fixed population size. otherwise, newly created chromosomes
+		// would be used as well.
+		int populationSize = jgapConfig.getPopulationSize();
 		Gene geneToMute;
 		Tuple<Double, Double> allowedRange;
 		IChromosome currentChromosome;
 		IChromosome copyOfChromosome = null;
 
+		// we cannot iterate over the chromosomes list,
+		// as it also contains the newly created chromosomes!
 		for (int j=0; j < populationSize; j++) {
 			currentChromosome = a_population.getChromosome(j);
 
@@ -176,7 +182,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 						mutateBoolean((BooleanGene) geneToMute);
 					}
 					else if (geneToMute instanceof DoubleGene) {
-						allowedRange = constraintsManager.getAllowedRange( currentChromosome , i );
+						allowedRange = constraintsManager.getAllowedRange( copyOfChromosome , i );
 
 						if (this.randomGenerator.nextDouble() < this.nonUniformProb) {
 							mutateDoubleNonUniform((DoubleGene) geneToMute, allowedRange);
@@ -194,7 +200,7 @@ public class JointPlanOptimizerJGAPMutation implements GeneticOperator {
 		}
 	}
 
-	private final void mutateBoolean(
+	private static final void mutateBoolean(
 			final BooleanGene gene) {
 		gene.setAllele(!gene.booleanValue());
 	}

@@ -231,6 +231,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 				mate2,
 				mate1,
 				crossingPoint);
+
 		//only compute "useful" values: more efficient and avoids cumulating
 		//rouding errors
 		boolean cross1 = (crossingCoef1 > EPSILON);

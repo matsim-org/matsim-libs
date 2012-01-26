@@ -215,6 +215,13 @@ public class UpperBoundsConstraintsManager implements ConstraintsManager {
 	}
 
 
+	/**
+	 * Calculates the simple cross-over coef for one individual inequality.
+	 * @param mat1Sum the sum of all terms entering the inequality at hand in the first mate
+	 * @param upperBound the maximal value the sum can take
+	 * @param crossOverSurplus the sum of the differences between the first mate and
+	 * the second mate values, for all genes entering the cross-over
+	 */
 	private static double calculatePlanDurCoef(
 			final double mate1Sum,
 			final double upperBound,
