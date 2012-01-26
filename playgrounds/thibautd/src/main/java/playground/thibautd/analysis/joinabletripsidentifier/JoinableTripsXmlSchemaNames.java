@@ -37,6 +37,10 @@ public class JoinableTripsXmlSchemaNames {
 	public static final String TIME = "acceptableTimeDifference";
 	public static final String DIST = "acceptableDistance";
 
+	public static final String FULLFILLED_CONDITION_TAG = "fullfilledCondition";
+	public static final String PU_WALK_DIST = "minPuWalkDistance";
+	public static final String DO_WALK_DIST = "minDoWalkDistance";
+
 	public static final String TRIP_TAG = "trip";
 
 	public static final String TRIP_ID = "id";

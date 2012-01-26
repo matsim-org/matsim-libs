@@ -61,10 +61,9 @@ public class JoinableTrips {
 	/**
 	 * "Computing" constructor. Given a {@link TripReconstructor} with trip
 	 * information and thresholds, it identifies the joinable trips and stores them.
+	 * @param conditions the conditions for which to search trips
+	 * @param tripReconstructor the event-parsing instance
 	 *
-	 * @param distanceRadius maximum acceptable walk distance
-	 * @param timeRadius maximum delay time (ie maximum earlier departure time
-	 * and/or later arrival time)
 	 */
 	public JoinableTrips(
 			List<AcceptabilityCondition> conditions,
@@ -87,6 +86,11 @@ public class JoinableTrips {
 		identifyJoinableTrips(tripReconstructor);
 	}
 
+	/**
+	 * Constructs an instance from already extracted trip records.
+	 * @param conditions
+	 * @param tripRecords
+	 */
 	public JoinableTrips(
 			final List<AcceptabilityCondition> conditions,
 			final Map<Id, TripRecord> tripRecords) {
@@ -457,8 +461,8 @@ public class JoinableTrips {
 		private final Id passengerTripId;
 
 		private List<Passage> passages = null;
-		private final List<AcceptabilityCondition> fullfilledConditions =
-			new ArrayList<AcceptabilityCondition>();
+		private final Map<AcceptabilityCondition, TripInfo> fullfilledConditions =
+			new HashMap<AcceptabilityCondition, TripInfo>();
 
 		JoinableTrip(final Id passengerTripId, final Id tripId) {
 			this.tripId = tripId;
@@ -494,8 +498,10 @@ public class JoinableTrips {
 				final List<AcceptabilityCondition> conditions) {
 
 			for (AcceptabilityCondition condition : conditions) {
-				if (condition.isFullfilled(passages)) {
-					fullfilledConditions.add(condition);
+				AcceptabilityCondition.Fullfillment fullfillment =
+					condition.getFullfillment( passages );
+				if ( fullfillment.isFullfilled() ) {
+					fullfilledConditions.put( condition , new TripInfo(fullfillment) );
 				}
 			}
 
@@ -506,11 +512,19 @@ public class JoinableTrips {
 			return fullfilledConditions.size() > 0;
 		}
 
-		public List<AcceptabilityCondition> getFullfilledConditions() {
+		public Map<AcceptabilityCondition, TripInfo> getFullfilledConditionsInfo() {
 			return fullfilledConditions;
+		}
+
+		public Collection<AcceptabilityCondition> getFullfilledConditions() {
+			return fullfilledConditions.keySet();
 		}
 	}
 
+	/**
+	 * Identifies the passage of a passenger close to a passenger's origin/destination
+	 * @author thibautd
+	 */
 	public static class Passage {
 		public enum Type {pickUp, dropOff};
 

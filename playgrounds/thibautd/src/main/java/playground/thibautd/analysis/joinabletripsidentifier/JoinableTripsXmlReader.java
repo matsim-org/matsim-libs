@@ -45,6 +45,8 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 	private List<JoinableTrips.JoinableTrip> currentJoinableTrips = null;
 	private JoinableTrips.JoinableTrip currentJoinableTrip = null;
 	private Id currentPassengerTrip = null;
+	private AcceptabilityCondition currentCondition = null;
+	private TripInfo currentTripInfo = null;
 
 	private final Counter count = new Counter("Import of trip # ");
 
@@ -70,7 +72,7 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 				conditions.add(getCondition(atts));
 			}
 			else {
-				currentJoinableTrip.getFullfilledConditions().add(getCondition(atts));
+				currentCondition = getCondition(atts);
 			}
 		}
 		else if ( name.equals(JoinableTripsXmlSchemaNames.TRIP_TAG) ) {
@@ -98,6 +100,9 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 					IdPool.getId( atts.getValue(JoinableTripsXmlSchemaNames.TRIP_ID) ) );
 			currentJoinableTrips.add(currentJoinableTrip);
 		}
+		else if ( name.equals( JoinableTripsXmlSchemaNames.FULLFILLED_CONDITION_TAG ) ) {
+			currentTripInfo = getTripInfo( atts );
+		}
 	}
 
 	@Override
@@ -105,6 +110,11 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 			final String name,
 			final String content,
 			final Stack<String> context) {
+		if ( name.equals( JoinableTripsXmlSchemaNames.FULLFILLED_CONDITION_TAG ) ) {
+			currentJoinableTrip.getFullfilledConditionsInfo().put( currentCondition , currentTripInfo );
+			currentCondition = null;
+			currentTripInfo = null;
+		}
 	}
 
 	private AcceptabilityCondition getCondition(final Attributes atts) {
@@ -114,6 +124,12 @@ public class JoinableTripsXmlReader extends MatsimXmlParser {
 
 		int i = conditions.indexOf(condition);
 		return i == -1 ? condition : conditions.get(i);
+	}
+
+	private static TripInfo getTripInfo(final Attributes atts) {
+		return new TripInfo(
+				Double.parseDouble( atts.getValue(JoinableTripsXmlSchemaNames.PU_WALK_DIST) ),
+				Double.parseDouble( atts.getValue(JoinableTripsXmlSchemaNames.DO_WALK_DIST) ) );
 	}
 
 	public JoinableTrips getJoinableTrips() {

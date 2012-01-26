@@ -45,30 +45,42 @@ public class AcceptabilityCondition {
 		return time;
 	}
 
-	public boolean isFullfilled(
+	public Fullfillment getFullfillment(
 			final List<JoinableTrips.Passage> passages) {
 		boolean validPUFound = false;
 		boolean validDOFound = false;
 
+		double minPuWalkDist = Double.POSITIVE_INFINITY;
+		double minDoWalkDist = Double.POSITIVE_INFINITY;
+
 		for (JoinableTrips.Passage passage : passages) {
-			if (passage.getDistance() <= distance) {
+			double passageDist = passage.getDistance();
+			if (passageDist <= distance) {
 				switch ( passage.getType() ) {
 					case pickUp:
 						if (passage.getTimeDifference() >= -time) {
 							validPUFound = true;
+
+							if (passageDist < minPuWalkDist) {
+								minPuWalkDist = passageDist;
+							}
 						}
 						break;
 					case dropOff:
 						if (passage.getTimeDifference() <= time) {
 							validDOFound = true;
+
+							if (passageDist < minDoWalkDist) {
+								minDoWalkDist = passageDist;
+							}
 						}
 						break;
 				}
-				if ( validPUFound && validDOFound ) return true;
+				//if ( validPUFound && validDOFound ) return true;
 			}
 		}
 
-		return false;
+		return new Fullfillment( validPUFound && validDOFound , minPuWalkDist , minDoWalkDist );
 	}
 
 	@Override
@@ -95,6 +107,33 @@ public class AcceptabilityCondition {
 	@Override
 	public int hashCode() {
 		return (int) (distance + (time * 100000));
+	}
+
+	public static class Fullfillment {
+		private final boolean isFullfilled;
+		private final double minPuWalkDist;
+		private final double minDoWalkDist;
+
+		private Fullfillment(
+				final boolean isFullfilled,
+				final double minPuWalkDist,
+				final double minDoWalkDist) {
+			this.isFullfilled = isFullfilled;
+			this.minPuWalkDist = minPuWalkDist;
+			this.minDoWalkDist = minDoWalkDist;
+		}
+
+		public boolean isFullfilled() {
+			return this.isFullfilled;
+		}
+
+		public double getMinPuWalkDist() {
+			return this.minPuWalkDist;
+		}
+
+		public double getMinDoWalkDist() {
+			return this.minDoWalkDist;
+		}
 	}
 }
 

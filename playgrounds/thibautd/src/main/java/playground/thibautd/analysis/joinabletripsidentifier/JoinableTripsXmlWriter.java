@@ -22,6 +22,7 @@ package playground.thibautd.analysis.joinabletripsidentifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -162,14 +163,31 @@ public class JoinableTripsXmlWriter extends MatsimXmlWriter {
 	}
 
 	private void writeFullfilledConditions(final JoinableTrips.JoinableTrip trip) {
-		List<AcceptabilityCondition> conditions = trip.getFullfilledConditions();
+		Map<AcceptabilityCondition, TripInfo> conditions = trip.getFullfilledConditionsInfo();
 
-		for ( AcceptabilityCondition condition : conditions ) {
+		for ( Map.Entry<AcceptabilityCondition, TripInfo> condition : conditions.entrySet() ) {
+			this.writeStartTag(
+					JoinableTripsXmlSchemaNames.FULLFILLED_CONDITION_TAG,
+					getAttributes(condition.getValue()),
+					false);
 			this.writeStartTag(
 					JoinableTripsXmlSchemaNames.CONDITION_TAG,
-					getAttributes(condition),
+					getAttributes(condition.getKey()),
 					true);
+			this.writeEndTag(JoinableTripsXmlSchemaNames.FULLFILLED_CONDITION_TAG);
 		}
 	}
+
+	private  List<Tuple<String, String>> getAttributes(
+			final TripInfo info) {
+		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+
+		atts.add(createTuple(JoinableTripsXmlSchemaNames.PU_WALK_DIST, info.getMinPuWalkDistance()));
+		atts.add(createTuple(JoinableTripsXmlSchemaNames.DO_WALK_DIST, info.getMinDoWalkDistance()));
+
+		return atts;
+	}
+
+
 }
 
