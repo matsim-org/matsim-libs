@@ -21,7 +21,7 @@ public class ScorAttrWriteTrigger implements IterationEndsListener {
 		int iteration = event.getIteration();
 		Controler4AttrRecorder controler = (Controler4AttrRecorder) event
 				.getControler();
-		String writeScorAttrIntervalStr = controler.getConfig().getParam(
+		String writeScorAttrIntervalStr = controler.getConfig().findParam(
 				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 				"writeScorAttrInterval");
 		if (writeScorAttrIntervalStr != null) {

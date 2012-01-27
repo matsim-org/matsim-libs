@@ -30,7 +30,6 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -50,9 +49,7 @@ import org.matsim.signalsystems.CalculateAngle;
  */
 public class LeftTurnIdentifier {
 	private static String getDirection(boolean leftTurn) {
-
 		return leftTurn ? "left turn" : "right turn";
-
 	}
 
 	/**
@@ -63,10 +60,21 @@ public class LeftTurnIdentifier {
 	 */
 	public static int getNumberOfLeftTurnsFromALeg(Leg leg,
 			Map<Id, ? extends Link> netLinks) {
-		if (leg.getMode().equals(TransportMode.car)) {
-			Route route = leg.getRoute();
+		Route route = leg.getRoute();
+		if (route instanceof NetworkRoute) {
+			// **********************************************
+			// if a route contains just ONE Link (incl. startLink and endLink),
+			// this is route will be automatically created as a genericRoute,
+			// though the Leg Mode could be "car"
+			// **********************************************
 			Id startLinkId = route.getStartLinkId();
 			Id endLinkId = route.getEndLinkId();
+			// if (route instanceof GenericRoute) {
+			// System.err.println(">>>>>leg:\n" + leg.toString());
+			// System.err.println(">>>>>route:\n" + route.toString());
+			// throw new RuntimeException(
+			// "This Route is a GenericRoute with LegMode \"car\", I don't know why!!!");
+			// }
 			List<Id> linkIds = ((NetworkRoute) route).getLinkIds();
 			if (startLinkId.equals(endLinkId) && linkIds.size() == 0) {
 				return 0;
@@ -90,7 +98,8 @@ public class LeftTurnIdentifier {
 
 			return number;
 
-		} else {// pt, walk, whatever else
+		} else {// pt, walk, whatever else that is an instance of {@code
+				// GenericRoute}
 			return 0;
 		}
 

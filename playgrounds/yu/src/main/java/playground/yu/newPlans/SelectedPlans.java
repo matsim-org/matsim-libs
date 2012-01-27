@@ -39,6 +39,34 @@ import org.matsim.core.scenario.ScenarioUtils;
  * 
  */
 public class SelectedPlans extends NewPopulation {
+	public static void main(final String[] args) {
+
+		String netFilename, populationFilename, outputPopulationFilename;
+		if (args.length == 3) {
+			netFilename = args[0];
+			populationFilename = args[1];
+			outputPopulationFilename = args[2];
+		} else {
+			netFilename = "../matsimTests/ParamCalibration/network.xml";
+			populationFilename = "../matsimTests/ParamCalibration/general2/reroute/ITERS/it.41/reroute.41.plans.xml.gz";
+			outputPopulationFilename = "../matsimTests/ParamCalibration/general2/basePop.xml.gz";
+		}
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		Network network = scenario.getNetwork();
+		new MatsimNetworkReader(scenario).readFile(netFilename);
+
+		Population population = scenario.getPopulation();
+		PopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(populationFilename);
+
+		SelectedPlans sp = new SelectedPlans(network, population,
+				outputPopulationFilename);
+		sp.run(population);
+		sp.writeEndPlans();
+	}
+
 	/**
 	 * Constructor, writes file-head
 	 * 
@@ -56,32 +84,5 @@ public class SelectedPlans extends NewPopulation {
 		person.getPlans().clear();
 		person.addPlan(selectedPlan);
 		pw.writePerson(person);
-	}
-
-	public static void main(final String[] args) {
-
-		String netFilename, populationFilename, outputPopulationFilename;
-		if (args.length == 3) {
-			netFilename = args[0];
-			populationFilename = args[1];
-			outputPopulationFilename = args[2];
-		} else {
-			netFilename = "../matsimTests/ParamCalibration/network.xml";
-			populationFilename = "../matsimTests/ParamCalibration/general2/reroute/ITERS/it.41/reroute.41.plans.xml.gz";
-			outputPopulationFilename = "../matsimTests/ParamCalibration/general2/basePop.xml.gz";
-		}
-
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(netFilename);
-
-		Population population = scenario.getPopulation();
-		PopulationReader plansReader = new MatsimPopulationReader(scenario);
-		plansReader.readFile(populationFilename);
-
-		SelectedPlans sp = new SelectedPlans(network, population,
-				outputPopulationFilename);
-		sp.run(population);
-		sp.writeEndPlans();
 	}
 }

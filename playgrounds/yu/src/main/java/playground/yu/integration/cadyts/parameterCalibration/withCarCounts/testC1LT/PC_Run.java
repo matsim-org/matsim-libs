@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MinimizeLeftTurnsControlerListener.java
+ * Run.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,53 +19,39 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
-package playground.yu.replanning.reRoute.minimizeLeftTurns;
+package playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testC1LT;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
 
-import playground.yu.travelCost.SingleReRouteSelectedControler;
+import playground.yu.analysis.RouteTravelTimeSummary;
+import playground.yu.counts.CntSimCap4Chart;
 
 /**
  * @author yu
  * 
  */
-public class MinimizeLeftTurnsControlerListener implements
-		IterationStartsListener {
-
-	public static void main(String[] args) {
-		run1(args);
-	}
-
+public class PC_Run {
+	/** @param args */
 	/**
-	 * with {@code SingleReRouteSelectedControler}
+	 * @param args
 	 */
-	public static void run0(String[] args) {
-		Controler controler = new SingleReRouteSelectedControler(args[0]);
-		controler
-				.addControlerListener(new MinimizeLeftTurnsControlerListener());
-		controler.setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
-		controler.run();
-	}
-
-	public static void run1(String[] args) {
-		Controler controler = new Controler(args[0]);
-		controler
-				.addControlerListener(new MinimizeLeftTurnsControlerListener());
-		// controler.setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
-		controler.run();
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		Controler ctl = event.getControler();
-		if (event.getIteration() > ctl.getFirstIteration()) {
-			ctl.setLeastCostPathCalculatorFactory(new MinimizeLeftTurnsDijkstraFactory());
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		Controler ctl = new PCCtlwithLeftTurnPenalty(config);
+		if (args.length > 1 && Boolean.parseBoolean(args[1])) {
+			ctl.addControlerListener(new CntSimCap4Chart());
+			ctl.addControlerListener(new RouteTravelTimeSummary());
 		}
+		// TODO set in config
+		// ctl.addControlerListener(new QVProfilControlerListener());
+
+		ctl.setCreateGraphs(false);
+		ctl.setOverwriteFiles(true);
+		ctl.run();
 	}
+
 }

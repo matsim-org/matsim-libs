@@ -43,22 +43,54 @@ import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.Volume;
 
 public class CountsFromLinkStats {
-	private Counts counts;
-	private CalcLinkStats linkStats;
+	public static void main(String[] args) {
+		String originalCountsFilename, networkFilename, linkStatsFilename, newCountsFilename;
+		double volScaleFactor;
+		if (args.length != 5) {
+			originalCountsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml";
+			networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz";
+			linkStatsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.linkstats.txt.gz";
+			newCountsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.counts.xml";
+			volScaleFactor = 50;
+		} else {
+			originalCountsFilename = args[0];
+			networkFilename = args[1];
+			linkStatsFilename = args[2];
+			newCountsFilename = args[3];
+			volScaleFactor = Double.parseDouble(args[4]);
+		}
+		// ////////////////////////////////////////////////
+		Counts counts = new Counts();
+		new MatsimCountsReader(counts).readFile(originalCountsFilename);
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
+				.createConfig());
+		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		CalcLinkStats linkStats = new CalcLinkStats(scenario.getNetwork(),
+				volScaleFactor);
+		linkStats.readFile(linkStatsFilename);
+
+		CountsFromLinkStats cfls = new CountsFromLinkStats(counts, linkStats);
+		cfls.writeNewCounts(newCountsFilename);
+	}
+
+	private final Counts counts;
+
+	private final CalcLinkStats linkStats;
 
 	public CountsFromLinkStats(Counts counts, CalcLinkStats linkStats) {
 		this.counts = counts;
 		this.linkStats = linkStats;
-		this.extractMeasuresFromLinkStatsToCounts();
+		extractMeasuresFromLinkStatsToCounts();
 	}
 
 	private void extractMeasuresFromLinkStatsToCounts() {
 
 		// parser counts
-		Collection<Count> countCollec = this.counts.getCounts().values();
+		Collection<Count> countCollec = counts.getCounts().values();
 		for (Count count : countCollec) {
 			// get Volumes from linkStats
-			double[] linkStatsVols = this.linkStats.getAvgLinkVolumes(count
+			double[] linkStatsVols = linkStats.getAvgLinkVolumes(count
 					.getLocId());
 			System.out.println("---->There are\t" + linkStatsVols.length
 					+ "\ttime steps.");
@@ -72,27 +104,6 @@ public class CountsFromLinkStats {
 	}
 
 	public void writeNewCounts(String newCountsFilename) {
-		new CountsWriter(this.counts).write(newCountsFilename);
-	}
-
-	public static void main(String[] args) {
-		String countsFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml"//
-		, networkFilename = "D:/Daten/work/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz"//
-		, linkStatsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.linkstats.txt.gz"//
-		, newCountsFilename = "D:/workspace/runs-svn/run1542/output/ITERS/it.2000/1542.2000.counts.xml";
-		double volScaleFactor = 50;
-		// ////////////////////////////////////////////////
-		Counts counts = new Counts();
-		new MatsimCountsReader(counts).readFile(countsFilename);
-
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
-				.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
-		CalcLinkStats linkStats = new CalcLinkStats(scenario.getNetwork(),
-				volScaleFactor);
-		linkStats.readFile(linkStatsFilename);
-
-		CountsFromLinkStats cfls = new CountsFromLinkStats(counts, linkStats);
-		cfls.writeNewCounts(newCountsFilename);
+		new CountsWriter(counts).write(newCountsFilename);
 	}
 }

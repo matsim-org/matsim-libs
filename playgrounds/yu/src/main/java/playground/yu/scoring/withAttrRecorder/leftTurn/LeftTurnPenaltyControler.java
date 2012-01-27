@@ -25,9 +25,9 @@ public class LeftTurnPenaltyControler extends Controler4AttrRecorder {
 	public static void main(String[] args) {
 		Config config;
 		if (args.length < 1) {
-			config = ConfigUtils.loadConfig("" +
-			// "test/input/2car1ptRoutes/writeScorAttrs/cfgCar-4_0.xml" +
-					"");
+			config = ConfigUtils.loadConfig(""
+					+ "test/input/2car1ptRoutes/writeScorAttrs/cfgCar-4_0.xml"
+					+ "");
 		} else/* args.length>=1 */{
 			config = ConfigUtils.loadConfig(args[0]);
 		}

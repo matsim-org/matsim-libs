@@ -30,49 +30,27 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 /**
  * @author yu
- *
+ * 
  */
 public class InsertExtraneousSelectedPlans extends NewPopulation {
-	private Population[] extraneousPopulations;
-
-	public InsertExtraneousSelectedPlans(Network network,
-			Population population, Population[] extraneousPopulations,
-			String outputPopfilename) {
-		super(network, population, outputPopfilename);
-		this.extraneousPopulations = extraneousPopulations;
-	}
-
-	@Override
-	public void beforeWritePersonHook(Person person) {
-		Id personId = person.getId();
-		for (Population extraneousPopulation : extraneousPopulations) {
-			Person extraneousPerson = extraneousPopulation.getPersons().get(
-					personId);
-
-			if (extraneousPerson != null) {
-				person.addPlan(extraneousPerson.getSelectedPlan());
-			} else {
-				Logger.getLogger("INSERT_EXTRANEOUS_PLAN")
-						.warning(
-								"Person\t"
-										+ person.getId()
-										+ "\tdoes NOT exist in the extraneous population!");
-			}
-		}
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		onePlusN(args);
 	}
 
 	public static void onePlusN(String[] args) {
 		String netFilename, populationFilename, extraneousPopulationFilenames[], outputPopulationFilename;
-		int extraneousPopSize = 2;
+		int extraneousPopSize;
 		if (args.length > 4) {
 			netFilename = args[0];
 			populationFilename = args[1];
@@ -106,8 +84,7 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 		for (String extraneousPopulationFilename : extraneousPopulationFilenames) {
 			Scenario extraneousScenario = ScenarioUtils
 					.createScenario(ConfigUtils.createConfig());
-			((ScenarioImpl) extraneousScenario)
-					.setNetwork((NetworkImpl) network);
+			((ScenarioImpl) extraneousScenario).setNetwork(network);
 			System.out.println(">>>>>Reading Population :\t"
 					+ extraneousPopulationFilename + "\tbegan");
 			new MatsimPopulationReader(extraneousScenario)
@@ -126,10 +103,31 @@ public class InsertExtraneousSelectedPlans extends NewPopulation {
 		iesp.writeEndPlans();
 	}
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		onePlusN(args);
+	private final Population[] extraneousPopulations;
+
+	public InsertExtraneousSelectedPlans(Network network,
+			Population population, Population[] extraneousPopulations,
+			String outputPopfilename) {
+		super(network, population, outputPopfilename);
+		this.extraneousPopulations = extraneousPopulations;
+	}
+
+	@Override
+	public void beforeWritePersonHook(Person person) {
+		Id personId = person.getId();
+		for (Population extraneousPopulation : extraneousPopulations) {
+			Person extraneousPerson = extraneousPopulation.getPersons().get(
+					personId);
+
+			if (extraneousPerson != null) {
+				person.addPlan(extraneousPerson.getSelectedPlan());
+			} else {
+				Logger.getLogger("INSERT_EXTRANEOUS_PLAN")
+						.warning(
+								"Person\t"
+										+ person.getId()
+										+ "\tdoes NOT exist in the extraneous population!");
+			}
+		}
 	}
 }
