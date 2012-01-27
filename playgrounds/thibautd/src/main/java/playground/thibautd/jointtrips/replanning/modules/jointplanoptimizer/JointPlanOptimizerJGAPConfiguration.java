@@ -225,12 +225,13 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		for (int nGenesTotal : nDurationGenes) {
 			// the first activity of an individual plan can start at any time
 			// before midnight
-			nGenes.add( 1 );
-			maxDurations.add( DAY_DUR );
+			//nGenes.add( 1 );
+			//maxDurations.add( DAY_DUR );
 
 			// the sum of other activity durations must be below the day duration
 			// (the last one must end before the end of the first one)
-			nGenes.add( nGenesTotal - 1 );
+			// nGenes.add( nGenesTotal - 1 );
+			nGenes.add( nGenesTotal );
 			maxDurations.add( DAY_DUR );
 		}
 
