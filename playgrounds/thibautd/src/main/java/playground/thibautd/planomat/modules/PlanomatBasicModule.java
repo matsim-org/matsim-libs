@@ -19,15 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.planomat.modules;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.planomat.costestimators.LegTravelTimeEstimatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -37,6 +35,7 @@ import playground.thibautd.planomat.api.ActivityWhiteList;
 import playground.thibautd.planomat.api.PlanomatFitnessFunctionFactory;
 import playground.thibautd.planomat.basic.PermissiveWhiteList;
 import playground.thibautd.planomat.basic.PlanomatBasicPtFitnessFunctionFactory;
+import playground.thibautd.planomat.basic.PlanomatConfigurationFactoryImpl;
 import playground.thibautd.planomat.basic.PlanomatFitnessFunctionFactoryImpl;
 import playground.thibautd.planomat.config.Planomat2ConfigGroup;
 import playground.thibautd.planomat.Planomat;
@@ -110,7 +109,11 @@ public class PlanomatBasicModule extends AbstractMultithreadedModule {
 						legTravelTimeEstimatorFactory);
 		}
 		
-		return new Planomat( fitnessFunctionFactory , whiteList , configGroup );
+		return new Planomat(
+				fitnessFunctionFactory,
+				new PlanomatConfigurationFactoryImpl( configGroup ),
+				whiteList,
+				MatsimRandom.getLocalInstance());
 	}
 }
 

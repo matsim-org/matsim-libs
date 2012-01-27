@@ -145,7 +145,8 @@ public class PlanomatBasicPtFitnessFunctionFactory implements PlanomatFitnessFun
 				new TransitActsRemover() );
 
 		fitnessFunction.addPostDecodingPlanAlgorithm(
-				new LegTravelTimeEstimatorWrapper( plan , estimator ) );
+				//new LegTravelTimeEstimatorWrapper( plan , estimator ) );
+				router );
 
 		return fitnessFunction;
 	}

@@ -21,79 +21,80 @@ package playground.thibautd.planomat;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.jgap.Configuration;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.planomat.api.ActivityWhiteList;
+import playground.thibautd.planomat.api.PlanomatConfigurationFactory;
 import playground.thibautd.planomat.api.PlanomatFitnessFunction;
 import playground.thibautd.planomat.api.PlanomatFitnessFunctionFactory;
-import playground.thibautd.planomat.config.Planomat2ConfigGroup;
 
 /**
  * The core of the v2 of the planomat external strategy module:
  * optimises a plan using a genetic algorithm.
- *
+ * <br>
  * The dimensions optimised, as well as the assumptions behind the
  * score estimation, are encapsulated in a {@link PlanomatFitnessFunctionFactory}
  * passed at the constructor.
- *
- * The genetic process is standard and non extensible, and is basically what provides
- * this new version of planomat.
- *
+ * <br>
+ * The genetic process is defined by the configuration objects returned by
+ * a {@link PlanomatConfigurationFactory} instance.
+ * <br>
  * Assembling of the elements (ie initialisation of the
- * {@link PlanomatFitnessFunctionFactory}) is let to the {@link PlanStrategyModule}
- * using this algorithm.
+ * {@link PlanomatFitnessFunctionFactory} and {@link PlanomatConfigurationFactory})
+ * is let to the {@link PlanStrategyModule} using this algorithm.
+ * <br>
+ * The idea is that this class is totally interpretation and parameter blind.
  *
  * @author thibautd, based on meisterk
  *
  */
 public class Planomat implements PlanAlgorithm {
 
-	private final Planomat2ConfigGroup planomatConfigGroup;
 	private final Random seedGenerator;
 	private final PlanomatFitnessFunctionFactory fitnessFunctionFactory;
+	private final PlanomatConfigurationFactory configurationFactory;
 	private final ActivityWhiteList whiteList;
 
-	private final static Logger logger = Logger.getLogger(Planomat.class);
-	private final boolean doLogging;
+	private final static int N_GEN = 100;
 
+	/**
+	 * Initialises an instance of planomat.
+	 *
+	 * @param fitnessFunctionFactory the {@link PlanomatFitnessFunctionFactory}
+	 * providing the interpretation of the process.
+	 * @param configurationFactory the {@link PlanomatConfigurationFactory}
+	 * defining the genetic process.
+	 * @param whiteList the activity white list
+	 * @param randomSeedSource a random generator to use to generate random
+	 * seeds for the genetic process.
+	 */
 	public Planomat(
 			final PlanomatFitnessFunctionFactory fitnessFunctionFactory,
+			final PlanomatConfigurationFactory configurationFactory,
 			final ActivityWhiteList whiteList,
-			final Planomat2ConfigGroup configGroup) {
-		this.planomatConfigGroup = configGroup;
+			final Random randomSeedSource) {
 		this.fitnessFunctionFactory = fitnessFunctionFactory;
+		this.configurationFactory = configurationFactory;
 		this.whiteList = whiteList;
 
-		this.doLogging = this.planomatConfigGroup.isDoLogging();
-
-		this.seedGenerator = MatsimRandom.getLocalInstance();
+		this.seedGenerator = randomSeedSource;
 	}
 
 	@Override
 	public void run(final Plan plan) {
-
-		if (this.doLogging) {
-			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...");
-		}
-
 		long seed = this.seedGenerator.nextLong();
-		if (this.doLogging) {
-			logger.info("agent id: " + plan.getPerson().getId() + "; JGAP seed: " + Long.toString(seed));
-		}
 
-		PlanomatJGAPConfiguration jgapConfiguration = new PlanomatJGAPConfiguration(
+		Configuration jgapConfiguration = configurationFactory.createConfiguration(
 				plan,
-				fitnessFunctionFactory,
-				seed,
 				whiteList,
-				planomatConfigGroup);
+				fitnessFunctionFactory,
+				seed);
 
 		Genotype population = null;
 		try {
@@ -101,33 +102,15 @@ public class Planomat implements PlanAlgorithm {
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e);
 		}
-		if (this.doLogging) {
-			logger.info("Initialization of JGAP configuration...done.");
-			logger.info("Running evolution...");
-		}
 
-		IChromosome fittest = this.evolveAndReturnFittest(population);
-
-		if (this.doLogging) {
-			logger.info("Running evolution...done.");
-			logger.info("Writing solution back to Plan object...");
-		}
+		// TODO: use evolution monitor (use more recent version of JGAP, for which
+		// evolution monitor is in the config?)
+		population.evolve( N_GEN );
+		IChromosome fittest = population.getFittestChromosome();
 
 		((PlanomatFitnessFunction) jgapConfiguration.getFitnessFunction()).modifyBackPlan( fittest );
 
-		if (this.doLogging) {
-			logger.info("Writing solution back to Plan object...done.");
-			logger.info("Running planomat on plan of person # " + plan.getPerson().getId().toString() + "...done.");
-		}
-
 		// invalidate score information
 		plan.setScore( null );
-	}
-
-	private IChromosome evolveAndReturnFittest(final Genotype population) {
-		// TODO: use fitness monitoring
-		population.evolve(planomatConfigGroup.getJgapMaxGenerations());
-
-		return population.getFittestChromosome();
 	}
 }
