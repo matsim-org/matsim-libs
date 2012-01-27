@@ -57,7 +57,7 @@ public class CollisionPredictionEnvironmentForceModule implements ForceModule {
 
 		for (Coordinate c : ed) {
 			double dist = c.distance(agent.getPosition());
-			double term1 = this.Ai * stopDist * Math.exp(-dist/this.Bi);
+			double term1 = this.Ai/10 * stopDist * Math.exp(-dist/this.Bi);
 			Vector vecDPrime_ij_t_i = getDistVector(agent,c,t_i);
 			double dPrime_ij_t_i = Math.sqrt(vecDPrime_ij_t_i.x*vecDPrime_ij_t_i.x+vecDPrime_ij_t_i.y*vecDPrime_ij_t_i.y);
 
