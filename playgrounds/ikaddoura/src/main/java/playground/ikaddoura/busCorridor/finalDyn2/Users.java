@@ -78,7 +78,7 @@ public class Users {
 					expScore = expScore + Math.exp(plan.getScore());
 				}
 				else {
-					log.warn("A plan of "+person.getId()+" is not used for LogSumUserScoring because of Agent would stuck --> Score: "+plan.getScore());
+					log.info("A plan of "+person.getId()+" is not used for LogSumUserScoring because of Agent would stuck --> Score: "+plan.getScore());
 				}
 			}
 			
@@ -87,7 +87,7 @@ public class Users {
 				execScores.add(score);
 			}
 			else {
-				log.warn("A plan of "+person.getId()+" is not used for AvgExecUserScoring because of Agent would stuck --> Score: "+score);
+				log.info("A plan of "+person.getId()+" is not used for AvgExecUserScoring because of Agent would stuck --> Score: "+score);
 			}
 			
 			double logSumThisPerson = (1/MONEY_UTILS) * Math.log(expScore);
