@@ -55,8 +55,15 @@ public class PlotData {
 	// for lisibility, charts per distance with a maximal
 	// distance are produced. For Zürich, distances longer than 30km
 	// do not make sense due to the way the population is defined.
-	private static double LONGER_DIST = 25 * 1000;
-	private static double LONGER_DRIVER_DIST = 25 * 1000;
+	private final static double LONGER_DIST = 25 * 1000;
+	private final static double LONGER_DRIVER_DIST = 25 * 1000;
+
+	// the "condition validator" will not only reject trips not
+	// fullfilling a condition, but also the ones which fullfill the condition
+	// but with a "walk distance" > ALPHA_WALK * trip_distance.
+	// the idea is to eliminate short trips for which a lot of driver trips are
+	// identified, but for which it is not very relevant
+	private final static double ALPHA_WALK = 0.25;
 
 	// config file: data dump, conditions (comme pour extract)
 	private static final String MODULE = "jointTripIdentifier";
@@ -91,7 +98,12 @@ public class PlotData {
 				double dist = Double.parseDouble(entry.getValue());
 				String num = entry.getKey().split("_")[1];
 				double time = Double.parseDouble(params.get(TIME + num));
-				conditions.add(new ConditionValidator(dist, time));
+				conditions.add(
+						new ConditionValidator(
+							network,
+							dist,
+							time,
+							ALPHA_WALK));
 			}
 		}
 
@@ -308,17 +320,46 @@ class CommutersFilter implements PassengerFilter {
 
 class ConditionValidator implements TwofoldTripValidator {
 	private final AcceptabilityCondition condition;
+	// joinable trips corresponding to a walk distance > alphaWalk * bee_fly_trip_distance
+	// will be considered invalid (this should be below 1)
+	private final double alphaWalk;
+	private final Network network;
+	private JoinableTrips joinableTrips = null;
 
-	public ConditionValidator(final double distance, final double time) {
+	public ConditionValidator(
+			final Network network,
+			final double distance,
+			final double time) {
+		this( network , distance , time , Double.POSITIVE_INFINITY );
+	}
+
+	public ConditionValidator(
+			final Network network,
+			final double distance,
+			final double time,
+			final double alphaWalk) {
 		this.condition = new AcceptabilityCondition(distance, time);
+		this.alphaWalk = alphaWalk;
+		this.network = network;
 	}
 
 	@Override
-	public void setJoinableTrips(final JoinableTrips joinableTrips) {}
+	public void setJoinableTrips(final JoinableTrips joinableTrips) {
+		this.joinableTrips = joinableTrips;
+	}
 
 	@Override
 	public boolean isValid(final JoinableTrip driverTrip) {
-		return driverTrip.getFullfilledConditions().contains(condition);
+		TripInfo tripInfo = driverTrip.getFullfilledConditionsInfo().get(condition);
+		boolean conditionVerified = tripInfo != null;
+
+		if (conditionVerified) {
+			double walk = tripInfo.getMinPuWalkDistance();
+			walk += tripInfo.getMinDoWalkDistance();
+			conditionVerified = walk < alphaWalk * joinableTrips.getTripRecords().get( driverTrip.getPassengerTripId() ).getDistance( network );
+		}
+
+		return conditionVerified;
 	}
 
 	@Override
@@ -328,7 +369,8 @@ class ConditionValidator implements TwofoldTripValidator {
 
 	public String getTailDescription() {
 		return "acceptable distance = "+condition.getDistance()+" m"+
-			"\nacceptable time = "+(condition.getTime()/60d)+" min";
+			"\nacceptable time = "+(condition.getTime()/60d)+" min"+
+			"\nalpha walk = "+alphaWalk;
 	}
 
 	@Override
