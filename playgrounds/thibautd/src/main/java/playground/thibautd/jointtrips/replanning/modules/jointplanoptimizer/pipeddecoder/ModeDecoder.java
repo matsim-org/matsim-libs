@@ -134,25 +134,22 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 	public JointPlan decode(
 			final IChromosome chromosome,
 			final JointPlan inputPlan) {
-		Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
-
 		for (Map.Entry<Id, Plan> planAttributes :
 				inputPlan.getIndividualPlans().entrySet()) {
-			individualPlans.put(
+			decodeIndividualPlan(
+				getIndividualGenes(
 					planAttributes.getKey(),
-					decodeIndividualPlan(
-						getIndividualGenes(
-							planAttributes.getKey(),
-							chromosome),
-						planAttributes.getValue()));
+					chromosome),
+				planAttributes.getValue());
 		}
 
-		return new JointPlan(
-				inputPlan.getClique(),
-				individualPlans,
-				false, //do not add at individual level
-				false, //do not synchronize
-				inputPlan.getScoresAggregatorFactory());
+		//return new JointPlan(
+		//		inputPlan.getClique(),
+		//		individualPlans,
+		//		false, //do not add at individual level
+		//		false, //do not synchronize
+		//		inputPlan.getScoresAggregatorFactory());
+		return inputPlan;
 	}
 
 	/**
@@ -187,12 +184,10 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 		boolean hasCar = 
 			!"never".equals(((PersonImpl) individualPlan.getPerson()).getCarAvail());
 
-		Plan output = new PlanImpl(individualPlan.getPerson());
 		List<PlanElement> planElements = individualPlan.getPlanElements();
 
 		//int subtourIndex;
 		String mode;
-		JointLeg legToAdd;
 
 		//construct the label and father tables
 		String[] subtourLabels = getSubtourLabels(planElements);
@@ -206,28 +201,24 @@ public class ModeDecoder implements JointPlanOptimizerDimensionDecoder {
 
 		// iterate over the plan elements, setting the mode according to the genes.
 		for (PlanElement pe : planElements) {
-			if (pe instanceof JointActivity) {
-				output.addActivity(new JointActivity((JointActivity) pe));
-			}
-			else if (pe instanceof JointLeg) {
+			if (pe instanceof JointLeg) {
 				mode = subtourModes[subtourIndexation[legIndex]];
 
-				legToAdd = new JointLeg((JointLeg) pe);
-				if ((legToAdd.getMode() != JointActingTypes.PASSENGER) &&
-						(!mode.equals(legToAdd.getMode()))) {
-					legToAdd.setMode(mode);
-					legToAdd.setRoute(null);
+				JointLeg leg = (JointLeg) pe;
+				if ((leg.getMode() != JointActingTypes.PASSENGER) &&
+						(!mode.equals(leg.getMode()))) {
+					leg.setMode(mode);
+					leg.setRoute(null);
 				}
-				output.addLeg(legToAdd);
 
 				legIndex++;
 			}
-			else {
+			else if ( !(pe instanceof JointActivity) ) {
 				throw new IllegalArgumentException("unexpected plan element type");
 			}
 		}
 
-		return output;
+		return individualPlan;
 	}
 
 	/**
