@@ -303,10 +303,12 @@ public class ScheduleVehiclesGenerator {
 	
 	private void setDepartureIDs(Map<Id, TransitRoute> routeId2transitRoute, String zeitraum, double endTime, double startTime, int numberOfBusesZeitraum, List<Id> vehicleIDsZeitraum) {	
 		this.periodNr++;
-		System.out.println("+++++ Beginn von period "+ periodNr+": "+this.vehNr2lastPeriodDepTimeHin);
+		System.out.println("+++++ Beginn von period "+ periodNr+" - lastPeriod: VehNr2DepTime: "+this.vehNr2lastPeriodDepTimeHin);
 
 		if (numberOfBusesZeitraum == 0){
 			log.info("No buses in time period "+periodNr+".");
+			this.vehNr2lastPeriodDepTimeHin.clear();
+			System.out.println("Clearing because no buses in this period!");
 		}
 		
 		if (numberOfBusesZeitraum > 0){
@@ -330,6 +332,7 @@ public class ScheduleVehiclesGenerator {
 				
 					if (newDay.get(periodNr-1).getNumberOfBuses()==0){
 						firstDepartureTime = startTime;
+						System.out.println("firstDepTime set to startTime: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
 						vehicleIndex = vehicleIDsZeitraum.size()-1;
 					}
 					if (newDay.get(periodNr-1).getNumberOfBuses() >= 0){
@@ -397,7 +400,7 @@ public class ScheduleVehiclesGenerator {
 							vehicleIndex = vehicleIDsZeitraum.size()-1;
 							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
 								firstDepartureTime = startTime;
-								log.warn("No departure in last period! --> first Departure Time set to startTime!");
+								log.warn("PeriodNr: "+this.periodNr+" --> No departure in last period! --> first Departure Time set to startTime! "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
 							}
 							else {
 								firstDepartureTime = this.lastPeriodDepTimeHin + takt;
@@ -427,6 +430,7 @@ public class ScheduleVehiclesGenerator {
 				}
 	
 				departureTime = firstDepartureTime;
+				System.out.println("add First Departure at: "+Time.writeTime(departureTime, Time.TIMEFORMAT_HHMMSS));
 					for (int depNr=1 ; departureTime <= lastDepartureTime - umlaufzeit ; depNr++){
 						Departure departure = sf.createDeparture(new IdImpl(zeitraum+"_"+depNr), departureTime);
 						departure.setVehicleId(vehicleIDsZeitraum.get(vehicleIndex));
@@ -435,6 +439,7 @@ public class ScheduleVehiclesGenerator {
 						if (routeNrCounter == 1){
 							if (depNr==1){
 								this.vehNr2lastPeriodDepTimeHin.clear();
+								System.out.println("clearing...");
 							}
 							this.vehNr2lastPeriodDepTimeHin.put(vehicleIndex, departureTime);
 							this.vehicleIndexLastDepartureHin = vehicleIndex;
