@@ -30,6 +30,7 @@ import org.jgap.IChromosome;
 import org.jgap.IInitializer;
 import org.jgap.Population;
 import org.jgap.impl.BooleanGene;
+import org.jgap.RandomGenerator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -716,6 +717,33 @@ public class TestJPO {
 	}
 
 	@Test
+	public void testRandomnessRandomInitialGenotype() throws Exception {
+		Genotype genotype = Genotype.randomInitialGenotype( jgapConf );
+
+		// approach: compare each gene of the first chromosome with the
+		// corresponding genes in the other chromosomes. As soon as a gene
+		// with a different value is found, set the gene in the first chromosome
+		// to null. At the end, all genes must be null.
+		Gene[] firstGenes = genotype.getPopulation().getChromosome( 0 ).getGenes();
+
+		for (Object chromosome : genotype.getPopulation().getChromosomes()) {
+			Gene[] currentGenes = ((IChromosome) chromosome).getGenes();
+
+			for (int i = 0; i < firstGenes.length; i++) {
+				if ( firstGenes[i] != null && !currentGenes[i].equals( firstGenes[i] ) ) {
+					firstGenes[i] = null;
+				}
+			}
+		}
+
+		for (Gene gene : firstGenes) {
+			Assert.assertNull(
+					"found a mono-value gene of type "+( gene == null ? "null" : gene.getClass() ),
+					gene);
+		}
+	}
+
+	@Test
 	public void testFitnessChromosome() throws Exception {
 		JointPlanOptimizerJGAPChromosome chrom = (JointPlanOptimizerJGAPChromosome)
 			((JointPlanOptimizerJGAPChromosome) jgapConf.getSampleChromosome()).createRandomChromosome();
@@ -741,19 +769,74 @@ public class TestJPO {
 	}
 
 	@Test
-	public void testCloneChromosome() throws Exception {
-		IChromosome chrom = createRandomChromosome();
-		IChromosome clone = (IChromosome) chrom.clone();
+	public void testCloneChromosomeGlobal() throws Exception {
+		int nTrys = 100;
 
-		Assert.assertNotSame(
-				"cloning chromosome just copies the reference!",
-				chrom,
-				clone);
+		for (int i = 0; i < nTrys; i++) {
+			IChromosome chrom = createRandomChromosome();
+			int clonedHashCode = chrom.hashCode();
+			IChromosome clone = (IChromosome) chrom.clone();
+			int cloneHashCode = clone.hashCode();
 
-		Assert.assertEquals(
-				"clone and cloned are not equal!",
-				chrom,
-				clone);
+			Assert.assertNotSame(
+					"cloning chromosome just copies the reference!",
+					chrom,
+					clone);
+
+			Assert.assertEquals(
+					"clone and cloned are not equal!",
+					chrom,
+					clone);
+
+			Assert.assertEquals(
+						"clone and cloned have different hashCodes!",
+						clonedHashCode,
+						cloneHashCode);
+
+			for (Gene gene : clone.getGenes()) {
+				gene.setToRandomValue( jgapConf.getRandomGenerator() );
+			}
+
+			Assert.assertFalse(
+					"clone and cloned are equal after mutation!",
+					chrom.equals(clone));
+
+			Assert.assertEquals(
+						"cloned hashCode changed with mutation of clone!",
+						clonedHashCode,
+						chrom.hashCode() );
+
+			Assert.assertFalse(
+					"clone's hashcode did not change after mutation!",
+					cloneHashCode == clone.hashCode() );
+
+		}
+	}
+
+	@Test
+	public void testCloneChromosomeGeneLevel() throws Exception {
+		int nTrys = 1;
+
+		for (int trycount = 0; trycount < nTrys; trycount++) {
+			IChromosome chrom = createRandomChromosome();
+			IChromosome clone = (IChromosome) chrom.clone();
+
+			RandomGenerator rand = jgapConf.getRandomGenerator();
+			for (int i = 0; i < chrom.size(); i++) {
+				int chromHashCode = chrom.getGene(i).hashCode();
+
+				Gene cloneGene = clone.getGene(i);
+
+				do {
+					cloneGene.setToRandomValue( rand );
+				} while (cloneGene.hashCode() == chromHashCode);
+
+				Assert.assertEquals(
+						"modifying a gene in clone modified corresponding gene in cloned!",
+						chromHashCode,
+						chrom.getGene(i).hashCode());
+			}
+		}	
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
