@@ -21,8 +21,6 @@ package playground.dgrether.daganzo2012;
 
 import org.matsim.core.controler.Controler;
 
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
-
 
 /**
  * @author dgrether
@@ -32,9 +30,9 @@ public class Daganzo2012Run {
 
 	public static void main(String[] args) {
 //		String config = args[0];
-		String config = "/media/data/work/repos/shared-svn/studies/dgrether/daganzo2012/scenario_1/daganzo_2012_config.xml";
+		String config = "/media/data/work/repos/shared-svn/studies/dgrether/daganzo2012/scenario_1/config.xml";
 		Controler controler = new Controler(config);
-		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
+//		controler.setSignalsControllerListenerFactory(new DgSylviaControlerListenerFactory());
 		controler.setOverwriteFiles(true);
 		controler.run();
 

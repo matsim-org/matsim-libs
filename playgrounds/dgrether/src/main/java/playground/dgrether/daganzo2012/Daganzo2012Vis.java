@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgTurnInfo
+ * Daganzo2012Vis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,46 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.designdrafts;
+package playground.dgrether.daganzo2012;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.run.OTFVis;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTurnInfo {
-	
-		private final Id fromLinkId;
-		private Set<String> modes;
-		
-		public DgTurnInfo(final Id fromLinkId) {
-			this.fromLinkId = fromLinkId;
-		}
-		
-		public Id getFromLinkId() {
-			return this.fromLinkId;
-		}
-		
-		public Set<TransportMode> getAllowedModes(){
-			return null;
-		}
-		
-		public Set<Id> getToLinkIdsAllModes() {
-			return null;
-		}
-		
-		public Set<Id> getToLinkIds(TransportMode mode){
-			return null;
-		}
-		
-		public void addToLink(TransportMode mode){
-			
-		}
-		
-		
+public class Daganzo2012Vis {
+
+	public static void main(String[] args) {
+		String file = "/media/data/work/repos/runs-svn/run1150/ITERS/it.20/1150.20.otfvis.mvi";
+		OTFVis.playMVI(file);
+	}
+
 }
