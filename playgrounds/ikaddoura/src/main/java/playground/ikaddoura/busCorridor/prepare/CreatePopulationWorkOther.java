@@ -139,7 +139,7 @@ public class CreatePopulationWorkOther implements Runnable {
 		for (int i=0; i<quantity; i++){
 			Coord homeLocation = getRndCoord();
 			Coord otherLocation = getRndCoord();
-			double homeEndTimeRnd = calculateRandomlyDistributedValue(14 * 60*60, 6*60*60);
+			double homeEndTimeRnd = calculateRandomlyDistributedValue(12 * 60*60, 6*60*60);
 			
 			Person person = population.getFactory().createPerson(createId("person_HomeOtherHome_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
 			Plan plan = population.getFactory().createPlan();
@@ -178,8 +178,8 @@ public class CreatePopulationWorkOther implements Runnable {
 	}
 	
 	private Leg createDriveLegPt() {
-		Leg leg = population.getFactory().createLeg(TransportMode.pt);
-//		Leg leg = population.getFactory().createLeg(TransportMode.car);
+//		Leg leg = population.getFactory().createLeg(TransportMode.pt);
+		Leg leg = population.getFactory().createLeg(TransportMode.car);
 		return leg;
 	}
 
