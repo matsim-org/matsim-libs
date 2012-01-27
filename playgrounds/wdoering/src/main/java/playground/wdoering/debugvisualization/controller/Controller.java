@@ -166,7 +166,10 @@ public class Controller {
 
 			manager.addHandler(this.importer); // handler must implement XYVxVyEventsHandler
 			reader.parse("C:\\temp\\events2.xml");
+			
 		}
+		
+//		this.pause();
 
 
 	}
@@ -231,6 +234,10 @@ public class Controller {
 		this.eventsManager.addHandler(this.importer);
 
 		this.readerThread.start();
+		
+		this.gui.setOffset(275,50);
+		
+		this.pause();
 
 		//eventsManager.
 

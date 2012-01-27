@@ -185,6 +185,12 @@ public class GUI extends JFrame {
 		}
 		
 	}
+
+	public void setOffset(int x, int y)
+	{
+		renderer.setOffset(x,y);
+		
+	}
 	
 	
 }

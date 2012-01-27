@@ -65,6 +65,7 @@ public class Bottleneck
 			double width = 1;
 			double distance = 3;
 			double waitingAreaWidth = 7;
+			int persons = 49;
 
 			//create config
 			Config c = ConfigUtils.createConfig();
@@ -77,7 +78,7 @@ public class Bottleneck
 			List<Link> links = createNetwork(scenario, inputDir, distance, length, width, waitingAreaWidth);
 
 			//create population
-			createPop(scenario, inputDir, links, length, width, waitingAreaWidth);
+			createPop(scenario, inputDir, links, length, width, waitingAreaWidth, persons);
 			//
 			c.controler().setLastIteration(0);
 			c.controler().setOutputDirectory(scDir + "output/");
@@ -144,20 +145,14 @@ public class Bottleneck
 		//DEBUG
 		GeometryFactory geofac = new GeometryFactory();
 
-		//			double length = 0;
-		//			for (int i = 0; i < links.size()/10; i++) {
-		//				Link link = links.get(i);
-		//				length += link.getLength();
-		//			}
-
-		double dist = length / persons;
+		//double dist = length / persons;
 
 		//get links
 		Iterator<Link> it = links.iterator();
 		Link currentLink = it.next();
-		double linkLength = currentLink.getLength();
+		//		double linkLength = currentLink.getLength();
 
-		//			double currPos = 0;
+		//double currPos = 0;
 
 		//approx. persons per row
 		double pprApprox = Math.sqrt(persons);
@@ -170,49 +165,35 @@ public class Bottleneck
 
 		for (int i = 0; i < persons; i++)
 		{
-			//				while (currPos > linkLength)
-			//				{
-			//					currentLink = it.next();
-			//					linkLength += currentLink.getLength();
-			//				}
-			//
-			//				double posOnLink = currPos - linkLength + currentLink.getLength();
-			//				double dx = posOnLink*(currentLink.getToNode().getCoord().getX() - currentLink.getFromNode().getCoord().getX())/currentLink.getLength();
-			//				double dy = posOnLink*(currentLink.getToNode().getCoord().getY() - currentLink.getFromNode().getCoord().getY())/currentLink.getLength();
-
-			//				double x = currentLink.getFromNode().getCoord().getX() + dx;
-			//				double y = currentLink.getFromNode().getCoord().getY() + dy;
 
 			double step = ((float)(((i % personsPerRow) + 0.01f) / (float)personsPerRow) );
-//			System.out.println(step);
+			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth) + 0.45d;
+			double y = (Math.floor((i+0.01)/personsPerRow));
 			
-			double x = (-waitingAreaWidth/2) + ( step * (float)waitingAreaWidth) + (float)gap/2f;
-			
-			double y = ((Math.floor((i + 0.01 / personsPerRow))/persons)*waitingAreaWidth/1.5);
-
+			//create geometry factory point
 			Point p = geofac.createPoint(new Coordinate(x,y));
 			GisDebugger.addGeometry(p, ""+i);
+			
+			//create person
 			Person pers = createPerson(pb,new CoordImpl(x,y),currentLink,links,time,sc);
 
+			//add preson to population
 			pop.addPerson(pers);
-			//				currPos += dist;
 		}
 
 		//		GisDebugger.dump("C:/temp/persons.shp");
-
-
 	}
 
 
 
-	private static void createPop(Scenario scenario, String inputDir, List<Link> links, double length, double width, double waitingAreaWidth)
+	private static void createPop(Scenario scenario, String inputDir, List<Link> links, double length, double width, double waitingAreaWidth, int persons)
 	{
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 
 		//			createPersons(scenario,pb,pop,links,83,0*60);
 
-		createPersons(scenario, populationFactory, population, links, 50, 0*60, length, width, waitingAreaWidth);
+		createPersons(scenario, populationFactory, population, links, persons, 0*60, length, width, waitingAreaWidth);
 //		createPersons(scenario, populationFactory, population, links, 23, 44, length, width, waitingAreaWidth);
 //		createPersons(scenario, populationFactory, population, links, 23, 88, length, width, waitingAreaWidth);
 //		createPersons(scenario, populationFactory, population, links, 23, 132, length, width, waitingAreaWidth);

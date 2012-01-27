@@ -155,6 +155,9 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 	}
 
 	public static void main(String [] args) {
+//		String eventsFile = "C:\\temp\\bottleneck\\output\\ITERS\\it.0\\0.events.xml.gz";
+//		String config = "C:\\temp\\bottleneck\\input\\config.xml";
+		
 		String eventsFile = "C:\\temp\\bottleneckoutput\\ITERS\\it.0\\0.events.xml.gz";
 		String config = "C:\\temp\\bn_social_force_model_old\\bottleneck\\input\\config.xml";
 
@@ -166,6 +169,8 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 		XYVxVyEventsFileReader r = new XYVxVyEventsFileReader(em);
 
 		//		Envelope e = new Envelope(4,7,2.75,3.25);
+		
+		//standard bottleneck experiment
 		Envelope e = new Envelope(-0.5,0.5,-3,-7);
 
 		List<Coordinate> l = new ArrayList<Coordinate>();

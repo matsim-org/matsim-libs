@@ -548,7 +548,7 @@ public class P3DRenderer extends PApplet
 		
 	}
 	
-	
+	private int fr = 0;
 
 	/**
 	 * draw function. calculating proportions.
@@ -559,12 +559,13 @@ public class P3DRenderer extends PApplet
 	@Override
 	public void draw()
 	{
+		fr++;
 		
 		if ((this.extremeValues != null) && (this.factorX == 0.0f))
 		{
 			//get max values
-			float maxWidth = (float)(this.extremeValues[0]-this.extremeValues[3]);
-			float maxHeight = (float)(this.extremeValues[1]-this.extremeValues[4]);
+			float maxWidth = (float)(Math.abs(this.extremeValues[0])+Math.abs(this.extremeValues[3]));
+			float maxHeight = (float)(Math.abs(this.extremeValues[1])+Math.abs(this.extremeValues[4]));
 
 			float longerSide = Math.max(maxWidth,  maxHeight);
 			float shorterSide = Math.min(maxWidth, maxHeight);
@@ -576,7 +577,8 @@ public class P3DRenderer extends PApplet
 			
 			//refactor min/max values of event+network file
 			this.factorX = longerSide / this.width;
-			this.factorY = longerSide / this.height;
+			this.factorY = longerSide / this.height; 
+			
 
 			//console.println(((this.maxPosX-this.minPosX) /factorX));
 		}		
@@ -626,6 +628,9 @@ public class P3DRenderer extends PApplet
 		
 		double timeMeasDiff= System.currentTimeMillis()-timeMeas;
 		avgRenderingTime += timeMeasDiff;
+		
+		
+		save("C:/temp/f" + String.format("%04d", fr) +".png");
 		
 
 
@@ -1152,6 +1157,12 @@ public class P3DRenderer extends PApplet
 				this.extremeValues[6], this.extremeValues[7]};
 		setExtremeValues(extremeValues);
 
+	}
+
+	public void setOffset(int x, int y)
+	{
+		offset.x = x;
+		offset.y = y;
 	}
 	
 
