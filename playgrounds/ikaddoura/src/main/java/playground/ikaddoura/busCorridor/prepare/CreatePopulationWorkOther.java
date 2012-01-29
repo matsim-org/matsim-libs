@@ -46,7 +46,7 @@ public class CreatePopulationWorkOther implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
-	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network.xml";
+	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network80links.xml";
 
 		
 	public static void main(String[] args) {
@@ -64,7 +64,7 @@ public class CreatePopulationWorkOther implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final/populationBusCorridor.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final/populationBusCorridor80links.xml");
 	}
 
 	private void fillZoneData() {
@@ -105,8 +105,8 @@ public class CreatePopulationWorkOther implements Runnable {
 	
 	private void generatePopulation() {
 		
-		createOtherTrips(1300);
-		createWorkTrips(700);
+		createOtherTrips(2600);
+		createWorkTrips(1400);
 
 	}
 	
