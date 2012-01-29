@@ -499,7 +499,7 @@ public class WorkFacilitiesGeneration {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SVY21, TransformationFactory.WGS84_UTM48N);
 		ResultSet mPAreasR = dataBaseAuxiliar.executeQuery("SELECT * FROM buildings WHERE use_for_generation = 1");
 		while(mPAreasR.next()) {
-			mPAreas.put(new IdImpl(mPAreasR.getString(1)),new ActivityFacilityImpl(new IdImpl(mPAreasR.getString(1)),coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(4), mPAreasR.getDouble(5)))));
+			mPAreas.put(new IdImpl(mPAreasR.getString(1)), null/*new ActivityFacilityImpl(new IdImpl(mPAreasR.getString(1)),coordinateTransformation.transform(new CoordImpl(mPAreasR.getDouble(4), mPAreasR.getDouble(5))))*/);
 			dataMPAreas.put(new IdImpl(mPAreasR.getString(1)), new MPAreaData(mPAreasR.getInt(1),mPAreasR.getString(2), mPAreasR.getDouble(3), mPAreasR.getDouble(6)));
 		}
 		mPAreasR.close();
