@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;

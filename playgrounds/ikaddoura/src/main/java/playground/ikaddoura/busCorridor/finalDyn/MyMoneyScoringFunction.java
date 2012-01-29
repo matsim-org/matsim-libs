@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.interfaces.BasicScoring;

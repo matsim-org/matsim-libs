@@ -1,4 +1,4 @@
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import java.io.BufferedWriter;
 import java.io.File;

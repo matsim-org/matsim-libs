@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;

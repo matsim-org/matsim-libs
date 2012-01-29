@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;

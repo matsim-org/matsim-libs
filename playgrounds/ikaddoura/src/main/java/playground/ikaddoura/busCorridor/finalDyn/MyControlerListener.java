@@ -22,7 +22,7 @@
  * 
  */
 
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;

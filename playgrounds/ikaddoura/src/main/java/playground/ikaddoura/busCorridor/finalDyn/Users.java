@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.busCorridor.finalDyn2;
+package playground.ikaddoura.busCorridor.finalDyn;
 
 import java.util.ArrayList;
 import java.util.List;
