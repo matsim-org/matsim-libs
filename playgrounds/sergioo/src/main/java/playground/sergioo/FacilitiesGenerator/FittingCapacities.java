@@ -1,9 +1,5 @@
 package playground.sergioo.FacilitiesGenerator;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import util.algebra.Matrix1DImpl;
 import util.algebra.Matrix2DImpl;
 import util.algebra.Matrix3DImpl;
@@ -33,12 +29,8 @@ public class FittingCapacities {
 			double totalStopQuantity = 0;
 			for(int o=0; o<dimensions[1]; o++)
 				totalStopQuantity += quantitiesOS.getElement(new int[]{o, s});
-			for(int f=0; f<dimensions[0]; f++) {
-				double quantity = weightsFS.getElement(new int[]{f, s})*totalStopQuantity;
-				if(quantity == 0)
-					quantity = Double.MIN_VALUE;
-				quantitiesFS.setElement(new int[]{f, s}, quantity);
-			}
+			for(int f=0; f<dimensions[0]; f++)
+				quantitiesFS.setElement(new int[]{f, s}, weightsFS.getElement(new int[]{f, s})*totalStopQuantity);
 		}
 		fs = new TotalFittingControl1D(quantitiesFS);
 		fo = new ProportionFittingControlND(proportionsFO, new int[]{2});
@@ -54,16 +46,12 @@ public class FittingCapacities {
 		System.out.println("Free heap memory: "+Runtime.getRuntime().freeMemory()+" of "+Runtime.getRuntime().maxMemory());
 		for(int i=0; i<times; i++) {
 			long time = System.currentTimeMillis();
-			fixMatrix(data);
 			totalIterateOS(data);
 			System.out.println("Iteration "+i+": "+(System.currentTimeMillis()-time)/1000);
-			fixMatrix(data);
 			totalIterateFS(data);
 			System.out.println("Iteration "+i+": "+(System.currentTimeMillis()-time)/1000);
-			fixMatrix(data);
 			proportionIterateFO(data);
 			System.out.println("Iteration "+i+": "+(System.currentTimeMillis()-time)/1000);
-			fixMatrix(data);
 			maxIterateF(data);
 			System.out.println("Iteration "+i+": "+(System.currentTimeMillis()-time)/1000);
 			System.out.println("Free heap memory: "+Runtime.getRuntime().freeMemory()+" of "+Runtime.getRuntime().maxMemory());
@@ -81,13 +69,6 @@ public class FittingCapacities {
 		}
 		return data;
 	}
-	private void fixMatrix(Matrix3DImpl data) {
-		for(int f=0; f<dimensions[0]; f++)
-			for(int o=0; o<dimensions[1]; o++)
-				for(int s=0; s<dimensions[2]; s++)
-					if(data.getElement(f, o, s)==0)
-						data.setElement(f, o, s, Double.MIN_VALUE);
-	}
 	private void totalIterateOS(Matrix3DImpl data) {
 		double[][][] matrix = data.getData();
 		Matrix2DImpl totalsOS = (Matrix2DImpl) os.getControlConstants();
@@ -102,18 +83,8 @@ public class FittingCapacities {
 						for(int f=0; f<dimensions[0]; f++)
 							matrix[f][o][s] = totalOS/dimensions[0];
 					else
-						for(int f=0; f<dimensions[0]; f++) {
-							double prev = matrix[f][o][s];
+						for(int f=0; f<dimensions[0]; f++)
 							matrix[f][o][s] = (matrix[f][o][s]/totalF)*totalOS;
-							if(data.getElement(f, o, s).isNaN()) {
-								System.out.println("Paila"+f+","+o+","+s+";"+prev+","+totalF+","+totalOS);
-								try {
-									new BufferedReader(new InputStreamReader(System.in)).readLine();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}
 			}
 	}
 	private void totalIterateFS(Matrix3DImpl data) {
@@ -127,13 +98,8 @@ public class FittingCapacities {
 					totalO += matrix[f][o][s];
 				if(!(totalO==0 && totalFS==0))
 					if(totalO==0)
-						for(int o=0; o<dimensions[1]; o++) {
+						for(int o=0; o<dimensions[1]; o++)
 							matrix[f][o][s] = totalFS/dimensions[1];
-							if(totalFS==0)
-								System.out.println("FS0");
-							if(dimensions[1]==0)
-								System.out.println("FS1");
-						}
 					else
 						for(int o=0; o<dimensions[1]; o++)
 							matrix[f][o][s] = (matrix[f][o][s]/totalO)*totalFS;
@@ -154,15 +120,8 @@ public class FittingCapacities {
 					totalS+=matrix[f][o][s];
 				if(!(totalS==0 && totalOS*proportionFO==0))
 					if(totalS==0)
-						for(int s=0; s<dimensions[2]; s++) {
+						for(int s=0; s<dimensions[2]; s++)
 							matrix[f][o][s] = totalOS*proportionFO/dimensions[2];
-							if(totalOS==0)
-								System.out.println("FO0");
-							if(proportionFO==0)
-								System.out.println("FO1");
-							if(dimensions[2]==0)
-								System.out.println("FO2");
-						}
 					else
 						for(int s=0; s<dimensions[2]; s++)
 							matrix[f][o][s] = (matrix[f][o][s]/totalS)*totalOS*proportionFO;

@@ -140,7 +140,7 @@ public class WorkFacilitiesGeneration {
 				double pTCapacityFO = 0;
 				for(int s=0; s<matrix.getDimension(2); s++)
 					pTCapacityFO += matrix.getElement(f, o, s);
-				if(pTCapacityFO>Double.MIN_VALUE*matrix.getDimension(2)) {
+				if(pTCapacityFO>0) {
 					ActivityOption activityOption = new ActivityOptionImpl(optionText, mPArea);
 					activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
 					activityOption.addOpeningTime(openingTime);
@@ -592,15 +592,17 @@ public class WorkFacilitiesGeneration {
 						throw new BadStopException(stopId);
 				}
 				double totalTimeFromStop = 0;
+				maxTimeFromStop++;
 				for(Entry<Tuple<Id, Id>,Double> weight:weights.entrySet())
 					if(weight.getKey().getFirst().equals(stopId)) {
 						double correctWeight = maxTimeFromStop-weight.getValue();
 						weights.put(weight.getKey(), correctWeight);
 						totalTimeFromStop += correctWeight;
 					}
-				for(Entry<Tuple<Id, Id>,Double> weight:weights.entrySet())
-					if(weight.getKey().getFirst().equals(stopId))
-						weights.put(weight.getKey(), weight.getValue()/totalTimeFromStop);
+				if(totalTimeFromStop!=0)
+					for(Entry<Tuple<Id, Id>,Double> weight:weights.entrySet())
+						if(weight.getKey().getFirst().equals(stopId))
+							weights.put(weight.getKey(), weight.getValue()/totalTimeFromStop);
 			}
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(WEIGHTS_MAP_FILE));
 			oos.writeObject(weights);
@@ -674,8 +676,8 @@ public class WorkFacilitiesGeneration {
 		for(String key:proportions.keySet())
 			for(int c=0; c<clusters.size(); c++) {
 				Double proportion = proportions.get(key).get(c)/proportionsT.get(key);
-				if(proportion==0 || proportion.isNaN())
-					proportion=Double.MIN_VALUE;
+				if(proportion.isNaN())
+					proportion=0.0;
 				proportions.get(key).set(c, proportion);
 			}
 		dataBaseAux.close();
@@ -708,7 +710,7 @@ public class WorkFacilitiesGeneration {
 			for(int s=0; s<quantities.getDimension(1); s++) {
 				Double quantity = quantitiesMap.get(stopsI.next()+SEPARATOR+c);
 				if(quantity==null)
-					quantity = Double.MIN_VALUE;
+					quantity = 0.0;
 				quantities.setElement(new int[]{c,s}, quantity);
 			}
 		}
@@ -727,8 +729,8 @@ public class WorkFacilitiesGeneration {
 			Iterator<String> stopsI = stopsBase.keySet().iterator();
 			for(int s=0; s<weights.getDimension(1); s++) {
 				Double weight = weightsMap.get(new Tuple<Id, Id>(new IdImpl(stopsI.next()), facilityId));
-				if(weight==null || weight==0)
-					weight = Double.MIN_VALUE;
+				if(weight==null)
+					weight = 0.0;
 				weights.setElement(f, s, weight);
 			}
 		}
@@ -748,8 +750,6 @@ public class WorkFacilitiesGeneration {
 		for(int f=0; f<maxs.getDimension(0); f++) {
 			MPAreaData dataMPArea = dataMPAreas.get(mPAreaI.next());
 			double max = (dataMPArea.getMaxArea()/workerAreas.get(dataMPArea.getType()))*dataMPArea.getModeShare();
-			if(max==0)
-				max = Double.MIN_VALUE;
 			maxs.setElement(new int[]{f}, max);
 		}
 		System.out.println("Max areas done!");
