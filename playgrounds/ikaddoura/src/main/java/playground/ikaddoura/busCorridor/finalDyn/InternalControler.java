@@ -78,13 +78,17 @@ public class InternalControler {
 	}
 	
 	public void run() {
-		String population = null;
-		if (this.extItNr==0){
-			population = populationFile;
-		}
-		else {
-			population = this.outputExternalIterationDirPath+"/extITERS/extIt."+(this.extItNr-1)+"/internalIterations/output_plans.xml.gz";
-		}
+		
+		String population = populationFile;
+		
+		// for using the outputplans of previous external iteration:
+//		String population = null;
+//		if (this.extItNr==0){
+//			population = populationFile;
+//		}
+//		else {
+//			population = this.outputExternalIterationDirPath+"/extITERS/extIt."+(this.extItNr-1)+"/internalIterations/output_plans.xml.gz";
+//		}
 		
 		Config config = new Config();
 		config.addCoreModules();
