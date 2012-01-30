@@ -24,7 +24,8 @@ public class ZurichUtilitiesZurichBigRoads {
 
 	/** scenario/test case identifier */
 	private static String CLOSE_UETLIBERGTUNNEL = "uetlibergtunnel";
-	private static String CLOSE_BIRMSDORFERSTRASSE = "birmsdorferstrasse";
+	private static String CLOSE_BIRMSDORFERSTRASSE_OUTERRIM = "birmsdorferstrasseouterrim"; // former birmsdorferstrasse
+	private static String CLOSE_BIRMSDORFERSTRASSE_CITYCENTER = "birmsdorferstrassecitycenter";
 	private static String CLOSE_SCHWAMENDINGERTUNNEL = "schwamendingertunnel";
 	private static String CLOSE_MILCHBUCKTUNNEL = "milchbucktunnel";
 	
@@ -45,8 +46,11 @@ public class ZurichUtilitiesZurichBigRoads {
 					.equalsIgnoreCase(CLOSE_SCHWAMENDINGERTUNNEL))
 				removeSchwamendingerTunnel(network);
 			else if (scenarioArray[i]
-					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE))
-				removeBirmensdorferstrasse(network);
+					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE_OUTERRIM))
+				removeBirmensdorferstrasseOuterRim(network);
+			else if (scenarioArray[i]
+					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE_CITYCENTER))
+				removeBirmensdorferstrasseCity(network);
 			else if (scenarioArray[i]
 					.equalsIgnoreCase(CLOSE_MILCHBUCKTUNNEL))
 				removeMilchbuckTunnel(network);
@@ -77,9 +81,9 @@ public class ZurichUtilitiesZurichBigRoads {
 	 * 
 	 * @param network
 	 */
-	private static void removeBirmensdorferstrasse(final Network network) {
+	private static void removeBirmensdorferstrasseOuterRim(final Network network) {
 
-		log.info("Closing Birmensdorferstrasse from network ...");
+		log.info("Closing Birmensdorferstrasse (outer rim) from network ...");
 		
 		linksToRemove = new ArrayList<Id>();
 		
@@ -88,7 +92,26 @@ public class ZurichUtilitiesZurichBigRoads {
 
 		// remove links from network
 		applyScenario(network);
-		log.info("Done closing Birmensdorferstrasse!");
+		log.info("Done closing Birmensdorferstrasse (outer rim)!");
+	}
+	
+	/**
+	 * removes the Birmensdorferstrasse next to city center links from MATSim network
+	 * 
+	 * @param network
+	 */
+	private static void removeBirmensdorferstrasseCity(final Network network) {
+
+		log.info("Closing Birmensdorferstrasse (near city center) from network ...");
+		
+		linksToRemove = new ArrayList<Id>();
+		
+		linksToRemove.add(new IdImpl(7889));
+		linksToRemove.add(new IdImpl(178));
+
+		// remove links from network
+		applyScenario(network);
+		log.info("Done closing Birmensdorferstrasse (near city center)!");
 	}
 
 	/**
