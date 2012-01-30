@@ -46,6 +46,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
+import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 /**
  * @author nagel
@@ -600,6 +601,8 @@ public class ReadFromUrbansimParcelModel {
 		// this hash map includes jobs according to job sample size
 		List<JobsObject> jobSampleList = readJobs(parcels, jobSample);
 		assert( jobSampleList != null );
+		
+		WorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
 		Map<Id, JobClusterObject> jobClusterMap = new HashMap<Id, JobClusterObject>();

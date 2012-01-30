@@ -23,7 +23,7 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.io.writer.AggregatedWorkplaceCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 
 public class GridBasedAccessibilityControlerListener implements ShutdownListener{
@@ -200,7 +200,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 			grid.writeGrid();
 			
 			// writing aggregated workplace data in csv format
-			AggregatedWorkplaceCSVWriter.writeWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedWorkplaces );
+			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedWorkplaces );
 			
 			// finalizing/closing csv file containing accessibility measures
 			GridBasedAccessibilityCSVWriter.close();

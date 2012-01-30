@@ -356,7 +356,7 @@ public class InitMATSimScenario {
 		// Adapting the storageCapFactor has the following reason:
 		// Too low SorageCapacities especially with small sampling 
 		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
-		// This leads to an unstable behavior of the simulation (by breackdowns 
+		// This leads to an unstable behavior of the simulation (by breakdowns 
 		// during the learning progress).
 		// The correction fetch factor introduced here raises the 
 		// storage capacity at low sampling rates and becomes flatten 
@@ -366,7 +366,7 @@ public class InitMATSimScenario {
 			popSampling = 0.01;
 			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
 		}
-		// tnicolai: check storage cap fectch factor with kai!!! (dec'11)
+		// tnicolai dec'11
 		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
 		double storageCap = popSampling * fetchFactor;
 		

@@ -206,6 +206,7 @@ public class Constants {
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
 	public static final String ERSA_PARCEL_ID = "parcel_id";
+	public static final String ERSA_JOB_ID = "job_id";
 	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
 	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
 	public static final String ERSA_NEARESTNODE_Y_COORD = "y_coord_nn";

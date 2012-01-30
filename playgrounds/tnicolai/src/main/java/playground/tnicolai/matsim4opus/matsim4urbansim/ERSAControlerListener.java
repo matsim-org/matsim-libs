@@ -267,15 +267,13 @@ public class ERSAControlerListener implements ShutdownListener{
 		log.info("Dumping workplace data used for this simulation: " + Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv");
 		
 		// dumping out data from jobClusterArray (containing aggregated workplace data)
-		bwAggregatedWP.write("zone_ID,num_of_jobs,x_grid_coord,y_grid_coord,x_nearest_node_coord,y_nearest_node_coord,nearest_node_ID");
+		bwAggregatedWP.write("zone_ID,num_of_jobs,x_nearest_node_coord,y_nearest_node_coord,nearest_node_ID");
 		bwAggregatedWP.newLine();
 		for(int i = 0; i < aggregatedWorkplaces.length; i++){
 			bwAggregatedWP.write(aggregatedWorkplaces[i].getZoneID() + "," + 
 						   	   aggregatedWorkplaces[i].getNumberOfJobs() + "," +
 					 		   aggregatedWorkplaces[i].getCoordinate().getX() + "," +
 					 		   aggregatedWorkplaces[i].getCoordinate().getY() + "," +
-					 		   aggregatedWorkplaces[i].getNearestNode().getCoord().getX()  + "," +
-					 		   aggregatedWorkplaces[i].getNearestNode().getCoord().getX()  + "," +
 					 		   aggregatedWorkplaces[i].getNearestNode().getId());
 			bwAggregatedWP.newLine();
 		}
