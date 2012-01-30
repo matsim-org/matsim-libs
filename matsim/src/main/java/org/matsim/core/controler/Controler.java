@@ -1003,7 +1003,7 @@ public class Controler {
 		}
 		if (simulation instanceof VisMobsim) {
 			int itNumber = this.getIterationNumber();
-			if (itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
+			if (config.controler().getWriteSnapshotsInterval() != 0 && itNumber % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
 				SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
 				SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
