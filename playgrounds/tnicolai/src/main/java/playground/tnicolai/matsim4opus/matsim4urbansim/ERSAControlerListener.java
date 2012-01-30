@@ -86,6 +86,8 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * - Workplace data dump:
 	 * 	Dumping out the used workplace data was simplified, since the simulation now already uses aggregated data.
 	 * 	Corresponding subroutines aggregating the data are not needed any more (see dumpWorkplaceData()).
+	 * 	But coordinates of the origin workplaces could not dumped out, this is now done in ReadFromUrbansimParcelModel
+	 *  during processing the UrbnAism job data
 	 * 
 	 * TODO: implement configurable betas for different accessibility measures based on different costs
 	 * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,

@@ -602,6 +602,8 @@ public class ReadFromUrbansimParcelModel {
 		List<JobsObject> jobSampleList = readJobs(parcels, jobSample);
 		assert( jobSampleList != null );
 		
+		// Since the aggregated workplaces in jobClusterArray do not contain the original workplace coordinates of
+		// every single job, this is dumped out here   tnicolai dec'12
 		WorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
