@@ -23,6 +23,7 @@ package org.matsim.core.events;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkChangeEvent;
 import org.matsim.core.api.experimental.events.LinkChangeFlowCapacityEvent;
@@ -184,6 +185,17 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			double value = Double.valueOf(atts.getValue(LinkChangeEvent.CHANGEVALUE));
 			NetworkChangeEvent.ChangeValue changeValue = new NetworkChangeEvent.ChangeValue(changeType, value);
 			this.events.processEvent(this.builder.createLinkChangeLanesEvent(time, new IdImpl(atts.getValue(LinkChangeEvent.ATTRIBUTE_LINK)), changeValue));
+		} else {
+			Event event = this.builder.createGenericEvent( eventType, time );
+			for ( int ii=0 ; ii<atts.getLength() ; ii++ ) {
+				String key = atts.getLocalName(ii) ;
+				if ( key.equals("time") || key.equals("type") ) {
+					continue ;
+				}
+				String value = atts.getValue(ii) ;
+				event.getAttributes().put(key, value) ;
+			}
+			this.events.processEvent(event) ;
 		}
 	}
 

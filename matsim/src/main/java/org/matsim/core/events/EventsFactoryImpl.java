@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.LinkChangeEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -127,6 +128,11 @@ public class EventsFactoryImpl implements EventsFactory {
 	@Override
 	public LinkChangeEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
 		return new LinkChangeLanesEventImpl(time, linkId, changeValue);
+	}
+
+	@Override
+	public GenericEvent createGenericEvent(String type, double time) {
+		return new GenericEventImpl( type, time ) ;
 	}
 
 }

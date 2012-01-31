@@ -60,5 +60,7 @@ public interface EventsFactory extends MatsimFactory {
 	PersonEntersVehicleEvent createPersonEntersVehicleEvent(double time, Id personId, Id vehicleId);
 
 	PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(double time, Id personId, Id vehicleId);
+	
+	GenericEvent createGenericEvent( String type, double time ) ;
 
 }
