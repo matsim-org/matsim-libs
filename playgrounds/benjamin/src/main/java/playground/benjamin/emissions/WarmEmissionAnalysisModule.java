@@ -22,6 +22,7 @@
 package playground.benjamin.emissions;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,8 +60,8 @@ public class WarmEmissionAnalysisModule {
 
 	int vehAttributesNotSpecifiedCnt = 0;
 	final int maxWarnCnt = 3;
-	Set<Id> vehAttributesNotSpecified = new HashSet<Id>();
-	Set<Id> vehicleIdSet = new HashSet<Id>();
+	Set<Id> vehAttributesNotSpecified = Collections.synchronizedSet(new HashSet<Id>());
+	Set<Id> vehicleIdSet = Collections.synchronizedSet(new HashSet<Id>());
 
 	int freeFlowCounter = 0;
 	int stopGoCounter = 0;
