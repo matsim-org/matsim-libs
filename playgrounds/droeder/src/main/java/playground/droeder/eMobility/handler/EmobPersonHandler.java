@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
@@ -44,14 +46,16 @@ public class EmobPersonHandler implements AgentArrivalEventHandler, AgentDepartu
 	private Map<Id, Double> vehId2startCharging;
 	private Map<Id, Double> vehId2finishCharging;
 	private Map<Id, Id> veh2chargetype;
+	private EventsManager events;
 
-	public EmobPersonHandler(Map<Id, EmobilityPerson> persons, EmobVehicleDrivingHandler vehicleHandler, ChargingProfiles chargingProfiles){
+	public EmobPersonHandler(Map<Id, EmobilityPerson> persons, EmobVehicleDrivingHandler vehicleHandler, ChargingProfiles chargingProfiles, EventsManager events){
 		this.persons = persons;
 		this.vehicleHandler = vehicleHandler;
 		this.cp = chargingProfiles;
 		this.vehId2startCharging = new HashMap<Id, Double>();
 		this.vehId2finishCharging = new HashMap<Id, Double>();
 		this.veh2chargetype = new HashMap<Id, Id>();
+		this.events = events ;
 	}
 
 	@Override
@@ -81,6 +85,9 @@ public class EmobPersonHandler implements AgentArrivalEventHandler, AgentDepartu
 					}
 					double newCharge = this.cp.getNewState(this.veh2chargetype.get(p.getId()), end/start, this.persons.get(p.getId()).getVehicle().getChargeState());
 					p.getVehicle().setNewCharge(newCharge, event.getTime());
+					GenericEvent chargingStateEvent = events.getFactory().createGenericEvent("chargingState", event.getTime() ) ;
+					chargingStateEvent.getAttributes().put("chargingLevel", Double.toString(newCharge) ) ;
+					events.processEvent(chargingStateEvent) ;
 				}
 			}
 		}

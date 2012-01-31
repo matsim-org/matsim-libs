@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -41,7 +42,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.droeder.DRPaths;
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
 import playground.droeder.eMobility.handler.EmobPersonHandler;
@@ -97,14 +97,16 @@ public class EmobilityRunner {
 	}
 	
 	public void run(){
-//		this.eHandler = new EmobiltyHandler(this.vehicles, this.charging, this.discharging, this.scenario.getNetwork());
+		Controler c = new Controler(this.scenario);
+		EventsManager events = c.getEvents() ;
+
+		//		this.eHandler = new EmobiltyHandler(this.vehicles, this.charging, this.discharging, this.scenario.getNetwork());
 //		this.handler.add(this.eHandler);
-		EmobVehicleDrivingHandler h1 =  new EmobVehicleDrivingHandler(discharging, this.scenario.getNetwork());
-		EmobPersonHandler h2 = new EmobPersonHandler(persons, h1, charging);
+		EmobVehicleDrivingHandler h1 =  new EmobVehicleDrivingHandler(discharging, this.scenario.getNetwork(), events);
+		EmobPersonHandler h2 = new EmobPersonHandler(persons, h1, charging, events);
 		this.handler.add(h1);
 		this.handler.add(h2);
 		
-		Controler c = new Controler(this.scenario);
 		c.addControlerListener(new MyListener(this.handler));
 		
 		c.setDumpDataAtEnd(true);

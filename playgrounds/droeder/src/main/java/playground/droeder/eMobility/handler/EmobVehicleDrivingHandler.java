@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
@@ -44,13 +45,15 @@ public class EmobVehicleDrivingHandler implements LinkEnterEventHandler, LinkLea
 	private Map<Id, EmobVehicle> veh;
 	private HashMap<Id, Id> vehDisChargeType;
 	private HashMap<Id, LinkEnterEvent> linkEnter;
+	private EventsManager events;
 
-	public EmobVehicleDrivingHandler(DisChargingProfiles disChargingProfiles, Network net){
+	public EmobVehicleDrivingHandler(DisChargingProfiles disChargingProfiles, Network net, EventsManager events){
 		this.dCharge = disChargingProfiles;
 		this.net = net;
 		this.veh = new HashMap<Id, EmobVehicle>();
 		this.vehDisChargeType = new HashMap<Id, Id>();
 		this.linkEnter = new HashMap<Id, LinkEnterEvent>();
+		this.events = events ;
 	}
 	
 	public void startRide(EmobVehicle v, Id disChargingType){
