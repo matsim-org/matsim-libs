@@ -276,6 +276,7 @@ public class ScheduleVehiclesGenerator {
 			double toTime = day.get(pNr).getToTime();
 			if(fromTime >= toTime || (toTime-fromTime) < umlaufzeit){
 				removePeriods.add(pNr);
+				log.warn("TimePeriod shorter than Umlaufzeit --> removed!");
 			}
 		}
 		for (Integer pNr : removePeriods){
@@ -304,11 +305,12 @@ public class ScheduleVehiclesGenerator {
 	private void setDepartureIDs(Map<Id, TransitRoute> routeId2transitRoute, String zeitraum, double endTime, double startTime, int numberOfBusesZeitraum, List<Id> vehicleIDsZeitraum) {	
 		this.periodNr++;
 		System.out.println("+++++ Beginn von period "+ periodNr+" - lastPeriod: VehNr2DepTime: "+this.vehNr2lastPeriodDepTimeHin);
+		System.out.println("VehicleIDs of this timePeriod: "+vehicleIDsZeitraum.toString());
 
 		if (numberOfBusesZeitraum == 0){
 			log.info("No buses in time period "+periodNr+".");
 			this.vehNr2lastPeriodDepTimeHin.clear();
-			System.out.println("Clearing because no buses in this period!");
+			System.out.println("Clearing lastPeriodInfo because no buses in this period!");
 		}
 		
 		if (numberOfBusesZeitraum > 0){
@@ -330,21 +332,20 @@ public class ScheduleVehiclesGenerator {
 					
 					lastDepartureTime = endTime;
 				
-					if (newDay.get(periodNr-1).getNumberOfBuses()==0){
+					if (newDay.get(periodNr-1).getNumberOfBuses()==0){ // in vorheriger Periode keine Busse!
 						firstDepartureTime = startTime;
-						System.out.println("firstDepTime set to startTime: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
+						System.out.println("firstDepTime set to startTime because no busses in previous timePeriod: "+Time.writeTime(firstDepartureTime, Time.TIMEFORMAT_HHMMSS));
 						vehicleIndex = vehicleIDsZeitraum.size()-1;
 					}
-					if (newDay.get(periodNr-1).getNumberOfBuses() >= 0){
-						if (newDay.get(periodNr-1).getNumberOfBuses() > numberOfBusesZeitraum){
-							// weniger Busse als in der Periode davor
+					else if (newDay.get(periodNr-1).getNumberOfBuses() > 0){ // in vorheriger Periode mehr als null Busse!
+						
+						if (newDay.get(periodNr-1).getNumberOfBuses() >= numberOfBusesZeitraum){
+							// weniger Busse als in der Periode davor oder gleichviele Busse
 							
 							if (this.vehicleIndexLastDepartureHin == 0){
 								vehicleIndex = vehicleIDsZeitraum.size()-1;
 							}
 							else {
-								System.out.println("vehIDsZeitraum: "+vehicleIDsZeitraum);
-								System.out.println("size: "+vehicleIDsZeitraum.size());
 								vehicleIndex = this.vehicleIndexLastDepartureHin-1;
 								
 								if (vehicleIDsZeitraum.size()-1 < vehicleIndex){
@@ -353,20 +354,24 @@ public class ScheduleVehiclesGenerator {
 									}
 								}
 							}
-							
-							System.out.println(vehicleIDsZeitraum.toString());
+													
 							Map<Integer,Double> vehNr2minimalFirstDeparture = new HashMap<Integer, Double>();
 							
 							int vehNr = 0;
 							for (Id vehID : vehicleIDsZeitraum){
-								double depNotBefore = this.vehNr2lastPeriodDepTimeHin.get(vehNr) + umlaufzeit;
+								System.out.println("vehNr: "+vehNr);
+								double depNotBefore = 24*3600;
+								if (!this.vehNr2lastPeriodDepTimeHin.containsKey(vehNr)){
+									log.warn("Not all of the buses departed previous period! --> change timePeriod");
+								}
+								else {
+									depNotBefore = this.vehNr2lastPeriodDepTimeHin.get(vehNr) + umlaufzeit;
+								}
 								System.out.println("vehNr: "+vehNr+" / lastPeriodDepTime: " + Time.writeTime(this.vehNr2lastPeriodDepTimeHin.get(vehNr), Time.TIMEFORMAT_HHMMSS) + " / no departure before: "+Time.writeTime(depNotBefore, Time.TIMEFORMAT_HHMMSS));
 								vehNr2minimalFirstDeparture.put(vehNr, depNotBefore);
 								vehNr++;
 							}
 							this.vehicleIndexRueck = vehicleIndex;
-							
-							
 							double maximalAufschlag = 0;
 							double firstDepartureTimeTmp = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit;
 							int vehNummer = vehicleIndex;
@@ -395,8 +400,8 @@ public class ScheduleVehiclesGenerator {
 							firstDepartureTime = this.vehNr2lastPeriodDepTimeHin.get(vehicleIndex) + umlaufzeit + maximalAufschlag;
 						}
 
-						else if (newDay.get(periodNr-1).getNumberOfBuses() <= numberOfBusesZeitraum){
-							// mehr Busse als in der Periode davor oder gleichviele Busse
+						else if (newDay.get(periodNr-1).getNumberOfBuses() < numberOfBusesZeitraum){
+							// mehr Busse als in der Periode davor
 							vehicleIndex = vehicleIDsZeitraum.size()-1;
 							if (this.vehNr2lastPeriodDepTimeHin.isEmpty()){
 								firstDepartureTime = startTime;
@@ -415,12 +420,14 @@ public class ScheduleVehiclesGenerator {
 					vehicleIndex = this.vehicleIndexRueck;
 				}
 				else if (this.periodNr == 1 && routeNrCounter == 1) { // erster Zeitraum, hin
+					System.out.println("Erster Zeitraum (Hin) --> firstDepTime = startTime");
 					vehicleIndex = vehicleIDsZeitraum.size()-1;
 					this.vehicleIndexRueck = vehicleIndex;
 					firstDepartureTime = startTime;
 					lastDepartureTime = endTime;
 				}
 				else if (this.periodNr == 1 && routeNrCounter == 2) { // erster Zeitraum, rück
+					System.out.println("Erster Zeitraum (Rück) --> firstDepTime = startTime + halbe Umlaufzeit");
 					vehicleIndex = this.vehicleIndexRueck;
 					firstDepartureTime = startTime + umlaufzeit/2;
 					lastDepartureTime = endTime + umlaufzeit/2;
@@ -436,10 +443,10 @@ public class ScheduleVehiclesGenerator {
 						departure.setVehicleId(vehicleIDsZeitraum.get(vehicleIndex));
 						routeId2transitRoute.get(routeId).addDeparture(departure);
 						
-						if (routeNrCounter == 1){
+						if (routeNrCounter == 1){ // hin
 							if (depNr==1){
 								this.vehNr2lastPeriodDepTimeHin.clear();
-								System.out.println("clearing...");
+								System.out.println("clearing vehNr2lastPeriodDepTimeHin before refilling...");
 							}
 							this.vehNr2lastPeriodDepTimeHin.put(vehicleIndex, departureTime);
 							this.vehicleIndexLastDepartureHin = vehicleIndex;
