@@ -37,6 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -111,6 +112,9 @@ public class EmobilityRunner {
 		
 		c.setDumpDataAtEnd(true);
 		c.setOverwriteFiles(true);
+		
+//		SimulationAfterSimStepListener assl = new MyListener() ;
+//		c.getQueueSimulationListener().add( assl ) ;
 		
 		c.run();
 	}
