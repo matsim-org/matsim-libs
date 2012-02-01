@@ -144,7 +144,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		Scenario sc = controler.getScenario();
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		// this calculates the workplace accessibility travel times based on (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
+		// this calculates the workplace accessibility travel times based on (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates the workplace accessibility distances (based on link lengths)
 		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
@@ -160,7 +160,9 @@ public class ERSAControlerListener implements ShutdownListener{
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Depature time (in seconds): " + depatureTime);
-			log.info("Beta per hour: " + beta_per_hr);
+			log.info("Beta traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
+			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
+			log.info("Beta per hour (traveling-performing): " + beta_per_hr);
 			log.info("Beta per minute: " + beta_per_min);
 			
 			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
@@ -205,15 +207,16 @@ public class ERSAControlerListener implements ShutdownListener{
 					
 					// travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
-					// travel costs in utils
-					double travelCosts = lcptTravelTime.getTree().get( nodeID ).getCost();
+					// travel costs as travelTime(sec)*marginalCostOfTime(sec)
+					double travelCosts_sec = lcptTravelTime.getTree().get( nodeID ).getCost();
+					double travel_Costs_min = travelCosts_sec / 60.;
 					// travel distance by car in meter
 					double travelDistance_meter = lcptDistance.getTree().get( nodeID ).getCost();
 					
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
 					// sum travel costs (mention the beta)
-					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
+					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travel_Costs_min ) * jobWeight; // tnicolai: find another beta for travel costs
 					// sum travel distances (mention the beta)
 					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
 				}

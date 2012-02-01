@@ -19,7 +19,8 @@ public class TravelDistanceCostCalculator implements TravelCost{
 	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		if(link != null)
-			return link.getLength();
+//			return link.getLength();
+			return link.getLength()/1000.; // tnicolai: experimental link lengths as km
 		log.warn("Link is null. Returned 0 as link length.");
 		return 0.;
 	}
