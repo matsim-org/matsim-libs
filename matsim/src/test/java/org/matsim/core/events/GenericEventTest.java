@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: matsim
- * GenericEventImpl.java
+ * project: org.matsim.*
+ * Plansgenerator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.core.events;
 
-import java.util.Map;
-import java.util.TreeMap;
 
+import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.GenericEvent;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
- * @author nagel
+ * @author droeder
  *
  */
-public class GenericEventImpl implements GenericEvent {
-	private final Map<String,String> atts = new TreeMap<String,String>() ;
-	private final double time ;
-	
-	public GenericEventImpl( String type, double time ) {
-		this.atts.put("time", String.valueOf(time));
-		this.time = time;
-		this.atts.put("type", type );
-	}
+public class GenericEventTest extends MatsimTestCase {
 
-	@Override
-	public Map<String, String> getAttributes() {
-		return atts ;
+	public void testWriteReadXml() {
+		final String TYPE = "GenericEvent";
+		final String KEY1 = "k1";
+		final String VALUE1 = "v1";
+		final EventsFactory factory= new EventsFactoryImpl();
+		final double time = 3601;
+		
+		GenericEvent writeEvent = factory.createGenericEvent(TYPE, time);
+		writeEvent.getAttributes().put(KEY1, VALUE1);
+		
+		GenericEvent readEvent = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", writeEvent);
+		
+		assertEquals(TYPE, readEvent.getAttributes().get("type"));
+		assertEquals(VALUE1, readEvent.getAttributes().get(KEY1));
+		assertEquals(String.valueOf(time), readEvent.getAttributes().get("time"));
+		assertEquals(time, readEvent.getTime());
+		
 	}
-
-	@Override
-	public double getTime() {
-		return time ;
-	}
-
 }
