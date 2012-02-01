@@ -176,6 +176,9 @@ public class Loader {
 		this.ec = new EvacuationConfigGroup(m);
 		this.config.getModules().put("evacuation", this.ec);
 		
+		this.buildings = BuildingsShapeReader.readDataFile(this.ec.getBuildingsFile(), this.ec.getSampleSize());
+		if (true)return;
+		
 		EvacuationScenario sc = this.ec.getEvacuationScanrio();
 
 		if (sc == EvacuationScenario.from_file) {
