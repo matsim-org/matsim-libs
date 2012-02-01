@@ -70,30 +70,15 @@ public class RestrictedTournamentSelector extends NaturalSelectorExt {
 			final ChromosomeDistanceComparator distanceComparator
 			) throws InvalidConfigurationException {
 		super(jgapConfig);
-		//this.windowSize = Math.min(
-		//		configGroup.getRtsWindowSize(),
-		//		//jgapConfig.getPopulationSize());
-		//		configGroup.getPopulationSize());
-		if (configGroup.isProportionnalWindowSize()) {
-			int paramWindowSize = (int) Math.ceil(
-					configGroup.getWindowSizeIntercept() +
-					configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
-			paramWindowSize = Math.min(
-					paramWindowSize,
-					jgapConfig.getPopulationSize());
 
-			this.windowSize = Math.max(1, paramWindowSize);
-		}
-		else {
-			int nToggleGenes =
-				((JointPlanOptimizerJGAPConfiguration) jgapConfig).getNumJointEpisodes();
-			int paramWindowSize = (int) Math.pow(2, nToggleGenes);
+		int paramWindowSize = (int) Math.ceil(
+				configGroup.getWindowSizeIntercept() +
+				configGroup.getWindowSizeCoef() * jgapConfig.getPopulationSize());
+		paramWindowSize = Math.min(
+				paramWindowSize,
+				jgapConfig.getPopulationSize());
 
-			this.windowSize = Math.min(
-					paramWindowSize,
-					jgapConfig.getPopulationSize());
-		}
-
+		this.windowSize = Math.max(1, paramWindowSize);
 
 		this.jgapConfig = jgapConfig;
 		this.random = new Random( jgapConfig.getRandomGenerator().nextLong() + 194534 );

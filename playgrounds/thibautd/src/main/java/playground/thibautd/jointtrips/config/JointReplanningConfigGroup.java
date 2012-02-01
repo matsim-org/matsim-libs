@@ -175,12 +175,6 @@ public class JointReplanningConfigGroup extends Module {
 	 * if true, the population size will be multiplied by (1 + n_jointTrips).
 	 */
 	public static final String MULTIPLICATIVE_POP_SIZE = "isMultiplicativePopSize";
-	/**
-	 * if true, the widow size will be proportional to the population size.
-	 * Otherwise, it will be set to 2 ** nToggleGenes, that is, the number of
-	 * possible combinations of joint trips.
-	 */
-	public static final String PROPORTIONNAL_WINDOW_SIZE = "isProportionnalWindowSize";
 
 	//parameter values, initialized to defaults.
 	private double populationCoef = 1;
@@ -211,7 +205,6 @@ public class JointReplanningConfigGroup extends Module {
 	private boolean inPlaceMutation = true;
 	private double pNonUniform = 0.0;
 	private boolean useOnlyHammingDistance = false;
-	private boolean isProportionnalWindowSize = false;
 	// default: with or without?
 	//private long maxCpuTimePerMember = (long) (10 * 1E9);
 	private long maxCpuTimePerMember = -1;
@@ -314,9 +307,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
 			this.setIsMultiplicativePopulationSize(value);
 		}
-		else if (param_name.equals(PROPORTIONNAL_WINDOW_SIZE)) {
-			this.setIsProportionnalWindowSize(value);
-		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -409,9 +399,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
 			return ""+this.getIsMultiplicativePopulationSize();
 		}
-		else if (param_name.equals(PROPORTIONNAL_WINDOW_SIZE)) {
-			return ""+this.isProportionnalWindowSize();
-		}
 		return null;
 	}
 
@@ -445,7 +432,6 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		this.addParameterToMap(map, MAX_CPU_TIME);
 		this.addParameterToMap(map, MAX_POP_SIZE);
-		this.addParameterToMap(map, PROPORTIONNAL_WINDOW_SIZE);
 		this.addParameterToMap(map, MULTIPLICATIVE_POP_SIZE);
 		return map;
 	}
@@ -794,13 +780,6 @@ public class JointReplanningConfigGroup extends Module {
 		return discreteCrossOverProb;
 	}
 
-	public void setIsProportionnalWindowSize(final String value) {
-		isProportionnalWindowSize = Boolean.parseBoolean( value );
-	}
-
-	public boolean isProportionnalWindowSize() {
-		return isProportionnalWindowSize;
-	}
 
 	// allow setting of GA params "directly"
 	public void setMutationProbability(final double mutationProb) {
