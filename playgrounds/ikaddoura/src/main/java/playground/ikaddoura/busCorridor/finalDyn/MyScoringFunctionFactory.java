@@ -27,6 +27,7 @@ import org.matsim.core.scoring.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
 
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
@@ -56,7 +57,7 @@ public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(new MyMoneyScoringFunction(params));
 		scoringFunctionAccumulator.addScoringFunction(new MyAgentStuckScoringFunction(this.agentStuckScore));
 		scoringFunctionAccumulator.addScoringFunction(new PtLegScoringFunction(plan, inVehWaitHandler.getPersonId2InVehicleTime(), inVehWaitHandler.getPersonId2WaitingTime(), this.TRAVEL_PT_IN_VEHICLE, this.TRAVEL_PT_WAITING));
-//		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
+		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(params));
 		return scoringFunctionAccumulator;
 	}
 
