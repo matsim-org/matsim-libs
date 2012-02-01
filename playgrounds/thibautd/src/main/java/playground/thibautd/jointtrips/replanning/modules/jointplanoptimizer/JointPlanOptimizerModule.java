@@ -34,6 +34,9 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.cost
 
 /**
  * {@link AbstractMultithreadedModule} using {@link JointPlanOptimizer}.
+ * It uses an activity duration encoding, which seems to behave badly with "slipping"
+ * scenario duration.
+ *
  * @author thibautd
  */
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
@@ -87,12 +90,16 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 			controler.getControlerIO().getIterationPath( it ) :
 			controler.getControlerIO().getTempPath();
 
-		return new JointPlanOptimizer(
-					this.configGroup,
+		JointPlanOptimizerSemanticsBuilder semanticsBuilder =
+			new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+					configGroup,
 					controler.getScoringFunctionFactory(),
-					this.legTravelTimeEstimatorFactory,
+					legTravelTimeEstimatorFactory,
 					routingAlgorithm,
-					this.network,
+					network);
+		return new JointPlanOptimizer(
+					configGroup,
+					semanticsBuilder,
 					iterationOutNumber
 					);
 	}

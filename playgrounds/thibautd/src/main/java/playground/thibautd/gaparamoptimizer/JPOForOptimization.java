@@ -38,6 +38,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
@@ -85,10 +86,12 @@ public class JPOForOptimization {
 			new JointPlanOptimizerJGAPConfiguration(
 					plan,
 					configGroup,
-					this.fitnessFunctionFactory,
-					this.legTravelTimeEstimatorFactory,
-					this.routingAlgorithm,
-					this.network,
+					new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+						configGroup,
+						this.fitnessFunctionFactory,
+						this.legTravelTimeEstimatorFactory,
+						this.routingAlgorithm,
+						this.network),
 					this.outputPath,
 					this.randomGenerator.nextLong());
 

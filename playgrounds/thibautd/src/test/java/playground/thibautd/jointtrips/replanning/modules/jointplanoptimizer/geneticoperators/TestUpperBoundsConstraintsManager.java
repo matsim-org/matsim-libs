@@ -41,6 +41,7 @@ import playground.thibautd.jointtrips.population.Clique;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.population.PopulationWithCliques;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.run.JointControler;
 import playground.thibautd.jointtrips.utils.JointControlerUtils;
@@ -104,10 +105,12 @@ public class TestUpperBoundsConstraintsManager {
 		this.jgapConf = new JointPlanOptimizerJGAPConfiguration(
 				this.samplePlan,
 				this.configGroup,
-				this.controler.getScoringFunctionFactory(),
-				this.legTTEstFactory,
-				this.routingAlgo,
-				this.controler.getNetwork(),
+				new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+					this.configGroup,
+					this.controler.getScoringFunctionFactory(),
+					this.legTTEstFactory,
+					this.routingAlgo,
+					this.controler.getNetwork()),
 				outputPath,
 				123);
 

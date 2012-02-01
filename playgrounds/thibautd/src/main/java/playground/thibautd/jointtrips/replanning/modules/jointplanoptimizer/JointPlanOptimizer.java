@@ -40,28 +40,19 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.cost
  * @author thibautd
  */
 public class JointPlanOptimizer extends JointPlanAlgorithm {
-	private final ScoringFunctionFactory fitnessFunctionFactory;
 	private final JointReplanningConfigGroup configGroup;
-	private final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory;
-	private final PlansCalcRoute routingAlgorithm;
-	private final Network network;
 	private final String outputPath;
+	private final JointPlanOptimizerSemanticsBuilder semanticsBuilder;
 
 	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
 	public JointPlanOptimizer(
 			final JointReplanningConfigGroup configGroup,
-			final ScoringFunctionFactory scoringFunctionFactory,
-			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
-			final Network network,
+			final JointPlanOptimizerSemanticsBuilder semanticsBuilder,
 			final String iterationOutputPath
 			) {
-		this.fitnessFunctionFactory = scoringFunctionFactory;
 		this.configGroup = configGroup;
-		this.legTravelTimeEstimatorFactory = legTravelTimeEstimatorFactory;
-		this.routingAlgorithm = routingAlgorithm;
-		this.network = network;
+		this.semanticsBuilder = semanticsBuilder;
 		this.outputPath = iterationOutputPath;
 	}
 
@@ -77,13 +68,10 @@ public class JointPlanOptimizer extends JointPlanAlgorithm {
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
 			new JointPlanOptimizerJGAPConfiguration(
 					plan,
-					this.configGroup,
-					this.fitnessFunctionFactory,
-					this.legTravelTimeEstimatorFactory,
-					this.routingAlgorithm,
-					this.network,
-					this.outputPath,
-					this.randomGenerator.nextLong());
+					configGroup,
+					semanticsBuilder,
+					outputPath,
+					randomGenerator.nextLong());
 
 		Genotype gaPopulation;
 		try {

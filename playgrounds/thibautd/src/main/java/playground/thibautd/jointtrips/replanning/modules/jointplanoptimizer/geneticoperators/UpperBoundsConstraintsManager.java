@@ -34,6 +34,8 @@ import org.matsim.core.utils.collections.Tuple;
  * on the sum of consecutive positive double gene values.
  * It can be used to enforce plan duration, or to keep optimised plans
  * synchronised with unoptimised plans.
+ * <br>
+ * This is useful for encodings based on activity duration.
  *
  * <br>
  * Note that the positiveness of the gene values is not checked.

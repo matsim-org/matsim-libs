@@ -171,10 +171,6 @@ public class JointReplanningConfigGroup extends Module {
 	 * seed may lead to sligthly different results.
 	 */
 	public static final String MAX_CPU_TIME = "maxCpuTimePerMemberNanoSecs";
-	/**
-	 * if true, the population size will be multiplied by (1 + n_jointTrips).
-	 */
-	public static final String MULTIPLICATIVE_POP_SIZE = "isMultiplicativePopSize";
 
 	//parameter values, initialized to defaults.
 	private double populationCoef = 1;
@@ -208,8 +204,6 @@ public class JointReplanningConfigGroup extends Module {
 	// default: with or without?
 	//private long maxCpuTimePerMember = (long) (10 * 1E9);
 	private long maxCpuTimePerMember = -1;
-	//private boolean isMemetic = true;
-	private boolean isMultiplicative = false;
 
 	public JointReplanningConfigGroup() {
 		super(GROUP_NAME);
@@ -304,9 +298,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_POP_SIZE)) {
 			this.setMaxPopulationSize(value);
 		}
-		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
-			this.setIsMultiplicativePopulationSize(value);
-		}
 		else {
 			log.warn("Unrecognized JointReplanning parameter: "+
 					param_name+", of value: "+value+".");
@@ -396,9 +387,6 @@ public class JointReplanningConfigGroup extends Module {
 		else if (param_name.equals(MAX_CPU_TIME)) {
 			return String.valueOf(this.getMaxCpuTimePerMemberNanoSecs());
 		}
-		else if (param_name.equals(MULTIPLICATIVE_POP_SIZE)) {
-			return ""+this.getIsMultiplicativePopulationSize();
-		}
 		return null;
 	}
 
@@ -432,7 +420,6 @@ public class JointReplanningConfigGroup extends Module {
 		this.addParameterToMap(map, WINDOW_SIZE_INTERCEPT);
 		this.addParameterToMap(map, MAX_CPU_TIME);
 		this.addParameterToMap(map, MAX_POP_SIZE);
-		this.addParameterToMap(map, MULTIPLICATIVE_POP_SIZE);
 		return map;
 	}
 
@@ -762,15 +749,6 @@ public class JointReplanningConfigGroup extends Module {
 	public int getMaxPopulationSize() {
 		return (this.maxPopulationSize < 2 ? Integer.MAX_VALUE : this.maxPopulationSize);
 	}
-
-	public void setIsMultiplicativePopulationSize(final String value) {
-		this.isMultiplicative = Boolean.parseBoolean( value );
-	}
-
-	public boolean getIsMultiplicativePopulationSize() {
-		return isMultiplicative;
-	}
-
 
 	public void setDiscreteCrossOverProbability(final String value) {
 		discreteCrossOverProb = Double.parseDouble( value );

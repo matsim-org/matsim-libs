@@ -19,41 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
-import org.jgap.Gene;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.event.EventManager;
-import org.jgap.impl.BooleanGene;
 import org.jgap.impl.ChromosomePool;
-import org.jgap.impl.DoubleGene;
 import org.jgap.impl.StockRandomGenerator;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.PlansCalcRoute;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.population.algorithms.PlanAnalyzeSubtours;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtrips.population.JointActingTypes;
-import playground.thibautd.jointtrips.population.JointActivity;
-import playground.thibautd.jointtrips.population.JointLeg;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.AbstractJointPlanOptimizerFitnessFunction;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.JPOFitnessFunctionFactory;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerPopulationAnalysisOperator;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.UpperBoundsConstraintsManager;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.HammingChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.RestrictedTournamentSelector;
@@ -68,44 +49,25 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 	private static final Logger log =
 		Logger.getLogger(JointPlanOptimizerJGAPConfiguration.class);
 
-	private static final double DAY_DUR = 24*3600d;
+	public static final double DAY_DUR = 24*3600d;
 
 	private static final long serialVersionUID = 1L;
 
-	//TODO: make final
-	private int numEpisodes;
-	private int numToggleGenes;
-	private int numModeGenes;
-	private int nMembers;
-	/**
-	 * stores the number of duration genes relatives to each individual plan in
-	 * the joint plan.
-	 */
-	private final List<Integer> nDurationGenes = new ArrayList<Integer>();
 	private final AbstractJointPlanOptimizerFitnessFunction fitnessFunction;
 	private final IEvolutionMonitor monitor;
 	private final JointPlanOptimizerPopulationAnalysisOperator populationAnalysis;
 	private final ConstraintsManager constraints;
 
-	private final boolean optimizeToggle;
-
 	public JointPlanOptimizerJGAPConfiguration(
 			final JointPlan plan,
 			final JointReplanningConfigGroup configGroup,
-			final ScoringFunctionFactory scoringFunctionFactory,
-			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTravelTimeEstimatorFactory,
-			final PlansCalcRoute routingAlgorithm,
-			final Network network,
+			final JointPlanOptimizerSemanticsBuilder semanticsBuilder,
 			final String outputPath,
-			final long randomSeed
-			) {
+			final long randomSeed) {
 		super(null);
 		Configuration.reset();
 
-		this.optimizeToggle = configGroup.getOptimizeToggle();
-
-		// get info on the plan structure
-		this.countEpisodes(plan, configGroup);
+		int nMembers = plan.getIndividualPlans().size();
 
 		try {
 			// default JGAP objects initializations
@@ -118,59 +80,23 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
 			this.monitor =
-				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup, this.nMembers);
+				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup, nMembers);
 
-			// Chromosome: construction
-			Gene[] sampleGenes =
-				new Gene[this.numToggleGenes + this.numEpisodes +this.numModeGenes];
-			for (int i=0; i < this.numToggleGenes; i++) {
-				sampleGenes[i] = new BooleanGene(this);
-			}
-			for (int i=this.numToggleGenes;
-					i < this.numToggleGenes + this.numEpisodes; i++) {
-				//sampleGenes[i] = new IntegerGene(this, 0, numTimeIntervals);
-				sampleGenes[i] = new DoubleGene(this, 0, DAY_DUR);
-			}
-			for (int i=this.numToggleGenes + this.numEpisodes;
-					i < this.numToggleGenes + this.numEpisodes + this.numModeGenes;
-					i++) {
-				sampleGenes[i] =
-					new JointPlanOptimizerJGAPModeGene(this, configGroup.getAvailableModes());
-			}
-
-			//log.debug("duration genes: "+this.numEpisodes+
-			//		", toggle genes: "+this.numToggleGenes+
-			//		", mode genes: "+this.numModeGenes);
-			this.setSampleChromosome(new JointPlanOptimizerJGAPChromosome(this, sampleGenes));
+			// semantics: builder calls, in the order defined in the javadoc of the interface
+			this.setSampleChromosome( semanticsBuilder.createSampleChromosome( plan , this ) );
+			constraints = semanticsBuilder.createConstraintsManager( plan , this );
+			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
+			this.fitnessFunction = semanticsBuilder.createFitnessFunction( plan , this );
+			this.setFitnessFunction( fitnessFunction );
 
 			// population size: the SPX cross-over requires at least one chromosome
 			// per double dimension.
-			//int popSize = Math.max(configGroup.getPopulationSize(), this.numEpisodes + 1);
-			//int popSize = configGroup.getPopulationSize();
-			double mult = configGroup.getIsMultiplicativePopulationSize() ? 1 + numToggleGenes : 1d;
 			int popSize = Math.min(
 					(int) Math.ceil(
 						configGroup.getPopulationIntercept() +
-						mult *
-						configGroup.getPopulationCoef() * sampleGenes.length),
+						configGroup.getPopulationCoef() * getSampleChromosome().size()),
 					configGroup.getMaxPopulationSize());
-			//log.debug("population size set to "+popSize);
 			this.setPopulationSize( Math.max(2, popSize) );
-
-			this.fitnessFunction = new JPOFitnessFunctionFactory(
-			//this.fitnessFunction = new JointPlanOptimizerFitnessFunction(
-						this,
-						plan,
-						configGroup,
-						legTravelTimeEstimatorFactory,
-						routingAlgorithm,
-						network,
-						this.numToggleGenes,
-						this.numEpisodes,
-						this.nMembers,
-						scoringFunctionFactory).createFitnessFunction();
-			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
-			this.setFitnessFunction(this.fitnessFunction);
 
 			// discarded chromosomes are "recycled" rather than suppressed.
 			this.setChromosomePool(new ChromosomePool());
@@ -190,13 +116,11 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setPreservFittestIndividual(false);
 
 			// genetic operators definitions
-			// creation of the constraints
-			constraints = createConstraintsManager();
 			if (configGroup.getPlotFitness()) {
 				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
 							configGroup.getMaxIterations(),
-							this.nMembers,
+							nMembers,
 							outputPath);
 				this.addGeneticOperator(this.populationAnalysis);
 			}
@@ -216,92 +140,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		} catch (InvalidConfigurationException e) {
 			throw new RuntimeException(e.getMessage());
 		}
-	 }
-
-	private ConstraintsManager createConstraintsManager() {
-		List<Integer> nGenes = new ArrayList<Integer>();
-		List<Double> maxDurations = new ArrayList<Double>();
-
-		for (int nGenesTotal : nDurationGenes) {
-			// the first activity of an individual plan can start at any time
-			// before midnight
-			//nGenes.add( 1 );
-			//maxDurations.add( DAY_DUR );
-
-			// the sum of other activity durations must be below the day duration
-			// (the last one must end before the end of the first one)
-			// nGenes.add( nGenesTotal - 1 );
-			nGenes.add( nGenesTotal );
-			maxDurations.add( DAY_DUR );
-		}
-
-		return new UpperBoundsConstraintsManager( nGenes , maxDurations );
-	}
-
-	/**
-	 * Sets the private variables numEpisodes and numToggleGenes.
-	 * an episode corresponds to an activity and its eventual access trip.
-	 * a joint episode is an episode which involves a joint trip.
-	 */
-	private void countEpisodes(
-			final JointPlan plan,
-			final JointReplanningConfigGroup configGroup) {
-		PlanAnalyzeSubtours analyseSubtours = new PlanAnalyzeSubtours();
-		analyseSubtours.setTripStructureAnalysisLayer(configGroup.getTripStructureAnalysisLayer());
-		Id[] ids = new Id[1];
-		ids = plan.getClique().getMembers().keySet().toArray(ids);
-		//List<JointLeg> alreadyExamined = new ArrayList<JointLeg>();
-		Plan currentPlan;
-		int currentNDurationGenes;
-		boolean sharedRideExamined = false;
-
-		this.numEpisodes = 0;
-		this.numToggleGenes = 0;
-		this.numModeGenes = 0;
-		this.nDurationGenes.clear();
-		this.nMembers = 0;
-
-		for (Id id : ids) {
-			currentPlan = plan.getIndividualPlan(id);
-			currentNDurationGenes = 0;
-			//TODO: use indices (and suppress the booleans)
-			for (PlanElement pe : currentPlan.getPlanElements()) {
-				// count activities for which duration is optimized
-				if ((pe instanceof JointActivity)&&
-						(!((JointActivity) pe).getType().equals(JointActingTypes.PICK_UP))&&
-						(!((JointActivity) pe).getType().equals(JointActingTypes.DROP_OFF)) ) {
-					currentNDurationGenes++;
-
-					if (sharedRideExamined) {
-						//reset the marker
-						sharedRideExamined = false;
-					}
-				} else if ((this.optimizeToggle)&&
-						(pe instanceof JointLeg)&&
-						(((JointLeg) pe).getJoint())&&
-						//(!alreadyExamined.contains(pe))
-						(((JointLeg) pe).getMode().equals(JointActingTypes.PASSENGER))&&
-						(!sharedRideExamined)
-						) {
-					// we are on the first shared ride of a passenger ride
-					this.numToggleGenes++;
-					sharedRideExamined = true;
-
-					//alreadyExamined.addAll(
-					//		((JointLeg) pe).getLinkedElements().values());
-				}
-			}
-			//do not count last activity
-			currentNDurationGenes--;
-			this.numEpisodes += currentNDurationGenes;
-			this.nDurationGenes.add(currentNDurationGenes);
-
-			//finally, count subtours
-			analyseSubtours.run(currentPlan);
-			this.numModeGenes += analyseSubtours.getNumSubtours();
-
-			this.nMembers++;
-		 }
 	 }
 
 	public JointPlanOptimizerDecoder getDecoder() {
