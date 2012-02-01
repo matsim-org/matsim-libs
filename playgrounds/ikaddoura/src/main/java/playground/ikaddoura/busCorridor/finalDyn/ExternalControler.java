@@ -42,20 +42,20 @@ public class ExternalControler {
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final/config_busline_withoutTimeChoice.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final/populationBusCorridor80links.xml"; // for first iteration only
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn/capacity_onePeriod_withoutTimeChoice";
-	static int lastExternalIteration = 8;
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output_finalDyn/fivePeriods_withoutTimeChoice_otherTimes";
+	static int lastExternalIteration = 0;
 	static int lastInternalIteration = 100;
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "DAY", 4, 4*3600, 23*3600); // orderId, id, numberOfBuses, fromTime, toTime
-//	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 2, 6*3600, 10*3600);
-//	TimePeriod p3 = new TimePeriod(3, "NVZ", 0, 10*3600, 14*3600);
-//	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 0, 14*3600, 18*3600);
-//	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 0, 18*3600, 23*3600);
+	TimePeriod p1 = new TimePeriod(1, "SVZ_1", 2, 4*3600, 6*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 12, 6*3600, 12*3600);
+	TimePeriod p3 = new TimePeriod(3, "NVZ", 8, 12*3600, 15*3600);
+	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 12, 15*3600, 21*3600);
+	TimePeriod p5 = new TimePeriod(5, "SVZ_2", 4, 21*3600, 23*3600);
 
 	private final double MONEY_UTILS = 0.14026; // has to be positive, because costs are negative!
-	private double fare = -4.0; // negative!
-	private int capacity = 20; // standing room + seats (realistic values between 19 and 101!)
+	private double fare = -3.5; // negative!
+	private int capacity = 50; // standing room + seats (realistic values between 19 and 101!)
 
 	private int extItNr;
 	private String directoryExtIt;
@@ -85,10 +85,10 @@ public class ExternalControler {
 	private void externalIteration() throws IOException {
 		
 		day.put(p1.getOrderId(), p1);
-//		day.put(p2.getOrderId(), p2);
-//		day.put(p3.getOrderId(), p3);
-//		day.put(p4.getOrderId(), p4);
-//		day.put(p5.getOrderId(), p5);
+		day.put(p2.getOrderId(), p2);
+		day.put(p3.getOrderId(), p3);
+		day.put(p4.getOrderId(), p4);
+		day.put(p5.getOrderId(), p5);
 		
 		ChartFileWriter chartWriter = new ChartFileWriter();
 		TextFileWriter stats = new TextFileWriter();
@@ -158,7 +158,7 @@ public class ExternalControler {
 //				this.setDay(extend("HVZ_2", 60 * 60));
 				
 //				this.setFare(operator.increaseFare(this.getFare(), -1.5)); // absolute value
-				this.setCapacity(operator.increaseCapacity(10)); // absolute value
+//				this.setCapacity(operator.increaseCapacity(10)); // absolute value
 			}
 			
 			log.info("************* EXTERNAL ITERATION "+extIt+" ENDS *************");
