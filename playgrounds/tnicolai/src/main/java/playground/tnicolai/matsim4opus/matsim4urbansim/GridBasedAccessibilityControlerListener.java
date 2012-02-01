@@ -22,7 +22,7 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDis
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 
@@ -43,7 +43,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListener.class);
 	
-	private JobClusterObject[] aggregatedWorkplaces;
+	private ClusterObject[] aggregatedWorkplaces;
 	private int resolutionMeter;
 	
 	private Map<Id, AccessibilityStorage> resultMap;
@@ -56,7 +56,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	 * @param resolutionMeter
 	 * @param benchmark
 	 */
-	public GridBasedAccessibilityControlerListener(JobClusterObject[] aggregatedWorkplaces, int resolutionMeter, Benchmark benchmark){
+	public GridBasedAccessibilityControlerListener(ClusterObject[] aggregatedWorkplaces, int resolutionMeter, Benchmark benchmark){
 		
 		log.info("Initializing GridBasedAccessibilityControlerListener ...");
 		
@@ -143,7 +143,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					// using number of aggregated workplaces as weight for log sum measure
-					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfJobs();
+					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
 
 					double arrivalTime = lcptTravelTimeDistance.getTree().get( nodeID ).getTime();
 					

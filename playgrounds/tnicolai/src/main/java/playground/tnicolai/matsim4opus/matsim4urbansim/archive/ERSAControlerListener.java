@@ -52,7 +52,7 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 
@@ -78,7 +78,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
-	private JobClusterObject[] jobClusterArray;
+	private ClusterObject[] jobClusterArray;
 	private ZoneLayer<ZoneAccessibilityObject> startZones;
 	
 	private SpatialGrid<Double> travelTimeAccessibilityGrid;
@@ -93,7 +93,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * constructor
 	 * @param jobClusterMap
 	 */
-	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, JobClusterObject[] jobClusterArray, 
+	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, ClusterObject[] jobClusterArray, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
 			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
@@ -176,7 +176,7 @@ public class ERSAControlerListener implements ShutdownListener{
 					
 					Node destinationNode = this.jobClusterArray[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
-					int jobCounter = this.jobClusterArray[i].getNumberOfJobs();
+					int jobCounter = this.jobClusterArray[i].getNumberOfObjects();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
 					
@@ -243,7 +243,7 @@ public class ERSAControlerListener implements ShutdownListener{
 			bwWeightedWP.write(jobClusterArray[i].getZoneID() + "," + 
 					 jobClusterArray[i].getCoordinate().getX() + "," +
 					 jobClusterArray[i].getCoordinate().getY() + "," +
-					 jobClusterArray[i].getNumberOfJobs() + "," +
+					 jobClusterArray[i].getNumberOfObjects() + "," +
 					 jobClusterArray[i].getNearestNode().getId()  + "," +
 					 jobClusterArray[i].getNearestNode().getCoord().getX()  + "," +
 					 jobClusterArray[i].getNearestNode().getCoord().getX());
@@ -263,11 +263,11 @@ public class ERSAControlerListener implements ShutdownListener{
 			Id nodeID = jobClusterArray[i].getNearestNode().getId();
 			if(aggregatedWorkplaces.containsKey( nodeID )){
 				WorkplaceObject numWorkplaces = aggregatedWorkplaces.get( nodeID );
-				numWorkplaces.counter += jobClusterArray[i].getNumberOfJobs();
+				numWorkplaces.counter += jobClusterArray[i].getNumberOfObjects();
 			}
 			else{
 				WorkplaceObject numWorkplaces = new WorkplaceObject();
-				numWorkplaces.counter = jobClusterArray[i].getNumberOfJobs();
+				numWorkplaces.counter = jobClusterArray[i].getNumberOfObjects();
 				aggregatedWorkplaces.put(nodeID, numWorkplaces);
 				nearestNode.put( nodeID, jobClusterArray[i].getNearestNode());
 			}
@@ -410,7 +410,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	ZoneLayer<ZoneAccessibilityObject> getStartZones(){
 		return startZones;
 	}
-	JobClusterObject[] getJobObjectMap(){
+	ClusterObject[] getJobObjectMap(){
 		return jobClusterArray;
 	}
 	SpatialGrid<Double> getTravelTimeAccessibilityGrid(){

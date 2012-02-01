@@ -206,6 +206,7 @@ public class Constants {
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
 	public static final String ERSA_PARCEL_ID = "parcel_id";
+	public static final String ERSA_PERSON_ID = "person_id";
 	public static final String ERSA_JOB_ID = "job_id";
 	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
 	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
@@ -223,6 +224,7 @@ public class Constants {
 	public static final String ERSA_CENTROID = "centroid";
 	public static final String ERSA_MEAN = "mean";
 	public static final String ERSA_DERIVATION = "derivation";
+	public static final String ERSA_PERSONS_COUNT = "persons";
 	public static final String ERSA_WORKPLACES_COUNT = "workplaces";
 	
 	/** Spatial IDs and spatial conversion factors */

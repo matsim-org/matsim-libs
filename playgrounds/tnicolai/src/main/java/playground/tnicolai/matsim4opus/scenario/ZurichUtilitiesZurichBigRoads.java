@@ -24,10 +24,11 @@ public class ZurichUtilitiesZurichBigRoads {
 
 	/** scenario/test case identifier */
 	private static String CLOSE_UETLIBERGTUNNEL = "uetlibergtunnel";
-	private static String CLOSE_BIRMSDORFERSTRASSE_OUTERRIM = "birmsdorferstrasseouterrim"; // former birmsdorferstrasse
-	private static String CLOSE_BIRMSDORFERSTRASSE_CITYCENTER = "birmsdorferstrassecitycenter";
+	private static String CLOSE_BIRMENSDORFERSTRASSE_OUTERRIM = "birmsdorferstrasseouterrim"; // former birmsdorferstrasse
+	private static String CLOSE_BIRMENSDORFERSTRASSE_CITYCENTER = "birmsdorferstrassecitycenter";
 	private static String CLOSE_SCHWAMENDINGERTUNNEL = "schwamendingertunnel";
 	private static String CLOSE_MILCHBUCKTUNNEL = "milchbucktunnel";
+	private static String CLOSE_GUBRISTTUNNEL = "gubristtunnel";
 	
 	/** links to remove */
 	private static ArrayList<Id> linksToRemove = null;
@@ -46,14 +47,17 @@ public class ZurichUtilitiesZurichBigRoads {
 					.equalsIgnoreCase(CLOSE_SCHWAMENDINGERTUNNEL))
 				removeSchwamendingerTunnel(network);
 			else if (scenarioArray[i]
-					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE_OUTERRIM))
+					.equalsIgnoreCase(CLOSE_BIRMENSDORFERSTRASSE_OUTERRIM))
 				removeBirmensdorferstrasseOuterRim(network);
 			else if (scenarioArray[i]
-					.equalsIgnoreCase(CLOSE_BIRMSDORFERSTRASSE_CITYCENTER))
+					.equalsIgnoreCase(CLOSE_BIRMENSDORFERSTRASSE_CITYCENTER))
 				removeBirmensdorferstrasseCity(network);
 			else if (scenarioArray[i]
 					.equalsIgnoreCase(CLOSE_MILCHBUCKTUNNEL))
 				removeMilchbuckTunnel(network);
+			else if (scenarioArray[i]
+					.equalsIgnoreCase(CLOSE_GUBRISTTUNNEL))
+				removeGubristTunnel(network);
 		}
 	}
 
@@ -64,7 +68,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 */
 	private static void removeUetliBergTunnel(final Network network) {
 
-		log.info("Closing Uetlibertunnel from network ...");
+		log.info("Closing/removing Uetlibertunnel from network ...");
 		
 		linksToRemove = new ArrayList<Id>();
 		
@@ -83,7 +87,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 */
 	private static void removeBirmensdorferstrasseOuterRim(final Network network) {
 
-		log.info("Closing Birmensdorferstrasse (outer rim) from network ...");
+		log.info("Closing/removing Birmensdorferstrasse (outer rim) from network ...");
 		
 		linksToRemove = new ArrayList<Id>();
 		
@@ -102,7 +106,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 */
 	private static void removeBirmensdorferstrasseCity(final Network network) {
 
-		log.info("Closing Birmensdorferstrasse (near city center) from network ...");
+		log.info("Closing/removing Birmensdorferstrasse (near city center) from network ...");
 		
 		linksToRemove = new ArrayList<Id>();
 		
@@ -120,7 +124,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 * @param network
 	 */
 	private static void removeSchwamendingerTunnel(final Network network) {
-		log.info("Closing Schwamendingertunnel from network ...");
+		log.info("Closing/removing Schwamendingertunnel from network ...");
 
 		linksToRemove = new ArrayList<Id>();
 		
@@ -138,7 +142,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 * @param network
 	 */
 	private static void removeMilchbuckTunnel(final Network network) {
-		log.info("Closing Milchbucktunnel from network ...");
+		log.info("Closing/removing Milchbucktunnel from network ...");
 
 		linksToRemove = new ArrayList<Id>();
 		
@@ -148,6 +152,24 @@ public class ZurichUtilitiesZurichBigRoads {
 		// remove links from network
 		applyScenario(network);
 		log.info("Done closing Milchbucktunnel!");
+	}
+	
+	/**
+	 * removes the Gubristtunnel links from MATSim network
+	 * 
+	 * @param network
+	 */
+	private static void removeGubristTunnel(final Network network){
+		log.info("Closing/removing Gubristtunnel from network ...");
+
+		linksToRemove = new ArrayList<Id>();
+		
+		linksToRemove.add(new IdImpl(37190));
+		linksToRemove.add(new IdImpl(20341));
+
+		// remove links from network
+		applyScenario(network);
+		log.info("Done closing Gubristtunnel!");
 	}
 	
 	/**
@@ -267,6 +289,7 @@ public class ZurichUtilitiesZurichBigRoads {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// for testing
 	}
 
 }

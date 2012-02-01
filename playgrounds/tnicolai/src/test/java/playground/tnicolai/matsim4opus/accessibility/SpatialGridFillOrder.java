@@ -41,8 +41,8 @@ import org.matsim.utils.LeastCostPathTree;
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
@@ -57,7 +57,7 @@ public class SpatialGridFillOrder {
 	 */
 	public static void main(final String[] args) {
 		NetworkImpl network = createNetwork();
-		JobClusterObject[] dummyJobClusterArray = createWorkplaces(network);
+		ClusterObject[] dummyJobClusterArray = createWorkplaces(network);
 		SpatialGrid<Interpolation> grid = network2SpatialGrid(network);
 		Map<Id, Double> resultMap = travelTimeAccessibility(network, dummyJobClusterArray);
 
@@ -174,7 +174,7 @@ public class SpatialGridFillOrder {
 	/**
 	 * creating workplaces ...
 	 */
-	static JobClusterObject[] createWorkplaces(final NetworkImpl network){
+	static ClusterObject[] createWorkplaces(final NetworkImpl network){
 
 		System.out.println("Creating workplaces ...");
 
@@ -197,18 +197,18 @@ public class SpatialGridFillOrder {
 		Id zoneID = new IdImpl(1);
 		Id parcelID1 = new IdImpl(1);
 		Id parcelID2 = new IdImpl(2);
-		List<JobsObject> dummyJobSampleList = new ArrayList<JobsObject>();
+		List<PersonAndJobsObject> dummyJobSampleList = new ArrayList<PersonAndJobsObject>();
 		// 1 job at node 1
-		dummyJobSampleList.add( new JobsObject(new IdImpl(0), parcelID1, zoneID, new CoordImpl(0, 210)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(0), parcelID1, zoneID, new CoordImpl(0, 210)));
 		// 5 jobs at node 7
-		dummyJobSampleList.add( new JobsObject(new IdImpl(2), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new JobsObject(new IdImpl(3), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new JobsObject(new IdImpl(4), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new JobsObject(new IdImpl(5), parcelID2, zoneID, new CoordImpl(200, 110)));
-		dummyJobSampleList.add( new JobsObject(new IdImpl(6), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(2), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(3), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(4), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(5), parcelID2, zoneID, new CoordImpl(200, 110)));
+		dummyJobSampleList.add( new PersonAndJobsObject(new IdImpl(6), parcelID2, zoneID, new CoordImpl(200, 110)));
 
 		// aggregate jobs
-		JobClusterObject[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
+		ClusterObject[] dummyJobClusterArray = dummyUrbanSimPracelModel.aggregateJobsWithSameParcelID(dummyJobSampleList);
 
 		// add nearest network node
 		for(int i = 0; i < dummyJobClusterArray.length; i++){
@@ -232,7 +232,7 @@ public class SpatialGridFillOrder {
 	 * @return
 	 */
 	static Map<Id, Double> travelTimeAccessibility(final NetworkImpl network,
-													final JobClusterObject[] dummyJobClusterArray){
+													final ClusterObject[] dummyJobClusterArray){
 
 		System.out.println("Computing travel time accessibility ...");
 
@@ -267,7 +267,7 @@ public class SpatialGridFillOrder {
 
 				Node destinationNode = dummyJobClusterArray[i].getNearestNode();
 				Id nodeID = destinationNode.getId();
-				int jobCounter = dummyJobClusterArray[i].getNumberOfJobs();
+				int jobCounter = dummyJobClusterArray[i].getNumberOfObjects();
 
 				double arrivalTime = lcptTime.getTree().get( nodeID ).getTime();
 				// with "dummyCostFactor=1" this is the same as: lcptTime.getTree().get( nodeID ).getCost() / 60

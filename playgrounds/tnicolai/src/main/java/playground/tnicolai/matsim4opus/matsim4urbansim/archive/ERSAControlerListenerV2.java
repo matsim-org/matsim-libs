@@ -43,7 +43,7 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDis
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
@@ -61,7 +61,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 
 	private static final Logger log = Logger.getLogger(ERSAControlerListenerV2.class);
 
-	private final JobClusterObject[] aggregatedJobArray;
+	private final ClusterObject[] aggregatedJobArray;
 	private final int resolutionFeet;
 	private final int resolutionMeter;
 
@@ -79,7 +79,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 	 * constructor
 	 * @param aggregatedJobArray
 	 */
-	public ERSAControlerListenerV2(final JobClusterObject[] aggregatedJobArray, final int resolutionFeet, final int resolutionMeter, final Benchmark benchmark){
+	public ERSAControlerListenerV2(final ClusterObject[] aggregatedJobArray, final int resolutionFeet, final int resolutionMeter, final Benchmark benchmark){
 
 		log.info("Initializing ERSAControlerListenerV2 ...");
 
@@ -160,7 +160,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 
 					Node destinationNode = this.aggregatedJobArray[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
-					int jobWeight = this.aggregatedJobArray[i].getNumberOfJobs();
+					int jobWeight = this.aggregatedJobArray[i].getNumberOfObjects();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
 

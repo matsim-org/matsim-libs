@@ -42,10 +42,11 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.CreateHomeWorkHomePlan;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.ids.ZoneId;
+import playground.tnicolai.matsim4opus.utils.io.writer.PopulationCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 /**
@@ -198,6 +199,72 @@ public class ReadFromUrbansimParcelModel {
 			protected double sumXCoordinate = 0.0;
 			protected double sumYCoordinate = 0.0;
 			protected long count = 0;	// denominator of x and y coordinate
+	}
+	
+	/**
+	 * dumps out raw and aggregated population data as csv
+	 * @param parcels
+	 * @param network
+	 */
+	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
+		
+		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_PERSON_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
+		log.info( "Starting to read persons table from " + filename );
+		
+		Map<Id, PersonAndJobsObject> personLocations = new HashMap<Id, PersonAndJobsObject>();
+		Map<Id, ClusterObject> personClusterMap = new HashMap<Id, ClusterObject>();
+		
+		try {
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
+
+			String line = reader.readLine();
+			// get columns for home, work and person id
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, Constants.TAB_SEPERATOR );
+			final int indexParcelID_HOME 	= idxFromKey.get( Constants.PARCEL_ID_HOME );
+			final int indexPersonID			= idxFromKey.get( Constants.PERSON_ID );
+			
+			while ( (line=reader.readLine()) != null ) {
+				
+				String[] parts = line.split( Constants.TAB_SEPERATOR );
+				
+				// check if home location is available
+				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
+					// create new person
+					Id personId = new IdImpl( parts[ indexPersonID ] );
+					// get home location id
+					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
+					
+					
+					if(homeLocation != null){
+						personLocations.put(personId, new PersonAndJobsObject(personId, homeParcelId, null, homeLocation.getCoord()));
+						
+						{ // aggregating persons to nearest network nodes
+							assert( homeLocation.getCoord() != null );
+							Node nearestNode = ((NetworkImpl)network).getNearestNode( homeLocation.getCoord() );
+							assert( nearestNode != null );
+	
+							if( personClusterMap.containsKey( nearestNode.getId() ) ){
+								ClusterObject co = personClusterMap.get( nearestNode.getId() );
+								co.addObject( personId );
+							}
+							else
+								personClusterMap.put( nearestNode.getId(), new ClusterObject(personId,
+																							 homeParcelId,
+																						  	 null,
+																						  	 nearestNode.getCoord(),
+																						  	 nearestNode) );
+						}
+					}
+				}
+			}
+			// dump population data
+			PopulationCSVWriter.writePopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "population.csv", personLocations);
+			// dump aggregated population data
+			PopulationCSVWriter.writeAggregatedPopulationData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+			
+			
+		} catch (Exception e) {e.printStackTrace();}
 	}
 
 	/**
@@ -537,14 +604,14 @@ public class ReadFromUrbansimParcelModel {
 	 * @return HashMap
 	 */
 	@Deprecated
-	public JobClusterObject[] readAndBuildJobsObject(final ActivityFacilitiesImpl parcels, double jobSample){
+	public ClusterObject[] readAndBuildJobsObject(final ActivityFacilitiesImpl parcels, double jobSample){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
-		List<JobsObject> jobSampleList = readJobs(parcels, jobSample);
+		List<PersonAndJobsObject> jobSampleList = readJobs(parcels, jobSample);
 		assert( jobSampleList != null );
 		// this hash map aggregates jobs belonging to the same parcel (key = parcel id)
-		JobClusterObject[] jobClusterArray = aggregateJobsWithSameParcelID(jobSampleList);
+		ClusterObject[] jobClusterArray = aggregateJobsWithSameParcelID(jobSampleList);
 				
 		return jobClusterArray;		
 	}
@@ -555,30 +622,30 @@ public class ReadFromUrbansimParcelModel {
 	 * @param jobObjectMap
 	 */
 	@Deprecated
-	public JobClusterObject[] aggregateJobsWithSameParcelID(List<JobsObject> jobSampleList) {
+	public ClusterObject[] aggregateJobsWithSameParcelID(List<PersonAndJobsObject> jobSampleList) {
 		
 		log.info("Aggregating Job with identical parcel ID ...");
-		Map<Id, JobClusterObject> jobClusterMap = new HashMap<Id, JobClusterObject>();
+		Map<Id, ClusterObject> jobClusterMap = new HashMap<Id, ClusterObject>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 		
 		for(int i = 0; i < jobSampleList.size(); i++){
 			bar.update();
-			JobsObject jo = jobSampleList.get( i );
+			PersonAndJobsObject jo = jobSampleList.get( i );
 			
 			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
-				JobClusterObject jco = jobClusterMap.get( jo.getParcelID() );
-				jco.addJob( jo.getJobID() );
+				ClusterObject jco = jobClusterMap.get( jo.getParcelID() );
+				jco.addObject( jo.getObjectID() );
 			}
 			else
-				jobClusterMap.put( jo.getParcelID(), new JobClusterObject(jo.getJobID(),
+				jobClusterMap.put( jo.getParcelID(), new ClusterObject(jo.getObjectID(),
 																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  jo.getCoord() ) );
 		}
 		
-		JobClusterObject jobClusterArray []  = new JobClusterObject[ jobClusterMap.size() ];
-		Iterator<JobClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
+		ClusterObject jobClusterArray []  = new ClusterObject[ jobClusterMap.size() ];
+		Iterator<ClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
 
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
@@ -595,45 +662,45 @@ public class ReadFromUrbansimParcelModel {
 	 * @param network
 	 * @return
 	 */
-	public JobClusterObject[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network){
+	public ClusterObject[] getAggregatedWorkplaces(final ActivityFacilitiesImpl parcels, final double jobSample, final NetworkImpl network){
 		
 		// readJobs creates a hash map of job with key = job id
 		// this hash map includes jobs according to job sample size
-		List<JobsObject> jobSampleList = readJobs(parcels, jobSample);
+		List<PersonAndJobsObject> jobSampleList = readJobs(parcels, jobSample);
 		assert( jobSampleList != null );
 		
-		// Since the aggregated workplaces in jobClusterArray do not contain the original workplace coordinates of
-		// every single job, this is dumped out here   tnicolai dec'12
+		// Since the aggregated workplaces in jobClusterArray does contain coordinates of their nearest node 
+		// this result is dumped out here    tnicolai dec'12
 		WorkplaceCSVWriter.writeWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
-		Map<Id, JobClusterObject> jobClusterMap = new HashMap<Id, JobClusterObject>();
+		Map<Id, ClusterObject> jobClusterMap = new HashMap<Id, ClusterObject>();
 		
 		ProgressBar bar = new ProgressBar( jobSampleList.size() );
 		
 		for(int i = 0; i < jobSampleList.size(); i++){
 			bar.update();
 			
-			JobsObject jo = jobSampleList.get( i );
+			PersonAndJobsObject jo = jobSampleList.get( i );
 			assert( jo.getCoord() != null );
 			Node nearestNode = network.getNearestNode( jo.getCoord() );
 			assert( nearestNode != null );
 			
 			
 			if( jobClusterMap.containsKey( nearestNode.getId() ) ){
-				JobClusterObject jco = jobClusterMap.get( nearestNode.getId() );
-				jco.addJob( jo.getJobID() );
+				ClusterObject jco = jobClusterMap.get( nearestNode.getId() );
+				jco.addObject( jo.getObjectID() );
 			}
 			else
-				jobClusterMap.put( nearestNode.getId(), new JobClusterObject(jo.getJobID(),
+				jobClusterMap.put( nearestNode.getId(), new ClusterObject(jo.getObjectID(),
 																		  jo.getParcelID(),
 																		  jo.getZoneID(),
 																		  nearestNode.getCoord(),
 																		  nearestNode) );
 		}
 		
-		JobClusterObject jobClusterArray []  = new JobClusterObject[ jobClusterMap.size() ];
-		Iterator<JobClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
+		ClusterObject jobClusterArray []  = new ClusterObject[ jobClusterMap.size() ];
+		Iterator<ClusterObject> jobClusterIterator = jobClusterMap.values().iterator();
 
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
@@ -651,14 +718,14 @@ public class ReadFromUrbansimParcelModel {
 	 * @param jobSample
 	 * @return
 	 */
-	private List<JobsObject> readJobs(final ActivityFacilitiesImpl parcels,
+	private List<PersonAndJobsObject> readJobs(final ActivityFacilitiesImpl parcels,
 			double jobSample) {
 		Id jobID, parcelID, zoneID;
 		Coord coord;
 		JobCounter cnt = new JobCounter();
 		
-		List<JobsObject> jobSampleList = new ArrayList<JobsObject>();
-		List<JobsObject> backupList = new ArrayList<JobsObject>();
+		List<PersonAndJobsObject> jobSampleList = new ArrayList<PersonAndJobsObject>();
+		List<PersonAndJobsObject> backupList = new ArrayList<PersonAndJobsObject>();
 		
 		
 		String filename = Constants.MATSIM_4_OPUS_TEMP + Constants.URBANSIM_JOB_DATASET_TABLE + this.year + Constants.FILE_TYPE_TAB;
@@ -704,11 +771,11 @@ public class ReadFromUrbansimParcelModel {
 						assert( coord != null );
 						
 						if(isBackup){
-							backupList.add( new JobsObject(jobID, parcelID, zoneID, coord) );
+							backupList.add( new PersonAndJobsObject(jobID, parcelID, zoneID, coord) );
 							cnt.backupJobs++;
 						}
 						else
-							jobSampleList.add( new JobsObject(jobID, parcelID, zoneID, coord) );
+							jobSampleList.add( new PersonAndJobsObject(jobID, parcelID, zoneID, coord) );
 					}
 					else
 						cnt.skippedJobs++;	// counting number of skipped jobs ...
@@ -736,7 +803,7 @@ public class ReadFromUrbansimParcelModel {
 	 * @param jobObjectMap
 	 * @param backupList
 	 */
-	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<JobsObject> jobSampleList, List<JobsObject> backupList) {
+	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<PersonAndJobsObject> jobSampleList, List<PersonAndJobsObject> backupList) {
 		
 		cnt.allowedJobs = Math.round( jobSample*cnt.NUrbansimJobs );
 		
@@ -748,7 +815,7 @@ public class ReadFromUrbansimParcelModel {
 			log.info("Size of actual added jobs (" + jobSampleList.size() + ") is smaller than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Adding jobs, stored in backupList ... ");
 			Collections.shuffle( backupList );
 			
-			for(JobsObject jObject : backupList){
+			for(PersonAndJobsObject jObject : backupList){
 				if(cnt.allowedJobs > jobSampleList.size()){
 					jobSampleList.add( jObject );
 					cnt.addedJobsFromBackup++;

@@ -12,6 +12,10 @@ import org.matsim.core.router.util.TravelCost;
 public class TravelDistanceCostCalculator implements TravelCost{
 	private static final Logger log = Logger.getLogger(TravelDistanceCostCalculator.class);
 	
+	/**
+	 * uses network link lengths as costs. 
+	 * lengths are usually given in meter
+	 */
 	@Override
 	public double getLinkGeneralizedTravelCost(final Link link, final double time) {
 		if(link != null)

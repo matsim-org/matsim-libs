@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.InitMATSimScenario;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
@@ -132,6 +132,8 @@ public class MATSim4UrbanSimV2 {
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
 		readUrbansimParcelModel(parcels, zones);
+		// dumping population data as csv
+		dumpPopulation2CSV(parcels, network);
 		
 		// population generation
 		int pc = benchmark.addMeasure("Population construction");
@@ -167,11 +169,24 @@ public class MATSim4UrbanSimV2 {
 	}
 	
 	/**
+	 * read UrbanSim person data and generates 
+	 * 1) a csv file with original data
+	 * 2) a csv file with persons aggregated to their nearest node
+	 * 
+	 * @param parcels
+	 * @param network
+	 */
+	void dumpPopulation2CSV(final ActivityFacilitiesImpl parcels, final Network network){
+		// this is just a stub and does nothing. 
+		// This needs to be implemented/overwritten by an inherited class
+	}
+	
+	/**
 	 * Reads the UrbanSim job table and aggregates jobs with same nearest node 
 	 * 
 	 * @return JobClusterObject[] 
 	 */
-	JobClusterObject[] readUrbansimJobs(ActivityFacilitiesImpl parcels, double jobSample){
+	ClusterObject[] readUrbansimJobs(ActivityFacilitiesImpl parcels, double jobSample){
 		return readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl) scenario.getNetwork());
 	}
 	
@@ -237,7 +252,7 @@ public class MATSim4UrbanSimV2 {
 		// get VolumeLinkAnalyzer by "event.getControler.getVolume... and run getVolumesForLink. that returns an int array with the number of cars per hour on an specific link 
 		// see also http://matsim.org/docs/controler
 		
-		// run the iterations, including the post-processing:
+		// run the iterations, including post-processing:
 		controler.run() ;
 	}
 
@@ -274,7 +289,7 @@ public class MATSim4UrbanSimV2 {
 	 */
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by another class
+		// This needs to be implemented/overwritten by an inherited class
 	}
 	
 	/**
@@ -297,7 +312,7 @@ public class MATSim4UrbanSimV2 {
 	 */
 	void modifyNetwork(Network network){
 		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by another class
+		// This needs to be implemented/overwritten by an inherited class
 	}
 	
 	/**
@@ -308,7 +323,7 @@ public class MATSim4UrbanSimV2 {
 	 */
 	void modifyPopulation(Population population){
 		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by another class
+		// This needs to be implemented/overwritten by an inherited class
 	}
 	
 	/**

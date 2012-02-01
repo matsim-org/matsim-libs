@@ -47,7 +47,7 @@ import playground.tnicolai.matsim4opus.gis.io.FeatureKMLWriter;
 import playground.tnicolai.matsim4opus.gis.io.FeatureSHP;
 import playground.tnicolai.matsim4opus.matsim4urbansim.MATSim4UrbanSim;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.WorkplaceObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
@@ -415,7 +415,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		// gather all workplaces
 		int jmID = benchmark.addMeasure("Creating Destinations (jobObjectMap)");
 		// JobClusterObject[] jobClusterArray = readFromUrbansim.readAndBuildJobsObject(parcels, jobSample); // tnicolai: old version
-		JobClusterObject[] jobClusterArray = readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl)scenario.getNetwork()); // this aggreagtes workplaces directly to their nearest node 
+		ClusterObject[] jobClusterArray = readFromUrbansim.getAggregatedWorkplaces(parcels, jobSample, (NetworkImpl)scenario.getNetwork()); // this aggreagtes workplaces directly to their nearest node 
 		benchmark.stoppMeasurement(jmID);
 		logger.info("Creating job destinations (jobObjectMap) took " + benchmark.getDurationInSeconds(jmID) + "seconds.");
 		

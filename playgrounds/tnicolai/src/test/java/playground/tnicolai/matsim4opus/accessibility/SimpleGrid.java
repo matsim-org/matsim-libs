@@ -13,7 +13,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
@@ -29,7 +29,7 @@ public class SimpleGrid {
 		
 		
 		NetworkImpl network = SpatialGridFillOrder.createNetwork();
-		JobClusterObject[] dummyJobClusterArray = SpatialGridFillOrder.createWorkplaces(network);
+		ClusterObject[] dummyJobClusterArray = SpatialGridFillOrder.createWorkplaces(network);
 		Map<Id, Double> resultMap = SpatialGridFillOrder.travelTimeAccessibility(network, dummyJobClusterArray);
 		
 		SquareLayer[][] mySimpleGrid = network2SimpleGrid( network, resultMap );

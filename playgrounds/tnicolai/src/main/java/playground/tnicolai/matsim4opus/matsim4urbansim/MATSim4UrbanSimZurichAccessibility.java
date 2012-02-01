@@ -119,6 +119,19 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	}
 	
 	/**
+	 * read UrbanSim person data and generates 
+	 * 1) a csv file with original data
+	 * 2) a csv file with persons aggregated to their nearest node
+	 * 
+	 * @param parcels
+	 * @param network
+	 */
+	@Override
+	void dumpPopulation2CSV(final ActivityFacilitiesImpl parcels, final Network network){
+		readFromUrbansim.readAndDumpPersons2CSV(parcels, network);
+	}
+	
+	/**
 	 * This modifies the MATSim network according to the given
 	 * test parameter in the MATSim config file (from UrbanSim)
 	 */

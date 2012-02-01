@@ -18,7 +18,7 @@ import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDis
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneBasedAccessibilityCSVWriter;
 
@@ -27,7 +27,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListener.class);
 	
 	private ActivityFacilitiesImpl zones; 
-	private JobClusterObject[] aggregatedWorkplaces;
+	private ClusterObject[] aggregatedWorkplaces;
 	
 	private Benchmark benchmark;
 	
@@ -38,7 +38,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 	 * @param benchmark
 	 */
 	public ZoneBasedAccessibilityControlerListener(ActivityFacilitiesImpl zones, 
-												   JobClusterObject[] aggregatedWorkplaces, 
+												   ClusterObject[] aggregatedWorkplaces, 
 												   Benchmark benchmark){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListener ...");
@@ -117,7 +117,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 					Node destinationNode = this.aggregatedWorkplaces[toIndex].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					// using number of aggregated workplaces as weight for log sum measure
-					int jobWeight = this.aggregatedWorkplaces[toIndex].getNumberOfJobs();
+					int jobWeight = this.aggregatedWorkplaces[toIndex].getNumberOfObjects();
 
 					double arrivalTime = lcptTravelTimeDistance.getTree().get( nodeID ).getTime();
 					

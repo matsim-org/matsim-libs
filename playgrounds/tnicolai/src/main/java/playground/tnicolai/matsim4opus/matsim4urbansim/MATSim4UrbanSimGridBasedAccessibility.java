@@ -6,7 +6,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
@@ -74,7 +74,7 @@ public class MATSim4UrbanSimGridBasedAccessibility extends MATSim4UrbanSim{
 		log.info("### DONE with demand generation from UrbanSim ###");
 		
 		// gather all workplaces, workplaces are aggregated with respect to their nearest Node
-		JobClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
+		ClusterObject[] aggregatedWorkplaces = readUrbanSimData.getAggregatedWorkplaces(parcels, jobSample, network);
 		
 		// Running the controler
 		Controler controler = new Controler(scenario);

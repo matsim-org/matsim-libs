@@ -51,7 +51,7 @@ import playground.tnicolai.matsim4opus.gis.ZoneLayer;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 
 import com.vividsolutions.jts.geom.Point;
@@ -97,7 +97,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
-	private JobClusterObject[] aggregatedWorkplaces;
+	private ClusterObject[] aggregatedWorkplaces;
 	private ZoneLayer<ZoneAccessibilityObject> startZones;
 	
 	private SpatialGrid<Double> travelTimeAccessibilityGrid;
@@ -112,7 +112,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	 * constructor
 	 * @param jobClusterMap
 	 */
-	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, JobClusterObject[] aggregatedWorkplaces, 
+	ERSAControlerListener(ZoneLayer<ZoneAccessibilityObject> startZones, ClusterObject[] aggregatedWorkplaces, 
 			SpatialGrid<Double> travelTimeAccessibilityGrid, SpatialGrid<Double> travelCostAccessibilityGrid, 
 			SpatialGrid<Double> travelDistanceAccessibilityGrid, Benchmark benchmark){
 		
@@ -199,7 +199,7 @@ public class ERSAControlerListener implements ShutdownListener{
 					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					// using number of aggregated workplaces as weight for log sum measure
-					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfJobs();
+					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
 
 					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
 					
@@ -273,7 +273,7 @@ public class ERSAControlerListener implements ShutdownListener{
 		bwAggregatedWP.newLine();
 		for(int i = 0; i < aggregatedWorkplaces.length; i++){
 			bwAggregatedWP.write(aggregatedWorkplaces[i].getZoneID() + "," + 
-						   	   aggregatedWorkplaces[i].getNumberOfJobs() + "," +
+						   	   aggregatedWorkplaces[i].getNumberOfObjects() + "," +
 					 		   aggregatedWorkplaces[i].getCoordinate().getX() + "," +
 					 		   aggregatedWorkplaces[i].getCoordinate().getY() + "," +
 					 		   aggregatedWorkplaces[i].getNearestNode().getId());
@@ -420,7 +420,7 @@ public class ERSAControlerListener implements ShutdownListener{
 	public ZoneLayer<ZoneAccessibilityObject> getStartZones(){
 		return startZones;
 	}
-	public JobClusterObject[] getJobObjectMap(){
+	public ClusterObject[] getJobObjectMap(){
 		return aggregatedWorkplaces;
 	}
 	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){

@@ -8,8 +8,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.JobsObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
 
 public class WorkplaceCSVWriter {
 	
@@ -20,7 +20,7 @@ public class WorkplaceCSVWriter {
 	 * @param file
 	 * @param jobClusterArray
 	 */
-	public static void writeAggregatedWorkplaceData2CSV(String file, JobClusterObject[] jobClusterArray){
+	public static void writeAggregatedWorkplaceData2CSV(final String file, final ClusterObject[] jobClusterArray){
 		
 		try{
 			log.info("Dumping aggregated workplace information as csv to " + file + " ...");
@@ -41,7 +41,7 @@ public class WorkplaceCSVWriter {
 									 jobClusterArray[i].getNearestNode().getId()  + "," +
 									 jobClusterArray[i].getCoordinate().getX() + "," +
 									 jobClusterArray[i].getCoordinate().getY() + "," +
-									 jobClusterArray[i].getNumberOfJobs());
+									 jobClusterArray[i].getNumberOfObjects());
 				bwAggregatedWP.newLine();
 			}
 			
@@ -59,7 +59,7 @@ public class WorkplaceCSVWriter {
 	 * @param file
 	 * @param jobSampleList
 	 */
-	public static void writeWorkplaceData2CSV(String file, List<JobsObject> jobSampleList){
+	public static void writeWorkplaceData2CSV(final String file, final List<PersonAndJobsObject> jobSampleList){
 		
 		try{
 			log.info("Dumping workplace information as csv to " + file + " ...");
@@ -73,13 +73,13 @@ public class WorkplaceCSVWriter {
 								 Constants.ERSA_Y_COORDINATE);
 			bwWorkplaces.newLine();
 			
-			Iterator<JobsObject> jobIterator = jobSampleList.iterator();
+			Iterator<PersonAndJobsObject> jobIterator = jobSampleList.iterator();
 
 			while(jobIterator.hasNext()){
 				
-				JobsObject job = jobIterator.next();
+				PersonAndJobsObject job = jobIterator.next();
 				
-				bwWorkplaces.write(job.getJobID() + "," + 
+				bwWorkplaces.write(job.getObjectID() + "," + 
 								   job.getParcelID() + "," +
 								   job.getZoneID() + "," +
 								   job.getCoord().getX() + "," +

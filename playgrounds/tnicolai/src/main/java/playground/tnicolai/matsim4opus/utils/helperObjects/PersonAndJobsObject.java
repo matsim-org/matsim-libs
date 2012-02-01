@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.Id;
  * @author thomas
  *
  */
-public class JobsObject {
+public class PersonAndJobsObject {
 	
-	private Id jobID = null;
+	private Id objectID = null; // either a person or job id
 	private Id parcelID = null;
 	private Id zoneID = null;
 	private Coord coordinate = null;
@@ -40,13 +40,13 @@ public class JobsObject {
 	/**
 	 * constructor
 	 * 
-	 * @param jobID
+	 * @param objectID
 	 * @param parcelID
 	 * @param zoneID
 	 * @param coord
 	 */
-	public JobsObject(final Id jobID, final Id parcelID, final Id zoneID, final Coord coord){
-		this.jobID 		= jobID;
+	public PersonAndJobsObject(final Id objectID, final Id parcelID, final Id zoneID, final Coord coord){
+		this.objectID 	= objectID;
 		this.parcelID 	= parcelID;
 		this.zoneID 	= zoneID;
 		this.coordinate = coord;
@@ -54,8 +54,8 @@ public class JobsObject {
 	
 	// getter methods
 	
-	public Id getJobID(){
-		return this.jobID;
+	public Id getObjectID(){
+		return this.objectID;
 	}
 
 	public Id getParcelID(){
