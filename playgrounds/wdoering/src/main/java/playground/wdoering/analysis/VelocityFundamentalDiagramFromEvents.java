@@ -106,7 +106,7 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 			ys[pos++] = t.getSecond();
 		}
 
-		chart.addSeries("model", xs, ys);
+		chart.addSeries("Bottleneck Experiment (Social Force Model; w=1; p=49; waw=7)", xs, ys);
 		chart.saveAsPng(dir + "/fnd.png", 800, 400);
 	}
 
@@ -158,8 +158,8 @@ public class VelocityFundamentalDiagramFromEvents implements XYVxVyEventsHandler
 //		String eventsFile = "C:\\temp\\bottleneck\\output\\ITERS\\it.0\\0.events.xml.gz";
 //		String config = "C:\\temp\\bottleneck\\input\\config.xml";
 		
-		String eventsFile = "C:\\temp\\bottleneckoutput\\ITERS\\it.0\\0.events.xml.gz";
-		String config = "C:\\temp\\bn_social_force_model_old\\bottleneck\\input\\config.xml";
+		String eventsFile = "C:/temp/bottleneck/output/ITERS/it.0/0.events.xml.gz";
+		String config = "C:/temp/bottleneck/input/config.xml";
 
 		Config c = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(c);
