@@ -1,16 +1,15 @@
 package playground.michalm.demand;
 
 import java.io.*;
-import java.util.*;
 
-import javax.naming.*;
-import javax.xml.parsers.*;
+import javax.naming.ConfigurationException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.xml.sax.*;
+import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.array2d.*;
+import pl.poznan.put.util.array2d.Array2DReader;
 
 
 public class ODDemandGenerator
@@ -18,15 +17,24 @@ public class ODDemandGenerator
 {
     // private static final Logger log = Logger.getLogger(ODDemandGenerator.class);
 
-    private int zoneCount;
-    private int[][] odMatrix;
+    private final int zoneCount;
+    private final int[][] odMatrix;
+
+    private final double hours; // time of simulation (i.e. 1.5 hours)
+    private final double flowCoeff; // artificial increase/decrease of the flow
+    private final double taxiProbability; // for internal flow (i.e. between internal zones: 0-8)
 
 
     public ODDemandGenerator(String networkFileName, String zonesXMLFileName,
-            String zonesShpFileName, String odMatrixFileName, String idField)
+            String zonesShpFileName, String odMatrixFileName, String idField, double hours,
+            double flowCoeff, double taxiProbability)
         throws IOException, SAXException, ParserConfigurationException
     {
         super(networkFileName, zonesXMLFileName, zonesShpFileName, idField);
+
+        this.hours = hours;
+        this.flowCoeff = flowCoeff;
+        this.taxiProbability = taxiProbability;
 
         // read OD matrix
         zoneCount = fileOrderedZones.size();
@@ -47,28 +55,20 @@ public class ODDemandGenerator
             for (int j = 0; j < zoneCount; j++) {
                 Zone dZone = fileOrderedZones.get(j);
 
-                int odFlow = odMatrix[i][j] / 2;// artificially reduced
+                int odFlow = (int)Math.round(flowCoeff * odMatrix[i][j]);
+                boolean isInternalFlow = i < 9 && j < 9;
 
-                for (int k = 0; k < 2 * odFlow; k++) {// "2 * odFlow" because for 2 hours
-                    // generatePlans for the OD pair
-
-                    // if (!(k % 100 == 0 && i < 9 && j < 9)) {
-                    // continue;
-                    // }
-
+                for (int k = 0; k < hours * odFlow; k++) {
                     Plan plan = createPlan();
 
                     Coord oCoord = getRandomCoordInZone(oZone);
                     Activity act = createActivity(plan, "dummy", oCoord);
 
                     double timeStep = 3600. / odFlow;
-
                     act.setEndTime((int)uniform.nextDoubleFromTo(k * timeStep, (k + 1) * timeStep));
 
-                    // x% probability of choosing taxi for internal travels
-                    // (i.e. between internal zones: 0-8)
-                    double taxiProbability = 0.01;
-                    if (i < 9 && j < 9 && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
+                    if (isInternalFlow && taxiProbability > 0
+                            && uniform.nextDoubleFromTo(0, 1) < taxiProbability) {
                         plan.addLeg(pf.createLeg("taxi"));
                     }
                     else {
@@ -86,40 +86,20 @@ public class ODDemandGenerator
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
-        String dirName;
+        String dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
+        String networkFileName = dirName + "network.xml";
+        String zonesXMLFileName = dirName + "zones.xml";
+        String zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
+        String odMatrixFileName = dirName + "odMatrix.dat";
+        String plansFileName = dirName + "plans.xml";
+        String idField = "NO";
 
-        String networkFileName;
-        String zonesXMLFileName;
-        String zonesShpFileName;
-        String odMatrixFileName;
-        String plansFileName;
-        String idField;
-
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\mielec-nowe-OD\\";
-            networkFileName = dirName + "network.xml";
-            zonesXMLFileName = dirName + "zones.xml";
-            zonesShpFileName = dirName + "GIS\\zones_with_no_zone.SHP";
-            odMatrixFileName = dirName + "odMatrix.dat";
-            plansFileName = dirName + "plans.xml";
-            idField = "NO";
-        }
-        else if (args.length == 7) {
-            dirName = args[0];
-            networkFileName = dirName + args[1];
-            zonesXMLFileName = dirName + args[2];
-            zonesShpFileName = dirName + args[3];
-            odMatrixFileName = dirName + args[4];
-            plansFileName = dirName + args[5];
-            idField = args[6];
-        }
-        else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
-        }
+        double hours = 2;
+        double flowCoeff = 0.5;
+        double taxiProbability = 0.01;
 
         ODDemandGenerator dg = new ODDemandGenerator(networkFileName, zonesXMLFileName,
-                zonesShpFileName, odMatrixFileName, idField);
+                zonesShpFileName, odMatrixFileName, idField, hours, flowCoeff, taxiProbability);
         dg.generate();
         dg.write(plansFileName);
     }
