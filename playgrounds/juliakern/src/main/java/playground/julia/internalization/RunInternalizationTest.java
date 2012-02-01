@@ -55,6 +55,9 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.benjamin.emissions.EmissionModule;
 import playground.benjamin.emissions.types.HbefaVehicleCategory;
+import playground.benjamin.internalization.EmissionScoringFunctionFactory;
+import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
 /**
  * @author benjamin
