@@ -26,9 +26,9 @@ public class GridBasedAccessibilityCSVWriter {
 			accessibilityDataWriter.write( Constants.ERSA_NEARESTNODE_ID + "," +
 												Constants.ERSA_NEARESTNODE_X_COORD + "," +
 												Constants.ERSA_NEARESTNODE_Y_COORD + "," + 
-												Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
-												Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
-												Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
+												Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+												Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+												Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");
@@ -41,23 +41,23 @@ public class GridBasedAccessibilityCSVWriter {
 	/**
 	 * writing the accessibility measures into csv file
 	 * @param node
-	 * @param travelTimeAccessibility
-	 * @param travelCostAccessibility
-	 * @param travelDistanceAccessibility
+	 * @param congestedTravelTimesCarLogSum
+	 * @param freespeedTravelTimesCarLogSum
+	 * @param travelTimesWalkLogSum
 	 */
 	public static void write(Node node, 
-							 double travelTimeAccessibility, 
-							 double travelCostAccessibility, 
-							 double travelDistanceAccessibility){
+							 double congestedTravelTimesCarLogSum, 
+							 double freespeedTravelTimesCarLogSum, 
+							 double travelTimesWalkLogSum){
 		
 		try{
 			assert(GridBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( node.getId() + "," + 
 												node.getCoord().getX() + "," +  
 												node.getCoord().getY() + "," + 
-												travelTimeAccessibility + "," + 
-												travelCostAccessibility + "," + 
-												travelDistanceAccessibility );
+												congestedTravelTimesCarLogSum + "," + 
+												freespeedTravelTimesCarLogSum + "," + 
+												travelTimesWalkLogSum );
 			accessibilityDataWriter.newLine();
 		}
 		catch(Exception e){

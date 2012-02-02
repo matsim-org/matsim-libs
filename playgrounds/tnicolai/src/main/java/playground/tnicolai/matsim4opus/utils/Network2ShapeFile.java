@@ -37,14 +37,14 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 public class Network2ShapeFile {
 
 	public static void main(String[] args) {
-		String netFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/merged_zurich_network.xml";
+		String netFile = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 		// WGS84 isn't correct and may affects the transformation, but this isn't important to see the link id's
 		// use CH1903_LV03_GT for switzerland
-		new Links2ESRIShape(net, "/Users/thomas/Development/opus_home/data/zurich_parcel/shapefiles/network/merged_zurich_network.shp", TransformationFactory.CH1903_LV03_GT).write();
+		new Links2ESRIShape(net, "/Users/thomas/Development/opus_home/data/zurich_parcel/shapefiles/network/ivtch-osm.shp", TransformationFactory.CH1903_LV03_GT).write();
 	}
 
 }

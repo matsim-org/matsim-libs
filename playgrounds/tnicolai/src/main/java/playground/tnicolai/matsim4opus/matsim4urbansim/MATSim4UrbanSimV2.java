@@ -79,8 +79,12 @@ public class MATSim4UrbanSimV2 {
 	ReadFromUrbansimParcelModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
 	Benchmark benchmark = null;
+	// needed for aggregating workplaces
+	double jobSample = 1.;
 	// indicates if MATSim run was successful
 	static boolean isSuccessfulMATSimRun = Boolean.FALSE;
+	// needed for controler listerners
+	ClusterObject[] aggregatedWorkplaces = null;
 	
 	
 	/**
@@ -276,10 +280,14 @@ public class MATSim4UrbanSimV2 {
 																					  parcels) ); 
 		
 		if(computeZoneBasedAccessibilities)
+			
+			// init aggregatedWorkplaces
+			if(aggregatedWorkplaces == null)
+				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
 			// creates zone based table of log sums (workplace accessibility)
 			// uses always a 100% jobSample size (see readUrbansimJobs below)
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
-																						readUrbansimJobs(parcels, 1.), 
+																						aggregatedWorkplaces, 
 																						benchmark));
 	}
 	

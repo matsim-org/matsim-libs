@@ -54,12 +54,12 @@ public class FixedSizeGrid {
 	
 	/**
 	 * creates numbers 
-	 * @param resolutionMeter
+	 * @param gridSizeInMeter
 	 * @param network
 	 * @param resultMap
 	 * @param coarseningSteps
 	 */
-	public FixedSizeGrid(final double resolutionMeter, final NetworkImpl network, final Map<Id, AccessibilityStorage> resultMap, int coarseningSteps){
+	public FixedSizeGrid(final double gridSizeInMeter, final NetworkImpl network, final Map<Id, AccessibilityStorage> resultMap, int coarseningSteps){
 		
 		logger.info("Initializing Grid ...");
 		
@@ -70,17 +70,17 @@ public class FixedSizeGrid {
 		else
 			this.coarseningSteps = coarseningSteps;
 		
-		this.resolution = resolutionMeter;
+		this.resolution = gridSizeInMeter;
 		
 		assert(network != null);
 		NetworkBoundary boundary = UtilityCollection.getNetworkBoundary(network);
 		
 		this.minX = boundary.getMinX();
 		this.minY = boundary.getMinY();
-		this.rowPoints = (int)Math.ceil( boundary.getYLength() / resolutionMeter ) + 1;
-		this.colPoints = (int)Math.ceil( boundary.getXLength() / resolutionMeter ) + 1;
-		this.maxX = minX + ((colPoints - 1) * resolutionMeter); // round up max x-coordinate 
-		this.maxY = minY + ((rowPoints - 1) * resolutionMeter); // round up max y-coordinate
+		this.rowPoints = (int)Math.ceil( boundary.getYLength() / gridSizeInMeter ) + 1;
+		this.colPoints = (int)Math.ceil( boundary.getXLength() / gridSizeInMeter ) + 1;
+		this.maxX = minX + ((colPoints - 1) * gridSizeInMeter); // round up max x-coordinate 
+		this.maxY = minY + ((rowPoints - 1) * gridSizeInMeter); // round up max y-coordinate
 		
 		logger.info("Determined area:");
 		logger.info("Y Min: " + this.minY);
@@ -97,11 +97,11 @@ public class FixedSizeGrid {
 		
 		for(int col = 0; col < colPoints; col++){
 			
-			xCoord = minX + (col * resolutionMeter);
+			xCoord = minX + (col * gridSizeInMeter);
 			
 			for(int row = 0; row < rowPoints; row++){
 				
-				yCoord = minY + (row * resolutionMeter);
+				yCoord = minY + (row * gridSizeInMeter);
 
 				// create coordinate from current x, y values
 				Coord coordinate = new CoordImpl(xCoord, yCoord);
@@ -133,7 +133,7 @@ public class FixedSizeGrid {
 		logger.info("The matrix has a relolution of " + currResolution + " meter.");
 		
 		try{
-			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
+			BufferedWriter ttWriter = IOUtils.getBufferedWriter(Constants.MATSIM_4_OPUS_TEMP + currResolution + Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + Constants.FILE_TYPE_TXT);
 			
 			// writing x coordinates (header)
 			for(int col = 0; (col < colPoints); col++ ){
@@ -169,7 +169,7 @@ public class FixedSizeGrid {
 					
 					
 					ttWriter.write("\t");
-					ttWriter.write( String.valueOf( grid[row][col].getTravelTimeAccessibility() ));
+					ttWriter.write( String.valueOf( grid[row][col].getCongestedTravelTimeAccessibility() ));
 				}
 				ttWriter.newLine();
 			}

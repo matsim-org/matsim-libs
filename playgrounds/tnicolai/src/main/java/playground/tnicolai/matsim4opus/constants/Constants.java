@@ -218,6 +218,9 @@ public class Constants {
 	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
 	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
 	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	public static final String ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
+	public static final String ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
+	public static final String ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
 	public static final String ERSA_CENTROID_ACCESSIBILITY = "centroid_accessibility";
 	public static final String ERSA_MEAN_ACCESSIBILITY = "mean_accessibility";
 	public static final String ERSA_DERIVATION_ACCESSIBILITY = "derivation_accessibility";

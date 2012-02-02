@@ -325,17 +325,17 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
 			int ttID = benchmark.addMeasure("Writing TravelTime SpatialGrid-Table" , Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelTimeAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(myListener.getCongestedTravelTimeAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(ttID);
 			logger.info("Writing TravelTime SpatialGrid-Table took " + benchmark.getDurationInSeconds(ttID) + " seconds.");
 			
 			int tcID = benchmark.addMeasure("Writing TravelCostSpatialGrid-Table", Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelCostAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(myListener.getFreespeedTravelTimeAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(tcID);
 			logger.info("Writing TravelCost SpatialGrid-Table took " + benchmark.getDurationInSeconds(tcID) + " seconds.");
 			
 			int tdID = benchmark.addMeasure("Writing TravelDistanceSpatialGrid-Table", Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT, false);
-			sgTableWriter.write(myListener.getTravelDistanceAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(myListener.getWalkTravelTimeAccessibilityGrid(), Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + gridSizeInMeter + Constants.FILE_TYPE_TXT);
 			benchmark.stoppMeasurement(tdID);
 			logger.info("Writing TravelDistance SpatialGrid-Table took " + benchmark.getDurationInSeconds(tdID) + " seconds.");
 			
@@ -362,9 +362,9 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		
 		for(Zone<ZoneAccessibilityObject> zone : startZones.getZones()) {
 			geometries.add(zone.getGeometry());
-			travelTimeValues.put(zone.getGeometry(), zone.getAttribute().getTravelTimeAccessibility());
-			travelCostValues.put(zone.getGeometry(), zone.getAttribute().getTravelCostAccessibility());
-			travelDistanceValues.put(zone.getGeometry(), zone.getAttribute().getTravelDistanceAccessibility());
+			travelTimeValues.put(zone.getGeometry(), zone.getAttribute().getCongestedTravelTimeAccessibility());
+			travelCostValues.put(zone.getGeometry(), zone.getAttribute().getFreespeedTravelTimeAccessibility());
+			travelDistanceValues.put(zone.getGeometry(), zone.getAttribute().getWalkTravelTimeAccessibility());
 		}
 		
 		// writing travel time accessibility kmz file

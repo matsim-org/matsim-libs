@@ -393,13 +393,15 @@ public class InitMATSimScenario {
 	private void initStrategy(){
 		log.info("Setting strategy to config...");
 		// configure strategies for re-planning tnicolai: make configurable
-		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5); // 5
+		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5);
 		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator");
 		timeAlocationMutator.setProbability(0.1);
 		timeAlocationMutator.setDisableAfter(100);
 		scenario.getConfig().strategy().addStrategySettings(timeAlocationMutator);
+		// change mutation range to 2h. tnicolai:feb'12
+		scenario.getConfig().setParam("TimeAllocationMutator", "mutationRange", "7200"); 
 		
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
 		changeExpBeta.setModuleName("ChangeExpBeta");

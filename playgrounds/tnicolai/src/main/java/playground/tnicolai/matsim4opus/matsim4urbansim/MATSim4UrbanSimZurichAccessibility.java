@@ -34,13 +34,19 @@ import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesZurichBigRoads;
+import playground.tnicolai.matsim4opus.scenario.ZurichUtilities;
+import playground.tnicolai.matsim4opus.scenario.ZurichUtilitiesIVTCHNetwork;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObject;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
+ * This class extends MATSim4UrbanSimV2 including two extra accessibility measurements
+ * 1) Grid-based accessibility using a shape file (better for plotting)
+ * 2) Grid-based accessibility using network only, dumping out different girdsize resolutions (easier to use)
+ * tnicolai feb'12
+ * 
  * 
  * @author thomas
  *
@@ -52,7 +58,6 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	
 	private String shapeFile = null;
 	private double gridSizeInMeter = -1;
-	double jobSample = 1.;
 	
 	/**
 	 * constructor
@@ -148,8 +153,8 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 		}
 		else{
 			String scenarioArray[] = testParameter.split(",");
-			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
-			// ZurichUtilitiesOSMNetwork.modifyNetwork(network, scenarioArray);
+			ZurichUtilitiesIVTCHNetwork.modifyNetwork(network, scenarioArray);
+//			ZurichUtilitiesZurichBigRoads.modifyNetwork(network, scenarioArray);
 			log.info("Done modifying network.");
 			log.info("");
 		}
@@ -161,8 +166,7 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	 */
 	@Override
 	void modifyPopulation(Population population){
-		ZurichUtilitiesZurichBigRoads.deleteRoutesContainingRemovedLinks(population);
-		// ZurichUtilitiesOSMNetwork.deleteRoutesContainingRemovedLinks(population);
+		ZurichUtilities.deleteRoutesContainingRemovedLinks(population);
 	}
 	
 	/**
@@ -174,22 +178,38 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 		
 		// tnicolai: make this configurable 
 		boolean computeGridBasedAccessibilities = true;
+		boolean computeGridBasedAccessibilitiesNetwork = false;
 		
 		if(computeGridBasedAccessibilities){
+			
+			// init aggregatedWorkplaces
+			if(aggregatedWorkplaces == null)
+				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
 			
 			Geometry boundary = GridUtils.getBoundary(shapeFile);
 			ZoneLayer<ZoneAccessibilityObject> startZones = GridUtils.createGridLayerByGridSize(gridSizeInMeter, boundary);
 			
-			SpatialGrid<Double> travelTimeAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
-			SpatialGrid<Double> travelCostAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
-			SpatialGrid<Double> travelDistanceAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
+			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
+			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
+			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
 			
 			controler.addControlerListener( new ERSAControlerListener(startZones, 
-																	  readUrbansimJobs(parcels, jobSample),
-																	  travelTimeAccessibilityGrid, 
-																	  travelCostAccessibilityGrid, 
-																	  travelDistanceAccessibilityGrid, 
+																	  aggregatedWorkplaces,
+																	  congestedTravelTimeAccessibilityGrid, 
+																	  freespeedTravelTimeAccessibilityGrid, 
+																	  walkTravelTimeAccessibilityGrid, 
 																	  benchmark) );
+		}
+		
+		if(computeGridBasedAccessibilitiesNetwork){ // debug GridBasedAccessibilityControlerListener first before setting flag "TRUE"
+			
+			// init aggregatedWorkplaces
+			if(aggregatedWorkplaces == null)
+				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
+			
+			controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, 
+																						gridSizeInMeter, 
+																						benchmark));
 		}
 	}
 	

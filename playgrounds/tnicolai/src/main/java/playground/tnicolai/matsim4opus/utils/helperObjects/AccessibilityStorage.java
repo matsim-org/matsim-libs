@@ -3,32 +3,32 @@ package playground.tnicolai.matsim4opus.utils.helperObjects;
 
 public class AccessibilityStorage {
 
-	private double travelTimeAccessibility = - Double.MAX_VALUE;
-	private double travelCostAccessibility = - Double.MAX_VALUE;
-	private double travelDistanceAccessibility = - Double.MAX_VALUE;
+	private double congestedTravelTimeAccessibility = - Double.MAX_VALUE;
+	private double freespeedTravelCostAccessibility = - Double.MAX_VALUE;
+	private double walkTravelTimeAccessibility 		= - Double.MAX_VALUE;
 
 	/**
 	 * constructor
 	 * 
-	 * @param tTimeAccessibility
-	 * @param tCostAccessibility
-	 * @param tDistanceAccessibility
+	 * @param conTravelTimeAccessibility
+	 * @param freeTravelTimeAccessibility
+	 * @param walkTravelTimeAccessibility
 	 */
-	public AccessibilityStorage(double tTimeAccessibility, double tCostAccessibility, double tDistanceAccessibility){
+	public AccessibilityStorage(double conTravelTimeAccessibility, double freeTravelTimeAccessibility, double walkTravelTimeAccessibility){
 		
-		this.travelTimeAccessibility = tTimeAccessibility;
-		this.travelCostAccessibility = tCostAccessibility;
-		this.travelDistanceAccessibility = tDistanceAccessibility;
+		this.congestedTravelTimeAccessibility = conTravelTimeAccessibility;
+		this.freespeedTravelCostAccessibility = freeTravelTimeAccessibility;
+		this.walkTravelTimeAccessibility = walkTravelTimeAccessibility;
 	}
 	
-	public double getTravelTimeAccessibility(){
-		return this.travelTimeAccessibility;
+	public double getCongestedTravelTimeAccessibility(){
+		return this.congestedTravelTimeAccessibility;
 	}
-	public double getTravelCostAccessibility(){
-		return this.travelCostAccessibility;
+	public double getFreespeedTravelCostAccessibility(){
+		return this.freespeedTravelCostAccessibility;
 	}
-	public double getTravelDistanceAccessibility(){
-		return this.travelDistanceAccessibility;
+	public double getWalkTravelTimeAccessibility(){
+		return this.walkTravelTimeAccessibility;
 	}
 
 }

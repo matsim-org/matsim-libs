@@ -131,16 +131,16 @@ public class GridUtils {
 	 */
 	public static void writeSpatialGridTables(ERSAControlerListener myListener) {
 		
-		SpatialGrid<Double> travelTimeAccessibilityGrid = myListener.getTravelTimeAccessibilityGrid();
-		SpatialGrid<Double> travelCostAccessibilityGrid = myListener.getTravelCostAccessibilityGrid();
-		SpatialGrid<Double> travelDistanceAccessibilityGrid = myListener.getTravelDistanceAccessibilityGrid();
+		SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = myListener.getCongestedTravelTimeAccessibilityGrid();
+		SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = myListener.getFreespeedTravelTimeAccessibilityGrid();
+		SpatialGrid<Double> walkTravelTimeAccessibilityGrid = myListener.getWalkTravelTimeAccessibilityGrid();
 		
 		log.info("Writing spatial grid tables ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
-			sgTableWriter.write(travelTimeAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + travelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
-			sgTableWriter.write(travelCostAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + travelCostAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
-			sgTableWriter.write(travelDistanceAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + travelDistanceAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(congestedTravelTimeAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + congestedTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(freespeedTravelTimeAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + freespeedTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
+			sgTableWriter.write(walkTravelTimeAccessibilityGrid, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + walkTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_TXT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -155,9 +155,9 @@ public class GridUtils {
 		
 		ZoneLayer<ZoneAccessibilityObject> startZones = myListener.getStartZones();
 		
-		SpatialGrid<Double> travelTimeAccessibilityGrid = myListener.getTravelTimeAccessibilityGrid();
-		SpatialGrid<Double> travelCostAccessibilityGrid = myListener.getTravelCostAccessibilityGrid();
-		SpatialGrid<Double> travelDistanceAccessibilityGrid = myListener.getTravelDistanceAccessibilityGrid();
+		SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = myListener.getCongestedTravelTimeAccessibilityGrid();
+		SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = myListener.getFreespeedTravelTimeAccessibilityGrid();
+		SpatialGrid<Double> walkTravelTimeAccessibilityGrid = myListener.getWalkTravelTimeAccessibilityGrid();
 		
 		FeatureKMLWriter writer = new FeatureKMLWriter();
 		Set<Geometry> geometries = new HashSet<Geometry>();
@@ -168,22 +168,22 @@ public class GridUtils {
 		
 		for(Zone<ZoneAccessibilityObject> zone : startZones.getZones()) {
 			geometries.add(zone.getGeometry());
-			travelTimeValues.put(zone.getGeometry(), zone.getAttribute().getTravelTimeAccessibility());
-			travelCostValues.put(zone.getGeometry(), zone.getAttribute().getTravelCostAccessibility());
-			travelDistanceValues.put(zone.getGeometry(), zone.getAttribute().getTravelDistanceAccessibility());
+			travelTimeValues.put(zone.getGeometry(), zone.getAttribute().getCongestedTravelTimeAccessibility());
+			travelCostValues.put(zone.getGeometry(), zone.getAttribute().getFreespeedTravelTimeAccessibility());
+			travelDistanceValues.put(zone.getGeometry(), zone.getAttribute().getWalkTravelTimeAccessibility());
 		}
 		
 		// writing travel time accessibility kmz file
 		writer.setColorizable(new MyColorizer(travelTimeValues));
-		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + travelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + congestedTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
 		
 		// writing travel cost accessibility kmz file
 		writer.setColorizable(new MyColorizer(travelCostValues));
-		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "_GridSize_" + travelCostAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + freespeedTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
 		
 		// writing travel distance accessibility kmz file
 		writer.setColorizable(new MyColorizer(travelDistanceValues));
-		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY + "_GridSize_" + travelDistanceAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
+		writer.write(geometries, Constants.MATSIM_4_OPUS_TEMP + Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY + "_GridSize_" + walkTravelTimeAccessibilityGrid.getResolution() + Constants.FILE_TYPE_KMZ);
 		
 		log.info("Done with writing Google Erath files ...");
 	}

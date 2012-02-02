@@ -48,7 +48,8 @@ import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
 import playground.tnicolai.matsim4opus.gis.ZoneLayer;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
@@ -100,9 +101,9 @@ public class ERSAControlerListener implements ShutdownListener{
 	private ClusterObject[] aggregatedWorkplaces;
 	private ZoneLayer<ZoneAccessibilityObject> startZones;
 	
-	private SpatialGrid<Double> travelTimeAccessibilityGrid;
-	private SpatialGrid<Double> travelCostAccessibilityGrid;
-	private SpatialGrid<Double> travelDistanceAccessibilityGrid;
+	private SpatialGrid<Double> congestedTravelTimeAccessibilityGrid;
+	private SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid;
+	private SpatialGrid<Double> walkTravelTimeAccessibilityGrid;
 	
 	private Benchmark benchmark;
 	
@@ -121,11 +122,11 @@ public class ERSAControlerListener implements ShutdownListener{
 		assert ( aggregatedWorkplaces != null );
 		this.aggregatedWorkplaces 	= aggregatedWorkplaces;
 		assert ( travelTimeAccessibilityGrid != null );
-		this.travelTimeAccessibilityGrid = travelTimeAccessibilityGrid;
+		this.congestedTravelTimeAccessibilityGrid = travelTimeAccessibilityGrid;
 		assert ( travelCostAccessibilityGrid != null );
-		this.travelCostAccessibilityGrid = travelCostAccessibilityGrid;
+		this.freespeedTravelTimeAccessibilityGrid = travelCostAccessibilityGrid;
 		assert ( travelDistanceAccessibilityGrid != null );
-		this.travelDistanceAccessibilityGrid = travelDistanceAccessibilityGrid;
+		this.walkTravelTimeAccessibilityGrid = travelDistanceAccessibilityGrid;
 		assert( benchmark != null );
 		this.benchmark = benchmark;
 	}
@@ -144,26 +145,37 @@ public class ERSAControlerListener implements ShutdownListener{
 		Scenario sc = controler.getScenario();
 		// init spannig tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		// this calculates the workplace accessibility travel times based on (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
-		LeastCostPathTree lcptTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
-		// this calculates the workplace accessibility distances (based on link lengths)
-		LeastCostPathTree lcptDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
+		// calculates the workplace accessibility based on congested travel times:
+		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
+		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
+		// calculates the workplace accessibility based on freespeed travel times:
+		// link.getLength() * link.getFreespeed()
+		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
+		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
-		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
-		double beta_per_min = beta_per_hr / 60.; // get utility per minute
-		
+		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaCarMin = betaCarHour / 60.; // get utility per minute. this is done for urbansim that e.g. takes travel times in minutes (tnicolai feb'12)
+		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
+
 		try{
 			BufferedWriter accessibilityIndicatorWriter = initCSVWriter( sc );
 			
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Depature time (in seconds): " + depatureTime);
-			log.info("Beta traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
+			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
+			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
 			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
-			log.info("Beta per hour (traveling-performing): " + beta_per_hr);
-			log.info("Beta per minute: " + beta_per_min);
+			log.info("Beta brain (scale factor): " + betaBrain);
+			log.info("Beta car traveling per h: " + betaCarHour);
+			log.info("Beta car traveling per min: " + betaCarMin);
+			log.info("Beta walk traveling per h: " + betaWalkHour);
+			log.info("Beta walk traveling per min: " + betaWalkMin);
 			
 			Iterator<Zone<ZoneAccessibilityObject>> startZoneIterator = startZones.getZones().iterator();
 			log.info(startZones.getZones().size() + " measurement points are now processing ...");
@@ -185,14 +197,15 @@ public class ERSAControlerListener implements ShutdownListener{
 				Node fromNode = network.getNearestNode(coordFromZone);
 				assert( fromNode != null );
 				// run dijkstra on network
-				lcptTravelTime.calculate(network, fromNode, depatureTime);			
-				lcptDistance.calculate(network, fromNode, depatureTime);	
+				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
+				lcptFreespeedTravelTime.calculate(network, fromNode, depatureTime);			
+				lcptWalkTime.calculate(network, fromNode, depatureTime);	
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				double accessibilityTravelTimes = 0.;
-				double accessibilityTravelTimeCosts = 0.;
-				double accessibilityTravelDistanceCosts = 0.;
+				double congestedTravelTimesCarSum = 0.;
+				double freespeedTravelTimesCarSum = 0.;
+				double travelTimesWalkSum  	   	  = 0.; // substitute for travel distance
 
 				// go through all jobs (nearest network node) and calculate workplace accessibility
 				for ( int i = 0; i < this.aggregatedWorkplaces.length; i++ ) {
@@ -203,29 +216,28 @@ public class ERSAControlerListener implements ShutdownListener{
 					// using number of aggregated workplaces as weight for log sum measure
 					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
 
-					double arrivalTime = lcptTravelTime.getTree().get( nodeID ).getTime();
+					double arrivalTime = lcptCongestedTravelTime.getTree().get( nodeID ).getTime();
 					
-					// travel times in minutes
-					double travelTime_min = (arrivalTime - depatureTime) / 60.;
-					// travel costs as travelTime(sec)*marginalCostOfTime(sec)
-					double travelCosts_sec = lcptTravelTime.getTree().get( nodeID ).getCost();
-					double travel_Costs_min = travelCosts_sec / 60.;
-					// travel distance by car in meter
-					double travelDistance_meter = lcptDistance.getTree().get( nodeID ).getCost();
+					// travel times by car in minutes
+					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
+					// freespeed travel times by car in minutes
+					double freespeedTravelTime_min = lcptFreespeedTravelTime.getTree().get( nodeID ).getCost() / 60.;
+					// walk travel times in minutes
+					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
 					
-					// sum travel times
-					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
-					// sum travel costs (mention the beta)
-					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travel_Costs_min ) * jobWeight; // tnicolai: find another beta for travel costs
-					// sum travel distances (mention the beta)
-					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_meter ) * jobWeight; // tnicolai: find another beta for travel distance
+					// sum congested travel times
+					congestedTravelTimesCarSum += Math.exp( betaCarMin * congestedTravelTime_min ) * jobWeight;
+					// sum freespeed travel times
+					freespeedTravelTimesCarSum += Math.exp( betaCarMin * freespeedTravelTime_min ) * jobWeight;
+					// sum walk travel times (substitute for distances)
+					travelTimesWalkSum 		   += Math.exp( betaWalkMin * walkTravelTime_min ) * jobWeight;
 				}
 				
 				// assign accessibilities sums to current starZone object. 
 				setAccessibilityValue2StartZone(startZone,
-												accessibilityTravelTimes, 
-												accessibilityTravelTimeCosts,
-												accessibilityTravelDistanceCosts);
+												congestedTravelTimesCarSum, 
+												freespeedTravelTimesCarSum,
+												travelTimesWalkSum);
 				
 				// accessibility values stored in current starZone object are now used in spatial grid
 				setAccessiblityValue2SpatialGrid(startZone);
@@ -333,9 +345,9 @@ public class ERSAControlerListener implements ShutdownListener{
 	 */
 	private void setAccessiblityValue2SpatialGrid(Zone<ZoneAccessibilityObject> startZone) {
 		
-		travelTimeAccessibilityGrid.setValue(startZone.getAttribute().getTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
-		travelCostAccessibilityGrid.setValue(startZone.getAttribute().getTravelCostAccessibility() , startZone.getGeometry().getCentroid());
-		travelDistanceAccessibilityGrid.setValue(startZone.getAttribute().getTravelDistanceAccessibility() , startZone.getGeometry().getCentroid());
+		congestedTravelTimeAccessibilityGrid.setValue(startZone.getAttribute().getCongestedTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		freespeedTravelTimeAccessibilityGrid.setValue(startZone.getAttribute().getFreespeedTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
+		walkTravelTimeAccessibilityGrid.setValue(startZone.getAttribute().getWalkTravelTimeAccessibility() , startZone.getGeometry().getCentroid());
 	}
 	
 	/**
@@ -354,9 +366,9 @@ public class ERSAControlerListener implements ShutdownListener{
 		accessibilityIndicatorWriter.write( Constants.ERSA_ZONE_ID + "," +
 											Constants.ERSA_X_COORDNIATE + "," +
 											Constants.ERSA_Y_COORDINATE + "," + 
-											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
-											Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
-											Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
+											Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+											Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+											Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
 		accessibilityIndicatorWriter.newLine();
 		return accessibilityIndicatorWriter;
 	}	
@@ -376,9 +388,9 @@ public class ERSAControlerListener implements ShutdownListener{
 		double tc = Math.log( accessibilityTravelCosts );
 		double td =  Math.log( accessibilityTravelDistance);
 		
-		startZone.getAttribute().setTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
-		startZone.getAttribute().setTravelCostAccessibility( tc < 0.0 ? 0.0 : tc );
-		startZone.getAttribute().setTravelDistanceAccessibility(td < 0.0 ? 0.0 : td );
+		startZone.getAttribute().setCongestedTravelTimeAccessibility( tt < 0.0 ? 0.0 : tt );
+		startZone.getAttribute().setFreespeedTravelTimeAccessibility( tc < 0.0 ? 0.0 : tc );
+		startZone.getAttribute().setWalkTravelTimeAccessibility(td < 0.0 ? 0.0 : td );
 	}
 
 	/**
@@ -394,9 +406,9 @@ public class ERSAControlerListener implements ShutdownListener{
 		accessibilityIndicatorWriter.write( startZone.getAttribute().getZoneID() + "," +
 											coordFromZone.getX() + "," +
 											coordFromZone.getY() + "," +
-											startZone.getAttribute().getTravelTimeAccessibility() + "," +
-											startZone.getAttribute().getTravelCostAccessibility() + "," +
-											startZone.getAttribute().getTravelDistanceAccessibility() );
+											startZone.getAttribute().getCongestedTravelTimeAccessibility() + "," +
+											startZone.getAttribute().getFreespeedTravelTimeAccessibility() + "," +
+											startZone.getAttribute().getWalkTravelTimeAccessibility() );
 		accessibilityIndicatorWriter.newLine();
 	}
 
@@ -426,13 +438,13 @@ public class ERSAControlerListener implements ShutdownListener{
 	public ClusterObject[] getJobObjectMap(){
 		return aggregatedWorkplaces;
 	}
-	public SpatialGrid<Double> getTravelTimeAccessibilityGrid(){
-		return travelTimeAccessibilityGrid;
+	public SpatialGrid<Double> getCongestedTravelTimeAccessibilityGrid(){
+		return congestedTravelTimeAccessibilityGrid;
 	}
-	public SpatialGrid<Double> getTravelCostAccessibilityGrid(){
-		return travelCostAccessibilityGrid;
+	public SpatialGrid<Double> getFreespeedTravelTimeAccessibilityGrid(){
+		return freespeedTravelTimeAccessibilityGrid;
 	}
-	public SpatialGrid<Double> getTravelDistanceAccessibilityGrid(){
-		return travelDistanceAccessibilityGrid;
+	public SpatialGrid<Double> getWalkTravelTimeAccessibilityGrid(){
+		return walkTravelTimeAccessibilityGrid;
 	}
 }

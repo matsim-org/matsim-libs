@@ -30,9 +30,9 @@ package playground.tnicolai.matsim4opus.utils.helperObjects;
 public class ZoneAccessibilityObject {
 	
 	private int zoneId;
-	private double travelTimeAccessibility;
-	private double travelCostAccessibility;
-	private double travelDistanceAccessibility;
+	private double congestedTravelTimeAccessibility;
+	private double freespeedTravelCostAccessibility;
+	private double walkTravelTimeAccessibility;
 	
 	/**
 	 * constructor
@@ -40,37 +40,37 @@ public class ZoneAccessibilityObject {
 	 */
 	public ZoneAccessibilityObject(int zoneID){
 		this.zoneId 					= zoneID;
-		this.travelTimeAccessibility 	= 0.;
-		this.travelCostAccessibility 	= 0.;
-		this.travelDistanceAccessibility = 0.;
+		this.congestedTravelTimeAccessibility 	= 0.;
+		this.freespeedTravelCostAccessibility 	= 0.;
+		this.walkTravelTimeAccessibility= 0.;
 	}
 	
 	// setter methods
 	public void setZoneID(int zoneId){
 		this.zoneId = zoneId;
 	}
-	public void setTravelTimeAccessibility(double travelTimeAccessibility){
-		this.travelTimeAccessibility = travelTimeAccessibility;
+	public void setCongestedTravelTimeAccessibility(double congestedTravelTimeAccessibility){
+		this.congestedTravelTimeAccessibility = congestedTravelTimeAccessibility;
 	}
-	public void setTravelCostAccessibility(double travelCostAccessibility){
-		this.travelCostAccessibility = travelCostAccessibility;
+	public void setFreespeedTravelTimeAccessibility(double freespeedTravelTimeAccessibility){
+		this.freespeedTravelCostAccessibility = freespeedTravelTimeAccessibility;
 	}
-	public void setTravelDistanceAccessibility(double travelDistanceAccessibility){
-		this.travelDistanceAccessibility = travelDistanceAccessibility;
+	public void setWalkTravelTimeAccessibility(double walkTravelTimeAccessibility){
+		this.walkTravelTimeAccessibility = walkTravelTimeAccessibility;
 	}
 
 	// getter methods
 	public int getZoneID(){
 		return this.zoneId;
 	}
-	public double getTravelTimeAccessibility(){
-		return this.travelTimeAccessibility;
+	public double getCongestedTravelTimeAccessibility(){
+		return this.congestedTravelTimeAccessibility;
 	}
-	public double getTravelCostAccessibility(){
-		return this.travelCostAccessibility;
+	public double getFreespeedTravelTimeAccessibility(){
+		return this.freespeedTravelCostAccessibility;
 	}
-	public double getTravelDistanceAccessibility(){
-		return this.travelDistanceAccessibility;
+	public double getWalkTravelTimeAccessibility(){
+		return this.walkTravelTimeAccessibility;
 	}
 }
 

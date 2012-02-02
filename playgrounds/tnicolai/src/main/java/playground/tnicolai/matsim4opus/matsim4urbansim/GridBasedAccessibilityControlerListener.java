@@ -18,7 +18,8 @@ import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.FixedSizeGrid;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
@@ -44,7 +45,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListener.class);
 	
 	private ClusterObject[] aggregatedWorkplaces;
-	private int resolutionMeter;
+	private double gridSizeInMeter;
 	
 	private Map<Id, AccessibilityStorage> resultMap;
 	
@@ -53,17 +54,17 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	/**
 	 * constructor 
 	 * @param aggregatedWorkplaces
-	 * @param resolutionMeter
+	 * @param gridSizeInMeter
 	 * @param benchmark
 	 */
-	public GridBasedAccessibilityControlerListener(ClusterObject[] aggregatedWorkplaces, int resolutionMeter, Benchmark benchmark){
+	public GridBasedAccessibilityControlerListener(ClusterObject[] aggregatedWorkplaces, double gridSizeInMeter, Benchmark benchmark){
 		
 		log.info("Initializing GridBasedAccessibilityControlerListener ...");
 		
 		assert(aggregatedWorkplaces != null);
 		this.aggregatedWorkplaces = aggregatedWorkplaces;
-		assert(resolutionMeter > 0);
-		this.resolutionMeter = resolutionMeter;
+		assert(gridSizeInMeter > 0);
+		this.gridSizeInMeter = gridSizeInMeter;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		
@@ -84,31 +85,42 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
-		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation");
+		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation (without network)");
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		// init LeastCostPathTree in order to calculate travel times and travel costs
+		// calculates the workplace accessibility based on congested travel times:
+		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		TravelTime ttc = controler.getTravelTimeCalculator();
-//		tnicolai: testing travel time calculator
-//		LeastCostPathTree lcptTravelTimeTest = new LeastCostPathTree(ttc, new TravelTimeCostCalculator(ttc));
 		// this calculates the workplace accessibility travel times based on (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
-		LeastCostPathTree lcptTravelTimeDistance = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
-		// this calculates the workplace accessibility distances (based on link lengths)
-		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
+		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
+		// calculates the workplace accessibility based on freespeed travel times:
+		// link.getLength() * link.getFreespeed()
+		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
+		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		
-		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
-		double beta_per_min = beta_per_hr / 60.; // get utility per minute
+		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaCarMin = betaCarHour / 60.; // get utility per minute. this is done for urbansim that e.g. takes travel times in minutes (tnicolai feb'12)
+		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 		
 		try{
 			log.info("Computing and writing grid based accessibility measures with following settings:" );
 			log.info("Depature time (in seconds): " + depatureTime);
-			log.info("Beta per hour: " + beta_per_hr);
-			log.info("Beta per minute: " + beta_per_min);
+			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
+			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
+			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
+			log.info("Beta brain (scale factor): " + betaBrain);
+			log.info("Beta car traveling per h: " + betaCarHour);
+			log.info("Beta car traveling per min: " + betaCarMin);
+			log.info("Beta walk traveling per h: " + betaWalkHour);
+			log.info("Beta walk traveling per min: " + betaWalkMin);
 			
 			Iterator<? extends Node> startNodeIterator = network.getNodes().values().iterator();
 			int numberOfStartNodes = network.getNodes().values().size();
@@ -124,16 +136,15 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 				Node originNode = startNodeIterator.next();
 				assert(originNode != null);
 				// run dijkstra on network
-				lcptTravelTimeDistance.calculate(network, originNode, depatureTime);
-				lcptTravelDistance.calculate(network, originNode, depatureTime);
-//				tnicolai: testing travel time calculator
-//				lcptTravelTimeTest.calculate(network, originNode, depatureTime);
+				lcptCongestedTravelTime.calculate(network, originNode, depatureTime);
+				lcptCongestedTravelTime.calculate(network, originNode, depatureTime);
+				lcptWalkTime.calculate(network, originNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("originNode")
 				
-				double accessibilityTravelTimes = 0.;
-				double accessibilityTravelTimeCosts = 0.;
-				double accessibilityTravelDistanceCosts = 0.;
+				double congestedTravelTimesCarSum = 0.;
+				double freespeedTravelTimesCarSum = 0.;
+				double travelTimesWalkSum 		  = 0.; // substitute for travel distance
 				
 				// iterate through all aggregated jobs (respectively their nearest network nodes) 
 				// and calculate workplace accessibility for current start/origin node.
@@ -145,41 +156,39 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 					// using number of aggregated workplaces as weight for log sum measure
 					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
 
-					double arrivalTime = lcptTravelTimeDistance.getTree().get( nodeID ).getTime();
+					double arrivalTime = lcptCongestedTravelTime.getTree().get( nodeID ).getTime();
 					
-					// travel times in minutes
-					double travelTime_min = (arrivalTime - depatureTime) / 60.;
-//					tnicolai: testing travel time cost calculator
-//					double testTravelTime_min = lcptTravelTimeTest.getTree().get( nodeID ).getCost() / 60.;
-					// travel costs in utils
-					double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
-					// travel distance by car in km (since distances in meter are very large values making the log sum -Infinity most of the time) 
-					double travelDistance_km = lcptTravelDistance.getTree().get( nodeID ).getCost() / 1000.;
+					// travel times by car in minutes
+					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
+					// freespeed travel times by car in minutes
+					double freespeedTravelTime_min = lcptFreespeedTravelTime.getTree().get( nodeID ).getCost() / 60.;
+					// walk travel times in minutes 
+					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
 					
-					// sum travel times
-					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
-					// sum travel costs  (mention the beta)
-					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
-					// sum travel distances  (mention the beta)
-					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_km ) * jobWeight; // tnicolai: find another beta for travel distance
+					// sum congested travel times
+					congestedTravelTimesCarSum += Math.exp( betaCarMin * congestedTravelTime_min ) * jobWeight;
+					// sum freespeed travel times
+					freespeedTravelTimesCarSum += Math.exp( betaCarMin * freespeedTravelTime_min ) * jobWeight;
+					// sum walk travel times (substitute for distances)
+					travelTimesWalkSum 		   += Math.exp( betaCarMin * walkTravelTime_min ) * jobWeight;
 				}
 				
 				// assign accessibility 
-				double travelTimeAccessibility = Math.log( accessibilityTravelTimes );
-				double travelCostAccessibility = Math.log( accessibilityTravelTimeCosts );
-				double travelDistanceAccessibility = Math.log( accessibilityTravelDistanceCosts );
+				double congestedTravelTimesCarLogSum = Math.log( congestedTravelTimesCarSum );
+				double freespeedTravelTimesCarLogSum = Math.log( freespeedTravelTimesCarSum );
+				double travelTimesWalkLogSum 		 = Math.log( travelTimesWalkSum );
 
 				// assigning each storage object with its corresponding node id
 				this.resultMap.put(originNode.getId(), 
-								   new AccessibilityStorage(travelTimeAccessibility, 
-										   					travelCostAccessibility, 
-										   					travelDistanceAccessibility));
+								   new AccessibilityStorage(congestedTravelTimesCarLogSum, 
+										   					freespeedTravelTimesCarLogSum, 
+										   					travelTimesWalkLogSum));
 				
 				// writing accessibility measures of current node in csv format
 				GridBasedAccessibilityCSVWriter.write(originNode, 
-													  travelTimeAccessibility, 
-													  travelCostAccessibility, 
-													  travelDistanceAccessibility);
+													  congestedTravelTimesCarLogSum, 
+													  freespeedTravelTimesCarLogSum, 
+													  travelTimesWalkLogSum);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);
@@ -195,8 +204,8 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 		catch(Exception e){ e.printStackTrace(); }
 		finally{
 			// writing accessibility measures stored in a hash map as matrix
-			int coarseSteps = 8;
-			FixedSizeGrid grid = new FixedSizeGrid(resolutionMeter, network, resultMap, coarseSteps);
+			int coarseSteps = 4;
+			FixedSizeGrid grid = new FixedSizeGrid(gridSizeInMeter, network, resultMap, coarseSteps);
 			grid.writeGrid();
 			
 			// writing aggregated workplace data in csv format

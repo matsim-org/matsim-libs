@@ -47,7 +47,7 @@ import org.matsim.matrices.Matrix;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
+import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
@@ -94,7 +94,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
 		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
-		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculator()); // tnicolai: check with kai
+		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator()); // tnicolai: check with kai
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
