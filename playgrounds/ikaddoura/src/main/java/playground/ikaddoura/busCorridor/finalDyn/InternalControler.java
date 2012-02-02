@@ -61,6 +61,7 @@ public class InternalControler {
 	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
 	
 	private final double PERFORMING = 1.8534;
+	private final double LATE_ARRIVAL = 0;
 	
 	private final double monetaryCostPerKm = -0.11; // AUD per km 
 	
@@ -136,6 +137,7 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setConstantCar(CONSTANT_CAR);
 		planCalcScoreConfigGroup.setConstantPt(CONSTANT_PT);
 		planCalcScoreConfigGroup.setPerforming_utils_hr(PERFORMING);
+		planCalcScoreConfigGroup.setLateArrival_utils_hr(LATE_ARRIVAL);
 		
 		MyScoringFunctionFactory scoringfactory = new MyScoringFunctionFactory(planCalcScoreConfigGroup, this.ptLegHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, monetaryCostPerKm, agentStuckScore);
 		controler.setScoringFunctionFactory(scoringfactory);
