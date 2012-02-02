@@ -92,6 +92,8 @@ public class Sim2DEngine implements MobsimEngine {
 			this.sim.getEventsManager().processEvent(new TickEvent(sim2DTime));
 			this.floor.move(sim2DTime);
 
+//			this.floor.drawGeometries(sim2DTime);
+			
 			sim2DTime += this.sim2DStepSize;
 		}
 	}

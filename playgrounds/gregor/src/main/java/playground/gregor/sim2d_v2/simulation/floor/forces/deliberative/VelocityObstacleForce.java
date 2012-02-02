@@ -10,6 +10,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
@@ -59,8 +60,8 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		double minY = -1000 + this.sc.getScenarioElement(MyDataContainer.class).getDenseCoordsQuadTree().getMinNorthing();
 		this.agentsQuad = new QuadTree<Agent2D>(minX, minY, maxX, maxY);
 
-		this.velocityChooser = new RandomAlternativeVelocityChooser();
-//		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
+//		this.velocityChooser = new RandomAlternativeVelocityChooser();
+		this.velocityChooser = new PenaltyBasedAlternativeVelocityChooser();
 	}
 
 
@@ -95,33 +96,37 @@ public class VelocityObstacleForce implements DynamicForceModule{
 		Coordinate c1 = new Coordinate(c0.x+df[0],c0.y + df[1]);
 
 
-		//		//DEBUG
-		//c1 = new Coordinate(c0.x+df[0],c0.y + df[1]);
-		//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
-		//		GisDebugger.addGeometry(lsdvA,"dvA");
-
+////		//DEBUG
+//		GeometryFactory geofac = new GeometryFactory();
+//		Coordinate c2 = new Coordinate(c0.x+agent.getVx(),c0.y + agent.getVy());
+//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
+//		GisDebugger.addGeometry(lsdvA,"dvA");
+//		LineString lsvA = geofac.createLineString(new Coordinate []{c0,c2});
+//		GisDebugger.addGeometry(lsvA,"vA");
+//		GisDebugger.dump("/Users/laemmel/devel/tmp/v.shp");
+//		boolean brk = false;
+////		//DEBUG
+		
 		if (Algorithms.testForCollision(VOs, c1)) {
 			this.velocityChooser.chooseAlterantiveVelocity(VOs,c0,c1,df,agent);
+//			brk = true;
 		}
 
 
-		double fx = Agent2D.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
-		double fy = Agent2D.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
+		double fx = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[0] - agent.getVx())/this.tau;
+		double fy = PhysicalAgentRepresentation.AGENT_WEIGHT*(df[1] - agent.getVy())/this.tau;
 
 		f.incrementX(fx);
 		f.incrementY(fy);
 
-		//		double timeToUpdate = Math.min(.5, ii/2);
-		//		agent.setEarliestUpdate(time+timeToUpdate);
-
-		//		//DEBUG
-		//		GeometryFactory geofac = new GeometryFactory();
-		//		LineString lr = geofac.createLineString(aGeo.getCCWRing());
-		//		GisDebugger.addGeometry(lr,"A");
-		//		c1 = new Coordinate(c0.x+df[0],c0.y + df[1]);
-		//		LineString lsdvA = geofac.createLineString(new Coordinate []{c0,c1});
-		//		GisDebugger.addGeometry(lsdvA,"dvA");
-		//		GisDebugger.dump("/Users/laemmel/tmp/vis/minkowski.shp");
+////		//DEBUG
+//		LineString lr = geofac.createLineString(aGeo.getCCWRing());
+//		GisDebugger.addGeometry(lr,"A:"+ agent.getId().toString());
+//		GisDebugger.dump("/Users/laemmel/devel/tmp/agent.shp");
+//		if (brk && agent.getCurrentLinkId().toString().equals("26") && agent.getId().toString().equals("r6") && time>=65) {
+//			System.out.println();
+//		}
+////		//DEBUG
 
 	}
 
@@ -194,13 +199,14 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 
-		//		GeometryFactory geofac = new GeometryFactory();
+//		GeometryFactory geofac = new GeometryFactory();
+//		boolean dump = false;
 
 		Collection<Agent2D> l = this.agentsQuad.get(agent.getPosition().x, agent.getPosition().y, sensingRange);
 
-		if (l.size() > 8) {
+		if (l.size() > 32) {
 			agent.setSensingRange(sensingRange*.9);
-		} else if (l.size() < 4) {
+		} else if (l.size() < 16) {
 			agent.setSensingRange(sensingRange *1.2);
 		}
 
@@ -267,10 +273,10 @@ public class VelocityObstacleForce implements DynamicForceModule{
 				tan = new Coordinate[]{new Coordinate(agent.getPosition()),new Coordinate(cso[idx[0]]),new Coordinate(cso[idx[1]])};
 			}
 
+			double mvCoeff = 1 - agent.kindness /(agent.kindness + other.kindness);
 
-
-			double mvX = .5*(agent.getVx() - other.getVx());
-			double mvY = .5*(agent.getVy() - other.getVy());
+			double mvX = mvCoeff*(agent.getVx() - other.getVx());
+			double mvY = mvCoeff*(agent.getVy() - other.getVy());
 
 			double tX = other.getVx() + mvX;
 			double tY = other.getVy() + mvY;
@@ -285,11 +291,39 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			VOs.add(info);
 
 
-			//
-			//			LineString ranR = geofac.createLineString(new Coordinate []{tan[1],tan[0],tan[2]});
-			//			GisDebugger.addGeometry(ranR,"VO");
+////			//DEBUG
+//			double dx0 = 100*(tan[1].x - tan[0].x);
+//			double dy0 = 100*(tan[1].y - tan[0].y);
+//			double dx1 = 100*(tan[2].x - tan[0].x);
+//			double dy1 = 100*(tan[2].y - tan[0].y);
+//			LinearRing ranR = geofac.createLinearRing(new Coordinate []{new Coordinate(tan[0]),new Coordinate(tan[0].x+dx0,tan[0].y + dy0),new Coordinate(tan[0].x+dx1,tan[0].y + dy1),tan[0]});
+//			Polygon p = geofac.createPolygon(ranR, null);
+//			GisDebugger.addGeometry(p,"VO B:" + other.getId().toString());
+//			dump = true;
 		}
 
+//		if (dump) {
+//			GisDebugger.dump("/Users/laemmel/devel/tmp/vo.shp");
+//			for (Agent2D other : l) {
+//				if (other == agent) {
+//					continue;
+//				}
+//				LineString lr = geofac.createLineString(other.getGeometry().getCCWRing());
+//				GisDebugger.addGeometry(lr,"B:" + other.getId().toString());
+//				 
+//			}
+// 			 GisDebugger.dump("/Users/laemmel/devel/tmp/others.shp");
+//			for (Agent2D other : l) {
+//				if (other == agent) {
+//					continue;
+//				}
+//				LineString lr = geofac.createLineString(new Coordinate[]{other.getPosition(),new Coordinate(other.getPosition().x+other.getVx(),other.getPosition().y+other.getVy())});
+//				GisDebugger.addGeometry(lr,"vb");
+//				 
+//			}
+//			GisDebugger.dump("/Users/laemmel/devel/tmp/vothers.shp");
+//			
+//		}
 
 	}
 

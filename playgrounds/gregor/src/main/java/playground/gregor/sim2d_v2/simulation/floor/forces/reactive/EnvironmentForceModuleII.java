@@ -6,6 +6,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -54,7 +55,7 @@ public class EnvironmentForceModuleII implements ForceModule {
 		double dx =(agent.getPosition().x - obj.x) / dist;
 		double dy =(agent.getPosition().y - obj.y) / dist;
 
-		double bounderyDist = Agent2D.AGENT_DIAMETER/2 - dist;
+		double bounderyDist = PhysicalAgentRepresentation.AGENT_DIAMETER/2 - dist;
 		double g = bounderyDist > 0 ? bounderyDist : 0;
 		double tanDvx = (- agent.getVx()) * dx;
 		double tanDvy = (- agent.getVy()) * dy;

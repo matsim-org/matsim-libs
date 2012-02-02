@@ -7,6 +7,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
@@ -20,8 +21,8 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 	private QuadTree<Agent2D> coordsQuad;
 
 	//Helbing constant
-	private static final double Bi=0.125;
-	private static final double Ai=5;
+	private static final double Bi=0.5;
+	private static final double Ai=25;
 
 
 	/**
@@ -53,7 +54,7 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 		double fx = 0;
 		double fy = 0;
 
-		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 5*Agent2D.AGENT_DIAMETER);
+		Collection<Agent2D> l = this.coordsQuad.get(agent.getPosition().x, agent.getPosition().y, 5*PhysicalAgentRepresentation.AGENT_DIAMETER);
 
 		for (Agent2D other : l) {
 			if (other == agent) {
@@ -61,7 +62,7 @@ public class PhysicalAgentInteractionForce implements DynamicForceModule {
 			}
 
 			double dist = other.getPosition().distance(agent.getPosition());
-			if (dist > Agent2D.AGENT_DIAMETER) {
+			if (dist > PhysicalAgentRepresentation.AGENT_DIAMETER) {
 				continue;
 			}
 			double dx = (agent.getPosition().x - other.getPosition().x) / dist;

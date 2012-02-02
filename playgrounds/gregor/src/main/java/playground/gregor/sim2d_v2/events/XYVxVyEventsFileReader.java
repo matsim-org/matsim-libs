@@ -35,6 +35,8 @@ import org.matsim.core.events.PersonEventImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
+import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -102,6 +104,19 @@ public class XYVxVyEventsFileReader extends MatsimXmlParser {
 			Event e = new DoubleValueStringKeyAtCoordinateEvent(new Coordinate(Double.parseDouble(x),Double.parseDouble(y)), Double.parseDouble(val), key, time);
 			this.events.processEvent(e);
 
+		} else if (ArrowEvent.EVENT_TYPE.equals(eventType)) {
+			String fromX = atts.getValue(ArrowEvent.ATTRIBUTE_FROM_X);
+			String fromY = atts.getValue(ArrowEvent.ATTRIBUTE_FROM_Y);
+			String toX = atts.getValue(ArrowEvent.ATTRIBUTE_TO_X);
+			String toY = atts.getValue(ArrowEvent.ATTRIBUTE_TO_Y);
+			String id = atts.getValue(PersonEventImpl.ATTRIBUTE_PERSON);
+			String lineSegType = atts.getValue(ArrowEvent.ATTRIBUTE_LINE_SEG_TYPE);
+			Coordinate c1 = new Coordinate(Double.parseDouble(fromX),Double.parseDouble(fromY));
+			Coordinate c2 = new Coordinate(Double.parseDouble(toX),Double.parseDouble(toY));
+			IdImpl idImpl = new IdImpl(id);
+			int type = Integer.parseInt(lineSegType);
+			ArrowEvent e = new ArrowEvent(idImpl, c1, c2, 0.f, 0.f, 0.f, type, time);
+			this.events.processEvent(e);
 		}
 
 	}

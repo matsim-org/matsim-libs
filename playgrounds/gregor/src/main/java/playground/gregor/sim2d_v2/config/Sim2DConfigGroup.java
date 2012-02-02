@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v2.config;
 
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.core.config.Module;
 
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 
 /**
  * @author laemmel
@@ -99,7 +98,7 @@ public class Sim2DConfigGroup extends Module {
 
 	//Zanlungo et al constant
 	private double Bi=.71;
-	private double Ai=1.13*Agent2D.AGENT_WEIGHT;
+	private double Ai=1.13*PhysicalAgentRepresentation.AGENT_WEIGHT;
 	private double lambda=.35;
 
 	public Sim2DConfigGroup(Module sim2d) {

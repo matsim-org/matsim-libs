@@ -63,6 +63,7 @@ import playground.gregor.sim2d_v2.events.debug.ArrowEvent;
 import playground.gregor.sim2d_v2.events.debug.ArrowEventHandler;
 import playground.gregor.sim2d_v2.helper.GEO;
 import playground.gregor.sim2d_v2.scenario.ScenarioLoader2DImpl;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -286,7 +287,11 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		this.pc.setBotPositionII(e.getPersonId().toString().hashCode(), (float) ((e.getX() - this.ofX)* this.scale), (float) ((e.getY() - this.ofY)* this.scale), (float) (0* this.scale), (float) (GEO.getAzimuth(e.getVX(),e.getVY())),(float)this.scale);
 
 		this.locations.put(e.getPersonId(), e.getCoordinate());
+		
+//		createArrow(e);
 	}
+
+
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -340,7 +345,13 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 			g = 1.f;
 		}
 		this.pc.setBotColorII(event.getPersonId().toString().hashCode(), r, g, b);
+		
+		
+		
+	
 	}
+
+
 
 	/**
 	 * @param newPos
@@ -399,7 +410,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//				PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/sim2dDemoII/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/counter/output/ITERS/it.0/0.events.xml.gz", true, 1.);
 		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/output/ITERS/it.0/0.events.xml.gz", true, 1.);
-//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, .1);
+//		PedVisPeekABot vis = new PedVisPeekABot(c,"/Users/laemmel/devel/gr90/input/events.xml", true, 1.);
 		vis.play(true);
 
 	}
@@ -498,6 +509,67 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 		//		this.pc.removeBotII(Integer.parseInt(e.getPersonId().toString()));
 	}
 
+	
+	
+	private void createArrow(XYVxVyEvent e) {
+		
+//		double a_min = .13;
+//		double b_min = .2;
+//		double b_max = .25;
+//		double tau_a = .1;
+		final double a_min = .18;
+		final double b_min = .2;
+		final double b_max = .25;
+		final double tau_a = .53;
+//		
+		double vx = e.getVX();
+		double vy = e.getVY();
+		double v = Math.sqrt(vx*vx + vy*vy);
+		double a = a_min + tau_a * v;
+		double b = b_max - (b_max - b_min)*v/1.34;
+//		double a = this.a_min;
+//		double b = this.b_max;
+		Coordinate[] c = Algorithms.getEllipse(a, b);
+		double angle = Algorithms.getPolarAngle(vx, vy);
+		Coordinate [] tmp = new Coordinate[c.length];
+		for (int i = 0; i < c.length-1; i++) {
+			tmp[i] = new Coordinate(c[i]);
+		}
+		tmp[c.length-1] = tmp[0];
+//		double alpha = angle / 360. * 2 * Math.PI;
+		Algorithms.rotate(angle, tmp);
+		Algorithms.translate(e.getX(), e.getY(), tmp);
+		for (int i = 0; i < tmp.length-1; i++) {
+			createArrowSegment(tmp[i],tmp[i+1],i,e.getPersonId());
+		}
+		createArrowSegment(tmp[tmp.length-1],tmp[0],tmp.length-1,e.getPersonId());
+	}
+	
+	private void createArrowSegment(Coordinate c1, Coordinate c2, int i, Id personId) {
+		int agentId = personId.toString().hashCode();
+		float fromX = (float) ((c1.x - this.ofX)* this.scale);
+		float fromY = (float) ((c1.y - this.ofY)* this.scale);
+		float fromZ = 0;//event.getFrom().z;
+		float toX = (float) ((c2.x - this.ofX)* this.scale);
+		float toY = (float) ((c2.y - this.ofY)* this.scale);
+		float toZ = 0; //event.getTo().z;
+		float r = 0;
+		float g = 0;
+		float b = 0;
+
+		// experimental id dependent colorization
+		MatsimRandom.reset(personId.toString().hashCode());
+		MatsimRandom.getRandom().nextDouble();
+		MatsimRandom.getRandom().nextDouble();
+		b = MatsimRandom.getRandom().nextFloat();
+		if (personId.toString().contains("r")) {
+			r = 1.f;
+		} else {
+			g = 1.f;
+		}
+		this.pc.drawArrowII(i, agentId, r, g, b, fromX, fromY, fromZ, toX, toY, toZ);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -508,10 +580,7 @@ public class PedVisPeekABot implements XYVxVyEventsHandler, AgentDepartureEventH
 	@Override
 	public void handleEvent(ArrowEvent event) {
 		int arrowId = event.getType();
-		int agentId = Integer.parseInt(event.getPersId().toString());
-		if (agentId != 1) {
-			return;
-		}
+		int agentId = event.getPersId().toString().hashCode();
 		float r = event.getR();
 		float g = event.getG();
 		float b = event.getB();

@@ -1,7 +1,7 @@
 package playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle;
 
-import java.util.Map.Entry;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -279,25 +279,25 @@ public abstract class Algorithms {
 
 	public static Coordinate[] getEllipse(double a, double b) {
 		//create agentGeometry
-		int numOfParts = 8;
+		final int numOfParts = 4;
 		Coordinate[] c = new Coordinate[numOfParts + 1];
-		double x = -a;
-		double incr = 4*a/numOfParts;
+		double incr = 2*a/(numOfParts/2+1);
+		double x = -a+incr;
 		int pos=0;
-		while (x <= a) {
+		for (int i = 0; i < numOfParts/2; i++) {
 			double ySqr = Algorithms.getYSquareOfEllipse(x,a,b);
 			double y = Math.sqrt(ySqr);
 			c[pos++] = new Coordinate(x,y);
 			x += incr;
 		}
-		x -= incr;
-		x -= incr;
-		while (x >= -a) {
+		x = a-incr;
+		for (int i = 0; i < numOfParts/2; i++) {
 			double ySqr = Algorithms.getYSquareOfEllipse(x,a,b);
 			double y = -Math.sqrt(ySqr);
 			c[pos++] = new Coordinate(x,y);
 			x -= incr;
 		}
+		
 		c[numOfParts] = c[0];
 		return c;
 	}
@@ -392,7 +392,6 @@ public abstract class Algorithms {
 
 	public static boolean testForCollision(VelocityObstacle info, Coordinate c) {
 		Coordinate[] vo = info.getVo();
-
 		boolean leftOfLeft = Algorithms.isLeftOfLine(c, vo[0], vo[1]) > 0;
 		boolean rightOfRight = Algorithms.isLeftOfLine(c, vo[0], vo[2]) < 0;
 		if (leftOfLeft && rightOfRight) {

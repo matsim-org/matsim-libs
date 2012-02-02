@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
@@ -86,8 +87,8 @@ public class DrivingForceModule implements ForceModule {
 		double driveY = d.y * agent.getDesiredVelocity();
 
 
-		double dx = Agent2D.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/this.tau;
-		double dy = Agent2D.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/this.tau;
+		double dx = PhysicalAgentRepresentation.AGENT_WEIGHT *(driveX - agent.getForce().getVx())/this.tau;
+		double dy = PhysicalAgentRepresentation.AGENT_WEIGHT *(driveY - agent.getForce().getVy())/this.tau;
 
 
 		agent.getForce().incrementX(dx);

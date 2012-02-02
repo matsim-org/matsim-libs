@@ -11,6 +11,7 @@ import org.matsim.ptproject.qsim.interfaces.Netsim;
 
 import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.LinkSwitcher;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.MentalLinkSwitcher;
 
@@ -41,10 +42,12 @@ public class Sim2DAgentFactory implements AgentFactory {
 		}
 	}
 
+	
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
 		MobsimDriverAgent pda = this.defaultAgentFactory.createMobsimAgentFromPerson(p);
-		Agent2D agent = new Agent2D(pda, this.sc, this.mlsw);
+		PhysicalAgentRepresentation par = new PhysicalAgentRepresentation();
+		Agent2D agent = new Agent2D(pda, this.sc, this.mlsw,par);
 		return agent;
 	}
 

@@ -12,6 +12,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 
@@ -35,7 +36,7 @@ public class PathAndDrivingAcceleration {
 	private static final double SIN_RIGHT = Math.sin(-Math.PI / 2);
 
 	// Mauron constant
-	private static final double Apath =5;
+	private static final double Apath =25;
 
 
 
@@ -100,8 +101,8 @@ public class PathAndDrivingAcceleration {
 		double driveX = d.x  * agent.getDesiredVelocity();
 		double driveY = d.y * agent.getDesiredVelocity();
 
-		double fdx = Agent2D.AGENT_WEIGHT *(driveX)/this.tau;
-		double fdy = Agent2D.AGENT_WEIGHT *(driveY)/this.tau;
+		double fdx = PhysicalAgentRepresentation.AGENT_WEIGHT *(driveX)/this.tau;
+		double fdy = PhysicalAgentRepresentation.AGENT_WEIGHT *(driveY)/this.tau;
 
 		Coordinate pos = agent.getPosition();
 		LinkInfo li = this.linkGeos.get(mentalLinkId);
@@ -111,7 +112,7 @@ public class PathAndDrivingAcceleration {
 		double fpx = 0;
 		double fpy = 0;
 		if (pathDist > 0.1) {
-			double bpath = Math.max(1, li.pathWidth-Agent2D.AGENT_DIAMETER);
+			double bpath = Math.max(1, li.pathWidth-PhysicalAgentRepresentation.AGENT_DIAMETER);
 			double f = Apath * Math.exp(pathDist / bpath);
 
 			boolean rightHandSide = Algorithms.isLeftOfLine(pos, li.c0, li.c1) > 0;
@@ -124,8 +125,8 @@ public class PathAndDrivingAcceleration {
 		double fy = fdy + fpy;
 
 
-		double dvx = (this.tau *fx)/Agent2D.AGENT_WEIGHT; //desired velocity
-		double dvy =(this.tau *fy)/Agent2D.AGENT_WEIGHT;
+		double dvx = (this.tau *fx)/PhysicalAgentRepresentation.AGENT_WEIGHT; //desired velocity
+		double dvy =(this.tau *fy)/PhysicalAgentRepresentation.AGENT_WEIGHT;
 
 		//		double dvx = agent.getVx()+(this.tau*fx)/Agent2D.AGENT_WEIGHT; //desired velocity
 		//		double dvy = agent.getVy()+(this.tau*fy)/Agent2D.AGENT_WEIGHT;

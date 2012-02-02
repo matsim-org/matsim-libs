@@ -141,7 +141,7 @@ public class ScenarioGenerator {
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 2, 1, 1);
 			sc.getNetwork().addLink(l);
 			links.add(l);
 		}
@@ -189,7 +189,7 @@ public class ScenarioGenerator {
 
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
-			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 1.34, 1, 1);
+			Link l = nf.createLink(lid, n0, n1, (NetworkImpl) sc.getNetwork(), c0.distance(c1), 2, 1, 1);
 			sc.getNetwork().addLink(l);
 			links.add(l);
 		}

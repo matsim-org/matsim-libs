@@ -59,6 +59,7 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.SignalsPe
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
+import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -120,6 +121,7 @@ public class PhysicalFloor implements Floor {
 		
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
 			this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
+			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){
@@ -437,6 +439,31 @@ public class PhysicalFloor implements Floor {
 	protected EventsManager getEventsManager() {
 		return this.em;
 	}
+
+//	//DEBUG
+//	public void drawGeometries(double time) {
+//		for (Agent2D agent : this.agents) {
+//			CCWPolygon geo = agent.getGeometry();
+//			drawGeometry(geo, agent.getId(), time);
+//		}
+//		
+//	}
+//
+//	private void drawGeometry(CCWPolygon geo, Id id, double time) {
+//		Coordinate[] ring = geo.getCCWRing();
+//		for (int i = 0; i < ring.length-1; i++) {
+//			drawSeg(id,i,ring[i], ring[i+1], time);
+//		}
+//		drawSeg(id,ring.length-1,ring[ring.length-1], ring[0], time);
+//	}
+//
+//	private void drawSeg(Id id, int i, Coordinate coordinate,
+//			Coordinate coordinate2, double time) {
+//		
+//		ArrowEvent ev = new ArrowEvent(id, coordinate, coordinate2, 0.f, 0.f, 0.f, i, time);
+//		this.em.processEvent(ev);
+//		
+//	}
 
 
 	//	public void printTimings() {

@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
-import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
 
 /**
  * @author laemmel

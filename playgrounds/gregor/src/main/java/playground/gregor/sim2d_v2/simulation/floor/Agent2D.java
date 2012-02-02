@@ -21,9 +21,9 @@ package playground.gregor.sim2d_v2.simulation.floor;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
@@ -48,18 +48,13 @@ public class Agent2D implements MobsimAgent {
 	private final Scenario sc;
 	private double currentDesiredVelocity;
 
-	private final double maxV = 2.;
+	
 
-	public static final double AGENT_WEIGHT = 80;// * 1000;
-	public static final double AGENT_DIAMETER = 0.5;
 
-	private CCWPolygon geometry;
-	private final double a_min = .18;
-	private final double b_min = .2;
-	private final double b_max = .25;
-	private final double tau_a = .53;
+	
+	
 	//	private final double tau_a = .3;
-	private QuadTree<CCWPolygon> geometryQuad;
+	
 	private double v;
 	private double alpha = 0;
 
@@ -70,51 +65,27 @@ public class Agent2D implements MobsimAgent {
 
 
 	private double sensingRange = 5;
+	
+	public final double kindness = MatsimRandom.getRandom().nextDouble();
+	private final PhysicalAgentRepresentation par;
 
 
 	/**
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw) {
+	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw, PhysicalAgentRepresentation par) {
 
 		this.pda = pda;
 		this.sc = sc;
+		this.par = par;
 		// TODO think about this
 		this.desiredVelocity = 1.34; //1.29+(MatsimRandom.getRandom().nextDouble() - 0.5) / 5;
 		this.currentDesiredVelocity = this.desiredVelocity;
 		this.mentalLinkSwitcher = mlsw;
-		initGeometry();
 	}
 
-	private void initGeometry() {
 
-		//x dim velo
-		//y dim angle
-		this.geometryQuad = new QuadTree<CCWPolygon>(0,0,2,360);
-
-		for (double v = 0; v < this.maxV; v += this.maxV/24 ) {
-			double a = this.a_min + this.tau_a * v;
-			double b = this.b_max - (this.b_max - this.b_min)*v/this.desiredVelocity;
-			Coordinate[] c = Algorithms.getEllipse(a, b);
-			for (double angle = 0; angle < 360; angle += 15) {
-				Coordinate [] tmp = new Coordinate[c.length];
-				for (int i = 0; i < c.length-1; i++) {
-					tmp[i] = new Coordinate(c[i]);
-				}
-				tmp[c.length-1] = tmp[0];
-				double alpha = angle / 360. * 2 * Math.PI;
-				Algorithms.rotate(alpha, tmp);
-				CCWPolygon ccw = new CCWPolygon(tmp, new Coordinate(0,0), Math.max(a, b));
-				this.geometryQuad.put(v, angle, ccw);
-			}
-		}
-		this.geometry = this.geometryQuad.get(0, 0);
-	}
-
-	public CCWPolygon getGeometry(){
-		return this.geometry;
-	}
 
 	/**
 	 * @return
@@ -125,7 +96,7 @@ public class Agent2D implements MobsimAgent {
 
 	public void setPostion(Coordinate pos) {
 		this.currentPosition = pos;
-		this.geometry.translate(pos);
+		this.par.getGeometry().translate(pos);
 	}
 
 	public Force getForce() {
@@ -149,8 +120,8 @@ public class Agent2D implements MobsimAgent {
 		if (vx2 != 0 || vy2 != 0) {
 			this.alpha = 360*Algorithms.getPolarAngle(this.vx, this.vy)/(2*Math.PI);
 		}
-		this.geometry = this.geometryQuad.get(this.v, this.alpha);
-		this.geometry.translate(this.currentPosition);
+		
+		this.par.update(this.v,this.alpha, this.currentPosition);
 
 		this.mentalLinkSwitcher.checkForMentalLinkSwitch(getCurrentLinkId(), chooseNextLinkId(), this);
 
@@ -182,7 +153,7 @@ public class Agent2D implements MobsimAgent {
 	}
 
 	public double getWeight() {
-		return AGENT_WEIGHT;
+		return PhysicalAgentRepresentation.AGENT_WEIGHT;
 	}
 
 	public void notifyMoveOverNode(Id newLinkId, double time) {
@@ -309,6 +280,12 @@ public class Agent2D implements MobsimAgent {
 
 	public MobsimDriverAgent getDelegate() {
 		return this.pda;
+	}
+
+
+
+	public CCWPolygon getGeometry() {
+		return this.par.getGeometry();
 	}
 
 

@@ -17,6 +17,6 @@ public class XORShiftRandom {
 
 	public double nextDouble() {
 		long l = randomLong();
-		return (double)l/Long.MAX_VALUE;
+		return (double)l/ (double)Long.MAX_VALUE;
 	}
 }

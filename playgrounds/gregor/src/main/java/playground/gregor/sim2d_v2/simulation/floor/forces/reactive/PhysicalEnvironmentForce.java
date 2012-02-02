@@ -3,12 +3,13 @@ package playground.gregor.sim2d_v2.simulation.floor.forces.reactive;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.collections.QuadTree;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
 import playground.gregor.sim2d_v2.simulation.floor.Floor;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
 import playground.gregor.sim2d_v2.simulation.floor.forces.ForceModule;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class PhysicalEnvironmentForce implements ForceModule{
 
@@ -45,7 +46,7 @@ public class PhysicalEnvironmentForce implements ForceModule{
 
 		Coordinate obj = this.quad.get(agent.getPosition().x, agent.getPosition().y);
 		double dist = obj.distance(agent.getPosition());
-		if (dist > Agent2D.AGENT_DIAMETER/2) {
+		if (dist > PhysicalAgentRepresentation.AGENT_DIAMETER/2) {
 			return;
 		}
 

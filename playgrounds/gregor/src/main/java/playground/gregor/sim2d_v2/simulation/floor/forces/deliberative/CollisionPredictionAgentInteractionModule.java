@@ -4,17 +4,18 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
 
+import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
+import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
+import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
-
-import playground.gregor.sim2d_v2.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
-import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 
 public class CollisionPredictionAgentInteractionModule implements
 DynamicForceModule {
@@ -31,7 +32,7 @@ DynamicForceModule {
 
 	//Zanlungo et al constant
 	public double Bi=.71;
-	public double Ai=1.13*Agent2D.AGENT_WEIGHT;
+	public double Ai=1.13*PhysicalAgentRepresentation.AGENT_WEIGHT;
 	public double lambda=.75;
 
 

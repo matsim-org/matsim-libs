@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v2.events.debug;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.events.PersonEventImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -30,8 +30,16 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laemmel
  * 
  */
-public class ArrowEvent implements Event {
-
+public class ArrowEvent extends PersonEventImpl {
+	
+	public static final String ATTRIBUTE_FROM_X = "fromX";
+	public static final String ATTRIBUTE_FROM_Y = "fromY";
+	public static final String ATTRIBUTE_TO_X = "toX";
+	public static final String ATTRIBUTE_TO_Y = "toY";
+	public static final String ATTRIBUTE_LINE_SEG_TYPE = "lineSegType";
+	
+	public static final String EVENT_TYPE = "line_seg";
+	
 	private final Coordinate from;
 	private final Coordinate to;
 	private final int type;
@@ -40,7 +48,8 @@ public class ArrowEvent implements Event {
 	private final float g;
 	private final float b;
 
-	public ArrowEvent(Id personId, Coordinate from, Coordinate to, float r, float g, float b, int type) {
+	public ArrowEvent(Id personId, Coordinate from, Coordinate to, float r, float g, float b, int type, double time) {
+		super(time,personId);
 		this.from = from;
 		this.to = to;
 		this.type = type;
@@ -62,8 +71,14 @@ public class ArrowEvent implements Event {
 	 */
 	@Override
 	public Map<String, String> getAttributes() {
-		// TODO Auto-generated method stub
-		return null;
+		Map<String, String> map = super.getAttributes();
+		map.put(ATTRIBUTE_FROM_X, ""+this.from.x);
+		map.put(ATTRIBUTE_FROM_Y, ""+this.from.y);
+		map.put(ATTRIBUTE_TO_X, ""+this.to.x);
+		map.put(ATTRIBUTE_TO_Y, ""+this.to.y);
+		map.put(ATTRIBUTE_LINE_SEG_TYPE, ""+this.type);
+		
+		return map;
 	}
 
 	/*
@@ -73,8 +88,7 @@ public class ArrowEvent implements Event {
 	 */
 	@Override
 	public double getTime() {
-		// TODO Auto-generated method stub
-		return 0;
+		return super.getTime();
 	}
 
 	/**
@@ -124,6 +138,11 @@ public class ArrowEvent implements Event {
 	 */
 	public Coordinate getTo() {
 		return this.to;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 
 }
