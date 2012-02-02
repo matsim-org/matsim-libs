@@ -65,7 +65,7 @@ public class InternalControler {
 	
 	private final double monetaryCostPerKm = -0.11; // AUD per km 
 	
-	private final double agentStuckScore = -100000;
+	private final double agentStuckScore = -200000;
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS) {
 		this.configFile = configFile;
