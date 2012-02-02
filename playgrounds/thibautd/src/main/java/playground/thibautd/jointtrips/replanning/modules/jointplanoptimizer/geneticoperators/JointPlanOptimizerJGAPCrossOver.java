@@ -140,9 +140,9 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	}
 
 	private int getNumberOfOperations(final double rate, final double populationSize) {
-		// always perform at least one operation of each CO
-		//return Math.max(1, (int) Math.ceil(rate * populationSize));
-		return (int) Math.ceil(rate * populationSize);
+		// always perform at least one operation of each CO,
+		// except if explicitly requested that no operation is performed
+		return rate > EPSILON ? (int) Math.ceil(rate * populationSize) : 0;
 	}
 
 	/**

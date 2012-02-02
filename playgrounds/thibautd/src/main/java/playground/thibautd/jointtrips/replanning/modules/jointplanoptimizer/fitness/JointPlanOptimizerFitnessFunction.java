@@ -61,11 +61,20 @@ public class JointPlanOptimizerFitnessFunction extends AbstractJointPlanOptimize
 			final int numEpisodes,
 			final int nMembers,
 			final ScoringFunctionFactory scoringFunctionFactory) {
+		 this(new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
+				routingAlgorithm, network, numJointEpisodes, numEpisodes, nMembers).createDecoder(),
+				scoringFunctionFactory);
+	}
+
+	public JointPlanOptimizerFitnessFunction(
+			final JointPlanOptimizerDecoder decoder,
+			final ScoringFunctionFactory scoringFunctionFactory) {
 		super();
-		this.decoder = (new JointPlanOptimizerDecoderFactory(plan, configGroup, legTravelTimeEstimatorFactory,
-				routingAlgorithm, network, numJointEpisodes, numEpisodes, nMembers)).createDecoder();
+		this.decoder = decoder;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
+
+
 
 	@Override
 	protected double evaluate(final IChromosome chromosome) {

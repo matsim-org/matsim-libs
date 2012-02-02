@@ -20,9 +20,12 @@
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
+import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.GeneticOperator;
 import org.jgap.Genotype;
@@ -36,8 +39,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,6 +52,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.planomat.costestimators.DepartureDelayAverageCalculator;
 import org.matsim.testcases.MatsimTestUtils;
@@ -65,6 +74,7 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitn
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPCrossOver;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.JointPlanOptimizerJGAPMutation;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.DurationDecoder;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.DurationDecoderActivityEndsEncoding;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.DurationDecoderPartial;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.pipeddecoder.JointPlanOptimizerDimensionDecoder;
 import playground.thibautd.jointtrips.run.JointControler;
@@ -74,12 +84,43 @@ import playground.thibautd.jointtrips.utils.JointControlerUtils;
  * various tests related to the JointPlanOptimizer.
  * Those tests are grouped here not to split too much all the initialisation procedures.
  * It should be split in the future.
+ *
+ * <br>
+ * It uses a parameterized approach to test various encodings:
+ * <ul>
+ * <li> 0: activity ends
+ * <li> 1: activity durations
+ * </ul>
  * @author thibautd
  */
+@RunWith(Parameterized.class)
 public class TestJPO {
 //TODO: refactor (one abstract fixtures initializing class, and individual class tests)
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	// /////////////////////////////////////////////////////////////////////////
+	// Trick to test both encoding without reimplementing everything:
+	// use the "parameterized" approach
+	// problem: when a test fails, it is more difficult to see
+	// which semantics is used
+	private final SemanticsFactory semanticsFactory;
+
+	@Parameters
+	public static Collection<Object[]> getSemantics() {
+		Object[][] semantics = {
+			{new EndsSemanticsFactory()} ,
+			{new DurationsSemanticsFactory()}};
+		return Arrays.asList( semantics );
+	}
+
+	public TestJPO(
+			final SemanticsFactory semanticsFactory) {
+		this.semanticsFactory = semanticsFactory;
+	}
+	// end of the trick
+	// /////////////////////////////////////////////////////////////////////////
+
 	// sample clique
 	private static final Id idSample = new IdImpl("2593674");
 	private static final int N_TEST_CHROM = 1000;
@@ -136,7 +177,7 @@ public class TestJPO {
 		this.jgapConf = new JointPlanOptimizerJGAPConfiguration(
 				this.samplePlan,
 				this.configGroup,
-				new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+				this.semanticsFactory.createSemantics(
 					this.configGroup,
 					this.controler.getScoringFunctionFactory(),
 					this.legTTEstFactory,
@@ -230,6 +271,7 @@ public class TestJPO {
 	 * with an on the fly fitness is created by the full decoder.
 	 */
 	@Test
+	// FIXME: linked to one encoding, but ran for each
 	public void testFitnesses() throws Exception {
 		JointPlanOptimizerFitnessFunction full = new JointPlanOptimizerFitnessFunction(
 					this.samplePlan,
@@ -267,6 +309,7 @@ public class TestJPO {
 	 * given the same chromosome.
 	 */
 	@Test
+	// FIXME: linked to one encoding, but ran for each
 	public void testOTFDeterministic() throws Exception {
 		int nChrom = 10;
 		int nTries = 10;
@@ -376,35 +419,34 @@ public class TestJPO {
 	 * Tests whether a plan decoded with the duration decoder ends at midnight.
 	 */
 	@Test
-	public void testDurationDecoderClassicalEndTime() throws Exception {
-		DurationDecoder classical = new DurationDecoder(
+	public void testDurationDecoderEndTime() throws Exception {
+		JointPlanOptimizerDimensionDecoder classical = semanticsFactory.createDurationDecoder(
 					this.samplePlan,
 					this.configGroup,
 					this.legTTEstFactory,
 					this.routingAlgo,
 					this.controler.getNetwork(),
 					numToggleGenes,
-					numDurationGenes,
-					this.sampleClique.getMembers().size());
+					numDurationGenes);
 
 		testDurationDecoderEndTime(classical);
 	}
 
-	@Test
-	public void testDurationDecoderPartialEndTime() throws Exception {
-		DurationDecoderPartial partial = new DurationDecoderPartial(
-					this.samplePlan,
-					new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					numToggleGenes,
-					numDurationGenes,
-					this.sampleClique.getMembers().size());
+	//@Test
+	//public void testDurationDecoderPartialEndTime() throws Exception {
+	//	DurationDecoderPartial partial = new DurationDecoderPartial(
+	//				this.samplePlan,
+	//				new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
+	//				this.configGroup,
+	//				this.legTTEstFactory,
+	//				this.routingAlgo,
+	//				this.controler.getNetwork(),
+	//				numToggleGenes,
+	//				numDurationGenes,
+	//				this.sampleClique.getMembers().size());
 
-		testDurationDecoderEndTime(partial);
-	}
+	//	testDurationDecoderEndTime(partial);
+	//}
 
 	private void testDurationDecoderEndTime(final JointPlanOptimizerDimensionDecoder decoder) throws Exception {
 		int nTrys = 100;
@@ -472,35 +514,34 @@ public class TestJPO {
 	}
 
 	@Test
-	public void testTimeLineClassical() throws Exception {
-		DurationDecoder classical = new DurationDecoder(
+	public void testTimeLine() throws Exception {
+		JointPlanOptimizerDimensionDecoder durationDecoder = semanticsFactory.createDurationDecoder(
 					this.samplePlan,
 					this.configGroup,
 					this.legTTEstFactory,
 					this.routingAlgo,
 					this.controler.getNetwork(),
 					numToggleGenes,
-					numDurationGenes,
-					this.sampleClique.getMembers().size());
+					numDurationGenes);
 
-		testTimeLine(classical);
+		testTimeLine( durationDecoder );
 	}
 
-	@Test
-	public void testTimeLinePartial() throws Exception {
-		DurationDecoderPartial partial = new DurationDecoderPartial(
-					this.samplePlan,
-					new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					numToggleGenes,
-					numDurationGenes,
-					this.sampleClique.getMembers().size());
+	//@Test
+	//public void testTimeLinePartial() throws Exception {
+	//	DurationDecoderPartial partial = new DurationDecoderPartial(
+	//				this.samplePlan,
+	//				new ArrayList<Id>(this.sampleClique.getMembers().keySet()),
+	//				this.configGroup,
+	//				this.legTTEstFactory,
+	//				this.routingAlgo,
+	//				this.controler.getNetwork(),
+	//				numToggleGenes,
+	//				numDurationGenes,
+	//				this.sampleClique.getMembers().size());
 
-		testTimeLine(partial);
-	}
+	//	testTimeLine(partial);
+	//}
 
 	private void testTimeLine(final JointPlanOptimizerDimensionDecoder decoder) throws Exception {
 		int nTrys = 10;
@@ -547,16 +588,19 @@ public class TestJPO {
 	 */
 	@Test
 	public void testScoresConsistencyGA() throws Exception {
-		JointPlanOptimizerOTFFitnessFunction scorer = new JointPlanOptimizerOTFFitnessFunction(
-					this.samplePlan,
-					this.configGroup,
-					this.legTTEstFactory,
-					this.routingAlgo,
-					this.controler.getNetwork(),
-					numToggleGenes,
-					numDurationGenes,
-					this.sampleClique.getMembers().size(),
-					this.controler.getScoringFunctionFactory());
+		//JointPlanOptimizerOTFFitnessFunction scorer = new JointPlanOptimizerOTFFitnessFunction(
+		//			this.samplePlan,
+		//			this.configGroup,
+		//			this.legTTEstFactory,
+		//			this.routingAlgo,
+		//			this.controler.getNetwork(),
+		//			numToggleGenes,
+		//			numDurationGenes,
+		//			this.sampleClique.getMembers().size(),
+		//			this.controler.getScoringFunctionFactory());
+		//	We have to do it to test various encodings, but does
+		//	it still makes sense?
+		FitnessFunction scorer = jgapConf.getFitnessFunction();
 
 
 		Genotype gaPopulation = Genotype.randomInitialGenotype( jgapConf );
@@ -582,10 +626,50 @@ public class TestJPO {
 	 * Checks whether the offspring of the cross-overs respect the constraints.
 	 */
 	@Test
-	public void testCOConstraints() throws Exception {
+	public void testWholeCOConstraints() throws Exception {
 		this.configGroup.setWholeCrossOverProbability(P_CO);
-		this.configGroup.setSingleCrossOverProbability(P_CO);
+		this.configGroup.setSingleCrossOverProbability(0);
+		this.configGroup.setSimpleCrossOverProbability(0);
+
+		JointPlanOptimizerJGAPCrossOver crossOver =
+			new JointPlanOptimizerJGAPCrossOver(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+		testGeneticOperatorConstraints(crossOver, jgapPop, offsprings);
+	}
+
+	/**
+	 * Checks whether the offspring of the cross-overs respect the constraints.
+	 */
+	@Test
+	public void testSimpleCOConstraints() throws Exception {
+		this.configGroup.setWholeCrossOverProbability(0);
+		this.configGroup.setSingleCrossOverProbability(0);
 		this.configGroup.setSimpleCrossOverProbability(P_CO);
+
+		JointPlanOptimizerJGAPCrossOver crossOver =
+			new JointPlanOptimizerJGAPCrossOver(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+		testGeneticOperatorConstraints(crossOver, jgapPop, offsprings);
+	}
+
+	/**
+	 * Checks whether the offspring of the cross-overs respect the constraints.
+	 */
+	@Test
+	public void testSingleCOConstraints() throws Exception {
+		this.configGroup.setWholeCrossOverProbability(0);
+		this.configGroup.setSingleCrossOverProbability(P_CO);
+		this.configGroup.setSimpleCrossOverProbability(0);
 
 		JointPlanOptimizerJGAPCrossOver crossOver =
 			new JointPlanOptimizerJGAPCrossOver(
@@ -619,9 +703,30 @@ public class TestJPO {
 	 * Checks whether the offspring of the cross-overs respect the constraints.
 	 */
 	@Test
-	public void testMutationConstraints() throws Exception {
+	public void testUniformMutationConstraints() throws Exception {
 		this.configGroup.setInPlaceMutation(false);
 		this.configGroup.setMutationProbability(P_MUT);
+		this.configGroup.setNonUniformMutationProbability( 0 );
+
+		JointPlanOptimizerJGAPMutation mutation =
+			new JointPlanOptimizerJGAPMutation(
+					this.jgapConf,
+					this.configGroup,
+					this.jgapConf.getConstraintsManager());
+
+		List<IChromosome> offsprings = new ArrayList<IChromosome>();
+		Population jgapPop = createSampleGeneticPopulation();
+		testGeneticOperatorConstraints(mutation, jgapPop, offsprings);
+	}
+
+	/**
+	 * Checks whether the offspring of the cross-overs respect the constraints.
+	 */
+	@Test
+	public void testNonUniformMutationConstraints() throws Exception {
+		this.configGroup.setInPlaceMutation(false);
+		this.configGroup.setMutationProbability(P_MUT);
+		this.configGroup.setNonUniformMutationProbability( 1 );
 
 		JointPlanOptimizerJGAPMutation mutation =
 			new JointPlanOptimizerJGAPMutation(
@@ -700,6 +805,98 @@ public class TestJPO {
 		testGeneticOperatorSideEffects(mutation, jgapPop, offsprings);	
 	}
 
+	/////////////////////////////// constraint manager /////////////////////////
+	@Test
+	public void testSimpleCoef() throws Exception {
+		int nTrys = 1000;
+		ConstraintsManager manager = jgapConf.getConstraintsManager();
+
+		Population jgapPop = createSampleGeneticPopulation();
+
+		RandomGenerator rand = jgapConf.getRandomGenerator();
+		int popSize = jgapPop.size();
+		for (int count = 0; count < nTrys; count++) {
+			IChromosome chrom1 = jgapPop.getChromosome( rand.nextInt(popSize) );
+			IChromosome chrom2 = jgapPop.getChromosome( rand.nextInt(popSize) );
+
+			double coef =
+				manager.getSimpleCrossOverCoef(
+						chrom1,
+						chrom2,
+						rand.nextInt( chrom1.size() ) );
+			checkCoef( coef );
+		}
+	}
+
+	@Test
+	public void testSingleCoefLowerBound() throws Exception {
+		int nTrys = 1000;
+		ConstraintsManager manager = jgapConf.getConstraintsManager();
+
+		Population jgapPop = createSampleGeneticPopulation();
+
+		RandomGenerator rand = jgapConf.getRandomGenerator();
+		int popSize = jgapPop.size();
+		for (int count = 0; count < nTrys; count++) {
+			IChromosome chrom1 = jgapPop.getChromosome( rand.nextInt(popSize) );
+			IChromosome chrom2 = jgapPop.getChromosome( rand.nextInt(popSize) );
+
+			int crossingPoint = -1;
+			
+			do {
+				crossingPoint = rand.nextInt( chrom1.size() );
+			} while ( !(chrom1.getGene( crossingPoint ) instanceof DoubleGene) );
+
+			Tuple<Double, Double> coef =
+				manager.getSingleCrossOverCoefInterval(
+						chrom1,
+						chrom2,
+						crossingPoint );
+			checkCoef( coef.getFirst() );
+		}
+	}
+
+	@Test
+	public void testSingleCoefUpperBound() throws Exception {
+		int nTrys = 1000;
+		ConstraintsManager manager = jgapConf.getConstraintsManager();
+
+		Population jgapPop = createSampleGeneticPopulation();
+
+		RandomGenerator rand = jgapConf.getRandomGenerator();
+		int popSize = jgapPop.size();
+		for (int count = 0; count < nTrys; count++) {
+			IChromosome chrom1 = jgapPop.getChromosome( rand.nextInt(popSize) );
+			IChromosome chrom2 = jgapPop.getChromosome( rand.nextInt(popSize) );
+
+			int crossingPoint = -1;
+			
+			do {
+				crossingPoint = rand.nextInt( chrom1.size() );
+			} while ( !(chrom1.getGene( crossingPoint ) instanceof DoubleGene) );
+
+			Tuple<Double, Double> coef =
+				manager.getSingleCrossOverCoefInterval(
+						chrom1,
+						chrom2,
+						crossingPoint );
+			checkCoef( coef.getFirst() + coef.getSecond() );
+		}
+	}
+
+	/**
+	 * performs basic test of a CO coef (ie that it lies in [0, 1]
+	 */
+	private static void checkCoef(final double coef) {
+		Assert.assertTrue(
+				"got negative coef "+coef,
+				coef > -MatsimTestUtils.EPSILON);
+
+		Assert.assertTrue(
+				"got too large coef "+coef,
+				coef < 1 + MatsimTestUtils.EPSILON);
+	}
+
 	/////////////////////////////// chromosome /////////////////////////////////
 	/**
 	 * Tests whether the randomly generated chromosomes respect the constraints.
@@ -709,12 +906,13 @@ public class TestJPO {
 		int nTrys = 1000;
 		jgapConf.setPopulationSize( nTrys );
 		Genotype genotype = Genotype.randomInitialGenotype( jgapConf );
+		Population population = genotype.getPopulation();
 
 		ConstraintsManager constr = jgapConf.getConstraintsManager();
 
 		int countTrys = 0;
 		List<Object> examined = new ArrayList<Object>();
-		for (Object chromosome : genotype.getPopulation().getChromosomes()) {
+		for (Object chromosome : population.getChromosomes()) {
 			Assert.assertTrue(
 					"random initial genotype does not respects constraints!",
 					constr.respectsConstraints( (IChromosome) chromosome ));
@@ -860,30 +1058,39 @@ public class TestJPO {
 	// helpers
 	// /////////////////////////////////////////////////////////////////////////
 	private void testGeneticOperatorConstraints(
-			final GeneticOperator operator,
+			final GeneticOperator genOperator,
 			final Population pop,
 			final List<IChromosome> offsprings) {
-		operator.operate(pop, offsprings);
+		ConstraintsManager constr = jgapConf.getConstraintsManager();
 
-		UpperBoundsConstraintsManager constr = (UpperBoundsConstraintsManager) jgapConf.getConstraintsManager();
+		for (Object chrom : pop.getChromosomes()) {
+			// just to be sure (executing the operators on a population not respecting
+			// the costriants will lead to offspring not respecting the constraints.
+			Assert.assertTrue(
+					"population does not respects the constraints!",
+					constr.respectsConstraints( (IChromosome) chrom ));
+		}
+
+		genOperator.operate(pop, offsprings);
+
 		for (IChromosome chrom : offsprings) {
 			Assert.assertTrue(
-					operator.getClass().getSimpleName()+"returned offspring not"+
+					genOperator.getClass().getSimpleName()+" returned offspring not"+
 						" respecting the constraints.",
 					constr.respectsConstraints( chrom ));
 		}
 	}
 
 	private void testGeneticOperatorSideEffects(
-			final GeneticOperator operator,
+			final GeneticOperator genOperator,
 			final Population pop,
 			final List<IChromosome> offsprings) {
 		Population previousPop = (Population) pop.clone();
 
-		operator.operate(pop, offsprings);
+		genOperator.operate(pop, offsprings);
 
 		Assert.assertEquals(
-				"applying the operator "+operator.getClass()+" modified the previous generation!",
+				"applying the operator "+genOperator.getClass()+" modified the previous generation!",
 				previousPop,
 				pop);
 	}
@@ -891,14 +1098,17 @@ public class TestJPO {
 	private Population createSampleGeneticPopulation() throws Exception {
 		IChromosome[] chromosomes = new IChromosome[jgapConf.getPopulationSize()];
 
-		UpperBoundsConstraintsManager constr = (UpperBoundsConstraintsManager) jgapConf.getConstraintsManager();
+		ConstraintsManager constr = jgapConf.getConstraintsManager();
 
 		for (int i=0; i < chromosomes.length; i++) {
 			// create "full" chromosomes so that the propability of creating
 			// invalid chromosomes is high in the case the constraints are not
 			// well considered in the operators.
 			chromosomes[i] = createRandomChromosome();
-			constr.fillChromosome( chromosomes[i] );
+
+			if (constr instanceof UpperBoundsConstraintsManager) {
+				((UpperBoundsConstraintsManager) constr).fillChromosome( chromosomes[i] );
+			}
 		}
 
 		return new Population(this.jgapConf, chromosomes);
@@ -909,3 +1119,96 @@ public class TestJPO {
 	}
 }
 
+/**
+ * Provides factories for the elements to test for a particular encoding
+ */
+interface SemanticsFactory {
+	public JointPlanOptimizerSemanticsBuilder createSemantics(
+				JointReplanningConfigGroup configGroup,
+				ScoringFunctionFactory scoringFunctionFactory,
+				JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+				PlansCalcRoute routingAlgo,
+				Network network);
+
+	public JointPlanOptimizerDimensionDecoder createDurationDecoder(
+			JointPlan plan,
+			JointReplanningConfigGroup configGroup,
+			JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+			PlansCalcRoute routingAlgo,
+			Network network,
+			int numToggleGenes,
+			int numDurationGenes);
+}
+
+class EndsSemanticsFactory implements SemanticsFactory {
+	@Override
+	public JointPlanOptimizerSemanticsBuilder createSemantics(
+			final JointReplanningConfigGroup configGroup,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+			final PlansCalcRoute routingAlgo,
+			final Network network) {
+		return new JointPlanOptimizerActivityEndsEncodingSemanticsBuilder(
+				configGroup,
+				scoringFunctionFactory,
+				legTTEstFactory,
+				routingAlgo,
+				network);
+	}
+
+	@Override
+	public JointPlanOptimizerDimensionDecoder createDurationDecoder(
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+			final PlansCalcRoute routingAlgo,
+			final Network network,
+			final int numToggleGenes,
+			final int numDurationGenes) {
+		return new DurationDecoderActivityEndsEncoding(
+					plan,
+					configGroup,
+					legTTEstFactory,
+					routingAlgo,
+					network,
+					numToggleGenes,
+					new TreeSet<Id>(plan.getIndividualPlans().keySet()));
+	}
+}
+
+class DurationsSemanticsFactory implements SemanticsFactory {
+	@Override
+	public JointPlanOptimizerSemanticsBuilder createSemantics(
+			final JointReplanningConfigGroup configGroup,
+			final ScoringFunctionFactory scoringFunctionFactory,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+			final PlansCalcRoute routingAlgo,
+			final Network network) {
+		return new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+				configGroup,
+				scoringFunctionFactory,
+				legTTEstFactory,
+				routingAlgo,
+				network);
+	}
+
+	@Override
+	public JointPlanOptimizerDimensionDecoder createDurationDecoder(
+			final JointPlan plan,
+			final JointReplanningConfigGroup configGroup,
+			final JointPlanOptimizerLegTravelTimeEstimatorFactory legTTEstFactory,
+			final PlansCalcRoute routingAlgo,
+			final Network network,
+			final int numToggleGenes,
+			final int numDurationGenes) {
+		return new DurationDecoder(
+					plan,
+					configGroup,
+					legTTEstFactory,
+					routingAlgo,
+					network,
+					numToggleGenes,
+					numDurationGenes,
+					plan.getClique().getMembers().size());
+	}
+}
