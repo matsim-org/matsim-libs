@@ -7,6 +7,23 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityo
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+
+//physical representation based an an ellipse
+//see:
+//@article{PhysRevE.82.046111,
+//author = {Chraibi, Mohcine and Seyfried, Armin and Schadschneider, Andreas},
+//volume = {82},
+//journal = {Phys. Rev. E},
+//month = {Oct},
+//numpages = {9},
+//title = {Generalized centrifugal-force model for pedestrian dynamics},
+//year = {2010},
+//url = {http://link.aps.org/doi/10.1103/PhysRevE.82.046111},
+//doi = {10.1103/PhysRevE.82.046111},
+//issue = {4},
+//publisher = {American Physical Society},
+//pages = {046111}
+//}
 public class VelocityDependentEllipse extends PhysicalAgentRepresentation {
 
 	QuadTree<CCWPolygon> geometryQuad;
