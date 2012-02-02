@@ -16,6 +16,45 @@ public abstract class Algorithms {
 	private static final double ATANS_LOOKUP_TABLE_RES = Math.PI/100.;
 
 	/**
+	 * Computes both tangents of a circle running through a given point. Computation uses Thales' theorem.
+	 * Note the point has to be outside the circle. This requirement, however, will not be checked!
+	 * @param circleCenter
+	 * @param radius
+	 * @param point
+	 * @return tangentsCoordinates
+	 */
+	public static Coordinate[] computeTangentsThroughPoint(Coordinate circleCenter, double radius, Coordinate point) {
+		Coordinate[] ret = new Coordinate[2];
+		
+		double dx = (point.x - circleCenter.x)/2;
+		double dy = (point.y - circleCenter.y)/2;
+		
+		
+		double d = Math.hypot(dx, dy); // hypot avoids underflow/overflow  
+		
+		double a = (radius*radius) / (2.0 *d);
+		
+		double x2 = circleCenter.x + (dx * a /d);
+		double y2 = circleCenter.y + (dy * a /d);
+		
+		double h = Math.sqrt(radius*radius - a*a);
+		
+		double rx = -dy * (h/d);
+		double ry = dx * (h/d);
+		
+		double xi = x2 + rx;
+		double yi = y2 + ry;
+		double xiPrime = x2 - rx;
+		double yiPrime = y2 -ry;
+		
+		ret[0] = new Coordinate(xi,yi);
+		ret[1] = new Coordinate(xiPrime, yiPrime);
+		
+		return ret;
+	}
+	
+	
+	/**
 	 * tests whether then polar angle of vector s0s1 is bigger than the polar angle of vector t0t1
 	 * @param s0
 	 * @param s1
