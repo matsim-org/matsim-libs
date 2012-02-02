@@ -290,7 +290,7 @@ public class ScenarioGeneratorV {
 		return links;
 	}
 
-	private static List<Coordinate> getOval(double r, double xm, double ym,
+	public static List<Coordinate> getOval(double r, double xm, double ym,
 			double length, double res) {
 
 		List<Coordinate> coords = new ArrayList<Coordinate>();

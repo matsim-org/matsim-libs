@@ -67,14 +67,14 @@ public class Agent2D implements MobsimAgent {
 	private double sensingRange = 5;
 	
 	public final double kindness = MatsimRandom.getRandom().nextDouble();
-	private final PhysicalAgentRepresentation par;
+	private final VelocityDependentEllipse par;
 
 
 	/**
 	 * @param p
 	 * @param sim2d
 	 */
-	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw, PhysicalAgentRepresentation par) {
+	public Agent2D(MobsimDriverAgent pda, Scenario sc, LinkSwitcher mlsw, VelocityDependentEllipse par) {
 
 		this.pda = pda;
 		this.sc = sc;
