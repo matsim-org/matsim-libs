@@ -40,7 +40,7 @@ import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerRTSProcessBuilder;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerTournamentSelectionProcessBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
 
 /**
@@ -92,7 +92,7 @@ public class JPOForOptimization {
 						this.legTravelTimeEstimatorFactory,
 						this.routingAlgorithm,
 						this.network),
-					new JointPlanOptimizerRTSProcessBuilder( configGroup ),
+					new JointPlanOptimizerTournamentSelectionProcessBuilder( configGroup ),
 					configGroup,
 					this.outputPath,
 					this.randomGenerator.nextLong());
