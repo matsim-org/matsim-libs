@@ -348,7 +348,9 @@ public class InitMATSimScenario {
 		timeAlocationMutator.setProbability(0.1);
 		timeAlocationMutator.setDisableAfter(100);
 		scenario.getConfig().strategy().addStrategySettings(timeAlocationMutator);
-		
+		// changing mutation range to 2h. tnicolai:feb'12
+		scenario.getConfig().setParam("TimeAllocationMutator", "mutationRange", "7200"); 
+				
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
 		changeExpBeta.setModuleName("ChangeExpBeta");
 		changeExpBeta.setProbability(0.9);
