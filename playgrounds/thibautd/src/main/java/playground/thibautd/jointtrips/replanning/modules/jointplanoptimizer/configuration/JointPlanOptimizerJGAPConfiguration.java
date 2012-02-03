@@ -90,18 +90,6 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
-			if (configGroup.getPlotFitness()) {
-				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
-							this,
-							configGroup.getMaxIterations(),
-							nMembers,
-							outputPath);
-				this.addGeneticOperator(this.populationAnalysis);
-			}
-			else {
-				this.populationAnalysis = null;
-			}
-
 			// /////////////////////////////////////////////////////////////////
 			// 2 - initialise configurable semantics
 			// /////////////////////////////////////////////////////////////////
@@ -120,15 +108,25 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			this.addNaturalSelector(
 					processBuilder.createNaturalSelector( plan , this ),
 					false );
+
+			// not configurable, but must go here: between population size and other
+			// operators.
+			if (configGroup.getPlotFitness()) {
+				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
+							this,
+							configGroup.getMaxIterations(),
+							nMembers,
+							outputPath);
+				this.addGeneticOperator(this.populationAnalysis);
+			}
+			else {
+				this.populationAnalysis = null;
+			}
+
+
 			for (GeneticOperator op : processBuilder.createGeneticOperators( plan , this )) {
 				this.addGeneticOperator( op );
 			}
-
-			//int tournamentSize = (int) Math.round( 0.1 * popSize );
-			//TournamentSelector selector = new TournamentSelector( this , tournamentSize < 2 ? 2 : tournamentSize , 1 );
-			//selector.setDoubletteChromosomesAllowed( false );
-			//this.setKeepPopulationSizeConstant( true );
-			//this.addNaturalSelector(selector, false);
 		}
 		catch (Exception e) {
 			throw new RuntimeException( "exception thrown at configuration init" , e);
