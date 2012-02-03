@@ -342,6 +342,8 @@ public class ParameterOptimizerFitness extends FitnessFunction {
 		configGroup.setWindowSizeCoef(getDoubleValue(genes[RTS_WINDOW_SLOPE_GENE]));
 		configGroup.setWindowSizeIntercept(getDoubleValue(genes[RTS_WINDOW_INTERCEPT_GENE]));
 
+		configGroup.setOptimizeToggle( ""+false );
+
 		return configGroup;
 	}
 
