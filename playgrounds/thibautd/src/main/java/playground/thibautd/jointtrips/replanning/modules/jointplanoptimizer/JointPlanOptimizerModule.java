@@ -34,13 +34,12 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.cost
 
 /**
  * {@link AbstractMultithreadedModule} using {@link JointPlanOptimizer}.
- * It uses an activity duration encoding, which seems to behave badly with "slipping"
- * scenario duration.
  *
  * @author thibautd
  */
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	//private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
+	private static final boolean USE_END_ENCODING = false;
 
 	private final JointReplanningConfigGroup configGroup;
 	private final Network network;
@@ -90,18 +89,33 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 			controler.getControlerIO().getIterationPath( it ) :
 			controler.getControlerIO().getTempPath();
 
-		JointPlanOptimizerSemanticsBuilder semanticsBuilder =
-			new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
-					configGroup,
-					controler.getScoringFunctionFactory(),
-					legTravelTimeEstimatorFactory,
-					routingAlgorithm,
-					network);
+		JointPlanOptimizerSemanticsBuilder semanticsBuilder;
+		JointPlanOptimizerProcessBuilder processBuilder = new JointPlanOptimizerRTSProcessBuilder( configGroup );
+
+		if (USE_END_ENCODING) {
+			semanticsBuilder=
+				new JointPlanOptimizerActivityEndsEncodingSemanticsBuilder(
+						configGroup,
+						controler.getScoringFunctionFactory(),
+						legTravelTimeEstimatorFactory,
+						routingAlgorithm,
+						network);
+		}
+		else {
+			semanticsBuilder=
+				new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
+						configGroup,
+						controler.getScoringFunctionFactory(),
+						legTravelTimeEstimatorFactory,
+						routingAlgorithm,
+						network);
+		}
+
 		return new JointPlanOptimizer(
 					configGroup,
 					semanticsBuilder,
-					iterationOutNumber
-					);
+					processBuilder,
+					iterationOutNumber);
 	}
 }
 

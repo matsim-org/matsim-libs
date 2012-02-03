@@ -41,6 +41,7 @@ import playground.thibautd.jointtrips.population.JointPlan;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerRTSProcessBuilder;
 
 /**
  * Runs the joint plan optimizer and returns the best obtained score
@@ -85,13 +86,14 @@ public class JPOForOptimization {
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
 			new JointPlanOptimizerJGAPConfiguration(
 					plan,
-					configGroup,
 					new JointPlanOptimizerActivityDurationEncodingSemanticsBuilder(
 						configGroup,
 						this.fitnessFunctionFactory,
 						this.legTravelTimeEstimatorFactory,
 						this.routingAlgorithm,
 						this.network),
+					new JointPlanOptimizerRTSProcessBuilder( configGroup ),
+					configGroup,
 					this.outputPath,
 					this.randomGenerator.nextLong());
 

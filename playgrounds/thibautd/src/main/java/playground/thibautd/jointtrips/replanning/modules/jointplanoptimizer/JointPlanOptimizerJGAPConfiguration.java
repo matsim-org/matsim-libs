@@ -19,9 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 
+import java.lang.Exception;
+
 import org.apache.log4j.Logger;
 import org.jgap.Configuration;
 import org.jgap.DefaultFitnessEvaluator;
+import org.jgap.GeneticOperator;
+import org.jgap.impl.BestChromosomesSelector;
+import org.jgap.impl.TournamentSelector;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.audit.IEvolutionMonitor;
 import org.jgap.event.EventManager;
@@ -60,8 +65,9 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 
 	public JointPlanOptimizerJGAPConfiguration(
 			final JointPlan plan,
-			final JointReplanningConfigGroup configGroup,
 			final JointPlanOptimizerSemanticsBuilder semanticsBuilder,
+			final JointPlanOptimizerProcessBuilder processBuilder,
+			final JointReplanningConfigGroup configGroup,
 			final String outputPath,
 			final long randomSeed) {
 		super(null);
@@ -70,52 +76,18 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 		int nMembers = plan.getIndividualPlans().size();
 
 		try {
-			// default JGAP objects initializations
+			// /////////////////////////////////////////////////////////////////
+			// 1 - initialise non-configurable parts
+			// /////////////////////////////////////////////////////////////////
 			this.setBreeder(new JointPlanOptimizerJGAPBreeder());
 			this.setEventManager(new EventManager());
+			this.setChromosomePool(new ChromosomePool());
 
 			// seed the default JGAP pseudo-random generator with a matsim random
 			// number, so that the simulations are reproducible.
 			this.setRandomGenerator(new StockRandomGenerator());
 			((StockRandomGenerator) this.getRandomGenerator()).setSeed(randomSeed);
 
-			this.monitor =
-				new JointPlanOptimizerJGAPEvolutionMonitor(this, configGroup, nMembers);
-
-			// semantics: builder calls, in the order defined in the javadoc of the interface
-			this.setSampleChromosome( semanticsBuilder.createSampleChromosome( plan , this ) );
-			constraints = semanticsBuilder.createConstraintsManager( plan , this );
-			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
-			this.fitnessFunction = semanticsBuilder.createFitnessFunction( plan , this );
-			this.setFitnessFunction( fitnessFunction );
-
-			// population size: the SPX cross-over requires at least one chromosome
-			// per double dimension.
-			int popSize = Math.min(
-					(int) Math.ceil(
-						configGroup.getPopulationIntercept() +
-						configGroup.getPopulationCoef() * getSampleChromosome().size()),
-					configGroup.getMaxPopulationSize());
-			this.setPopulationSize( Math.max(2, popSize) );
-
-			// discarded chromosomes are "recycled" rather than suppressed.
-			this.setChromosomePool(new ChromosomePool());
-
-			// selector
-			RestrictedTournamentSelector selector = 
-				new RestrictedTournamentSelector(
-						this,
-						configGroup,
-						(configGroup.getUseOnlyHammingDistanceInRTS() ?
-							 new HammingChromosomeDistanceComparator() :
-							 new DefaultChromosomeDistanceComparator(
-								configGroup.getDiscreteDistanceScale())));
-			this.addNaturalSelector(selector, false);
-
-			// do not try to reintroduce fittest: RTS never eliminates it
-			this.setPreservFittestIndividual(false);
-
-			// genetic operators definitions
 			if (configGroup.getPlotFitness()) {
 				this.populationAnalysis = new JointPlanOptimizerPopulationAnalysisOperator(
 							this,
@@ -127,18 +99,37 @@ public class JointPlanOptimizerJGAPConfiguration extends Configuration {
 			else {
 				this.populationAnalysis = null;
 			}
-			this.addGeneticOperator( new JointPlanOptimizerJGAPCrossOver(
-						this,
-						configGroup,
-						constraints));
 
-			this.addGeneticOperator( new JointPlanOptimizerJGAPMutation(
-						this,
-						configGroup,
-						constraints));
+			// /////////////////////////////////////////////////////////////////
+			// 2 - initialise configurable semantics
+			// /////////////////////////////////////////////////////////////////
+			// semantics: builder calls, in the order defined in the javadoc of the interface
+			this.setSampleChromosome( semanticsBuilder.createSampleChromosome( plan , this ) );
+			this.constraints = semanticsBuilder.createConstraintsManager( plan , this );
+			this.setFitnessEvaluator(new DefaultFitnessEvaluator());
+			this.fitnessFunction = semanticsBuilder.createFitnessFunction( plan , this );
+			this.setFitnessFunction( fitnessFunction );
 
-		} catch (InvalidConfigurationException e) {
-			throw new RuntimeException(e.getMessage());
+			// /////////////////////////////////////////////////////////////////
+			// 3 - initialise configurable process
+			// /////////////////////////////////////////////////////////////////
+			this.setPopulationSize( processBuilder.getPopulationSize( plan , this ) );
+			this.monitor = processBuilder.createEvolutionMonitor( plan , this );
+			this.addNaturalSelector(
+					processBuilder.createNaturalSelector( plan , this ),
+					false );
+			for (GeneticOperator op : processBuilder.createGeneticOperators( plan , this )) {
+				this.addGeneticOperator( op );
+			}
+
+			//int tournamentSize = (int) Math.round( 0.1 * popSize );
+			//TournamentSelector selector = new TournamentSelector( this , tournamentSize < 2 ? 2 : tournamentSize , 1 );
+			//selector.setDoubletteChromosomesAllowed( false );
+			//this.setKeepPopulationSizeConstant( true );
+			//this.addNaturalSelector(selector, false);
+		}
+		catch (Exception e) {
+			throw new RuntimeException( "exception thrown at configuration init" , e);
 		}
 	 }
 

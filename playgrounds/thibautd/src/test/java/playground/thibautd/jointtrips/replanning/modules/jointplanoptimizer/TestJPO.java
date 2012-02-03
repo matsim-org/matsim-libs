@@ -46,12 +46,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -176,13 +178,14 @@ public class TestJPO {
 
 		this.jgapConf = new JointPlanOptimizerJGAPConfiguration(
 				this.samplePlan,
-				this.configGroup,
 				this.semanticsFactory.createSemantics(
 					this.configGroup,
 					this.controler.getScoringFunctionFactory(),
 					this.legTTEstFactory,
 					this.routingAlgo,
 					this.controler.getNetwork()),
+				new JointPlanOptimizerRTSProcessBuilder( configGroup ),
+				this.configGroup,
 				outputPath,
 				123);
 
@@ -584,24 +587,12 @@ public class TestJPO {
 
 	/**
 	 * Tests whether the scores obtained by the getter on the chromosomes
-	 * correspond to the scores obtained by decoding them, in the non-memetic setting.
+	 * correspond to the scores obtained by decoding them and than scoring
+	 * them with the MATSim scoring function.
 	 */
 	@Test
-	public void testScoresConsistencyGA() throws Exception {
-		//JointPlanOptimizerOTFFitnessFunction scorer = new JointPlanOptimizerOTFFitnessFunction(
-		//			this.samplePlan,
-		//			this.configGroup,
-		//			this.legTTEstFactory,
-		//			this.routingAlgo,
-		//			this.controler.getNetwork(),
-		//			numToggleGenes,
-		//			numDurationGenes,
-		//			this.sampleClique.getMembers().size(),
-		//			this.controler.getScoringFunctionFactory());
-		//	We have to do it to test various encodings, but does
-		//	it still makes sense?
-		FitnessFunction scorer = jgapConf.getFitnessFunction();
-
+	public void testScoresConsistency() throws Exception {
+		JointPlanOptimizerDecoder decoder = jgapConf.getDecoder();
 
 		Genotype gaPopulation = Genotype.randomInitialGenotype( jgapConf );
 
@@ -610,15 +601,44 @@ public class TestJPO {
 		// notify end
 		jgapConf.finish();
 
+		ScoringFunctionFactory scoringFunctionFactory = controler.getScoringFunctionFactory();
+		double bestScore = Double.NEGATIVE_INFINITY;
+
 		for ( Object elem : gaPopulation.getPopulation().getChromosomes() ) {
 			IChromosome chrom = (IChromosome) elem;
 			double score = chrom.getFitnessValue();
-			double decoded = scorer.getFitnessValue(chrom);
+			JointPlan plan = decoder.decode( chrom );
+			bestScore = score > bestScore ? score : bestScore;
+
+			//TODO: score with MATSim scoring function
+			for (Plan individualPlan : plan.getIndividualPlans().values()) {
+				ScoringFunction scoringFunction =
+					scoringFunctionFactory.createNewScoringFunction( individualPlan );
+
+				scoringFunction.reset();
+				for (PlanElement pe : individualPlan.getPlanElements()) {
+					if (pe instanceof Activity) {
+						scoringFunction.handleActivity( (Activity) pe );
+					}
+					else if (pe instanceof Leg) {
+						scoringFunction.handleLeg( (Leg) pe );
+					}
+				}
+				scoringFunction.finish();
+				individualPlan.setScore( scoringFunction.getScore() );
+			}
 
 			Assert.assertEquals(
 					"score returned by chromosome do not correspond to decoded score",
-					decoded, score, MatsimTestUtils.EPSILON);
+					plan.getScore(), score, MatsimTestUtils.EPSILON);
 		}
+
+		Assert.assertEquals(
+				"score of the best chromosome returned by genotype does not corresponds to the best score found",
+				bestScore,
+				gaPopulation.getFittestChromosome().getFitnessValue(),
+				MatsimTestUtils.EPSILON);
+
 	}
 
 	/////////////////////////////////// operators //////////////////////////////

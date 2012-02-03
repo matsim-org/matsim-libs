@@ -43,16 +43,19 @@ public class JointPlanOptimizer extends JointPlanAlgorithm {
 	private final JointReplanningConfigGroup configGroup;
 	private final String outputPath;
 	private final JointPlanOptimizerSemanticsBuilder semanticsBuilder;
+	private final JointPlanOptimizerProcessBuilder processBuilder;
 
 	private final Random randomGenerator = MatsimRandom.getLocalInstance();
 
 	public JointPlanOptimizer(
 			final JointReplanningConfigGroup configGroup,
 			final JointPlanOptimizerSemanticsBuilder semanticsBuilder,
+			final JointPlanOptimizerProcessBuilder processBuilder,
 			final String iterationOutputPath
 			) {
 		this.configGroup = configGroup;
 		this.semanticsBuilder = semanticsBuilder;
+		this.processBuilder = processBuilder;
 		this.outputPath = iterationOutputPath;
 	}
 
@@ -68,8 +71,9 @@ public class JointPlanOptimizer extends JointPlanAlgorithm {
 		JointPlanOptimizerJGAPConfiguration jgapConfig =
 			new JointPlanOptimizerJGAPConfiguration(
 					plan,
-					configGroup,
 					semanticsBuilder,
+					processBuilder,
+					configGroup,
 					outputPath,
 					randomGenerator.nextLong());
 
