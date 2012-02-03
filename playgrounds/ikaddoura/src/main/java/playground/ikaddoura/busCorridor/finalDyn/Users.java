@@ -70,6 +70,9 @@ public class Users {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Population population = scenario.getPopulation();
 
+		int counter = 0;
+		int counterPlans = 0;
+		
 		double logSumAllPersons = 0.0;
 		for(Person person : population.getPersons().values()){
 			double expScore = 0.0;
@@ -79,6 +82,7 @@ public class Users {
 				}
 				else {
 					log.info("A plan of "+person.getId()+" is not used for LogSumUserScoring because of Agent would stuck --> Score: "+plan.getScore());
+					counterPlans++;
 				}
 			}
 			
@@ -94,6 +98,7 @@ public class Users {
 			
 			if (logSumThisPerson<-100000){
 				log.warn("All plans of "+person.getId()+" are not used for LogSum User Scoring. (LogSum for this person: "+logSumThisPerson+")");
+				counter++;
 			}
 			else {
 				logSumAllPersons = logSumThisPerson + logSumAllPersons;
@@ -108,6 +113,10 @@ public class Users {
 		this.setAvgExecScore(execScoreSum/execScores.size());
 		this.setLogSum(logSumAllPersons);
 		
+		if (counter > 0){
+			log.warn("Number of agents that are not used for LogSum User Scoring: "+counter);
+		}
+		log.info("Number of plans that are not used for Welfare Scoring: "+counterPlans);
 		log.info("Average User Score calculated. "+this.avgExecScore);
 		log.info("User Score Sum (LogSum) calculated. "+this.logSum);
 	}
