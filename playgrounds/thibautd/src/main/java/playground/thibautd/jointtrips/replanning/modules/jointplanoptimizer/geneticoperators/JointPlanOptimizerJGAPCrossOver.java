@@ -19,19 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.jgap.Gene;
 import org.jgap.GeneticOperator;
 import org.jgap.IChromosome;
 import org.jgap.Population;
 import org.jgap.RandomGenerator;
-import org.jgap.impl.BooleanGene;
 import org.jgap.impl.DoubleGene;
 
 import org.matsim.core.utils.collections.Tuple;
@@ -47,21 +41,18 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.Join
  * <li> on continuous variables: GENOCOP-like "arithmetical" cross overs.
  * </ul>
  *
- * assumes the following structure for the chromosome: [boolean genes]-[Double genes]-[mode genes]
  * @author thibautd
  */
 public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
-	private static final Logger log =
-		Logger.getLogger(JointPlanOptimizerJGAPCrossOver.class);
-
 	private static final long serialVersionUID = 1L;
 
 	private static final double EPSILON = 1e-10;
+	private static final double WHOLE_COEF = 0.25;
 
-	private final double WHOLE_CO_RATE;
-	private final double SIMPLE_CO_RATE;
-	private final double SINGLE_CO_RATE;
-	private final double DISCRETE_CO_RATE;
+	private final double wholeCoRate;
+	private final double simpleCoRate;
+	private final double singleCoRate;
+	private final double discreteCoRate;
 
 	private final ConstraintsManager constraintsManager;
 
@@ -74,10 +65,10 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 			final JointPlanOptimizerJGAPConfiguration config,
 			final JointReplanningConfigGroup configGroup,
 			final ConstraintsManager constraintsManager) {
-		this.WHOLE_CO_RATE = configGroup.getWholeCrossOverProbability();
-		this.SIMPLE_CO_RATE = configGroup.getSimpleCrossOverProbability();
-		this.SINGLE_CO_RATE = configGroup.getSingleCrossOverProbability();
-		this.DISCRETE_CO_RATE = configGroup.getDiscreteCrossOverProbability();
+		this.wholeCoRate = configGroup.getWholeCrossOverProbability();
+		this.simpleCoRate = configGroup.getSimpleCrossOverProbability();
+		this.singleCoRate = configGroup.getSingleCrossOverProbability();
+		this.discreteCoRate = configGroup.getDiscreteCrossOverProbability();
 		this.randomGenerator = config.getRandomGenerator();
 		this.constraintsManager = constraintsManager;
 	}
@@ -92,10 +83,10 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		int numOfSingleCo;
 		int numOfDiscreteCo;
 
-		numOfWholeCo = getNumberOfOperations(this.WHOLE_CO_RATE, populationSize);
-		numOfSimpleCo = getNumberOfOperations(this.SIMPLE_CO_RATE, populationSize);
-		numOfSingleCo = getNumberOfOperations(this.SINGLE_CO_RATE, populationSize);
-		numOfDiscreteCo = getNumberOfOperations(this.DISCRETE_CO_RATE, populationSize);
+		numOfWholeCo = getNumberOfOperations(this.wholeCoRate, populationSize);
+		numOfSimpleCo = getNumberOfOperations(this.simpleCoRate, populationSize);
+		numOfSingleCo = getNumberOfOperations(this.singleCoRate, populationSize);
+		numOfDiscreteCo = getNumberOfOperations(this.discreteCoRate, populationSize);
 
 		int numOfCo = numOfWholeCo + numOfSimpleCo + numOfSingleCo + numOfDiscreteCo;
 		int chromLength = a_population.getChromosome( 0 ).size();
@@ -177,7 +168,7 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 	 * Performs a "GENOCOP-like" "Whole arithmetical cross-over" on the double
 	 * valued genes, with a random coefficient.
 	 */
-	private boolean doDoubleWholeCrossOver(
+	private static boolean doDoubleWholeCrossOver(
 			final IChromosome mate1,
 			final IChromosome mate2) {
 		boolean somethingWasDone = false;
@@ -189,7 +180,8 @@ public class JointPlanOptimizerJGAPCrossOver implements GeneticOperator {
 		DoubleGene gene2;
 		double oldValue1;
 		double oldValue2;
-		double randomCoef = this.randomGenerator.nextDouble();
+		//double randomCoef = this.randomGenerator.nextDouble();
+		double randomCoef = WHOLE_COEF;
 
 		for (int i=0; i < mate1Genes.length; i++) {
 			if (mate1Genes[i] instanceof DoubleGene) {
