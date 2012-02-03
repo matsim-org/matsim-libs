@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
 
-//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -35,7 +34,10 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.conf
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerProcessBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerRTSProcessBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerSemanticsBuilder;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerTournamentSelectionProcessBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
+
+//import org.apache.log4j.Logger;
 
 /**
  * {@link AbstractMultithreadedModule} using {@link JointPlanOptimizer}.
@@ -45,6 +47,7 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.cost
 public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 	//private static final Logger log = Logger.getLogger(JointPlanOptimizerModule.class);
 	private static final boolean USE_END_ENCODING = false;
+	private static final boolean USE_RTS = false;
 
 	private final JointReplanningConfigGroup configGroup;
 	private final Network network;
@@ -95,7 +98,14 @@ public class JointPlanOptimizerModule extends AbstractMultithreadedModule {
 			controler.getControlerIO().getTempPath();
 
 		JointPlanOptimizerSemanticsBuilder semanticsBuilder;
-		JointPlanOptimizerProcessBuilder processBuilder = new JointPlanOptimizerRTSProcessBuilder( configGroup );
+		JointPlanOptimizerProcessBuilder processBuilder;
+
+		if (USE_RTS) {
+			processBuilder = new JointPlanOptimizerRTSProcessBuilder( configGroup );
+		}
+		else {
+			processBuilder = new JointPlanOptimizerTournamentSelectionProcessBuilder( configGroup );
+		}
 
 		if (USE_END_ENCODING) {
 			semanticsBuilder=
