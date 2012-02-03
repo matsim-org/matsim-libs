@@ -31,7 +31,7 @@ import org.jgap.NaturalSelectorExt;
 import org.jgap.Population;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
 
 /**
  * Selector using a "restricted tournament" (cf Harik 1995) to generate the new 

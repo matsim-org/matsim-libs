@@ -41,7 +41,7 @@ import org.jgap.IChromosome;
 import org.jgap.Population;
 import org.jgap.impl.BooleanGene;
 
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
 
 /**
  * "fake" genetic operator for displaying information about the population.

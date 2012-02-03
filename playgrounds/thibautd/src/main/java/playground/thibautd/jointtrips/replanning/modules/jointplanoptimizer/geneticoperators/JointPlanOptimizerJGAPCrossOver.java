@@ -31,7 +31,7 @@ import org.jgap.impl.DoubleGene;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
 
 /**
  * Cross breeds joint plans.

@@ -17,11 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
+package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration;
 
 import org.jgap.InvalidConfigurationException;
 
 import playground.thibautd.jointtrips.population.JointPlan;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPChromosome;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.fitness.AbstractJointPlanOptimizerFitnessFunction;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.geneticoperators.ConstraintsManager;
 

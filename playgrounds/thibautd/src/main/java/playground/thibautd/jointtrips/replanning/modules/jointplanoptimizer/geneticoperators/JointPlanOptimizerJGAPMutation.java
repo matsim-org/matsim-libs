@@ -38,8 +38,8 @@ import org.jgap.impl.DoubleGene;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPModeGene;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
 
 /**
  * Class mutating random members from the previous generation.

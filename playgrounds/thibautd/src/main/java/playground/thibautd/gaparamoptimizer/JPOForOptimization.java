@@ -38,10 +38,10 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.jointtrips.config.JointReplanningConfigGroup;
 import playground.thibautd.jointtrips.population.JointPlan;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerActivityDurationEncodingSemanticsBuilder;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerJGAPConfiguration;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration.JointPlanOptimizerRTSProcessBuilder;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.costestimators.JointPlanOptimizerLegTravelTimeEstimatorFactory;
-import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.JointPlanOptimizerRTSProcessBuilder;
 
 /**
  * Runs the joint plan optimizer and returns the best obtained score

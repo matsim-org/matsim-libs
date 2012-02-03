@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer;
+package playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.configuration;
 
 import java.util.Collection;
 
