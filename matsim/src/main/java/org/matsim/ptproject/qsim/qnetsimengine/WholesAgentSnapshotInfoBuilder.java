@@ -57,11 +57,11 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 	public void addVehiclePositions(VisLane visLane, Collection<AgentSnapshotInfo> positions,
 			Collection<QVehicle> buffer, Collection<QVehicle> vehQueue, Collection<QItem> holes,
 			double linkLength, double offset, Integer laneNumber) {
-		double storageCapacity = visLane.getStorageCapacity() ;
-		double bufferStorageCapacity = visLane.getBufferStorage() ;
-
-		double currentQueueEnd = linkLength; // queue end initialized at end of link
-
+//		double storageCapacity = visLane.getStorageCapacity() ;
+//		double bufferStorageCapacity = visLane.getBufferStorage() ;
+//
+//		double currentQueueEnd = linkLength; // queue end initialized at end of link
+//
 		// for holes: using the "queue" method, but with different vehSpacing:
 //		float vehSpacing = (float) calculateVehicleSpacingAsQueue(linkLength, storageCapacity, bufferStorageCapacity);
 		//		float vehSpacingWithHoles = (float) calculateVehicleSpacingWithHoles(linkLength, storageCapacity, bufferStorageCapacity,
@@ -77,10 +77,10 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 
 	}
 
-	private void positionOtherDrivingVehiclesWithHoles(final Collection<AgentSnapshotInfo> positions, double queueEnd,
-			double vehSpacing, Collection<QVehicle> vehQueue, Collection<QItem> holes, double offset, Integer laneNumber,
-			VisLane visLane)
-	{
+//	private void positionOtherDrivingVehiclesWithHoles(final Collection<AgentSnapshotInfo> positions, double queueEnd,
+//			double vehSpacing, Collection<QVehicle> vehQueue, Collection<QItem> holes, double offset, Integer laneNumber,
+//			VisLane visLane)
+//	{
 //		if ( visLane instanceof QLane ) {
 //			throw new RuntimeException("holes visualization is not implemented for lanes since I don't understand which "
 //					+ "quantities refer to the link and which to the lane.  kai, nov'10" ) ;
@@ -128,7 +128,7 @@ public class WholesAgentSnapshotInfoBuilder extends QueueAgentSnapshotInfoBuilde
 //		}
 //		throw new RuntimeException("this is not (yet) finished; aborting ...") ;
 
-	}
+//	}
 	//	private double calculateVehicleSpacingWithHoles(double linkLength, double storageCapacity, double bufferStorageCapacity,
 	//			double congestedDensity_veh_m ) {
 	//		// yyyyyy abusing congDens as nHolesMax!

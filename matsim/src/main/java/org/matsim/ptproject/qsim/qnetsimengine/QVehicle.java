@@ -42,7 +42,6 @@ import org.matsim.vehicles.Vehicle;
 
 public class QVehicle extends QItem implements MobsimVehicle {
 
-	private double linkEnterTime = Double.NaN;
 	private double earliestLinkExitTime = 0;
 	private DriverAgent driver = null;
 	private Id id;

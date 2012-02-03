@@ -788,14 +788,14 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		private OTFLaneModelBuilder laneModelBuilder = new OTFLaneModelBuilder();
 		private double linkScale;
 		private 	OTFLane visLane ;
-		private double laneStartPointOnLink;
+//		private double laneStartPointOnLink;
 		
 		VisDataImpl(){
 			this.linkScale = (QLane.this.qLink.getLink().getLength() - 2.0 * nodeOffsetMeter) / QLane.this.qLink.getLink().getLength();
 			double linkLengthCorrectionFactor = ((LinkImpl)QLane.this.qLink.getLink()).getEuklideanDistance() / QLane.this.qLink.getLink().getLength();
 			visLane = laneModelBuilder.createOTFLane(QLane.this.laneData, QLane.this, QLane.this.qLink.getLink().getLength(), 
 					linkScale, linkLengthCorrectionFactor);
-			this.laneStartPointOnLink = QLane.this.qLink.getLink().getLength() -  QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();
+//			this.laneStartPointOnLink = QLane.this.qLink.getLink().getLength() -  QLane.this.getLaneData().getStartsAtMeterFromLinkEnd();
 		}
 		
 		@Override

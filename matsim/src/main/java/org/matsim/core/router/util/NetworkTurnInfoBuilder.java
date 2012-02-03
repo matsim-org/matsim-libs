@@ -81,13 +81,13 @@ public class NetworkTurnInfoBuilder {
 	 */
 	public void mergeTurnInfoMaps(Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap,
 			Map<Id, List<TurnInfo>> restrictingTurnInfoMap) {
-		Set<Id> allowedInLinkIds = allowedInLinkTurnInfoMap.keySet();
-		for (Id inLinkId : allowedInLinkIds) {
-			if (!restrictingTurnInfoMap.containsKey(inLinkId)) {
+		for (Map.Entry<Id, List<TurnInfo>> e : allowedInLinkTurnInfoMap.entrySet()) {
+			if (!restrictingTurnInfoMap.containsKey(e.getKey())) {
 				continue; // there is no restriction for the inLink
 			}
 			else { // there are restrictions for the inLink
-				List<TurnInfo> allowedTurnInfos = new ArrayList<TurnInfo>(allowedInLinkTurnInfoMap.get(inLinkId));
+				Id inLinkId = e.getKey();
+				List<TurnInfo> allowedTurnInfos = new ArrayList<TurnInfo>(e.getValue());
 				List<TurnInfo> restrictingTurnInfos = restrictingTurnInfoMap.get(inLinkId);
 				for (TurnInfo allowedForOutlink : allowedTurnInfos) {
 					TurnInfo restrictionForOutlink = this.getTurnInfoForOutlinkId(
