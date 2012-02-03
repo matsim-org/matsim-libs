@@ -20,8 +20,10 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,17 +37,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.households.Household;
 
 /**
  * Checks whether a car is available for an agent or not.
@@ -53,14 +57,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * 
  * @author cdobler
  */
-public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentDepartureEventHandler, 
-	ActivityStartEventHandler, SimulationInitializedListener {
+public class ModeAvailabilityChecker implements AgentDepartureEventHandler, 
+	PersonEntersVehicleEventHandler, ActivityStartEventHandler, SimulationInitializedListener {
 
 	private final Scenario scenario;
 	private final double maxDistance;
-	private final Set<Id> carArrivals;
-	private final Map<Id, Coord> carCoords;
-
+	private final Set<Id> drivers;
+	private final Map<Id, Id> driverVehicleMapping;		// <PersonId, VehicleId>
+	private final Map<Id, Coord> vehicleCoordinates;	// <VehicleId, Coordinate>
+	
 	/**
 	 * @param scenario the simulated scenario
 	 * @param maxDistance the maximum distance [m] that we allow to be between an agent and its car
@@ -69,8 +74,44 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 		this.scenario = scenario;
 		this.maxDistance = maxDistance;
 		
-		this.carArrivals = new HashSet<Id>();
-		this.carCoords = new HashMap<Id, Coord>();
+		this.drivers = new HashSet<Id>();
+		this.vehicleCoordinates = new HashMap<Id, Coord>();
+		this.driverVehicleMapping = new HashMap<Id, Id>();
+	}
+	/**
+	 * 
+	 * @param householdId Id of the household to check
+	 * @param facilityId Id of the facility where the household is located
+	 * @return
+	 */
+	public List<Id> getAvailableCars(Id householdId, Id facilityId) {
+		Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
+		return getAvailableCars(household, facilityId);
+	}
+	
+	/**
+	 * 
+	 * @param household household to check
+	 * @param facilityId Id of the facility where the household is located
+	 * @return
+	 */
+	public List<Id> getAvailableCars(Household household, Id facilityId) {
+		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		Coord facilityCoord = facility.getCoord();
+		
+		List<Id> vehicles = household.getVehicleIds();
+				
+		List<Id> availableVehicles = new ArrayList<Id>();
+		
+		for (Id vehicleId : vehicles) {
+			Coord carCoord = this.vehicleCoordinates.get(vehicleId);
+			if (carCoord == null) continue;
+			else if (CoordUtils.calcDistance(facilityCoord, carCoord) <= this.maxDistance) {
+				availableVehicles.add(vehicleId);
+			}
+		}
+		
+		return availableVehicles;
 	}
 	
 	/**
@@ -91,7 +132,8 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 	 * @return true if the person has a car available within the pre-defined maxDistance, otherwise false
 	 */
 	public boolean isCarAvailable(Id personId, Coord coord) {
-		Coord carCoord = this.carCoords.get(personId);
+		Id vehicleId = this.driverVehicleMapping.get(personId);
+		Coord carCoord = this.vehicleCoordinates.get(vehicleId);
 		if (carCoord == null) return false;
 		else return CoordUtils.calcDistance(coord, carCoord) <= this.maxDistance;
 	}
@@ -101,7 +143,8 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 	 * @return the coordinates of the car of the given person or false if the person has no car available
 	 */
 	public Coord getCarCoord(Id personId) {
-		return carCoords.get(personId);
+		Id vehicleId = this.driverVehicleMapping.get(personId);
+		return vehicleCoordinates.get(vehicleId);
 	}
 	
 	/**
@@ -154,30 +197,35 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 	
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) this.carCoords.remove(event.getPersonId());
+		Id vehicleId = driverVehicleMapping.get(event.getPersonId());
+		if (event.getLegMode().equals(TransportMode.car)) {
+			this.vehicleCoordinates.remove(vehicleId);
+			this.drivers.add(event.getPersonId());
+		}
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) this.carArrivals.add(event.getPersonId());
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (drivers.contains(event.getPersonId())) driverVehicleMapping.put(event.getPersonId(), event.getVehicleId());		
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		
 		/*
-		 * If the agent has just arrived from a car trip we set the car's position to
-		 * the position of the agent's current activity.
+		 * If the agent has just arrived from a car trip (and was the car's driver),
+		 * we set the car's position to  the position of the agent's current facility.
 		 */
-		if (carArrivals.remove(event.getPersonId())) {
-			carCoords.put(event.getPersonId(), ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord());
+		if (drivers.remove(event.getPersonId())) {	
+			driverVehicleMapping.remove(event.getPersonId());
+			vehicleCoordinates.put(event.getPersonId(), ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId()).getCoord());
 		}
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		this.carArrivals.clear();
-		this.carCoords.clear();
+		this.drivers.clear();
+		this.vehicleCoordinates.clear();
+		this.driverVehicleMapping.clear();
 	}
 
 	/*
@@ -199,12 +247,15 @@ public class ModeAvailabilityChecker implements AgentArrivalEventHandler, AgentD
 					 * If its a car leg, then we assume that the car is located
 					 * at the coordinate of the previous activity.
 					 */
-					if (((Leg) planElement).getMode().equals(TransportMode.car)) {
-						carCoords.put(person.getId(), activityCoord);
+					Leg leg = (Leg) planElement;
+					if (leg.getMode().equals(TransportMode.car)) {
+						NetworkRoute route = (NetworkRoute) leg.getRoute();
+						vehicleCoordinates.put(route.getVehicleId(), activityCoord);
 						break;
 					}
 				}
 			}
 		}
 	}
+
 }

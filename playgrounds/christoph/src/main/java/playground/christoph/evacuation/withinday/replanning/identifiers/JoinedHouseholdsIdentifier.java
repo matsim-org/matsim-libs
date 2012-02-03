@@ -41,8 +41,11 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -58,6 +61,7 @@ import playground.christoph.evacuation.events.handler.HouseholdLeaveMeetingPoint
 import playground.christoph.evacuation.events.handler.HouseholdSeparatedEventHandler;
 import playground.christoph.evacuation.events.handler.HouseholdSetMeetingPointEventHandler;
 import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
+import playground.christoph.evacuation.mobsim.PassengerTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdInfo;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
@@ -78,21 +82,24 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
+	private final Vehicles vehicles;
 	private final HouseholdsUtils householdUtils;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final PassengerEventsCreator passengerEventsCreator;
+	private final PassengerTracker passengerTracker;
 	private final Map<Id, PlanBasedWithinDayAgent> agentMapping;
 	private final Map<Id, String> transportModeMapping;
 	private final Set<Id> joinedHouseholds;
 	private final Queue<HouseholdDeparture> householdDepartures;
 	
-	public JoinedHouseholdsIdentifier(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
-			ModeAvailabilityChecker modeAvailabilityChecker, PassengerEventsCreator passengerEventsCreator) {
+	public JoinedHouseholdsIdentifier(Vehicles vehicles, HouseholdsUtils householdUtils, 
+			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
+			ModeAvailabilityChecker modeAvailabilityChecker, PassengerTracker passengerTracker) {
+		this.vehicles = vehicles;
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.passengerEventsCreator = passengerEventsCreator;
+		this.passengerTracker = passengerTracker;
 		
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
@@ -139,7 +146,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 							transportModeMapping.put(agentId, PassengerEventsCreator.passengerTransportMode);
 							passengers.add(agentId);
 						}
-						passengerEventsCreator.addDriverPassengersSet(firstPersonWithCarId, passengers);
+						Id vehicleId = selectVehicle(householdInfo.getHousehold(), facilityId);
+						passengerTracker.addVehicleAllocation(vehicleId, firstPersonWithCarId, passengers);
 					}
 				}
 				// all agents will walk
@@ -177,6 +185,27 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		}
 				
 		return transportModes;
+	}
+	
+	/*
+	 * Find the vehicles with the largest number of seats among a
+	 * household's available vehicles.
+	 */
+	private Id selectVehicle(Household household, Id facilityId) {
+		List<Id> availableVehicles = modeAvailabilityChecker.getAvailableCars(household, facilityId);
+		
+		Id vehicleId = null;
+		int maxSeats = 0;
+		for (Id id : availableVehicles) {
+			Vehicle vehicle = vehicles.getVehicles().get(id);
+			int seats = vehicle.getType().getCapacity().getSeats();
+			if (seats > maxSeats) {
+				maxSeats = seats;
+				vehicleId = id;
+			}
+		}
+		
+		return vehicleId;
 	}
 	
 	@Override
@@ -295,7 +324,6 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	 */
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
-		
 		QSim sim = (QSim) e.getQueueSimulation();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {

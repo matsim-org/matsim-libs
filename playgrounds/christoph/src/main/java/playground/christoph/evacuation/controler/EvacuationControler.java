@@ -30,8 +30,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.parallelEventsHandler.SimStepParallelEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -49,8 +51,10 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelTimeFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.OnlyTimeDependentScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
@@ -68,12 +72,14 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
+import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
+import playground.christoph.evacuation.mobsim.PassengerTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
-import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
-import playground.christoph.evacuation.vehicles.HouseholdVehiclesTracker;
+import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
+import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -87,7 +93,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
 import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
-		StartupListener, AfterMobsimListener {
+		IterationStartsListener, StartupListener, AfterMobsimListener {
 
 	protected boolean adaptOriginalPlans = false;
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
@@ -159,18 +165,23 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	
 //	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
-	protected HouseholdVehiclesTracker householdVehiclesTracker;
-	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
+//	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
+//	protected HouseholdVehiclesTracker householdVehiclesTracker;
+	
+	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
+	protected AssignVehiclesToPlans assignVehiclesToPlans;
+	
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
-	protected PassengerEventsCreator passengerEventsCreator;
+	protected PassengerDepartureHandler passengerDepartureHandler;
+	protected PassengerTracker passengerTracker;
 	protected CoordAnalyzer coordAnalyzer;
 	protected Geometry affectedArea;
 
 	/*
 	 * Analysis modules
 	 */
-	protected boolean analyzeEvacuation = false;
+	protected boolean analyzeEvacuation = true;
 	protected EvacuationTimePicture evacuationTimePicture;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
@@ -264,21 +275,31 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, this.getEvents(), householdsUtils, coordAnalyzer);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		
-		this.passengerEventsCreator = new PassengerEventsCreator(this.events);
+		this.passengerTracker = new PassengerTracker(this.getEvents());
+		this.getEvents().addHandler(passengerTracker);
+		this.getFixedOrderSimulationListener().addSimulationListener(passengerTracker);
 		
-		this.getEvents().addHandler(passengerEventsCreator);
-		this.getFixedOrderSimulationListener().addSimulationListener(passengerEventsCreator);
+		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), passengerTracker);
+		
+//		/*
+//		 * Read household-vehicles-assignment files.
+//		 */
+//		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
+//		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
+//		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
+//		
+//		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
+//		this.getEvents().addHandler(householdVehiclesTracker);
 		
 		/*
-		 * Read household-vehicles-assignment files.
+		 * Assign vehicles to agent's plans.
 		 */
-		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
-		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
-		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.createRoutingAlgorithm());
+		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
+			this.assignVehiclesToPlans.run(household);
+		}
+		this.assignVehiclesToPlans.printStatistics();
 		
-		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
-		this.getEvents().addHandler(householdVehiclesTracker);
-				
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.
@@ -317,6 +338,18 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		this.initIdentifiers();
 	}
 	
+	/*
+	 * PersonPrepareForSim is run before the first iteration is started.
+	 * There, some routes might be recalculated and their vehicleIds set to null.
+	 * As a result, we have to reassign the vehicles to the agents.
+	 */
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if (event.getIteration() == this.config.controler().getFirstIteration()) {
+			this.assignVehiclesToPlans.reassignVehicles();
+		}
+	}
+	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
 		
@@ -324,8 +357,8 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * Need to do this since this does not only create events, but also behaves 
 		 * like a Mobsim Engine by ending (passenger) legs.  kai, dec'11 
 		 */
-		((QSim)e.getQueueSimulation()).addMobsimEngine(this.passengerEventsCreator);
-		
+		((QSim)e.getQueueSimulation()).addMobsimEngine(this.passengerTracker);
+			
 		this.initReplanners((QSim)e.getQueueSimulation());
 		
 		/*
@@ -348,7 +381,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			}
 		}
 		
-		((QSim)e.getQueueSimulation()).addDepartureHandler(passengerEventsCreator);
+		((QSim)e.getQueueSimulation()).addDepartureHandler(passengerDepartureHandler);	
 	}
 		
 	@Override
@@ -356,7 +389,7 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		householdsUtils.printStatistics();
 		householdsUtils.printClosingStatistics();
 		
-		householdVehiclesTracker.printClosingStatistics();
+//		householdVehiclesTracker.printClosingStatistics();
 	}
 
 	protected void initIdentifiers() {
@@ -366,8 +399,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 */
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
 		
-		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.householdsUtils, 
-				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.passengerEventsCreator).createIdentifier();
+		
+		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData.getVehicles(), this.householdsUtils, 
+				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.passengerTracker).createIdentifier();
 		this.getEvents().addHandler((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		

@@ -20,33 +20,37 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
+import org.matsim.vehicles.Vehicles;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
-import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
+import playground.christoph.evacuation.mobsim.PassengerTracker;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
 public class JoinedHouseholdsIdentifierFactory implements DuringActivityIdentifierFactory {
 
+	private final Vehicles vehicles;
 	private final HouseholdsUtils householdUtils;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final PassengerEventsCreator passengerEventsCreator;
+	private final PassengerTracker passengerTracker;
 	
-	public JoinedHouseholdsIdentifierFactory(HouseholdsUtils householdUtils, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
-			ModeAvailabilityChecker modeAvailabilityChecker, PassengerEventsCreator passengerEventsCreator) {
+	public JoinedHouseholdsIdentifierFactory(Vehicles vehicles, HouseholdsUtils householdUtils, 
+			SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, ModeAvailabilityChecker modeAvailabilityChecker, 
+			PassengerTracker passengerTracker) {
+		this.vehicles = vehicles;
 		this.householdUtils = householdUtils;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
-		this.passengerEventsCreator = passengerEventsCreator;
+		this.passengerTracker = passengerTracker;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(householdUtils, selectHouseholdMeetingPoint, 
-				modeAvailabilityChecker, passengerEventsCreator);
+		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(vehicles, householdUtils, selectHouseholdMeetingPoint, 
+				modeAvailabilityChecker, passengerTracker);
 		identifier.setIdentifierFactory(this);
 		return identifier;
 	}
