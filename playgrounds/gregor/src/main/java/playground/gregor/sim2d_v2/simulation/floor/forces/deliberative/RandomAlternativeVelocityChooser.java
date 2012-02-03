@@ -18,7 +18,7 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 	private static final double MAX_V_COEFF = 1.25;
 	private final XORShiftRandom random;
 
-	private static final double W_I = 1.; //TODO shouldn't this be a parameter of the agents?
+	private static final double W_I = 5.; //TODO shouldn't this be a parameter of the agents?
 
 	public RandomAlternativeVelocityChooser() {
 		this.random = new XORShiftRandom(MatsimRandom.getRandom().nextLong());
@@ -26,7 +26,7 @@ public class RandomAlternativeVelocityChooser extends AlternativeVelocityChooser
 
 
 	@Override
-	public void chooseAlterantiveVelocity(List<VelocityObstacle> vOs, Coordinate c0, Coordinate c1, double[] df, Agent2D agent) {
+	public void chooseAlterantiveVelocity(List<? extends VelocityObstacle> vOs, Coordinate c0, Coordinate c1, double[] df, Agent2D agent) {
 
 //		//DEBUG
 		GeometryFactory geofac = new GeometryFactory();

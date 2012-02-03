@@ -56,10 +56,9 @@ import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.Collision
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.DrivingForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.PathForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.SignalsPerception;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForce;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.VelocityObstacleForceII;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.CircularAgentInteractionModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.EnvironmentForceModuleII;
-import playground.gregor.sim2d_v2.simulation.floor.forces.reactive.PhysicalAgentInteractionForce;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -120,8 +119,8 @@ public class PhysicalFloor implements Floor {
 		
 		
 		if (this.sim2DConfig.isEnableVelocityObstacleModule()) {
-			this.dynamicForceModules.add(new VelocityObstacleForce(this, this.scenario));
-			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
+			this.dynamicForceModules.add(new VelocityObstacleForceII(this, this.scenario));
+//			this.dynamicForceModules.add(new PhysicalAgentInteractionForce(this, this.scenario));
 		}
 
 		if (this.sim2DConfig.isEnableCircularAgentInteractionModule()){

@@ -24,7 +24,7 @@ public abstract class Algorithms {
 	 * @return tangentsCoordinates
 	 */
 	public static Coordinate[] computeTangentsThroughPoint(Coordinate circleCenter, double radius, Coordinate point) {
-		Coordinate[] ret = new Coordinate[2];
+		Coordinate[] ret = new Coordinate[3];
 		
 		double dx = (point.x - circleCenter.x)/2;
 		double dy = (point.y - circleCenter.y)/2;
@@ -47,8 +47,9 @@ public abstract class Algorithms {
 		double xiPrime = x2 - rx;
 		double yiPrime = y2 -ry;
 		
-		ret[0] = new Coordinate(xi,yi);
-		ret[1] = new Coordinate(xiPrime, yiPrime);
+		ret[0] = new Coordinate(point);
+		ret[1] = new Coordinate(xi,yi);
+		ret[2] = new Coordinate(xiPrime, yiPrime);
 		
 		return ret;
 	}
@@ -430,6 +431,9 @@ public abstract class Algorithms {
 	}
 
 	public static boolean testForCollision(VelocityObstacle info, Coordinate c) {
+		if (info.getCollTime() <= 0) {
+			return true;
+		}
 		Coordinate[] vo = info.getVo();
 		boolean leftOfLeft = Algorithms.isLeftOfLine(c, vo[0], vo[1]) > 0;
 		boolean rightOfRight = Algorithms.isLeftOfLine(c, vo[0], vo[2]) < 0;
@@ -439,7 +443,7 @@ public abstract class Algorithms {
 		return false;
 	}
 
-	public static boolean testForCollision(List<VelocityObstacle> infos, Coordinate c) {
+	public static boolean testForCollision(List<? extends VelocityObstacle> infos, Coordinate c) {
 		for (VelocityObstacle info : infos) {
 			if (testForCollision(info,c)) {
 				return true;

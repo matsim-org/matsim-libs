@@ -33,7 +33,7 @@ public class PenaltyBasedAlternativeVelocityChooser extends AlternativeVelocityC
 	private static final double SIN_PI_SIXTEENTH_RIGHT = Math.sin(-Math.PI/16);
 
 	@Override
-	public void chooseAlterantiveVelocity(List<VelocityObstacle> vOs, Coordinate c0, Coordinate c1, double[] df, Agent2D agent) {
+	public void chooseAlterantiveVelocity(List<? extends VelocityObstacle> vOs, Coordinate c0, Coordinate c1, double[] df, Agent2D agent) {
 
 		double baseCollisionTime = timeToCollision(vOs, c0, c1);
 		if (baseCollisionTime > this.timeHorizont) {

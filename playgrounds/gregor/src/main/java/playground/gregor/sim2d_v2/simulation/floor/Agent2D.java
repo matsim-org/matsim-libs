@@ -289,4 +289,10 @@ public class Agent2D implements MobsimAgent {
 	}
 
 
+
+	public PhysicalAgentRepresentation getPhysicalAgentRepresentation() {
+		return this.par;
+	}
+
+
 }

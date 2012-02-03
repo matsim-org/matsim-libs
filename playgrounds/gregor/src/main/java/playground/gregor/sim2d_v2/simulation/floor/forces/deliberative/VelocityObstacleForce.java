@@ -10,14 +10,14 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2d_v2.scenario.MyDataContainer;
 import playground.gregor.sim2d_v2.simulation.floor.Agent2D;
-import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.PhysicalAgentRepresentation;
+import playground.gregor.sim2d_v2.simulation.floor.PhysicalFloor;
 import playground.gregor.sim2d_v2.simulation.floor.forces.DynamicForceModule;
 import playground.gregor.sim2d_v2.simulation.floor.forces.Force;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.CCWPolygon;
 import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.ConfigurationSpaceObstacle;
-import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.VelocityObstacle;
+import playground.gregor.sim2d_v2.simulation.floor.forces.deliberative.velocityobstacle.PolygonalVelocityObstacle;
 
 import com.vividsolutions.jts.algorithm.NonRobustLineIntersector;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -85,7 +85,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 
 
-		List<VelocityObstacle> VOs = new ArrayList<VelocityObstacle>();
+		List<PolygonalVelocityObstacle> VOs = new ArrayList<PolygonalVelocityObstacle>();
 
 
 		calcOtherAgentsVOs(VOs,agent,aGeo);
@@ -130,7 +130,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 
 	}
 
-	private void calcEnvVOs(List<VelocityObstacle> VOs, Agent2D agent,
+	private void calcEnvVOs(List<PolygonalVelocityObstacle> VOs, Agent2D agent,
 			CCWPolygon aGeo) {
 		QuadTree<CCWPolygon> q = this.sc.getScenarioElement(MyDataContainer.class).getSegmentsQuadTree();
 
@@ -173,7 +173,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			}
 
 			Coordinate [] tan = new Coordinate []{new Coordinate(agent.getPosition()),new Coordinate(envObst[idx[0]]),new Coordinate(envObst[idx[1]])};
-			VelocityObstacle info = new VelocityObstacle();
+			PolygonalVelocityObstacle info = new PolygonalVelocityObstacle();
 			info.setCso(envObst);
 			info.setVo(tan);
 			info.setvBx(0);
@@ -189,7 +189,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 	}
 
 
-	private void calcOtherAgentsVOs(List<VelocityObstacle> VOs, Agent2D agent, CCWPolygon aGeo) {
+	private void calcOtherAgentsVOs(List<PolygonalVelocityObstacle> VOs, Agent2D agent, CCWPolygon aGeo) {
 		double sensingRange = agent.getSensingRange();
 
 		//		double minX = agent.getPosition().x - sensingRange;
@@ -282,7 +282,7 @@ public class VelocityObstacleForce implements DynamicForceModule{
 			double tY = other.getVy() + mvY;
 
 			Algorithms.translate(tX,tY, tan);
-			VelocityObstacle info = new VelocityObstacle();
+			PolygonalVelocityObstacle info = new PolygonalVelocityObstacle();
 			info.setCso(cso);
 			info.setVo(tan);
 			info.setvBx(other.getVx());
