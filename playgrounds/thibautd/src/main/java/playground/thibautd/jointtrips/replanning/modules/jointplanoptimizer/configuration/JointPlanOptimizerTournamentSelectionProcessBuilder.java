@@ -38,6 +38,7 @@ import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.Join
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.DefaultChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.HammingChromosomeDistanceComparator;
 import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.RestrictedTournamentSelector;
+import playground.thibautd.jointtrips.replanning.modules.jointplanoptimizer.selectors.TournamentSelectorWithRemoval;
 
 /**
  * @author thibautd
@@ -80,7 +81,7 @@ public class JointPlanOptimizerTournamentSelectionProcessBuilder implements Join
 				configGroup.getWindowSizeIntercept() +
 				configGroup.getWindowSizeCoef() * configuration.getPopulationSize() );
 
-		return new TournamentSelector(
+		return new TournamentSelectorWithRemoval(
 					configuration,
 					tournamentSize < 2 ? 2 : tournamentSize,
 					1 );
