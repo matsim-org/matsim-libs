@@ -84,22 +84,36 @@ public class SpatialAveragingForLinkEmissionsSingleRun {
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile);
+
 		defineListOfPollutants();
+		// (concatenates the WarmPollutant enum and ColdPollutant enum into the listOfPollutants)
+
 		loadScenario(netFile);
 		this.network = this.scenario.getNetwork();
+		
 		initFeatures();
+		// (initializes a bunch of geotools things)
 
 		processEmissions(emissionFile);
+		// (processes the the emissions File and stores output in this.warmHandler and this.coldHandler)
+		
+		
 		Map<Double, Map<Id, Map<String, Double>>> time2warmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<String, Double>>> time2coldEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
 
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1 = sumUpEmissions(time2warmEmissionsTotal1, time2coldEmissionsTotal1);
+		// (essentially sums up the hot and cold emissions.  The result contains, 
+		// per time interval, a map that contains, per link Id, a list of pollutants and their Double values.
+		// These are absolute values, for that link and the time interval.)
+		
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered1 = setNonCalculatedEmissionsAndFilter(time2EmissionsTotal1);
+		// (Does two things: (1) set emissions to zero for all non-existing map entries; (2) filters the region to a 
+		// rectangle that contains Munich center (to avoid processing all of Bavaria).
 
 		Collection<Feature> features = new ArrayList<Feature>();
 
 		for(double endOfTimeInterval : time2EmissionsTotalFiltered1.keySet()){
-			Map<Id, Map<String, Double>> deltaEmissionsTotal = time2EmissionsTotalFiltered1.get(endOfTimeInterval);
+			Map<Id, Map<String, Double>> emissionsTotal = time2EmissionsTotalFiltered1.get(endOfTimeInterval);
 
 			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
 			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -120,7 +134,7 @@ public class SpatialAveragingForLinkEmissionsSingleRun {
 					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = deltaEmissionsTotal.get(linkId).get(pollutant);
+							double value = emissionsTotal.get(linkId).get(pollutant);
 							// TODO: not distance between data points, but distance between
 							// data point and cell centroid is used now; is the former to expensive?
 							double weightOfLinkForCell = calculateWeightOfPersonForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
