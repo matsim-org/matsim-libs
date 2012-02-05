@@ -76,15 +76,9 @@ public class OTFLaneReader extends OTFDataReader {
 
 	private Tuple<OTFLinkWLanes,List<String>> readVisLinkData(ByteBuffer in){
 		//read link data
-		String linkId = ByteBufferUtils.getString(in);
-		OTFLinkWLanes lanesLinkData = new OTFLinkWLanes(linkId);
+		OTFLinkWLanes lanesLinkData = (OTFLinkWLanes) ByteBufferUtils.getObject(in);
 		this.drawer.addLaneLinkData(lanesLinkData);
 		
-		lanesLinkData.setLinkStart(in.getDouble(), in.getDouble());
-		lanesLinkData.setLinkEnd(in.getDouble(), in.getDouble());
-		lanesLinkData.setNormalizedLinkVector(in.getDouble(), in.getDouble());
-		lanesLinkData.setLinkOrthogonalVector(in.getDouble(), in.getDouble());
-		lanesLinkData.setNumberOfLanes(in.getDouble());
 		int noOutLinks = in.getInt();
 		List<String> outLinks = new ArrayList<String>(noOutLinks);
 		for (int i = 0; i < noOutLinks; i++){

@@ -21,6 +21,7 @@ package org.matsim.lanes.otfvis.io;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,12 +34,12 @@ import org.matsim.signalsystems.otfvis.io.OTFSignal;
  * @author dgrether
  *
  */
-public class OTFLinkWLanes {
+public class OTFLinkWLanes implements Serializable{
 
 	private Point2D.Double linkStart = null;
 	private Point2D.Double linkEnd = null;
-	private Double normalizedLinkVector;
-	private Double linkOrthogonalVector;
+	private Point2D.Double normalizedLinkVector;
+	private Point2D.Double linkOrthogonalVector;
 	private double numberOfLanes = 1.0;
 	private int maximalAlignment = 0;
 	private Map<String, OTFLane> laneData =  null;
@@ -58,22 +59,41 @@ public class OTFLinkWLanes {
 		return this.id;
 	}
 	
+	@Deprecated
 	public void setLinkStart(double x, double y) {
 		this.linkStart = new Point2D.Double(x, y);
 	}
 
+	@Deprecated
 	public void setLinkEnd(double x, double y) {
 		this.linkEnd = new Point2D.Double(x, y);
 	}
 
+	@Deprecated
 	public void setNormalizedLinkVector(double x, double y) {
 		this.normalizedLinkVector = new Point2D.Double(x, y);
 	}
 	
+	@Deprecated
 	public void setLinkOrthogonalVector(double x, double y){
 		this.linkOrthogonalVector = new Point2D.Double(x, y);
 	}
 
+	public void setLinkStart(Point2D.Double v) {
+		this.linkStart = v;
+	}
+
+	public void setLinkEnd(Point2D.Double v) {
+		this.linkEnd = v;
+	}
+
+	public void setNormalizedLinkVector(Point2D.Double v) {
+		this.normalizedLinkVector = v;
+	}
+	
+	public void setLinkOrthogonalVector(Point2D.Double v){
+		this.linkOrthogonalVector = v;
+	}
 	
 	public Point2D.Double getLinkStart() {
 		return linkStart;
