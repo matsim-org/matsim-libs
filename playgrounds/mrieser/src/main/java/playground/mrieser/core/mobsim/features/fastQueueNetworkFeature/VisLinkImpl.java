@@ -22,7 +22,6 @@ package playground.mrieser.core.mobsim.features.fastQueueNetworkFeature;
 import java.util.Collection;
 
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 import playground.mrieser.core.mobsim.api.MobsimVehicle;
@@ -45,7 +44,7 @@ public class VisLinkImpl implements VisLink {
 
 		for (MobsimVehicle veh : this.link.buffer.buffer) {
 			dist -= vehSize;
-			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			AgentSnapshotInfo pi = this.link.network.getAgentSnapshotInfoFactory().createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(1.0);
 			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
 			positions.add(pi);
@@ -53,7 +52,7 @@ public class VisLinkImpl implements VisLink {
 		vehSize = dist / this.link.vehQueue.size();
 		for (MobsimVehicle veh : this.link.vehQueue) {
 			dist -= vehSize;
-			AgentSnapshotInfo pi = AgentSnapshotInfoFactory.createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
+			AgentSnapshotInfo pi = this.link.network.getAgentSnapshotInfoFactory().createAgentSnapshotInfo(veh.getId(), this.link.link, dist, 1);
 			pi.setColorValueBetweenZeroAndOne(0.5);
 			pi.setAgentState(AgentState.PERSON_DRIVING_CAR);
 			positions.add(pi);

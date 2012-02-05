@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 /**
  * QueueNetwork is responsible for creating the QueueLinks and QueueNodes.
@@ -49,6 +50,8 @@ public class DBSimNetwork{
 
 	private final DBSimNetworkFactory<DBSimNode, DBSimLink> queueNetworkFactory;
 
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+	
 	public DBSimNetwork(final Network networkLayer2) {
 		this(networkLayer2, new DefaultDBSimNetworkFactory());
 	}
@@ -100,5 +103,10 @@ public class DBSimNetwork{
 	public DBSimNode getQueueNode(final Id id) {
 		return this.nodes.get(id);
 	}
+	
+	/*package*/   AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
+		return this.snapshotInfoFactory;
+	}
+
 	
 }

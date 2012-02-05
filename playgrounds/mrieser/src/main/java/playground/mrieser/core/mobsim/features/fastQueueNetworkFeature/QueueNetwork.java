@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 import playground.mrieser.core.mobsim.api.TimestepMobsimEngine;
 import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
@@ -41,7 +42,9 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 	private double stuckTime = 100;
 	private final Operator operator;
 	private boolean simStarted = false;
-
+	
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+  
 	public QueueNetwork(final TimestepMobsimEngine simEngine, final Operator operator) {
 		this.simEngine = simEngine;
 		this.operator = operator;
@@ -121,5 +124,8 @@ import playground.mrieser.core.mobsim.network.api.MobsimNetwork;
 	public void setStuckTime(final double stuckTime) {
 		this.stuckTime = stuckTime;
 	}
-
+	
+	/*package*/   AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
+		return this.snapshotInfoFactory;
+	}
 }
