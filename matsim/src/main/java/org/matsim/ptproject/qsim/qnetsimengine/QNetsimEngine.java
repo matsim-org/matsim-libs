@@ -122,7 +122,6 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		this.random = random;
 		this.qsim = sim;
 
-		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
 
 		// configuring the car departure hander (including the vehicle behavior)
@@ -159,6 +158,8 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
 		network.initialize(this);
+		
+		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 	}
 
 	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
