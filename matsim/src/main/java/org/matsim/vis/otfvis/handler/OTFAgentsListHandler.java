@@ -78,6 +78,8 @@ public class OTFAgentsListHandler extends OTFDataReader {
 
 	private static AgentState[] al = AgentState.values();
 
+	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory();
+	
 	private void readAgent(ByteBuffer in, SceneGraph graph) {
 		String id = ByteBufferUtils.getString(in);
 		float x = in.getFloat();
@@ -85,7 +87,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		int int1 = in.getInt() ;
 		int int2 = in.getInt() ;
 		float float1 = in.getFloat() ;
-		AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.) ;
+		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.) ;
 		agInfo.setAgentState( al[int1] ) ;
 		agInfo.setUserDefined( int2 ) ;
 		agInfo.setColorValueBetweenZeroAndOne( float1 ) ;

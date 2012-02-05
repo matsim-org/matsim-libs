@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -48,6 +49,9 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 
 	private final NetsimNetworkFactory<QNode, AbstractQLink> queueNetworkFactory;
 
+	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+
+	
 	QNetsimEngine simEngine;
 
 	QNetwork(final Network network, final NetsimNetworkFactory<QNode, AbstractQLink> factory ) {
@@ -101,6 +105,10 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 		return this.nodes.get(id);
 	}
 
+	@Override
+	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
+		return this.snapshotInfoFactory;
+	}
 
 
 }

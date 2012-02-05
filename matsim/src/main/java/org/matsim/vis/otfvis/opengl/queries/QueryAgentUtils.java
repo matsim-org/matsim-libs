@@ -23,6 +23,7 @@ public class QueryAgentUtils {
 
 	private static final Logger log = Logger.getLogger(QueryAgentUtils.class);
 
+	private static AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
 
 	enum Level { ROUTES, PLANELEMENTS } 
 	static private Level myLevel ;
@@ -70,7 +71,7 @@ public class QueryAgentUtils {
 						log.info("can't find link with given id in net; not drawing activity location") ;
 						continue ;
 					}
-					AgentSnapshotInfo pi = AgentSnapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
+					AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
 					if ( pi.getEasting()==0. && pi.getNorthing()==0. ) {
 						log.info("both coordinates are zero; this is implausible; not drawing activity location") ;
 						continue ;

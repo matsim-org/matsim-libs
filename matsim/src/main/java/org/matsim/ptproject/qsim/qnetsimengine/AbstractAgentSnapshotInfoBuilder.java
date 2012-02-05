@@ -51,15 +51,17 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 
 	protected final double cellSize;
 
-	AbstractAgentSnapshotInfoBuilder( Scenario sc ){
+	private final AgentSnapshotInfoFactory snapshotInfoFactory;
+	
+	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
 		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
-
+		this.snapshotInfoFactory = agentSnapshotInfoFactory;
 		double effLaneWidth = sc.getNetwork().getEffectiveLaneWidth() ;
 		if ( Double.isNaN( effLaneWidth ) ) {
-			AgentSnapshotInfoFactory.setLaneWidth( 3.75 ) ; // yyyyyy magic number
+			snapshotInfoFactory.setLaneWidth( 3.75 ) ; // yyyyyy magic number
 		} else {
-			AgentSnapshotInfoFactory.setLaneWidth( effLaneWidth );
+			snapshotInfoFactory.setLaneWidth( effLaneWidth );
 		}
 	}
 	
@@ -77,7 +79,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			Collection<MobsimAgent> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
 			for (MobsimAgent passenger : peopleInVehicle) {
-				AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
+				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 				}
@@ -97,7 +99,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		int c = cnt2;
 		for (MobsimAgent pa : agentsInActivities) {
-			AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), c) ;
+			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), c) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			positions.add(agInfo) ;
 			c++ ;
@@ -120,7 +122,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
-					AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
+					AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 					if ( passenger.getId().toString().startsWith("pt")) {
 						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
 					} else if (last) {
@@ -140,7 +142,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Link link, QVehicle veh, 
 			double distanceFromFromNode,	int lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
-		AgentSnapshotInfo pos = AgentSnapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), link, 
+		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), link, 
 				distanceFromFromNode, lane);
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
@@ -179,7 +181,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	{
 		int cnt = passengers.size();
 		for (PassengerAgent passenger : passengers) {
-			AgentSnapshotInfo passengerPosition = AgentSnapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
+			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
 					distanceOnLink, lane+2*cnt);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -51,6 +52,9 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 	private final Map<Id, QueueNode> queuenodes;
 
 	private final Network networkLayer;
+	
+  private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory();
+
 
 	/*package*/ QueueNetwork(final Network networkLayer, QueueSimulation qSim2) {
 		this.networkLayer = networkLayer;
@@ -115,4 +119,10 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 	public QueueSimulation getMobsim() {
 		return qSim;
 	}
+	
+	@Override
+	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
+		return this.snapshotInfoFactory;
+	}
+
 }

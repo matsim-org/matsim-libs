@@ -20,6 +20,7 @@
 package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 
 /**
@@ -33,8 +34,8 @@ import org.matsim.api.core.v01.Scenario;
  */
 public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	public QueueAgentSnapshotInfoBuilder(Scenario scenario) {
-		super(scenario);
+	public QueueAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
+		super(scenario, agentSnapshotInfoFactory);
 	}
 
 	@Override

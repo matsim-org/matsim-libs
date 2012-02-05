@@ -45,7 +45,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link
-		AgentSnapshotInfo posInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl(1), link1, 250, 0);
+		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory().createAgentSnapshotInfo(new IdImpl(1), link1, 250, 0);
 		assertEquals(265.0, posInfo.getEasting(), epsilon);
 		assertEquals(235.0, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
@@ -66,7 +66,7 @@ public class PositionInfoTest extends MatsimTestCase {
 		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link
-		AgentSnapshotInfo posInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl(1), link1, 500, 0);
+		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory().createAgentSnapshotInfo(new IdImpl(1), link1, 500, 0);
 		assertEquals(257.5, posInfo.getEasting(), epsilon);
 		assertEquals(242.5, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08

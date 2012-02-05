@@ -58,11 +58,13 @@ public class FacilityDrawer {
 		private final transient TransitSchedule schedule;
 		private final transient TransitStopAgentTracker agentTracker;
 		private final transient Network network ;
+		private final transient AgentSnapshotInfoFactory agentSnapshotInfoFactory;
 
-		public Writer(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker) {
+		public Writer(final Network network, final TransitSchedule schedule, final TransitStopAgentTracker agentTracker, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
 			this.network = network ;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
+			this.agentSnapshotInfoFactory = agentSnapshotInfoFactory;
 		}
 
 		@Override
@@ -81,7 +83,7 @@ public class FacilityDrawer {
 						out.putDouble(point.getY());
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
-						AgentSnapshotInfo ps = AgentSnapshotInfoFactory.createAgentSnapshotInfo(facility.getId(), link, 0.9*link.getLength(), 0) ;
+						AgentSnapshotInfo ps = agentSnapshotInfoFactory.createAgentSnapshotInfo(facility.getId(), link, 0.9*link.getLength(), 0) ;
 						Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(ps.getEasting(), ps.getNorthing()));
 						out.putDouble(point.getX()) ;
 						out.putDouble(point.getY()) ;

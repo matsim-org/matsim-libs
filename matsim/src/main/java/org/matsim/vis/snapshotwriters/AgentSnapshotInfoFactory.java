@@ -42,24 +42,19 @@ public class AgentSnapshotInfoFactory {
 	 */
 	private static final double WIDTH_OF_MEDIAN = 30. ; // default
 
-	private static double LANE_WIDTH = 3.75;
-	public static void setLaneWidth( double dd ) {
-		LANE_WIDTH = dd ;
-	}
-
-	//TODO lane width is no longer static but it is defined in network. The question is,
-	//how to get this information here? One possibility is to use Gbl ... but I suppose not everyone
-	//would be comfortable with this idea? Is there a solution to do this in a strict OO manner
-	//(without a static Gbl)? [GL] - april 08
-	//
-	// The design is now in a way that this could, in principle, be fixed.  kai, aug'10
+	private double laneWidth = 3.75;
 
 	public AgentSnapshotInfoFactory() {
 	}
 
-	// static creators based on x/y
+	public void setLaneWidth( double dd ) {
+		laneWidth = dd ;
+	}
 
-	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
+	
+	// creators based on x/y
+
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
 		info.setEasting( easting ) ;
@@ -69,7 +64,7 @@ public class AgentSnapshotInfoFactory {
 	}
 
 	// static creators based on link
-	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
 		if (link instanceof LinkImpl){ //as for LinkImpl instances the euklidean distance is already computed we can safe computing time but have a cast instead
 			PositionInfo info = new PositionInfo() ;
 			info.setId(agentId) ;
@@ -84,7 +79,7 @@ public class AgentSnapshotInfoFactory {
 	 * Static creator based on Coord
 	 * @param lengthOfVector lengths are usually different (usually longer) than the Euklidean distances between the startCoord and endCoord
 	 */
-	public static AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
 			int lane, double lengthOfVector) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
@@ -96,7 +91,7 @@ public class AgentSnapshotInfoFactory {
 	
 	
 
-	private static final void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double distanceOnVector, double lengthOfVector, double euklideanDistance, int lane){
+	private final void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double distanceOnVector, double lengthOfVector, double euklideanDistance, int lane){
 		double dx = -startCoord.getX() + endCoord.getX();
 		double dy = -startCoord.getY() + endCoord.getY();
 		double theta = 0.0;
@@ -124,11 +119,11 @@ public class AgentSnapshotInfoFactory {
 
 		info.setEasting( startCoord.getX() 
 				+ (Math.cos(theta) * distanceOnVector * correction)
-				+ (Math.sin(theta) * (0.5 * WIDTH_OF_MEDIAN + LANE_WIDTH * lane) * correction) ) ;
+				+ (Math.sin(theta) * (0.5 * WIDTH_OF_MEDIAN + laneWidth * lane) * correction) ) ;
 		
 		info.setNorthing( startCoord.getY() 
 				+ Math.sin(theta) * distanceOnVector  * correction 
-				- Math.cos(theta) * (0.5 * WIDTH_OF_MEDIAN + LANE_WIDTH * lane) * correction );
+				- Math.cos(theta) * (0.5 * WIDTH_OF_MEDIAN + laneWidth * lane) * correction );
 		
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}

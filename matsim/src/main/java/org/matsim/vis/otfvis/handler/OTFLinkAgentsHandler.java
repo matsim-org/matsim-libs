@@ -51,6 +51,8 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 
 	private OGLSimpleQuadDrawer quadReceiver = new OGLSimpleQuadDrawer();
 
+	private AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory();
+	
 	static public class Writer extends OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
 
 		private static final long serialVersionUID = -7916541567386865404L;
@@ -165,7 +167,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		float colorValue = in.getFloat();
 		int state = in.getInt();
 
-		AgentSnapshotInfo agInfo = AgentSnapshotInfoFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
+		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
 		agInfo.setColorValueBetweenZeroAndOne(colorValue);
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);
@@ -173,6 +175,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		agentPointDrawer.setAgent(agInfo);
 	}
 
+	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		String id = ByteBufferUtils.getString(in);
 		this.quadReceiver.setQuad(in.getFloat(), in.getFloat(),in.getFloat(), in.getFloat(), in.getInt());

@@ -64,6 +64,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFEvent2MVI;
 import org.matsim.vis.otfvis.OTFVisMobsimFeature;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -217,7 +218,8 @@ public class OTFVis {
 			TransitSchedule transitSchedule = ((ScenarioImpl) scenario).getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
-			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker);
+			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
+			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
 			server.addAdditionalElement(facilityWriter);
 		}
 

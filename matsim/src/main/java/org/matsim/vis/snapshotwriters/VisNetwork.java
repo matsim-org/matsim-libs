@@ -9,4 +9,5 @@ public interface VisNetwork {
 
 	Map<Id,? extends VisLink> getVisLinks() ;
 	Network getNetwork() ;
+	AgentSnapshotInfoFactory getAgentSnapshotInfoFactory();
 }

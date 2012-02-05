@@ -170,17 +170,18 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
 		String  snapshotStyle = scenario.getConfig().getQSimConfigGroup().getSnapshotStyle();
 		if ("queue".equalsIgnoreCase(snapshotStyle)){
-			return new QueueAgentSnapshotInfoBuilder(scenario);
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 		else  if ("equiDist".equalsIgnoreCase(snapshotStyle)){
-			return new EquiDistAgentSnapshotInfoBuilder(scenario);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 		else if ("withHolesExperimental".equalsIgnoreCase(snapshotStyle)){
-			return new WholesAgentSnapshotInfoBuilder(scenario);
+			log.warn("The snapshot style \"withHolesExperimental\" is no longer supported, using \"queue\" instead. ");
+			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 		else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-			return new EquiDistAgentSnapshotInfoBuilder(scenario);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 	}
 
