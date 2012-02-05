@@ -36,7 +36,8 @@ public class UtilityChangesBVWP2003 extends UtilityChanges {
 	}
 	
 	@Override
-	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, ValuesForAUserType quantitiesPlanfall, Entry entry, double deltaAmounts) {
+	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
+			ValuesForAUserType quantitiesPlanfall, Entry entry) {
 		
 		UtlChanges utlChanges = new UtlChanges() ;
 		

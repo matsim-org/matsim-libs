@@ -16,8 +16,10 @@ class UtilityChangesRuleOfHalf extends UtilityChanges {
 	
 	@Override
 	UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall,
-			ValuesForAUserType quantitiesPlanfall, Entry entry, double deltaAmounts) 
+			ValuesForAUserType quantitiesPlanfall, Entry entry) 
 	{
+		double deltaAmounts = quantitiesPlanfall.getByEntry(Entry.XX) - quantitiesNullfall.getByEntry(Entry.XX) ;
+		
 		UtlChanges utlChanges = new UtlChanges() ;
 		utlChanges.deltaQuantity = quantitiesPlanfall.getByEntry( entry ) 
 		- quantitiesNullfall.getByEntry( entry ) ;

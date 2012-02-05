@@ -24,5 +24,5 @@ public class UtlChanges {
 	double utlGainByOldUsers ;
 	double utlGainByNewUsers ;
 	
-	double utl;
+	double utl ;
 }

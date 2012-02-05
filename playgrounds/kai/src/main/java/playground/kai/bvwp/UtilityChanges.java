@@ -38,18 +38,17 @@ abstract class UtilityChanges {
 					}
 					for ( Entry entry : Entry.values() ) { // for all entries (e.g. km or hrs)
 						if ( entry != Entry.XX ) {
-							UtlChanges utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry,
-									deltaAmounts);
+							UtlChanges utlChanges = computeUtilities(econValues, quantitiesNullfall, quantitiesPlanfall, entry);
 
 							if ( utlChanges.utlGainByOldUsers != 0. || utlChanges.utlGainByNewUsers != 0. ) {
-								System.out.printf("%35s change per demand item: %10.1f %10s", "-->",
+								System.out.printf("%35s change per person/ton: %10.1f %10s", "-->",
 										utlChanges.deltaQuantity, entry) ;
 								System.out.printf("; utl (gain) old//new demand: %10.1f", utlChanges.utlGainByOldUsers ) ;
 								System.out.printf(" //%10.1f\n", utlChanges.utlGainByNewUsers ) ;
 								utils += utlChanges.utlGainByOldUsers + utlChanges.utlGainByNewUsers  ;
 							}
 							else if ( utlChanges.utl != 0.){
-								System.out.println(utlChanges.utl);
+								System.out.printf("%35s utl change: %10.1f", "-->", utlChanges.utl ) ;
 								utils += utlChanges.utl;
 							}
 						}
@@ -60,5 +59,5 @@ abstract class UtilityChanges {
 		System.out.printf("utl gain: %10.1f\n", utils ) ;
 	}
 	abstract UtlChanges computeUtilities(ValuesForAUserType econValues, ValuesForAUserType quantitiesNullfall, 
-			ValuesForAUserType quantitiesPlanfall, Entry entry, double deltaAmounts);
+			ValuesForAUserType quantitiesPlanfall, Entry entry);
 }
