@@ -20,6 +20,7 @@
 package playground.dgrether.signalsystems.cottbus.commuterdemand;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,14 +39,13 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeCost;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -64,37 +64,35 @@ import com.vividsolutions.jts.geom.Point;
 public class CommuterDemandWriter {
 
 	private static final Logger log = Logger.getLogger(CommuterDemandWriter.class);
-	private HashMap<String,Feature> municipalityMap;
+	private HashMap<String, Feature> municipalityMap;
 	private List<CommuterDataElement> demand;
-	private Scenario scenario;
-	private Population population;
 	private double scalefactor = 1.0;
-	private double workStartTime = 8.0 * 3600.0;
+	private double workStartTime = 7.0 * 3600.0;
 	private double durationWork = 8.5 * 3600.0;
-	private Random random;
+	private Random timeRandom;
+	private Random locationRandom;
 	private PersonPrepareForSim pp4s;
 	private boolean createMutateableActivities = false;
 	private Map<String, String> workActivityTypesStartTimeMap = new HashMap<String, String>();
-	
+	private CoordinateReferenceSystem targetCrs;
+	private Landuse landuse = null;
 
-	public CommuterDemandWriter(Scenario sc, Set<Feature> gemeindenFeatures,
-			CoordinateReferenceSystem featuresCrs, 
-			List<CommuterDataElement> demand, CoordinateReferenceSystem targetCrs) {
-		this.scenario = sc;
-		this.random = MatsimRandom.getLocalInstance();
+	public CommuterDemandWriter(Set<Feature> gemeindenFeatures,
+			CoordinateReferenceSystem featuresCrs, List<CommuterDataElement> demand,
+			CoordinateReferenceSystem targetCrs) {
+		this.targetCrs = targetCrs;
+		this.locationRandom = MatsimRandom.getLocalInstance();
+		this.timeRandom = MatsimRandom.getLocalInstance();
 		this.demand = demand;
 		this.tranformFeaturesAndInitMunicipalityMap(gemeindenFeatures, featuresCrs, targetCrs);
-		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(sc.getConfig().planCalcScore());
-		PlansCalcRoute router = new PlansCalcRoute(sc.getConfig().plansCalcRoute(), sc.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(), ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory());
-		this.pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
 	}
-	
-	
-	private void tranformFeaturesAndInitMunicipalityMap(Set<Feature> gemeindenFeatures, CoordinateReferenceSystem featuresCrs, CoordinateReferenceSystem targetCrs){
+
+	private void tranformFeaturesAndInitMunicipalityMap(Set<Feature> gemeindenFeatures,
+			CoordinateReferenceSystem featuresCrs, CoordinateReferenceSystem targetCrs) {
 		try {
 			MathTransform transformation = CRS.findMathTransform(featuresCrs, targetCrs, true);
 			this.municipalityMap = new HashMap<String, Feature>();
-			for (Feature ft : gemeindenFeatures){
+			for (Feature ft : gemeindenFeatures) {
 				String gemeindeId = ft.getAttribute("NR").toString();
 				Geometry geometry = JTS.transform(ft.getDefaultGeometry(), transformation);
 				ft.setDefaultGeometry(geometry);
@@ -104,36 +102,50 @@ public class CommuterDemandWriter {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
-		
 	}
 
-	public void writeDemand(String filename) {
+	public void computeDemand(Scenario scenario) {
 		log.error("Watch out! This version of the demand generator turns the whole BA data into car commuters which isn't exactly accurate. Adjusting the CommuterDemandWriter --> Scalefactor to your needs might make sense.");
-		population = this.scenario.getPopulation();
-		generatePopulation();
-		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(),
-				scenario.getNetwork());
-		populationWriter.write(filename);
-		log.info("population written to " + filename);
+		generatePopulation(scenario);
 
-		if (this.createMutateableActivities){
+		if (this.createMutateableActivities) {
 			log.info("");
-			log.info("activity types: " );
-			for (Entry<String, String> e : this.workActivityTypesStartTimeMap.entrySet()){
+			log.info("activity types: ");
+			for (Entry<String, String> e : this.workActivityTypesStartTimeMap.entrySet()) {
 				System.out.println("<param name=\"activityType_\"");
-				//<param name="activityType_80"           value="l13" />
+				// <param name="activityType_80" value="l13" />
 				System.out.println(e.getKey() + e.getValue());
-				//<param name="activityLatestStartTime_46"     value="08:00:00" />
+				// <param name="activityLatestStartTime_46" value="08:00:00" />
 			}
 		}
 	}
 
-	private void generatePopulation() {
+	private void generatePopulation(Scenario scenario) {
+		final FreespeedTravelTimeCost timeCostCalc = new FreespeedTravelTimeCost(scenario.getConfig()
+				.planCalcScore());
+		PlansCalcRoute router = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(),
+				scenario.getNetwork(), timeCostCalc, timeCostCalc, new DijkstraFactory(),
+				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+		this.pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
+
 		int pnr = 0;
 		for (CommuterDataElement commuterDataElement : demand) {
 			for (int i = 0; i < commuterDataElement.getCommuters() * scalefactor; i++) {
-				generatePlanForZones(pnr, commuterDataElement.getFromId(), commuterDataElement.getToId());
-				pnr++;
+				Id id = scenario.createId(pnr + "_" + commuterDataElement.getFromId() + "_"
+						+ commuterDataElement.getToId());
+				Person p = scenario.getPopulation().getFactory().createPerson(id);
+				Plan plan = generateCommuterPlan(scenario, commuterDataElement.getFromId(),
+						commuterDataElement.getToId());
+				if (plan != null){
+					p.addPlan(plan);
+					pnr++;
+					this.pp4s.run(p);
+					this.correctHomeEndTime(p);
+					scenario.getPopulation().addPerson(p);
+				}
+				if (pnr % 100 == 0) {
+					log.info("created person nr: " + pnr);
+				}
 			}
 
 			log.info("Created " + commuterDataElement.getCommuters() + " commuters from "
@@ -144,75 +156,110 @@ public class CommuterDemandWriter {
 
 	}
 
-	private void generatePlanForZones(int pnr, String home, String work) {
-		Person p;
-		Id id;
-		Plan plan;
-//		double workStart = this.calculateNormallyDistributedTime(this.workStartTime);
-		double workStart = this.workStartTime + (3600.0 * random.nextDouble());
-		double workEnd = workStart + this.durationWork;
-		id = scenario.createId(pnr + "_" + home.toString() + "_" + work.toString());
-		p = population.getFactory().createPerson(id);
-		plan = generatePlan(home, work, workStart, workEnd);
-		p.addPlan(plan);
-		this.pp4s.run(p);
-		this.correctHomeEndTime(p);
-		population.addPerson(p);
+	private Plan generateCommuterPlan(Scenario scenario, String homeMunicipalityId,
+			String workMunicipalityId) {
+		double workStartTime = this.workStartTime + (7200.0 * timeRandom.nextDouble());
+		double workEndTime = workStartTime + this.durationWork;
+		Plan plan = scenario.getPopulation().getFactory().createPlan();
 
-	}
-
-	private Plan generatePlan(String home, String work, double workStartTime, double workEndTime) {
-		Plan plan = population.getFactory().createPlan();
-		Feature feature = this.municipalityMap.get(home);
-		Coord homeCoord = MGC.coordinate2Coord(this.getRandomPointInFeature(feature.getDefaultGeometry()));
-		feature = this.municipalityMap.get(work);
-		Coord workCoord = MGC.coordinate2Coord(this.getRandomPointInFeature(feature.getDefaultGeometry()));
-		plan.addActivity(this.createActivity("home", 0.0, workStartTime, homeCoord));
-		Leg leg = population.getFactory().createLeg(TransportMode.car);
+		Feature feature = this.municipalityMap.get(homeMunicipalityId);
+		Coord homeCoord = null;
+		do {
+			Coord coord = MGC
+					.coordinate2Coord(this.getRandomPointInFeature(feature.getDefaultGeometry()));
+			Boolean coordInLanduse = isCoordInLanduse(coord, "home", homeMunicipalityId);
+			if (coordInLanduse == null) {
+				return null;
+			}
+			if (coordInLanduse) {
+				homeCoord = coord;
+			}
+		} while (homeCoord == null);
+		plan.addActivity(this.createActivity(scenario, "home", 0.0, workStartTime, homeCoord));
+		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 		plan.addLeg(leg);
-		if (this.createMutateableActivities){
+
+		feature = this.municipalityMap.get(workMunicipalityId);
+		Coord workCoord = null;
+		do {
+			Coordinate c = this.getRandomPointInFeature(feature.getDefaultGeometry());
+			Coord coord = MGC.coordinate2Coord(c);
+			Boolean coordInLanduse = isCoordInLanduse(coord, "work", workMunicipalityId);
+			if (coordInLanduse == null) {
+				return null;
+			}
+			if (coordInLanduse) {
+				workCoord = coord;
+			}
+		} while (workCoord == null);
+
+		if (this.createMutateableActivities) {
 			String workStartTimeString = Time.writeTime(workStartTime);
 			String activityType = "work_" + workStartTimeString;
-			plan.addActivity(this.createActivity(activityType, workStartTime, workEndTime, workCoord));
+			plan.addActivity(this.createActivity(scenario, activityType, workStartTime, workEndTime,
+					workCoord));
 			this.workActivityTypesStartTimeMap.put(activityType, workStartTimeString);
 		}
 		else {
-			plan.addActivity(this.createActivity("work", workStartTime, workEndTime, workCoord));
+			plan.addActivity(this.createActivity(scenario, "work", workStartTime, workEndTime, workCoord));
 		}
-		leg = population.getFactory().createLeg(TransportMode.car);
+		leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
 		plan.addLeg(leg);
-		plan.addActivity(this.createActivity("home", workEndTime, 24.0 * 3600, homeCoord));
+
+		plan.addActivity(this.createActivity(scenario, "home", workEndTime, 24.0 * 3600, homeCoord));
 		return plan;
 
 	}
 
-	private Activity createActivity(String type, Double start, Double end, Coord coord) {
-		Activity activity = population.getFactory().createActivityFromCoord(type, coord);
+	private Boolean isCoordInLanduse(Coord coord, String actType, String municipalityId) {
+		if (this.landuse == null) {
+			return true;
+		}
+		else {
+			Point point = MGC.xy2Point(coord.getX(), coord.getY());
+			Set<Feature> landuseFeatures = this.landuse.getLanduseFeature(actType, municipalityId);
+			if (landuseFeatures == null) {
+				log.warn("no landuse for point " + point.getX() + " " + point.getY() + " within municipality id: " + municipalityId + " locating " + actType + " activity somewhere...");
+				return true; //return null; if activity and thus person should be removed from population
+			}
+			else {
+				for (Feature feature : landuseFeatures) {
+					if (feature.getDefaultGeometry().contains(point)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	private Activity createActivity(Scenario scenario, String type, Double start, Double end,
+			Coord coord) {
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord(type, coord);
 		activity.setStartTime(start);
 		activity.setEndTime(end);
 		return activity;
 	}
-	
+
 	private void correctHomeEndTime(Person p) {
 		Activity homeAct = (Activity) p.getPlans().get(0).getPlanElements().get(0);
 		Activity workAct = (Activity) p.getPlans().get(0).getPlanElements().get(2);
 		Leg leg = (Leg) p.getPlans().get(0).getPlanElements().get(1);
 		homeAct.setEndTime(workAct.getStartTime() - leg.getTravelTime());
-//		leg.setRoute(null);
-//		leg = (Leg) p.getPlans().get(0).getPlanElements().get(3);
-//		leg.setRoute(null);
+		// leg.setRoute(null);
+		// leg = (Leg) p.getPlans().get(0).getPlanElements().get(3);
+		// leg.setRoute(null);
 	}
 
-	
 	private double calculateNormallyDistributedTime(double i) {
 		Random random = new Random();
-		//draw two random numbers [0;1] from uniform distribution
+		// draw two random numbers [0;1] from uniform distribution
 		double r1 = random.nextDouble();
 		double r2 = random.nextDouble();
-		//Box-Muller-Method in order to get a normally distributed variable
+		// Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		//linear transformation in order to optain N[i,7200²]
-		double endTimeInSec = i + 60 * 60 * normal ;
+		// linear transformation in order to optain N[i,7200²]
+		double endTimeInSec = i + 60 * 60 * normal;
 		return endTimeInSec;
 	}
 
@@ -220,9 +267,9 @@ public class CommuterDemandWriter {
 		Point p = null;
 		double x, y;
 		do {
-			x = g.getEnvelopeInternal().getMinX() + this.random.nextDouble()
+			x = g.getEnvelopeInternal().getMinX() + this.locationRandom.nextDouble()
 					* (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
-			y = g.getEnvelopeInternal().getMinY() + this.random.nextDouble()
+			y = g.getEnvelopeInternal().getMinY() + this.locationRandom.nextDouble()
 					* (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 			p = MGC.xy2Point(x, y);
 		} while (!g.contains(p));
@@ -235,6 +282,46 @@ public class CommuterDemandWriter {
 
 	public void setDuration(double duration) {
 		this.durationWork = duration;
+	}
+
+	public void addLanduse(String activityType, Tuple<Set<Feature>, CoordinateReferenceSystem> landuse)
+			throws Exception {
+		if (this.landuse == null) {
+			this.landuse = new Landuse();
+		}
+		MathTransform transformation = null;
+		transformation = CRS.findMathTransform(landuse.getSecond(), this.targetCrs, true);
+		for (Feature ft : landuse.getFirst()) {
+			Geometry geometry = JTS.transform(ft.getDefaultGeometry(), transformation);
+			ft.setDefaultGeometry(geometry);
+			for (Entry<String, Feature> entry : this.municipalityMap.entrySet()) {
+				Feature municipalityFeature = entry.getValue();
+				if (municipalityFeature.getDefaultGeometry().contains(ft.getDefaultGeometry())
+						|| municipalityFeature.getDefaultGeometry().intersects(ft.getDefaultGeometry())) {
+					this.landuse.addLanduseFeature(activityType, entry.getKey(), ft);
+				}
+			}
+		}
+	}
+
+	private class Landuse {
+
+		Map<String, Map<String, Set<Feature>>> landuseMap = new HashMap<String, Map<String, Set<Feature>>>();
+
+		void addLanduseFeature(String activityType, String municipalityId, Feature feature) {
+			if (! landuseMap.containsKey(activityType)) {
+				landuseMap.put(activityType, new HashMap<String, Set<Feature>>());
+			}
+			if (! landuseMap.get(activityType).containsKey(municipalityId)) {
+				landuseMap.get(activityType).put(municipalityId, new HashSet<Feature>());
+			}
+			landuseMap.get(activityType).get(municipalityId).add(feature);
+		}
+
+		Set<Feature> getLanduseFeature(String activityType, String municipalityId) {
+			return landuseMap.get(activityType).get(municipalityId);
+		}
+
 	}
 
 }

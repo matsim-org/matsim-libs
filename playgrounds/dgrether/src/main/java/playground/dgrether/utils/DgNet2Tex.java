@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -56,28 +57,11 @@ public class DgNet2Tex {
 		log.info("starting conversion...");
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(texnet);
-			writer.write("\\begin{figure}[htp]");
+			this.writeNetworkTable(net, writer);
 			writer.newLine();
-			writer.write("\\begin{center}");
 			writer.newLine();
-			writer.write("\\begin{tabular}[c]{|l|r|r|r|r|r|r|}");
-			writer.newLine();
-			this.hline(writer);
-			writer.write("	Links 		& Length (m)& Lanes &$v_{fs}$ (m/s) & Capacity (veh/h) 	& $C_{storage}$ & $tt_{fs}$ (s) \\\\");
-			writer.newLine();
-			this.hline(writer);
-			this.writeNetwork(net, writer);
-
-			writer.write("\\end{tabular}");
-			writer.newLine();
-			writer.write("\\end{center}");
-			writer.newLine();
-			writer.write("\\caption{}");
-			writer.newLine();
-			writer.write("\\label{fig:}");
-			writer.newLine();
-			writer.write("\\end{figure}");
-			writer.newLine();
+			this.writeTkizPicture(net, writer);
+			
 			writer.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -87,7 +71,53 @@ public class DgNet2Tex {
 		log.info("latex output written!");
 	}
 
-	private void writeNetwork(Network net, BufferedWriter writer) throws IOException {
+	private void writeTkizPicture(Network net, BufferedWriter writer) throws IOException{
+		writer.write("\\begin{figure}[htp]");
+		writer.newLine();
+		writer.write("\\begin{center}");
+		writer.newLine();
+		writer.write("	\\begin{tikzpicture}");
+		writer.newLine();
+		writer.write("	[scale=0.7,");
+		writer.newLine();
+		writer.write("vertex/.style={circle,draw,thick,inner sep=0pt,minimum size=4mm}");
+		writer.newLine();
+		writer.write("	]");
+		writer.newLine();
+		for (Node n : net.getNodes().values()) {
+			writer.write("\\node[vertex] (v" + n.getId() + ") at (" + (n.getCoord().getX()/1000) + "," + (n.getCoord().getY()/1000) + ")"
+					+ "{" + n.getId() + "};");
+			writer.newLine();
+		}
+		
+		for (Link l : net.getLinks().values()){
+			writer.write("\\draw[->] (v" + l.getFromNode().getId() + ") -- (v" + l.getToNode().getId() + ");" );
+			writer.newLine();
+		}
+		
+		writer.write("\\end{tikzpicture}");
+		
+		writer.write("\\end{center}");
+		writer.newLine();
+		writer.write("\\caption{}");
+		writer.newLine();
+		writer.write("\\label{fig:}");
+		writer.newLine();
+		writer.write("\\end{figure}");
+		writer.newLine();
+	}
+	
+	private void writeNetworkTable(Network net, BufferedWriter writer) throws IOException {
+		writer.write("\\begin{figure}[htp]");
+		writer.newLine();
+		writer.write("\\begin{center}");
+		writer.newLine();
+		writer.write("\\begin{tabular}[c]{|l|r|r|r|r|r|r|}");
+		writer.newLine();
+		this.hline(writer);
+		writer.write("	Links 		& Length (m)& Lanes &$v_{fs}$ (m/s) & Capacity (veh/h) 	& $C_{storage}$ & $tt_{fs}$ (s) \\\\");
+		writer.newLine();
+		this.hline(writer);
 		List<Set<Link>> samePropertyLinksList = this.classifyNetwork(net);
 		for (Set<Link> linkSet : samePropertyLinksList){
 			Iterator<Link> it = linkSet.iterator();
@@ -116,6 +146,17 @@ public class DgNet2Tex {
 			this.hline(writer);
 			writer.newLine();
 		}
+		
+		writer.write("\\end{tabular}");
+		writer.newLine();
+		writer.write("\\end{center}");
+		writer.newLine();
+		writer.write("\\caption{}");
+		writer.newLine();
+		writer.write("\\label{fig:}");
+		writer.newLine();
+		writer.write("\\end{figure}");
+		writer.newLine();
 	}
 
 

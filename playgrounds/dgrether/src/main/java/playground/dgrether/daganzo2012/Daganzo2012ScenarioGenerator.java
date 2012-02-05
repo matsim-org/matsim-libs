@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -87,10 +86,9 @@ public class Daganzo2012ScenarioGenerator {
 		config.network().setInputFile(NETWORK_INPUTFILE);
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
-		this.createPlans(this.scenario);
-
-		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
-		popWriter.writeV5(PLANS_OUTPUTFILE);
+//		this.createPlans(this.scenario);
+//		PopulationWriter popWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
+//		popWriter.writeV5(PLANS_OUTPUTFILE);
 		
 		DgNet2Tex net2tex = new DgNet2Tex();
 		net2tex.convert(this.scenario.getNetwork(), NETWORK_INPUTFILE + ".tex");

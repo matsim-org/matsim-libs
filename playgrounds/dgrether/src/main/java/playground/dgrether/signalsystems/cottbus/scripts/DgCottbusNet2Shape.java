@@ -20,7 +20,6 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -35,16 +34,18 @@ import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 public class DgCottbusNet2Shape {
 
 	public static void main(String[] args) {
-		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network.xml.gz";
+		String netFile = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFile);
 
 //		NetworkCleaner nc = new NetworkCleaner();
 //		nc.run(net);
-		NetworkWriter writer = new NetworkWriter(net);
-		writer.write(netFile);
-		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shp/network.shp", "WGS84").write();
+//		NetworkWriter writer = new NetworkWriter(net);
+//		writer.write(netFile);
+		new Links2ESRIShape(net, "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_network_wgs84_utm33n/network_wgs84_utm33n.shp", "WGS84_UTM33N").write();
+		
+		
 	}
 
 }

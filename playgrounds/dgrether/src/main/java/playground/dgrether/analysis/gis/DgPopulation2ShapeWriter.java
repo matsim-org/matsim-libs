@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -64,7 +65,7 @@ public class DgPopulation2ShapeWriter {
 		this.popCrs = crs;
 	}
 	
-	public void write(String filename, CoordinateReferenceSystem targetCrs){
+	public void write(String activityType, String filename, CoordinateReferenceSystem targetCrs){
 		try {
 			MathTransform transformation = CRS.findMathTransform(this.popCrs, targetCrs, true);
 			FeatureType actFeatureType = this.createActFeatureType(targetCrs);
@@ -72,10 +73,16 @@ public class DgPopulation2ShapeWriter {
 			Feature f = null;
 			for (Person p : this.pop.getPersons().values()){
 				Plan plan = p.getSelectedPlan();
-				Activity homeActivity = (Activity) plan.getPlanElements().get(0);
-				f = this.
-				getActivityFeature(actFeatureType, homeActivity, p.getId(), transformation);
-				features.add(f);
+				for (PlanElement pe : plan.getPlanElements()){
+					if (pe instanceof Activity){
+						Activity activity = (Activity) pe;
+						if (activity.getType().compareTo(activityType) == 0){
+							f = this.getActivityFeature(actFeatureType, activity, p.getId(), transformation);
+							features.add(f);
+						}
+					}
+					
+				}
 			}
 			
 			ShapeFileWriter.writeGeometries(features, filename);
