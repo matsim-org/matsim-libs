@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.DaFileReader;
-import playground.droeder.eMobility.io.EmobEnergyProfileReader;
 
 /**
  * @author droeder

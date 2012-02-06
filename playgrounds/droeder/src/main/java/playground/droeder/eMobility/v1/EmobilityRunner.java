@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility;
+package playground.droeder.eMobility.v1;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -44,10 +44,10 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.handler.EmobPersonHandler;
-import playground.droeder.eMobility.handler.EmobVehicleDrivingHandler;
-import playground.droeder.eMobility.io.EmobEnergyProfileReader;
-import playground.droeder.eMobility.subjects.EmobilityPerson;
+import playground.droeder.eMobility.energy.EmobEnergyProfileReader;
+import playground.droeder.eMobility.v1.handler.EmobPersonHandler;
+import playground.droeder.eMobility.v1.handler.EmobVehicleDrivingHandler;
+import playground.droeder.eMobility.v1.subjects.EmobilityPerson;
 import playground.droeder.eMobility.v2.population.EmobPerson;
 
 /**

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.handler;
+package playground.droeder.eMobility.v1.handler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.subjects.EmobVehicle;
+import playground.droeder.eMobility.v1.subjects.EmobVehicle;
 
 /**
  * @author droeder

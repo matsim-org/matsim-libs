@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.subjects;
+package playground.droeder.eMobility.v1.subjects;
 
 import java.util.ArrayList;
 import java.util.Iterator;

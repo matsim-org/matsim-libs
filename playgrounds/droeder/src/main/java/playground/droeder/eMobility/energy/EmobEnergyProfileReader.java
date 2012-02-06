@@ -17,15 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.io;
+package playground.droeder.eMobility.energy;
 
 import java.util.Set;
 
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.droeder.DaFileReader;
-import playground.droeder.eMobility.energy.ChargingProfiles;
-import playground.droeder.eMobility.energy.DisChargingProfiles;
 
 /**
  * @author droeder
