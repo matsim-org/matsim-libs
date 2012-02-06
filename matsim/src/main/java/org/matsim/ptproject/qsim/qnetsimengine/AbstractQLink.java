@@ -78,7 +78,7 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
-	protected NetElementActivator netElementActivator;
+	/*package*/ NetElementActivator netElementActivator;
 	
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
@@ -94,28 +94,28 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 	
 	abstract QNode getToNode() ;
 
-	public final void addParkedVehicle(MobsimVehicle vehicle) {
+	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle ; // cast ok: when it gets here, it needs to be a qvehicle to work.
 		this.parkedVehicles.put(qveh.getId(), qveh);
 		qveh.setCurrentLink(this.link);
 	}
 
-	public final QVehicle removeParkedVehicle(Id vehicleId) {
+	/*package*/ final QVehicle removeParkedVehicle(Id vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
-	public final void addDepartingVehicle(MobsimVehicle mvehicle) {
+	/*package*/ final void addDepartingVehicle(MobsimVehicle mvehicle) {
 		QVehicle vehicle = (QVehicle) mvehicle ;
 		this.waitingList.add(vehicle);
 		vehicle.setCurrentLink(this.getLink());
 		this.activateLink();
 	}
 
-	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
+	/*package*/ void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
 		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
+	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
@@ -203,11 +203,11 @@ abstract class AbstractQLink extends AbstractQLane implements NetsimLink {
 		return customAttributes;
 	}
 
-	public void setNetElementActivator(NetElementActivator qSimEngineRunner) {
+	/*package*/ void setNetElementActivator(NetElementActivator qSimEngineRunner) {
 		this.netElementActivator = qSimEngineRunner;
 	}
 
-	public void registerAgentWaitingForCar(MobsimDriverAgent agent) {
+	/*package*/ void registerAgentWaitingForCar(MobsimDriverAgent agent) {
 		Id vehicleId = agent.getPlannedVehicleId() ;
 		agentsWaitingForCars.put(vehicleId, agent);
 	}

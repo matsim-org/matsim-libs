@@ -159,7 +159,12 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	
 	public double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 //		log.error("  earliestLinkExitTime: " + veh.getEarliestLinkExitTime() + " inverseFlowCap: " + inverseSimulatedFlowCapacity);
+
 		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
+		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
+		// ahead). Especially important with small samples sizes.  This is debatable :-).  kai, jan'11
+		
+		
 //		log.error("  now: " + now + " cmp: " + cmp);
 		double speed = (now > cmp ? 0.0 : 1.0);
 		return speed;

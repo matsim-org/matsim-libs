@@ -42,9 +42,14 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
 			double storageCapacity, double bufferStorageCapacity) {
 	// the length of a vehicle in visualization
+
 		double vehLen = Math.min( 
-				linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
-				this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
+		linkLength / (storageCapacity + bufferStorageCapacity), // number of ``cells''
+		linkLength / numberOfVehiclesOnLink ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
+//		double vehLen = Math.min( 
+//		linkLength / (storageCapacity + bufferStorageCapacity), // all vehicles must have place on the link
+//		this.cellSize / this.storageCapacityFactor); // a vehicle should not be larger than it's actual size. yyyy why is that an issue? kai, apr'10
+
 		return vehLen;
 	}
 	
@@ -63,7 +68,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 			distanceFromFromNode = (travelTime / freespeedTraveltime) * length;
 		}
 		
-		if (distanceFromFromNode > lastDistanceFromFromNode) { 
+		if (distanceFromFromNode >= lastDistanceFromFromNode - spacing ) { 
 			/* vehicle is already in queue or has to stay behind another vehicle
 			 * -> position it directly after the last position
 			 */

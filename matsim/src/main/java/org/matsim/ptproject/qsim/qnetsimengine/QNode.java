@@ -43,7 +43,7 @@ public class QNode implements NetsimNode {
 
 	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
-	protected final AbstractQLink[] inLinksArrayCache;
+	private final AbstractQLink[] inLinksArrayCache;
 	private final AbstractQLink[] tempLinks;
 
 	private boolean active = false;
@@ -58,7 +58,7 @@ public class QNode implements NetsimNode {
 
 	private QNetwork network;
 
-	protected QNode(final Node n, final QNetwork network) {
+	/*package*/ QNode(final Node n, final QNetwork network) {
 		this.node = n;
 		this.network = network; 
 		this.activator = network.simEngine;	// by default (single threaded QSim)
@@ -100,7 +100,7 @@ public class QNode implements NetsimNode {
 		this.activator = activator;
 	}
 
-	protected final void activateNode() {
+	/*package*/ final void activateNode() {
 		if (!this.active) {
 			this.activator.activateNode(this);
 			this.active = true;
@@ -127,7 +127,7 @@ public class QNode implements NetsimNode {
 	 *          The current time in seconds from midnight.
 	 * @param random the random number generator to be used
 	 */
-	protected void moveNode(final double now, final Random random) {
+	/*package*/ void moveNode(final double now, final Random random) {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
@@ -166,7 +166,7 @@ public class QNode implements NetsimNode {
 		}
 	}
 
-	protected void clearLinkBuffer(final AbstractQLink link, final double now){
+	/*package*/ void clearLinkBuffer(final AbstractQLink link, final double now){
 		if (link instanceof QLinkImpl){
 			while (!link.bufferIsEmpty()) {
 				QVehicle veh = link.getFirstFromBuffer();
@@ -190,7 +190,7 @@ public class QNode implements NetsimNode {
 	}
 
 
-	protected void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
+	private void checkNextLinkSemantics(Link currentLink, Link nextLink, QVehicle veh){
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
 			throw new RuntimeException("Cannot move vehicle " + veh.getId() +
 					" from link " + currentLink.getId() + " to link " + nextLink.getId());
@@ -202,16 +202,16 @@ public class QNode implements NetsimNode {
 	// ////////////////////////////////////////////////////////////////////
 	/**
 	 * @param veh
-	 * @param qbufferedItem
+	 * @param fromLaneBuffer
 	 * @param now
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	protected boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane qbufferedItem, final double now) {
+	private boolean moveVehicleOverNode(final QVehicle veh, final AbstractQLane fromLaneBuffer, final double now) {
 		Id nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
-		if ((!qbufferedItem.hasGreenForToLink(nextLinkId))) {
-			if (!((now - qbufferedItem.getBufferLastMovedTime()) > network.simEngine.getStuckTime())){
+		if ((!fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
+			if (!((now - fromLaneBuffer.getBufferLastMovedTime()) > network.simEngine.getStuckTime())){
 				return false;
 			}
 		}
@@ -221,7 +221,7 @@ public class QNode implements NetsimNode {
 			Link nextLink = nextQueueLink.getLink();
 			this.checkNextLinkSemantics(currentLink, nextLink, veh);
 			if (nextQueueLink.hasSpace()) {
-				qbufferedItem.popFirstFromBuffer();
+				fromLaneBuffer.popFirstFromBuffer();
 				veh.getDriver().notifyMoveOverNode(nextLinkId);
 				nextQueueLink.addFromIntersection(veh);
 				return true;
@@ -229,19 +229,19 @@ public class QNode implements NetsimNode {
 
 			// check if veh is stuck!
 
-			if ((now - qbufferedItem.getBufferLastMovedTime()) > network.simEngine.getStuckTime()) {
+			if ((now - fromLaneBuffer.getBufferLastMovedTime()) > network.simEngine.getStuckTime()) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
 				if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
-					qbufferedItem.popFirstFromBuffer();
+					fromLaneBuffer.popFirstFromBuffer();
 					network.simEngine.getMobsim().getAgentCounter().decLiving();
 					network.simEngine.getMobsim().getAgentCounter().incLost();
 					network.simEngine.getMobsim().getEventsManager().processEvent(
 							new AgentStuckEventImpl(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {
-					qbufferedItem.popFirstFromBuffer();
+					fromLaneBuffer.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);
 					nextQueueLink.addFromIntersection(veh);
 					return true;
@@ -251,7 +251,7 @@ public class QNode implements NetsimNode {
 		}
 
 		// --> nextLink == null
-		qbufferedItem.popFirstFromBuffer();
+		fromLaneBuffer.popFirstFromBuffer();
 		network.simEngine.getMobsim().getAgentCounter().decLiving();
 		network.simEngine.getMobsim().getAgentCounter().incLost();
 		log.error(

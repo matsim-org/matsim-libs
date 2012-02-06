@@ -121,13 +121,13 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * buffer. This value is updated each time step by a call to
 	 * {@link #updateBufferCapacity(double)}.
 	 */
-	private double remainingBufferCap = 0.0;
+	private double remainingflowCap = 0.0;
 
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
 	 */
-	private double buffercap_accumulate = 1.0;
+	private double flowcap_accumulate = 1.0;
 
 	/**
 	 * null if the link is not signalized
@@ -207,6 +207,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		veh.setEarliestLinkExitTime(earliestExitTime);
 
 		this.linkEnterTimeMap.put(veh, now);
+		// (yyyyyy why calling this twice?  kai, jan'11)
 	}
 
 	@Override
@@ -243,15 +244,16 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		moveLaneToBuffer(now);
 		// move vehicles from waitingQueue into buffer if possible
 		moveWaitToBuffer(now);
+
 		this.active = this.isActive();
 		return active;
 	}
 
 
 	private void updateBufferCapacity() {
-		this.remainingBufferCap = this.flowCapacityPerTimeStep;
-		if (this.thisTimeStepGreen && this.buffercap_accumulate < 1.0) {
-			this.buffercap_accumulate += this.flowCapFractionCache;
+		this.remainingflowCap = this.flowCapacityPerTimeStep;
+		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0) {
+			this.flowcap_accumulate += this.flowCapFractionCache;
 		}
 	}
 
@@ -296,7 +298,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 				/* is there still room left in the buffer, or is it overcrowded from the
 				 * last time steps? */
-				if (!hasBufferSpace()) {
+				if (!hasFlowCapacityLeftAndBufferSpace()) {
 					return;
 				}
 
@@ -345,7 +347,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 *          the current time
 	 */
 	private void moveWaitToBuffer(final double now) {
-		while (hasBufferSpace()) {
+		while (hasFlowCapacityLeftAndBufferSpace()) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return;
@@ -386,7 +388,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				}
 
 				addToBuffer(veh, now);
-				this.linkEnterTimeMap.put(veh, now);
+//				this.linkEnterTimeMap.put(veh, now);
+				// (yyyyyy really??  kai, jan'11)
 			}
 		}
 	}
@@ -490,7 +493,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.buffercap_accumulate = (this.flowCapFractionCache == 0.0 ? 0.0 : 1.0);
+		this.flowcap_accumulate = (this.flowCapFractionCache == 0.0 ? 0.0 : 1.0);
 	}
 
 	private void calculateFlowCapacity(final double time) {
@@ -674,25 +677,25 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) 
+		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) 
 				|| (!this.waitingList.isEmpty() || (!this.transitVehicleStopQueue.isEmpty()));
 		return active;
 	}
 
-	/**
-	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
-	 */
-	private boolean hasBufferSpace() {
-		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingBufferCap >= 1.0)
-				|| (this.buffercap_accumulate >= 1.0)));
+	private boolean hasFlowCapacityLeftAndBufferSpace() {
+		return (
+				(this.buffer.size() < this.bufferStorageCapacity) 
+				&& 
+				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
+				);
 	}
 
 	private void addToBuffer(final QVehicle veh, final double now) {
-		if (this.remainingBufferCap >= 1.0) {
-			this.remainingBufferCap--;
+		if (this.remainingflowCap >= 1.0) {
+			this.remainingflowCap--;
 		}
-		else if (this.buffercap_accumulate >= 1.0) {
-			this.buffercap_accumulate--;
+		else if (this.flowcap_accumulate >= 1.0) {
+			this.flowcap_accumulate--;
 		}
 		else {
 			throw new IllegalStateException("Buffer of link " + this.getLink().getId() + " has no space left!");
@@ -700,6 +703,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.buffer.add(veh);
 		if (this.buffer.size() == 1) {
 			this.bufferLastMovedTime = now;
+			// (if there is one vehicle in the buffer now, there were zero vehicles in the buffer before.  in consequence,
+			// need to reset the lastMovedTime.  If, in contrast, there was already a vehicle in the buffer before, we can
+			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
 		this.getToNode().activateNode();
 	}
@@ -775,36 +781,27 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			double numberOfVehiclesDriving = QLinkImpl.this.buffer.size() + QLinkImpl.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
 				double now = QLinkImpl.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-				double lastDistanceFromFromNode = Double.NaN;
 				Link link = QLinkImpl.this.getLink();
 				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(link.getLength(), numberOfVehiclesDriving,
 						QLinkImpl.this.storageCapacity, QLinkImpl.this.bufferStorageCapacity); 
 				double freespeedTraveltime = link.getLength() / link.getFreespeed(now);
 				
+				double lastDistanceFromFromNode = Double.NaN;
 				for (QVehicle veh : QLinkImpl.this.buffer){
-					double travelTime = now - QLinkImpl.this.linkEnterTimeMap.get(veh);
-					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
-							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-//					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 				for (QVehicle veh : QLinkImpl.this.vehQueue) {
-					double travelTime = now - QLinkImpl.this.linkEnterTimeMap.get(veh);
-					lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
-							lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
-					int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-					double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-//					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
-					snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 			}
 			
 			
 			//old code to keep
 			
-			int cnt2 = 0 ; // a counter according to which non-moving items can be "spread out" in the visualization
+			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
+			// initialize a bit away from the lane
 
 			// treat vehicles from transit stops
 			snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitVehicleStopQueue, cnt2 );
@@ -818,6 +815,25 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 			// return:
 			return positions;
+		}
+
+		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
+				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
+				double spacing, double freespeedTraveltime, QVehicle veh)
+		{
+			double travelTime = Double.POSITIVE_INFINITY ;
+			if ( QLinkImpl.this.linkEnterTimeMap.get(veh) != null ) {
+				// (otherwise the vehicle has never entered from an intersection)
+				travelTime = now - QLinkImpl.this.linkEnterTimeMap.get(veh);
+			}
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(link.getLength(), spacing, 
+					lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
+			int lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
+					QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
+//					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
+			snapshotInfoBuilder.createAndAddVehiclePosition(positions, link, veh, lastDistanceFromFromNode, lane, speedValue);
+			return lastDistanceFromFromNode;
 		}
 	}
 
