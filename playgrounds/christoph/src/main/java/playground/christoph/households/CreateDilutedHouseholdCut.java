@@ -44,6 +44,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
  * Creates diluted cut scenario that where only households are removed if no 
@@ -63,12 +66,17 @@ public class CreateDilutedHouseholdCut {
 	// createPopulation()
 	//////////////////////////////////////////////////////////////////////
 
-	public static void filterDemand(Config config, String populationOutFile, String householdOutFile, double radius, double xCoord, double yCoord) {
+	public static void filterDemand(Config config, String householdObjectAttributesFile, String populationOutFile, String householdOutFile, 
+			String householdObjectAttributesOutFile, double radius, double xCoord, double yCoord) {
 
 		log.info("MATSim-DB: filterDemand...");
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 
+		// loading household object attributes
+		ObjectAttributes householdAttributes = new ObjectAttributes();
+		new ObjectAttributesXmlReader(householdAttributes).parse(householdObjectAttributesFile);
+		
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  calculate area of interest... ");
@@ -118,6 +126,9 @@ public class CreateDilutedHouseholdCut {
 				scenario.getPopulation().getPersons().remove(personId);
 				filteredPersons++;
 			}
+			// remove object attributes
+			householdAttributes.removeAllAttributes(household.getId().toString());
+			
 			filteredHouseholds++;
 		}
 		log.info("  done.");
@@ -138,6 +149,10 @@ public class CreateDilutedHouseholdCut {
 		new HouseholdsWriterV10(scenario.getHouseholds()).writeFile(householdOutFile);
 		log.info("  done.");
 		
+		log.info("Writing object attributes...");
+		new ObjectAttributesXmlWriter(householdAttributes).writeFile(householdObjectAttributesOutFile);
+		log.info("done.");
+		
 		//////////////////////////////////////////////////////////////////////
 	}
 
@@ -147,21 +162,24 @@ public class CreateDilutedHouseholdCut {
 
 	public static void main(final String[] args) throws IOException {
 
-		if (args.length != 6) {
-			log.error("Invalid number of arguments. Expected 5 (config file, output file, cut radius, center x coord, center y coord).");
+		if (args.length != 8) {
+			log.error("Invalid number of arguments. Expected 8 (config file, household object attributes file, population output file, " +
+					"household output file, household object attributes output file, cut radius, center x coord, center y coord).");
 			return;
 		}
 		
 		Gbl.startMeasurement();
 
 		Config config = ConfigUtils.loadConfig(args[0]);
-		String populationOutFile = args[1];
-		String householdOutFile = args[2];
-		double radius = Double.valueOf(args[3]);
-		double xCoord = Double.valueOf(args[4]);
-		double yCoord = Double.valueOf(args[5]);
+		String householdObjectAttributesFile = args[1];
+		String populationOutFile = args[2];
+		String householdOutFile = args[3];
+		String householdObjectAttributesOutFile = args[4];
+		double radius = Double.valueOf(args[5]);
+		double xCoord = Double.valueOf(args[6]);
+		double yCoord = Double.valueOf(args[7]);
 		
-		filterDemand(config, populationOutFile, householdOutFile, radius, xCoord, yCoord);
+		filterDemand(config, householdObjectAttributesFile, populationOutFile, householdOutFile, householdObjectAttributesOutFile, radius, xCoord, yCoord);
 
 		Gbl.printElapsedTime();
 	}
