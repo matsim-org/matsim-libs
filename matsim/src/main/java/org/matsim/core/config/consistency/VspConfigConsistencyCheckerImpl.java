@@ -51,6 +51,11 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 					"This is a bug and may be changed eventually.  kai, jun'11") ;
 		}
 		
+		if ( config.getQSimConfigGroup()!=null && config.getQSimConfigGroup().isRemoveStuckVehicles() ) {
+			problem = true ;
+			log.warn("found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");
+		}
+		
 		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
 			log.fatal( str ) ; 
