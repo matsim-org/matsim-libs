@@ -34,7 +34,6 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.charts.XYScatterChart;
-import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.config.ConfigUtils;
 import org.xml.sax.SAXException;
 
@@ -49,6 +48,21 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 	private Map<Id,LinkData> linksData;
 	private Network network;
 	
+	/**
+	 * 
+	 * @param args
+	 * 				0-Network file location
+	 * 				1-Events file location
+	 * 				2-CSV file location
+	 * 				3-Time interval in minutes
+	 * 				4-Graphs option: -link (link graph), -avg (links average graph), -avgint (links average with time interval), other (print the most congested link)
+	 * 				5-With -link is the link id, With -avgint is the initial bin
+	 * 				6-With -avgint is the final bin
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException, ParseException {
 		TimeSpaceDistribution.TIME_INTERVAL = 60*Double.parseDouble(args[3]);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -56,8 +70,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		EventsManager events = EventsUtils.createEventsManager();
 		TimeSpaceDistribution tSD = new TimeSpaceDistribution(scenario.getNetwork());
 		events.addHandler(tSD);
-		MatsimXmlParser matsimXmlParser = new EventsReaderXMLv1(events);
-		matsimXmlParser.parse(args[1]);
+		new EventsReaderXMLv1(events).parse(args[1]);
 		tSD.printCSVFiles(args[2]);
 		//tSD.printTXTFiles(args[2]);
 		if(args.length>4) {
