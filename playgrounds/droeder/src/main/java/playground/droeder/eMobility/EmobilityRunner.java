@@ -37,7 +37,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -49,6 +48,7 @@ import playground.droeder.eMobility.handler.EmobPersonHandler;
 import playground.droeder.eMobility.handler.EmobVehicleDrivingHandler;
 import playground.droeder.eMobility.io.EmobEnergyProfileReader;
 import playground.droeder.eMobility.subjects.EmobilityPerson;
+import playground.droeder.eMobility.v2.population.EmobPerson;
 
 /**
  * @author droeder

@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 
 import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.subjects.EmobilityPerson;
+import playground.droeder.eMobility.v2.population.EmobPerson;
 
 /**
  * @author droeder
