@@ -69,6 +69,7 @@ import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
 import org.matsim.ptproject.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.ptproject.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.ptproject.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.ptproject.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.ptproject.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
@@ -1078,7 +1079,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
             TransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
             this.transitVehicle = new TransitQVehicle(new VehicleImpl(tDriver.getId(), vehicleType), 1.0);
-            this.qlink1.addParkedVehicle(this.transitVehicle);
+
+//            this.qlink1.addParkedVehicle(this.transitVehicle);
+            ((QNetsimEngine)this.simEngine).addParkedVehicle(this.transitVehicle, this.qlink1.getLink().getId()) ;
+
             this.transitVehicle.setEarliestLinkExitTime(100);
             this.transitVehicle.setDriver(tDriver);
             this.transitVehicle.setStopHandler(new SimpleTransitStopHandler());
@@ -1089,7 +1093,8 @@ public class TransitQueueNetworkTest extends TestCase {
             // (not great, but is a test. kai, dec'11)
 
             this.normalVehicle = new QVehicle(new VehicleImpl(id2, vehicleType));
-            this.qlink1.addParkedVehicle(this.normalVehicle);
+//            this.qlink1.addParkedVehicle(this.normalVehicle);
+            ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle, this.qlink1.getLink().getId()) ;
 
             PersonDriverAgentImpl nDriver = createAndInsertPersonDriverAgentImpl(person);
             this.normalVehicle.setDriver(nDriver);
@@ -1102,7 +1107,8 @@ public class TransitQueueNetworkTest extends TestCase {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,
                      * that *could* overtake a transit vehicle at its second stop. */
                 this.normalVehicle2 = new QVehicle(new VehicleImpl(id3, vehicleType));
-                this.qlink1.addParkedVehicle(this.normalVehicle2);
+//                this.qlink1.addParkedVehicle(this.normalVehicle2);
+                ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle2, this.qlink1.getLink().getId()) ;
 
                 Person person2 = pb.createPerson(id3);
                 Plan plan2 = pb.createPlan();
