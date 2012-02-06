@@ -87,6 +87,9 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
 				Math.min(marginalUtilityOfTraveling_s, marginalUtilityOfWaiting_s)) * 3600.0 * 24.0; // SCENARIO_DURATION
 		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
+		// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
+		// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.  
+		// kai, feb'12
 
 		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
