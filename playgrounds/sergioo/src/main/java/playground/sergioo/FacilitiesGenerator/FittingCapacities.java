@@ -1,15 +1,15 @@
 package playground.sergioo.FacilitiesGenerator;
 
-import util.algebra.Matrix1DImpl;
-import util.algebra.Matrix2DImpl;
-import util.algebra.Matrix3DImpl;
-import util.algebra.MatrixND;
-import util.algebra.MatrixNDImpl;
-import util.fitting.FittingControl1D;
-import util.fitting.FittingControlND;
-import util.fitting.MaxFittingControlND;
-import util.fitting.ProportionFittingControlND;
-import util.fitting.TotalFittingControl1D;
+import others.sergioo.util.algebra.Matrix1DImpl;
+import others.sergioo.util.algebra.Matrix2DImpl;
+import others.sergioo.util.algebra.Matrix3DImpl;
+import others.sergioo.util.algebra.MatrixND;
+import others.sergioo.util.algebra.MatrixNDImpl;
+import others.sergioo.util.fitting.FittingControl1D;
+import others.sergioo.util.fitting.FittingControlND;
+import others.sergioo.util.fitting.MaxFittingControlND;
+import others.sergioo.util.fitting.ProportionFittingControlND;
+import others.sergioo.util.fitting.TotalFittingControl1D;
 
 public class FittingCapacities {
 

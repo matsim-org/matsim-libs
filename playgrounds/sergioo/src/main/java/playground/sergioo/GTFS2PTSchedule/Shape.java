@@ -8,8 +8,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import util.geometry.Point2D;
-import util.geometry.Vector2D;
+import others.sergioo.util.geometry.Point2D;
+import others.sergioo.util.geometry.Vector2D;
+
 
 public class Shape {
 	

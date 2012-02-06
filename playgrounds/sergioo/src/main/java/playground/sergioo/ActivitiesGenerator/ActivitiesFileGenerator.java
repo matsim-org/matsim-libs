@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 
 public class ActivitiesFileGenerator {
 

@@ -34,10 +34,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 import playground.sergioo.AddressLocator.AddressLocator;
 import playground.sergioo.AddressLocator.BadAddressException;
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;

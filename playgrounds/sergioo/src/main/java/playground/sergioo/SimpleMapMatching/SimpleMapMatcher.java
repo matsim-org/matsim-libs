@@ -14,11 +14,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 
-import util.geometry.Line2D;
-import util.geometry.Point2D;
-import util.geometry.Vector2D;
-import visUtils.PointLines;
-import visUtils.Window;
+import others.sergioo.util.geometry.Line2D;
+import others.sergioo.util.geometry.Point2D;
+import others.sergioo.util.geometry.Vector2D;
+import others.sergioo.visUtils.PointLines;
+import others.sergioo.visUtils.Window;
+
 
 public class SimpleMapMatcher extends Observable implements PointLines {
 	

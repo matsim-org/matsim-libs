@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.apache.commons.math.stat.clustering.Clusterable;
 
-import util.algebra.PointNDImpl;
+import others.sergioo.util.algebra.PointNDImpl;
 
 public class PointPerson extends PointNDImpl.Double implements Clusterable<PointPerson> {
 	

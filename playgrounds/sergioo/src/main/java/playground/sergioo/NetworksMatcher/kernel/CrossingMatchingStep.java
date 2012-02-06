@@ -30,6 +30,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import others.sergioo.util.geometry.Functions2D;
+
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedLink;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode;
@@ -38,7 +40,6 @@ import playground.sergioo.NetworksMatcher.kernel.core.NodesMatching;
 import playground.sergioo.NetworksMatcher.kernel.core.Region;
 import playground.sergioo.NetworksMatcher.kernel.core.ComposedNode.Types;
 import playground.sergioo.Visualizer2D.LayersWindow;
-import util.geometry.Functions2D;
 
 public class CrossingMatchingStep extends MatchingStep {
 

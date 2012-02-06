@@ -35,14 +35,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import util.algebra.MatrixND;
-import util.algebra.MatrixNDImpl;
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
-import util.fitting.FittingControl1D;
-import util.fitting.FittingData;
-import util.fitting.ProportionFittingControl1D;
-import util.fitting.TotalFittingControl1D;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+import others.sergioo.util.fitting.FittingControl1D;
+import others.sergioo.util.fitting.FittingData;
+import others.sergioo.util.fitting.ProportionFittingControl1D;
+import others.sergioo.util.fitting.TotalFittingControl1D;
+
+import others.sergioo.util.algebra.MatrixND;
+import others.sergioo.util.algebra.MatrixNDImpl;
 
 public class SecondaryFacilitiesGenerator {
 

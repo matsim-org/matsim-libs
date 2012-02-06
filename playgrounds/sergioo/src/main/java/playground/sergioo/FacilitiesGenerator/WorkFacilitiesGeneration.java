@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -46,6 +47,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
@@ -55,6 +57,7 @@ import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelMinCost;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -62,17 +65,19 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playground.sergioo.FacilitiesGenerator.gui.WeigthsNetworkWindow;
 import playground.sergioo.FacilitiesGenerator.hits.PersonSchedule;
 import playground.sergioo.FacilitiesGenerator.hits.PointPerson;
 import playground.sergioo.FacilitiesGenerator.hits.Trip;
+import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 
-import util.algebra.Matrix1DImpl;
-import util.algebra.Matrix2DImpl;
-import util.algebra.Matrix3DImpl;
-import util.algebra.MatrixND;
-import util.algebra.PointND;
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.algebra.Matrix1DImpl;
+import others.sergioo.util.algebra.Matrix2DImpl;
+import others.sergioo.util.algebra.Matrix3DImpl;
+import others.sergioo.util.algebra.MatrixND;
+import others.sergioo.util.algebra.PointND;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
 
 public class WorkFacilitiesGeneration {
 
@@ -82,13 +87,14 @@ public class WorkFacilitiesGeneration {
 	private static final String NETWORK_FILE = "./data/currentSimulation/singapore2.xml";
 	private static final String LINKS_MAP_FILE = "./data/facilities/auxiliar/links.map";
 	private static final String NEAREST_LINKS_MAP_FILE = "./data/facilities/auxiliar/nearestLinks.map";
-	private static final String WEIGHTS_MAP_FILE = "./data/facilities/auxiliar/weights.map";
+	private static final String WEIGHTS_MAP_FILE = "./data/facilities/auxiliar/weightsMap.map";
 	private static final String WEIGHTS2_MAP_FILE = "./data/facilities/auxiliar/weights2.map";
 	private static final String CAPACITIES_FILE = "./data/facilities/auxiliar/finalCapacities.map";
+	private static final String WORK_FACILITIES_FILEO = "./data/facilities/workFacilitiesO.xml";
 	private static final String WORK_FACILITIES_FILE = "./data/facilities/workFacilities.xml";
 	//private static final String MATRIX_AREAS_FILE = "./data/facilities/auxiliar/matrixAreas.map";
 	private static final double WALKING_SPEED = 4/3.6;
-	private static final double PRIVATE_BUS_SPEED = 40/3.6;
+	private static final double PRIVATE_BUS_SPEED = 16/3.6;
 	private static final double MAX_TRAVEL_TIME = 15*60;
 	private static final String SEPARATOR = ";;;";
 	private static final int NUM_NEAR = 3;
@@ -98,79 +104,133 @@ public class WorkFacilitiesGeneration {
 
 	//Methods
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, BadStopException {
-		if(args.length==2) {
-			SIZE = Integer.parseInt(args[0]);
-			NUM_ITERATIONS = Integer.parseInt(args[1]);
-		}
-		SortedMap<Id, ActivityFacility> mPAreas = new TreeMap<Id, ActivityFacility>();
-		Map<Id, MPAreaData> dataMPAreas = new HashMap<Id, MPAreaData>();
-		Tuple <FittingCapacities, List<Cluster<PointPerson>>> tuple = getFittingCapacitiesObject(mPAreas, dataMPAreas);
-		FittingCapacities fittingCapacities = tuple.getFirst();
-		List<Cluster<PointPerson>> clusters = tuple.getSecond();
-		MatrixND<Double> capacities = null;
-		try {
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CAPACITIES_FILE));
-			capacities = (MatrixND<Double>) ois.readObject();
-			ois.close();
-		} catch (EOFException e) {
-			Runtime.getRuntime().gc();
-			capacities = fittingCapacities.run(NUM_ITERATIONS);
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CAPACITIES_FILE));
-			oos.writeObject(capacities);
-			oos.close();
-			System.out.println("Matrix written!");
-		}
-		Matrix3DImpl matrix = (Matrix3DImpl)capacities;
-		for(int o=0; o<matrix.getDimension(1); o++) {
-			double[] center = new double[]{0, 0};
-			for(PointPerson pointPerson:clusters.get(o).getPoints())
+		ActivityFacilitiesImpl facilities;
+		/*try {
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			new FacilitiesReaderMatsimV1(scenario).readFile(WORK_FACILITIES_FILEO);
+			facilities = scenario.getActivityFacilities();
+		} catch (Exception e) {*/
+			if(args.length==2) {
+				SIZE = Integer.parseInt(args[0]);
+				NUM_ITERATIONS = Integer.parseInt(args[1]);
+			}
+			SortedMap<Id, ActivityFacility> mPAreas = new TreeMap<Id, ActivityFacility>();
+			Map<Id, MPAreaData> dataMPAreas = new HashMap<Id, MPAreaData>();
+			Tuple <FittingCapacities, List<Cluster<PointPerson>>> tuple = getFittingCapacitiesObject(mPAreas, dataMPAreas);
+			FittingCapacities fittingCapacities = tuple.getFirst();
+			List<Cluster<PointPerson>> clusters = tuple.getSecond();
+			MatrixND<Double> capacities = null;
+			try {
+				ObjectInputStream ois = new ObjectInputStream(new FileInputStream(CAPACITIES_FILE));
+				capacities = (MatrixND<Double>) ois.readObject();
+				ois.close();
+			} catch (EOFException e2) {
+				Runtime.getRuntime().gc();
+				capacities = fittingCapacities.run(NUM_ITERATIONS);
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(CAPACITIES_FILE));
+				oos.writeObject(capacities);
+				oos.close();
+				System.out.println("Matrix written!");
+			}
+			Matrix3DImpl matrix = (Matrix3DImpl)capacities;
+			for(int o=0; o<matrix.getDimension(1); o++) {
+				double[] center = new double[]{0, 0};
+				for(PointPerson pointPerson:clusters.get(o).getPoints())
+					for(int i=0; i<2; i++)
+						center[i] += pointPerson.getElement(i);
 				for(int i=0; i<2; i++)
-					center[i] += pointPerson.getElement(i);
-			for(int i=0; i<2; i++)
-				center[i] /= clusters.get(o).getPoints().size();
-			int minStart = ((int) Math.round(((center[0]%3600.0)/60)/15))*15;
-			int minDuration = ((int) Math.round(((center[1]%3600.0)/60)/15))*15;
-			NumberFormat numberFormat = new DecimalFormat("00");
-			String optionText = "w_"+numberFormat.format(Math.floor(center[0]/3600))+numberFormat.format(minStart)+"_"+numberFormat.format(Math.floor(center[1]/3600))+numberFormat.format(minDuration);
-			OpeningTime openingTime = new OpeningTimeImpl(DayType.wkday, Math.round(center[0]/900)*900, Math.round((center[0]+center[1])/900)*900);
-			Iterator<ActivityFacility> mPAreaI = mPAreas.values().iterator();
-			for(int f=0; f<matrix.getDimension(0); f++) {
-				ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreaI.next();
-				MPAreaData mPAreaData = dataMPAreas.get(mPArea.getId());
-				double pTCapacityFO = 0;
-				for(int s=0; s<matrix.getDimension(2); s++)
-					pTCapacityFO += matrix.getElement(f, o, s);
-				if(pTCapacityFO>0) {
-					ActivityOption activityOption = new ActivityOptionImpl(optionText, mPArea);
-					activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
-					activityOption.addOpeningTime(openingTime);
-					mPArea.getActivityOptions().put(activityOption.getType(), activityOption);
+					center[i] /= clusters.get(o).getPoints().size();
+				int minStart = ((int) Math.round(((center[0]%3600.0)/60)/15))*15;
+				int minDuration = ((int) Math.round(((center[1]%3600.0)/60)/15))*15;
+				NumberFormat numberFormat = new DecimalFormat("00");
+				String optionText = "w_"+numberFormat.format(Math.floor(center[0]/3600))+numberFormat.format(minStart)+"_"+numberFormat.format(Math.floor(center[1]/3600))+numberFormat.format(minDuration);
+				OpeningTime openingTime = new OpeningTimeImpl(DayType.wkday, Math.round(center[0]/900)*900, Math.round((center[0]+center[1])/900)*900);
+				Iterator<ActivityFacility> mPAreaI = mPAreas.values().iterator();
+				for(int f=0; f<matrix.getDimension(0); f++) {
+					ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreaI.next();
+					MPAreaData mPAreaData = dataMPAreas.get(mPArea.getId());
+					double pTCapacityFO = 0;
+					for(int s=0; s<matrix.getDimension(2); s++)
+						pTCapacityFO += matrix.getElement(f, o, s);
+					if(pTCapacityFO>0) {
+						ActivityOption activityOption = new ActivityOptionImpl(optionText, mPArea);
+						activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
+						activityOption.addOpeningTime(openingTime);
+						mPArea.getActivityOptions().put(activityOption.getType(), activityOption);
+					}
 				}
 			}
-		}
-		/*PrintWriter printWriter = new PrintWriter(MATRIX_AREAS_FILE);
-		Iterator<MPAreaData> mPIterator = dataMPAreas.values().iterator();
-		int i = 0;
-		while(mPIterator.hasNext())
-			printWriter.println(i+++" "+mPIterator.next().getId());
-		printWriter.close();*/
-		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
-		ResultSet buildingsR = dataBaseAux.executeQuery("SELECT id, area_perc, no_ AS id_building, xcoord AS xcoord_bldg, ycoord AS ycoord_bldg FROM work_facilities_aux.buildings LEFT JOIN work_facilities_aux.building_perc ON FID_master = id WHERE use_for_generation = 1");
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
-		ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		while(buildingsR.next()) {
-			Id areaId =  new IdImpl(buildingsR.getString(1));
-			ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreas.get(areaId);
-			MPAreaData mPAreaData = dataMPAreas.get(areaId);
-			ActivityFacilityImpl building = facilities.createFacility(new IdImpl(buildingsR.getString(3)), coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5))));
-			building.setDesc(mPAreaData.getType());
-			double proportion = buildingsR.getDouble(2);
-			for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
-				ActivityOption activityOption = new ActivityOptionImpl(activityOptionArea.getType(), building);
-				activityOption.setCapacity(activityOptionArea.getCapacity()*proportion);
-				activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
-				building.getActivityOptions().put(activityOption.getType(), activityOption);
+			/*PrintWriter printWriter = new PrintWriter(MATRIX_AREAS_FILE);
+			Iterator<MPAreaData> mPIterator = dataMPAreas.values().iterator();
+			int i = 0;
+			while(mPIterator.hasNext())
+				printWriter.println(i+++" "+mPIterator.next().getId());
+			printWriter.close();*/
+			DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
+			ResultSet buildingsR = dataBaseAux.executeQuery("SELECT id, area_perc, no_ AS id_building, xcoord AS xcoord_bldg, ycoord AS ycoord_bldg FROM work_facilities_aux.buildings LEFT JOIN work_facilities_aux.building_perc ON FID_master = id WHERE use_for_generation = 1");
+			CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
+			facilities = new ActivityFacilitiesImpl();
+			while(buildingsR.next()) {
+				Id areaId =  new IdImpl(buildingsR.getString(1));
+				ActivityFacilityImpl mPArea = (ActivityFacilityImpl) mPAreas.get(areaId);
+				MPAreaData mPAreaData = dataMPAreas.get(areaId);
+				ActivityFacilityImpl building = facilities.createFacility(new IdImpl(buildingsR.getString(3)), coordinateTransformation.transform(new CoordImpl(buildingsR.getDouble(4), buildingsR.getDouble(5))));
+				building.setDesc(mPAreaData.getType());
+				double proportion = buildingsR.getDouble(2);
+				for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
+					double capacity = activityOptionArea.getCapacity()*proportion;
+					if(capacity>0) {
+						ActivityOption activityOption = new ActivityOptionImpl(activityOptionArea.getType(), building);
+						activityOption.setCapacity(capacity);
+						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
+						building.getActivityOptions().put(activityOption.getType(), activityOption);
+					}
+				}
 			}
+		//}
+		for(ActivityFacility building:facilities.getFacilities().values()) {
+			String minOption="", maxOption="";
+			double minCapacity=Double.MAX_VALUE, maxCapacity=0;
+			double rawRest = 0;
+			Set<String> zeroOptions = new HashSet<String>();
+			for(ActivityOption activityOption:building.getActivityOptions().values()) {
+				double rawCapacity = activityOption.getCapacity();
+				double capacity = Math.round(rawCapacity);
+				if(capacity==0)
+					zeroOptions.add(activityOption.getType());
+				activityOption.setCapacity(capacity);
+				if(rawCapacity<minCapacity) {
+					minCapacity = rawCapacity;
+					minOption = activityOption.getType();
+				}
+				if(rawCapacity>maxCapacity) {
+					maxCapacity = rawCapacity;
+					maxOption = activityOption.getType();
+				}
+				rawRest += rawCapacity-capacity;
+			}
+			double rest = Math.round(rawRest);
+			if(rest>0)
+				building.getActivityOptions().get(maxOption).setCapacity(Math.round(maxCapacity)+rest);
+			else
+				while(rest<0) {
+					rest = Math.round(minCapacity)+rest;
+					if(rest>0)
+						building.getActivityOptions().get(minOption).setCapacity(rest);
+					else {
+						building.getActivityOptions().remove(minOption);
+						if(rest<0) {
+							minCapacity = Double.MAX_VALUE;
+							for(ActivityOption activityOption:building.getActivityOptions().values())
+								if(activityOption.getCapacity()<minCapacity) {
+									minCapacity = activityOption.getCapacity();
+									minOption = activityOption.getType();
+								}
+						}
+					}
+				}
+			for(String zeroOption:zeroOptions)
+				building.getActivityOptions().remove(zeroOption);
 		}
 		/*Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
@@ -446,7 +506,7 @@ public class WorkFacilitiesGeneration {
 		}
 		return pointsC;
 	}
-	private static Map<Tuple<Id, Id>,Double> calculateAreaStopWeights(Map<String, Coord> stopsBase, Map<Id, Double> stops, Map<String, Double> workerAreas, SortedMap<Id, ActivityFacility> mPAreas, Map<Id, MPAreaData> dataMPAreas) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static Tuple<Map<Tuple<Id, Id>,Tuple<Boolean,Double>>, Network> calculateAreaStopWeights(Map<String, Coord> stopsBase, Map<Id, Double> stopsCapacities, Map<String, Double> workerAreas, SortedMap<Id, ActivityFacility> mPAreas, Map<Id, MPAreaData> dataMPAreas) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		new MatsimNetworkReader(scenario).readFile(NETWORK_FILE);
@@ -532,13 +592,13 @@ public class WorkFacilitiesGeneration {
 		for(ActivityFacility mPArea:mPAreas.values())
 			((ActivityFacilityImpl)mPArea).setLinkId(new IdImpl(nearestLinks.get(mPArea.getId().toString())));
 		//Compute stops facilities weights
-		Map<Tuple<Id, Id>,Double> weights;
+		Map<Tuple<Id, Id>,Tuple<Boolean,Double>> weights;
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(WEIGHTS_MAP_FILE));
-			weights = (Map<Tuple<Id, Id>,Double>) ois.readObject();
+			weights = (Map<Tuple<Id, Id>,Tuple<Boolean,Double>>) ois.readObject();
 			ois.close();
 		} catch(EOFException e) {
-			weights = new HashMap<Tuple<Id,Id>, Double>();
+			weights = new HashMap<Tuple<Id,Id>, Tuple<Boolean,Double>>();
 			int i=0;
 			for(String stopKey: stopsBase.keySet()) {
 				double maxTimeFromStop = 0;
@@ -557,17 +617,17 @@ public class WorkFacilitiesGeneration {
 								walkingTime = walkingTimeA;
 						}
 						if(walkingTime<=MAX_TRAVEL_TIME) {
-							weights.put(new Tuple<Id, Id>(stopId, mPArea.getId()), walkingTime);
+							weights.put(new Tuple<Id, Id>(stopId, mPArea.getId()), new Tuple<Boolean, Double>(true, walkingTime));
 							if(walkingTime>maxTimeFromStop)
 								maxTimeFromStop = walkingTime;
 							MPAreaData dataMPArea = dataMPAreas.get(mPArea.getId());
 							maxCapacityNearFacilities += (dataMPArea.getMaxArea()/workerAreas.get(dataMPArea.getType()))*dataMPArea.getModeShare();
 						}
 					}
-				if(stops.get(stopId)>maxCapacityNearFacilities) {
+				if(stopsCapacities.get(stopId)>maxCapacityNearFacilities) {
 					double maxCapacityNear2Facilities = maxCapacityNearFacilities;
 					for(ActivityFacility mPArea:mPAreas.values())
-						if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*PRIVATE_BUS_SPEED) {
+						if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<(MAX_TRAVEL_TIME*2/3)*PRIVATE_BUS_SPEED) {
 							double walkingTime = Double.MAX_VALUE;
 							for(int n=0; n<NUM_NEAR; n++) {
 								double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost;
@@ -580,35 +640,56 @@ public class WorkFacilitiesGeneration {
 								if(privateBusTimeA<privateBusTime)
 									privateBusTime = privateBusTimeA;
 							}
-							if(walkingTime>MAX_TRAVEL_TIME && privateBusTime<=MAX_TRAVEL_TIME) {
-								weights.put(new Tuple<Id, Id>(stopId, mPArea.getId()), privateBusTime);
+							if(walkingTime>MAX_TRAVEL_TIME && privateBusTime<=(MAX_TRAVEL_TIME*2/3)) {
+								weights.put(new Tuple<Id, Id>(stopId, mPArea.getId()), new Tuple<Boolean, Double>(false, privateBusTime));
 								if(privateBusTime>maxTimeFromStop)
 									maxTimeFromStop = privateBusTime;
 								MPAreaData dataMPArea = dataMPAreas.get(mPArea.getId());
 								maxCapacityNear2Facilities += (dataMPArea.getMaxArea()/workerAreas.get(dataMPArea.getType()))*dataMPArea.getModeShare();
 							}
 						}
-					if(stops.get(stopId)>maxCapacityNear2Facilities)
-						throw new BadStopException(stopId);
+					if(stopsCapacities.get(stopId)>maxCapacityNear2Facilities) {
+						System.out.println("Far" + stopId);
+						double maxCapacityNear3Facilities = maxCapacityNear2Facilities;
+						for(ActivityFacility mPArea:mPAreas.values())
+							if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*PRIVATE_BUS_SPEED) {
+								double privateBusTime = Double.MAX_VALUE;
+								for(int n=0; n<NUM_NEAR; n++) {
+									double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;
+									if(privateBusTimeA<privateBusTime)
+										privateBusTime = privateBusTimeA;
+								}
+								if(privateBusTime>(MAX_TRAVEL_TIME*2/3) && privateBusTime<=MAX_TRAVEL_TIME) {
+									weights.put(new Tuple<Id, Id>(stopId, mPArea.getId()), new Tuple<Boolean, Double>(false, privateBusTime));
+									if(privateBusTime>maxTimeFromStop)
+										maxTimeFromStop = privateBusTime;
+									MPAreaData dataMPArea = dataMPAreas.get(mPArea.getId());
+									maxCapacityNear3Facilities += (dataMPArea.getMaxArea()/workerAreas.get(dataMPArea.getType()))*dataMPArea.getModeShare();
+								}
+							}
+						if(stopsCapacities.get(stopId)>maxCapacityNear3Facilities) {
+							System.out.println("Very far" + stopId);
+						}
+					}
 				}
 				double totalTimeFromStop = 0;
 				maxTimeFromStop++;
-				for(Entry<Tuple<Id, Id>,Double> weight:weights.entrySet())
+				for(Entry<Tuple<Id, Id>,Tuple<Boolean, Double>> weight:weights.entrySet())
 					if(weight.getKey().getFirst().equals(stopId)) {
-						double correctWeight = maxTimeFromStop-weight.getValue();
-						weights.put(weight.getKey(), correctWeight);
+						double correctWeight = maxTimeFromStop-weight.getValue().getSecond();
+						weights.put(weight.getKey(), new Tuple<Boolean, Double>(weight.getValue().getFirst(), correctWeight));
 						totalTimeFromStop += correctWeight;
 					}
 				if(totalTimeFromStop!=0)
-					for(Entry<Tuple<Id, Id>,Double> weight:weights.entrySet())
+					for(Entry<Tuple<Id, Id>,Tuple<Boolean, Double>> weight:weights.entrySet())
 						if(weight.getKey().getFirst().equals(stopId))
-							weights.put(weight.getKey(), weight.getValue()/totalTimeFromStop);
+							weights.put(weight.getKey(), new Tuple<Boolean, Double>(weight.getValue().getFirst(),weight.getValue().getSecond()/totalTimeFromStop));
 			}
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(WEIGHTS_MAP_FILE));
 			oos.writeObject(weights);
 			oos.close();
 		}
-		return weights;
+		return new Tuple<Map<Tuple<Id, Id>, Tuple<Boolean, Double>>, Network>(weights, network);
 	}
 	private static Map<String, Double> calculateStopClustersQuantities(List<Cluster<PointPerson>> clusters, Map<Id, Double> stops) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
@@ -720,7 +801,15 @@ public class WorkFacilitiesGeneration {
 		while(typesResult.next())
 			workerAreas.put(typesResult.getString(1), typesResult.getDouble(2));
 		typesResult.close();
-		Map<Tuple<Id, Id>,Double> weightsMap = calculateAreaStopWeights(stopsBase, stops, workerAreas, mPAreas, dataMPAreas);
+		Tuple<Map<Tuple<Id, Id>,Tuple<Boolean,Double>>, Network> weightsMap = calculateAreaStopWeights(stopsBase, stops, workerAreas, mPAreas, dataMPAreas);
+		WeigthsNetworkWindow weigthsNetworkWindow = new WeigthsNetworkWindow("Weights", new NetworkPainter(weightsMap.getSecond()), weightsMap.getFirst(), mPAreas, stopsBase);
+		weigthsNetworkWindow.setVisible(true);
+		while(!weigthsNetworkWindow.isReadyToExit())
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		System.out.println("Facilities done!");
 		Matrix2DImpl weights = new Matrix2DImpl(new int[]{mPAreas.size(),stopsBase.size()});
 		Iterator<Id> mPAreaI = mPAreas.keySet().iterator();
@@ -728,7 +817,7 @@ public class WorkFacilitiesGeneration {
 			Id facilityId = mPAreaI.next();
 			Iterator<String> stopsI = stopsBase.keySet().iterator();
 			for(int s=0; s<weights.getDimension(1); s++) {
-				Double weight = weightsMap.get(new Tuple<Id, Id>(new IdImpl(stopsI.next()), facilityId));
+				Double weight = weightsMap.getFirst().get(new Tuple<Id, Id>(new IdImpl(stopsI.next()), facilityId)).getSecond();
 				if(weight==null)
 					weight = 0.0;
 				weights.setElement(f, s, weight);

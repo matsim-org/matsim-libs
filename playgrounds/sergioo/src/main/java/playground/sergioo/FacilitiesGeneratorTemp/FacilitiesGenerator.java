@@ -25,8 +25,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 
 public class FacilitiesGenerator {
 	

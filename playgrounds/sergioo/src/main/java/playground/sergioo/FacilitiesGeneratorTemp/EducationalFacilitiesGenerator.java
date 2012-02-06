@@ -23,8 +23,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 
 public class EducationalFacilitiesGenerator {
 

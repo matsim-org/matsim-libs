@@ -41,8 +41,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
+import others.sergioo.util.geometry.Point2D;
+
 import playground.sergioo.BusRoutesVisualizer.gui.Window.Option;
-import util.geometry.Point2D;
 
 public class PanelPathEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 	/**

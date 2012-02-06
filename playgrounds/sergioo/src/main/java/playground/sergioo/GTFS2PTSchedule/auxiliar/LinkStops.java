@@ -16,9 +16,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
+import others.sergioo.util.geometry.Line2D;
+import others.sergioo.util.geometry.Point2D;
+
 import playground.sergioo.GTFS2PTSchedule.Stop;
-import util.geometry.Line2D;
-import util.geometry.Point2D;
 
 public class LinkStops {
 	

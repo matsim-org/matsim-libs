@@ -6,8 +6,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import util.geometry.Line2D;
-import util.geometry.Point2D;
+import others.sergioo.util.geometry.Line2D;
+import others.sergioo.util.geometry.Point2D;
+
 
 public class LinkAttached {
 	

@@ -46,8 +46,8 @@ import playground.sergioo.Visualizer2D.PointsPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainter;
 import playground.sergioo.Visualizer2D.NetworkVisualizer.SimpleNetworkWindow.Options;
-import util.algebra.PointND;
-import util.clustering.Cluster;
+import others.sergioo.util.algebra.PointND;
+import others.sergioo.util.clustering.Cluster;
 
 public class ClustersPanel extends LayersPanel implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
 	

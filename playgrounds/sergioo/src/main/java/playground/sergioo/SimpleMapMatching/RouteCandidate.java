@@ -7,8 +7,9 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
-import util.geometry.Line2D;
-import util.geometry.Point2D;
+import others.sergioo.util.geometry.Line2D;
+import others.sergioo.util.geometry.Point2D;
+
 
 public class RouteCandidate {
 	

@@ -9,6 +9,7 @@ import java.awt.geom.Ellipse2D;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public abstract class Painter {
@@ -39,6 +40,12 @@ public abstract class Painter {
 		g2.setStroke(new BasicStroke((float) (pointSize)));
 		g2.drawLine(layersPanel.getScreenX(coord.getX())-(int)pointSize, layersPanel.getScreenY(coord.getY())+(int)pointSize, layersPanel.getScreenX(coord.getX())+(int)pointSize, layersPanel.getScreenY(coord.getY())-(int)pointSize);
 		g2.drawLine(layersPanel.getScreenX(coord.getX())-(int)pointSize, layersPanel.getScreenY(coord.getY())-(int)pointSize, layersPanel.getScreenX(coord.getX())+(int)pointSize, layersPanel.getScreenY(coord.getY())+(int)pointSize);
+	}
+	protected void paintArrow(Graphics2D g2, LayersPanel layersPanel, Tuple<Coord, Coord> points, double angleArrow, double longArrow, Stroke stroke, Color color) {
+		double angle = Math.atan2(points.getSecond().getY()-points.getFirst().getY(), points.getSecond().getX()-points.getFirst().getX());
+		paintLine(g2, layersPanel, points, stroke, color);
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(points.getSecond(), new CoordImpl(points.getSecond().getX()-longArrow*Math.sin(Math.PI/2-angle-angleArrow), points.getSecond().getY()-longArrow*Math.cos(Math.PI/2-angle-angleArrow))), stroke, color);
+		paintLine(g2, layersPanel, new Tuple<Coord, Coord>(points.getSecond(), new CoordImpl(points.getSecond().getX()-longArrow*Math.sin(Math.PI/2-angle+angleArrow), points.getSecond().getY()-longArrow*Math.cos(Math.PI/2-angle+angleArrow))), stroke, color);
 	}
 	
 }

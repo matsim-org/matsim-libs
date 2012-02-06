@@ -32,9 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import others.sergioo.util.clustering.Cluster;
+
 import playground.sergioo.FacilitiesGenerator.hits.PointPerson;
 import playground.sergioo.Visualizer2D.LayersWindow;
-import util.clustering.Cluster;
 
 
 public class ClustersWindow extends LayersWindow implements ActionListener {

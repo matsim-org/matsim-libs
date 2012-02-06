@@ -32,8 +32,9 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 
 public class VehiclesDataProcessor {
 

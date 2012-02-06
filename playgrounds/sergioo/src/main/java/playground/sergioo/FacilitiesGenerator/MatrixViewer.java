@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 
-import util.algebra.Matrix2DImpl;
-import util.algebra.Matrix3DImpl;
+import others.sergioo.util.algebra.Matrix2DImpl;
+import others.sergioo.util.algebra.Matrix3DImpl;
 
 public class MatrixViewer {
 

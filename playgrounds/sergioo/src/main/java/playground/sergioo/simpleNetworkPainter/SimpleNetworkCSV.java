@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Observable;
 
-import util.geometry.Line2D;
-import util.geometry.Point2D;
-import visUtils.PointLines;
-import visUtils.Window;
+import others.sergioo.util.geometry.Line2D;
+import others.sergioo.util.geometry.Point2D;
+import others.sergioo.visUtils.PointLines;
+import others.sergioo.visUtils.Window;
+
 
 public class SimpleNetworkCSV extends Observable implements PointLines{
 	

@@ -26,8 +26,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
-import util.dataBase.DataBaseAdmin;
-import util.dataBase.NoConnectionException;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+
 
 public class FacilitiesFileGenerator {
 

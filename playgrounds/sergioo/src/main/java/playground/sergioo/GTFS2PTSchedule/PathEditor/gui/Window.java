@@ -52,11 +52,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
+import others.sergioo.util.geometry.Point2D;
+
 import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutePath;
 import playground.sergioo.GTFS2PTSchedule.PathEditor.kernel.RoutesPathsGenerator;
 import playground.sergioo.GTFS2PTSchedule.Stop;
 import playground.sergioo.GTFS2PTSchedule.Trip;
-import util.geometry.Point2D;
 
 public class Window extends JFrame implements ActionListener {
 	/**

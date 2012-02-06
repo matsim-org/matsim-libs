@@ -162,16 +162,16 @@ public abstract class LayersPanel extends JPanel {
 		setAspectRatio();
 	}
 	public int getScreenX(double x) {
-		return (int) ((x-camera.getUpLeftCorner().getX())*width/camera.getSize().getX())+(this.getWidth()-width)/2;
+		return (int) ((x-camera.getUpLeftCorner().getX())*width/camera.getSize().getX())+(getWidth()-width)/2;
 	}
 	public int getScreenY(double y) {
-		return (int) ((y-camera.getUpLeftCorner().getY())*height/camera.getSize().getY())+(this.getHeight()-height)/2;
+		return (int) ((y-camera.getUpLeftCorner().getY())*height/camera.getSize().getY())+(getHeight()-height)/2;
 	}
 	public double getWorldX(int x) {
-		return (x-(this.getWidth()-width)/2)*camera.getSize().getX()/width+camera.getUpLeftCorner().getX();
+		return (x-(getWidth()-width)/2)*camera.getSize().getX()/width+camera.getUpLeftCorner().getX();
 	}
 	public double getWorldY(int y) {
-		return (y-(this.getHeight()-height)/2)*camera.getSize().getY()/height+camera.getUpLeftCorner().getY();
+		return (y-(getHeight()-height)/2)*camera.getSize().getY()/height+camera.getUpLeftCorner().getY();
 	}
 	
 	

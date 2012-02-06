@@ -10,8 +10,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import others.sergioo.util.dataBase.*;
+
 import playground.sergioo.AddressLocator.*;
-import util.dataBase.*;
 
 
 public class Geocoder {

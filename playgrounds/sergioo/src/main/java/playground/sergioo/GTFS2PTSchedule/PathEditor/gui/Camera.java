@@ -1,7 +1,7 @@
 package playground.sergioo.GTFS2PTSchedule.PathEditor.gui;
 
-import util.geometry.Point2D;
-import util.geometry.Vector2D;
+import others.sergioo.util.geometry.Point2D;
+import others.sergioo.util.geometry.Vector2D;
 
 public class Camera {
 	
