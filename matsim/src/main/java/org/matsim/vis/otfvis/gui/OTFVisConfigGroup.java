@@ -88,6 +88,7 @@ public class OTFVisConfigGroup extends Module {
 
 	public static final String COLORING_STANDARD = "standard" ;
 	public static final String COLORING_BVG = "bvg" ;
+	public static final String COLORING_BVG_2 = "bvg2" ;
 
 	private String coloring = COLORING_STANDARD ;
 

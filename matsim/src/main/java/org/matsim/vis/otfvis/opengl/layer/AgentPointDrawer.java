@@ -24,6 +24,8 @@ package org.matsim.vis.otfvis.opengl.layer;
 
 import java.awt.Color;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
@@ -47,6 +49,7 @@ public class AgentPointDrawer {
 		this.oglAgentPointLayer = oglAgentPointLayer;
 	}
 
+	private static int bvg2cnt = 0 ;
 	public void setAgent( AgentSnapshotInfo agInfo ) {
 		char[] id = agInfo.getId().toString().toCharArray();
 		
@@ -63,6 +66,32 @@ public class AgentPointDrawer {
 				} else if ( idstr.contains("line_T")) {
 					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.RED, true);
 				} else if ( idstr.contains("line_S")) {
+					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
+				} else if ( idstr.contains("line_U")) {
+					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
+				} else {
+					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+				}
+			} else {
+				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.YELLOW, true);
+			}
+		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equalsIgnoreCase( OTFVisConfigGroup.COLORING_BVG_2 ) ) {
+			if ( bvg2cnt < 1 ) {
+				bvg2cnt++ ;
+				Logger.getLogger(this.getClass()).info( "using bvg2 coloring scheme ...") ;
+			}
+
+			if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.DARK_GRAY, true);
+			} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+				this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.ORANGE, true);
+			} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+				String idstr = agInfo.getId().toString();
+				if ( idstr.contains("line_") && idstr.contains("-B-") ) {
+					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.MAGENTA, true);
+				} else if ( idstr.contains("line_") && idstr.contains("-T-")) {
+					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.RED, true);
+				} else if ( idstr.contains("line_SB")) {
 					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.GREEN, true);
 				} else if ( idstr.contains("line_U")) {
 					this.oglAgentPointLayer.addAgent(id, (float)agInfo.getEasting(), (float)agInfo.getNorthing(), Color.BLUE, true);
