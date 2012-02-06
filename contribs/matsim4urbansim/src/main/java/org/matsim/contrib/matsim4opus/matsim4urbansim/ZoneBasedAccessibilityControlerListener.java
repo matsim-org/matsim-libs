@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.constants.Constants;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCostCalculator;
 import org.matsim.contrib.matsim4opus.utils.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
@@ -74,7 +73,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// this calculates a least cost path for (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance)   with marginalCostOfDistance = 0
 		LeastCostPathTree lcptTravelTimeDistance = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
-		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
+		// LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
 		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
@@ -100,13 +99,13 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				Id originZoneID = zones[fromIndex].getZoneID();
 				// run dijkstra on network
 				lcptTravelTimeDistance.calculate(network, fromNode, depatureTime);
-				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				// lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
 				double accessibilityTravelTimes = 0.;
-				double accessibilityTravelTimeCosts = 0.;
-				double accessibilityTravelDistanceCosts = 0.;
+				// double accessibilityTravelTimeCosts = 0.;
+				// double accessibilityTravelDistanceCosts = 0.;
 				
 				// iterate through all aggregated jobs (respectively their nearest network nodes) 
 				// and calculate workplace accessibility for current start/origin node.
@@ -123,22 +122,22 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 					// travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// travel costs in utils
-					double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
+					// double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
 					// travel distance by car in km (since distances in meter are very large values making the log sum -Infinity most of the time) 
-					double travelDistance_km = lcptTravelDistance.getTree().get( nodeID ).getCost() / 1000.;
+					// double travelDistance_km = lcptTravelDistance.getTree().get( nodeID ).getCost() / 1000.;
 					
 					// sum travel times
 					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
 					// sum travel costs  (mention the beta)
-					accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
+					// accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
 					// sum travel distances  (mention the beta)
-					accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_km ) * jobWeight; // tnicolai: find another beta for travel distance
+					// accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_km ) * jobWeight; // tnicolai: find another beta for travel distance
 				}
 				
 				// get log sum 
 				double travelTimeAccessibility = Math.log( accessibilityTravelTimes );
-				double travelCostAccessibility = Math.log( accessibilityTravelTimeCosts );
-				double travelDistanceAccessibility = Math.log( accessibilityTravelDistanceCosts );
+				double travelCostAccessibility = 0.; //Math.log( accessibilityTravelTimeCosts );
+				double travelDistanceAccessibility = 0.; // Math.log( accessibilityTravelDistanceCosts );
 
 				// writing accessibility measures of current node in csv format
 				ZoneBasedAccessibilityCSVWriter.write(originZoneID, travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility);
