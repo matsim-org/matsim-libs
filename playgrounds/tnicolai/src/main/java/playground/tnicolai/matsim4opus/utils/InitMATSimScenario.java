@@ -47,11 +47,19 @@ import playground.tnicolai.matsim4opus.utils.io.Paths;
 /**
  * @author thomas
  * 
+ * improvements dec'11:
+ * - adjusting flow- and storage capacities to population sample rate. The
+ * storage capacity includes a fetch factor to avoid backlogs and network breakdown
+ * for small sample rates.
+ * 
  * improvements jan'12:
  * - initGlobalSettings sets the number of available processors in the 
  * 	GlobalConfigGroup to speed up MATSim computations. Before that only
  * 	2 processors were used even if there are more.
  * 
+ * improvements feb'12:
+ * - setting mutationrange = 2h for TimeAllocationMutator (this seems to 
+ * shift the depature times ???)
  *
  */
 public class InitMATSimScenario {

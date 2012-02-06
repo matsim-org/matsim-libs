@@ -24,9 +24,9 @@ public class ZoneBasedAccessibilityCSVWriter {
 			
 			// create header
 			accessibilityDataWriter.write( Constants.ERSA_ZONE_ID + "," +
-											Constants.ERSA_TRAVEL_TIME_ACCESSIBILITY + "," +
-											Constants.ERSA_TRAVEL_COST_ACCESSIBILITY + "," + 
-											Constants.ERSA_TRAVEL_DISTANCE_ACCESSIBILITY);
+											Constants.ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY + "," +
+											Constants.ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY + "," + 
+											Constants.ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY);
 			accessibilityDataWriter.newLine();
 			
 			log.info("... done!");
@@ -39,21 +39,21 @@ public class ZoneBasedAccessibilityCSVWriter {
 	/**
 	 * writing the accessibility measures into csv file
 	 * @param node
-	 * @param travelTimeAccessibility
-	 * @param travelCostAccessibility
-	 * @param travelDistanceAccessibility
+	 * @param congestedTravelTimesCarLogSum
+	 * @param freespeedTravelTimesCarLogSum
+	 * @param travelTimesWalkLogSum
 	 */
 	public static void write(Id zoneID,
-							 double travelTimeAccessibility, 
-							 double travelCostAccessibility, 
-							 double travelDistanceAccessibility){
+							 double congestedTravelTimesCarLogSum, 
+							 double freespeedTravelTimesCarLogSum, 
+							 double travelTimesWalkLogSum){
 		
 		try{
 			assert(ZoneBasedAccessibilityCSVWriter.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( zoneID + "," + 
-										   travelTimeAccessibility + "," + 
-										   travelCostAccessibility + "," + 
-										   travelDistanceAccessibility );
+										   congestedTravelTimesCarLogSum + "," + 
+										   freespeedTravelTimesCarLogSum + "," + 
+										   travelTimesWalkLogSum );
 			accessibilityDataWriter.newLine();
 		}
 		catch(Exception e){

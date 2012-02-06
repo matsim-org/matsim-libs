@@ -92,9 +92,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
-		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
-		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator()); // tnicolai: check with kai
+		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
+		// tnicolai: calculate "distance" as walk time -> add "am_walk_time_in_minutes:f4" to header
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator());
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
@@ -126,8 +126,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				Id originZoneID = zones[fromZoneIndex].getZoneID();
 				
 				// run dijksrtra for current node as origin
-				lcptTravelTime.calculate(network, fromNode, depatureTime);
-				lcptTravelDistance.calculate(network, fromNode, depatureTime);
+				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
+				lcptWalkTime.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					
@@ -136,18 +136,21 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					Id destinationZoneID = zones[toZoneIndex].getZoneID();
 					
 					// get arrival time
-					double arrivalTime = lcptTravelTime.getTree().get( toNode.getId() ).getTime();
-					// travel times in minutes (for UrbanSim)
+					double arrivalTime = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getTime();
+					// congested car travel times in minutes
 					double travelTime_min = (arrivalTime - depatureTime) / 60.;
 					// we guess that any value less than 1.2 leads to errors on the UrbanSim side
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(travelTime_min < 1.2)
 						travelTime_min = 1.2;
-					
 					// get travel cost (marginal cost of time * travel time)
-					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
+					double travelCost_min = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost() / 60.;
+					if(travelCost_min < 1.2)
+						travelCost_min = 1.2;
 					// get travel distance (link lengths in meter)
-					double distance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
+					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
+					if(walkTravelTime_min < 1.2)
+						walkTravelTime_min = 1.2;
 					
 					// query trips in OD Matrix
 					double trips = 0.0;
@@ -159,12 +162,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// 			  when changing anything at this call.
 					travelDataWriter.write ( originZoneID.toString()			//origin zone id
 										+ "," + destinationZoneID.toString()	//destination zone id
-										+ "," + travelCost //travelCost 		//tcost
-										+ "," + travelTime_min 					//ttimes
-										+ "," + travelTime_min*10.				//walk ttimes
-										+ "," + trips							//vehicle trips
-										+ "," + distance_meter					// distance
-					);		
+										+ "," + travelCost_min 				 	//congested tcost
+										+ "," + travelTime_min 					//congested ttimes
+										+ "," + walkTravelTime_min				//walk ttimes
+										+ "," + trips);							//vehicle trips
 					travelDataWriter.newLine();
 				}
 			}
@@ -199,8 +200,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		
 		// Travel Data Header
-		// tnicolai: add single_vehicle_to_work_travel_distance:f4 for distance output
-		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4:single_vehicle_to_work_travel_distance:f4" ) ; 
+		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		
 		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 		travelDataWriter.newLine();

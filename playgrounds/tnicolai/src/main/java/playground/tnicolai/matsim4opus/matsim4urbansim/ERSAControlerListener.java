@@ -44,6 +44,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.gis.EuclideanDistance;
 import playground.tnicolai.matsim4opus.gis.GridUtils;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.gis.Zone;
@@ -58,44 +59,49 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneAccessibilityObje
 import com.vividsolutions.jts.geom.Point;
 
 /**
+ * improvements sep'11:
+ * 
+ * Code improvements since last version (deadline ersa paper):
+ * - Aggregated Workplaces: 
+ * 	Workplaces with same parcel_id are aggregated to a weighted job (see JobClusterObject)
+ * 	This means much less iteration cycles
+ * - Less time consuming look-ups: 
+ * 	All workplaces are assigned to their nearest node in an pre-proscess step
+ * 	(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
+ * 	iteration cycle
+ * - Distance based accessibility added: 
+ * 	like the travel time accessibility computation now also distances are computed
+ * 	with LeastCostPathTree (tnicolai feb'12 distances are replaced by walking times 
+ *  which is also linear and corresponds to distances)
+ * 
+ * improvements jan'12:
+ * 
+ * - Better readability:
+ * 	Removed unused methods such as "addNearestNodeToJobClusterArray" (this is done while gathering/processing
+ * 	workplaces). Also all results are now dumped directly from this class. Before, the SpatialGrid 
+ * 	tables were transfered to another class to dump out the results. This also improves readability
+ * - Workplace data dump:
+ * 	Dumping out the used workplace data was simplified, since the simulation now already uses aggregated data.
+ * 	Corresponding subroutines aggregating the data are not needed any more (see dumpWorkplaceData()).
+ * 	But coordinates of the origin workplaces could not dumped out, this is now done in ReadFromUrbansimParcelModel
+ *  during processing the UrbnAism job data
+ *  
+ *  improvements feb'12
+ *  - distance between square centroid and nearest node on road network is considered in the accessibility computation
+ *  as walk time of the euclidian distance between both (centroid and nearest node). This walk time is added as an offset 
+ *  to each measured travel times
+ *  - using walk travel times instead of travel distances. This is because of the betas that are utils/time unit. The walk time
+ *  corresponds to distances since this is also linear.
+ * 
+ * TODO: implement configurable betas for different accessibility measures based on different costs
+ * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
+ * betaPowerTravelCosts, betaTravelDistance, betaLnTravelDistance, betaPowerTravelDistance
+ * 
  * @author thomas
- *
+ * 
  */
 public class ERSAControlerListener implements ShutdownListener{
-	
-	/**
-	 * improvements sep'11:
-	 * 
-	 * Code improvements since last version (deadline ersa paper):
-	 * - Aggregated Workplaces: 
-	 * 	Workplaces with same parcel_id are aggregated to a weighted job (see JobClusterObject)
-	 * 	This means much less iteration cycles
-	 * - Less time consuming look-ups: 
-	 * 	All workplaces are assigned to their nearest node in an pre-proscess step
-	 * 	(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
-	 * 	iteration cycle
-	 * - Distance based accessibility added: 
-	 * 	like the travel time accessibility computation now also distances are computed
-	 * 	with LeastCostPathTree -> CHECK WITH KAI IF TRAVELDISTANCECOSTCALULATOR IS OK!
-	 * 
-	 * improvements jan'12:
-	 * 
-	 * - Better readability:
-	 * 	Removed unused methods such as "addNearestNodeToJobClusterArray" (this is done while gathering/processing
-	 * 	workplaces). Also all results are now dumped directly from this class. Before, the SpatialGrid 
-	 * 	tables were transfered to another class to dump out the results. This also improves readability
-	 * - Workplace data dump:
-	 * 	Dumping out the used workplace data was simplified, since the simulation now already uses aggregated data.
-	 * 	Corresponding subroutines aggregating the data are not needed any more (see dumpWorkplaceData()).
-	 * 	But coordinates of the origin workplaces could not dumped out, this is now done in ReadFromUrbansimParcelModel
-	 *  during processing the UrbnAism job data
-	 * 
-	 * TODO: implement configurable betas for different accessibility measures based on different costs
-	 * beta, betaTravelTimes, betaLnTravelTimes, betaPowerTravelTimes, betaTravelCosts, betaLnTravelCosts,
-	 * betaPowerTravelCosts, betaTravelDistance, betaLnTravelDistance, betaPowerTravelDistance
-	 * 
-	 */
-	
+
 	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
 	
 	private ClusterObject[] aggregatedWorkplaces;
@@ -203,6 +209,8 @@ public class ERSAControlerListener implements ShutdownListener{
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
+				// captures the eulidean distance between a square centroid and its nearest node
+				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(coordFromZone, fromNode.getCoord()) / 60.;
 				double congestedTravelTimesCarSum = 0.;
 				double freespeedTravelTimesCarSum = 0.;
 				double travelTimesWalkSum  	   	  = 0.; // substitute for travel distance
@@ -213,24 +221,25 @@ public class ERSAControlerListener implements ShutdownListener{
 					// get stored network node (this is the nearest node next to an aggregated workplace)
 					Node destinationNode = this.aggregatedWorkplaces[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
+
 					// using number of aggregated workplaces as weight for log sum measure
 					int jobWeight = this.aggregatedWorkplaces[i].getNumberOfObjects();
 
 					double arrivalTime = lcptCongestedTravelTime.getTree().get( nodeID ).getTime();
 					
-					// travel times by car in minutes
+					// congested car travel times in minutes
 					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
-					// freespeed travel times by car in minutes
+					// freespeed car  travel times in minutes
 					double freespeedTravelTime_min = lcptFreespeedTravelTime.getTree().get( nodeID ).getCost() / 60.;
 					// walk travel times in minutes
 					double walkTravelTime_min = lcptWalkTime.getTree().get( nodeID ).getCost() / 60.;
 					
 					// sum congested travel times
-					congestedTravelTimesCarSum += Math.exp( betaCarMin * congestedTravelTime_min ) * jobWeight;
+					congestedTravelTimesCarSum += Math.exp( betaCarMin * (congestedTravelTime_min + walkTimeOffset_min) ) * jobWeight;
 					// sum freespeed travel times
-					freespeedTravelTimesCarSum += Math.exp( betaCarMin * freespeedTravelTime_min ) * jobWeight;
+					freespeedTravelTimesCarSum += Math.exp( betaCarMin * (freespeedTravelTime_min + walkTimeOffset_min) ) * jobWeight;
 					// sum walk travel times (substitute for distances)
-					travelTimesWalkSum 		   += Math.exp( betaWalkMin * walkTravelTime_min ) * jobWeight;
+					travelTimesWalkSum 		   += Math.exp( betaWalkMin * (walkTravelTime_min + walkTimeOffset_min) ) * jobWeight;
 				}
 				
 				// assign accessibilities sums to current starZone object. 
