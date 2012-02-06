@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.plansToPlans;
+package playground.kai.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -83,7 +83,7 @@ public class MyPlansToPlans {
 
 		
 		
-		Scenario newScen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
+		Scenario newScen = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 		Population newPop = newScen.getPopulation() ;
 		for ( Person person : pop.getPersons().values() ) {
 			if ( Math.random() < 0.1 ) 

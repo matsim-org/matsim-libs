@@ -16,17 +16,17 @@ class EconomicValues3 {
 		{
 			ValuesForAMode roadValues = economicValues.getByMode(Mode.road) ;
 			{
-				ValuesForAUserType pvValues = roadValues.getByType(Type.GV) ;
-				pvValues.setByEntry( Entry.km, -0.00 ) ;
-				pvValues.setByEntry( Entry.hrs, -0.00 ) ;
+				ValuesForAUserType gvValues = roadValues.getByType(Type.GV) ;
+				gvValues.setByEntry( Entry.km, -0.00 ) ;
+				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
 		}
 		{
 			ValuesForAMode railValues = economicValues.getByMode(Mode.rail) ;
 			{
-				ValuesForAUserType pvValues = railValues.getByType(Type.GV) ;
-				pvValues.setByEntry( Entry.km, -5. ) ;
-				pvValues.setByEntry( Entry.hrs, -0.00 ) ;
+				ValuesForAUserType gvValues = railValues.getByType(Type.GV) ;
+				gvValues.setByEntry( Entry.km, -5. ) ;
+				gvValues.setByEntry( Entry.hrs, -0.00 ) ;
 			}
 		}
 	
