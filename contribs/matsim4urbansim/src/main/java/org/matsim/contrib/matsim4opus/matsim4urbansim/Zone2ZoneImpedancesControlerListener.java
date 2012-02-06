@@ -91,8 +91,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
-		// tnicolai: calculate distance -> add "single_vehicle_to_work_travel_distance.lf4" to header
-//		LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(ttc, new TravelDistanceCostCalculator()); // tnicolai: check with kai
+		
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
@@ -125,7 +124,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				
 				// run dijksrtra for current node as origin
 				lcptTravelTime.calculate(network, fromNode, depatureTime);
-//				lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					
@@ -142,11 +140,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if(travelTime_min < 1.2)
 						travelTime_min = 1.2;
 					
-					// get travel cost (marginal cost of time * travel time)
-//					double travelCost = lcptTravelTime.getTree().get( toNode.getId() ).getCost();
-					// get travel distance (link lengths in meter)
-//					double distance_meter = lcptTravelDistance.getTree().get( toNode.getId() ).getCost();
-					
 					// query trips in OD Matrix
 					double trips = 0.0;
 					Entry e = originDestinationMatrix.getEntry( originZoneID, destinationZoneID );
@@ -157,11 +150,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// 			  when changing anything at this call.
 					travelDataWriter.write ( originZoneID.toString()	//origin zone id
 							+ "," + destinationZoneID.toString()		//destination zone id
-							+ "," + travelTime_min //travelCost 		//tcost
+							+ "," + travelTime_min 				 		//tcost
 							+ "," + travelTime_min 						//ttimes
 							+ "," + travelTime_min*10.					//walk ttimes
 							+ "," + trips								//vehicle trips
-							// + "," + distance_meter					// distance
 							);		
 					travelDataWriter.newLine();
 				}
@@ -198,7 +190,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		// Travel Data Header
 		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
-		// tnicolai: add single_vehicle_to_work_travel_distance:f4 for distance output
 		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
 		travelDataWriter.newLine();
 		return travelDataWriter;
@@ -255,20 +246,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			}
 				
 		}
-		// tnicolai: debugging
-//		for(Id fromId : originDestinationMatrix.getFromLocations().keySet()){
-//			System.out.println("From Zone: " + fromId.toString());
-//			for(Entry e : originDestinationMatrix.getFromLocEntries(fromId)){
-//				System.out.println("To Zone: " + e.getToLocation() + " value = " + e.getValue());
-//			}
-//		}
-//		
-//		for(Id ToId : originDestinationMatrix.getToLocations().keySet()){
-//			System.out.println("To Zone: " + ToId.toString());
-//			for(Entry e : originDestinationMatrix.getToLocEntries(ToId)){
-//				System.out.println("From Zone: " + e.getFromLocation() + " value = " + e.getValue());
-//			}
-//		}
 		
 		log.info("DONE with computing zone2zone trip numbers ...") ;
 	}
