@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
 
@@ -48,8 +49,8 @@ public class OTFLinkWLanes implements Serializable{
 	private Point2D.Double linkStartCenterPoint = null;
 	private Point2D.Double linkEndCenterPoint = null;
 	private Map<String, OTFSignal> signals = null;
-	private List<OTFLinkWLanes> toLinks = null;
-	
+	private ArrayList<Id> toLinkIds;
+	private transient List<OTFLinkWLanes> toLinks = null;
 	
 	public OTFLinkWLanes(String id){
 		this.id = id;
@@ -59,26 +60,6 @@ public class OTFLinkWLanes implements Serializable{
 		return this.id;
 	}
 	
-	@Deprecated
-	public void setLinkStart(double x, double y) {
-		this.linkStart = new Point2D.Double(x, y);
-	}
-
-	@Deprecated
-	public void setLinkEnd(double x, double y) {
-		this.linkEnd = new Point2D.Double(x, y);
-	}
-
-	@Deprecated
-	public void setNormalizedLinkVector(double x, double y) {
-		this.normalizedLinkVector = new Point2D.Double(x, y);
-	}
-	
-	@Deprecated
-	public void setLinkOrthogonalVector(double x, double y){
-		this.linkOrthogonalVector = new Point2D.Double(x, y);
-	}
-
 	public void setLinkStart(Point2D.Double v) {
 		this.linkStart = v;
 	}
@@ -187,6 +168,14 @@ public class OTFLinkWLanes implements Serializable{
 		return this.toLinks ;
 	}
 	
+	public void addToLinkId(Id toLinkId){
+		if (this.toLinkIds == null)
+			this.toLinkIds = new ArrayList<Id>();
+		this.toLinkIds.add(toLinkId);
+	}
 
+	public List<Id> getToLinkIds() {
+		return toLinkIds ;
+	}
 	
 }

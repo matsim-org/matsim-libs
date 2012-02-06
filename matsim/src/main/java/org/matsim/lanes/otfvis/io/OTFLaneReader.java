@@ -21,12 +21,7 @@ package org.matsim.lanes.otfvis.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.otfvis.OTFLaneModelBuilder;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
@@ -50,82 +45,12 @@ public class OTFLaneReader extends OTFDataReader {
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {
 		int noLinks = in.getInt();
-		Map<OTFLinkWLanes, List<String>> outLinks = new HashMap<OTFLinkWLanes, List<String>>();
 		for (int i = 0; i < noLinks; i++){
-			Tuple<OTFLinkWLanes, List<String>> ol = this.readVisLinkData(in);
-			outLinks.put(ol.getFirst(), ol.getSecond());
+			//read link data
+			OTFLinkWLanes lanesLinkData = (OTFLinkWLanes) ByteBufferUtils.getObject(in);
+			this.drawer.addLaneLinkData(lanesLinkData);
 		}
-		int noLanes = in.getInt();
-		for (int i = 0; i < noLanes; i++){
-			this.readLaneData(in);
-		}
-		this.connectVisLinksWithoutLanes(outLinks);
-	}
-	
-	private void connectVisLinksWithoutLanes(Map<OTFLinkWLanes, List<String>> outLinks) {
-		for (Map.Entry<OTFLinkWLanes, List<String>> e : outLinks.entrySet()) {
-			OTFLinkWLanes link = e.getKey();
-			if (link.getLaneData() == null || link.getLaneData().isEmpty()) {
-				for (String outLinkId : e.getValue()) {
-					OTFLinkWLanes outlink = this.drawer.getLanesLinkData().get(outLinkId);
-					link.addToLink(outlink);
-				}
-			}
-		}
-	}
-
-	private Tuple<OTFLinkWLanes,List<String>> readVisLinkData(ByteBuffer in){
-		//read link data
-		OTFLinkWLanes lanesLinkData = (OTFLinkWLanes) ByteBufferUtils.getObject(in);
-		this.drawer.addLaneLinkData(lanesLinkData);
-		
-		int noOutLinks = in.getInt();
-		List<String> outLinks = new ArrayList<String>(noOutLinks);
-		for (int i = 0; i < noOutLinks; i++){
-			String outLinkId = ByteBufferUtils.getString(in);
-			outLinks.add(outLinkId);
-		}
-		Tuple<OTFLinkWLanes, List<String>> outLinkIds = new Tuple<OTFLinkWLanes, List<String>>(lanesLinkData, outLinks);
-		return outLinkIds;
-	}
-	
-	private void readLaneData(ByteBuffer in){
-		String linkId = ByteBufferUtils.getString(in);
-		OTFLinkWLanes laneLinkData = null;
-		laneLinkData = this.drawer.getLanesLinkData().get(linkId);
-		int noLanes = in.getInt();
-		for (int i = 0; i < noLanes; i++){
-			OTFLane data = (OTFLane) ByteBufferUtils.getObject(in);
-			laneLinkData.addLaneData(data);
-		}
-		laneLinkData.setMaximalAlignment(in.getInt());
-		//read and process the connections
-		if (OTFLaneWriter.DRAW_LINK_TO_LINK_LINES){
-			for (int i = 0; i < noLanes; i++){
-				String laneId = ByteBufferUtils.getString(in);
-				OTFLane data = laneLinkData.getLaneData().get(laneId);
-				this.readLaneToLinkConnections(in, data);
-				this.readLaneToLaneConnections(in, data, laneLinkData);
-			}
-		}
-	}
-	
-	private void readLaneToLaneConnections(ByteBuffer in, OTFLane data, OTFLinkWLanes lanesLinkData){
-		int numberOfToLanes = in.getInt();
-		for (int j = 0; j < numberOfToLanes; j++){
-			String toLaneId = ByteBufferUtils.getString(in);
-			OTFLane toLane = lanesLinkData.getLaneData().get(toLaneId);
-			data.addToLane(toLane);
-		}
-	}
-	
-	private void readLaneToLinkConnections(ByteBuffer in, OTFLane data){
-		int numberOfToLinks = in.getInt();
-		for (int j = 0; j < numberOfToLinks; j++){
-			String toLinkId = ByteBufferUtils.getString(in);
-			OTFLinkWLanes toLink = this.drawer.getLanesLinkData().get(toLinkId);
-			data.addToLink(toLink);
-		}
+		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
 	}
 	
 	@Override

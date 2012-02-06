@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.otfvis.io.OTFSignal;
 
@@ -40,12 +41,13 @@ public class OTFLane implements Serializable {
 	private double startPosition;
 	private int alignment;
 	private double numberOfLanes;
-	private List<OTFLinkWLanes> toLinksData = null;
 	private List<OTFLane> toLanes = null;
 	private SignalGroupState state = null;
 	private Point2D.Double startPoint = null;
 	private Point2D.Double endPoint = null;
 	private Map<String, OTFSignal> signals = null;
+	private List<Id> toLinkIds;
+	private transient List<OTFLinkWLanes> toLinksData = null;
 	
 	public OTFLane(String id) {
 		this.id = id;
@@ -150,7 +152,16 @@ public class OTFLane implements Serializable {
 	public List<OTFLinkWLanes> getToLinks() {
 		return toLinksData;
 	}
+	
+	public void addToLinkId(Id toLinkId){
+		if (this.toLinkIds == null)
+			this.toLinkIds = new ArrayList<Id>();
+		this.toLinkIds.add(toLinkId);
+	}
 
+	public List<Id> getToLinkIds() {
+		return toLinkIds ;
+	}
 	
 	public List<OTFLane> getToLanes() {
 		return toLanes;
