@@ -61,11 +61,13 @@ public class InternalControler {
 	private final double TRAVEL_PT_WAITING = -3.6822; // Utils per Hour
 	
 	private final double PERFORMING = 1.8534;
+//	private final double PERFORMING = 0;
+
 	private final double LATE_ARRIVAL = 0;
 	
 	private final double monetaryCostPerKm = -0.11; // AUD per km 
 	
-	private final double agentStuckScore = -200000;
+	private final double agentStuckScore = -100;
 	
 	public InternalControler(String configFile, int extItNr, String directoryExtIt, int lastInternalIteration, String populationFile, String outputExternalIterationDirPath, int numberOfBuses, String networkFile, double fare, double MONEY_UTILS) {
 		this.configFile = configFile;
@@ -125,8 +127,12 @@ public class InternalControler {
 			writeInterval = this.lastInternalIteration;
 		}
 		
-		controlerConfGroup.setWriteEventsInterval(writeInterval);
-		controlerConfGroup.setWritePlansInterval(writeInterval);
+//		controlerConfGroup.setWriteEventsInterval(writeInterval);
+//		controlerConfGroup.setWritePlansInterval(writeInterval);
+		
+		controlerConfGroup.setWriteEventsInterval(1);
+		controlerConfGroup.setWritePlansInterval(1);
+		
 		controlerConfGroup.setOutputDirectory(this.directoryExtIt+"/internalIterations");
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = controler.getConfig().planCalcScore();	

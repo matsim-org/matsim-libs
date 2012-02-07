@@ -77,7 +77,7 @@ public class Users {
 		for(Person person : population.getPersons().values()){
 			double expScore = 0.0;
 			for (Plan plan : person.getPlans()){
-				if (plan.getScore()>-100000){
+				if (plan.getScore()>-50){
 					expScore = expScore + Math.exp(plan.getScore());
 				}
 				else {
@@ -87,7 +87,7 @@ public class Users {
 			}
 			
 			double score = person.getSelectedPlan().getScore();
-			if (score > -100000){
+			if (score > -50){
 				execScores.add(score);
 			}
 			else {
@@ -96,7 +96,7 @@ public class Users {
 			
 			double logSumThisPerson = (1/MONEY_UTILS) * Math.log(expScore);
 			
-			if (logSumThisPerson<-100000){
+			if (logSumThisPerson<-50){
 				log.warn("All plans of "+person.getId()+" are not used for LogSum User Scoring. (LogSum for this person: "+logSumThisPerson+")");
 				counter++;
 			}

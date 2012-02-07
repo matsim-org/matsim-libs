@@ -28,6 +28,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.charyparNagel.ActivityScoringFunction;
+import org.matsim.core.scoring.charyparNagel.AgentStuckScoringFunction;
 
 public class MyScoringFunctionFactory implements ScoringFunctionFactory {
 
