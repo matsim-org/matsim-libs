@@ -6,7 +6,7 @@ import playground.kai.bvwp.Values.Entry;
 import playground.kai.bvwp.Values.Mode;
 import playground.kai.bvwp.Values.Type;
 
-class Illustration1Scenario {
+class Scenario0 {
 
 	static ScenarioForEval createNullfall1() {
 		// set up the base case:

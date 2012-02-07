@@ -1,7 +1,7 @@
 package playground.kai.bvwp;
 
 
-public class Illustration1 {
+public class Illustrations {
 	
 	public static void main(String[] args) {
 
@@ -15,13 +15,13 @@ public class Illustration1 {
 		System.out.println("\n===\nFirst test example, based on nothing.") ;
 		
 		// create the economic values
-		Values economicValues = Illustration1EconomicValues.createEconomicValues1();
+		Values economicValues = EconomicValues0.createEconomicValues1();
 		
 		// create the base case:
-		ScenarioForEval nullfall = Illustration1Scenario.createNullfall1();
+		ScenarioForEval nullfall = Scenario0.createNullfall1();
 		
 		// create the policy case:
-		ScenarioForEval planfall = Illustration1Scenario.createPlanfall1(nullfall);
+		ScenarioForEval planfall = Scenario0.createPlanfall1(nullfall);
 		
 		{
 			// instantiate the class that defines the utility calculation:

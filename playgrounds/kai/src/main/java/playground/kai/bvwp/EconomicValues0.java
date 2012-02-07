@@ -4,7 +4,7 @@ import playground.kai.bvwp.Values.Entry;
 import playground.kai.bvwp.Values.Mode;
 import playground.kai.bvwp.Values.Type;
 
-class Illustration1EconomicValues {
+class EconomicValues0 {
 
 	static Values createEconomicValues1() {
 		Values economicValues = new Values() ;
