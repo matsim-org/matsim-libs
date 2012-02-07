@@ -13,6 +13,7 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.optimizer.*;
 import pl.poznan.put.vrp.dynamic.optimizer.listener.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import playground.michalm.vrp.data.jdbc.JDBCWriter;
 import playground.michalm.vrp.otfvis.*;
 import playground.michalm.vrp.taxi.taxicab.*;
 
@@ -126,6 +127,14 @@ public class TaxiSimEngine
         // this happens at the end of QSim.doSimStep() therefore "time+1"
         // this value will be used throughout the next QSim.doSimStep()
         vrpData.setTime((int)time + 1); // this can be moved to Before/AfterSimStepListener
+        
+        if (time == 3600) {
+            System.err.println("************************ SQL &&&&&&&&&&&&&&&&&&&&&");
+            JDBCWriter writer = new JDBCWriter(vrpData);
+            writer.simulationInitialized();
+            writer.fillWithTaskForTesting();
+            writer.close();
+        }
     }
 
 
