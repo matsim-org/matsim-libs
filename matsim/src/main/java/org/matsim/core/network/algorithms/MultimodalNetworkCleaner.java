@@ -132,7 +132,7 @@ public class MultimodalNetworkCleaner {
 				}
 			}
 		}
-		log.info("    The biggest cluster consists of " + biggestCluster.size() + " nodes.");
+		log.info("    The biggest cluster consists of " + biggestCluster.size() + " links.");
 		log.info("  done.");
 
 		/* Remove the modes from all links not being part of the cluster. If a link has no allowed mode
