@@ -23,8 +23,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
 import playground.benjamin.emissions.events.EmissionEventsReader;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerPersonWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonWarmEventHandler;
 
 /**
  * @author benjamin
