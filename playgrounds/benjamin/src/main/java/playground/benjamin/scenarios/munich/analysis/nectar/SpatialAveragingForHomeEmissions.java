@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis;
+package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.emissions.types.WarmPollutant;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.mobilTUM.EmissionsPerPersonAggregator;
 
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;

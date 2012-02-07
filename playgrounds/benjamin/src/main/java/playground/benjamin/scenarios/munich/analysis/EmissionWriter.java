@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Population;
 public class EmissionWriter {
 	private static final Logger logger = Logger.getLogger(EmissionWriter.class);
 
-	void writeHomeLocation2Emissions(
+	public void writeHomeLocation2Emissions(
 			Population population,
 			SortedSet<String> listOfPollutants,
 			Map<Id, Map<String, Double>> emissions,

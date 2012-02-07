@@ -17,18 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis;
+package playground.benjamin.utils;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -38,11 +38,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 
@@ -55,8 +55,10 @@ public class LegModeDistanceDistribution {
 	private static final Logger logger = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	// INPUT
-	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/run25/";
+	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
 	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
+//	private static String initialPlansFile = runDirectory + "ITERS/it.1001/1001.plans.xml.gz";
+//	private static String initialPlansFile = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/output_plans.xml.gz";
 	private static String finalPlansFile = runDirectory + "output_plans.xml.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 //	private static String finalPlansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
@@ -66,6 +68,9 @@ public class LegModeDistanceDistribution {
 	private final Scenario finalScenario;
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
+	
+	private final boolean considerMidOnly = true;
+	private final int noOfDistanceClasses = 8;
 
 	public LegModeDistanceDistribution(){
 		Config config = ConfigUtils.createConfig();
@@ -83,15 +88,24 @@ public class LegModeDistanceDistribution {
 	private void run(String[] args) {
 		loadSceanrio(this.initialScenario, netFile, initialPlansFile);
 		loadSceanrio(this.finalScenario, netFile, finalPlansFile);
-		setDistanceClasses(9);
+		setDistanceClasses(noOfDistanceClasses);
 		getUsedModes();
 		Population initialPop = this.initialScenario.getPopulation();
 		Population finalPop = this.finalScenario.getPopulation();
-		PersonFilter filter = new PersonFilter();
-		Population initialMiDPop = filter.getMiDPopulation(initialPop);
-		Population finalMiDPop = filter.getMiDPopulation(finalPop);
-		SortedMap<String, Map<Integer, Integer>> initialMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(initialMiDPop);
-		SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(finalMiDPop);
+		
+		SortedMap<String, Map<Integer, Integer>> initialMode2DistanceClassNoOfLegs;
+		SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs;
+		
+		if(considerMidOnly){
+			PersonFilter filter = new PersonFilter();
+			Population initialMiDPop = filter.getMiDPopulation(initialPop);
+			Population finalMiDPop = filter.getMiDPopulation(finalPop);
+			initialMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(initialMiDPop);
+			finalMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(finalMiDPop);
+		} else {
+			initialMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(initialPop);
+			finalMode2DistanceClassNoOfLegs = calculateMode2DistanceClassNoOfLegs(finalPop);
+		}
 		SortedMap<String, Map<Integer, Integer>> differenceMode2DistanceClassNoOfLegs = calculateDifferenceMode2DistanceClassNoOfLegs(initialMode2DistanceClassNoOfLegs, finalMode2DistanceClassNoOfLegs);
 		
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.internalization;
+package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -25,6 +25,8 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 
 import playground.benjamin.emissions.EmissionModule;
+import playground.benjamin.internalization.EmissionTravelCostCalculatorFactory;
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
 /**
  * @author benjamin

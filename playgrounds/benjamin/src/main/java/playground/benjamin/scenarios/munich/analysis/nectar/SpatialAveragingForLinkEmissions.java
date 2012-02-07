@@ -17,16 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis;
+package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.factory.FactoryRegistryException;
@@ -59,6 +59,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
+import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkWarmEventHandler;
 
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;

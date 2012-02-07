@@ -40,12 +40,16 @@ import playground.benjamin.emissions.EmissionModule;
  */
 public class InternalizeEmissionsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(InternalizeEmissionsControlerListener.class);
-	
+
 	Controler controler;
 	EmissionModule emissionModule;
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
+	
+	int iteration;
+	int firstIt;
+	int lastIt;
 
 	public InternalizeEmissionsControlerListener(EmissionModule emissionModule) {
 		this.emissionModule = emissionModule;
@@ -54,43 +58,50 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		controler = event.getControler();
-		
+
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		
+		firstIt = controler.getFirstIteration();
+		lastIt = controler.getLastIteration();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		Integer iteration = event.getIteration();
-		emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-		
+		iteration = event.getIteration();
+
 		logger.info("creating new emission internalization handler...");
 		emissionInternalizationHandler = new EmissionInternalizationHandler(controler);
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
-		
-		logger.info("creating new emission events writer...");
-		emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-		logger.info("adding emission events writer to emission events stream...");
-		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+
+		if(iteration == firstIt || iteration == lastIt){
+			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
+			logger.info("creating new emission events writer...");
+			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+			logger.info("adding emission events writer to emission events stream...");
+			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
-		
-		logger.info("removing emission events writer from emission events stream...");
-		emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
-		logger.info("closing emission events file...");
-		emissionEventWriter.closeFile();
+
+		if(iteration == firstIt || iteration == lastIt){
+			logger.info("removing emission events writer from emission events stream...");
+			emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
+			logger.info("closing emission events file...");
+			emissionEventWriter.closeFile();
+		}
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
-	
+
 }

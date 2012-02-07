@@ -17,13 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis;
+package playground.benjamin.scenarios.munich.analysis.mobilTUM;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,12 +53,12 @@ public class EmissionsPerPersonAggregator {
 	private Map<Id, Map<String, Double>> totalEmissions;
 	private SortedSet<String> listOfPollutants;
 
-	EmissionsPerPersonAggregator(Population population, String emissionFile) {
+	public EmissionsPerPersonAggregator(Population population, String emissionFile) {
 		this.population = population;
 		this.emissionFile = emissionFile;
 	}
 
-	void run() {
+	public void run() {
 		processEmissions();
 		warmEmissions = warmHandler.getWarmEmissionsPerPerson();
 		coldEmissions = coldHandler.getColdEmissionsPerPerson();
@@ -68,7 +68,7 @@ public class EmissionsPerPersonAggregator {
 		totalEmissions = sumUpEmissions(warmEmissions, coldEmissions);
 	}
 
-	Map<Id, Map<String, Double>> getTotalEmissions() {
+	public Map<Id, Map<String, Double>> getTotalEmissions() {
 		return totalEmissions;
 	}
 	
