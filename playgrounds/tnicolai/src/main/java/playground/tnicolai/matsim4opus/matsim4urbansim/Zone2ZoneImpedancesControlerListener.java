@@ -144,9 +144,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if(travelTime_min < 1.2)
 						travelTime_min = 1.2;
 					// get travel cost (marginal cost of time * travel time)
-					double travelCost_min = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost() / 60.;
-					if(travelCost_min < 1.2)
-						travelCost_min = 1.2;
+					double travelCost_util = lcptCongestedTravelTime.getTree().get( toNode.getId() ).getCost();
+					if(travelCost_util < 1.2)
+						travelCost_util = 1.2;
 					// get travel distance (link lengths in meter)
 					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
 					if(walkTravelTime_min < 1.2)
@@ -162,7 +162,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// 			  when changing anything at this call.
 					travelDataWriter.write ( originZoneID.toString()			//origin zone id
 										+ "," + destinationZoneID.toString()	//destination zone id
-										+ "," + travelCost_min 				 	//congested tcost
+										+ "," + travelCost_util 				//congested tcost
 										+ "," + travelTime_min 					//congested ttimes
 										+ "," + walkTravelTime_min				//walk ttimes
 										+ "," + trips);							//vehicle trips
