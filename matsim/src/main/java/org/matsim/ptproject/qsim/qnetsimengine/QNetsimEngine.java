@@ -43,7 +43,7 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.MobsimVehicle;
-import org.matsim.ptproject.qsim.qnetsimengine.CarDepartureHandler.VehicleBehavior;
+import org.matsim.ptproject.qsim.qnetsimengine.VehiclularDepartureHandler.VehicleBehavior;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -136,7 +136,7 @@ public class QNetsimEngine extends QSimEngineInternalI implements MobsimEngine {
 		} else {
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
-		dpHandler = new CarDepartureHandler(this, vehicleBehavior);
+		dpHandler = new VehiclularDepartureHandler(this, vehicleBehavior);
 
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {

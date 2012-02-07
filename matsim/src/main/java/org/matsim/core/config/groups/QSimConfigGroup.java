@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.Time;
 
@@ -39,7 +40,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String TIME_STEP_SIZE = "timeStepSize";
 	private static final String SNAPSHOT_PERIOD = "snapshotperiod";
 //	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
-	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
 	private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 	private static final String STUCK_TIME = "stuckTime";
@@ -48,9 +48,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation" ;
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
-
-	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
-	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
 
 	public static final String TRAFF_DYN_QUEUE = "queue" ;
 	public static final String TRAFF_DYN_W_HOLES = "withHolesExperimental" ;
@@ -66,7 +63,6 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
-	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
 	private double stuckTime = 100;
@@ -75,6 +71,18 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private String trafficDynamics = TRAFF_DYN_QUEUE ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
+	
+	// ---
+
+	private static final String SNAPSHOT_STYLE = "snapshotStyle";
+	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
+	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
+	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
+	
+	// ---
+	
+	private static final String MAIN_MODE = "mainMode" ;
+	private String mainMode = TransportMode.car ;
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
@@ -108,6 +116,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			setSimStarttimeInterpretation(value) ;
 		} else if (VEHICLE_BEHAVIOR.equals(key)) {
 			setVehicleBehavior(value);
+		} else if (MAIN_MODE.equals(key)) {
+			setMainMode(value) ;
 		} else if ("writeSnapshotsInterval".equals(key)) {
 			log.error("The config entry `writeSnapshotsInterval' was removed from the qsim config group. " +
 					"It is now in the controler config group; please move it there.  Aborting ...");
@@ -143,6 +153,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
+		map.put(MAIN_MODE, getMainMode()) ;
 		return map;
 	}
 
@@ -167,6 +178,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				+ ONLY_USE_STARTTIME + "'" ) ;
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
+		map.put(MAIN_MODE, "Defines which mode should be the qsim `main' (=congested) mode. Technically, this is the mode that " +
+				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
+				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.") ;
 		return map ;
 	}
 	/* direct access */
@@ -303,6 +317,14 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
+	}
+
+	public void setMainMode(String mainMode) {
+		this.mainMode = mainMode;
+	}
+
+	public String getMainMode() {
+		return mainMode;
 	}
 	
 }

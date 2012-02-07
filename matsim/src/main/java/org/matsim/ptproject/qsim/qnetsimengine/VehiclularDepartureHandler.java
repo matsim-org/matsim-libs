@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
-class CarDepartureHandler implements DepartureHandler {
+class VehiclularDepartureHandler implements DepartureHandler {
 
 	/*
 	 * What to do when some agent wants to drive their vehicle but it isn't there.
@@ -36,7 +36,7 @@ class CarDepartureHandler implements DepartureHandler {
 	 */
 	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION };
 	
-	private static Logger log = Logger.getLogger(CarDepartureHandler.class);
+	private static Logger log = Logger.getLogger(VehiclularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 
@@ -44,14 +44,18 @@ class CarDepartureHandler implements DepartureHandler {
 
 	private QNetsimEngine qNetsimEngine;
 	
-	CarDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
+	private String transportMode ;
+	
+	VehiclularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
+		this.transportMode = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainMode() ;
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
-		if (agent.getMode().equals(TransportMode.car)) {
+//		if (agent.getMode().equals(TransportMode.car)) {
+			if (agent.getMode().equals(this.transportMode)) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
 				return true ;
