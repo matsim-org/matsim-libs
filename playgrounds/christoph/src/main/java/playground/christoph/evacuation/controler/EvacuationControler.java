@@ -58,6 +58,7 @@ import org.matsim.households.Household;
 import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.MultiModalTravelTimeWrapperFactory;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
@@ -73,13 +74,16 @@ import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
-import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
 import playground.christoph.evacuation.mobsim.PassengerTracker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
+import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeDataCollector;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
+import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
+import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
+import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -95,6 +99,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class EvacuationControler extends WithinDayController implements SimulationInitializedListener, 
 		IterationStartsListener, StartupListener, AfterMobsimListener {
 
+	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
+	
 	protected boolean adaptOriginalPlans = false;
 //	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/Zone1.shp"};
 	protected String[] evacuationAreaSHPFiles = new String[]{"../../matsim/mysimulations/census2000V2/input_1pct/shp/KKW_Buffer10km.shp"};
@@ -128,14 +134,13 @@ public class EvacuationControler extends WithinDayController implements Simulati
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZG.txt",
 			"../../matsim/mysimulations/census2000V2/input_1pct/Fahrzeugtypen_Kanton_ZH.txt"};
 
-
-//	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
-//	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
+	protected String dhm25File = "../../matsim/mysimulations/networks/GIS/nodes_3d_dhm25.shp";
+	protected String srtmFile = "../../matsim/mysimulations/networks/GIS/nodes_3d_srtm.shp";
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
 	 */
-	protected int numReplanningThreads = 6;
+	protected int numReplanningThreads;
 
 	/*
 	 * Identifiers
@@ -163,9 +168,9 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //	protected WithinDayDuringLegReplanner duringInsecureLegReplanner;
 //	protected WithinDayDuringLegReplanner currentInsecureLegReplanner;
 	
-//	protected AddZCoordinatesToNetwork zCoordinateAdder;
+	protected AddZCoordinatesToNetwork zCoordinateAdder;
 	protected HouseholdsUtils householdsUtils;
-//	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
+	protected HouseholdVehicleAssignmentReader householdVehicleAssignmentReader;
 //	protected HouseholdVehiclesTracker householdVehiclesTracker;
 	
 	protected CreateVehiclesForHouseholds createVehiclesForHouseholds;
@@ -181,8 +186,10 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	/*
 	 * Analysis modules
 	 */
-	protected boolean analyzeEvacuation = true;
+//	protected boolean analyzeEvacuation = true;
+	protected boolean createEvacuationTimePicture = false;
 	protected EvacuationTimePicture evacuationTimePicture;
+	protected boolean countAgentsInEvacuationArea = true;
 	protected AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
@@ -212,6 +219,16 @@ public class EvacuationControler extends WithinDayController implements Simulati
 	public void notifyStartup(StartupEvent event) {
 		
 		/*
+		 * get number of threads from config file
+		 */
+		this.numReplanningThreads = this.config.global().getNumberOfThreads();
+		
+//		PlansLinkReferenceDumping planAlgo = new PlansLinkReferenceDumping();
+//		for (Person person : population.getPersons().values()) {
+//			planAlgo.run(person);
+//		}
+		
+		/*
 		 * If a SimStepParallelEventsManagerImpl is used, we ensure that it it
 		 * processed as very first SimulationListener. Doing so ensures that all
 		 * events of a time step have been processed before the other
@@ -231,20 +248,20 @@ public class EvacuationControler extends WithinDayController implements Simulati
 //		new AddSecureFacilitiesToNetwork(this.scenarioData).createSecureFacilities();
 		
 		
-//		/*
-//		 * Adding z-coordinates to the network
-//		 */
-//		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
-//		zCoordinateAdder.addZCoordinatesToNetwork();
-//		zCoordinateAdder.checkSteepness();
+		/*
+		 * Adding z-coordinates to the network
+		 */
+		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
+		zCoordinateAdder.addZCoordinatesToNetwork();
+		zCoordinateAdder.checkSteepness();
 
-//		/*
-//		 * Use advanced walk- and bike travel time calculators
-//		 */
-//		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
-//		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
-//		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
+		/*
+		 * Use advanced walk- and bike travel time calculators
+		 */
+		PersonalizableTravelTimeFactory walkTravelTimeFactory = new WalkTravelTimeFactory(this.config.plansCalcRoute());
+		PersonalizableTravelTimeFactory bikeTravelTimeFactory = new BikeTravelTimeFactory(this.config.plansCalcRoute());
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.walk, walkTravelTimeFactory);
+		this.getMultiModalTravelTimeWrapperFactory().setPersonalizableTravelTimeFactory(TransportMode.bike, bikeTravelTimeFactory);
 		
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
@@ -281,16 +298,29 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		
 		this.passengerDepartureHandler = new PassengerDepartureHandler(this.getEvents(), passengerTracker);
 		
-//		/*
-//		 * Read household-vehicles-assignment files.
-//		 */
-//		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
-//		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
-//		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
-//		
+		/*
+		 * Read household-vehicles-assignment files.
+		 */
+		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
+		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
+		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
+		
 //		this.householdVehiclesTracker = new HouseholdVehiclesTracker(this.scenarioData, householdVehicleAssignmentReader.getAssignedVehicles());
 //		this.getEvents().addHandler(householdVehiclesTracker);
 		
+		/*
+		 * Create vehicles for households and add them to the scenario.
+		 * When useVehicles is set to true, the scenario creates a Vehicles container if necessary.
+		 */
+		this.config.scenario().setUseVehicles(true);
+		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
+		createVehiclesForHouseholds.run();
+		
+		/*
+		 * Write vehicles to file.
+		 */
+		new VehicleWriterV1(scenarioData.getVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
+			
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
@@ -316,22 +346,26 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		transportModes.add(TransportMode.pt);
 		transportModes.add(TransportMode.ride);
 		transportModes.add(TransportMode.walk);
-		transportModes.add(PassengerEventsCreator.passengerTransportMode);
+		transportModes.add(PassengerDepartureHandler.passengerTransportMode);
+
+		/*
+		 * intialize analyse modules
+		 */
+		// Create kmz file containing distribution of evacuation times. 
+		if (createEvacuationTimePicture) {
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, transportModes, coordAnalyzer);
+			this.addControlerListener(evacuationTimePicture);
+			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
+			this.events.addHandler(evacuationTimePicture);	
+		}
 		
-		if (analyzeEvacuation) {
-			/*
-			 * Create and add an AgentsInEvacuationAreaCounter.
-			 */
+		 // Create and add an AgentsInEvacuationAreaCounter.
+		if (countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-			this.events.addHandler(agentsInEvacuationAreaCounter);
-			
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, transportModes, coordAnalyzer);
-			this.addControlerListener(evacuationTimePicture);
-			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
-			this.events.addHandler(evacuationTimePicture);			
+			this.events.addHandler(agentsInEvacuationAreaCounter);	
 		}
 		
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
@@ -398,7 +432,6 @@ public class EvacuationControler extends WithinDayController implements Simulati
 		 * During Activity Identifiers
 		 */
 		this.activityPerformingIdentifier = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap()).createIdentifier();
-		
 		
 		this.joinedHouseholdsIdentifier = new JoinedHouseholdsIdentifierFactory(this.scenarioData.getVehicles(), this.householdsUtils, 
 				this.selectHouseholdMeetingPoint, this.modeAvailabilityChecker, this.passengerTracker).createIdentifier();

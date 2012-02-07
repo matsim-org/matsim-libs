@@ -20,8 +20,10 @@
 
 package playground.christoph.evacuation.analysis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -48,9 +51,15 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.events.PersonEntersVehicleEvent;
+import org.matsim.core.events.PersonLeavesVehicleEvent;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
 import org.matsim.core.scenario.ScenarioImpl;
+
+import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 
 /**
  * Counts the number of agents within an evacuated area.
@@ -61,6 +70,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		AgentArrivalEventHandler, AgentDepartureEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
+		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		AgentStuckEventHandler, IterationEndsListener,
 		SimulationInitializedListener {
 
@@ -78,7 +88,11 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 	protected Set<Id> activityAgentsInEvacuationArea;
 	protected Map<String, Set<Id>> legAgentsInEvacuationArea;
 	protected Map<Id, String> currentTransportMode;
-
+	
+	protected Set<Id> vehiclesWithoutDriver;
+	protected Map<Id, Id> driverVehicleMap;
+	protected Map<Id, List<Id>> vehiclePassengersMap;	// the driver is not included!
+	
 	protected Map<String, int[]> legBins;
 	protected int[] activityBins;
 
@@ -95,6 +109,9 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		currentTransportMode = new HashMap<Id, String>();
 		activityAgentsInEvacuationArea = new HashSet<Id>();
 		legAgentsInEvacuationArea = new HashMap<String, Set<Id>>();
+		vehiclesWithoutDriver = new HashSet<Id>();
+		driverVehicleMap = new HashMap<Id, Id>();
+		vehiclePassengersMap = new HashMap<Id, List<Id>>();
 		activityBins = new int[nofBins];
 		legBins = new TreeMap<String, int[]>();
 
@@ -137,10 +154,25 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		String transportMode = currentTransportMode.get(event.getPersonId());
 		Set<Id> set = legAgentsInEvacuationArea.get(transportMode);
 
+		Id vehicleId = driverVehicleMap.get(event.getPersonId());
+		List<Id> passengers = null;
+		Set<Id> passengerSet = null;
+		if (vehicleId != null) {
+			passengers = vehiclePassengersMap.get(vehicleId);
+			passengerSet = legAgentsInEvacuationArea.get(PassengerDepartureHandler.passengerTransportMode);
+		}
+		
 		if (this.coordAnalyzer.isCoordAffected(link.getCoord())) {
 			set.add(event.getPersonId());
-		} else
+			if (passengers != null) {
+				for (Id passengerId : passengers) passengerSet.add(passengerId);
+			}
+		} else {
 			set.remove(event.getPersonId());
+			if (passengers != null) {
+				for (Id passengerId : passengers) passengerSet.remove(passengerId);
+			}
+		}
 	}
 
 	@Override
@@ -210,18 +242,77 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			set.remove(event.getPersonId());
 		}
 	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		/*
+		 * We create a list where the passengers will be added.
+		 * The driver is NOT added to the list!
+		 */
+		List<Id> passengers = vehiclePassengersMap.get(event.getVehicleId());
+		if (passengers == null) {
+			passengers = new ArrayList<Id>();
+			vehiclePassengersMap.put(event.getVehicleId(), passengers);
+		}
+		
+		boolean isDriver = currentTransportMode.get(event.getPersonId()).equals(TransportMode.car);
+		if (isDriver) {
+			driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
+		} else {			
+			passengers.add(event.getPersonId());
+		}
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		List<Id> passengers = vehiclePassengersMap.get(event.getVehicleId());
+		
+		// try to remove the person as driver
+		Id driverId = driverVehicleMap.remove(event.getPersonId());
+		
+		// check whether the agent is the driver of the vehicle
+		boolean isDriver;
+		if (driverId == null) isDriver = false;
+		else isDriver = true;
+		
+		if (isDriver) {	
+			// if the vehicle is empty
+			if (passengers.size() == 0) {
+				vehiclePassengersMap.remove(event.getVehicleId());
+				driverVehicleMap.remove(driverId);
+			}
+			// the driver leaves the car but some passengers are left
+			else {
+				vehiclesWithoutDriver.add(driverId);
+				driverVehicleMap.remove(driverId);
+			}
+		}
+		// it is a passenger
+		else {
+			// remove it from the list
+			passengers.remove(event.getPersonId());
+			
+			// if it is the last passenger and the driver has also already left the vehicle
+			if (passengers.size() == 0 && vehiclesWithoutDriver.contains(event.getVehicleId())) {
+				vehiclesWithoutDriver.remove(event.getVehicleId());
+				vehiclePassengersMap.remove(event.getVehicleId());
+			}
+		}
+	}
 
 	@Override
 	public void reset(int iteration) {
 		currentBin = 0;
 		activityAgentsInEvacuationArea.clear();
+		vehiclesWithoutDriver.clear();
+		driverVehicleMap.clear();
+		vehiclePassengersMap.clear();
 		activityBins = new int[nofBins];
 		
 		for (String string : transportModes) {
 			legAgentsInEvacuationArea.put(string, new HashSet<Id>());
 			legBins.put(string, new int[nofBins]);
 		}
-		
 		
 		for (Set<Id> set : legAgentsInEvacuationArea.values()) {
 			set.clear();

@@ -42,15 +42,6 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		if (agent.getMode().equals(passengerTransportMode)) {
 			if (agent instanceof MobsimDriverAgent) {
-
-				// creates ActivityEndEvent and advances in the agent's plan
-				agent.endActivityAndAssumeControl(now);
-				
-//				if ( agent.getDestinationLinkId().equals(link.getId()) && (agent.chooseNextLinkId() == null)) {
-//					agent.endLegAndAssumeControl(now);
-//					this.addParkedVehicle(vehicle);
-//					this.network.simEngine.internalInterface.arrangeNextAgentState(agent);
-//				}
 				
 				// create PersonEntersVehicleEvent
 				Id vehicleId = passengerTracker.getPassengersVehicle(agent.getId());

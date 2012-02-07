@@ -42,6 +42,13 @@ import org.matsim.ptproject.qsim.QSim;
 import org.matsim.ptproject.qsim.interfaces.MobsimEngine;
 import org.matsim.ptproject.qsim.interfaces.Netsim;
 
+import playground.christoph.evacuation.config.EvacuationConfig;
+
+/**
+ * Class that tracks agents that travel as passengers within a car.
+ * 
+ * @author cdobler
+ */
 public class PassengerTracker implements SimulationInitializedListener, MobsimEngine,
 	PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentArrivalEventHandler {
 	
@@ -99,6 +106,17 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 		
 		return driver.getCurrentLinkId();
 	}
+
+	/**
+	 * If the given event occurred after the evacuation has started,
+	 * true is returned. Otherwise false.
+	 * @param e Event
+	 * @return
+	 */
+	private boolean checkTime(Event e) {
+		if (e.getTime() < EvacuationConfig.evacuationTime) return false;
+		else return true;
+	}
 	
 	@Override
 	public void notifySimulationInitialized(SimulationInitializedEvent e) {
@@ -110,6 +128,8 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!checkTime(event)) return;
+		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) this.driverVehicleMap.put(event.getPersonId(), event.getVehicleId());
 		
@@ -119,13 +139,13 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 		if (isDriver) {
 			expectedId = event.getPersonId();
 			foundId = vehicleDriverMap.get(event.getVehicleId());
-			if (foundId != expectedId) {
+			if (!foundId.equals(expectedId)) {
 				log.warn("Found driver (" + foundId.toString() + ") does not match expected driver (" + expectedId.toString() + ").");
 			}
 			
 			expectedId = event.getVehicleId();
 			foundId = driverVehicleMap.get(event.getPersonId());
-			if (foundId != expectedId) {
+			if (!foundId.equals(expectedId)) {
 				log.warn("Found vehicle (" + foundId.toString() + ") does not match expected vehicle (" + expectedId.toString() + ").");
 			}
 		} else {
@@ -137,7 +157,7 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 			
 			expectedId = event.getVehicleId();
 			foundId = passengerVehicleMap.get(event.getPersonId());
-			if (foundId != expectedId) {
+			if (!foundId.equals(expectedId)) {
 				log.warn("Found vehicle (" + foundId.toString() + ") does not match expected vehicle (" + expectedId.toString() + ").");
 			}
 		}
@@ -148,12 +168,14 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 	 */
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
+		if (!checkTime(event)) return;
+		
 		boolean isDriver = driverVehicleMap.containsKey(event.getPersonId());
 		if (isDriver) {
 			List<Id> passengers = vehiclePassengerMap.get(event.getVehicleId());
 			if (passengers != null) {
 				for (Id passengerId : passengers) {
-					Event e = eventsManager.getFactory().createPersonLeavesVehicleEvent(event.getTime(), passengerId, event.getPersonId());
+					Event e = eventsManager.getFactory().createPersonLeavesVehicleEvent(event.getTime(), passengerId, event.getVehicleId());
 					eventsManager.processEvent(e);
 				}
 			}	
@@ -162,6 +184,7 @@ public class PassengerTracker implements SimulationInitializedListener, MobsimEn
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
+		if (!checkTime(event)) return;
 		
 		Id vehicleId = driverVehicleMap.remove(event.getPersonId());
 		if (vehicleId != null) {

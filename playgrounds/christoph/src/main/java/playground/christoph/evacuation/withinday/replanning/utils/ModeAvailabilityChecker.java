@@ -46,6 +46,7 @@ import org.matsim.core.events.PersonEntersVehicleEvent;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.mobsim.framework.events.SimulationInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.SimulationInitializedListener;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -78,6 +79,17 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 		this.vehicleCoordinates = new HashMap<Id, Coord>();
 		this.driverVehicleMapping = new HashMap<Id, Id>();
 	}
+	
+	/**
+	 * Returns true, if the given person has a driving license, otherwise false.
+	 * @param personId the Id of the person to check
+	 * @return
+	 */
+	public boolean hasDrivingLicense(Id personId) {
+		PersonImpl p = (PersonImpl) this.scenario.getPopulation().getPersons().get(personId);
+		return p.hasLicense();
+	}
+	
 	/**
 	 * 
 	 * @param householdId Id of the household to check
@@ -206,7 +218,9 @@ public class ModeAvailabilityChecker implements AgentDepartureEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (drivers.contains(event.getPersonId())) driverVehicleMapping.put(event.getPersonId(), event.getVehicleId());		
+		if (drivers.contains(event.getPersonId())) {
+			driverVehicleMapping.put(event.getPersonId(), event.getVehicleId());		
+		}
 	}
 
 	@Override

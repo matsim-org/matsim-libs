@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.ptproject.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
@@ -37,7 +38,7 @@ import org.matsim.ptproject.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.mobsim.PassengerEventsCreator;
+import playground.christoph.evacuation.mobsim.PassengerDepartureHandler;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdsUtils;
 
@@ -115,7 +116,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * the router cannot handle it.
 		 */
 		Leg legToMeeting;
-		if (transportMode.equals(PassengerEventsCreator.passengerTransportMode)) {
+		if (transportMode.equals(PassengerDepartureHandler.passengerTransportMode)) {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);
 		} else {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);
@@ -135,6 +136,14 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		
 		// set correct transport mode
 		legToMeeting.setMode(transportMode);
+		
+		
+		// set vehicle in the route, if it is a car leg
+		if (transportMode.equals(TransportMode.car)) {
+			Id vehicleId = this.identifier.getDriverVehicleMapping().get(withinDayAgent.getId());
+			NetworkRoute route = (NetworkRoute) legToMeeting.getRoute();
+			route.setVehicleId(vehicleId);
+		}
 		
 		meetingActivity.setStartTime(legToMeeting.getDepartureTime() + legToMeeting.getTravelTime());
 		
