@@ -40,8 +40,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.benjamin.emissions.events.EmissionEventsReader;
 import playground.benjamin.emissions.types.ColdPollutant;
 import playground.benjamin.emissions.types.WarmPollutant;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.EmissionsPerLinkWarmEventHandler;
+import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkColdEventHandler;
+import playground.benjamin.scenarios.munich.analysis.cupum.EmissionsPerLinkWarmEventHandler;
 
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.util.Assert;
