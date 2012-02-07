@@ -133,6 +133,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				Id originZoneID = zones[fromIndex].getZoneID();
 				// run dijkstra on network
 				lcptCongestedTravelTime.calculate(network, fromNode, depatureTime);
+				lcptFreespeedTravelTime.calculate(network, fromNode, depatureTime);
 				lcptWalkTime.calculate(network, fromNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("fromNode")
