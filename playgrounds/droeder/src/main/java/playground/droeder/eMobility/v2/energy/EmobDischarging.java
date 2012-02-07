@@ -17,55 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v2.fleet;
-
-import java.util.HashMap;
-import java.util.Map;
+package playground.droeder.eMobility.v2.energy;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.GenericEvent;
-import org.matsim.core.events.GenericEventImpl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 
 /**
  * @author droeder
  *
  */
-public class EmobFleet implements SimulationAfterSimStepListener{
+public class EmobDischarging {
 	
-	private Map<Id, EmobVehicle> fleet;
-	private EventsManager manager;
+	private Id type;
 
-	public EmobFleet(EventsManager manager){
-		this.fleet = new HashMap<Id, EmobVehicle>();
-		this.manager = manager;
-	}
-	
-	public EmobVehicle getVehicle(Id  id){
-		return this.fleet.get(id);
-	}
-	
-	public void addVehicle(EmobVehicle veh){
-		this.fleet.put(veh.getId(), veh);
-	}
-	
-	public Map<Id, EmobVehicle> getFleet(){
-		return this.fleet;
+	public EmobDischarging(Id type){
+		this.type = type;
 	}
 
-	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		for(EmobVehicle veh : this.fleet.values()){
-			GenericEvent ge;
-			if(veh.changedSoC()){
-				ge = new GenericEventImpl("SoCChange", e.getSimulationTime());
-				ge.getAttributes().put("SoC", String.valueOf(veh.getCurrentSoC()));
-				ge.getAttributes().put("link", String.valueOf(veh.getPositionLinkId()));
-				this.manager.processEvent(ge);
-			}
-		}
+	public Id getType(){
+		return this.type;
 	}
-
 }

@@ -29,16 +29,15 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class EmobVehicle{
 	private Id id;
+	//should be the link
 	private Id position;
 	private boolean changed = false;
 	private double soc;
-	private Id disChargingMode;
 	
 	public EmobVehicle(Id id,Link position, double soc){
 		this.id = id;
 		this.position = position.getId(); 
 		this.soc = 0.0;
-		this.disChargingMode = new IdImpl("NONE");
 	}
 
 	/**
@@ -50,6 +49,14 @@ public class EmobVehicle{
 	
 	public Id getPositionLinkId(){
 		return this.position;
+	}
+
+	/**
+	 * 
+	 * @param linkId
+	 */
+	public void setPosistion(Id linkId){
+		this.position = linkId;
 	}
 	
 	public double getCurrentSoC(){
@@ -68,12 +75,5 @@ public class EmobVehicle{
 		}
 		return false;
 	}
-
-	public void setCurrentDisChargingMode(Id id){
-		this.disChargingMode = id;
-	}
-	public Id getCurrentDischargingMode() {
-		return this.disChargingMode;
-	}
-
+	
 }

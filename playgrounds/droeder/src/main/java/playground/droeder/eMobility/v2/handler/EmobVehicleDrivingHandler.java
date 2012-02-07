@@ -22,38 +22,46 @@ package playground.droeder.eMobility.v2.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.PersonLeavesVehicleEvent;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
+import playground.droeder.eMobility.energy.ChargingProfiles;
 import playground.droeder.eMobility.energy.DisChargingProfiles;
-import playground.droeder.eMobility.v2.fleet.EmobFleet;
+import playground.droeder.eMobility.v2.energy.EmobCharging;
+import playground.droeder.eMobility.v2.energy.EmobDischarging;
 import playground.droeder.eMobility.v2.fleet.EmobVehicle;
 
 /**
  * @author droeder
  *
  */
-public class EmobVehicleHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler{
+public class EmobVehicleDrivingHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
 	
-	private EmobFleet fleet;
-	private Map<Id, LinkEnterEvent> person2linkEnter;
+	private static final Logger log = Logger
+			.getLogger(EmobVehicleDrivingHandler.class);
+	
+	private Map<Id, LinkEnterEvent> veh2linkEnter;
 	private Network net;
 	private DisChargingProfiles disCharge;
+
+	private Map<Id, EmobVehicle> vehicles;
+	private Map<Id, EmobDischarging> usageProfiles;
+
 	
-	public EmobVehicleHandler(EmobFleet fleet, Network net, DisChargingProfiles disCharge){
-		this.fleet = fleet;
+	public EmobVehicleDrivingHandler(Network net, DisChargingProfiles disCharge){
 		this.net = net;
-		this.person2linkEnter = new HashMap<Id, LinkEnterEvent>();
+		this.veh2linkEnter = new HashMap<Id, LinkEnterEvent>();
 		this.disCharge = disCharge;
+		this.vehicles = new HashMap<Id, EmobVehicle>();
+		this.usageProfiles = new HashMap<Id, EmobDischarging>();
 	}
 
+	
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
@@ -61,29 +69,42 @@ public class EmobVehicleHandler implements LinkEnterEventHandler, LinkLeaveEvent
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		this.calcAndSetNewSoc(event.getVehicleId(), event.getTime());
+		this.calcAndSetNewSocForDischarge(event.getVehicleId(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		this.person2linkEnter.put(event.getVehicleId(), event);
+		this.veh2linkEnter.put(event.getVehicleId(), event);
 	}
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		this.calcAndSetNewSoc(event.getVehicleId(), event.getTime());
-	}
-	
-	private void calcAndSetNewSoc(Id vehId, double time) {
-		LinkEnterEvent e = this.person2linkEnter.remove(vehId);
-		EmobVehicle veh = this.fleet.getVehicle(vehId);
+	private void calcAndSetNewSocForDischarge(Id vehId, double time) {
+		LinkEnterEvent e = this.veh2linkEnter.remove(vehId);
+		EmobVehicle veh = this.vehicles.get(vehId);
 		
-		//TODO calc links from coordinates or use the given one?
-		double l = this.net.getLinks().get(e.getLinkId()).getLength();
-		double speed = l / (time - e.getTime());
+		//TODO calc length from coordinates or use the given one?
+		double length = this.net.getLinks().get(e.getLinkId()).getLength();
+		double speed = length / (time - e.getTime());
 		double slope = 0.0;
-		double joulePerKm = this.disCharge.getJoulePerKm(veh.getCurrentDischargingMode(), speed, slope);
-		veh.setSoC(veh.getCurrentSoC() - (joulePerKm  * (l/1000)));
+		double joulePerKm = this.disCharge.getJoulePerKm(this.usageProfiles.get(vehId).getType(), speed, slope);
+		veh.setSoC(veh.getCurrentSoC() - (joulePerKm  * (length/1000)));
+		veh.setPosistion(e.getLinkId());
+	}
+
+	/**
+	 * @param vehicle
+	 * @param currentDischargingProfile
+	 */
+	public void registerVeh(Id id, EmobVehicle vehicle, EmobDischarging currentDischargingProfile) {
+		this.vehicles.put(id, vehicle);
+		this.usageProfiles.put(id, currentDischargingProfile);
+		
+	}
+
+	/**
+	 * @param vehicleId
+	 */
+	public void removeVeh(Id vehicleId, Double time) {
+		this.calcAndSetNewSocForDischarge(vehicleId, time);
 	}
 
 }

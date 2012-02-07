@@ -17,54 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v2.fleet;
+package playground.droeder.eMobility.v2.energy;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.GenericEvent;
-import org.matsim.core.events.GenericEventImpl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
 
 /**
  * @author droeder
  *
  */
-public class EmobFleet implements SimulationAfterSimStepListener{
+public class EmobCharging {
+	private static final Logger log = Logger.getLogger(EmobCharging.class);
 	
-	private Map<Id, EmobVehicle> fleet;
-	private EventsManager manager;
+	private Double start;
+	private Double end;
+	private Id type;
 
-	public EmobFleet(EventsManager manager){
-		this.fleet = new HashMap<Id, EmobVehicle>();
-		this.manager = manager;
+	public EmobCharging(Id type, Double plannedStart, Double end){
+		this.type = type;
+		this.start = plannedStart;
+		this.end = end;
 	}
 	
-	public EmobVehicle getVehicle(Id  id){
-		return this.fleet.get(id);
+	public Double getStart(){
+		return this.start;
 	}
 	
-	public void addVehicle(EmobVehicle veh){
-		this.fleet.put(veh.getId(), veh);
+	public void setRealStart(double time){
+		if(time > this.start){
+			this.start = time;
+		}
 	}
 	
-	public Map<Id, EmobVehicle> getFleet(){
-		return this.fleet;
+	public Double getEnd(){
+		return this.end;
+	}
+	
+	public Double getDuration(){
+		return (this.end - this.start);
+	}
+	
+	public Id getProfile(){
+		return this.type;
 	}
 
-	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		for(EmobVehicle veh : this.fleet.values()){
-			GenericEvent ge;
-			if(veh.changedSoC()){
-				ge = new GenericEventImpl("SoCChange", e.getSimulationTime());
-				ge.getAttributes().put("SoC", String.valueOf(veh.getCurrentSoC()));
-				ge.getAttributes().put("link", String.valueOf(veh.getPositionLinkId()));
-				this.manager.processEvent(ge);
-			}
+	/**
+	 * @param time
+	 */
+	public void checkRealEnd(double time) {
+		if(this.end > time){
+			log.error("the realEndTime should not be smaller, than the given EndTime. Check plansFile...");
 		}
 	}
 

@@ -17,55 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.eMobility.v2.fleet;
+package playground.droeder.eMobility.v2.population;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.GenericEvent;
-import org.matsim.core.events.GenericEventImpl;
-import org.matsim.core.mobsim.framework.events.SimulationAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.SimulationAfterSimStepListener;
+import playground.droeder.eMobility.v2.fleet.EmobFleet;
 
 /**
  * @author droeder
  *
  */
-public class EmobFleet implements SimulationAfterSimStepListener{
+public class EmobPopulationReader {
 	
-	private Map<Id, EmobVehicle> fleet;
-	private EventsManager manager;
+	private Network net;
+	private EmobPopulation pop;
+	private EmobFleet fleet;
 
-	public EmobFleet(EventsManager manager){
-		this.fleet = new HashMap<Id, EmobVehicle>();
-		this.manager = manager;
+	public EmobPopulationReader(Network net){
+		this.net = net;
 	}
 	
-	public EmobVehicle getVehicle(Id  id){
-		return this.fleet.get(id);
+	public void read(String inFile){
+		
+	}
+
+	public EmobPopulation getPopulation(){
+		return this.pop;
 	}
 	
-	public void addVehicle(EmobVehicle veh){
-		this.fleet.put(veh.getId(), veh);
+	public void add2MATSimPopulation(Population p){
+
 	}
 	
-	public Map<Id, EmobVehicle> getFleet(){
+	public EmobFleet getFleet(){
 		return this.fleet;
 	}
-
-	@Override
-	public void notifySimulationAfterSimStep(SimulationAfterSimStepEvent e) {
-		for(EmobVehicle veh : this.fleet.values()){
-			GenericEvent ge;
-			if(veh.changedSoC()){
-				ge = new GenericEventImpl("SoCChange", e.getSimulationTime());
-				ge.getAttributes().put("SoC", String.valueOf(veh.getCurrentSoC()));
-				ge.getAttributes().put("link", String.valueOf(veh.getPositionLinkId()));
-				this.manager.processEvent(ge);
-			}
-		}
-	}
-
 }

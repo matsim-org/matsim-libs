@@ -33,6 +33,8 @@ import playground.droeder.DaFileReader;
  */
 public class ChargingProfiles {
 	
+	public static final Id NONE = new IdImpl("none");
+	
 	private HashMap<Id, ChargingProfile> profiles;
 
 	public ChargingProfiles(){
