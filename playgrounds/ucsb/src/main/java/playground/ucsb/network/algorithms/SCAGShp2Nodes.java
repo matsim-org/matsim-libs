@@ -48,6 +48,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 	private final String nodeShpFile;
 	private final ObjectAttributes nodeObjectAttributes;
 	
+	// for node attribute description see "SCAG TransCAD Regional Model Users Guide.pdf" page 107
 	private static final String ID_NAME = "ID";
 	private static final String ZONE_CENTR = "ZONE_CENTR";
 	private static final String NODE_TYPE = "NODE_TYPE";

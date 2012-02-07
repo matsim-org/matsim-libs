@@ -20,9 +20,16 @@
 
 package playground.ucsb.network;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -46,9 +53,9 @@ public class SCAGNetworkConverter {
 	public static void main(String[] args) {
 
 		args = new String[] {
-				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/scagnetwork/scagnetworknode_Project_UTM_Zone_11N.shp",
-				"D:/sandboxSenozon/senozon/data/raw/america/usa/losAngeles/UCSB/scagnetwork/scagnetworknodelink_Project_UTM_Zone_11N.shp",
-				"D:/balmermi/documents/eclipse/output/ucsb"
+				"D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000/network/scagnetwork/scagnetworknode_Project_UTM_Zone_11N.shp",
+				"D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000/network/scagnetwork/scagnetworknodelink_Project_UTM_Zone_11N.shp",
+				"D:/balmermi/documents/eclipse/output/ucsb/scagnetwork"
 		};
 
 		if (args.length != 3) {
@@ -68,11 +75,30 @@ public class SCAGNetworkConverter {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ObjectAttributes nodeObjectAttributes = new ObjectAttributes();
+		ObjectAttributes linkObjectAttributes = new ObjectAttributes();
+
 		new SCAGShp2Nodes(nodeShpFile, nodeObjectAttributes).run(scenario.getNetwork());
-		new SCAGShp2Links().run(scenario.getNetwork());
-		new NetworkWriter(scenario.getNetwork()).write(outputBase+"/network.xml.gz");
-		new NetworkWriteAsTable(outputBase).run(scenario.getNetwork());
-		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(outputBase+"/nodeObjectAttributes.xml.gz");
+		new SCAGShp2Links(linkShpFile, linkObjectAttributes).run(scenario.getNetwork());
+		
+		String base = outputBase+"/complete";
+		if (!(new File(base).mkdir())) { throw new RuntimeException("Could not create "+base); }
+		new NetworkWriter(scenario.getNetwork()).write(base+"/network.xml.gz");
+		new NetworkWriteAsTable(base).run(scenario.getNetwork());
+		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(base+"/nodeObjectAttributes.xml.gz");
+		new ObjectAttributesXmlWriter(linkObjectAttributes).writeFile(base+"/linkObjectAttributes.xml.gz");
+		
+		Set<String> modes = new HashSet<String>();
+		modes.add(TransportMode.car);
+		new MultimodalNetworkCleaner(scenario.getNetwork()).run(modes);
+		modes.clear(); modes.add(SCAGShp2Links.HOV);
+		new MultimodalNetworkCleaner(scenario.getNetwork()).run(modes);
+
+		base = outputBase+"/cleaned";
+		if (!(new File(base).mkdir())) { throw new RuntimeException("Could not create "+base); }
+		new NetworkWriter(scenario.getNetwork()).write(base+"/network.xml.gz");
+		new NetworkWriteAsTable(base).run(scenario.getNetwork());
+		new ObjectAttributesXmlWriter(nodeObjectAttributes).writeFile(base+"/nodeObjectAttributes.xml.gz");
+		new ObjectAttributesXmlWriter(linkObjectAttributes).writeFile(base+"/linkObjectAttributes.xml.gz");
 	}
 
 }
