@@ -26,21 +26,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.yu.scoring.Events2ScoreI;
 import utilities.math.BasicStatistics;
 
-public interface CadytsChoice extends EventHandler {
+public interface CadytsChoice extends Events2ScoreI {
+
+	/** save Attr values into Maps */
+	@Override
+	public void finish();
+
+	public PlanCalcScoreConfigGroup getScoring();
 
 	public void reset(List<Tuple<Id, Plan>> toRemoves);
 
-	/** save Attr values into Maps */
-	public void finish();
-
-	public void setPersonScore(Person person);
-
 	public void setPersonAttrs(Person person, BasicStatistics[] statistics);
 
-	public PlanCalcScoreConfigGroup getScoring();
+	public void setPersonScore(Person person);
 }

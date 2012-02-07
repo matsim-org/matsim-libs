@@ -17,7 +17,8 @@ import playground.yu.scoring.PlansScoringI;
  * @author yu
  * 
  */
-public class Controler4AttrRecorder extends Controler {
+public class Controler4AttrRecorder extends Controler implements
+		ControlerWithAttrRecorder {
 	public static void main(String[] args) {
 		Config config;
 		if (args.length < 1) {
@@ -41,6 +42,7 @@ public class Controler4AttrRecorder extends Controler {
 		// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	}
 
+	@Override
 	public PlansScoringI getPlansScoring4AttrRecorder() {
 		return planScoring4AttrRecorder;
 	}

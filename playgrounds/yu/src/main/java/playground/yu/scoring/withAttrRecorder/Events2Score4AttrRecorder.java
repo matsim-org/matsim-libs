@@ -85,7 +85,7 @@ public class Events2Score4AttrRecorder extends EventsToScore implements
 		// actPerforming
 		attrNameList.add("performing");
 
-		// attrNameList.addScaleFactor("lateArrival");//TODO in
+		// attrNameList.addScaleFactor("lateArrival");//would appear in
 		// ActivityScoringFunction4PC
 
 		// stuck

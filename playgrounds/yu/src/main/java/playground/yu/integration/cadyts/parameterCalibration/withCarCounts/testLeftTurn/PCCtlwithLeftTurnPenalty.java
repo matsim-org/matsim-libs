@@ -25,6 +25,7 @@ public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler {
 		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
+		// addControlerListener(new ScorAttrWriteTrigger());
 	}
 
 	/**

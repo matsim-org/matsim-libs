@@ -5,6 +5,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlValidation.CadytsChoice;
+import playground.yu.scoring.PlansScoringI;
 
 /**
  * Interface for all {@code PlanScoring4PC}
@@ -13,6 +14,7 @@ import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.mnlVa
  * 
  */
 public interface PlansScoring4PC_I extends StartupListener, ScoringListener,
-		IterationStartsListener {
+		IterationStartsListener, PlansScoringI {
+	@Override
 	public CadytsChoice getPlanScorer();
 }

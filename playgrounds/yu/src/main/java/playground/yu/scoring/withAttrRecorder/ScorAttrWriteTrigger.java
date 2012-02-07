@@ -3,6 +3,7 @@
  */
 package playground.yu.scoring.withAttrRecorder;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
@@ -19,8 +20,7 @@ public class ScorAttrWriteTrigger implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
-		Controler4AttrRecorder controler = (Controler4AttrRecorder) event
-				.getControler();
+		Controler controler = event.getControler();
 		String writeScorAttrIntervalStr = controler.getConfig().findParam(
 				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
 				"writeScorAttrInterval");
@@ -29,7 +29,7 @@ public class ScorAttrWriteTrigger implements IterationEndsListener {
 					.parseInt(writeScorAttrIntervalStr);
 			if (writeScorAttrInterval > 0
 					&& iteration % writeScorAttrInterval == 0) {
-				((Events2Score4AttrRecorder) controler
+				((Events2Score4AttrRecorder) ((ControlerWithAttrRecorder) controler)
 						.getPlansScoring4AttrRecorder().getPlanScorer())
 						.writeScoreAttrs(controler
 								.getControlerIO()

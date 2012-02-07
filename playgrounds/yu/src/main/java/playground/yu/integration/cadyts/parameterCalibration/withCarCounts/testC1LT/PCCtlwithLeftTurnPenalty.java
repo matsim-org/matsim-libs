@@ -11,19 +11,35 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import playground.yu.integration.cadyts.CalibrationConfig;
 import playground.yu.integration.cadyts.parameterCalibration.withCarCounts.testLeftTurn.PlansScoringWithLeftTurnPenalty4PC;
+import playground.yu.scoring.PlansScoringI;
+import playground.yu.scoring.withAttrRecorder.ControlerWithAttrRecorder;
+import playground.yu.scoring.withAttrRecorder.ScorAttrWriteTrigger;
 import playground.yu.scoring.withAttrRecorder.leftTurn.CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty;
 
 /**
  * @author yu
  * 
  */
-public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler {
+public class PCCtlwithLeftTurnPenalty extends BseParamCalibrationControler
+		implements ControlerWithAttrRecorder {
 
 	public PCCtlwithLeftTurnPenalty(Config config) {
 		super(config);
 		extension = new PCCtlListener();
 		addControlerListener(extension);
+		String writeScorAttrIntervalStr = config.findParam(
+				CalibrationConfig.BSE_CONFIG_MODULE_NAME,
+				"writeScorAttrInterval");
+		if (writeScorAttrIntervalStr != null) {
+			addControlerListener(new ScorAttrWriteTrigger());
+		}
+	}
+
+	@Override
+	public PlansScoringI getPlansScoring4AttrRecorder() {
+		return getPlansScoring4PC();
 	}
 
 	/**

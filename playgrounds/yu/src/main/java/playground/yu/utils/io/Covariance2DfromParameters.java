@@ -36,7 +36,8 @@ import utilities.math.Vector;
 
 /**
  * calculates var{E{...}} (variance of expectation, the 2nd part of total
- * variance), see also: {@link http://en.wikipedia.org/wiki/Law_of_total_covariance}
+ * variance), see also: {@link http
+ * ://en.wikipedia.org/wiki/Law_of_total_covariance}
  * 
  * @author yu
  * 
@@ -45,7 +46,7 @@ public class Covariance2DfromParameters {
 	public class ParameterFileHandler implements TabularFileHandler {
 		private final List<Integer> iterations = new ArrayList<Integer>();
 		private final List<Double> travelingPts = new ArrayList<Double>(),
-		constantPts = new ArrayList<Double>();
+				constantPts = new ArrayList<Double>();
 
 		public List<Double> getConstantPts() {
 			return constantPts;
@@ -64,7 +65,7 @@ public class Covariance2DfromParameters {
 			int size = row.length;
 			if (size != 3) {
 				throw new RuntimeException(
-				"Each line in parameter file should contains 3 columes");
+						"Each line in parameter file should contains 3 columes");
 			}
 
 			iterations.add(Integer.parseInt(row[0]));
@@ -84,10 +85,10 @@ public class Covariance2DfromParameters {
 		String paramFilename, outputFilename;
 		int width;
 		if (args.length != 3) {
-			//			paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
-			paramFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams.log";
-			outputFilename = "test/output/2car1ptRoutes/pc2params/outputTravPt-6constPt-3/pureParams500Windows.log";
-			width = 500;
+			// paramFilename = "test/input/bln2pct/baseSyn3PureParams.log";
+			paramFilename = "test/input/bln2pct/oldC1PureParameter-6_0to-4.5_0.log";
+			outputFilename = "test/output/bln2pct/oldC1PureParameter-6_0to-4.5_0_1kWindows.log";
+			width = 1000;
 		} else {
 			paramFilename = args[0];
 			outputFilename = args[1];
@@ -97,6 +98,7 @@ public class Covariance2DfromParameters {
 		Covariance2DfromParameters cfp = new Covariance2DfromParameters(
 				paramFilename, width, outputFilename);
 	}
+
 	private final List<Integer> iterations;
 
 	private final List<Double> travelingPts, constantPts;
@@ -108,7 +110,7 @@ public class Covariance2DfromParameters {
 	public Covariance2DfromParameters(String filename, int windowWidth,
 			String outputFilename) {
 		this.windowWidth = windowWidth;
-		///////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////
 		parserConfig.setStartTag("iter");
 		parserConfig.setDelimiterTags(new String[] { "\t" });
 		parserConfig.setFileName(filename);
@@ -124,7 +126,7 @@ public class Covariance2DfromParameters {
 		iterations = fileHandler.getIterations();
 		travelingPts = fileHandler.getTravelingPts();
 		constantPts = fileHandler.getConstantPts();
-		/////////////////////////////////////////////////////////
+		// ///////////////////////////////////////////////////////
 		createCovrainces();
 		writer.close();
 	}
