@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -42,12 +44,12 @@ public class ExternalControler {
 	static String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/network80links.xml";
 	static String configFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/config_busline_withoutTimeChoice.xml";
 	static String populationFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/populationBusCorridor80linksCar.xml";
-	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withoutTimeChoice_busNumber";
-	static int lastExternalIteration = 25;
+	static String outputExternalIterationDirPath = "../../shared-svn/studies/ihab/busCorridor/output/withoutTimeChoice_busNumber+10";
+	static int lastExternalIteration = 10;
 	static int lastInternalIteration = 100;
 	
 	// settings for first iteration or if values not changed for all iterations
-	TimePeriod p1 = new TimePeriod(1, "DAY", 1, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
+	TimePeriod p1 = new TimePeriod(1, "DAY", 15, 4*3600, 24*3600); // orderId, id, numberOfBuses, fromTime, toTime
 //	TimePeriod p2 = new TimePeriod(2, "HVZ_1", 12, 6*3600, 12*3600);
 //	TimePeriod p3 = new TimePeriod(3, "NVZ", 8, 12*3600, 15*3600);
 //	TimePeriod p4 = new TimePeriod(4, "HVZ_2", 12, 15*3600, 21*3600);
@@ -63,19 +65,19 @@ public class ExternalControler {
 	
 	private Map<Integer, TimePeriod> day = new HashMap<Integer, TimePeriod>();
 
-	private Map<Integer, Double> iteration2operatorProfit = new HashMap<Integer, Double>();
-	private Map<Integer, Double> iteration2operatorCosts = new HashMap<Integer, Double>();
-	private Map<Integer, Double> iteration2operatorRevenue = new HashMap<Integer, Double>();
-	private Map<Integer, Double> iteration2numberOfBuses = new HashMap<Integer, Double>();
-	private Map<Integer, String> iteration2day = new HashMap<Integer, String>();
-	private Map<Integer, Double> iteration2userScore = new HashMap<Integer,Double>();
-	private Map<Integer, Double> iteration2userScoreSum = new HashMap<Integer,Double>();
-	private Map<Integer, Double> iteration2totalScore = new HashMap<Integer,Double>();
-	private Map<Integer, Integer> iteration2numberOfCarLegs = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> iteration2numberOfPtLegs = new HashMap<Integer, Integer>();
-	private Map<Integer, Integer> iteration2numberOfWalkLegs = new HashMap<Integer, Integer>();
-	private Map<Integer, Double> iteration2fare = new HashMap<Integer, Double>();
-	private Map<Integer, Double> iteration2capacity = new HashMap<Integer, Double>();
+	private SortedMap<Integer, Double> iteration2operatorProfit = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, Double> iteration2operatorCosts = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, Double> iteration2operatorRevenue = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, Double> iteration2numberOfBuses = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, String> iteration2day = new TreeMap<Integer, String>();
+	private SortedMap<Integer, Double> iteration2userScore = new TreeMap<Integer,Double>();
+	private SortedMap<Integer, Double> iteration2userScoreSum = new TreeMap<Integer,Double>();
+	private SortedMap<Integer, Double> iteration2totalScore = new TreeMap<Integer,Double>();
+	private SortedMap<Integer, Integer> iteration2numberOfCarLegs = new TreeMap<Integer, Integer>();
+	private SortedMap<Integer, Integer> iteration2numberOfPtLegs = new TreeMap<Integer, Integer>();
+	private SortedMap<Integer, Integer> iteration2numberOfWalkLegs = new TreeMap<Integer, Integer>();
+	private SortedMap<Integer, Double> iteration2fare = new TreeMap<Integer, Double>();
+	private SortedMap<Integer, Double> iteration2capacity = new TreeMap<Integer, Double>();
 
 	public static void main(final String[] args) throws IOException {
 		ExternalControler simulation = new ExternalControler();
@@ -149,7 +151,7 @@ public class ExternalControler {
 			// settings for next external iteration	
 			if (this.getExtItNr() < lastExternalIteration){
 				
-				this.setDay(increaseNumberOfBusesAllTimePeriods(1));
+				this.setDay(increaseNumberOfBusesAllTimePeriods(10));
 //				
 //				this.setDay(increaseBuses("HVZ_1", 1)); // id, number of buses
 //				this.setDay(increaseBuses("HVZ_2", 1)); // id, number of buses
@@ -206,7 +208,7 @@ public class ExternalControler {
 		Map<Integer, TimePeriod> dayNextExtIt = new HashMap<Integer, TimePeriod>();
 		for (TimePeriod t : this.getDay().values()){
 			TimePeriod t2 = t;
-			t2.increaseNumberOfBuses(1);
+			t2.increaseNumberOfBuses(i);
 			dayNextExtIt.put(t.getOrderId(), t2);
 		}
 		return dayNextExtIt;
