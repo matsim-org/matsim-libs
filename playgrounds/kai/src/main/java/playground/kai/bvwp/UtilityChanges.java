@@ -31,7 +31,7 @@ abstract class UtilityChanges {
 					ValuesForAUserType quantitiesNullfall = quantitiesNullfallByMode.getByType(type) ;
 					ValuesForAUserType quantitiesPlanfall = quantitiesPlanfallByMode.getByType(type) ;
 					double deltaAmounts = quantitiesPlanfall.getByEntry( Entry.XX ) - quantitiesNullfall.getByEntry( Entry.XX ) ;
-					if ( quantitiesPlanfall.getByEntry(Entry.XX)!=0. && quantitiesNullfall.getByEntry(Entry.XX)!=0. ) {
+					if ( quantitiesPlanfall.getByEntry(Entry.XX)!=0. || quantitiesNullfall.getByEntry(Entry.XX)!=0. ) {
 						System.out.printf("%10s; %10s; %10s; old demand: %10.1f persons/tons; new demand: %10.1f persons/tons; " +
 								"demand change: %10.1f persons/tons\n", 
 								id, mode, type, quantitiesNullfall.getByEntry(Entry.XX), 

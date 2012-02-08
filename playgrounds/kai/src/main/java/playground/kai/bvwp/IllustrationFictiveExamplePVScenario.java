@@ -38,7 +38,8 @@ class IllustrationFictiveExamplePVScenario { // Relationsbezogen_mit_generalisie
 				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV) ;
 				pvValuesRail.setByEntry( Entry.XX, 2000. ) ; // number of persons
 				pvValuesRail.setByEntry( Entry.km, 41. ) ;
-				pvValuesRail.setByEntry( Entry.hrs, 0.43 ) ;
+				pvValuesRail.setByEntry( Entry.hrs, 0.43 ) ; 
+				// (yyyyyy: I think this should be _larger_ than for road for a convincing example.  kai, feb'12) 
 			}			
 			
 //			
