@@ -34,6 +34,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.Feature;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -200,7 +201,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 			logger.warn("No path for the shape file was given. The path is set to " + shapeFile + "!!!");
 		}
 		
-		if(!pathExsits(shapeFile))
+		if(!Paths.pathExsits(shapeFile))
 			throw new RuntimeException("Given path to shape file does not exist: " + shapeFile);
 		
 		/** If the used input data comes from PSRC-PARCEL (URBANSIM) than the following spatial layer attributes will apply:

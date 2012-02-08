@@ -23,6 +23,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ZoneObject;
 import playground.tnicolai.matsim4opus.utils.io.writer.ZoneBasedAccessibilityCSVWriter;
+import playground.tnicolai.matsim4opus.utils.io.writer.ZoneCSVWriter;
 
 /**
  *  improvements feb'12
@@ -65,9 +66,12 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
-		// data set table.
+		// data set table. THIS PRODUCES URBANSIM INPUT
 		ZoneBasedAccessibilityCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP +
 															   Constants.ZONES_FILE_CSV);
+		// in contrast to the file above this contains all information about zones but is not dedicated for URBASIM
+		ZoneCSVWriter.initAccessiblityWriter(Constants.MATSIM_4_OPUS_TEMP + 
+											 Constants.ZONES_COMPLETE_FILE_CSV);
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListener!");
 	}
@@ -176,11 +180,18 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				double freespeedTravelTimesCarLogSum = Math.log( freespeedTravelTimesCarSum );
 				double travelTimesWalkLogSum 		 = Math.log( travelTimesWalkSum );
 
-				// writing accessibility measures of current node in csv format
-				ZoneBasedAccessibilityCSVWriter.write(originZoneID, 
+				// writing accessibility measures of current node in csv format (UrbanSim input)
+				ZoneBasedAccessibilityCSVWriter.write(originZoneID,
 													  congestedTravelTimesCarLogSum, 
 													  freespeedTravelTimesCarLogSum, 
 													  travelTimesWalkLogSum);
+				// writing complete zones information for further analysis
+				ZoneCSVWriter.write(originZoneID, 
+									zones[fromIndex].getZoneCoordinate(), 
+									fromNode.getCoord(), 
+									congestedTravelTimesCarLogSum, 
+									freespeedTravelTimesCarLogSum, 
+									travelTimesWalkLogSum);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);
@@ -197,6 +208,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		finally{
 			// finalizing/closing csv file containing accessibility measures
 			ZoneBasedAccessibilityCSVWriter.close();
+			ZoneCSVWriter.close();
 		}
 	}
 }

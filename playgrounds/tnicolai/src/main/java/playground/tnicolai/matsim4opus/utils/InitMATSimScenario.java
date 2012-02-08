@@ -146,10 +146,11 @@ public class InitMATSimScenario {
 	 * Determines and sets available processors into MATSim config
 	 */
 	private void initGlobalSettings(){
-		
-		log.info("Setting number of Threads to " + Runtime.getRuntime().availableProcessors() + " ...");
+		log.info("Setting GlobalConfigGroup to config...");
 		GlobalConfigGroup globalCG = (GlobalConfigGroup) scenario.getConfig().getModule(GlobalConfigGroup.GROUP_NAME);
 		globalCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		log.info("GlobalConfigGroup settings:");
+		log.info("Number of Threads: " + Runtime.getRuntime().availableProcessors() + " ...");
 		log.info("... done!");
 	}
 	
@@ -159,7 +160,7 @@ public class InitMATSimScenario {
 	 * @param matsim4UrbanSimParameter
 	 */
 	private void initMATSim4UrbanSimParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
-		log.info("Setting MATSim4UrbanSim parameter to config...");
+		log.info("Setting MATSim4UrbanSim to config...");
 		double samplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
 		int year = matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
 		String opusHome = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
@@ -199,8 +200,7 @@ public class InitMATSimScenario {
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.CUSTOM_PARAMETER, "");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MEASUREMENT_LOGFILE, Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE);
 		
-		log.info("Setting OPUS paths ...");
-		
+		// setting opus paths internally
 		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_HOME_PARAM);
 		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_DATA_PATH_PARAM);
 		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_PARAM);
@@ -209,7 +209,7 @@ public class InitMATSimScenario {
 		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM);
 		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
 		
-		log.info("MATSim4UrbanSim Parameter:");
+		log.info("MATSim4UrbanSim settings:");
 		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE) );
 		log.info("Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ); 
 		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
@@ -242,13 +242,15 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initNetwork(ConfigType matsimParameter){
-		log.info("Setting network to config...");
+		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME);
-		// set values
-		networkCG.setInputFile( networkFile );	// network
-		log.info("... done!");
+		// set network
+		networkCG.setInputFile( networkFile );
+		
+		log.info("NetworkConfigGroup settings:");
 		log.info("Network: " + networkCG.getInputFile());
+		log.info("... done!");
 	}
 	
 	/**
@@ -257,7 +259,7 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initInputPlansFile(ConfigType matsimParameter){
-		log.info("Setting input plans file to config...");
+		log.info("Looking for warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
@@ -276,7 +278,7 @@ public class InitMATSimScenario {
 			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.WARM_START);
 		}
 		else{
-			log.info("Cold Start (no pop file) detected!");
+			log.info("Cold Start (no plans file) detected!");
 			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.COLD_START);
 		}
 		
@@ -290,13 +292,17 @@ public class InitMATSimScenario {
 	}
 
 	/**
-	 * 
+	 * sets (either a "warm" or "hot" start) a plans file, see above.
 	 */
 	private void setPlansFile(String plansFile) {
+		log.info("Setting PlansConfigGroup to config...");
 		PlansConfigGroup plansCG = (PlansConfigGroup) scenario.getConfig().getModule(PlansConfigGroup.GROUP_NAME);
-		// set values
-		plansCG.setInputFile( plansFile );	// input plans file
+		// set input plans file
+		plansCG.setInputFile( plansFile );
+		
+		log.info("PlansConfigGroup setting:");
 		log.info("Input plans file set to: " + plansCG.getInputFile());
+		log.info("... done!");
 	}
 	
 	/**
@@ -305,12 +311,12 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initControler(ConfigType matsimParameter){
-		log.info("Setting controler to config...");
+		log.info("Setting ControlerConfigGroup to config...");
 		int firstIteration = matsimParameter.getControler().getFirstIteration().intValue();
 		int lastIteration = matsimParameter.getControler().getLastIteration().intValue();
 		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
 		// set values
-		controlerCG.setFirstIteration( firstIteration );	// controller (first, last iteration)
+		controlerCG.setFirstIteration( firstIteration );
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
 		
@@ -318,9 +324,11 @@ public class InitMATSimScenario {
 		hs.add("otfvis");
 		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
 		
+		log.info("ControlerConfigGroup settings:");
+		log.info("FirstIteration: " + controlerCG.getFirstIteration());
+		log.info("LastIteration: " + controlerCG.getLastIteration());
+		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
 		log.info("... done!");
-		log.info("Controler FirstIteration: " + controlerCG.getFirstIteration() + " LastIteration: " + controlerCG.getLastIteration() + 
-				          " MATSim output directory: " +  controlerCG.getOutputDirectory());
 	}
 	
 	/**
@@ -329,7 +337,7 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initPlanCalcScore(ConfigType matsimParameter){
-		log.info("Setting planCalcScore to config...");
+		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
 		ActivityParams actType0 = new ActivityParams(activityType_0);
@@ -340,17 +348,20 @@ public class InitMATSimScenario {
 		actType1.setLatestStartTime(9*3600);	// tnicolai: make configurable
 		scenario.getConfig().planCalcScore().addActivityParams( actType0 );
 		scenario.getConfig().planCalcScore().addActivityParams( actType1 );
+		
+		log.info("PlanCalcScore settings:");
+		log.info("Activity_Type_0: " + actType0.getType() + " Typical Duration Activity_Type_0: " + actType0.getTypicalDuration());
+		log.info("Activity_Type_1: " + actType1.getType() + " Typical Duration Activity_Type_1: " + actType1.getTypicalDuration());
+		log.info("Opening Time Activity_Type_1: " + actType1.getOpeningTime()); 
+		log.info("Latest Start Time Activity_Type_1: " + actType1.getLatestStartTime());
 		log.info("... done!");
-		log.info("PlanCalcScore Activity_Type_0: " + actType0.getType() + " Typical Duration Activity_Type_0: " + actType0.getTypicalDuration() + 
-							  " Activity_Type_1: " + actType1.getType() + " Typical Duration Activity_Type_1: " + actType1.getTypicalDuration() + 
-							  " Opening Time Activity_Type_1: " + actType1.getOpeningTime() + " Latest Start Time Activity_Type_1: " + actType1.getLatestStartTime());
 	}
 	
 	/**
 	 * setting simulation
 	 */
 	private void initSimulation(){
-		log.info("Setting simulation to config...");
+		log.info("Setting SimulationConfigGroup to config...");
 		
 		SimulationConfigGroup simulation = new SimulationConfigGroup();
 		
@@ -387,28 +398,33 @@ public class InitMATSimScenario {
 		
 		scenario.getConfig().addSimulationConfigGroup( simulation );
 		
-		log.info("... done!");
-		
+		log.info("SimulationConfigGroup settings:");
 		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() );
+		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
 		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+		log.info("... done!");
 	}
 	
 	/**
 	 * setting strategy
 	 */
 	private void initStrategy(){
-		log.info("Setting strategy to config...");
+		log.info("Setting StrategyConfigGroup to config...");
+		
+		// some modules are disables after 80% of overall iterations, 
+		// last iteration for them determined here tnicolai feb'12
+		int disableStrategyAfterIteration = (int) Math.ceil(scenario.getConfig().controler().getLastIteration() * 0.8);
+		
 		// configure strategies for re-planning tnicolai: make configurable
 		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5);
 		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator");
 		timeAlocationMutator.setProbability(0.1);
-		timeAlocationMutator.setDisableAfter(100);
+		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(timeAlocationMutator);
-		// change mutation range to 2h. tnicolai:feb'12
+		// change mutation range to 2h. tnicolai feb'12
 		scenario.getConfig().setParam("TimeAllocationMutator", "mutationRange", "7200"); 
 		
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
@@ -419,12 +435,14 @@ public class InitMATSimScenario {
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
 		reroute.setModuleName("ReRoute_Dijkstra");
 		reroute.setProbability(0.1);
-		reroute.setDisableAfter(100);
+		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
+		
+		log.info("StrategyConfigGroup settings:");
+		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter()); 
+		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability());
+		log.info("Strategy_3_ " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
 		log.info("... done!");
-		log.info("Strategy Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability Strategy_1: " + timeAlocationMutator.getProbability() + " Disable After Itereation (Strategy_1): " + timeAlocationMutator.getDisableAfter() + 
-						 " Strategy_2: " + changeExpBeta.getModuleName() + " Probability Strategy_2: " + changeExpBeta.getProbability() +
-						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
 	}
 	
 	// Testing fetch  factor calculation for storageCap 
@@ -436,6 +454,10 @@ public class InitMATSimScenario {
 			double storageCap = sample * factor;
 			
 			System.out.println("Sample rate " + sample + " leads to a fetch fector of: " + factor + " and a StroraceCapacity of: " + storageCap );
+		}
+		
+		for(int i = 0; i <= 100; i++){
+			System.out.println("i = " + i + " disable int = " + (int) Math.ceil(i * 0.8)+ " disable double = " + i * 0.8);			
 		}
 	}
 }

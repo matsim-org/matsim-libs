@@ -110,6 +110,7 @@ public class Constants {
 	public static final String TRAVEL_DATA_FILE_CSV		= "travel_data.csv";
 	public static final String GRID_DATA_FILE_CSV 		= "grid_data.csv";
 	public static final String ZONES_FILE_CSV 			= "zones.csv";
+	public static final String ZONES_COMPLETE_FILE_CSV 	= "zones_complete.csv";
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
@@ -205,6 +206,8 @@ public class Constants {
 	
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
+	public static final String ERSA_ZONE_X_COORD = "x_coord_zonecentroid";
+	public static final String ERSA_ZONE_Y_COORD = "y_coord_zonecentroid";
 	public static final String ERSA_PARCEL_ID = "parcel_id";
 	public static final String ERSA_PERSON_ID = "person_id";
 	public static final String ERSA_JOB_ID = "job_id";
