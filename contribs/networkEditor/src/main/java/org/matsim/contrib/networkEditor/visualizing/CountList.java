@@ -71,11 +71,9 @@ public class CountList extends javax.swing.JPanel {
 
         setBackground(java.awt.Color.white);
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
-            @Override
-						public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
-            @Override
-						public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 formAncestorResized(evt);
             }
         });
@@ -85,54 +83,50 @@ public class CountList extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Hora", "Volumen"
+                "Hour", "Volume"
             }
         ) {
             Class[] types = new Class [] {
                 java.lang.Integer.class, java.lang.Double.class
             };
 
-            @Override
-						public Class getColumnClass(int columnIndex) {
+            public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
         });
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setBackground(java.awt.Color.white);
-        jButton1.setFont(new java.awt.Font("Arial", 0, 10));
+        jButton1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         jButton1.setForeground(new java.awt.Color(17, 196, 19));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matsim/contrib/networkEditor/images/add.png")));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matsim/contrib/networkEditor/images/add.png"))); // NOI18N
         jButton1.setToolTipText("Agregar conteo");
-        jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1.setIconTextGap(0);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-						public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
         jButton2.setBackground(java.awt.Color.white);
-        jButton2.setFont(new java.awt.Font("Arial", 0, 10));
+        jButton2.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
         jButton2.setForeground(new java.awt.Color(254, 1, 1));
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matsim/contrib/networkEditor/images/minus.png")));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/matsim/contrib/networkEditor/images/minus.png"))); // NOI18N
         jButton2.setToolTipText("Eliminar Conteo");
         jButton2.setAutoscrolls(true);
-        jButton2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        jButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton2.setIconTextGap(0);
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-						public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-						public void mouseClicked(java.awt.event.MouseEvent evt) {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel1MouseClicked(evt);
             }
         });
@@ -142,12 +136,11 @@ public class CountList extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton2)
                 .addGap(6, 6, 6))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
         );
@@ -155,11 +148,11 @@ public class CountList extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
+                    .addComponent(jButton1)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE))
+                    .addComponent(jButton2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
