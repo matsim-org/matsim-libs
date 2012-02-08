@@ -83,7 +83,7 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 	
 	@Override
 	public void glInit() {
-		netDisplList = -1;
+//		netDisplList = -1;
 		GL gl = OTFGLAbstractDrawable.getGl();
 		checkNetList(gl);
 	}
