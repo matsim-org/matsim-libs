@@ -1,7 +1,7 @@
 package playground.kai.bvwp;
 
 
-public class Main {
+public class Main_BVWP2003 {
 
 	public static void main(String[] args) {
 		
