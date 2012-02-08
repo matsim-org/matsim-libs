@@ -9,7 +9,7 @@ import playground.kai.bvwp.Values.Type;
  *
  */
 
-class EconomicValues4 {
+class EconomicValues_ExcelPV {
 
 	static Values createEconomicValues1() {
 		Values economicValues = new Values() ;
