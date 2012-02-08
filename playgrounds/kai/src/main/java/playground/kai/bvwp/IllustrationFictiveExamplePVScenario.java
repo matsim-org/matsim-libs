@@ -11,7 +11,7 @@ import playground.kai.bvwp.Values.Type;
  *
  */
 
-class Scenario_ExcelPV { // Relationsbezogen_mit_generalisierten_Kosten
+class IllustrationFictiveExamplePVScenario { // Relationsbezogen_mit_generalisierten_Kosten
 
 	static ScenarioForEval createNullfall1() {
 		// set up the base case:

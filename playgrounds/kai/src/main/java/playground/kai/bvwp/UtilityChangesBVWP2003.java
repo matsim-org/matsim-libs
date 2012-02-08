@@ -45,7 +45,7 @@ public class UtilityChangesBVWP2003 extends UtilityChanges {
 		double personenXPlan = quantitiesPlanfall.getByEntry(Entry.XX) * quantitiesPlanfall.getByEntry(entry);
 		double diff = personenXPlan - personenXNull;
 		
-		utlChanges.utl = diff * econValues.getByEntry(entry);				
+		utlChanges.utl = diff * econValues.getByEntry(entry);
 		return utlChanges;
 	}
 
