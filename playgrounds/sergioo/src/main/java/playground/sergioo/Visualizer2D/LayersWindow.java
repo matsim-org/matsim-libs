@@ -1,6 +1,5 @@
 package playground.sergioo.Visualizer2D;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +53,6 @@ public abstract class LayersWindow extends JFrame {
 		lblCoords[1].setText(" "+nF.format(y));
 	}
 	public abstract void refreshLabel(Labels label);
-	
+
 }
 

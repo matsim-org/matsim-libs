@@ -4,10 +4,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Coord;
@@ -30,13 +35,12 @@ public abstract class LayersPanel extends JPanel {
 	private double xMin;
 	private double yMin;
 	private int frameSize=10;
-	protected byte activeLayer = 0;
-	protected byte principalLayer = 0;
+	protected byte activeLayer = -1;
+	protected byte principalLayer = -1;
 	private int yAnt;
 	private int heightAnt;
 	private int xAnt;
 	private int widthAnt;
-	
 	//Methods
 	public LayersPanel() {
 		layers = new ArrayList<Layer>();
@@ -63,9 +67,24 @@ public abstract class LayersPanel extends JPanel {
 		return layers.size();
 	}
 	protected void addLayer(Layer layer) {
+		if(principalLayer==-1)
+			principalLayer = (byte) layers.size();
+		if(activeLayer==-1 && layer.isActive())
+			activeLayer = (byte) layers.size();
+		layers.add(layer);
+	}
+	protected void addLayer(Layer layer, boolean principal) {
+		if(principal)
+			principalLayer = (byte) layers.size();
+		if(activeLayer==-1 && layer.isActive())
+			activeLayer = (byte) layers.size();
 		layers.add(layer);
 	}
 	protected void addLayer(int position, Layer layer) {
+		if(principalLayer==-1)
+			principalLayer = (byte) position;
+		if(activeLayer==-1 && layer.isActive())
+			activeLayer = (byte) position;
 		layers.add(position, layer);
 	}
 	protected void setLayer(int position, Layer layer) {
@@ -158,6 +177,16 @@ public abstract class LayersPanel extends JPanel {
 		}
 		camera.setBoundaries(cXMin, cYMin, cXMax, cYMax);
 	}
+	protected void saveImage(String type, File file) {
+		Image windowImage = this.createImage(this.getSize().width, this.getSize().height);
+		this.paintComponent(windowImage.getGraphics());
+		try {
+			ImageIO.write((RenderedImage) windowImage, type, file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Image saved");
+	}
 	public void viewAll() {
 		setAspectRatio();
 	}
@@ -173,6 +202,5 @@ public abstract class LayersPanel extends JPanel {
 	public double getWorldY(int y) {
 		return (y-(getHeight()-height)/2)*camera.getSize().getY()/height+camera.getUpLeftCorner().getY();
 	}
-	
 	
 }

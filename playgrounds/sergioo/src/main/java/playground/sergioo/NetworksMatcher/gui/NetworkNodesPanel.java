@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 
+import playground.sergioo.NetworkBusLaneAdder.gui.NetworkTwoNodesPainter;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkMatchingWindow.Options;
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
@@ -109,7 +110,7 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 		getLayer(1).setPainter(new MatchingsPainter(nodesMatchings, matchingOption, colors));
 	}
 	public void setNetwork(Network network) {
-		((NetworkNodesPainter)getLayer(0).getPainter()).setNetwork(network);
+		((NetworkTwoNodesPainter)getLayer(0).getPainter()).setNetwork(network);
 	}
 	public Set<Node> getSelectedNodes() {
 		return ((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).getSelectedNodesAndClear();
@@ -179,11 +180,11 @@ public class NetworkNodesPanel extends LayersPanel implements MouseListener, Mou
 				doubleNetworkWindow.refreshLabel(Labels.LINK);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON1) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).selectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.SELECT_NODES) && e.getButton()==MouseEvent.BUTTON3) {
-				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNodeFromCollection(getWorldX(e.getX()),getWorldY(e.getY()));
+				((NetworkNodesPainterManager)((NetworkPainter)getActiveLayer().getPainter()).getNetworkPainterManager()).unselectNearestNode(getWorldX(e.getX()),getWorldY(e.getY()));
 				doubleNetworkWindow.refreshLabel(Labels.NODES);
 			}
 			else if(doubleNetworkWindow.getOption().equals(Options.ZOOM) && e.getButton()==MouseEvent.BUTTON1) {

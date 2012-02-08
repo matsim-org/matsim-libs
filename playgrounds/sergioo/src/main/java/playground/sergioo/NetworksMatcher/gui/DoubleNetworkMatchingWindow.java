@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.sergioo.NetworkBusLaneAdder.gui.NetworkTwoNodesPainter;
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
 import playground.sergioo.NetworksMatcher.kernel.CrossingMatchingStep;
 import playground.sergioo.NetworksMatcher.kernel.core.MatchingProcess;
@@ -149,7 +150,7 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this.add(infoPanel, BorderLayout.SOUTH);
 		setSize(Toolkit.getDefaultToolkit().getScreenSize().width,Toolkit.getDefaultToolkit().getScreenSize().height);
 	}
-	public DoubleNetworkMatchingWindow(String title, NetworkNodesPainter networkPainterA, NetworkNodesPainter networkPainterB) {
+	public DoubleNetworkMatchingWindow(String title, NetworkTwoNodesPainter networkPainterA, NetworkTwoNodesPainter networkPainterB) {
 		this(title);
 		layersPanels.put(PanelIds.A, new NetworkNodesPanel(this, networkPainterA));
 		layersPanels.put(PanelIds.B, new NetworkNodesPanel(this, networkPainterB));
@@ -171,13 +172,13 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this.step = matchingProcess.getNumSteps();
 		nodesMatchings = matchingProcess.getFinalMatchings();
 		colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
-		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), colors));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
+		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkTwoNodesPainter(matchingProcess.getFinalNetworkA()), colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkTwoNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkTwoNodesPainter(matchingProcess.getFinalNetworkA()), new NetworkTwoNodesPainter(matchingProcess.getFinalNetworkB(), Color.BLACK), colors));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A));
@@ -204,13 +205,13 @@ public class DoubleNetworkMatchingWindow extends LayersWindow implements ActionL
 		this.add(toolsPanel, BorderLayout.NORTH);
 		this.nodesMatchings = nodesMatchings;
 		colors = MatchingsPainter.generateRandomColors(nodesMatchings.size());
-		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkNodesPainter(networkA), colors));
-		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkNodesPainter(networkB, Color.DARK_GRAY), colors));
+		layersPanels.put(PanelIds.A, new NetworkNodesPanel(nodesMatchings, MatchingOptions.A, this, new NetworkTwoNodesPainter(networkA), colors));
+		layersPanels.put(PanelIds.B, new NetworkNodesPanel(nodesMatchings, MatchingOptions.B, this, new NetworkTwoNodesPainter(networkB, Color.DARK_GRAY), colors));
 		layersPanels.get(PanelIds.A).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.get(PanelIds.B).setBorder(new LineBorder(Color.BLACK, 5));
 		layersPanels.put(PanelIds.ACTIVE, layersPanels.get(PanelIds.A));
 		layersPanels.get(PanelIds.ACTIVE).requestFocus();
-		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkNodesPainter(networkA), new NetworkNodesPainter(networkB, Color.BLACK), colors));
+		layersPanels.put(PanelIds.DOUBLE, new DoubleNetworkMatchingPanel(nodesMatchings, this, new NetworkTwoNodesPainter(networkA), new NetworkTwoNodesPainter(networkB, Color.BLACK), colors));
 		panelsPanel = new JPanel();
 		panelsPanel.setLayout(new GridLayout());
 		panelsPanel.add(layersPanels.get(PanelIds.A));

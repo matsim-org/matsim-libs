@@ -21,7 +21,6 @@
 package playground.sergioo.FacilitiesGenerator.gui;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -30,16 +29,12 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
-
-import javax.imageio.ImageIO;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -153,16 +148,6 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 			camera.zoomOut();
 		repaint();
 	}
-	private void saveImage() {
-		Image windowImage = this.createImage(this.getSize().width, this.getSize().height);
-		this.paintComponent(windowImage.getGraphics());
-		try {
-			ImageIO.write((RenderedImage) windowImage, "png", new File("./data/prueba.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("Image saved");
-	}
 	@Override
 	public void keyTyped(KeyEvent e) {
 		switch(e.getKeyChar()) {
@@ -173,7 +158,7 @@ public class WeigthsNetworkPanel extends LayersPanel implements MouseListener, M
 			viewAll();
 			break;
 		case 's':
-			saveImage();
+			saveImage("png", new File("./data/prueba.png"));
 			break;
 		}
 		repaint();

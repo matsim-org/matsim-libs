@@ -1,7 +1,8 @@
-package playground.sergioo.NetworksMatcher.gui;
+package playground.sergioo.NetworkBusLaneAdder.gui;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -9,21 +10,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.sergioo.Visualizer2D.NetworkVisualizer.NetworkPainters.NetworkPainterManager;
 
-public class NetworkNodesPainterManager extends NetworkPainterManager {
+public class NetworkTwoNodesPainterManager extends NetworkPainterManager {
 
 	private static final String SEPARATOR = " & ";
 	//Attributes
-	private Set<Id> selectedNodesId;
+	private final List<Id> selectedNodesId;
+	private final List<Link> selectedLinks;
 	
 	//Methods
-	public NetworkNodesPainterManager(Network network) {
+	public NetworkTwoNodesPainterManager(Network network) {
 		super(network);
-		selectedNodesId = new HashSet<Id>();
+		selectedNodesId = new ArrayList<Id>();
+		selectedLinks = new ArrayList<Link>();
 	}
 	public Set<Node> getSelectedNodes() {
 		Set<Node> selectedNodes = new HashSet<Node>();
@@ -31,21 +36,20 @@ public class NetworkNodesPainterManager extends NetworkPainterManager {
 			selectedNodes.add(network.getNodes().get(selectedNodeId));
 		return selectedNodes;
 	}
-	public Set<Node> getSelectedNodesAndClear() {
-		Set<Node> selectedNodes = getSelectedNodes();
-		selectedNodesId.clear();
-		return selectedNodes;
+	public List<Link> getSelectedLinks() {
+		return selectedLinks;
 	}
-	public void selectNodes(Set<Node> nodes) {
-		selectedNodesId = new HashSet<Id>();
-		for(Node node:nodes)
-			selectedNodesId.add(node.getId());
-	}
-	public Collection<? extends Link> getLinks(){
-		return network.getLinks().values();
+	public void selectLinks(AStarLandmarks aStarLandmarks) {
+		selectedLinks.clear();
+		if(selectedNodesId.size()==2) {
+			Path path=aStarLandmarks.calcLeastCostPath(network.getNodes().get(selectedNodesId.get(0)), network.getNodes().get(selectedNodesId.get(1)), 0);
+			for(Link link:path.links)
+				selectedLinks.add(link);
+		}
 	}
 	public void selectNearestNode(double x, double y) {
-		selectedNodesId.add(getIdNearestNode(x, y));
+		if(selectedNodesId.size()<2)
+			selectedNodesId.add(getIdNearestNode(x, y));
 	}
 	public void unselectNearestNode(double x, double y) {
 		if(selectedNodesId.size()>0)

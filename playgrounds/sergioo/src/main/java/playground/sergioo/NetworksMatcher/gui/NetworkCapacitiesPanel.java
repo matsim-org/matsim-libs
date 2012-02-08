@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.sergioo.NetworkBusLaneAdder.gui.NetworkTwoNodesPainter;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Labels;
 import playground.sergioo.NetworksMatcher.gui.DoubleNetworkCapacitiesWindow.Options;
 import playground.sergioo.NetworksMatcher.gui.MatchingsPainter.MatchingOptions;
@@ -75,7 +76,7 @@ public class NetworkCapacitiesPanel extends LayersPanel implements MouseListener
 		setFocusable(true);
 	}
 	public void setNetwork(Network network) {
-		((NetworkNodesPainter)getLayer(0).getPainter()).setNetwork(network);
+		((NetworkTwoNodesPainter)getLayer(0).getPainter()).setNetwork(network);
 	}
 	public Node getSelectedNode() {
 		return ((NetworkPainterManager)((NetworkPainter)getLayer(1).getPainter()).getNetworkPainterManager()).getSelectedNode();
