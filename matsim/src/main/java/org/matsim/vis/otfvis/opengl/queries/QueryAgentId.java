@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.VisMobsimFeature;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -76,8 +77,9 @@ public class QueryAgentId extends AbstractQuery {
 		double dist = 0;
 		for(AgentSnapshotInfo info : queueModel.getSnapshot()) {
 			if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
-			double xDist = info.getEasting() - this.x;
-			double yDist = info.getNorthing() - this.y;
+			java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new CoordImpl(info.getEasting(), info.getNorthing()));
+			double xDist = xy.getX() - this.x;
+			double yDist = xy.getY() - this.y;
 			if (this.width == 0) {
 				// search for NEAREST agent to given POINT
 				dist = Math.sqrt(xDist*xDist + yDist*yDist);
@@ -105,8 +107,9 @@ public class QueryAgentId extends AbstractQuery {
 			qlink.getVisData().getVehiclePositions( positions);
 			for(AgentSnapshotInfo info : positions) {
 				if ((info.getAgentState()== AgentState.PERSON_AT_ACTIVITY) && !OTFLinkAgentsHandler.showParked) continue;
-				double xDist = info.getEasting() - this.x;
-				double yDist = info.getNorthing() - this.y;
+				java.awt.geom.Point2D.Double xy = OTFServerQuadTree.transform(new CoordImpl(info.getEasting(), info.getNorthing()));
+				double xDist = xy.getX() - this.x;
+				double yDist = xy.getY() - this.y;
 				if (this.width == 0) {
 					// search for NEAREST agent to given POINT
 					dist = Math.sqrt(xDist*xDist + yDist*yDist);

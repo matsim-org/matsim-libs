@@ -205,13 +205,13 @@ public class OTFOGLDrawer implements GLEventListener {
 				break;
 			}
 			if(function.equals("Zoom")) { 
-				if (OTFClientControl.getInstance().getOTFVisConfig().isMapOverlayMode()) {
+			//	if (OTFClientControl.getInstance().getOTFVisConfig().isMapOverlayMode()) {
 					// Zooming via a rectangle is disabled in map overlay mode,
 					// because we can only zoom in straight powers of two. Compare Google maps.
-					button = 0;
-				} else {
+		//			button = 0;
+	//			} else {
 					button = 1;
-				}
+//				}
 			}
 			else if (function.equals("Pan")) button = 2;
 			else if (function.equals("Menu")) button = 3;
@@ -660,13 +660,11 @@ public class OTFOGLDrawer implements GLEventListener {
 			popmen.show(this.canvas, e.getX(), e.getY());
 			return;
 		}
-		Point2D.Double origPoint = new Point2D.Double(point.x + this.clientQ.offsetEast, point.y + this.clientQ.offsetNorth);
-		if(this.queryHandler != null) this.queryHandler.handleClick(origPoint,mouseButton);
+		if(this.queryHandler != null) this.queryHandler.handleClick(point,mouseButton);
 	}
 
 	public void handleClick(Rectangle currentRect, int button) {
-		Rectangle2D.Double origRect = new Rectangle2D.Double(currentRect.x + this.clientQ.offsetEast, currentRect.y + this.clientQ.offsetNorth, currentRect.width, currentRect.height);
-		if(this.queryHandler != null) this.queryHandler.handleClick(origRect,button);
+		if(this.queryHandler != null) this.queryHandler.handleClick(new Rectangle2D.Double(currentRect.getX(), currentRect.getY(), currentRect.getWidth(), currentRect.getHeight()), button);
 	}
 
 	@Override

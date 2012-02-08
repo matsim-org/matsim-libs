@@ -25,11 +25,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Executor;
-import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.VisMobsimFeature;
@@ -80,23 +80,11 @@ public class QueryLinkId extends AbstractQuery {
 	
 	private Result result;
 
-	public QueryLinkId(double x,double y) {
-		this.sx = x;
-		this.sy = y;
-	}
-
 	public QueryLinkId(Rectangle2D.Double rect) {
 		this.sx = rect.x;
 		this.sy = rect.y;
 		this.width = rect.width;
 		this.height = rect.height;
-	}
-
-	public QueryLinkId(Rect rect) {
-		this.sx = rect.minX;
-		this.sy = rect.minY;
-		this.width = rect.maxX - sx;
-		this.height = rect.maxY - sy;
 	}
 
 	class AddIdStringExecutor implements Executor<OTFDataWriter> {
@@ -116,12 +104,15 @@ public class QueryLinkId extends AbstractQuery {
 			if(src instanceof VisLink) {
 				Link link = ((VisLink)src).getLink();
 				double alpha = 0.6;
-				double fromX = link.getFromNode().getCoord().getX();
-				double fromY = link.getFromNode().getCoord().getY();
-				double middleX = alpha*fromX + (1.0-alpha)*link.getToNode().getCoord().getX();
-				double middleY = alpha*fromY + (1.0-alpha)*link.getToNode().getCoord().getY();
+				Coord from = link.getFromNode().getCoord();
+				java.awt.geom.Point2D.Double transformedFrom = OTFServerQuadTree.transform(from);
+				double fromX = transformedFrom.getX();
+				double fromY = transformedFrom.getY();
+				Coord to = link.getToNode().getCoord();
+				java.awt.geom.Point2D.Double transformedTo = OTFServerQuadTree.transform(to);
+				double middleX = alpha*fromX + (1.0-alpha)*transformedTo.getX();
+				double middleY = alpha*fromY + (1.0-alpha)*transformedTo.getY();
 				if (nearestOnly) {
-					
 					double xDist = middleX - sx;
 					double yDist = middleY - sy;
 					// search for NEAREST agent to given POINT
@@ -149,14 +140,13 @@ public class QueryLinkId extends AbstractQuery {
 		// just look in a certain region around the actual point, 
 		double regionWidth = (quad.getMaxEasting()-quad.getMinEasting())*0.1;
 		double regionHeight = (quad.getMaxNorthing()-quad.getMinNorthing())*0.1;
-		
+
 		QuadTree.Rect rect;
-		// The quadtree has its own coord system from (0,0) (max-minXY)
-		double qsx = sx - quad.getMinEasting();
-		double qsy = sy - quad.getMinNorthing();
-		
-		if (width == 0) rect = new QuadTree.Rect(qsx-regionWidth, qsy-regionHeight, qsx+regionWidth, qsy+regionHeight);
-		else rect = new QuadTree.Rect(qsx,qsy,qsx+width, qsy+height);
+		if (width == 0) {
+			rect = new QuadTree.Rect(sx-regionWidth, sy-regionHeight, sx+regionWidth, sy+regionHeight);
+		} else {
+			rect = new QuadTree.Rect(sx,sy,sx+width,sy+height);
+		}
 		quad.execute(rect, new AddIdStringExecutor(width == 0));
 	}
 
