@@ -46,7 +46,7 @@ public class CreatePopulationWorkOther implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
 	private Scenario scenario;
 	private Population population;
-	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final/network80links.xml";
+	private String networkFile = "../../shared-svn/studies/ihab/busCorridor/input_final_2/network80links.xml";
 
 		
 	public static void main(String[] args) {
@@ -64,7 +64,7 @@ public class CreatePopulationWorkOther implements Runnable {
 		generatePopulation();
 		
 		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
-		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final/populationBusCorridor80links.xml");
+		populationWriter.write("../../shared-svn/studies/ihab/busCorridor/input_final_2/populationBusCorridor80linksCar.xml");
 	}
 
 	private void fillZoneData() {
@@ -119,8 +119,10 @@ public class CreatePopulationWorkOther implements Runnable {
 //			Coord workLocation = new CoordImpl(5000, 0);
 
 			
-			double homeEndTimeRnd = calculateNormallyDistributedTime(8*60*60, 1*60*60);
-			
+//			double homeEndTimeRnd = calculateNormallyDistributedTime(8*60*60, 1*60*60);
+//			double homeEndTimeRnd = calculateRandomlyDistributedValue(8*3600, 1.5*3600);
+			double homeEndTimeRnd = 8*3600;
+
 			Person person = population.getFactory().createPerson(createId("person_HomeWorkHome_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 			Plan plan = population.getFactory().createPlan();
 
@@ -139,7 +141,7 @@ public class CreatePopulationWorkOther implements Runnable {
 		for (int i=0; i<quantity; i++){
 			Coord homeLocation = getRndCoord();
 			Coord otherLocation = getRndCoord();
-			double homeEndTimeRnd = calculateRandomlyDistributedValue(14 * 60*60, 6*60*60);
+			double homeEndTimeRnd = calculateRandomlyDistributedValue(12.5 * 60*60, 4.5*60*60); // 8 - 17 Uhr
 			
 			Person person = population.getFactory().createPerson(createId("person_HomeOtherHome_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
 			Plan plan = population.getFactory().createPlan();
