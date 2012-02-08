@@ -81,6 +81,10 @@ public class Constants {
 	public static final String GENERATED_PLANS_FILE_NAME = "output_plans.xml.gz";
 	public static final String SCORESTATS_FILE_NAME = "scorestats.txt";
 	public static final String TRAVELDISTANCESSTAT_FILE_NAME = "traveldistancestats.txt";
+	public static final String LOG_FILE_NAME = "logfile.log";
+	public static final String LOG_FILE_WARNINGS_ERRORS_NAME = "logfileWarningsErrors.log";
+	public static final String OUTPUT_CONFIG_FILE_NAME = "output_config.xml.gz";
+	public static final String OUTPUT_NETWORK_FILE_NAME = "output_network.xml.gz";
 	public static final String GENERATED_MATSIM_CONFIG_FILE_NAME = "MATSimConfigFile.xml.gz";
 	public static final String URBANSIM_PARCEL_DATASET_TABLE = "parcel__dataset_table__exported_indicators__";
 	public static final String URBANSIM_PERSON_DATASET_TABLE = "person__dataset_table__exported_indicators__";
@@ -106,6 +110,7 @@ public class Constants {
 	public static final String TRAVEL_DATA_FILE_CSV		= "travel_data.csv";
 	public static final String GRID_DATA_FILE_CSV 		= "grid_data.csv";
 	public static final String ZONES_FILE_CSV 			= "zones.csv";
+	public static final String ZONES_COMPLETE_FILE_CSV 	= "zones_complete.csv";
 	
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
@@ -124,17 +129,19 @@ public class Constants {
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
 	
-	/** test run */
-	public static final int TEST_RUN_SUCCESSFUL = 0;
-	public static final int TEST_RUN_FAILD = -1;
-	
 	/** xsd on matsim.org */
-	public static final String MATSIM_4_URBANSIM_XSD_V1 = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V1 = "/dtd/matsim4urbansim_v1";
-	public static final String XSD_FILE_NAME_V1 = "matsim4urbansim_v1";
-	public static final String MATSIM_4_URBANSIM_XSD_V2 = "http://matsim.org/files/dtd/matsim4urbansim_v2.xsd";
-	public static final String MATSIM_4_URBANSIM_XSD_LOCAL_V2 = "/dtd/matsim4urbansim_v2";
-	public static final String XSD_FILE_NAME_V2 = "matsim4urbansim_v2";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.xsd";
+	public static final String CURRENT_XSD_FILE_NAME = "matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.xsd";
+	public static final String V1_XSD_FILE_NAME = "matsim4urbansim_v1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v1.1.xsd";
+	public static final String V11_XSD_FILE_NAME = "matsim4urbansim_v1.1.xsd";
 	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfig";
 	
 	/** MATSim properties */
@@ -153,6 +160,10 @@ public class Constants {
 	public static final String MATSIM_CONFIG_PARAMETER_SAMPLING_RATE = "samplingRate";
 	public static final String MATSIM_CONFIG_PARAMETER_YEAR = "year";
 	public static final String MATSIM_CONFIG_PARAMETER_TEMP_DIRECTORY = "tempDirectory";
+	
+	/** test run */
+	public static final int TEST_RUN_SUCCESSFUL = 0;
+	public static final int TEST_RUN_FAILD = -1;
 	
 	/** exit codes */
 	public static final int NOT_VALID_PATH	= 0;
@@ -195,7 +206,11 @@ public class Constants {
 	
 	/** ERSA output file header items */
 	public static final String ERSA_ZONE_ID = "zone_id";
+	public static final String ERSA_ZONE_X_COORD = "x_coord_zonecentroid";
+	public static final String ERSA_ZONE_Y_COORD = "y_coord_zonecentroid";
 	public static final String ERSA_PARCEL_ID = "parcel_id";
+	public static final String ERSA_PERSON_ID = "person_id";
+	public static final String ERSA_JOB_ID = "job_id";
 	public static final String ERSA_NEARESTNODE_ID = "nearest_node_id";
 	public static final String ERSA_NEARESTNODE_X_COORD = "x_coord_nn";
 	public static final String ERSA_NEARESTNODE_Y_COORD = "y_coord_nn";
@@ -206,17 +221,21 @@ public class Constants {
 	public static final String ERSA_TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
 	public static final String ERSA_TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
 	public static final String ERSA_TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
+	public static final String ERSA_CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
+	public static final String ERSA_FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
+	public static final String ERSA_WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
 	public static final String ERSA_CENTROID_ACCESSIBILITY = "centroid_accessibility";
 	public static final String ERSA_MEAN_ACCESSIBILITY = "mean_accessibility";
 	public static final String ERSA_DERIVATION_ACCESSIBILITY = "derivation_accessibility";
 	public static final String ERSA_CENTROID = "centroid";
 	public static final String ERSA_MEAN = "mean";
 	public static final String ERSA_DERIVATION = "derivation";
+	public static final String ERSA_PERSONS_COUNT = "persons";
 	public static final String ERSA_WORKPLACES_COUNT = "workplaces";
 	
 	/** Spatial IDs and spatial conversion factors */
 	public static final int SRID_WASHINGTON_NORTH = 2926;// srid 2285 also worked, but was last updated in 2001 instead of 2007
-	public static final int SRID_SWITZERLAND = 21781; // tnicolai: from johannes, check id!!!
+	public static final int SRID_SWITZERLAND = 21781;
 	public static final double FEET_IN_METER_CONVERSION_FACTOR = 0.3048; 			// this means 1ft corresponds to 0.348m
 	public static final double METER_IN_FEET_CONVERSION_FACTOR = 3.280839895013124;	// here 1 meter corresponds to 3.28084ft
 	

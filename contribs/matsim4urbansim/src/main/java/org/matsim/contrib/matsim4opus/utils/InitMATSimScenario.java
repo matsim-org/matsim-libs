@@ -33,7 +33,9 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigType;
 import org.matsim.contrib.matsim4opus.utils.ids.IdFactory;
+import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -43,6 +45,20 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author thomas
+ * 
+ * improvements dec'11:
+ * - adjusting flow- and storage capacities to population sample rate. The
+ * storage capacity includes a fetch factor to avoid backlogs and network breakdown
+ * for small sample rates.
+ * 
+ * improvements jan'12:
+ * - initGlobalSettings sets the number of available processors in the 
+ * 	GlobalConfigGroup to speed up MATSim computations. Before that only
+ * 	2 processors were used even if there are more.
+ * 
+ * improvements feb'12:
+ * - setting mutationrange = 2h for TimeAllocationMutator (this seems to 
+ * shift the depature times ???)
  *
  */
 public class InitMATSimScenario {
@@ -67,6 +83,38 @@ public class InitMATSimScenario {
 	}
 	
 	/**
+	 * constructor
+	 * 
+	 * @param scenario stores MATSim parameters
+	 * @param matsimConfiFile path to matsim config file
+	 */
+	public InitMATSimScenario(ScenarioImpl scenario, String matsimConfiFile){
+		
+		this.scenario = scenario;
+		this.matsimConfig = unmarschal(matsimConfiFile); // loading and initializing MATSim config		
+	}
+	
+	/**
+	 * loading, validating and initializing MATSim config.
+	 */
+	MatsimConfigType unmarschal(String matsimConfigFile){
+		
+		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
+		// the current xsd (checks e.g. the presents and data type of parameter) and generates
+		// an Java object representing the config file.
+		JAXBUnmaschal unmarschal = new JAXBUnmaschal( matsimConfigFile );
+		
+		MatsimConfigType matsimConfig = null;
+		
+		// binding the parameter from the MATSim Config into the JAXB data structure
+		if( (matsimConfig = unmarschal.unmaschalMATSimConfig()) == null){
+			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
+			System.exit(Constants.UNMARSCHALLING_FAILED);
+		}
+		return matsimConfig;
+	}
+	
+	/**
 	 * Transferring all parameter from matsim4urbansim config to internal MATSim config/scenario
 	 * @return boolean true if initialization successful
 	 */
@@ -77,6 +125,7 @@ public class InitMATSimScenario {
 			ConfigType matsimParameter = matsimConfig.getConfig();
 			Matsim4UrbansimType matsim4UrbanSimParameter = matsimConfig.getMatsim4Urbansim();
 			
+			initGlobalSettings(); // tnicolai: experimental
 			initMATSim4UrbanSimParameter(matsim4UrbanSimParameter);
 			initNetwork(matsimParameter);
 			initInputPlansFile(matsimParameter);
@@ -90,7 +139,18 @@ public class InitMATSimScenario {
 			return false;
 		}
 		return true;
-		
+	}
+	
+	/**
+	 * Determines and sets available processors into MATSim config
+	 */
+	private void initGlobalSettings(){
+		log.info("Setting GlobalConfigGroup to config...");
+		GlobalConfigGroup globalCG = (GlobalConfigGroup) scenario.getConfig().getModule(GlobalConfigGroup.GROUP_NAME);
+		globalCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		log.info("GlobalConfigGroup settings:");
+		log.info("Number of Threads: " + Runtime.getRuntime().availableProcessors() + " ...");
+		log.info("... done!");
 	}
 	
 	/**
@@ -99,16 +159,16 @@ public class InitMATSimScenario {
 	 * @param matsim4UrbanSimParameter
 	 */
 	private void initMATSim4UrbanSimParameter(Matsim4UrbansimType matsim4UrbanSimParameter){
-		log.info("Setting MATSim4UrbanSim parameter to config...");
+		log.info("Setting MATSim4UrbanSim to config...");
 		double samplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getSamplingRate();
 		int year = matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
-		String opusHome = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
-		String opusDataPath = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
-		String matsim4Opus = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
-		String matsim4OpusConfig = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusConfig() );
-		String matsim4OpusOutput = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusOutput() );
-		String matsim4OpusTemp = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp() );
-		String matsim4OpusBackup = UtilityCollection.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() ) + UtilityCollection.checkPathEnding( "backup" );
+		String opusHome = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
+		String opusDataPath = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
+		String matsim4Opus = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
+		String matsim4OpusConfig = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusConfig() );
+		String matsim4OpusOutput = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusOutput() );
+		String matsim4OpusTemp = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4OpusTemp() );
+		String matsim4OpusBackup = Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() ) + Paths.checkPathEnding( "backup" );
 		boolean isTestRun = matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
 		boolean backupRunData = matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter = matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
@@ -139,8 +199,7 @@ public class InitMATSimScenario {
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.CUSTOM_PARAMETER, "");
 		scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MEASUREMENT_LOGFILE, Constants.MATSIM_4_OPUS_TEMP + Constants.MEASUREMENT_LOGFILE);
 		
-		log.info("Setting OPUS paths ...");
-		
+		// setting opus paths internally
 		Constants.OPUS_HOME = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_HOME_PARAM);
 		Constants.OPUS_DATA_PATH = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.OPUS_DATA_PATH_PARAM);
 		Constants.MATSIM_4_OPUS = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_PARAM);
@@ -149,7 +208,7 @@ public class InitMATSimScenario {
 		Constants.MATSIM_4_OPUS_TEMP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_TEMP_PARAM);
 		Constants.MATSIM_4_OPUS_BACKUP = scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_4_OPUS_BACKUP_PARAM);
 		
-		log.info("MATSim4UrbanSim Parameter:");
+		log.info("MATSim4UrbanSim settings:");
 		log.info("SamplingRate: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE) );
 		log.info("Year: " + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) ); 
 		log.info("OPUS_HOME: " + Constants.OPUS_HOME );
@@ -182,13 +241,15 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initNetwork(ConfigType matsimParameter){
-		log.info("Setting network to config...");
+		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME);
-		// set values
-		networkCG.setInputFile( networkFile );	// network
-		log.info("... done!");
+		// set network
+		networkCG.setInputFile( networkFile );
+		
+		log.info("NetworkConfigGroup settings:");
 		log.info("Network: " + networkCG.getInputFile());
+		log.info("... done!");
 	}
 	
 	/**
@@ -197,7 +258,7 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initInputPlansFile(ConfigType matsimParameter){
-		log.info("Setting input plans file to config...");
+		log.info("Looking for warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
@@ -216,7 +277,7 @@ public class InitMATSimScenario {
 			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.WARM_START);
 		}
 		else{
-			log.info("Cold Start (no pop file) detected!");
+			log.info("Cold Start (no plans file) detected!");
 			scenario.getConfig().setParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.MATSIM_MODE, Constants.COLD_START);
 		}
 		
@@ -230,13 +291,17 @@ public class InitMATSimScenario {
 	}
 
 	/**
-	 * 
+	 * sets (either a "warm" or "hot" start) a plans file, see above.
 	 */
 	private void setPlansFile(String plansFile) {
+		log.info("Setting PlansConfigGroup to config...");
 		PlansConfigGroup plansCG = (PlansConfigGroup) scenario.getConfig().getModule(PlansConfigGroup.GROUP_NAME);
-		// set values
-		plansCG.setInputFile( plansFile );	// input plans file
+		// set input plans file
+		plansCG.setInputFile( plansFile );
+		
+		log.info("PlansConfigGroup setting:");
 		log.info("Input plans file set to: " + plansCG.getInputFile());
+		log.info("... done!");
 	}
 	
 	/**
@@ -245,12 +310,12 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initControler(ConfigType matsimParameter){
-		log.info("Setting controler to config...");
+		log.info("Setting ControlerConfigGroup to config...");
 		int firstIteration = matsimParameter.getControler().getFirstIteration().intValue();
 		int lastIteration = matsimParameter.getControler().getLastIteration().intValue();
 		ControlerConfigGroup controlerCG = (ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME);
 		// set values
-		controlerCG.setFirstIteration( firstIteration );	// controller (first, last iteration)
+		controlerCG.setFirstIteration( firstIteration );
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( Constants.MATSIM_4_OPUS_OUTPUT );
 		
@@ -258,9 +323,11 @@ public class InitMATSimScenario {
 		hs.add("otfvis");
 		controlerCG.setSnapshotFormat(Collections.unmodifiableSet(hs));
 		
+		log.info("ControlerConfigGroup settings:");
+		log.info("FirstIteration: " + controlerCG.getFirstIteration());
+		log.info("LastIteration: " + controlerCG.getLastIteration());
+		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
 		log.info("... done!");
-		log.info("Controler FirstIteration: " + controlerCG.getFirstIteration() + " LastIteration: " + controlerCG.getLastIteration() + 
-				          " MATSim output directory: " +  controlerCG.getOutputDirectory());
 	}
 	
 	/**
@@ -269,7 +336,7 @@ public class InitMATSimScenario {
 	 * @param matsimParameter
 	 */
 	private void initPlanCalcScore(ConfigType matsimParameter){
-		log.info("Setting planCalcScore to config...");
+		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
 		ActivityParams actType0 = new ActivityParams(activityType_0);
@@ -280,17 +347,20 @@ public class InitMATSimScenario {
 		actType1.setLatestStartTime(9*3600);	// tnicolai: make configurable
 		scenario.getConfig().planCalcScore().addActivityParams( actType0 );
 		scenario.getConfig().planCalcScore().addActivityParams( actType1 );
+		
+		log.info("PlanCalcScore settings:");
+		log.info("Activity_Type_0: " + actType0.getType() + " Typical Duration Activity_Type_0: " + actType0.getTypicalDuration());
+		log.info("Activity_Type_1: " + actType1.getType() + " Typical Duration Activity_Type_1: " + actType1.getTypicalDuration());
+		log.info("Opening Time Activity_Type_1: " + actType1.getOpeningTime()); 
+		log.info("Latest Start Time Activity_Type_1: " + actType1.getLatestStartTime());
 		log.info("... done!");
-		log.info("PlanCalcScore Activity_Type_0: " + actType0.getType() + " Typical Duration Activity_Type_0: " + actType0.getTypicalDuration() + 
-							  " Activity_Type_1: " + actType1.getType() + " Typical Duration Activity_Type_1: " + actType1.getTypicalDuration() + 
-							  " Opening Time Activity_Type_1: " + actType1.getOpeningTime() + " Latest Start Time Activity_Type_1: " + actType1.getLatestStartTime());
 	}
 	
 	/**
 	 * setting simulation
 	 */
 	private void initSimulation(){
-		log.info("Setting simulation to config...");
+		log.info("Setting SimulationConfigGroup to config...");
 		
 		SimulationConfigGroup simulation = new SimulationConfigGroup();
 		
@@ -304,7 +374,7 @@ public class InitMATSimScenario {
 		// Adapting the storageCapFactor has the following reason:
 		// Too low SorageCapacities especially with small sampling 
 		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
-		// This leads to an unstable behavior of the simulation (by breackdowns 
+		// This leads to an unstable behavior of the simulation (by breakdowns 
 		// during the learning progress).
 		// The correction fetch factor introduced here raises the 
 		// storage capacity at low sampling rates and becomes flatten 
@@ -314,7 +384,7 @@ public class InitMATSimScenario {
 			popSampling = 0.01;
 			log.warn("Raised popSampling rate to " + popSampling + " to to avoid erros while calulating the correction fetch factor ...");
 		}
-		// tnicolai: check storage cap fectch factor with kai!!! (dec'11)
+		// tnicolai dec'11
 		double fetchFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
 		double storageCap = popSampling * fetchFactor;
 		
@@ -327,30 +397,35 @@ public class InitMATSimScenario {
 		
 		scenario.getConfig().addSimulationConfigGroup( simulation );
 		
-		log.info("... done!");
-		
+		log.info("SimulationConfigGroup settings:");
 		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() );
+		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
 		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+		log.info("... done!");
 	}
 	
 	/**
 	 * setting strategy
 	 */
 	private void initStrategy(){
-		log.info("Setting strategy to config...");
+		log.info("Setting StrategyConfigGroup to config...");
+		
+		// some modules are disables after 80% of overall iterations, 
+		// last iteration for them determined here tnicolai feb'12
+		int disableStrategyAfterIteration = (int) Math.ceil(scenario.getConfig().controler().getLastIteration() * 0.8);
+		
 		// configure strategies for re-planning tnicolai: make configurable
-		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5); // 5
+		scenario.getConfig().strategy().setMaxAgentPlanMemorySize(5);
 		
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator");
 		timeAlocationMutator.setProbability(0.1);
-		timeAlocationMutator.setDisableAfter(100);
+		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(timeAlocationMutator);
-		// changing mutation range to 2h. tnicolai:feb'12
+		// change mutation range to 2h. tnicolai feb'12
 		scenario.getConfig().setParam("TimeAllocationMutator", "mutationRange", "7200"); 
-				
+		
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
 		changeExpBeta.setModuleName("ChangeExpBeta");
 		changeExpBeta.setProbability(0.9);
@@ -359,12 +434,14 @@ public class InitMATSimScenario {
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
 		reroute.setModuleName("ReRoute_Dijkstra");
 		reroute.setProbability(0.1);
-		reroute.setDisableAfter(100);
+		reroute.setDisableAfter(disableStrategyAfterIteration);
 		scenario.getConfig().strategy().addStrategySettings(reroute);
+		
+		log.info("StrategyConfigGroup settings:");
+		log.info("Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability: " + timeAlocationMutator.getProbability() + " Disable After Itereation: " + timeAlocationMutator.getDisableAfter()); 
+		log.info("Strategy_2: " + changeExpBeta.getModuleName() + " Probability: " + changeExpBeta.getProbability());
+		log.info("Strategy_3_ " + reroute.getModuleName() + " Probability: " + reroute.getProbability() + " Disable After Itereation: " + reroute.getDisableAfter() );
 		log.info("... done!");
-		log.info("Strategy Strategy_1: " + timeAlocationMutator.getModuleName() + " Probability Strategy_1: " + timeAlocationMutator.getProbability() + " Disable After Itereation (Strategy_1): " + timeAlocationMutator.getDisableAfter() + 
-						 " Strategy_2: " + changeExpBeta.getModuleName() + " Probability Strategy_2: " + changeExpBeta.getProbability() +
-						 " Strategy_3_ " + reroute.getModuleName() + " Probability Strategy_3: " + reroute.getProbability() + " Disable After Itereation (Strategy_3): " + reroute.getDisableAfter() );
 	}
 	
 	// Testing fetch  factor calculation for storageCap 

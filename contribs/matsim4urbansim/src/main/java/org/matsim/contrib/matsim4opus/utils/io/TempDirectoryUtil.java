@@ -29,7 +29,6 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.constants.Constants;
-import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 
 
 /**
@@ -54,7 +53,7 @@ public class TempDirectoryUtil {
 		log.info("Creating a custom temp directory");
 		
 		try {
-			String tempPath = UtilityCollection.checkPathEnding( System.getProperty("java.io.tmpdir") );
+			String tempPath = Paths.checkPathEnding( System.getProperty("java.io.tmpdir") );
 			
 			log.info("Creating directory \"" + customDirectory + "\" in temp path \"" + tempPath + "\".");
 		

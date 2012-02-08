@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 
 /**
  * @author thomas
@@ -69,7 +68,7 @@ public class FileCopy {
 	        }
 	        	
 	        // set destination path         
-	        String targetRootName = UtilityCollection.checkPathEnding( root.getCanonicalPath() );
+	        String targetRootName = Paths.checkPathEnding( root.getCanonicalPath() );
 
 	        // list all source files
 	        ArrayList<File> fileNames = listAllFiles(source, true); 
@@ -144,7 +143,7 @@ public class FileCopy {
 	 */
 	public static boolean fileCopy(File sourceFile, File outputFile) throws IOException, Exception{
 
-			log.info("Copying generated outputPlans file " + sourceFile.getCanonicalPath() + " to " + outputFile.getCanonicalPath());
+			log.info("Copying file " + sourceFile.getCanonicalPath() + " to " + outputFile.getCanonicalPath());
 			return writeBinaryFile(readBinaryFile(sourceFile), outputFile);
 	}
 	

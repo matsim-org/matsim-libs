@@ -38,10 +38,10 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig.MatsimConfigTyp
 import org.matsim.contrib.matsim4opus.utils.DateUtil;
 import org.matsim.contrib.matsim4opus.utils.InitMATSimScenario;
 import org.matsim.contrib.matsim4opus.utils.JAXBUnmaschal;
-import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.WorkplaceObject;
 import org.matsim.contrib.matsim4opus.utils.io.FileCopy;
+import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -80,20 +80,18 @@ public class MATSim4UrbanSim {
 		// Stores location of MATSim configuration file
 		String matsimConfiFile = (args!= null && args.length>0) ? args[0].trim():null;
 		// checks if args parameter contains a valid path
-		isValidPath(matsimConfiFile);
-		// loading and initializing MATSim config
-		MatsimConfigType matsimConfig = unmarschal(matsimConfiFile);
-		
+		Paths.isValidPath(matsimConfiFile);
+
 		// get default scenario
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		if( !(new InitMATSimScenario(scenario, matsimConfig)).init() ){
+		if( !(new InitMATSimScenario(scenario, matsimConfiFile)).init() ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
 		}			
+		ScenarioUtils.loadScenario(scenario);
+		
 		// init Benchmark as default
 		benchmark = new Benchmark();
-
-		ScenarioUtils.loadScenario(scenario);
 	}
 	
 	/**
@@ -119,6 +117,8 @@ public class MATSim4UrbanSim {
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
 		readUrbansimParcelModel(readFromUrbansim, parcels, zones);
+		
+		// population generation
 		int pc = benchmark.addMeasure("Population construction");
 		Population newPopulation = readUrbansimPersons(readFromUrbansim, parcels, network);
 		benchmark.stoppMeasurement(pc);
@@ -155,11 +155,7 @@ public class MATSim4UrbanSim {
 	 * @param zones
 	 */
 	void readUrbansimParcelModel(ReadFromUrbansimParcelModel readFromUrbansim, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
-
 		readFromUrbansim.readFacilities(parcels, zones);
-		// write the facilities from the UrbanSim parcel model as a compressed locations.xml file into the temporary directory if they are need in following runs
-		// new FacilitiesWriter(parcels).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.OUTPUT_PARCEL_FILE_GZ ); 	// disabled, since output file will not be re-used
-		// new FacilitiesWriter(zones).write( Constants.OPUS_MATSIM_TEMPORARY_DIRECTORY + Constants.OUTPUT_ZONES_FILE_GZ );		// disabled, since output file will not be re-used
 	}
 	
 	/**
@@ -195,6 +191,8 @@ public class MATSim4UrbanSim {
 
 		// read urbansim persons.  Generates hwh acts as side effect
 		Population newPopulation = readFromUrbansim.readPersons( oldPopulation, parcels, network, Double.parseDouble( scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.SAMPLING_RATE)) ) ;
+		
+		// clean
 		oldPopulation=null;
 		System.gc();
 		
@@ -208,7 +206,6 @@ public class MATSim4UrbanSim {
 	 * @return HashMap
 	 */
 	Map<Id,WorkplaceObject> ReadUrbansimJobs(ReadFromUrbansimParcelModel readFromUrbansim){
-
 		return readFromUrbansim.readZoneBasedWorkplaces();
 	}
 	
@@ -236,30 +233,6 @@ public class MATSim4UrbanSim {
 		
 		// run the iterations, including the post-processing:
 		controler.run() ;
-	}
-	
-	/**
-	 * verifying if args argument contains a valid path. 
-	 * @param args
-	 */
-	void isValidPath(String matsimConfiFile){
-		// test the path to matsim config xml
-		if( matsimConfiFile==null || matsimConfiFile.length() <= 0 || !pathExsits( matsimConfiFile ) ){
-			log.error(matsimConfiFile + " is not a valid path to a MATSim configuration file. SHUTDOWN MATSim!");
-			System.exit(Constants.NOT_VALID_PATH);
-		}
-	}
-	
-	/**
-	 * Checks a given path if it exists
-	 * @param arg path
-	 * @return true if the given file exists
-	 */
-	boolean pathExsits(String matsimConfigFile){
-
-		if( (new File(matsimConfigFile)).exists() )
-			return true;
-		return false;
 	}
 	
 	/**
@@ -313,7 +286,7 @@ public class MATSim4UrbanSim {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 		
 		String saveDirectory = "run" + scenario.getConfig().getParam(Constants.MATSIM_4_URBANSIM_PARAM, Constants.YEAR) + "-" + DateUtil.now();
-		String savePath = UtilityCollection.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
+		String savePath = Paths.checkPathEnding( Constants.MATSIM_4_OPUS_BACKUP + saveDirectory );
 		FileCopy.copyTree(Constants.MATSIM_4_OPUS_TEMP, savePath);
 		
 		String newPlansFile = Constants.MATSIM_4_OPUS_OUTPUT + Constants.GENERATED_PLANS_FILE_NAME;
