@@ -199,20 +199,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	/* package */void add(final QueueVehicle veh, final double now) {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		double departureTime;
-		/*
-		 * It's not the original lane, so there is a fractional rest we add to
-		 * this link's freeSpeedTravelTime
-		 */
-		departureTime = now + this.freespeedTravelTime
-				+ veh.getEarliestLinkExitTime()
-				- Math.floor(veh.getEarliestLinkExitTime());
-		/*
-		 * It's a QueueLane that is directly connected to a QueueNode, so we
-		 * have to floor the freeLinkTravelTime in order the get the same
-		 * results compared to the old mobSim
-		 */
-		departureTime = Math.floor(departureTime);
+		double departureTime = Math.floor(now + this.freespeedTravelTime);
 		veh.setLinkEnterTime(now);
 		veh.setEarliestLinkExitTime(departureTime);
 	}
