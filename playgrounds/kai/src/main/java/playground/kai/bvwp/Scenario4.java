@@ -25,15 +25,26 @@ class Scenario4 { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValues = roadValues.getByType(Type.PV) ;
-				pvValues.setByEntry( Entry.XX, 2000. ) ; // number of persons
-				pvValues.setByEntry( Entry.km, 41. ) ;
-				pvValues.setByEntry( Entry.hrs, 0.43 ) ;
-			}				
+				ValuesForAUserType pvValuesRoad = roadValues.getByType(Type.PV) ;
+				pvValuesRoad.setByEntry( Entry.XX, 3000. ) ; // number of persons
+				pvValuesRoad.setByEntry( Entry.km, 38. ) ;
+				pvValuesRoad.setByEntry( Entry.hrs, 0.45 ) ;
+			}			
 			
-			// rail values are just a copy of the road values:
-			ValuesForAMode railValues = roadValues.createDeepCopy() ;
-			nullfallForOD.setValuesForMode( Mode.rail, railValues ) ;
+			// construct values for the rail mode for this OD relation:
+			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
+			{
+				// passenger traffic:
+				ValuesForAUserType pvValuesRail = railValues.getByType(Type.PV) ;
+				pvValuesRail.setByEntry( Entry.XX, 2000. ) ; // number of persons
+				pvValuesRail.setByEntry( Entry.km, 41. ) ;
+				pvValuesRail.setByEntry( Entry.hrs, 0.43 ) ;
+			}			
+			
+//			
+//			// rail values are just a copy of the road values:
+//			ValuesForAMode railValues = roadValues.createDeepCopy() ;
+//			nullfallForOD.setValuesForMode( Mode.rail, railValues ) ;
 		}
 		
 		// return the base case:
@@ -51,7 +62,7 @@ class Scenario4 { // Relationsbezogen_mit_generalisierten_Kosten
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
-			railValues.getByType(Type.PV).incByEntry( Entry.hrs, -0.08 ) ;
+			railValues.getByType(Type.PV).incByEntry( Entry.hrs, -0.1 ) ;
 			
 			// modify some demand (presumably as a result):
 			double delta = 100. ;
