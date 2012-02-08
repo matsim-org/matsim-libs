@@ -16,7 +16,7 @@ Changes:
   - move the "snapshotFormat" entry which you may have in your "simulation" and/or in your "qsim" configuration group to the "controler" configuration group (mzilske, r16484)
 
 - New features:
-  - OTFVis can display OSM-maps as background (how??)
+  - OTFVis can display OSM-maps as background. Set option "mapOverlayMode" to "true". Also set the coordinate system of your scenario in the "global" section of config. 
 
 - Feature improvements:
   - Major memory improvements in OsmNetworkReader by using Long instead of String for osm-ids (r14944)
