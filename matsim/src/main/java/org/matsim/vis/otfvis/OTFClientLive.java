@@ -24,6 +24,9 @@ import java.awt.BorderLayout;
 
 import javax.swing.SwingUtilities;
 
+import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
+import org.jdesktop.swingx.mapviewer.TileFactory;
+import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.matsim.core.config.Config;
 import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
@@ -100,9 +103,37 @@ public class OTFClientLive {
 				otfClient.getFrame().getContentPane().add(queryControlBar, BorderLayout.SOUTH);
 				mainDrawer.setQueryHandler(queryControl);
 				otfClient.addDrawerAndInitialize(mainDrawer, saver);
+				if (config.otfVis().isMapOverlayMode()) {
+
+					assertZoomLevel17(config);
+					otfClient.addMapViewer(osmTileFactory());
+				}
 				otfClient.show();
 			}
 		});
+	}
+	
+	private static void assertZoomLevel17(Config config) {
+		if(config.otfVis().getMaximumZoom() != 17) {
+			throw new RuntimeException("The OSM layer only works with maximumZoomLevel = 17. Please adjust your config.");
+		}
+	}
+	
+	private static TileFactory osmTileFactory() {
+		final int max=17;
+		TileFactoryInfo info = new TileFactoryInfo(0, 17, 17,
+				256, true, true,
+				"http://tile.openstreetmap.org",
+				"x","y","z") {
+			public String getTileUrl(int x, int y, int zoom) {
+				zoom = max-zoom;
+				String url = this.baseURL +"/"+zoom+"/"+x+"/"+y+".png";
+				return url;
+			}
+
+		};
+		TileFactory tf = new DefaultTileFactory(info);
+		return tf;
 	}
 
 }

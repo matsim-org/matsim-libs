@@ -26,13 +26,24 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.OverlayLayout;
+import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.JXMapViewer;
+import org.jdesktop.swingx.mapviewer.GeoPosition;
+import org.jdesktop.swingx.mapviewer.TileFactory;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.WGS84ToMercator;
 import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFFrame;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
@@ -54,12 +65,39 @@ public final class OTFClient {
 
 	private OTFHostControlBar hostControlBar;
 
-	private JPanel compositePanel;
-
 	private OTFOGLDrawer mainDrawer;
 
 	private OTFServer server;
 
+	private JPanel compositePanel;
+
+	/**
+	 * This method statically installs a custom Swing RepaintManager which ties the map component to the JPanel in which it is 
+	 * layered under the agent drawer. Otherwise the map would repaint itself when it has finished loading a tile, and the agent drawer
+	 * would not notice and would be painted over.
+	 * 
+	 * This looks dirty and probably does not scale to the case where many components would do this, but it is the only way
+	 * I have found, short of patching the JXMapViewer.
+	 * 
+	 */
+	private static void installCustomRepaintManager(final JPanel compositePanel, final JXMapViewer jMapViewer) {
+		RepaintManager myManager = new RepaintManager() {
+			public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
+				// I had the feeling I should call the *previous* RepaintManager here instead of the supertype, but that does not work.
+				// So I call the supertype.
+				super.addDirtyRegion(c, x, y, w, h); 
+				if (c == jMapViewer) {
+					addDirtyRegion(compositePanel, x, y, w, h);
+				}
+			}
+		};
+		RepaintManager.setCurrentManager(myManager);
+	}
+	
+	private static double log2 (double scale) {
+		return Math.log(scale) / Math.log(2);
+	}
+	
 	public OTFClient() {
 		this.frame = new OTFFrame("MATSim OTFVis");
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -130,7 +168,7 @@ public final class OTFClient {
 		SwingUtilities.updateComponentTreeUI(frame);
 	}
 
-	public void addDrawerAndInitialize(OTFOGLDrawer mainDrawer, SettingsSaver saver) {
+	public void addDrawerAndInitialize(final OTFOGLDrawer mainDrawer, SettingsSaver saver) {
 		this.mainDrawer = mainDrawer;
 		log.info("got OTFVis config");
 		frame.getContentPane().add(this.hostControlBar, BorderLayout.NORTH);
@@ -140,20 +178,42 @@ public final class OTFClient {
 		log.info("created drawer");
 		compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
-		compositePanel.add(mainDrawer.getComponent());
+		compositePanel.add(mainDrawer.getComponent());	
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(compositePanel, BorderLayout.CENTER);
 		this.frame.getContentPane().add(panel);
 		hostControlBar.setDrawer(mainDrawer);
 	}
+	
+	public void addMapViewer(TileFactory tf) {
+		final JXMapViewer jMapViewer = new JXMapViewer();
+		jMapViewer.setTileFactory(tf);
+		jMapViewer.setPanEnabled(false);
+		jMapViewer.setZoomEnabled(false);
+		compositePanel.add(jMapViewer);
+		installCustomRepaintManager(compositePanel, jMapViewer);
+		OTFVisConfigGroup otfVisConfig = OTFClientControl.getInstance().getOTFVisConfig();
+		final CoordinateTransformation coordinateTransformation = new WGS84ToMercator.Deproject(otfVisConfig.getMaximumZoom());
+		mainDrawer.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				double x = mainDrawer.getViewBoundsAsQuadTreeRect().centerX + mainDrawer.getQuad().offsetEast;
+				double y = mainDrawer.getViewBoundsAsQuadTreeRect().centerY + mainDrawer.getQuad().offsetNorth;
+				Coord center = coordinateTransformation.transform(new CoordImpl(x,y));
+				double scale = mainDrawer.getScale();
+				int zoom = (int) log2(scale);
+				jMapViewer.setCenterPosition(new GeoPosition(center.getY(), center.getX()));
+				jMapViewer.setZoom(zoom);
+				compositePanel.repaint();
+			}
+
+		});
+	}
 
 	public void show() {
 		mainDrawer.redraw();
 		frame.setVisible(true);
-	}
-
-	public JPanel getCompositePanel() {
-		return compositePanel;
 	}
 
 	public OTFHostControlBar getHostControlBar() {

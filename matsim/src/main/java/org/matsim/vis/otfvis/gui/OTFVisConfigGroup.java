@@ -98,6 +98,8 @@ public class OTFVisConfigGroup extends Module {
 	
 	public static final String NUMBER_OF_LANES = "numberOfLanes" ;
 	public static final String CAPACITY = "capacity" ;
+
+	private static final String MAP_OVERLAY_MODE = "mapOverlayMode";
 	
 	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
 	
@@ -209,11 +211,14 @@ public class OTFVisConfigGroup extends Module {
 		else if (RIGHT_MOUSE_FUNC.equals(key)) {
 			this.rightMouseFunc = value;
 		}
-		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)){
+		else if (SHOW_TELEPORTATION.equalsIgnoreCase(key)) {
 			this.showTeleportedAgents = Boolean.parseBoolean(value);
 		}
-		else if (LINK_WIDTH.equalsIgnoreCase(key)){
+		else if (LINK_WIDTH.equalsIgnoreCase(key)) {
 			this.linkWidth = Float.parseFloat(value);
+		}
+		else if (MAP_OVERLAY_MODE.equalsIgnoreCase(key)) {
+			this.mapOverlayMode = Boolean.parseBoolean(value);
 		}
 //		else if ( SHOW_PARKING.equalsIgnoreCase(key) ) {
 //			this.setShowParking( Boolean.parseBoolean(value) ) ;
@@ -229,14 +234,15 @@ public class OTFVisConfigGroup extends Module {
 		// this is needed for everything since the config dump is based on this.
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(AGENT_SIZE, Float.toString(this.getAgentSize()) );
+		map.put(AGENT_SIZE, Float.toString(this.getAgentSize()));
 		map.put(LEFT_MOUSE_FUNC, getValue(LEFT_MOUSE_FUNC));
 		map.put(MIDDLE_MOUSE_FUNC, getValue(MIDDLE_MOUSE_FUNC));
 		map.put(RIGHT_MOUSE_FUNC, getValue(RIGHT_MOUSE_FUNC));
-		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents() ) ) ;
-		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, this.getLinkWidthIsProportionalTo() );
-		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()) );
-		map.put(COLORING, this.getColoringScheme() ) ;
+		map.put(SHOW_TELEPORTATION, Boolean.toString( this.isShowTeleportedAgents()));
+		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, this.getLinkWidthIsProportionalTo());
+		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
+		map.put(COLORING, this.getColoringScheme());
+		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
 //		map.put(SHOW_PARKING, Boolean.toString( this.isShowParking() ) ) ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
 
@@ -249,8 +255,9 @@ public class OTFVisConfigGroup extends Module {
 		map.put(AGENT_SIZE, "The (initial) size of the agents.  Only a range of numbers is allowed, otherwise otfvis aborts"
 				+ " rather ungracefully, or displays no agents at all." ) ;
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
-		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." ) ;
-		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''") ;
+		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'." );
+		map.put(COLORING, "coloring scheme for otfvis.  Currently (2010) allowed values: ``standard'', ``bvg''");
+		map.put(MAP_OVERLAY_MODE, "Render everything on top of OpenStreetMap tiles.");
 //		map.put(SHOW_PARKING, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 //				"May affect all non-moving items.") ;
 		// can't set this outside the true preferences dialogue since there is additional mechanics involved.  kai, jan'11
