@@ -4,11 +4,11 @@
 <person id="1">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="undefined">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:10" />
-		<leg mode="car">
+		<leg mode="undefined">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -18,11 +18,11 @@
 <person id="2">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="05:59" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="02:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -32,11 +32,11 @@
 <person id="3">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="05:58:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="01:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -60,11 +60,11 @@
 <person id="5">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="06:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -74,11 +74,11 @@
 <person id="6">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -88,11 +88,11 @@
 <person id="7">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -102,11 +102,11 @@
 <person id="8">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -116,11 +116,11 @@
 <person id="9">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -157,11 +157,11 @@
 <person id="12">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -213,11 +213,11 @@
 <person id="16">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -255,11 +255,11 @@
 <person id="19">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -297,11 +297,11 @@
 <person id="22">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -339,11 +339,11 @@
 <person id="25">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -381,11 +381,11 @@
 <person id="28">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -423,11 +423,11 @@
 <person id="31">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -465,11 +465,11 @@
 <person id="34">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -507,11 +507,11 @@
 <person id="37">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -535,11 +535,11 @@
 <person id="39">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -549,11 +549,11 @@
 <person id="40">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="pt">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -591,11 +591,11 @@
 <person id="43">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -647,11 +647,11 @@
 <person id="47">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -703,11 +703,11 @@
 <person id="51">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -759,11 +759,11 @@
 <person id="55">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -815,11 +815,11 @@
 <person id="59">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="ride">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -941,11 +941,11 @@
 <person id="68">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -955,11 +955,11 @@
 <person id="69">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -969,11 +969,11 @@
 <person id="70">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -983,11 +983,11 @@
 <person id="71">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -997,11 +997,11 @@
 <person id="72">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1011,11 +1011,11 @@
 <person id="73">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1025,11 +1025,11 @@
 <person id="74">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1039,11 +1039,11 @@
 <person id="75">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1053,11 +1053,11 @@
 <person id="76">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1067,11 +1067,11 @@
 <person id="77">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1081,11 +1081,11 @@
 <person id="78">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1095,11 +1095,11 @@
 <person id="79">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1109,11 +1109,11 @@
 <person id="80">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1123,11 +1123,11 @@
 <person id="81">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1137,11 +1137,11 @@
 <person id="82">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="walk">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1151,11 +1151,11 @@
 <person id="83">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1165,11 +1165,11 @@
 <person id="84">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1179,11 +1179,11 @@
 <person id="85">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1193,11 +1193,11 @@
 <person id="86">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1207,11 +1207,11 @@
 <person id="87">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1221,11 +1221,11 @@
 <person id="88">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1235,11 +1235,11 @@
 <person id="89">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1249,11 +1249,11 @@
 <person id="90">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1263,11 +1263,11 @@
 <person id="91">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1277,11 +1277,11 @@
 <person id="92">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1291,11 +1291,11 @@
 <person id="93">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1305,11 +1305,11 @@
 <person id="94">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1319,11 +1319,11 @@
 <person id="95">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1333,11 +1333,11 @@
 <person id="96">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1347,11 +1347,11 @@
 <person id="97">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1361,11 +1361,11 @@
 <person id="98">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1375,11 +1375,11 @@
 <person id="99">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
@@ -1389,11 +1389,11 @@
 <person id="100">
 	<plan>
 		<act type="h" x="-25000" y="0" link="1" end_time="06:00" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>2 7 12</route>
 		</leg>
 		<act type="w" x="10000" y="0" link="20" dur="00:30" />
-		<leg mode="car">
+		<leg mode="bike">
 			<route>13 14 15 1</route>
 		</leg>
 		<act type="h" x="-25000" y="0" link="1" />
