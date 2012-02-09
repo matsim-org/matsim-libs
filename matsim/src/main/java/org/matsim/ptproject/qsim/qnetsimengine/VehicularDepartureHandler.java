@@ -21,13 +21,12 @@ package org.matsim.ptproject.qsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.ptproject.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.ptproject.qsim.interfaces.DepartureHandler;
 
-class VehiclularDepartureHandler implements DepartureHandler {
+class VehicularDepartureHandler implements DepartureHandler {
 
 	/*
 	 * What to do when some agent wants to drive their vehicle but it isn't there.
@@ -35,18 +34,18 @@ class VehiclularDepartureHandler implements DepartureHandler {
 	 * for the car to arrive, or throw an exception.
 	 */
 	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION };
-	
-	private static Logger log = Logger.getLogger(VehiclularDepartureHandler.class);
+
+	private static Logger log = Logger.getLogger(VehicularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 
 	private VehicleBehavior vehicleBehavior;
 
 	private QNetsimEngine qNetsimEngine;
-	
+
 	private String transportMode ;
-	
-	VehiclularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
+
+	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportMode = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainMode() ;
@@ -54,8 +53,7 @@ class VehiclularDepartureHandler implements DepartureHandler {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
-//		if (agent.getMode().equals(TransportMode.car)) {
-			if (agent.getMode().equals(this.transportMode)) {
+		if (agent.getMode().equals(this.transportMode)) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
 				return true ;
