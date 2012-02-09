@@ -30,7 +30,11 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.ptproject.qsim.multimodalsimengine.router.util.TravelTimeFactoryWrapper;
 
+import playground.thibautd.router.BaseTripRouterBuilder;
+import playground.thibautd.router.CompositeTripRouterBuilder;
 import playground.thibautd.router.PlanRouterWrapper;
+import playground.thibautd.router.TeleportationPtTripRouterBuilder;
+import playground.thibautd.router.TransitTripRouterBuilder;
 import playground.thibautd.router.TripRouterFactory;
 
 /**
@@ -41,10 +45,10 @@ public class MultiLegRoutingControler extends Controler {
 		super(config);
 	}
 
-	@Override
-	protected void setUp() {
-		super.setUp();
-	}
+	//@Override
+	//protected void setUp() {
+	//	super.setUp();
+	//}
 
 	//TODO: check particular settings and handle them
 	@Override
@@ -76,14 +80,34 @@ public class MultiLegRoutingControler extends Controler {
 			persFactory = new TravelTimeFactoryWrapper( getTravelTimeCalculator() );
 		}
 
+		CompositeTripRouterBuilder builder = new CompositeTripRouterBuilder();
+
+		// Base handlers
+		builder.addBuilder(
+				new BaseTripRouterBuilder(
+					getConfig().plansCalcRoute(),
+					getConfig().planCalcScore()));
+
+		// PT handler: depends on the type of PT simulation
+		if (getConfig().scenario().isUseTransit()) {
+			builder.addBuilder(
+					new TransitTripRouterBuilder(
+						getTransitRouterFactory()));
+		}
+		else {
+			builder.addBuilder(
+					new TeleportationPtTripRouterBuilder(
+						getConfig().plansCalcRoute(),
+						getConfig().planCalcScore()));
+		}
+
 		return new TripRouterFactory(
-				getConfig().plansCalcRoute(),
-				getConfig().planCalcScore(),
 				getNetwork(),
 				getTravelCostCalculatorFactory(),
 				persFactory,
 				getLeastCostPathCalculatorFactory(),
-				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory());
+				((PopulationFactoryImpl) (getPopulation().getFactory())).getModeRouteFactory(),
+				builder);
 	}
 }
 

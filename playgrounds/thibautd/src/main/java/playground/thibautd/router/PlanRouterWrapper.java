@@ -28,11 +28,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlansCalcRoute;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PersonalizableTravelCost;
 import org.matsim.core.router.util.PersonalizableTravelTime;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
@@ -112,15 +114,7 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 		double now = depTime;
 
 		for (PlanElement pe : trip) {
-			if (pe instanceof Activity) {
-				now = ((Activity) pe).getEndTime();
-			}
-			else if (pe instanceof Leg) {
-				now += ((Leg) pe).getTravelTime();
-			}
-			else {
-				throw new RuntimeException( "unhandled plan element type "+pe.getClass() );
-			}
+			now = updateNow( now , pe );
 		}
 
 		return now - depTime;
@@ -131,5 +125,33 @@ public class PlanRouterWrapper extends PlansCalcRoute {
 		return tripRouterFactory.getModeRouteFactory();
 	}
 
+	private static double updateNow(
+			final double now,
+			final PlanElement pe) {
+		if (pe instanceof Activity) {
+			Activity act = (Activity) pe;
+			double endTime = act.getEndTime();
+			double startTime = act.getStartTime();
+			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			if (endTime != Time.UNDEFINED_TIME) {
+				// use fromAct.endTime as time for routing
+				return endTime;
+			}
+			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+				// use fromAct.startTime + fromAct.duration as time for routing
+				return startTime + dur;
+			}
+			else if (dur != Time.UNDEFINED_TIME) {
+				// use last used time + fromAct.duration as time for routing
+				return now + dur;
+			}
+			else {
+				throw new RuntimeException("activity has neither end-time nor duration." + act);
+			}
+		}
+		else {
+			return now + ((Leg) pe).getTravelTime();
+		}
+	}
 }
 

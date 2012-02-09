@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.LegImpl;
 
@@ -104,15 +105,14 @@ public class TripRouter {
 				if (checker.isStageActivity( act.getType() )) {
 					currentTrip.add( act );
 				}
-				else if (currentTrip.size() > 1) {
-					Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
-					// set the time attributes?
-					simplifiedPlan.add( newLeg );
-					currentTrip.clear();
-				}
-				else if (currentTrip.size() == 1) {
-					simplifiedPlan.addAll( currentTrip );
-					currentTrip.clear();
+				else {
+					if (currentTrip.size() > 0) {
+						Leg newLeg = new LegImpl( identifyMainMode( currentTrip ) );
+						// set the time attributes?
+						simplifiedPlan.add( newLeg );
+						currentTrip.clear();
+					}
+					simplifiedPlan.add( act );
 				}
 			}
 			else if (currentElement instanceof Leg) {
@@ -136,7 +136,7 @@ public class TripRouter {
 	 * @param person the {@link Person} to route
 	 * @return a list of {@link PlanElement}, in proper order, representing the trip.
 	 *
-	 * @throws IllegalArgumentException if no RoutingModule is registered for the
+	 * @throws UnknownModeException if no RoutingModule is registered for the
 	 * given mode.
 	 */
 	public List<? extends PlanElement> calcRoute(
@@ -155,16 +155,20 @@ public class TripRouter {
 					person);
 		}
 
-		throw new IllegalArgumentException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
+		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
 	}
 
 	// TODO: include a "main mode" attribute in leg, and use it
 	private static String identifyMainMode(final List<PlanElement> trip) {
-		if (trip.size() == 1) {
-			return ((Leg) trip.get( 0 )).getMode();
-		}
-		else {
-			return ((Leg) trip.get( 2 )).getMode();
+		String mode = ((Leg) trip.get( 0 )).getMode();
+
+		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
+	}
+
+	public static class UnknownModeException extends RuntimeException {
+		private UnknownModeException(
+				final String msg) {
+			super( msg );
 		}
 	}
 }

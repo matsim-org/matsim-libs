@@ -47,33 +47,33 @@ public class TripRouterFactory implements MatsimFactory {
 	private final ModeRouteFactory modeRouteFactory;
 	private final TripRouterBuilder builder;
 
-	/**
-	 * Default constructor: uses a {@link TripRouterBuilderImpl} to configure
-	 * the {@link TripRouter}.
-	 *
-	 * @param routeConfigGroup
-	 * @param scoreConfigGroup
-	 * @param network
-	 * @param travelCostCalculatorFactory
-	 * @param travelTimeFactory
-	 * @param leastCostPathAlgoFactory
-	 * @param modeRouteFactory
-	 */
-	public TripRouterFactory(
-			final PlansCalcRouteConfigGroup routeConfigGroup,
-			final PlanCalcScoreConfigGroup scoreConfigGroup,
-			final Network network,
-			final TravelCostCalculatorFactory travelCostCalculatorFactory,
-			final PersonalizableTravelTimeFactory travelTimeFactory,
-			final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
-			final ModeRouteFactory modeRouteFactory) {
-		this( network,
-				travelCostCalculatorFactory,
-				travelTimeFactory,
-				leastCostPathAlgoFactory,
-				modeRouteFactory,
-				new TripRouterBuilderImpl( routeConfigGroup , scoreConfigGroup ));
-	}
+	///**
+	// * Default constructor: uses a {@link TripRouterBuilderImpl} to configure
+	// * the {@link TripRouter}.
+	// *
+	// * @param routeConfigGroup
+	// * @param scoreConfigGroup
+	// * @param network
+	// * @param travelCostCalculatorFactory
+	// * @param travelTimeFactory
+	// * @param leastCostPathAlgoFactory
+	// * @param modeRouteFactory
+	// */
+	//public TripRouterFactory(
+	//		final PlansCalcRouteConfigGroup routeConfigGroup,
+	//		final PlanCalcScoreConfigGroup scoreConfigGroup,
+	//		final Network network,
+	//		final TravelCostCalculatorFactory travelCostCalculatorFactory,
+	//		final PersonalizableTravelTimeFactory travelTimeFactory,
+	//		final LeastCostPathCalculatorFactory leastCostPathAlgoFactory,
+	//		final ModeRouteFactory modeRouteFactory) {
+	//	this( network,
+	//			travelCostCalculatorFactory,
+	//			travelTimeFactory,
+	//			leastCostPathAlgoFactory,
+	//			modeRouteFactory,
+	//			new TripRouterBuilderImpl( routeConfigGroup , scoreConfigGroup ));
+	//}
 
 
 	/**

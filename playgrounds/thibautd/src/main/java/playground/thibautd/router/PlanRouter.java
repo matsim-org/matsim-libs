@@ -91,42 +91,49 @@ public class PlanRouter implements PlanAlgorithm {
 		Iterator<PlanElement> pes = planStructure.iterator();
 		Activity currentAct =  (Activity) pes.next();
 		Facility origin = toFacility( currentAct );
-		Leg trip = null;
+		Leg legTrip = null;
+		List<? extends PlanElement> trip = null;
 
 		double now = 0;
 		newPlanElements.add( currentAct );
 		while (pes.hasNext()) {
-			// strict act/leg alternance here
-			trip = (Leg) pes.next();
-			double endTime = currentAct.getEndTime();
-			double startTime = currentAct.getStartTime();
-			double dur = (currentAct instanceof ActivityImpl ? ((ActivityImpl) currentAct).getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				now = endTime;
+			// normally, strict act/leg alternance here (trips replaced by legs).
+			// If not, throw an exception with an informative debugging message.
+			try {
+				legTrip = (Leg) pes.next();
 			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				now = startTime + dur;
-			}
-			else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				now += dur;
-			}
-			else {
-				throw new RuntimeException("activity of plan of person " + plan.getPerson().getId() + " has neither end-time nor duration." + currentAct);
+			catch (ClassCastException e) {
+				throw new RuntimeException( "agent "+person.getId()+": unexpected leg/act alternance in structure "+planStructure );
 			}
 
-			currentAct = (Activity) pes.next();
+			now = updateNow( now , currentAct );
+			
+			try {
+				currentAct = (Activity) pes.next();
+			}
+			catch (ClassCastException e) {
+				throw new RuntimeException( "agent "+person.getId()+": unexpected leg/act alternance in structure "+planStructure );
+			}
+
 			destination = toFacility( currentAct );
 
-			newPlanElements.addAll(
-					routingHandler.calcRoute(
-						trip.getMode(),
-						origin,
-						destination,
-						now,
-						person));
+			try {
+				trip = routingHandler.calcRoute(
+							legTrip.getMode(),
+							origin,
+							destination,
+							now,
+							person);
+			}
+			catch (TripRouter.UnknownModeException e) {
+				throw new RuntimeException( "agent "+person.getId()+": unexpected mode in structure "+planStructure , e );
+			}
+
+			newPlanElements.addAll( trip );
+
+			for (PlanElement pe : trip) {
+				now = updateNow( now , pe );
+			}
 
 			newPlanElements.add( currentAct );
 			origin = destination;
@@ -135,6 +142,9 @@ public class PlanRouter implements PlanAlgorithm {
 		updatePlanElements( plan , newPlanElements );
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// helpers
+	// /////////////////////////////////////////////////////////////////////////
 	private Facility toFacility(final Activity act) {
 		if (facilities != null) {
 			return facilities.getFacilities().get( act.getFacilityId() );
@@ -151,6 +161,37 @@ public class PlanRouter implements PlanAlgorithm {
 		pes.clear();
 		pes.addAll( newPlanElements );
 	}
+
+	private static double updateNow(
+			final double now,
+			final PlanElement pe) {
+		if (pe instanceof Activity) {
+			Activity act = (Activity) pe;
+			double endTime = act.getEndTime();
+			double startTime = act.getStartTime();
+			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			if (endTime != Time.UNDEFINED_TIME) {
+				// use fromAct.endTime as time for routing
+				return endTime;
+			}
+			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+				// use fromAct.startTime + fromAct.duration as time for routing
+				return startTime + dur;
+			}
+			else if (dur != Time.UNDEFINED_TIME) {
+				// use last used time + fromAct.duration as time for routing
+				return now + dur;
+			}
+			else {
+				throw new RuntimeException("activity has neither end-time nor duration." + act);
+			}
+		}
+		else {
+			return now + ((Leg) pe).getTravelTime();
+		}
+	}	
+
+
 
 	private static class ActivityWrapperFacility implements Facility {
 		private final Activity act;

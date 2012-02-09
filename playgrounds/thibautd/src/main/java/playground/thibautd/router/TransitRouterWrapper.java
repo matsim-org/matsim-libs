@@ -19,15 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * Wraps a {@link TransitRouter}.
@@ -59,11 +67,70 @@ public class TransitRouterWrapper implements RoutingModeHandler {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		return router.calcRoute(
+		List<Leg> baseTrip = router.calcRoute(
 				fromFacility.getCoord(),
 				toFacility.getCoord(),
 				departureTime,
 				person);
+
+		TransitSchedule schedule = router.getSchedule();
+		List<PlanElement> trip = new ArrayList<PlanElement>();
+
+		// the following was executed in PlansCalcTransitRoute at plan insertion.
+		Leg firstLeg = baseTrip.get(0);
+		Id fromLinkId = fromFacility.getLinkId();
+		Id toLinkId = null;
+		if (baseTrip.size() > 1) { // at least one pt leg available
+			toLinkId = (baseTrip.get(1).getRoute()).getStartLinkId();
+		} else {
+			toLinkId = toFacility.getLinkId();
+		}
+
+		//XXX: use ModeRouteFactory instead?
+		firstLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+
+		Leg lastLeg = baseTrip.get(baseTrip.size() - 1);
+		toLinkId = toFacility.getLinkId();
+		if (baseTrip.size() > 1) { // at least one pt leg available
+			fromLinkId = (baseTrip.get(baseTrip.size() - 2).getRoute()).getEndLinkId();
+		}
+
+		//XXX: use ModeRouteFactory instead?
+		lastLeg.setRoute(new GenericRouteImpl(fromLinkId, toLinkId));
+
+		boolean isFirstLeg = true;
+		Coord nextCoord = null;
+		for (Leg leg2 : baseTrip) {
+			if (isFirstLeg) {
+				trip.add( leg2 );
+				isFirstLeg = false;
+			}
+			else {
+				if (leg2.getRoute() instanceof ExperimentalTransitRoute) {
+					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg2.getRoute();
+					ActivityImpl act =
+						new ActivityImpl(
+								PtConstants.TRANSIT_ACTIVITY_TYPE, 
+								schedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), 
+								tRoute.getStartLinkId());
+					act.setMaximumDuration(0.0);
+					trip.add(act);
+					nextCoord = schedule.getFacilities().get(tRoute.getEgressStopId()).getCoord();
+				}
+				else { // walk legs don't have a coord, use the coord from the last egress point
+					ActivityImpl act =
+						new ActivityImpl(
+								PtConstants.TRANSIT_ACTIVITY_TYPE,
+								nextCoord, 
+								leg2.getRoute().getStartLinkId());
+					act.setMaximumDuration(0.0);
+					trip.add(act);
+				}
+				trip.add(leg2);
+			}
+		}
+
+		return trip;
 	}
 
 	@Override
