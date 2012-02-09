@@ -19,6 +19,7 @@ package org.matsim.contrib.networkEditor.run;
 
 import javax.swing.JFileChooser;
 
+import org.matsim.contrib.networkEditor.utils.OsmImport;
 import org.matsim.contrib.networkEditor.visualizing.NetVisualizerPanel;
 
 /**
@@ -178,10 +179,9 @@ public class NetworkEditor extends javax.swing.JFrame {
 	}//GEN-LAST:event_resizeHandler
 
 	private void btnSaveNetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveNetActionPerformed
-		// Save Network
 		JFileChooser chooser = new JFileChooser();
 		chooser.setApproveButtonText("Save");
-		int state = chooser.showOpenDialog(null);
+		int state = chooser.showSaveDialog(null);
 		String path = "";
 		if(state == JFileChooser.APPROVE_OPTION) {
 			path = chooser.getSelectedFile().getAbsolutePath();
@@ -190,13 +190,11 @@ public class NetworkEditor extends javax.swing.JFrame {
 	}//GEN-LAST:event_btnSaveNetActionPerformed
 
 	private void btnSaveCountsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveCountsActionPerformed
-		// Save Counts
 		JFileChooser chooser = new JFileChooser();
 		chooser.setApproveButtonText("Save");
-		int state = chooser.showOpenDialog(null);
-		String path = "";
+		int state = chooser.showSaveDialog(null);
 		if(state == JFileChooser.APPROVE_OPTION) {
-			path = chooser.getSelectedFile().getAbsolutePath();
+			String path = chooser.getSelectedFile().getAbsolutePath();
 			netVisFrame.saveCounts(path);
 		}
 	}//GEN-LAST:event_btnSaveCountsActionPerformed
@@ -204,9 +202,8 @@ public class NetworkEditor extends javax.swing.JFrame {
 	private void btnReadNetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReadNetActionPerformed
 		JFileChooser chooser = new JFileChooser();
 		int state = chooser.showOpenDialog(null);
-		String path = "";
 		if(state == JFileChooser.APPROVE_OPTION) {
-			path = chooser.getSelectedFile().getAbsolutePath();
+			String path = chooser.getSelectedFile().getAbsolutePath();
 			if(!netVisFrame.loadNetFromFile(path))
 				return;
 			btnSaveNet.setEnabled(true);
@@ -231,10 +228,17 @@ public class NetworkEditor extends javax.swing.JFrame {
 		JFileChooser chooser = new JFileChooser();
 		int state = chooser.showOpenDialog(null);
 		String path = "";
-		if(state == JFileChooser.APPROVE_OPTION) {
-			path = chooser.getSelectedFile().getAbsolutePath();
-			if(!netVisFrame.loadNetFromOSM(path))
+		if (state == JFileChooser.APPROVE_OPTION) {
+			OsmImport dlg = new OsmImport(this);
+			dlg.setVisible(true);
+			String crs = dlg.getIdentifiedCrsString();
+			if (crs == null) {
 				return;
+			}
+			path = chooser.getSelectedFile().getAbsolutePath();
+			if(!netVisFrame.loadNetFromOSM(path, crs)) {
+				return;
+			}
 			btnSaveNet.setEnabled(true);
 			btnSaveCounts.setEnabled(true);
 			btnReadCounts.setEnabled(true);
@@ -244,13 +248,11 @@ public class NetworkEditor extends javax.swing.JFrame {
 	}//GEN-LAST:event_btnReadOsmActionPerformed
 
 	private void btnExportShpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportShpActionPerformed
-		// Exportar a .shp
 		JFileChooser chooser = new JFileChooser();
-		chooser.setApproveButtonText("Salvar");
-		int state = chooser.showOpenDialog(null);
-		String path = "";
+		chooser.setApproveButtonText("Save");
+		int state = chooser.showSaveDialog(null);
 		if(state == JFileChooser.APPROVE_OPTION) {
-			path = chooser.getSelectedFile().getAbsolutePath();
+			String path = chooser.getSelectedFile().getAbsolutePath();
 			this.netVisFrame.saveNetworkAsESRI(path);
 		}
 	}//GEN-LAST:event_btnExportShpActionPerformed
@@ -264,7 +266,7 @@ public class NetworkEditor extends javax.swing.JFrame {
 		//netVisFrame.setSize(this.getSize().width-20, this.getSize().height-30);
 		this.mainPanel.add(netVisFrame);
 		//netVisFrame.setVisible(true);
-//		this.setSize(this.getWidth() + 1, this.getHeight()); // force relayout
+		this.setSize(this.getWidth() + 1, this.getHeight()); // force relayout
 		this.mainPanel.revalidate();
 		this.validate();
 		this.invalidate();

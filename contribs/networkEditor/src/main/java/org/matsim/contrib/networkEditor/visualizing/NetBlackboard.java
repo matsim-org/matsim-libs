@@ -93,11 +93,11 @@ public class NetBlackboard extends javax.swing.JPanel {
 	/**
 	 * The possible modes of the board
 	 */
-	public enum mode{NONE, MOVING, SELECTION, PAINTING, CUTTING};
+	public enum Mode{NONE, MOVING, SELECTION, PAINTING, CUTTING};
 	/**
 	 * The current mode of the board
 	 */
-	protected mode actualMode;
+	protected Mode actualMode = Mode.SELECTION;
 	/**
 	 * The line draw over the board for making a new node
 	 */
@@ -156,7 +156,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Initializes the variables
 	 */
 	private void initVars() {
-		actualMode = mode.NONE;
+		actualMode = Mode.SELECTION;
 		activeNode = null;
 		activeLink = null;
 		activeLink = null;
@@ -212,7 +212,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 * Sets the mode mode of the board, changing its current mode
 	 * @param m the new mode to be set
 	 */
-	public void setMode(mode m) {
+	public void setMode(Mode m) {
 		actualMode = m;
 		//activeLink = null;
 		activeNode = null;
@@ -322,6 +322,7 @@ public class NetBlackboard extends javax.swing.JPanel {
         jLabel2.setText("Network name:");
 
         nameLabel.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        nameLabel.setText(" ");
         nameLabel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 nameLabelMouseClicked(evt);
@@ -330,7 +331,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 
         btnTolerance.setBackground(java.awt.Color.white);
         btnTolerance.setText("T");
-        btnTolerance.setToolTipText("Modificar Tolerancia");
+        btnTolerance.setToolTipText("Node Selection Tolerance");
         btnTolerance.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         btnTolerance.setMaximumSize(new java.awt.Dimension(15, 15));
         btnTolerance.setMinimumSize(new java.awt.Dimension(15, 15));
@@ -343,7 +344,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 
         jButton2.setBackground(java.awt.Color.white);
         jButton2.setText("D");
-        jButton2.setToolTipText("Volver doble vía");
+        jButton2.setToolTipText("Add Reverse Link");
         jButton2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jButton2.setMaximumSize(new java.awt.Dimension(15, 15));
         jButton2.setMinimumSize(new java.awt.Dimension(15, 15));
@@ -366,25 +367,25 @@ public class NetBlackboard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblCoordinates, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnTolerance, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE))
+                    .addComponent(lblCoordinates, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(38, 38, 38)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(minLabel)
-                                .addGap(150, 150, 150)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(maxLabel))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(degradeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(capacityToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(degradeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(capacityToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnTolerance, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -393,19 +394,20 @@ public class NetBlackboard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(nameLabel)
                     .addComponent(capacityToggle, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(degradeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnTolerance, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(minLabel)
-                            .addComponent(maxLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 300, Short.MAX_VALUE)
+                        .addComponent(maxLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 291, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnTolerance, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(minLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(lblCoordinates)))
                 .addContainerGap())
         );
@@ -430,18 +432,18 @@ public class NetBlackboard extends javax.swing.JPanel {
 			}
 			this.repaint();
 		}else if(evt.getButton() == java.awt.event.MouseEvent.BUTTON1) {
-			if(actualMode == mode.NONE)
+			if(actualMode == Mode.NONE)
 				return;
-			else if(actualMode == mode.SELECTION) {
+			else if(actualMode == Mode.SELECTION) {
 				CoordImpl mousePos = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
 				this.setActiveSomething(mousePos);
 				this.controls.updateTable();
 				/*if(activeLink != null)
                     addLinkInSelectedLinkList(activeLink, true);*/
-			} else if(actualMode == mode.PAINTING) {
+			} else if(actualMode == Mode.PAINTING) {
 				if(line.active == false) {
 					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
-					LinkNodeCoord lnc = setLinePoint(c);
+					LinkNodeCoord lnc = setLinePointForceNode(c);
 					line.start = inverseTransform(lnc.coord);
 					line.linkClosestToStart = lnc.link;
 					line.nodeClosestToStart = lnc.node;
@@ -449,7 +451,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 					line.active = true;
 				} else {
 					Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
-					LinkNodeCoord lnc = setLinePoint(c);
+					LinkNodeCoord lnc = setLinePointForceNode(c);
 					line.end = lnc.coord;
 					line.start = transform(line.start);
 					line.linkClosestToEnd = lnc.link;
@@ -457,14 +459,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 					createLink(line);
 					line = new LineOnBoard();
 				}
-			} else if(actualMode == mode.CUTTING) {
+			} else if(actualMode == Mode.CUTTING) {
 				if(activeLink == null) {
-					javax.swing.JOptionPane.showMessageDialog(this, "Debe seleccionar un enlace", null, javax.swing.JOptionPane.INFORMATION_MESSAGE);
+					javax.swing.JOptionPane.showMessageDialog(this, "You must select a link.", null, javax.swing.JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
 				Coord c = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
 				if(this.splitActiveLink(inverseTransform(c))==false)
-					javax.swing.JOptionPane.showMessageDialog(this, "Corte inválido", null, javax.swing.JOptionPane.WARNING_MESSAGE);
+					javax.swing.JOptionPane.showMessageDialog(this, "Invalid selection, link not cut.", null, javax.swing.JOptionPane.WARNING_MESSAGE);
 			}
 			this.repaint();
 		}
@@ -496,32 +498,28 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}//GEN-LAST:event_formKeyTyped
 
 	private void formMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseEntered
-		// TODO add your handling code here:
 		this.requestFocusInWindow();
-		if(this.actualMode == mode.NONE)
+		if(this.actualMode == Mode.NONE)
 			this.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-		else if(this.actualMode == mode.PAINTING) {
+		else if(this.actualMode == Mode.PAINTING) {
 			Toolkit toolkit = Toolkit.getDefaultToolkit();
 			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/pencil.gif").getPath());
 			Point hotSpot = new Point(0,0);
 			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Pencil");
-			//System.out.println(image + " " + cursor);
 			this.setCursor(cursor);
-		} else if(this.actualMode == mode.SELECTION)
-			this.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-		else if(actualMode == mode.MOVING) {
+		} else if(this.actualMode == Mode.SELECTION)
+			this.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+		else if(actualMode == Mode.MOVING) {
 			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/hand.gif").getPath());
+			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/move.png").getPath());
 			Point hotSpot = new Point(0,0);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Hand");
-			//System.out.println(image + " " + cursor);
+			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Move");
 			this.setCursor(cursor);
-		} else if(actualMode == mode.CUTTING) {
+		} else if(actualMode == Mode.CUTTING) {
 			Toolkit toolkit = Toolkit.getDefaultToolkit();
 			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/scissors.png").getPath());
-			Point hotSpot = new Point(20,0);
+			Point hotSpot = new Point(20,10);
 			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Scissor");
-			//System.out.println(image + " " + cursor);
 			this.setCursor(cursor);
 		}
 	}//GEN-LAST:event_formMouseEntered
@@ -545,7 +543,6 @@ public class NetBlackboard extends javax.swing.JPanel {
 			moveViewBox(getWidth()*0.02, 0);
 			repaint();
 		} else if(keyCode == java.awt.event.KeyEvent.VK_CONTROL) {
-			//System.out.println("LoL");
 			isControlPressed = true;
 		}
 	}//GEN-LAST:event_formKeyPressed
@@ -562,16 +559,10 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}//GEN-LAST:event_formMouseWheelMoved
 
 	private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
-		if(actualMode == mode.MOVING && move.active == false) {
+		if(actualMode == Mode.MOVING && move.active == false) {
 			move.active = true;
 			move.start = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/closedHand.gif").getPath());
-			Point hotSpot = new Point(0,0);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Closed Hand");
-			//System.out.println(image + " " + cursor);
-			this.setCursor(cursor);
-		} else if(actualMode == mode.SELECTION && selectionSquare.active == false) {
+		} else if(actualMode == Mode.SELECTION && selectionSquare.active == false) {
 			if(isControlPressed == false)
 				this.selectedLinkList.clear();
 			selectionSquare.active = true;
@@ -581,18 +572,12 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}//GEN-LAST:event_formMousePressed
 
 	private void formMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseReleased
-		if(actualMode == mode.MOVING && move.active == true) {
+		if(actualMode == Mode.MOVING && move.active == true) {
 			move.end = new CoordImpl(this.getMousePosition().x, this.getMousePosition().y);
 			this.moveViewBox(-(move.end.getX()-move.start.getX()), -(move.end.getY()-move.start.getY()));
 			move.active = false;
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Image image = toolkit.getImage(getClass().getResource("/org/matsim/contrib/networkEditor/images/hand.gif").getPath());
-			Point hotSpot = new Point(0,0);
-			Cursor cursor = toolkit.createCustomCursor(image, hotSpot, "Hand");
-			//System.out.println(image + " " + cursor);
-			this.setCursor(cursor);
 			this.repaint();
-		} else if(actualMode == mode.SELECTION && selectionSquare.active == true) {
+		} else if(actualMode == Mode.SELECTION && selectionSquare.active == true) {
 			Point p = this.getMousePosition();
 			if(p != null) {
 				selectionSquare.end = new CoordImpl(p.x, p.y);
@@ -1056,6 +1041,14 @@ public class NetBlackboard extends javax.swing.JPanel {
 		return lnc;
 	}
 
+	private LinkNodeCoord setLinePointForceNode(Coord mouse) {
+		LinkNodeCoord lnc = new LinkNodeCoord();
+		Node nearest = getNearestNode(inverseTransform(mouse));
+		lnc.coord = transform(nearest.getCoord());
+		lnc.node = nearest;
+		return lnc;
+	}
+
 	/**
 	 * Moves the view box by some difference over x and y.
 	 * @param dx
@@ -1148,7 +1141,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 	}
 
 	public Link makeDoubleWay(Link link){
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(getRandomLinkId(), link.getToNode().getId(), link.getFromNode().getId());
+		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(getRandomLinkId(), link.getToNode(), link.getFromNode());
 		newLink.setCapacity(link.getCapacity());
 		newLink.setLength(link.getLength());
 		newLink.setFreespeed(link.getFreespeed());
@@ -1182,7 +1175,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 			endAdded = true;
 		}
 		IdImpl id = getRandomLinkId();
-		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start.getId(), end.getId());
+		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start, end);
 		newLink.setLength(newLink.getEuklideanDistance());
 		newLink.setCapacity(600.0);
 		newLink.setFreespeed(8.3333);
@@ -1425,7 +1418,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		else
 			g2.setColor(Color.BLUE);
 		Coord transformed = transform(node.getCoord());
-		g2.fillOval((int)transformed.getX()-2, (int)transformed.getY()-2, 4, 4);
+		g2.fillRect((int)transformed.getX()-2, (int)transformed.getY()-2, 4, 4);
 	}
 
 	/**

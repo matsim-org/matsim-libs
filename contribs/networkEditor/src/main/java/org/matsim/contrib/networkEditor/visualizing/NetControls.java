@@ -34,7 +34,7 @@ public class NetControls extends javax.swing.JPanel {
 	public DifferenceManager diffManager;
 	public CountList countList;
 	private boolean selected[];
-	private final int numToggle = NetBlackboard.mode.values().length;
+	private final int numToggle = NetBlackboard.Mode.values().length;
 	javax.swing.JToggleButton toggles[];
 
 	/** Creates new form NetControls */
@@ -101,7 +101,7 @@ public class NetControls extends javax.swing.JPanel {
             @Override
             public java.awt.Component prepareRenderer(javax.swing.table.TableCellRenderer renderer,
                 int row, int column) {
-                java.awt.Component comp = (java.awt.Component) super.prepareRenderer(renderer, row, column);
+                java.awt.Component comp = super.prepareRenderer(renderer, row, column);
                 if(column == 0){
                     comp.setForeground(java.awt.Color.GRAY);
                 }else if (getModel().isCellEditable(row, column)) {
@@ -125,9 +125,11 @@ public class NetControls extends javax.swing.JPanel {
         setBackground(java.awt.Color.white);
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         addHierarchyBoundsListener(new java.awt.event.HierarchyBoundsListener() {
-            public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
+            @Override
+						public void ancestorMoved(java.awt.event.HierarchyEvent evt) {
             }
-            public void ancestorResized(java.awt.event.HierarchyEvent evt) {
+            @Override
+						public void ancestorResized(java.awt.event.HierarchyEvent evt) {
                 formAncestorResized(evt);
             }
         });
@@ -146,7 +148,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonUp.setMinimumSize(new java.awt.Dimension(20, 20));
         buttonUp.setPreferredSize(new java.awt.Dimension(22, 22));
         buttonUp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonUpActionPerformed(evt);
             }
         });
@@ -161,7 +164,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonRight.setMinimumSize(new java.awt.Dimension(20, 20));
         buttonRight.setPreferredSize(new java.awt.Dimension(22, 22));
         buttonRight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonRightActionPerformed(evt);
             }
         });
@@ -176,7 +180,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonDown.setMinimumSize(new java.awt.Dimension(20, 20));
         buttonDown.setPreferredSize(new java.awt.Dimension(22, 22));
         buttonDown.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonDownActionPerformed(evt);
             }
         });
@@ -191,7 +196,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonLeft.setMinimumSize(new java.awt.Dimension(20, 20));
         buttonLeft.setPreferredSize(new java.awt.Dimension(22, 22));
         buttonLeft.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonLeftActionPerformed(evt);
             }
         });
@@ -235,7 +241,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonZoomIn.setMinimumSize(new java.awt.Dimension(23, 23));
         buttonZoomIn.setPreferredSize(new java.awt.Dimension(23, 23));
         buttonZoomIn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonZoomInActionPerformed(evt);
             }
         });
@@ -249,7 +256,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonZoomOut.setMinimumSize(new java.awt.Dimension(23, 23));
         buttonZoomOut.setPreferredSize(new java.awt.Dimension(23, 23));
         buttonZoomOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonZoomOutActionPerformed(evt);
             }
         });
@@ -287,7 +295,8 @@ public class NetControls extends javax.swing.JPanel {
                 false, true
             };
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
+            @Override
+						public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
@@ -317,7 +326,8 @@ public class NetControls extends javax.swing.JPanel {
         undoButton.setContentAreaFilled(false);
         undoButton.setEnabled(false);
         undoButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 undoButtonActionPerformed(evt);
             }
         });
@@ -329,7 +339,8 @@ public class NetControls extends javax.swing.JPanel {
         redoButton.setContentAreaFilled(false);
         redoButton.setEnabled(false);
         redoButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 redoButtonActionPerformed(evt);
             }
         });
@@ -340,7 +351,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonToggleSelect.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         buttonToggleSelect.setEnabled(false);
         buttonToggleSelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonToggleSelectActionPerformed(evt);
             }
         });
@@ -351,7 +363,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonToggleMove.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         buttonToggleMove.setEnabled(false);
         buttonToggleMove.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonToggleMoveActionPerformed(evt);
             }
         });
@@ -362,7 +375,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonTogglePaint.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         buttonTogglePaint.setEnabled(false);
         buttonTogglePaint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonTogglePaintActionPerformed(evt);
             }
         });
@@ -373,7 +387,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonToggleScissor.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         buttonToggleScissor.setEnabled(false);
         buttonToggleScissor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonToggleScissorActionPerformed(evt);
             }
         });
@@ -385,7 +400,8 @@ public class NetControls extends javax.swing.JPanel {
         buttonDelete.setEnabled(false);
         buttonDelete.setMargin(new java.awt.Insets(2, 2, 2, 2));
         buttonDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            @Override
+						public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonDeleteActionPerformed(evt);
             }
         });
@@ -554,7 +570,7 @@ public class NetControls extends javax.swing.JPanel {
 	}
 
 	private void updateBoardState() {
-		NetBlackboard.mode modes[] = NetBlackboard.mode.values();
+		NetBlackboard.Mode modes[] = NetBlackboard.Mode.values();
 		for(int i=0; i<selected.length; ++i) {
 			if(selected[i]==true) {
 				board.setMode(modes[i]);
@@ -642,60 +658,58 @@ class MyTableModel extends AbstractTableModel {
 
 	public MyTableModel(LinkImpl activeLink) {
 		this.activeLink = activeLink;
-		init(11, 2);
+		init(10, 2);
 		actualMode = mode.LINK;
 
-		table[0][0] = new String("Capacity");
-		table[0][1] = new String(Double.toString(activeLink.getCapacity()));
+		table[0][0] = "Capacity";
+		table[0][1] = Double.toString(activeLink.getCapacity());
 		editable[0][1] = true;
 
-		table[1][0] = new String("Euklidean length");
-		table[1][1] = new String(Double.toString(activeLink.getEuklideanDistance()));
+		table[1][0] = "Euklidean length";
+		table[1][1] = Double.toString(activeLink.getEuklideanDistance());
 
-		table[2][0] = new String("Flow capacity");
-		table[2][1] = new String(Double.toString(activeLink.getFlowCapacity()));
+		table[2][0] = "Flow capacity / sec";
+		table[2][1] = Double.toString(activeLink.getFlowCapacity());
 		//editable[2][1] = true;
 
-		table[3][0] = new String("Free speed");
-		table[3][1] = new String(Double.toString(activeLink.getFreespeed()));
+		table[3][0] = "Free speed";
+		table[3][1] = Double.toString(activeLink.getFreespeed());
 		editable[3][1] = true;
 
-		table[4][0] = new String("Free speed travel time");
-		table[4][1] = new String(Double.toString(activeLink.getFreespeedTravelTime()));
+		table[4][0] = "Free speed travel time";
+		table[4][1] = Double.toString(activeLink.getFreespeedTravelTime());
 		//editable[4][1] = true;
 
-		table[5][0] = new String("Length");
-		table[5][1] = new String(Double.toString(activeLink.getLength()));
+		table[5][0] = "Length";
+		table[5][1] = Double.toString(activeLink.getLength());
 		editable[5][1] = true;
 
-		table[6][0] = new String("Number of lanes");
-		table[6][1] = new String(Double.toString(activeLink.getNumberOfLanes()));
+		table[6][0] = "Number of lanes";
+		table[6][1] = Double.toString(activeLink.getNumberOfLanes());
 		editable[6][1] = true;
 
-		table[7][0] = new String("From node");
-		table[7][1] = new String(activeLink.getFromNode().getId().toString());
+		table[7][0] = "From node";
+		table[7][1] = activeLink.getFromNode().getId().toString();
 
-		table[8][0] = new String("To node");
-		table[8][1] = new String(activeLink.getToNode().getId().toString());
+		table[8][0] = "To node";
+		table[8][1] = activeLink.getToNode().getId().toString();
 
-		table[9][0] = new String("Id");
-		table[9][1] = new String(activeLink.getId().toString());
-
-		table[10][0] = new String("Coordinate");
-		table[10][1] = new String(activeLink.getCoord().toString());
-
+		table[9][0] = "Id";
+		table[9][1] = activeLink.getId().toString();
 
 	}
 
 	public MyTableModel(Node activeNode) {
-		init(2,2);
+		init(3,2);
 		this.activeNode = activeNode;
 		actualMode = mode.NODE;
 
-		table[0][0] = new String("Id");
-		table[0][1] = new String(activeNode.getId().toString());
-		table[1][0] = new String("Coordinates");
-		table[1][1] = new String(activeNode.getCoord().toString());
+		table[0][0] = "Id";
+		table[0][1] = activeNode.getId().toString();
+		table[1][0] = "X";
+		table[1][1] = Double.toString(activeNode.getCoord().getX());
+		table[2][0] = "Y";
+		table[2][1] = Double.toString(activeNode.getCoord().getY());
 	}
 
 	private void init(int r, int c) {
@@ -703,8 +717,8 @@ class MyTableModel extends AbstractTableModel {
 		editable = new boolean[r][c];
 		for(int i=0; i<editable.length; ++i) for(int j=0; j<editable[i].length; ++j) editable[i][j] = false;
 		columnName = new String[c];
-		columnName[0] = new String("Property");
-		columnName[1] = new String("Value");
+		columnName[0] = "Property";
+		columnName[1] = "Value";
 		rows = r;
 		cols = c;
 	}

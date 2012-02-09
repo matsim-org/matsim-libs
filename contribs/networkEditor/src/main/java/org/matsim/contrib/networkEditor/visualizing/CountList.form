@@ -83,7 +83,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/matsim/contrib/networkEditor/images/add.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Agregar conteo"/>
+        <Property name="toolTipText" type="java.lang.String" value="Add Count"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
             <EmptyBorder/>
@@ -110,7 +110,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/matsim/contrib/networkEditor/images/minus.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Eliminar Conteo"/>
+        <Property name="toolTipText" type="java.lang.String" value="Delete Count"/>
         <Property name="autoscrolls" type="boolean" value="true"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
