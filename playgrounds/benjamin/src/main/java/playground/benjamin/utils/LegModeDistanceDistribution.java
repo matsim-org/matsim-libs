@@ -57,8 +57,7 @@ public class LegModeDistanceDistribution {
 	// INPUT
 	private static String runDirectory = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/";
 	private static String initialPlansFile = runDirectory + "ITERS/it.0/0.plans.xml.gz";
-//	private static String initialPlansFile = runDirectory + "ITERS/it.1001/1001.plans.xml.gz";
-//	private static String initialPlansFile = "../../detailedEval/testRuns/output/1pct/v0-default/internalize/output_baseCase/output_plans.xml.gz";
+//	private static String initialPlansFile = runDirectory + "ITERS/it.1000/1000.plans.xml.gz";
 	private static String finalPlansFile = runDirectory + "output_plans.xml.gz";
 	private static String netFile = runDirectory + "output_network.xml.gz";
 //	private static String finalPlansFile = runDirectory + "ITERS/it.300/300.plans.xml.gz";
@@ -69,8 +68,8 @@ public class LegModeDistanceDistribution {
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
 	
-	private final boolean considerMidOnly = true;
-	private final int noOfDistanceClasses = 8;
+	private final boolean considerMidOnly = false;
+	private final int noOfDistanceClasses = 15;
 
 	public LegModeDistanceDistribution(){
 		Config config = ConfigUtils.createConfig();
@@ -80,14 +79,9 @@ public class LegModeDistanceDistribution {
 		this.usedModes = new TreeSet<String>();
 	}
 
-	public static void main(String[] args) {
-		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
-		lmdd.run(args);
-	}
-
 	private void run(String[] args) {
-		loadSceanrio(this.initialScenario, netFile, initialPlansFile);
-		loadSceanrio(this.finalScenario, netFile, finalPlansFile);
+		loadScenario(this.initialScenario, netFile, initialPlansFile);
+		loadScenario(this.finalScenario, netFile, finalPlansFile);
 		setDistanceClasses(noOfDistanceClasses);
 		getUsedModes();
 		Population initialPop = this.initialScenario.getPopulation();
@@ -97,6 +91,7 @@ public class LegModeDistanceDistribution {
 		SortedMap<String, Map<Integer, Integer>> finalMode2DistanceClassNoOfLegs;
 		
 		if(considerMidOnly){
+			logger.warn("Only considering demand from MiD, omitting commuter and inverse commuter...");
 			PersonFilter filter = new PersonFilter();
 			Population initialMiDPop = filter.getMiDPopulation(initialPop);
 			Population finalMiDPop = filter.getMiDPopulation(finalPop);
@@ -223,12 +218,16 @@ public class LegModeDistanceDistribution {
 		logger.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
-	private void loadSceanrio(Scenario scenario, String netFile, String plansFile) {
+	private void loadScenario(Scenario scenario, String netFile, String plansFile) {
 		Config config = scenario.getConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(plansFile);
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario) ;
 		scenarioLoader.loadScenario() ;
+	}
 
+	public static void main(String[] args) {
+		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+		lmdd.run(args);
 	}
 }

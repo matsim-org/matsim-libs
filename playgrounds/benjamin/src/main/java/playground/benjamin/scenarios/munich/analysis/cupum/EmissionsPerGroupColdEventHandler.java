@@ -88,8 +88,7 @@ public class EmissionsPerGroupColdEventHandler implements ColdEmissionEventHandl
 
 	@Override
 	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-		
+		this.group2Emissions.clear();
 	}
 
 }
