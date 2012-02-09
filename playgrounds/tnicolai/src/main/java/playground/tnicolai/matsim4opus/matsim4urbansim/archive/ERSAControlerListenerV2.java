@@ -35,21 +35,19 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
 import playground.tnicolai.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import playground.tnicolai.matsim4opus.utils.ProgressBar;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
-import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGrid2KMZWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.SpatialGridTableWriterERSA_V2;
+import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -96,9 +94,9 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		this.travelTimeAccessibilityMap = new HashMap<Id, Double>();
 		this.travelDistanceAccessibilityMap = new HashMap<Id, Double>();
 
-		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   "accessibility_indicators_v2" +
-													   Constants.FILE_TYPE_CSV);
+//		CellBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
+//													   "accessibility_indicators_v2" +
+//													   Constants.FILE_TYPE_CSV);
 
 		log.info(".. done initializing ERSAControlerListenerV2!");
 	}
@@ -189,7 +187,7 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 				this.travelTimeAccessibilityMap.put(originNode.getId(), travelTimeLogSum );
 
 				// using hash maps to dump out log sum of current node in csv format
-				GridBasedAccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
+//				CellBasedAccessibilityCSVWriter.write(originNode, travelTimeLogSum, travelCostLogSum, travelDistanceLogSum);
 			}
 			this.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with " + numberOfStartNodes
@@ -213,18 +211,19 @@ public class ERSAControlerListenerV2 implements ShutdownListener{
 		SpatialGrid2KMZWriter.writeKMZFiles(this.travelTimeAccessibilityGrid, this.travelCostAccessibilityGrid, this.travelDistanceAccessibilityGrid);
 		WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedJobArray );
 		// accessibility measure were written while computing, just closing file now .
-		GridBasedAccessibilityCSVWriter.close();
+//		CellBasedAccessibilityCSVWriter.close();
 	}
 
 	private void initSpatialGirds(final NetworkImpl network){
 
 		log.info("Initializing Spatial Grids ...");
-		NetworkBoundary nb = UtilityCollection.getNetworkBoundary(network);
+		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
+		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
 
-		double xmin = nb.getMinX();
-		double xmax = nb.getMaxX();
-		double ymin = nb.getMinY();
-		double ymax = nb.getMaxY();
+		double xmin = networkBoundingBox[0];
+		double xmax = networkBoundingBox[1];
+		double ymin = networkBoundingBox[2];
+		double ymax = networkBoundingBox[3];
 
 		log.info("Detected network size: MinX=" + xmin + " MinY=" + ymin + " MaxX=" + xmax + " MaxY=" + ymax );
 

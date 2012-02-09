@@ -202,7 +202,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// Travel Data Header
 		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
 		
-		Logger.getLogger(this.getClass()).error( "add new fields" ) ; // remove when all travel data attributes are updated...
+		Logger.getLogger(this.getClass()).error( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();
 		return travelDataWriter;
 	}

@@ -4,11 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.tnicolai.matsim4opus.matsim4urbansim.ERSAControlerListener;
-
 public class EuclideanDistance {
 	// logger
-	private static final Logger log = Logger.getLogger(ERSAControlerListener.class);
+	private static final Logger log = Logger.getLogger(EuclideanDistance.class);
 	
 	public static double meterPerSecWalkSpeed = 1.38888889; // 1,38888889 m/s corresponds to 5km/h
 

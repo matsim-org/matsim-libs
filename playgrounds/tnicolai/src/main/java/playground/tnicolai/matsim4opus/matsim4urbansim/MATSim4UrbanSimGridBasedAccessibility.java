@@ -6,6 +6,7 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
+import playground.tnicolai.matsim4opus.matsim4urbansim.archive.GridBasedAccessibilityControlerListener;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 

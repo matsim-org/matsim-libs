@@ -1,4 +1,4 @@
-package playground.tnicolai.matsim4opus.matsim4urbansim;
+package playground.tnicolai.matsim4opus.matsim4urbansim.archive;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,8 +24,8 @@ import playground.tnicolai.matsim4opus.utils.ProgressBar;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
 import playground.tnicolai.matsim4opus.utils.helperObjects.Benchmark;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
+import playground.tnicolai.matsim4opus.utils.io.writer.CellBasedAccessibilityCSVWriter;
 import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
-import playground.tnicolai.matsim4opus.utils.io.writer.GridBasedAccessibilityCSVWriter;
 
 public class GridBasedAccessibilityControlerListener implements ShutdownListener{
 	
@@ -38,7 +38,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	 * 							(see addNearestNodeToJobClusterArray) instead to do nearest node look-ups in each 
 	 * 							iteration cycle
 	 * - distance based accessibility: is now also computed with with LeastCostPathTree 
-	 * 							-> CHECK WITH KAI IF TRAVELDISTANCECOSTCALULATOR IS OK!
+	 * 	
 	 * tnicolai: sep'11
 	 */
 	
@@ -48,6 +48,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	private double gridSizeInMeter;
 	
 	private Map<Id, AccessibilityStorage> resultMap;
+	private CellBasedAccessibilityCSVWriter accCsvWriter;
 	
 	private Benchmark benchmark;
 	
@@ -71,8 +72,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 		// this stores all accessibility measures (feeding the grid matrix)
 		this.resultMap = new HashMap<Id, AccessibilityStorage>();
 		
-		GridBasedAccessibilityCSVWriter.initAccessiblityWriter( Constants.MATSIM_4_OPUS_TEMP +
-													   			Constants.GRID_DATA_FILE_CSV);
+		accCsvWriter = new CellBasedAccessibilityCSVWriter("");
 		
 		log.info(".. done initializing GridBasedAccessibilityControlerListener!");
 	}
@@ -85,21 +85,21 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		
-		int benchmarkID = this.benchmark.addMeasure("grid-based accessibility computation (without network)");
+		int benchmarkID = this.benchmark.addMeasure("1-Point accessibility computation (without shape file)");
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		// calculates the workplace accessibility based on congested travel times:
-		// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
+		
 		TravelTime ttc = controler.getTravelTimeCalculator();
-		// this calculates the workplace accessibility travel times based on (travelTime*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
+		// calculates the workplace accessibility based on congested travel times:
+				// (travelTime(sec)*marginalCostOfTime)+(link.getLength()*marginalCostOfDistance) but marginalCostOfDistance = 0
 		LeastCostPathTree lcptCongestedTravelTime = new LeastCostPathTree( ttc, new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()) );
 		// calculates the workplace accessibility based on freespeed travel times:
 		// link.getLength() * link.getFreespeed()
 		LeastCostPathTree lcptFreespeedTravelTime = new LeastCostPathTree(ttc, new FreeSpeedTravelTimeCostCalculator());
 		// calculates walk times in seconds as substitute for travel distances (tnicolai: changed from distance calculator to walk time feb'12)
-		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree( ttc, new TravelWalkTimeCostCalculator() );
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
@@ -123,10 +123,9 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 			log.info("Beta walk traveling per min: " + betaWalkMin);
 			
 			Iterator<? extends Node> startNodeIterator = network.getNodes().values().iterator();
-			int numberOfStartNodes = network.getNodes().values().size();
-			log.info("Calculating " + numberOfStartNodes + " starting points ...");
+			log.info("Calculating " + network.getNodes().values().size() + " starting points ...");
 			
-			ProgressBar bar = new ProgressBar( numberOfStartNodes );
+			ProgressBar bar = new ProgressBar( network.getNodes().values().size() ); // init progress bar with number of origins
 			
 			// iterating over all network nodes as starting points calculating their workplace accessibility
 			while( startNodeIterator.hasNext() ){
@@ -170,7 +169,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 					// sum freespeed travel times
 					freespeedTravelTimesCarSum += Math.exp( betaCarMin * freespeedTravelTime_min ) * jobWeight;
 					// sum walk travel times (substitute for distances)
-					travelTimesWalkSum 		   += Math.exp( betaCarMin * walkTravelTime_min ) * jobWeight;
+					travelTimesWalkSum 		   += Math.exp( betaWalkMin * walkTravelTime_min ) * jobWeight;
 				}
 				
 				// assign accessibility 
@@ -185,14 +184,16 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 										   					travelTimesWalkLogSum));
 				
 				// writing accessibility measures of current node in csv format
-				GridBasedAccessibilityCSVWriter.write(originNode, 
-													  congestedTravelTimesCarLogSum, 
-													  freespeedTravelTimesCarLogSum, 
-													  travelTimesWalkLogSum);
+//				accCsvWriter.write(startZone, 
+//						   		   coordFromZone, 
+//						   		   fromNode, 
+//						   		   congestedTravelTimesCarLogSum, 
+//						   		   freespeedTravelTimesCarLogSum, 
+//						   		   travelTimesWalkLogSum);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);
-			log.info("Accessibility computation with " + numberOfStartNodes
+			log.info("Accessibility computation with " + network.getNodes().values().size()
 					+ " starting points (origins) and "
 					+ this.aggregatedWorkplaces.length
 					+ " destinations (workplaces) took "
@@ -212,7 +213,7 @@ public class GridBasedAccessibilityControlerListener implements ShutdownListener
 			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV( Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", this.aggregatedWorkplaces );
 			
 			// finalizing/closing csv file containing accessibility measures
-			GridBasedAccessibilityCSVWriter.close();
+			accCsvWriter.close();
 		}
 	}
 	

@@ -11,17 +11,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class FixedSizeGrid {
 	
 	private static int res = 10;
-	private static NetworkBoundary nb = null;
+	private static double xmin, xmax, ymin, ymax;
 
 	public static void main(String[] args) {
 
@@ -59,11 +58,11 @@ public class FixedSizeGrid {
 		
 		for(int xBin = 0; xBin < bins.xBins; xBin++){
 			
-			xCoord = nb.getMinX() + (xBin * binResolution);
+			xCoord = xmin + (xBin * binResolution);
 			
 			for(int yBin = 0; yBin < bins.yBins; yBin++){
 				
-				yCoord = nb.getMinY() + (yBin * binResolution);
+				yCoord = ymin + (yBin * binResolution);
 				
 				Coord coord = new CoordImpl(xCoord, yCoord);
 				// get nearest node on network
@@ -80,13 +79,18 @@ public class FixedSizeGrid {
 	
 	private static Bin[] createBins(final NetworkImpl network, final Map<Id, Double> resultMap){
 		
-		nb = UtilityCollection.getNetworkBoundary(network);
+		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
+		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
+		xmin = networkBoundingBox[0];
+		ymin = networkBoundingBox[1];
+		xmax = networkBoundingBox[2];
+		ymax = networkBoundingBox[3];
 		
 		Bin[] binArray = new Bin[3];
 
 		Bin bin = new Bin();
-		bin.xBins = getInitialNumOfBins(nb.getXLength(), res);
-		bin.yBins = getInitialNumOfBins(nb.getYLength(), res);
+		bin.xBins = getInitialNumOfBins( (xmax - xmin), res);
+		bin.yBins = getInitialNumOfBins( (ymax - ymin), res);
 		bin.resolution = res;
 		
 		double newXLength = (bin.xBins - 1) * res;
@@ -148,7 +152,7 @@ public class FixedSizeGrid {
 				
 				for(int xBin = 0; xBin < numXBins; xBin++){
 					// write x coordinates
-					double xCoord = nb.getMinX() + (xBin * res);
+					double xCoord = xmin + (xBin * res);
 					
 					layer1.write("\t");
 					layer1.write(String.valueOf(xCoord));
@@ -157,7 +161,7 @@ public class FixedSizeGrid {
 				
 				for(int yBin = numYBins - 1; yBin >= 0; yBin--){
 					// write y coordinates 
-					double yCoord = nb.getMaxY() - (yBin * res);
+					double yCoord = ymax - (yBin * res);
 					
 					layer1.write(String.valueOf(yCoord));
 					

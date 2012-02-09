@@ -42,6 +42,7 @@ import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.io.BackupRun;
 import playground.tnicolai.matsim4opus.utils.io.Paths;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
+import playground.tnicolai.matsim4opus.utils.io.writer.WorkplaceCSVWriter;
 
 
 /**
@@ -136,8 +137,6 @@ public class MATSim4UrbanSimV2 {
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		// initializing parcels and zones from UrbanSim input
 		readUrbansimParcelModel(parcels, zones);
-		// dumping population data as csv
-		dumpPopulation2CSV(parcels, network);
 		
 		// population generation
 		int pc = benchmark.addMeasure("Population construction");
@@ -170,19 +169,6 @@ public class MATSim4UrbanSimV2 {
 	 */
 	void readUrbansimParcelModel(ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl zones){
 		readFromUrbansim.readFacilities(parcels, zones);
-	}
-	
-	/**
-	 * read UrbanSim person data and generates 
-	 * 1) a csv file with original data
-	 * 2) a csv file with persons aggregated to their nearest node
-	 * 
-	 * @param parcels
-	 * @param network
-	 */
-	void dumpPopulation2CSV(final ActivityFacilitiesImpl parcels, final Network network){
-		// this is just a stub and does nothing. 
-		// This needs to be implemented/overwritten by an inherited class
 	}
 	
 	/**
@@ -272,14 +258,16 @@ public class MATSim4UrbanSimV2 {
 		// tnicolai: make this configurable 
 		boolean computeZone2ZoneImpedance = true;
 		boolean computeZoneBasedAccessibilities = true;
+		boolean dumpPopulationData = true;
+		boolean dumpAggegatedWorkplaceData = true;
 		
-		// The following lines register what should be done _after_ the iterations were run:
+		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance)
 			// creates zone2zone impedance matrix
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
 																					  parcels) ); 
 		
-		if(computeZoneBasedAccessibilities)
+		if(computeZoneBasedAccessibilities){
 			
 			// init aggregatedWorkplaces
 			if(aggregatedWorkplaces == null)
@@ -289,6 +277,15 @@ public class MATSim4UrbanSimV2 {
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListener(zones, 				
 																						aggregatedWorkplaces, 
 																						benchmark));
+		}
+		
+		if(dumpPopulationData)
+			readFromUrbansim.readAndDumpPersons2CSV(parcels, 
+												 	controler.getNetwork());
+		
+		if(dumpAggegatedWorkplaceData)
+			WorkplaceCSVWriter.writeAggregatedWorkplaceData2CSV(Constants.MATSIM_4_OPUS_TEMP + "aggregated_workplaces.csv", 
+																aggregatedWorkplaces);
 	}
 	
 	/**

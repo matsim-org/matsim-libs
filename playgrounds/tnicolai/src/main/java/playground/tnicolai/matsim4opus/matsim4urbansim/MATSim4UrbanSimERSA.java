@@ -294,7 +294,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		controler.setOverwriteFiles(true);	// sets, whether output files are overwritten
 		controler.setCreateGraphs(false);	// sets, whether output Graphs are created
 		
-		ERSAControlerListener myListener = null;
+		CellBasedAccessibilityShapeControlerListener myListener = null;
 		
 		try {
 			myListener = initAndAddControlerListener(parcels, readFromUrbansim, controler);
@@ -321,7 +321,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	/**
 	 * @param myListener
 	 */
-	void writeSpatialGridTables(ERSAControlerListener myListener) {
+	void writeSpatialGridTables(CellBasedAccessibilityShapeControlerListener myListener) {
 		logger.info("Writing spatial grid tables ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();
 		try {
@@ -349,7 +349,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	/**
 	 * @param myListener
 	 */
-	void writeKMZFiles(ERSAControlerListener myListener) {
+	void writeKMZFiles(CellBasedAccessibilityShapeControlerListener myListener) {
 		logger.info("Writing Google Erath files ...");
 		
 		ZoneLayer<ZoneAccessibilityObject> startZones = myListener.getStartZones();
@@ -398,7 +398,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 	 * @param controler
 	 * @throws IOException 
 	 */
-	private ERSAControlerListener initAndAddControlerListener(ActivityFacilitiesImpl parcels,
+	private CellBasedAccessibilityShapeControlerListener initAndAddControlerListener(ActivityFacilitiesImpl parcels,
 			ReadFromUrbansimParcelModel readFromUrbansim, Controler controler) throws IOException {
 		
 		Geometry boundary = getBoundary(shapeFile);
@@ -420,7 +420,7 @@ class MATSim4UrbanSimERSA extends MATSim4UrbanSim{
 		benchmark.stoppMeasurement(jmID);
 		logger.info("Creating job destinations (jobObjectMap) took " + benchmark.getDurationInSeconds(jmID) + "seconds.");
 		
-		ERSAControlerListener myListener = new ERSAControlerListener(startZones, jobClusterArray, 
+		CellBasedAccessibilityShapeControlerListener myListener = new CellBasedAccessibilityShapeControlerListener(startZones, jobClusterArray, 
 				travelTimeAccessibilityGrid, travelCostAccessibilityGrid, travelDistanceAccessibilityGrid, benchmark);
 		
 		// The following lines register what should be done _after_ the iterations were run:

@@ -124,19 +124,6 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	}
 	
 	/**
-	 * read UrbanSim person data and generates 
-	 * 1) a csv file with original data
-	 * 2) a csv file with persons aggregated to their nearest node
-	 * 
-	 * @param parcels
-	 * @param network
-	 */
-	@Override
-	void dumpPopulation2CSV(final ActivityFacilitiesImpl parcels, final Network network){
-		readFromUrbansim.readAndDumpPersons2CSV(parcels, network);
-	}
-	
-	/**
 	 * This modifies the MATSim network according to the given
 	 * test parameter in the MATSim config file (from UrbanSim)
 	 */
@@ -177,39 +164,47 @@ class MATSim4UrbanSimZurichAccessibility extends MATSim4UrbanSimV2{
 	void addFurtherControlerListener(Controler controler, ActivityFacilitiesImpl parcels){
 		
 		// tnicolai: make this configurable 
-		boolean computeGridBasedAccessibilities = true;
-		boolean computeGridBasedAccessibilitiesNetwork = false;
+		boolean computeGridBasedAccessibilitiesShapeFile = true;
+		boolean computeGridBasedAccessibilitiesNetwork 	 = true;
 		
-		if(computeGridBasedAccessibilities){
+		// The following lines register what should be done _after_ the iterations are done:
+		
+		if(computeGridBasedAccessibilitiesShapeFile){
 			
 			// init aggregatedWorkplaces
 			if(aggregatedWorkplaces == null)
 				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
 			
 			Geometry boundary = GridUtils.getBoundary(shapeFile);
-			ZoneLayer<ZoneAccessibilityObject> startZones = GridUtils.createGridLayerByGridSize(gridSizeInMeter, boundary);
 			
-			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
-			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
-			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGrid(gridSizeInMeter, boundary);
+			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
+			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
+			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByShapeBoundary(gridSizeInMeter, boundary);
 			
-			controler.addControlerListener( new ERSAControlerListener(startZones, 
-																	  aggregatedWorkplaces,
-																	  congestedTravelTimeAccessibilityGrid, 
-																	  freespeedTravelTimeAccessibilityGrid, 
-																	  walkTravelTimeAccessibilityGrid, 
-																	  benchmark) );
+			controler.addControlerListener( new CellBasedAccessibilityShapeControlerListener(GridUtils.createGridLayerByGridSizeByShapeFile(gridSizeInMeter, boundary), 
+																	  						 aggregatedWorkplaces,
+																	  						 congestedTravelTimeAccessibilityGrid, 
+																	  						 freespeedTravelTimeAccessibilityGrid, 
+																	  						 walkTravelTimeAccessibilityGrid, 
+																	  						 benchmark) );
 		}
 		
-		if(computeGridBasedAccessibilitiesNetwork){ // debug GridBasedAccessibilityControlerListener first before setting flag "TRUE"
+		if(computeGridBasedAccessibilitiesNetwork){
 			
 			// init aggregatedWorkplaces
 			if(aggregatedWorkplaces == null)
 				aggregatedWorkplaces = readUrbansimJobs(parcels, jobSample);
 			
-			controler.addControlerListener( new GridBasedAccessibilityControlerListener(aggregatedWorkplaces, 
-																						gridSizeInMeter, 
-																						benchmark));
+			SpatialGrid<Double> congestedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
+			SpatialGrid<Double> freespeedTravelTimeAccessibilityGrid = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
+			SpatialGrid<Double> walkTravelTimeAccessibilityGrid  	 = GridUtils.createSpatialGridByNetworkBoundary(gridSizeInMeter, controler.getNetwork());
+			
+			controler.addControlerListener( new CellBasedAccessibilityNetworkControlerListener(GridUtils.createGridLayerByGridSizeByNetwork(gridSizeInMeter, controler.getNetwork()), 
+																							   aggregatedWorkplaces, 
+																							   congestedTravelTimeAccessibilityGrid, 
+																							   freespeedTravelTimeAccessibilityGrid, 
+																							   walkTravelTimeAccessibilityGrid, 
+																							   benchmark));
 		}
 	}
 	

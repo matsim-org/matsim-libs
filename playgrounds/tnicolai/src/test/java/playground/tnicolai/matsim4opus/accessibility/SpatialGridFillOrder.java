@@ -36,14 +36,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.tnicolai.matsim4opus.costcalculators.TravelTimeCostCalculatorTest;
 import playground.tnicolai.matsim4opus.gis.SpatialGrid;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
 import playground.tnicolai.matsim4opus.utils.helperObjects.PersonAndJobsObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.io.ReadFromUrbansimParcelModel;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -78,12 +77,13 @@ public class SpatialGridFillOrder {
 	 * @param network
 	 */
 	private static SpatialGrid<Interpolation> network2SpatialGrid(final NetworkImpl network) {
-		NetworkBoundary nb = UtilityCollection.getNetworkBoundary(network);
-
-		double xmin = nb.getMinX();
-		double xmax = nb.getMaxX();
-		double ymin = nb.getMinY();
-		double ymax = nb.getMaxY();
+		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
+		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
+		double xmin = networkBoundingBox[0];
+		double xmax = networkBoundingBox[1];
+		double ymin = networkBoundingBox[2];
+		double ymax = networkBoundingBox[3];
+		
 		int res = 100;
 		int counter = 0;
 		GeometryFactory factory = new GeometryFactory();

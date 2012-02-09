@@ -10,17 +10,16 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.ClusterObject;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 import playground.tnicolai.matsim4opus.utils.helperObjects.SquareLayer;
 
 public class SimpleGrid {
 	
 	private static int res = 10;
-	private static NetworkBoundary nb = null;
+	private static double xmin, xmax, ymin, ymax;
 
 	/**
 	 * @param args
@@ -42,12 +41,12 @@ public class SimpleGrid {
 
 	private static SquareLayer[][] network2SimpleGrid( final NetworkImpl network, final Map<Id, Double> resultMap ){
 		
-		nb = UtilityCollection.getNetworkBoundary(network);
-		
-		double xmin = nb.getMinX();
-		double xmax = nb.getMaxX();
-		double ymin = nb.getMinY();
-		double ymax = nb.getMaxY();
+		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
+		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
+		xmin = networkBoundingBox[0];
+		xmax = networkBoundingBox[1];
+		ymin = networkBoundingBox[2];
+		ymax = networkBoundingBox[3];
 		
 		double xlength = xmax - xmin;
 		double ylength = ymax - ymin;
@@ -118,7 +117,7 @@ public class SimpleGrid {
 			
 			for(int xBin = 0; xBin < numXBins; xBin++){
 				// write x coordinates
-				double xCoord = nb.getMinX() + (xBin * res);
+				double xCoord = xmin + (xBin * res);
 				
 				layer1.write("\t");
 				layer1.write(String.valueOf(xCoord));
@@ -134,7 +133,7 @@ public class SimpleGrid {
 			
 			for(int yBin = numYBins - 1; yBin >= 0; yBin--){
 				// write y coordinates 
-				double yCoord = nb.getMaxY() - (yBin * res);
+				double yCoord = ymax - (yBin * res);
 				
 				layer1.write(String.valueOf(yCoord));
 				layer2.write(String.valueOf(yCoord));

@@ -30,11 +30,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 import playground.tnicolai.matsim4opus.constants.Constants;
-import playground.tnicolai.matsim4opus.utils.UtilityCollection;
 import playground.tnicolai.matsim4opus.utils.helperObjects.AccessibilityStorage;
-import playground.tnicolai.matsim4opus.utils.helperObjects.NetworkBoundary;
 
 public class FixedSizeGrid {
 	
@@ -73,20 +72,22 @@ public class FixedSizeGrid {
 		this.resolution = gridSizeInMeter;
 		
 		assert(network != null);
-		NetworkBoundary boundary = UtilityCollection.getNetworkBoundary(network);
+		// The bounding box of all the given nodes as double[] = {minX, minY, maxX, maxY}
+		double networkBoundingBox[] = NetworkUtils.getBoundingBox(network.getNodes().values());
 		
-		this.minX = boundary.getMinX();
-		this.minY = boundary.getMinY();
-		this.rowPoints = (int)Math.ceil( boundary.getYLength() / gridSizeInMeter ) + 1;
-		this.colPoints = (int)Math.ceil( boundary.getXLength() / gridSizeInMeter ) + 1;
+		this.minX = networkBoundingBox[0];
+		this.minY = networkBoundingBox[1];
 		this.maxX = minX + ((colPoints - 1) * gridSizeInMeter); // round up max x-coordinate 
 		this.maxY = minY + ((rowPoints - 1) * gridSizeInMeter); // round up max y-coordinate
+		this.rowPoints = (int)Math.ceil( (this.maxY - this.minY) / gridSizeInMeter ) + 1;
+		this.colPoints = (int)Math.ceil( (this.maxX - this.minX) / gridSizeInMeter ) + 1;
+
 		
 		logger.info("Determined area:");
 		logger.info("Y Min: " + this.minY);
-		logger.info("Y Max: " + this.maxY + "(this extended from " + boundary.getMaxY() + ").");
+		logger.info("Y Max: " + this.maxY + "(this extended from " + networkBoundingBox[3] + ").");
 		logger.info("X Min: " + this.minX);
-		logger.info("X Max: " + this.maxX + "(this extended from " + boundary.getMaxX() + ").");
+		logger.info("X Max: " + this.maxX + "(this extended from " + networkBoundingBox[2] + ").");
 		
 		logger.info("Create Grid with " + colPoints + " columns and " + rowPoints + " rows ...");
 		grid = new AccessibilityStorage[rowPoints][colPoints];
