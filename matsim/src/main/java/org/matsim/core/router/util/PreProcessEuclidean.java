@@ -56,7 +56,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 		super.run(network);
 
 		if (checkLinkLengths(network) == false) {
-			log.warn("There are links with stored length smaller than their Euclidean distance in this network. Thus, A* cannot guarantee to calculate the least-cost paths between two nodes.  This warning may be given although the A* router is nowhere used.");
+			log.warn("There are links with stored length smaller than their Euclidean distance in this network. Thus, A* cannot guarantee to calculate the least-cost paths between two nodes.");
 		}
 
 		updateMinTravelCostPerLength(network);
