@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.gis.EuclideanDistance;
 import org.matsim.contrib.matsim4opus.utils.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
@@ -20,6 +21,17 @@ import org.matsim.core.router.costcalculators.TravelTimeDistanceCostCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.LeastCostPathTree;
 
+/**
+ *  improvements feb'12
+ *  - distance between zone centroid and nearest node on road network is considered in the accessibility computation
+ *  as walk time of the euclidian distance between both (centroid and nearest node). This walk time is added as an offset 
+ *  to each measured travel times
+ *  - using walk travel times instead of travel distances. This is because of the betas that are utils/time unit. The walk time
+ *  corresponds to distances since this is also linear.
+ * 
+ * @author thomas
+ *
+ */
 public class ZoneBasedAccessibilityControlerListener implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListener.class);
@@ -64,7 +76,6 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
 		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 		
@@ -75,12 +86,28 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		// this calculates a least cost path tree only based on link.getLength() (without marginalCostOfDistance since it's zero)
 		// LeastCostPathTree lcptTravelDistance = new LeastCostPathTree( ttc, new TravelDistanceCostCalculator() ); // tnicolai: this is experimental, check with Kai, sep'2011
 		
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		double depatureTime = 8.*3600;	// tnicolai: make configurable
-		double beta_per_hr = sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr();
-		double beta_per_min = beta_per_hr / 60.; // get utility per minute
+		
+		double betaBrain = sc.getConfig().planCalcScore().getBrainExpBeta(); // scale parameter. tnicolai: test different beta brains (e.g. 02, 1, 10 ...)
+		double betaCarHour = betaBrain * (sc.getConfig().planCalcScore().getTraveling_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaCarMin = betaCarHour / 60.; // get utility per minute
+		double betaWalkHour = betaBrain * (sc.getConfig().planCalcScore().getTravelingWalk_utils_hr() - sc.getConfig().planCalcScore().getPerforming_utils_hr());
+		double betaWalkMin = betaWalkHour / 60.; // get utility per minute.
 		
 		try{
 			log.info("Computing and writing accessibility measures ..." );
+			
+			log.info("Computing and writing grid based accessibility measures with following settings:" );
+			log.info("Depature time (in seconds): " + depatureTime);
+			log.info("Beta car traveling utils/h: " + sc.getConfig().planCalcScore().getTraveling_utils_hr());
+			log.info("Beta walk traveling utils/h: " + sc.getConfig().planCalcScore().getTravelingWalk_utils_hr());
+			log.info("Beta performing utils/h: " + sc.getConfig().planCalcScore().getPerforming_utils_hr());
+			log.info("Beta brain (scale factor): " + betaBrain);
+			log.info("Beta car traveling per h: " + betaCarHour);
+			log.info("Beta car traveling per min: " + betaCarMin);
+			log.info("Beta walk traveling per h: " + betaWalkHour);
+			log.info("Beta walk traveling per min: " + betaWalkMin);
 			
 			// gather zone information like zone id, nearest node and coordinate (zone centroid)
 			ZoneObject[] zones = UtilityCollection.preProcessZoneData(this.zones, network);
@@ -99,13 +126,12 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 				Id originZoneID = zones[fromIndex].getZoneID();
 				// run dijkstra on network
 				lcptTravelTimeDistance.calculate(network, fromNode, depatureTime);
-				// lcptTravelDistance.calculate(network, fromNode, depatureTime);
 				
 				// from here: accessibility computation for current starting point ("fromNode")
 				
-				double accessibilityTravelTimes = 0.;
-				// double accessibilityTravelTimeCosts = 0.;
-				// double accessibilityTravelDistanceCosts = 0.;
+				// captures the eulidean distance between a zone centroid and its nearest node
+				double walkTimeOffset_min = EuclideanDistance.getEuclideanDistanceAsWalkTimeInSeconds(zones[fromIndex].getZoneCoordinate(), fromNode.getCoord()) / 60.;
+				double congestedTravelTimesCarSum = 0.;
 				
 				// iterate through all aggregated jobs (respectively their nearest network nodes) 
 				// and calculate workplace accessibility for current start/origin node.
@@ -119,28 +145,21 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 
 					double arrivalTime = lcptTravelTimeDistance.getTree().get( nodeID ).getTime();
 					
-					// travel times in minutes
-					double travelTime_min = (arrivalTime - depatureTime) / 60.;
-					// travel costs in utils
-					// double travelCosts = lcptTravelTimeDistance.getTree().get( nodeID ).getCost();
-					// travel distance by car in km (since distances in meter are very large values making the log sum -Infinity most of the time) 
-					// double travelDistance_km = lcptTravelDistance.getTree().get( nodeID ).getCost() / 1000.;
+					// congested car travel times in minutes
+					double congestedTravelTime_min = (arrivalTime - depatureTime) / 60.;
 					
-					// sum travel times
-					accessibilityTravelTimes += Math.exp( beta_per_min * travelTime_min ) * jobWeight;
-					// sum travel costs  (mention the beta)
-					// accessibilityTravelTimeCosts += Math.exp( beta_per_min * travelCosts ) * jobWeight; // tnicolai: find another beta for travel costs
-					// sum travel distances  (mention the beta)
-					// accessibilityTravelDistanceCosts += Math.exp( beta_per_min * travelDistance_km ) * jobWeight; // tnicolai: find another beta for travel distance
+					// sum congested travel times
+					congestedTravelTimesCarSum += Math.exp( (betaCarMin * congestedTravelTime_min) + (betaWalkMin * walkTimeOffset_min) ) * jobWeight;
 				}
 				
 				// get log sum 
-				double travelTimeAccessibility = Math.log( accessibilityTravelTimes );
-				double travelCostAccessibility = 0.; //Math.log( accessibilityTravelTimeCosts );
-				double travelDistanceAccessibility = 0.; // Math.log( accessibilityTravelDistanceCosts );
+				double congestedTravelTimesCarLogSum = Math.log( congestedTravelTimesCarSum );
 
 				// writing accessibility measures of current node in csv format
-				ZoneBasedAccessibilityCSVWriter.write(originZoneID, travelTimeAccessibility, travelCostAccessibility, travelDistanceAccessibility);
+				ZoneBasedAccessibilityCSVWriter.write(originZoneID, 
+													  congestedTravelTimesCarLogSum, 
+													  0.0, 
+													  0.0);
 			}
 			
 			this.benchmark.stoppMeasurement(benchmarkID);

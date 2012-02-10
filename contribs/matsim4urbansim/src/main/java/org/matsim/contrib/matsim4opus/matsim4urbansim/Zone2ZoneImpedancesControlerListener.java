@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.matsim4opus.constants.Constants;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelWalkTimeCostCalculator;
 import org.matsim.contrib.matsim4opus.utils.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.UtilityCollection;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.ZoneObject;
@@ -91,7 +92,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// init least cost path tree in order to calculate travel times and travel costs
 		TravelTime ttc = controler.getTravelTimeCalculator();
 		LeastCostPathTree lcptTravelTime = new LeastCostPathTree(ttc,new TravelTimeDistanceCostCalculator(ttc, controler.getConfig().planCalcScore()));
-		
+		LeastCostPathTree lcptWalkTime = new LeastCostPathTree(ttc, new TravelWalkTimeCostCalculator());
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
 		double depatureTime = 8.*3600 ;	// tnicolai: make configurable
@@ -124,6 +125,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 				
 				// run dijksrtra for current node as origin
 				lcptTravelTime.calculate(network, fromNode, depatureTime);
+				lcptWalkTime.calculate(network, fromNode, depatureTime);
 				
 				for(int toZoneIndex = 0; toZoneIndex < zones.length; toZoneIndex++){
 					
@@ -139,6 +141,10 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					// since ln(0) is not defined or ln(1) = 0 causes trouble as a denominator ...
 					if(travelTime_min < 1.2)
 						travelTime_min = 1.2;
+					// get walk travel time (link lengths in meter)
+					double walkTravelTime_min = lcptWalkTime.getTree().get( toNode.getId() ).getCost() / 60.;
+					if(walkTravelTime_min < 1.2)
+						walkTravelTime_min = 1.2;
 					
 					// query trips in OD Matrix
 					double trips = 0.0;
@@ -152,7 +158,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 							+ "," + destinationZoneID.toString()		//destination zone id
 							+ "," + travelTime_min 				 		//tcost
 							+ "," + travelTime_min 						//ttimes
-							+ "," + travelTime_min*10.					//walk ttimes
+							+ "," + walkTravelTime_min					//walk ttimes
 							+ "," + trips								//vehicle trips
 							);		
 					travelDataWriter.newLine();
@@ -190,6 +196,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		// Travel Data Header
 		travelDataWriter.write ( "from_zone_id:i4,to_zone_id:i4,single_vehicle_to_work_travel_cost:f4,am_single_vehicle_to_work_travel_time:f4,am_walk_time_in_minutes:f4,am_pk_period_drive_alone_vehicle_trips:f4" ) ; 
+		
 		Logger.getLogger(this.getClass()).error( "add new fields (this message is shown until all travel data attributes are updated)" );
 		travelDataWriter.newLine();
 		return travelDataWriter;
