@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
@@ -61,15 +61,19 @@ public final class OTFFileWriter implements SnapshotWriter {
 
 	private final OTFAgentsListHandler.Writer writer;
 
-	public OTFFileWriter(Network network, String outfilename) {
+	public OTFFileWriter(Scenario scenario, String outfilename) {
 		this.connect = new OTFConnectionManager();
 		this.connect.connectLinkToWriter(OTFLinkAgentsHandler.Writer.class);
 		this.connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		this.outFileName = outfilename;
-		this.quad = new SnapshotWriterQuadTree(network);
+		this.quad = new SnapshotWriterQuadTree(scenario.getNetwork());
 		this.quad.initQuadTree(connect);
 		this.writer = new OTFAgentsListHandler.Writer();
 		this.writer.setSrc(this.positions);
+		if (scenario.getConfig().otfVis() == null) {
+			scenario.getConfig().otfVis().setEffectiveLaneWidth(scenario.getNetwork().getEffectiveLaneWidth());
+		}
+		OTFClientControl.getInstance().setOTFVisConfig(scenario.getConfig().otfVis());
 		try {
 			this.zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(this.outFileName), FILE_BUFFERSIZE));
 			this.writeQuad();

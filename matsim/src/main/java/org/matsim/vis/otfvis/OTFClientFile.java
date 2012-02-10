@@ -71,6 +71,7 @@ public class OTFClientFile implements Runnable {
 		OTFClient otfClient = new OTFClient();
 		OTFFileReader otfServer = new OTFFileReader(url);
 		otfClient.setServer(otfServer);
+		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
 		OTFConnectionManager connect = new OTFConnectionManager();
 		connect.connectWriterToReader(OTFLinkAgentsHandler.Writer.class, OTFLinkAgentsHandler.class);
 		connect.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
@@ -78,8 +79,6 @@ public class OTFClientFile implements Runnable {
 		connect.connectReaderToReceiver(OTFLinkAgentsHandler.class, OGLSimpleQuadDrawer.class);
 		connect.connectReceiverToLayer(OGLSimpleQuadDrawer.class, OGLSimpleStaticNetLayer.class);		
 		connect.connectReceiverToLayer(AgentPointDrawer.class, OGLAgentPointLayer.class);
-		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
-		OTFClientControl.getInstance().setOTFVisConfig(otfVisConfig);
 		OTFHostControlBar hostControlBar = otfClient.getHostControlBar();
 		OTFHostControl otfHostControl = hostControlBar.getOTFHostControl();
 		OTFTimeLine timeLine = new OTFTimeLine("time", otfHostControl);

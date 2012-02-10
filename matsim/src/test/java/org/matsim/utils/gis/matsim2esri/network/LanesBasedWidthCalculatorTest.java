@@ -44,7 +44,7 @@ public class LanesBasedWidthCalculatorTest {
 		l1.setNumberOfLanes(2.0);
 
 
-		Assert.assertTrue(Double.isNaN(net.getEffectiveLaneWidth()));
+		Assert.assertEquals("The default in the Network is set to a value that is possibly not conform to the default in network_v1.dtd", 3.75, net.getEffectiveLaneWidth(), 1e-10);
 		double w = new LanesBasedWidthCalculator((NetworkImpl) net, 1.0).getWidth(l1);
 		Assert.assertFalse(Double.isNaN(w));
 		Assert.assertEquals(2.0, w, 1e-10);

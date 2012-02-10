@@ -130,15 +130,5 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 			gl.glEndList();
 		}
 	}
-
-	
-	public static float getBasicLaneWidth_m() {
-		Double effectiveLaneWidth = OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth() ;
-		if ( effectiveLaneWidth != null ) {
-			return (float) ( cachedLinkWidth * effectiveLaneWidth / 3.75 ) ;
-			// "3.75" seems to make sense in terms of retrofitting
-		}
-		return cachedLinkWidth ;
-	}
 	
 }

@@ -20,19 +20,18 @@
 
 package org.matsim.vis.otfvis;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 
 public class OTFEvent2MVI {
 
-	public static void convert(final MobsimConfigGroupI config, Network network, String eventFileName, String outFileName, double interval_s) {
-		OTFFileWriter otfFileWriter = new OTFFileWriter(network, outFileName);
+	public static void convert(Scenario scenario, String eventFileName, String outFileName, double interval_s) {
+		OTFFileWriter otfFileWriter = new OTFFileWriter(scenario, outFileName);
 		EventsManager events = EventsUtils.createEventsManager();
-		SnapshotGenerator visualizer = new SnapshotGenerator(network, interval_s, config);
+		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), interval_s, scenario.getConfig().getQSimConfigGroup());
 		visualizer.addSnapshotWriter(otfFileWriter);
 		events.addHandler(visualizer);
 		new MatsimEventsReader(events).readFile(eventFileName);

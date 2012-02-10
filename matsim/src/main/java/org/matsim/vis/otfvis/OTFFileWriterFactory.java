@@ -21,7 +21,6 @@
 package org.matsim.vis.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
@@ -29,8 +28,7 @@ public class OTFFileWriterFactory implements SnapshotWriterFactory {
 
 	@Override
 	public SnapshotWriter createSnapshotWriter(String filename, Scenario scenario) {
-		Network network = scenario.getNetwork();
-		OTFFileWriter writer = new OTFFileWriter(network, filename);
+		OTFFileWriter writer = new OTFFileWriter(scenario, filename);
 		return writer;
 	}
 

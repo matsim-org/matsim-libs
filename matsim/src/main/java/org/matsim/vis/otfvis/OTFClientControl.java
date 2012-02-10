@@ -42,7 +42,7 @@ public final class OTFClientControl {
   
   private OTFClientControl() {}
   
-  public static OTFClientControl getInstance() {
+  public static synchronized OTFClientControl getInstance() {
     return instance;
   }
   

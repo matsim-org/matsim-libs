@@ -25,6 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.AbstractNetworkTest;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -38,6 +39,27 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Override
 	public NetworkImpl getEmptyTestNetwork() {
 		return NetworkImpl.createNetwork();  // TODO should be NetworkImpl, but that doesn't work
+	}
+	
+	/**
+	 * Tests if the default values of a network instance are the same as the defaults specified in the network_v1.dtd
+	 */
+	@Test
+	public void testDefaultValues(){
+		NetworkImpl net = this.getEmptyTestNetwork();
+		Assert.assertEquals(7.5, net.getEffectiveCellSize(), 0.0);
+		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
+		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
+
+		Id id1 = new IdImpl(1);
+		Id id2 = new IdImpl(2);
+		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
+		net.addNode(node1);
+		net.addNode(node2);
+		Link link = net.getFactory().createLink(id1, node1, node2);
+		Assert.assertEquals(1, link.getAllowedModes().size());
+		Assert.assertEquals("car", link.getAllowedModes().iterator().next());
 	}
 
 	/**

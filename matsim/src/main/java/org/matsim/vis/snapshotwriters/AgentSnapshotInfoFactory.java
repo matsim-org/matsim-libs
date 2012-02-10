@@ -40,15 +40,23 @@ public class AgentSnapshotInfoFactory {
 	 * will be wrong (could be fixed), and, more importantly, the simulation still assumes "driving on the right" when locations
 	 * (with coordinates) are connected to links.) TODO should be configurable
 	 */
-	private static final double WIDTH_OF_MEDIAN = 30. ; // default
+	private double widthOfMedian = 30. ; // default
 
-	private double laneWidth = 3.75;
+	private double laneWidth = 3.75; //default in NetworkImpl and network_v1.dtd
 
 	public AgentSnapshotInfoFactory() {
 	}
 
 	public void setLaneWidth( double dd ) {
 		laneWidth = dd ;
+	}
+	
+	public void setLinkWidth(double linkWidthCorrectionFactor){
+		this.widthOfMedian = linkWidthCorrectionFactor;
+	}
+	
+	public double calculateLinkWidth(double nrOfLanes){
+		return widthOfMedian + laneWidth * nrOfLanes;
 	}
 
 	
@@ -119,11 +127,11 @@ public class AgentSnapshotInfoFactory {
 
 		info.setEasting( startCoord.getX() 
 				+ (Math.cos(theta) * distanceOnVector * correction)
-				+ (Math.sin(theta) * (0.5 * WIDTH_OF_MEDIAN + laneWidth * lane) * correction) ) ;
+				+ (Math.sin(theta) * (0.5 * widthOfMedian + laneWidth * lane) * correction) ) ;
 		
 		info.setNorthing( startCoord.getY() 
 				+ Math.sin(theta) * distanceOnVector  * correction 
-				- Math.cos(theta) * (0.5 * WIDTH_OF_MEDIAN + laneWidth * lane) * correction );
+				- Math.cos(theta) * (0.5 * widthOfMedian + laneWidth * lane) * correction );
 		
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}

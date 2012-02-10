@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.gui.OTFVisConfigGroup;
@@ -67,6 +68,7 @@ public final class OTFFileReader implements OTFServer {
 		this.fileName = fname;
 		this.sourceZipFile = new File(this.fileName);
 		otfVisConfig = readConfigOrUseDefaults();
+		OTFClientControl.getInstance().setOTFVisConfig(otfVisConfig);
 		openAndScanZipFile();
 	}
 
@@ -255,16 +257,22 @@ public final class OTFFileReader implements OTFServer {
 
 	private OTFVisConfigGroup readConfigOrUseDefaults() {
 		OTFVisConfigGroup otfVisConfig2 = tryToReadSettingsFromOldBinaryFormat();
-		if (otfVisConfig2 != null) {
-			return otfVisConfig2;
+		if (otfVisConfig2 == null) {
+			otfVisConfig2 = tryToReadSettingsFromFileNextToMovie();
 		}
-		otfVisConfig2 = tryToReadSettingsFromFileNextToMovie();
-		if (otfVisConfig2 != null) {
-			return otfVisConfig2;
+		if (otfVisConfig2 == null) {
+			otfVisConfig2 = new OTFVisConfigGroup();
 		}
-		return new OTFVisConfigGroup();
+		this.setEffectiveLaneWidthIfNull(otfVisConfig2);
+		return otfVisConfig2;
 	}
 
+	private void setEffectiveLaneWidthIfNull(OTFVisConfigGroup c){
+		if (c.getEffectiveLaneWidth() == null){
+			c.setEffectiveLaneWidth(3.75); //default value
+		}
+	}
+	
 	private OTFVisConfigGroup tryToReadSettingsFromFileNextToMovie() {
 		log.debug("Looking for settings in: " + this.fileName);
 		SettingsSaver saver = new SettingsSaver(this.fileName);

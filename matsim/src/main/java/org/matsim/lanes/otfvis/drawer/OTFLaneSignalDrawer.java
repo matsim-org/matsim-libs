@@ -34,7 +34,7 @@ import org.matsim.signalsystems.otfvis.io.OTFSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
-import org.matsim.vis.otfvis.opengl.layer.OGLSimpleStaticNetLayer;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 
 public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
@@ -55,14 +55,14 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 
 	private enum Color {LANECOLOR, GREEN, REDYELLOW, YELLOW, RED};
 	
-	private double currentCellWidth = java.lang.Double.NEGATIVE_INFINITY;
+	private double currentLinkWidthCorrection = java.lang.Double.NEGATIVE_INFINITY;
 	
 	private int glNetList = -1;
 	
 	@Override
 	public void onDraw(GL gl) {
-		if (this.currentCellWidth != OGLSimpleStaticNetLayer.getBasicLaneWidth_m()){
-			this.currentCellWidth = OGLSimpleStaticNetLayer.getBasicLaneWidth_m();
+		if (this.currentLinkWidthCorrection != OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth()){
+			this.currentLinkWidthCorrection = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
 			this.recalculatePositions();
 			gl.glDeleteLists(this.glNetList, 1);
 			this.glNetList = -1;
@@ -171,8 +171,12 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 
 	
 	private void recalculatePositions() {
+		AgentSnapshotInfoFactory tempFac = new AgentSnapshotInfoFactory();
+		tempFac.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
+		tempFac.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+		
 		for (OTFLinkWLanes linkData : this.lanesLinkData.values()){
-			double linkWidth = linkData.getNumberOfLanes() * OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
+			double linkWidth = tempFac.calculateLinkWidth(linkData.getNumberOfLanes()) ;
 			linkData.setLinkWidth(linkWidth);
 			double numberOfLinkParts = (2 * linkData.getMaximalAlignment()) + 2;
 			Point2D.Double linkStartCenter = this.calculatePointOnLink(linkData, 0.0, 0.5);

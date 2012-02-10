@@ -59,6 +59,7 @@ class QNetwork implements VisNetwork, NetsimNetwork {
 		this.queueNetworkFactory = factory;
 		this.links = new LinkedHashMap<Id, AbstractQLink>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.snapshotInfoFactory.setLaneWidth(network.getEffectiveLaneWidth());
 	}
 
 

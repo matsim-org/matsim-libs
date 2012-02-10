@@ -57,12 +57,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotInfoFactory = agentSnapshotInfoFactory;
-		double effLaneWidth = sc.getNetwork().getEffectiveLaneWidth() ;
-		if ( Double.isNaN( effLaneWidth ) ) {
-			snapshotInfoFactory.setLaneWidth( 3.75 ) ; // yyyyyy magic number
-		} else {
-			snapshotInfoFactory.setLaneWidth( effLaneWidth );
-		}
 	}
 	
 	  

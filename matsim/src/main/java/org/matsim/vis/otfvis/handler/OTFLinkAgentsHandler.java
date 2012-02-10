@@ -84,7 +84,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 					out.putInt(NetworkUtils.getNumberOfLanesAsInt(0, this.src.getLink()));
 				} else if ( OTFVisConfigGroup.CAPACITY.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo()) ) {
 					out.putInt( 1 + (int)(2.*this.src.getLink().getCapacity()/3600.) ) ;
-					// yyyyyy 3600. is a magic number but I cannot get to the network (where "capacityPeriod" resides).  
+					// yyyyyy 3600. is a magic number (the default of the capacity period attribute in Network) but I cannot get to the network (where "capacityPeriod" resides).  
 					// Please do better if you know better.  kai, jun'11
 				} else {
 					throw new RuntimeException("I do not understand.  Aborting ..." ) ;
