@@ -20,21 +20,30 @@
 
 package org.matsim.utils.gis.matsim2esri.network;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 
-public class LanesBasedWidthCalculator implements WidthCalculator{
+public class LanesBasedWidthCalculator implements WidthCalculator {
+
+	private static final Logger log = Logger.getLogger(LanesBasedWidthCalculator.class);
 
 	private final double effectiveLaneWidth;
 	private final double widthCoefficient;
 
 	/**
-	 * This constructor is used by reflection.
-	 * It's signature mustn't be changed or it won't work anymore. :-(
+	 * This constructor is used by reflection. It's signature mustn't be changed or it won't work anymore. :-(
 	 */
 	public LanesBasedWidthCalculator(final NetworkImpl network, final Double coef) {
 		double w = network.getEffectiveLaneWidth();
-		this.effectiveLaneWidth = (Double.isNaN(w) ? 1.0 : w);
+		if (w == 3.75) {
+			this.effectiveLaneWidth = 1.0;
+			log.warn("Effective lane with in network is set to the default value 3.75. Instead this tool uses 1.0 in order to maintain backwards compatibility " +
+					"to a version of MATSim that used Double.NaN as default in Java while in the network_v1.dtd the default is 3.75");
+		}
+		else {
+			this.effectiveLaneWidth = w;
+		}
 		this.widthCoefficient = coef;
 	}
 

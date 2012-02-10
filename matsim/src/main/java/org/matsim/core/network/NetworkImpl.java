@@ -63,7 +63,7 @@ public class NetworkImpl implements Network, BasicLocations {
 
 	private double effectiveCellSize = DEFAULT_EFFECTIVE_CELL_SIZE;
 
-	private double effectiveLaneWidth = Double.NaN;
+	private double effectiveLaneWidth = 3.75;
 
 	protected NetworkFactoryImpl factory;
 
