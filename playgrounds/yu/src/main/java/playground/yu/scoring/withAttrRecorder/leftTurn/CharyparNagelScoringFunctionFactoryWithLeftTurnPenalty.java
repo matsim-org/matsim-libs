@@ -19,13 +19,13 @@ import org.matsim.core.scoring.charyparNagel.MoneyScoringFunction;
  */
 public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 		CharyparNagelScoringFunctionFactory {
-	private final Config config;
+	// private final Config config;
 	private final AdditionalScoringParameters additionalParams;
 
 	public CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty(
 			Config config, Network network) {
 		super(config.planCalcScore(), network);
-		this.config = config;
+		// this.config = config;
 		additionalParams = new AdditionalScoringParameters(config);
 	}
 
